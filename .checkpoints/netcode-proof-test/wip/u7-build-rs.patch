@@ -1,5 +1,5 @@
 diff --git a/spikes/netcode-proof/check.mjs b/spikes/netcode-proof/check.mjs
-index fb09487..62fec58 100644
+index fb09487..48f2100 100644
 --- a/spikes/netcode-proof/check.mjs
 +++ b/spikes/netcode-proof/check.mjs
 @@ -18,8 +18,9 @@
@@ -71,7 +71,7 @@ index fb09487..62fec58 100644
    "every member inherits its lints but npt-client-wasm (allow), npt-tcpinfo (deny) and npt-hash-wasm (deny), whose own " +
    "lint tables are the workspace's otherwise, key for key, with no lint given in a form the reader does not read (a " +
    "lint's own table, a quoted, dotted, hyphenated or uppercase name); no manifest has a cargo-features or rustflags " +
-@@ -2609,6 +2638,45 @@ export function wasmStep(runner = run, io = WASM_IO, now = () => performance.now
+@@ -2609,6 +2638,47 @@ export function wasmStep(runner = run, io = WASM_IO, now = () => performance.now
    return { ok: problems.length === 0, out: [...lines, ...problems, summary].join("\n") };
  }
  
@@ -111,13 +111,15 @@ index fb09487..62fec58 100644
 +  out += t.out;
 +  const n = runner(process.execPath, ["--test", join(WEB, "test", "*.test.mjs")], HERE, { ...base, NPT_WEB_OUT: WEB_CHECK });
 +  if (!n.ok) return failedRun(n, `the web step's node tests (${nodeCounts(n.out)})`, out);
++  // A glob that selects no test exits 0 with "# tests 0" (U7R-TE-4): that fails, never passes.
++  if (!(Number(n.out.match(/^# tests (\d+)/m)?.[1] ?? 0) > 0)) return failedRun(n, "the web step's node tests (none ran)", out);
 +  return { ok: true, out: `${out}${n.out}\nweb: TypeScript ${WEB_TYPESCRIPT}, tsc into .gate/netcode-proof-test/web-check; ${nodeCounts(n.out)}` };
 +}
 +
  // Each cargo step takes the runner it calls cargo through (`run` when main calls it), so check.test.mjs pins what each
  // step runs: its commands, its flags, -D warnings included (the rust fix2 review's nit, u4s-carries.md entry 34).
  export const STEPS = {
-@@ -2640,6 +2708,7 @@ export const STEPS = {
+@@ -2640,6 +2710,7 @@ export const STEPS = {
      return { ok: problems.length === 0, out: problems.length ? `${problems.join("\n")}\n${summary}` : summary };
    },
    self: () => summarized(run(process.execPath, ["--test", join(HERE, "check.test.mjs")], HERE), nodeCounts),
@@ -126,7 +128,7 @@ index fb09487..62fec58 100644
      const t = run(process.execPath, ["--test", join(HERE, "ops", "operator", "redact-check.test.mjs")], HERE);
      if (!t.ok) return t;
 diff --git a/spikes/netcode-proof/check.test.mjs b/spikes/netcode-proof/check.test.mjs
-index 87f01fc..4f86f8f 100644
+index 87f01fc..be1948e 100644
 --- a/spikes/netcode-proof/check.test.mjs
 +++ b/spikes/netcode-proof/check.test.mjs
 @@ -12,6 +12,7 @@ import { fileURLToPath } from "node:url";
@@ -185,7 +187,7 @@ index 87f01fc..4f86f8f 100644
  test("npt-super and npt-host keep away from the sim, room, protocol and client crates", () => {
    assert.ok(problemsWith((e) => e["npt-super"].push(["npt-proto", null])).includes("npt-super depends on npt-proto"));
    assert.ok(problemsWith((e) => e["npt-host"].push(["npt-client", null])).includes("npt-host depends on npt-client"));
-@@ -1939,6 +1958,42 @@ test("each cargo step runs what it says: fmt, clippy and its wasm32 twin, doc an
+@@ -1939,6 +1958,49 @@ test("each cargo step runs what it says: fmt, clippy and its wasm32 twin, doc an
    assert.match(lastLine(steps("clippy").out.out), /^measured build and bites build both linted$/);
  });
  
@@ -204,7 +206,7 @@ index 87f01fc..4f86f8f 100644
 +  assert.match(lastLine(s.out), /^web: TypeScript 6\.0\.3, tsc into \.gate\/netcode-proof-test\/web-check; 56 of 56 tests passed$/);
 +  // TypeScript absent, or another version: npm ci first, security's exact form, scripts off in its environment too.
 +  for (const have of [null, "6.0.2"]) {
-+    r = recorder();
++    r = recorder([ok, ok, ok]);
 +    s = webStep(r.runner, { PATH: "/bin" }, () => have);
 +    assert.equal(s.ok, true, String(have));
 +    assert.equal(r.calls[0].cmd, "npm");
@@ -222,13 +224,20 @@ index 87f01fc..4f86f8f 100644
 +    assert.equal(r.calls.length, at + 1, what);
 +    assert.ok(lastLine(s.out).startsWith(`the web step's ${what}`), lastLine(s.out));
 +  }
++  // A Node run that selects no test (exit 0, "# tests 0", or no count at all) fails too (U7R-TE-4).
++  for (const zero of ["# tests 0\n# pass 0\n", "ran --test\n"]) {
++    r = recorder([ok, { ok: true, out: zero, stdout: "", status: 0 }]);
++    s = webStep(r.runner, {}, () => WEB_TYPESCRIPT);
++    assert.equal(s.ok, false, zero);
++    assert.match(lastLine(s.out), /^the web step's node tests \(none ran\) failed/);
++  }
 +  assert.ok(r.calls.every((c) => !c.args.includes("install")), "never npm install");
 +});
 +
  const lastLine = (text) => text.trimEnd().split("\n").at(-1);
  const cargoTail = "error: this URL is not a hyperlink\n --> crates/room/src/lib.rs:7:27\nerror: could not document `npt-room`\nwarning: build failed, waiting for other jobs to finish...\n";
  const failed = (out = cargoTail) => ({ ok: false, out, stdout: "", status: 101 });
-@@ -2782,7 +2837,7 @@ test("the wasm step's builds, legs and comparisons, in order; a clean run passes
+@@ -2782,7 +2844,7 @@ test("the wasm step's builds, legs and comparisons, in order; a clean run passes
    }
    assert.equal((last.match(/ 1\.5(?:,|$)/g) ?? []).length, w.calls.length, "each timed call's seconds");
    assert.deepEqual(STEPS.wasm.length, 0, "STEPS.wasm(runner) defaults its runner");
@@ -333,7 +342,7 @@ index 92fb762..275a3c2 100644
 +    engine::limits().to_vec()
 +}
 diff --git a/spikes/netcode-proof/crates/client/src/clock.rs b/spikes/netcode-proof/crates/client/src/clock.rs
-index 3fdcc96..cc0fbb3 100644
+index 3fdcc96..c07eba6 100644
 --- a/spikes/netcode-proof/crates/client/src/clock.rs
 +++ b/spikes/netcode-proof/crates/client/src/clock.rs
 @@ -28,6 +28,11 @@ const HALVE_NS: i64 = 100_000_000;
@@ -511,7 +520,7 @@ index 3fdcc96..cc0fbb3 100644
          let hi = self.samples.iter().map(|s| s.rtt_ns).max()?;
          let lo = self.samples.iter().map(|s| s.rtt_ns).min()?;
          Some(hi / 2 + (hi - lo) / 2)
-@@ -345,4 +373,136 @@ mod tests {
+@@ -345,4 +373,143 @@ mod tests {
              assert!(gaps.iter().all(|g| *g == every), "{hz} Hz: {gaps:?}");
          }
      }
@@ -571,10 +580,17 @@ index 3fdcc96..cc0fbb3 100644
 +                "due {due}, now {now}"
 +            );
 +        }
-+        let mut c = ClockSync::new(30);
-+        c.next_ping_ns = Some(u64::MAX - p / 2);
-+        assert!(c.ping(u64::MAX).is_some());
-+        assert_eq!(c.next_ping_ns, Some(u64::MAX), "saturates");
++        // The u64::MAX case on its own thread under a 10 s bound (U7R-TE-7): the old loop never ends there, and this
++        // fails the test instead of hanging it (libtest has no timeout).
++        let (tx, rx) = std::sync::mpsc::channel();
++        std::thread::spawn(move || {
++            let mut c = ClockSync::new(30);
++            c.next_ping_ns = Some(u64::MAX - p / 2);
++            let sent = c.ping(u64::MAX).is_some();
++            let _ = tx.send((sent, c.next_ping_ns));
++        });
++        let got = rx.recv_timeout(std::time::Duration::from_secs(10));
++        assert_eq!(got, Ok((true, Some(u64::MAX))), "returns, and saturates");
 +    }
 +
 +    /// U7 R1 (C-U7-4): a step 1 s late sends one ping and schedules the next at the first interval past now, on the
@@ -769,10 +785,10 @@ index 0000000..ebe5534
 +]
 diff --git a/spikes/netcode-proof/crates/client-wasm/src/engine.rs b/spikes/netcode-proof/crates/client-wasm/src/engine.rs
 new file mode 100644
-index 0000000..bd4cfeb
+index 0000000..a3b20a4
 --- /dev/null
 +++ b/spikes/netcode-proof/crates/client-wasm/src/engine.rs
-@@ -0,0 +1,809 @@
+@@ -0,0 +1,952 @@
 +//! The browser client's plain-Rust core (u7-brief.md rev 1.1 Block R3; the advisor's C2, C5), tested natively; lib.rs
 +//! only converts for wasm-bindgen. The slot token, C5's inbox and outbox (every integer little-endian), the steps due
 +//! (each the native hosts' order: `input` with what arrived, then each command due, then the endpoint's `step`; at most
@@ -991,7 +1007,9 @@ index 0000000..bd4cfeb
 +            self.endpoint.input(None, &received, now_ns);
 +            if let (Some(newest), Some(_)) = (self.endpoint.newest_tick(), self.endpoint.slot()) {
 +                for _ in 0..self.endpoint.commands_due() {
-+                    let c = script::command(self.steps, newest);
++                    // The presses from the commands issued, not the steps (U7R-NC-2): a catch-up burst runs many steps
++                    // a wake but issues about one command a tick, so at most one edge goes in each command.
++                    let c = script::command(self.commands, newest);
 +                    self.endpoint.input(Some(c), &[], now_ns);
 +                    self.commands += 1;
 +                }
@@ -1339,24 +1357,76 @@ index 0000000..bd4cfeb
 +    const BASE_NS: u64 = 1_000_000_000;
 +    /// The Loopback's datagram limit (npt-server's tests' lab: the room's groups stay within 1,000 B).
 +    const MAX_DATAGRAM: usize = 1_200;
++    const MS: u64 = 1_000_000;
++    /// The browser's clamp on a nested zero-delay timer (U7R-NC-2's 4 ms): the Worker's wakes are one chain of timers,
++    /// so a wake that leaves steps due re-arms at 0 and runs 4 ms later.
++    const TIMER_CLAMP_NS: u64 = 4 * MS;
++
++    /// A test-only `Link` over a Loopback end, as npt-server's tests' `Gate`: every send stamped `by_ns` later (the
++    /// path, and on the client's side the host's send lag too), so the other end polls it that much later; every
++    /// other call is the Loopback's. The Decoder's own sends (the `Pong`) take the path as the room's do.
++    struct Delayed {
++        inner: Loopback,
++        by_ns: u64,
++    }
++
++    impl Link for Delayed {
++        fn send_unreliable(&mut self, bytes: &[u8], now_ns: u64) -> npt_link::SendResult {
++            self.inner.send_unreliable(bytes, now_ns + self.by_ns)
++        }
++        fn send_reliable(
++            &mut self,
++            channel: Channel,
++            bytes: &[u8],
++            now_ns: u64,
++        ) -> npt_link::SendResult {
++            self.inner
++                .send_reliable(channel, bytes, now_ns + self.by_ns)
++        }
++        fn poll_recv(&mut self, now_ns: u64) -> Option<npt_link::Recv> {
++            self.inner.poll_recv(now_ns)
++        }
++        fn state(&self) -> npt_link::LinkState {
++            self.inner.state()
++        }
++        fn rtt_ns(&self) -> Option<u64> {
++            self.inner.rtt_ns()
++        }
++        fn max_datagram_size(&self) -> usize {
++            self.inner.max_datagram_size()
++        }
++        fn unsent_unreliable(&self) -> usize {
++            self.inner.unsent_unreliable()
++        }
++    }
 +
 +    /// R3's room (C6; C2's equality, U7's half): npt-room's `Room` behind npt-server's real `Decoder`, as npt-server's
 +    /// tests host it (crates/server/tests/common/mod.rs) and as the binary builds both (tick_loop.rs:455-467,
 +    /// :850-857): T5's scene and seed (stress, 7), first tick 0, npt-proto's version and content hash at the decoder,
-+    /// `with_hashes(CONTENT_HASH, MODE_HASH)` at the room. One Loopback pair; the `Core` woken at its own
-+    /// `next_due_ns` with what arrived as C5's records, its outbox sent at once and the wake's time passed as the next
-+    /// call's send time, as the Worker does (worker.ts:283-299).
++    /// `with_hashes(CONTENT_HASH, MODE_HASH)` at the room. One Loopback pair, each end behind a `Delayed` (U7R-NC-1:
++    /// the path each way, and the host's send lag on the client's side; 0 for the plain room); the `Core` woken at its
++    /// own `next_due_ns` (plus the wake schedule's lateness, U7R-TE-3), never before the last wake's send (its lag), nor
++    /// within the timer clamp after a wake that left steps due, with what arrived as C5's records, its outbox sent at
++    /// once and that send's time passed as the next call's, as the Worker does (worker.ts:283-299).
 +    struct RoomHost {
 +        room: Room<World>,
 +        decoder: Decoder,
-+        server: Loopback,
-+        client: Loopback,
++        server: Delayed,
++        client: Delayed,
 +        core: Core,
 +        slot: Option<u8>,
 +        /// Server ticks run, and the time of the last event.
 +        k: u64,
 +        now_ns: u64,
 +        prev_send_ns: u64,
++        /// The host's send lag, the wakes so far, the lateness of each wake by its index and the client's steps before
++        /// it, the earliest next wake.
++        lag_ns: u64,
++        wakes: u64,
++        late: fn(u64, u32) -> u64,
++        floor_ns: u64,
++        /// The wait after a wake that left steps due: the browser's clamp, or 0 for a host that re-wakes at once.
++        clamp_ns: u64,
 +        /// Every reliable message the room sent the client: its stream and bytes.
 +        from_room: Vec<(Channel, Vec<u8>)>,
 +        /// Every refusal record the room kept (its kinds 1-6, 8, 10; the sim's own are not among them).
@@ -1365,6 +1435,12 @@ index 0000000..bd4cfeb
 +
 +    impl RoomHost {
 +        fn new() -> RoomHost {
++            RoomHost::with_path(0, 0, 0, |_, _| 0)
++        }
++
++        /// The room over `up_ns` and `down_ns` of path, the host sending `lag_ns` after each wake, wake `w` (after `s`
++        /// client steps) running `late(w, s)` after its due time.
++        fn with_path(up_ns: u64, down_ns: u64, lag_ns: u64, late: fn(u64, u32) -> u64) -> RoomHost {
 +            let raw = [0x5a; 16];
 +            let scene = Scene::stress();
 +            let world = World::new(&scene, 7, 0);
@@ -1384,13 +1460,24 @@ index 0000000..bd4cfeb
 +            RoomHost {
 +                room,
 +                decoder,
-+                server,
-+                client,
++                server: Delayed {
++                    inner: server,
++                    by_ns: down_ns,
++                },
++                client: Delayed {
++                    inner: client,
++                    by_ns: lag_ns + up_ns,
++                },
 +                core,
 +                slot: None,
 +                k: 0,
 +                now_ns: BASE_NS,
 +                prev_send_ns: 0,
++                lag_ns,
++                wakes: 0,
++                late,
++                floor_ns: BASE_NS,
++                clamp_ns: TIMER_CLAMP_NS,
 +                from_room: Vec::new(),
 +                refusals: Vec::new(),
 +            }
@@ -1449,7 +1536,8 @@ index 0000000..bd4cfeb
 +            }
 +        }
 +
-+        /// One wake of the client at `now`: what arrived, packed as C5's inbox; the outbox sent at once.
++        /// One wake of the client at `now`: what arrived, packed as C5's inbox; the outbox sent `lag_ns` later (the
++        /// client's `Delayed` adds it), which is the send time the next call gets.
 +        fn wake(&mut self, now: u64) {
 +            let mut got = Vec::new();
 +            while let Some(r) = self.client.poll_recv(now) {
@@ -1470,7 +1558,10 @@ index 0000000..bd4cfeb
 +                    self.client.send_reliable(Channel::Control, &bytes, now);
 +                }
 +            }
-+            self.prev_send_ns = now;
++            self.prev_send_ns = now + self.lag_ns;
++            self.wakes += 1;
++            let left_due = self.core.next_due_ns() <= now + self.lag_ns;
++            self.floor_ns = now + self.lag_ns + if left_due { self.clamp_ns } else { 0 };
 +        }
 +
 +        /// Server ticks on U4b's schedule, the client woken at each of its due times between them, until `done` holds
@@ -1482,7 +1573,10 @@ index 0000000..bd4cfeb
 +                }
 +                let at = BASE_NS + self.k * 1_000_000_000 / u64::from(TICK_HZ);
 +                loop {
-+                    let due = self.core.next_due_ns().max(self.now_ns);
++                    let late = (self.late)(self.wakes, self.counter("steps"));
++                    let due = (self.core.next_due_ns() + late)
++                        .max(self.floor_ns)
++                        .max(self.now_ns);
 +                    if due >= at {
 +                        break;
 +                    }
@@ -1555,6 +1649,15 @@ index 0000000..bd4cfeb
 +    fn r3_the_press_script_draws_no_refusal_but_the_sims_own_over_3_000_steps() {
 +        let mut h = RoomHost::new();
 +        assert!(h.run(3_400, |h| h.counter("steps") >= 3_000), "3,000 steps");
++        no_room_refusal(&h);
++        let c = h.room.client(0).expect("slot 0").counters();
++        assert!(c.commands_run >= 2_900, "{}", c.commands_run);
++        assert!(h.counter("commands") >= 2_900);
++    }
++
++    /// No refusal from the room (no kind 1-6, 8 or 10 record, and the slot's eight refusal counters 0), and none of
++    /// the client's own (unencodable commands, decode refusals).
++    fn no_room_refusal(h: &RoomHost) {
 +        let c = h.room.client(0).expect("slot 0").counters();
 +        assert!(
 +            h.refusals.is_empty(),
@@ -1574,12 +1677,68 @@ index 0000000..bd4cfeb
 +            ],
 +            [0; 8]
 +        );
-+        assert!(c.commands_run >= 2_900, "{}", c.commands_run);
-+        assert!(h.counter("commands") >= 2_900);
 +        assert_eq!(
 +            (h.counter("unencodable_commands"), h.counter("refused")),
 +            (0, 0)
 +        );
++    }
++
++    /// U7R-NC-1 (C-U7-3 through the Core): over a 40 ms path each way, with the host sending 5 ms after each wake, the
++    /// client plays with no refusal and its newest clock sample's RTT is the path's 80 ms, within the room's 1 µs hold
++    /// rounding: the Core gives the endpoint the host's send time (without it, the wire stamp: 85 ms). Jitter and loss
++    /// stay with the endpoint's lab suites: the Core adds no logic that depends on them.
++    #[test]
++    fn r3_over_a_40_ms_path_with_a_5_ms_send_lag_the_clock_reads_80_ms() {
++        let mut h = RoomHost::with_path(40 * MS, 40 * MS, 5 * MS, |_, _| 0);
++        assert!(h.run(300, |h| h.counter("own_soldier") == 1), "Playing");
++        h.run(h.k + 90, |_| false);
++        no_room_refusal(&h);
++        let rtt = h.core.endpoint.clock().samples().back().map(|s| s.rtt_ns);
++        assert!(
++            rtt.is_some_and(|r| r.abs_diff(80 * MS) <= 1_000),
++            "{rtt:?} ns"
++        );
++    }
++
++    /// U7R-TE-3 (with U7R-NC-2): wakes late as a busy page's are (every 10th 200 ms late, one 1 s stall at wake 400,
++    /// one 3 s gap at wake 900), each catch-up wake at most `LOOP_CATCHUP` steps, under the browser's 4 ms timer clamp
++    /// and with none (a host that re-wakes at once). The room refuses nothing (kinds 5 and 10 among them) and the
++    /// client plays on. A gap of 2 s or more empties the clock's 2 s window, so the first command after it covers the
++    /// whole gap; under the clamp a catch-up spans one fire period at most. NC-2's double edge needs the narrow case
++    /// the last leg builds: 100 ms each way (a pong landing inside the stall keeps one sample), no clamp, a 2.1 s
++    /// stall at step 659 (59 of a 60-step fire period): about 63 steps, two fire edges, between two commands one tick
++    /// apart. Presses counted by steps draw kind 5 there; counted by commands, none.
++    #[test]
++    fn r3_late_wakes_a_1_s_stall_and_a_3_s_gap_draw_no_refusal() {
++        let busy = |w: u64, _: u32| match w {
++            400 => 1_000 * MS,
++            900 => 3_000 * MS,
++            w if w % 10 == 9 => 200 * MS,
++            _ => 0,
++        };
++        let edge = |_: u64, s: u32| if s == 659 { 2_100 * MS } else { 0 };
++        for (path_ns, late, clamp_ns) in [
++            (0, busy as fn(u64, u32) -> u64, TIMER_CLAMP_NS),
++            (0, busy, 0),
++            (100 * MS, edge, 0),
++        ] {
++            let mut h = RoomHost::with_path(path_ns, path_ns, 0, late);
++            h.clamp_ns = clamp_ns;
++            assert!(h.run(3_000, |h| h.wakes > 1_200), "1,200 wakes");
++            no_room_refusal(&h);
++            assert_eq!(h.counter("own_soldier"), 1);
++        }
++    }
++
++    /// U7R-TE-7: a datagram the endpoint cannot decode, in the inbox, counts in `refused`, read by its name.
++    #[test]
++    fn r3_a_malformed_datagram_counts_in_refused_by_name() {
++        let mut c = core();
++        c.step(0, 0, &[]);
++        let next = 1_000_000_000 / u64::from(TICK_HZ);
++        c.step(next, 0, &inbox(&[(0, 1, &[0xff; 9])]));
++        let i = COUNTER_NAMES.iter().position(|n| *n == "refused");
++        assert_eq!(i.map(|i| c.counters()[i]), Some(1));
 +    }
 +}
 diff --git a/spikes/netcode-proof/crates/client-wasm/src/script.rs b/spikes/netcode-proof/crates/client-wasm/src/script.rs
@@ -1792,10 +1951,10 @@ index 0000000..aed22d7
 +export const MDS_READ_PERIOD_MS = bite === "PM-0001-36/read-once" ? null : 10_000;
 diff --git a/spikes/netcode-proof/web/build.mjs b/spikes/netcode-proof/web/build.mjs
 new file mode 100644
-index 0000000..91e469c
+index 0000000..02815bf
 --- /dev/null
 +++ b/spikes/netcode-proof/web/build.mjs
-@@ -0,0 +1,162 @@
+@@ -0,0 +1,181 @@
 +#!/usr/bin/env node
 +// build.mjs: U7's web build (u7-brief.md rev 1.1 Block T1; u8-build.md F14). RS runs it in web/ as
 +// `npm_config_ignore_scripts=true CARGO_NET_OFFLINE=true node build.mjs` after `npm ci --ignore-scripts`.
@@ -1880,6 +2039,20 @@ index 0000000..91e469c
 +  return needles.filter((n) => text.includes(n));
 +}
 +
++/**
++ * What the seven assembled files must not hold (U7R-TE-9): `innerHTML` in any (dynamic text by textContent only), and a
++ * bite id (`PM-0001-`) in the measured dist (only the bites dist's hooks.js lists them). `files` are [name, bytes].
++ */
++export function distProblems(files, bites) {
++  const p = [];
++  for (const [name, bytes] of files) {
++    const text = Buffer.from(bytes).toString("latin1");
++    if (text.includes("innerHTML")) p.push(`${name} holds innerHTML`);
++    if (!bites && text.includes("PM-0001-")) p.push(`${name} holds a bite id in the measured dist`);
++  }
++  return p;
++}
++
 +function sha256(file) {
 +  return createHash("sha256").update(readFileSync(file)).digest("hex");
 +}
@@ -1953,6 +2126,11 @@ index 0000000..91e469c
 +  run(process.execPath, [join(WEB, "node_modules", "typescript", "bin", "tsc"), "-p", WEB, "--outDir", jsDir], process.env, WEB);
 +  const sums = assemble({ out, index: join(WEB, "index.html"), jsDir, bindgenDir,
 +    hooks: args.bites ? join(WEB, "bites", "hooks.js") : null });
++  const problems = distProblems(DIST_NAMES.map((n) => [n, readFileSync(join(out, n))]), args.bites);
++  if (problems.length > 0) {
++    console.error(`build.mjs: ${problems.join("; ")}`);
++    process.exit(1);
++  }
 +  console.log(`build.mjs: ${args.bites ? "bites" : "measured"} dist, ${sums.length} files`);
 +  for (const s of sums) console.log(`${s.sha256}  ${s.name}`);
 +}
@@ -2087,14 +2265,19 @@ index 0000000..4678a95
 +}
 diff --git a/spikes/netcode-proof/web/e2e/probe-worker.js b/spikes/netcode-proof/web/e2e/probe-worker.js
 new file mode 100644
-index 0000000..05cde09
+index 0000000..679844d
 --- /dev/null
 +++ b/spikes/netcode-proof/web/e2e/probe-worker.js
-@@ -0,0 +1,18 @@
+@@ -0,0 +1,23 @@
 +// probe-worker.js: the console probe's module Worker (probe.js): a marker line, then one connect the CSP refuses,
-+// and a report of what happened. The target is plain http on loopback port 9: not 'self' (another port), not in
-+// serve.mjs's connect-src list, and on loopback, so even an unrefused connect stays on this machine.
++// counted by the dist's countCsp on this Worker's scope (as worker.ts counts), and a report of what happened. The
++// target is plain http on loopback port 9: not 'self' (another port), not in serve.mjs's connect-src list, and on
++// loopback, so even an unrefused connect stays on this machine.
++import { countCsp } from "./lib.js";
++
++let count = 0;
 +let violation = "none";
++countCsp(self, () => count++);
 +self.addEventListener("securitypolicyviolation", (e) => {
 +  violation = e.effectiveDirective || e.violatedDirective || "unnamed";
 +});
@@ -2108,7 +2291,7 @@ index 0000000..05cde09
 +}
 +const ms = Math.round(performance.now() - t0);
 +await new Promise((ok) => setTimeout(ok, 100));
-+postMessage(`${outcome} in ${ms} ms; violation ${violation}`);
++postMessage({ count, text: `worker fetch ${outcome} in ${ms} ms; violation ${violation}` });
 diff --git a/spikes/netcode-proof/web/e2e/probe.html b/spikes/netcode-proof/web/e2e/probe.html
 new file mode 100644
 index 0000000..8670714
@@ -2128,24 +2311,36 @@ index 0000000..8670714
 +</html>
 diff --git a/spikes/netcode-proof/web/e2e/probe.js b/spikes/netcode-proof/web/e2e/probe.js
 new file mode 100644
-index 0000000..406aeec
+index 0000000..8e75a50
 --- /dev/null
 +++ b/spikes/netcode-proof/web/e2e/probe.js
-@@ -0,0 +1,8 @@
-+// probe.js: T5 (ii)'s console probe (pass mark 7): before the real loads, it shows whether the driver sees a module
-+// Worker's console, a CSP refusal inside the Worker among them. The Worker logs a marker, then tries one connect the
-+// page's CSP refuses (a documentation address, RFC 5737), and reports back.
+@@ -0,0 +1,20 @@
++// probe.js: T5 (ii)'s console probe and the positive control of page_csp_violations (pass mark 7; U7R-NC-7). The page
++// and its module Worker each make one connect the CSP refuses (plain http on loopback port 9: not 'self', not in
++// serve.mjs's connect-src, and on loopback, so even an unrefused connect stays on this machine), each counted by the
++// dist's own countCsp (lib.js) on the target the page uses: the document here, the Worker's scope there. Both counts
++// 1 shows the counter sees a refusal on each side; the Worker also logs a marker, to show its console is seen.
++import { countCsp } from "./lib.js";
++
++let page = 0;
++countCsp(document, () => page++);
 +const w = new Worker(new URL("./probe-worker.js", import.meta.url), { type: "module" });
-+w.onmessage = (e) => {
-+  document.getElementById("status").textContent = `Done: ${e.data}`;
++w.onmessage = async (e) => {
++  try {
++    await fetch("http://127.0.0.1:9/npt-probe-page", { cache: "no-store" });
++  } catch {
++    // refused
++  }
++  await new Promise((ok) => setTimeout(ok, 100));
++  document.getElementById("status").textContent = `Done: page csp ${page}; worker csp ${e.data.count}; ${e.data.text}`;
 +  window.probeDone = true;
 +};
 diff --git a/spikes/netcode-proof/web/e2e/room.mjs b/spikes/netcode-proof/web/e2e/room.mjs
 new file mode 100644
-index 0000000..1d54a08
+index 0000000..aec8b5b
 --- /dev/null
 +++ b/spikes/netcode-proof/web/e2e/room.mjs
-@@ -0,0 +1,79 @@
+@@ -0,0 +1,96 @@
 +// room.mjs: one npt-server start for T5's browser loads (u7-brief.md rev 1.1 Block T5; advisor-u7-brief.md C9): its
 +// settings in a fresh folder (its own token file, log and hash file: `create_new` refuses a used one), OPEN awaited,
 +// its slot tokens read by slot (never printed or recorded), its end by closing stdin, its log's events read.
@@ -2169,11 +2364,28 @@ index 0000000..1d54a08
 +  };
 +}
 +
++/** Every child process the drivers started and that has not exited (rooms here; t5ii.mjs adds its npt-host). */
++export const CHILDREN = new Set();
++
++/** Keeps `child` in CHILDREN until it exits. */
++export function track(child) {
++  CHILDREN.add(child);
++  child.on("exit", () => CHILDREN.delete(child));
++  return child;
++}
++
++/** A failure's last act (U7R-NC-4): SIGKILL every child still running, and drop the load's tokens file in `dir`. */
++export function reap(dir) {
++  for (const c of CHILDREN) c.kill("SIGKILL");
++  CHILDREN.clear();
++  if (dir) rmSync(join(dir, "tokens"), { force: true });
++}
++
 +/** Starts the room; `open` resolves true at its OPEN line, false at an exit or 15 s. */
 +export function startRoom(server, dir, s) {
 +  const file = join(dir, "settings.json");
 +  writeFileSync(file, `${JSON.stringify(s, null, 1)}\n`);
-+  const child = spawn(server, ["--settings", file], { stdio: ["pipe", "pipe", "pipe"] });
++  const child = track(spawn(server, ["--settings", file], { stdio: ["pipe", "pipe", "pipe"] }));
 +  const out = [];
 +  const err = [];
 +  child.stderr.on("data", (d) => err.push(d));
@@ -2287,10 +2499,10 @@ index 0000000..774e628
 +}
 diff --git a/spikes/netcode-proof/web/e2e/t5i.mjs b/spikes/netcode-proof/web/e2e/t5i.mjs
 new file mode 100644
-index 0000000..ba1b0d2
+index 0000000..01b5843
 --- /dev/null
 +++ b/spikes/netcode-proof/web/e2e/t5i.mjs
-@@ -0,0 +1,207 @@
+@@ -0,0 +1,209 @@
 +#!/usr/bin/env node
 +// t5i.mjs: Block T5 (i), early contact (u7-brief.md rev 1.1:129-132; advisor-u7-brief.md C9), with U6b's merged
 +// release binary and no cargo, before the Wasm client exists. Each load gets its own fresh room start in its own folder
@@ -2319,6 +2531,8 @@ index 0000000..ba1b0d2
 +const OUT = resolve(process.env.NPT_WEB_OUT || join(ROOT, ".gate", "netcode-proof-test", "web-check"));
 +const sleep = (ms) => new Promise((ok) => setTimeout(() => ok(null), ms));
 +const sha256 = (f) => createHash("sha256").update(readFileSync(f)).digest("hex");
++/** Text that may name a page URL, cut at any fragment (U7R-NC-4: as t5ii.mjs's). */
++const clean = (text) => String(text).replace(/#[^\s"']*/g, "#<cut>").slice(0, 240);
 +
 +function parseArgs(argv) {
 +  const a = { room: "27", commit: "8efb9b2d971c3bb48ef41337249438c725f34708" };
@@ -2434,7 +2648,7 @@ index 0000000..ba1b0d2
 +        result.contact = await page.evaluate(() => window.contact);
 +      }
 +    } catch (e) {
-+      result.wait_error = String(e.message).split("\n")[0].slice(0, 160);
++      result.wait_error = clean(String(e.message).split("\n")[0]).slice(0, 160);
 +    }
 +    result.page_ms = Date.now() - t0;
 +    await sleep(300);
@@ -2495,15 +2709,15 @@ index 0000000..ba1b0d2
 +}
 +
 +main().catch((e) => {
-+  console.error(`t5i: ${e.message}`);
++  console.error(`t5i: ${clean(String(e?.message ?? e).split("\n")[0])}`);
 +  process.exit(1);
 +});
 diff --git a/spikes/netcode-proof/web/e2e/t5ii.mjs b/spikes/netcode-proof/web/e2e/t5ii.mjs
 new file mode 100644
-index 0000000..63c7b63
+index 0000000..b3bb335
 --- /dev/null
 +++ b/spikes/netcode-proof/web/e2e/t5ii.mjs
-@@ -0,0 +1,341 @@
+@@ -0,0 +1,366 @@
 +#!/usr/bin/env node
 +// t5ii.mjs: Block T5 (ii), the whole client in a browser (u7-brief.md rev 1.1 section 3's browser line, pass marks 1-9;
 +// advisor-u7-brief.md C8, C9): the measured and bites dists from build.mjs, `<base>`'s release npt-server on 127.0.0.1,
@@ -2511,8 +2725,8 @@ index 0000000..63c7b63
 +// tools/'s playwright-core. Each load gets its own fresh room start, or its own slot (C9); nothing joins twice. Then
 +// C8's leg through U6c's npt-host. Container readings, recorded and never judged.
 +// Use: node t5ii.mjs --server <npt-server> --server-sha256 <hex> --host <npt-host> --host-sha256 <hex>
-+//      --chromium <chrome> --playwright <index.mjs> --dist <measured dist> --bites-dist <bites dist> [--room NN]
-+//      [--commit <40 hex>]
++//      --chromium <chrome> --playwright <index.mjs> --dist <measured dist> --bites-dist <bites dist>
++//      --commit <40 hex> --dist-log <build log> --bites-log <build log> [--room NN]
 +// Writes <checkout>/.gate/u7/t5ii/<UTC stamp>/<load>/ (settings.json, room.jsonl, room.stdout.txt, room.stderr.txt,
 +// hash-NN.json, result.json) and summary.json. No token, fragment or bind value is written or printed.
 +import { spawn, spawnSync } from "node:child_process";
@@ -2522,7 +2736,7 @@ index 0000000..63c7b63
 +import { connect as tcpConnect } from "node:net";
 +import { dirname, join, resolve } from "node:path";
 +import { fileURLToPath, pathToFileURL } from "node:url";
-+import { roomLog, roomTokens, settings, sleep, startRoom, stopRoom } from "./room.mjs";
++import { reap, roomLog, roomTokens, settings, sleep, startRoom, stopRoom, track } from "./room.mjs";
 +import { serve } from "./serve.mjs";
 +
 +const HERE = dirname(fileURLToPath(import.meta.url));
@@ -2537,15 +2751,21 @@ index 0000000..63c7b63
 +/** Text that may name a page URL (Playwright's errors do), cut at any fragment so no token is ever kept or printed. */
 +const clean = (text) => String(text).replace(/#[^\s"']*/g, "#<cut>").slice(0, 240);
 +
++/** The current load's folder, read by `fail` to drop its tokens file (U7R-NC-4). */
++const current = { dir: null };
++
 +function parseArgs(argv) {
-+  const a = { room: "27", commit: "7e2d6f333ae2f1dce76b96ccbc341d047e4972bb" };
-+  const keys = ["server", "server-sha256", "host", "host-sha256", "chromium", "playwright", "dist", "bites-dist", "room", "commit"];
++  const a = { room: "27" };
++  const keys = ["server", "server-sha256", "host", "host-sha256", "chromium", "playwright", "dist", "bites-dist", "commit",
++    "dist-log", "bites-log", "room"];
 +  for (let i = 0; i < argv.length; i += 2) {
 +    const k = argv[i]?.replace(/^--/, "");
 +    if (!keys.includes(k) || argv[i + 1] === undefined) throw new Error(`unknown or empty argument ${argv[i]}`);
 +    a[k] = argv[i + 1];
 +  }
-+  for (const k of keys.slice(0, 8)) if (!a[k]) throw new Error(`--${k} is needed`);
++  for (const k of keys.slice(0, 11)) if (!a[k]) throw new Error(`--${k} is needed`);
++  // U7R-TE-10: the tree's commit is given, never a default (the caller reads it with git, as its own command).
++  if (!/^[0-9a-f]{40}$/.test(a.commit)) throw new Error("--commit is 40 lower-case hex");
 +  if (!/^(0[0-9]|[12][0-8])$/.test(a.room)) throw new Error("--room is 00-28 (29-31 stay free for the silent sockets)");
 +  return a;
 +}
@@ -2680,7 +2900,7 @@ index 0000000..63c7b63
 +  const hostSettings = { bind: "127.0.0.1:31000", cert_chain: chain, cert_key: key, dist: resolve(a.dist),
 +    hash_template: join(dir, "hash-NN.json"), host_keys: join(dir, "host-keys.txt") };
 +  writeFileSync(join(dir, "host.json"), `${JSON.stringify(hostSettings, null, 1)}\n`);
-+  const host = spawn(a.host, ["serve", join(dir, "host.json")], { stdio: ["ignore", "pipe", "pipe"] });
++  const host = track(spawn(a.host, ["serve", join(dir, "host.json")], { stdio: ["ignore", "pipe", "pipe"] }));
 +  const hostErr = [];
 +  host.stderr.on("data", (d) => hostErr.push(d));
 +  const hostExit = new Promise((ok) => host.on("exit", (code, signal) => ok({ code, signal })));
@@ -2697,7 +2917,7 @@ index 0000000..63c7b63
 +      pages: [
 +        { query: link(a.room, "smoke", "wt", 0), ignore: true, until: playing("wt"), ms: 10000, extraMs: 3000 },
 +        { query: link(a.room, "smoke", "ws", 0), ignore: true, until: playing("ws"), ms: 10000, extraMs: 3000 },
-+      ] }, a, browser, null, base, {});
++      ] }, a, browser, null, base, current);
 +  } finally {
 +    await browser?.close();
 +    host.kill("SIGTERM");
@@ -2727,6 +2947,9 @@ index 0000000..63c7b63
 +  });
 +}
 +
++/** A page's page_csp_violations as its counters table showed it, or "not read" when the row was absent. */
++const cspCount = (s) => (Number.isFinite(s.counters?.page_csp_violations) ? s.counters.page_csp_violations : "not read");
++
 +/** The marks, from the loads (readings only). */
 +function marks(r) {
 +  const first = (n) => r[n]?.pages ?? [];
@@ -2744,6 +2967,9 @@ index 0000000..63c7b63
 +    m6_mds_reads: reads(p("6-mds")),
 +    m7_record_problems: all.flatMap((s) => recordProblems(s.records)),
 +    m7_csp_lines: all.flatMap((s) => cspLines(s.console ?? [])),
++    // U7R-NC-7: the page's and the Worker's securitypolicyviolation events, per page by load; a page whose table
++    // never held the row reads "not read", never 0.
++    m7_csp_violations: Object.fromEntries(Object.entries(r).map(([k, x]) => [k, (x.pages ?? []).map(cspCount)])),
 +    m8_read_once_reads: reads(p("8a-bite-read-once")).length,
 +    m8_no_wt_timeout_fallbacks: events(p("8b-bite-no-wt-timeout"), "fallback").length,
 +    m8_no_wt_timeout_playing_ns: events(p("8b-bite-no-wt-timeout"), "fallback").map((e) => e.f.playing_ns),
@@ -2763,7 +2989,6 @@ index 0000000..63c7b63
 +  const pwVersion = JSON.parse(readFileSync(join(dirname(a.playwright), "package.json"), "utf8")).version;
 +  const base = join(ROOT, ".gate", "u7", "t5ii", new Date().toISOString().replace(/[:.]/g, "-"));
 +  mkdirSync(base, { recursive: true });
-+  const current = { dir: null };
 +  const files = (dist) => Object.fromEntries(DIST.map((n) => [n === "index.html" ? "/" : `/${n}`, join(dist, n)]));
 +  const hash = (nn) => (nn === a.room && current.dir ? join(current.dir, `hash-${nn}.json`) : null);
 +  const probeFiles = { "/probe.html": join(HERE, "probe.html"), "/probe.js": join(HERE, "probe.js"),
@@ -2779,9 +3004,11 @@ index 0000000..63c7b63
 +  const loads = [
 +    { name: "1-smoke-wt", transport: "wt", pages: [{ query: link(n, "smoke", "wt", 0), until: playing("wt"), ms: 10000, extraMs: 6000 }] },
 +    { name: "2-smoke-ws", transport: "ws", pages: [{ query: link(n, "smoke", "ws", 0), ignore: true, until: playing("ws"), ms: 10000, extraMs: 4000 }] },
-+    { name: "3-cert-14d", transport: "wt", pages: [0, 1, 2].map((k) => ({ query: link(n, "cert-14d", "wt", k), until: attempted, ms: 15000 })) },
-+    { name: "4-wt-attempts-wrong-hash", transport: "wt", pages: [{ query: link(n, "wt-attempts", "wt", 0, "&hash=wrong"), until: attempted, ms: 15000 }] },
-+    { name: "5-fallback", transport: "both", silent: true, pages: [{ query: link(n, "fallback", "wt", 0), ignore: true, until: playing("ws"), ms: 10000, extraMs: 1000 }] },
++    // Loads 3-5 wait 2.5 s past their mark, so the counters table (drawn each second from the Worker's last post) holds
++    // page_csp_violations when it is read (U7R-NC-7).
++    { name: "3-cert-14d", transport: "wt", pages: [0, 1, 2].map((k) => ({ query: link(n, "cert-14d", "wt", k), until: attempted, ms: 15000, extraMs: 2500 })) },
++    { name: "4-wt-attempts-wrong-hash", transport: "wt", pages: [{ query: link(n, "wt-attempts", "wt", 0, "&hash=wrong"), until: attempted, ms: 15000, extraMs: 2500 }] },
++    { name: "5-fallback", transport: "both", silent: true, pages: [{ query: link(n, "fallback", "wt", 0), ignore: true, until: playing("ws"), ms: 10000, extraMs: 2500 }] },
 +    { name: "6-mds", transport: "wt", pages: [{ query: link(n, "mds", "wt", 0), until: always, extraMs: 12000 }] },
 +    { name: "8a-bite-read-once", transport: "wt", bites: true, pages: [{ query: link(n, "mds", "wt", 0, "&bite=PM-0001-36/read-once"), until: always, extraMs: 12000 }] },
 +    { name: "8b-bite-no-wt-timeout", transport: "both", bites: true, silent: true, pages: [{ query: link(n, "fallback", "wt", 0, "&bite=PM-0001-29/no-wt-timeout"), ignore: true, until: always, extraMs: 10000 }] },
@@ -2791,14 +3018,21 @@ index 0000000..63c7b63
 +    server: { path: a.server, sha256: a["server-sha256"] }, host: { path: a.host, sha256: a["host-sha256"] },
 +    dist: Object.fromEntries(DIST.map((f) => [f, sha256(join(a.dist, f))])),
 +    bites_dist: Object.fromEntries(DIST.map((f) => [f, sha256(join(a["bites-dist"], f))])),
++    // U7R-TE-10: each dist's build log, by hash (its runner header names the tree it was built from).
++    dist_log: { path: a["dist-log"], sha256: sha256(a["dist-log"]) },
++    bites_log: { path: a["bites-log"], sha256: sha256(a["bites-log"]) },
 +    browser: { path: a.chromium, version: browser.version(), headless: true }, playwright_core: pwVersion,
 +    command: ["node", "web/e2e/t5ii.mjs", ...process.argv.slice(2)].join(" "),
 +  };
 +  const results = {};
 +  try {
 +    const probe = await pageRun(browser, measured.origin, null, "", { path: "/probe.html", until: always, extraMs: 2000 });
++    // The positive control (U7R-NC-7): one refused connect on the page and one in its Worker, each counted by the dist's
++    // own countCsp on the targets the page uses (document, the Worker's scope): both 1, or the count cannot be trusted.
++    const counts = /page csp (\d+); worker csp (\d+)/.exec(probe.status ?? "");
 +    summary.console_probe = { worker_marker: probe.console.some((l) => l.text.includes("npt-probe: worker console")),
 +      worker_csp: cspLines(probe.console).length > 0, status: probe.status ?? null, error: probe.error,
++      page_csp: counts ? Number(counts[1]) : "not read", worker_csp_count: counts ? Number(counts[2]) : "not read",
 +      responses: probe.responses.map((x) => [x.path, x.status]), failed: probe.failed, lines: probe.console.slice(0, 6) };
 +    for (const spec of loads) {
 +      results[spec.name] = await runLoad(spec, a, browser, spec.bites ? bites : measured, base, current);
@@ -2829,6 +3063,7 @@ index 0000000..63c7b63
 +    every_response_from_npt_host: seen.length > 0 && seen.every((x) => x.ip === "127.0.0.1" && x.port === 31000),
 +    failed: c8.pages.flatMap((x) => x.failed),
 +    csp_lines: c8.pages.flatMap((x) => cspLines(x.console)),
++    csp_violations: c8.pages.map(cspCount),
 +  };
 +  summary.files = readdirSync(base, { recursive: true }).sort().map((f) => join(base, f))
 +    .filter((f) => statSync(f).isFile() && !f.endsWith(".pem")).map((f) => ({ file: f.slice(ROOT.length + 1), sha256: sha256(f) }));
@@ -2837,8 +3072,12 @@ index 0000000..63c7b63
 +  console.log(`t5ii: records under ${base.slice(ROOT.length + 1)}`);
 +}
 +
-+/** Any failure, caught or not, prints its first line cut at any '#' (a page URL's fragment holds the join token). */
++/**
++ * Any failure, caught or not: every child still running SIGKILLed and the load's tokens file dropped (U7R-NC-4), then
++ * its first line printed, cut at any '#' (a page URL's fragment holds the join token).
++ */
 +const fail = (e) => {
++  reap(current.dir);
 +  console.error(`t5ii: ${clean(String(e?.message ?? e).split("\n")[0])}`);
 +  process.exit(1);
 +};
@@ -2882,10 +3121,10 @@ index 0000000..8f1333d
 +export const MDS_READ_PERIOD_MS: number | null = 10_000;
 diff --git a/spikes/netcode-proof/web/src/lib.ts b/spikes/netcode-proof/web/src/lib.ts
 new file mode 100644
-index 0000000..0f4c66f
+index 0000000..f2e8536
 --- /dev/null
 +++ b/spikes/netcode-proof/web/src/lib.ts
-@@ -0,0 +1,523 @@
+@@ -0,0 +1,544 @@
 +// lib.ts: the page's logic, pure and Node-testable (u7-brief.md rev 1.1 Block T2 with the advisor's C1, C4, C5, C9):
 +// the link, the hash file, the stream framing, the WebSocket tag, the Wasm boundary's packing, the bounded inbox, the
 +// npt-log records and the transport chooser. It touches no global: the Worker and the page pass what it needs.
@@ -3254,6 +3493,27 @@ index 0000000..0f4c66f
 +    this.overMax = 0;
 +    this.lastSec = sec;
 +  }
++  /** At the session's end: the partial second's record, so a datagram counted in it is never lost (U7R-NC-6). */
++  final(ns: number): void {
++    const sec = Math.floor(ns / NS_PER_S);
++    if (sec <= this.lastSec) return;
++    this.emit(secondLine(sec, { recv_over_max_count: this.overMax }));
++    this.overMax = 0;
++    this.lastSec = sec;
++  }
++}
++
++/** Counts `securitypolicyviolation` events at `target`: the page's document, the Worker's scope (U7R-NC-7). */
++export function countCsp(target: { addEventListener(type: string, fn: () => void): void }, onCount: () => void): void {
++  target.addEventListener("securitypolicyviolation", () => onCount());
++}
++
++/** After a good parse: the token's fragment dropped from the address bar and history, path and query kept (U7R-NC-5). */
++export function forgetFragment(
++  loc: { readonly pathname: string; readonly search: string },
++  hist: { replaceState(data: null, unused: string, url: string): void },
++): void {
++  hist.replaceState(null, "", `${loc.pathname}${loc.search}`);
 +}
 +
 +/** The Worker clock's step (C1): the smallest non-zero difference over `reads` consecutive reads, integer ns. */
@@ -3411,16 +3671,16 @@ index 0000000..0f4c66f
 +}
 diff --git a/spikes/netcode-proof/web/src/main.ts b/spikes/netcode-proof/web/src/main.ts
 new file mode 100644
-index 0000000..5acb34e
+index 0000000..d828809
 --- /dev/null
 +++ b/spikes/netcode-proof/web/src/main.ts
-@@ -0,0 +1,72 @@
+@@ -0,0 +1,79 @@
 +// main.ts: the page (u7-brief.md rev 1.1 Block T3; C1). It reads its link, starts the module Worker, posts the link's
 +// fields, and draws the status, #version and a counters table, all by textContent. For U8's save() it keeps
 +// window.nptRecords (at most 4,096 npt-log lines), window.nptDropped and window.nptClockResNs, read-only.
 +// A malformed link starts nothing and says why, never echoing the token.
 +import * as hooks from "./hooks.js";
-+import { RECORDS_MAX, STATUS, parseLink, versionText, type Link } from "./lib.js";
++import { RECORDS_MAX, STATUS, countCsp, forgetFragment, parseLink, versionText, type Link } from "./lib.js";
 +import type { StartMsg, ToPage } from "./worker.js";
 +
 +/** The bites dist's hooks.js lists the bite ids its `bite` query may arm; the measured one lists none. */
@@ -3434,6 +3694,11 @@ index 0000000..5acb34e
 +  clockResNs = 0;
 +  status: string = STATUS.starting;
 +  counters: readonly (readonly [string, number])[] = [];
++  /** The page's own `securitypolicyviolation` events, added to the Worker's `page_csp_violations` (U7R-NC-7). */
++  csp = 0;
++  rows(): readonly (readonly [string, number])[] {
++    return this.counters.map(([n, v]) => [n, n === "page_csp_violations" ? v + this.csp : v] as const);
++  }
 +  apply(m: ToPage): void {
 +    if (m.kind === "status") this.status = m.text;
 +    else if (m.kind === "clock") this.clockResNs = m.resNs;
@@ -3467,6 +3732,7 @@ index 0000000..5acb34e
 +
 +if (typeof document !== "undefined" && typeof Worker !== "undefined") {
 +  const state = new PageState();
++  countCsp(document, () => state.csp++);
 +  const expose = (name: string, get: () => unknown): void => void Object.defineProperty(window, name, { get, enumerable: true });
 +  expose("nptRecords", () => state.records);
 +  expose("nptDropped", () => state.dropped);
@@ -3474,6 +3740,7 @@ index 0000000..5acb34e
 +  setText("version", versionText(navigator as unknown as Parameters<typeof versionText>[0]));
 +  const link = parseLink(location.search, location.hash, BITE_IDS);
 +  if (link.ok) {
++    forgetFragment(location, history);
 +    const w = new Worker(new URL("./worker.js", import.meta.url), { type: "module" });
 +    w.onmessage = (e: MessageEvent<ToPage>): void => {
 +      state.apply(e.data);
@@ -3482,24 +3749,24 @@ index 0000000..5acb34e
 +    w.onerror = (): void => setText("status", STATUS.ended("the Worker failed"));
 +    setText("status", STATUS.starting);
 +    w.postMessage(startMessage(link.value, location.hostname));
-+    setInterval(() => drawCounters(state.counters), COUNTERS_MS);
++    setInterval(() => drawCounters(state.rows()), COUNTERS_MS);
 +  } else {
 +    setText("status", STATUS.badLink(link.why));
 +  }
 +}
 diff --git a/spikes/netcode-proof/web/src/worker.ts b/spikes/netcode-proof/web/src/worker.ts
 new file mode 100644
-index 0000000..30ecccf
+index 0000000..0646b14
 --- /dev/null
 +++ b/spikes/netcode-proof/web/src/worker.ts
-@@ -0,0 +1,397 @@
+@@ -0,0 +1,409 @@
 +// worker.ts: the module Worker (u7-brief.md rev 1.1 Block T3; C-U7-3; C1, C5, C9). It loads the Wasm client, makes a
 +// 16 B bind, connects (lib.ts's chooser), stamps every received message with performance.now() in its own read,
 +// queues it (at most 512) and hands the queue to the client at the next wake, set from next_due_ns; after each wake's
 +// sends it stamps the send time the next step gets. A trap ends the session ("Ended"): no restart, no rejoin.
 +// The token reaches the Wasm only; the bind never leaves this Worker; neither is posted, logged or recorded.
 +import {
-+  ATTEMPT_DEADLINE_MS, CH, NS_PER_MS, Recorder, STATUS, clockResNs, connect, controlFramer, counterIndex,
++  ATTEMPT_DEADLINE_MS, CH, NS_PER_MS, Recorder, STATUS, clockResNs, connect, controlFramer, counterIndex, countCsp,
 +  fullStateFramer, packInbox, readLimits, settles, unpackOutbox, wsUnwrap, wsWrap,
 +  InboxQueue, type Channel, type Limits, type Link, type Needed, type OutRecord, type StreamFramer, type Transport,
 +  type WsLike, type WtLike, type WtOptions,
@@ -3566,8 +3833,10 @@ index 0000000..30ecccf
 +  })();
 +}
 +
-+/** The page's own counters, beside the client's. */
-+const PAGE_COUNTERS = ["inbox_dropped", "datagram_over_cap", "datagram_send_dropped", "send_failed", "uni_refused"] as const;
++/** The page's own counters, beside the client's; `csp_violations` the Worker's, the page adds its own (U7R-NC-7). */
++const PAGE_COUNTERS = [
++  "inbox_dropped", "datagram_over_cap", "datagram_send_dropped", "send_failed", "uni_refused", "csp_violations",
++] as const;
 +
 +export class Engine {
 +  private readonly startMs: number;
@@ -3590,7 +3859,7 @@ index 0000000..30ecccf
 +  private prevSendNs = NO_SEND_NS;
 +  private readonly inbox = new InboxQueue();
 +  private readonly pc: Record<(typeof PAGE_COUNTERS)[number], number> = {
-+    inbox_dropped: 0, datagram_over_cap: 0, datagram_send_dropped: 0, send_failed: 0, uni_refused: 0,
++    inbox_dropped: 0, datagram_over_cap: 0, datagram_send_dropped: 0, send_failed: 0, uni_refused: 0, csp_violations: 0,
 +  };
 +  private readonly timers: Record<"wake" | "second" | "mds" | "deadline", unknown> = {
 +    wake: null, second: null, mds: null, deadline: null,
@@ -3618,6 +3887,14 @@ index 0000000..30ecccf
 +      if (!this.ended) fn();
 +    }, ms);
 +  }
++  /** The time to the next whole second on the Worker clock's grid from its start, so `second` never drifts (U7R-NC-6). */
++  private toNextSecond(): number {
++    return SECOND_MS - ((this.d.now() - this.startMs) % SECOND_MS);
++  }
++  /** One `securitypolicyviolation` in this Worker (U7R-NC-7). */
++  cspViolation(): void {
++    this.pc.csp_violations++;
++  }
 +
 +  async start(m: StartMsg): Promise<void> {
 +    const core = (async (): Promise<CoreModule | null> => {
@@ -3632,7 +3909,7 @@ index 0000000..30ecccf
 +    const rec = new Recorder((line) => this.d.post({ kind: "records", lines: [line] }), this.ns());
 +    this.rec = rec;
 +    this.arm("deadline", () => rec.attempt(this.ns(), 0), ATTEMPT_DEADLINE_MS);
-+    this.arm("second", this.everySecond, SECOND_MS);
++    this.arm("second", this.everySecond, this.toNextSecond());
 +    const chosen = await connect({
 +      link: m.link, host: m.host, timeoutMs: m.wtTimeoutMs, fetchText: this.d.fetchText, webTransport: this.d.webTransport,
 +      webSocket: this.d.webSocket, setTimer: this.d.setTimer, clearTimer: this.d.clearTimer, onStatus: (s) => this.status(s),
@@ -3823,7 +4100,7 @@ index 0000000..30ecccf
 +  private readonly everySecond = (): void => {
 +    if (this.wt !== null && this.client !== null) this.rec?.second(this.ns());
 +    this.postCounters();
-+    this.arm("second", this.everySecond, SECOND_MS);
++    this.arm("second", this.everySecond, this.toNextSecond());
 +  };
 +
 +  /** Ends the session once: timers cleared, `attempt.ok` 0 if not yet written, the transport closed. No restart. */
@@ -3832,6 +4109,7 @@ index 0000000..30ecccf
 +    this.ended = true;
 +    Object.values(this.timers).forEach((t) => (t === null ? undefined : this.d.clearTimer(t)));
 +    this.rec?.attempt(this.ns(), 0);
++    if (this.wt !== null && this.client !== null) this.rec?.final(this.ns());
 +    this.status(STATUS.ended(why));
 +    try {
 +      this.postCounters();
@@ -3882,6 +4160,7 @@ index 0000000..30ecccf
 +    loadCore: async () => (await import(CORE_URL)) as CoreModule,
 +    post: (msg) => scope.postMessage(msg),
 +  });
++  countCsp(globalThis as unknown as Parameters<typeof countCsp>[0], () => engine.cspViolation());
 +  let started = false;
 +  scope.onmessage = (e): void => {
 +    const m = readStart(e.data);
@@ -3951,10 +4230,10 @@ index 0000000..01b2589
 +});
 diff --git a/spikes/netcode-proof/web/test/build.test.mjs b/spikes/netcode-proof/web/test/build.test.mjs
 new file mode 100644
-index 0000000..4715221
+index 0000000..1c907a4
 --- /dev/null
 +++ b/spikes/netcode-proof/web/test/build.test.mjs
-@@ -0,0 +1,125 @@
+@@ -0,0 +1,135 @@
 +// build.test.mjs: Block T1 (u7-brief.md rev 1.1): index.html under the CSP, build.mjs's dist and its checks, web/'s
 +// npm rule (advisor-u8-brief.md C2 as security-u7-deps.md item (4) applies it).
 +import assert from "node:assert/strict";
@@ -3963,8 +4242,8 @@ index 0000000..4715221
 +import { join } from "node:path";
 +import { test } from "node:test";
 +import {
-+  DIST_NAMES, GATE as BUILD_GATE, WEB as BUILD_WEB, assemble, encodedRustFlags, homePaths, outDirFor, parseArgs,
-+  wasmBindgenOk,
++  DIST_NAMES, GATE as BUILD_GATE, WEB as BUILD_WEB, assemble, distProblems, encodedRustFlags, homePaths, outDirFor,
++  parseArgs, wasmBindgenOk,
 +} from "../build.mjs";
 +import { GATE, WEB, scratch } from "./helpers.mjs";
 +
@@ -4056,6 +4335,16 @@ index 0000000..4715221
 +    "--remap-path-prefix=/w/spike=/npt",
 +    "--remap-path-prefix=/w/.gate/t=/npt-target",
 +  ]);
++});
++
++test("the dist scan: innerHTML in any of the seven fails; a bite id fails the measured dist only (U7R-TE-9)", () => {
++  const clean = DIST_NAMES.map((n) => [n, Buffer.from(`// ${n}: textContent only\n`)]);
++  assert.deepEqual(distProblems(clean, false), []);
++  const withHtml = clean.map(([n, b]) => [n, n === "npt_client_wasm.js" ? Buffer.from("x.innerHTML = y") : b]);
++  assert.deepEqual(distProblems(withHtml, true), ["npt_client_wasm.js holds innerHTML"]);
++  const withBite = clean.map(([n, b]) => [n, n === "hooks.js" ? Buffer.from('const B = ["PM-0001-36/read-once"];') : b]);
++  assert.deepEqual(distProblems(withBite, false), ["hooks.js holds a bite id in the measured dist"]);
++  assert.deepEqual(distProblems(withBite, true), []);
 +});
 +
 +test("the Wasm scan finds absolute home paths and passes remapped ones", () => {
@@ -4354,10 +4643,10 @@ index 0000000..09f39a3
 +});
 diff --git a/spikes/netcode-proof/web/test/fake-core.mjs b/spikes/netcode-proof/web/test/fake-core.mjs
 new file mode 100644
-index 0000000..5d0b47b
+index 0000000..ee586f5
 --- /dev/null
 +++ b/spikes/netcode-proof/web/test/fake-core.mjs
-@@ -0,0 +1,105 @@
+@@ -0,0 +1,107 @@
 +// fake-core.mjs: a stand-in for wasm-bindgen's npt_client_wasm.js with the Wasm class's shape (C5's boundary): a
 +// default `init`, `new Client(token, bind)`, `step(now_ns: bigint, prev_send_ns: bigint, inbox: Uint8Array)` returning
 +// the outbox, `next_due_ns(): bigint`, `counters(): Uint32Array`, and free `counter_names()` and `limits()`. Its
@@ -4423,7 +4712,8 @@ index 0000000..5d0b47b
 +        throw new TypeError("step(bigint, bigint, Uint8Array)");
 +      }
 +      const { records, refused } = fakeUnpackInbox(inbox, [limits[2], limits[0], limits[1]]);
-+      log.steps.push({ nowNs, prevSendNs, records });
++      const entry = { nowNs, prevSendNs, records, sent: 0 };
++      log.steps.push(entry);
 +      this.c.inbox_records += records.length;
 +      this.c.inbox_refused += refused;
 +      for (const r of records) {
@@ -4443,6 +4733,7 @@ index 0000000..5d0b47b
 +        if (this.c.steps % 5 === 0) out.push({ channel: 0, bytes: [TYPE.ping, this.c.steps & 0xff] });
 +        this.due = (this.due === 0n ? nowNs : this.due) + TICK_NS;
 +      }
++      entry.sent = out.length;
 +      return fakePackOutbox(out);
 +    }
 +    next_due_ns() {
@@ -4465,10 +4756,10 @@ index 0000000..5d0b47b
 +}
 diff --git a/spikes/netcode-proof/web/test/fakes.mjs b/spikes/netcode-proof/web/test/fakes.mjs
 new file mode 100644
-index 0000000..b2a96b5
+index 0000000..df9427a
 --- /dev/null
 +++ b/spikes/netcode-proof/web/test/fakes.mjs
-@@ -0,0 +1,157 @@
+@@ -0,0 +1,181 @@
 +// fakes.mjs: a fake clock with timers, a fake WebTransport and WebSocket (Node's own web streams), for the chooser and
 +// the Worker's tests. Each fake records what the page did to it; nothing touches a network.
 +
@@ -4477,15 +4768,20 @@ index 0000000..b2a96b5
 +  for (let i = 0; i < rounds; i++) await new Promise((r) => setImmediate(r));
 +}
 +
-+/** Time in ms from 0; timers fire only inside `advance`, in time order, with promises flushed after each. */
++/**
++ * Time in ms from 0; timers fire only inside `advance`, in time order, with promises flushed after each, each `lateMs`
++ * after its due time (a busy thread). Time never moves back: a test that advances `t` inside a callback (a write that
++ * takes time) holds.
++ */
 +export class FakeClock {
 +  t = 0;
 +  seq = 0;
++  lateMs = 0;
 +  timers = new Map();
 +  now = () => this.t;
 +  setTimer = (fn, ms) => {
 +    const id = ++this.seq;
-+    this.timers.set(id, { at: this.t + Math.max(0, ms), fn });
++    this.timers.set(id, { at: this.t + Math.max(0, ms) + this.lateMs, fn });
 +    return id;
 +  };
 +  clearTimer = (id) => {
@@ -4498,13 +4794,26 @@ index 0000000..b2a96b5
 +      const next = [...this.timers.entries()].filter(([, x]) => x.at <= end).sort((a, b) => a[1].at - b[1].at || a[0] - b[0])[0];
 +      if (!next) break;
 +      this.timers.delete(next[0]);
-+      this.t = next[1].at;
++      this.t = Math.max(this.t, next[1].at);
 +      next[1].fn();
 +      await flush();
 +    }
-+    this.t = end;
++    this.t = Math.max(this.t, end);
 +    await flush();
 +  }
++}
++
++/**
++ * A writable whose writer's `write` runs at once: `onWrite()` first (a write that takes time), then the bytes kept in
++ * `written`; `stuck` writes never settle (a stalled stream).
++ */
++export function hookedWritable(written, { onWrite = () => {}, stuck = false } = {}) {
++  const write = (b) => {
++    onWrite();
++    written.push(Uint8Array.from(b));
++    return stuck ? new Promise(() => {}) : Promise.resolve();
++  };
++  return { getWriter: () => ({ write }) };
 +}
 +
 +function deferred() {
@@ -4562,8 +4871,14 @@ index 0000000..b2a96b5
 +    this.closeCalls++;
 +    this._closed.resolve();
 +  }
++  /** Every writer from now on is a `hookedWritable` with `hook` (before the session opens). */
++  useHook(hook) {
++    this.hook = hook;
++    this.datagrams.writable = hookedWritable(this.dg.written, hook);
++  }
 +  async createBidirectionalStream() {
 +    const p = pipePair();
++    if (this.hook) p.writable = hookedWritable(p.written, this.hook);
 +    this.bidis.push(p);
 +    return p;
 +  }
@@ -4709,10 +5024,10 @@ index 0000000..6266b2d
 +}
 diff --git a/spikes/netcode-proof/web/test/lib.test.mjs b/spikes/netcode-proof/web/test/lib.test.mjs
 new file mode 100644
-index 0000000..04bcf47
+index 0000000..6c7d6b2
 --- /dev/null
 +++ b/spikes/netcode-proof/web/test/lib.test.mjs
-@@ -0,0 +1,229 @@
+@@ -0,0 +1,245 @@
 +// lib.test.mjs: Block T2's pure logic (u7-brief.md rev 1.1 section 3 with C1, C4, C5): the link, the hash file, the
 +// framing, the WebSocket tag, the limits, the inbox queue, the records, the status texts.
 +import assert from "node:assert/strict";
@@ -4942,12 +5257,28 @@ index 0000000..04bcf47
 +    { brand: "Chromium", version: "143" }] } }), "Chromium 143");
 +  assert.equal(L.versionText({ userAgent: "Mozilla/5.0 UA" }), "Mozilla/5.0 UA");
 +});
++
++test("countCsp counts securitypolicyviolation events at its target, and nothing else (U7R-NC-7)", () => {
++  const t = new EventTarget();
++  let n = 0;
++  L.countCsp(t, () => n++);
++  t.dispatchEvent(new Event("securitypolicyviolation"));
++  t.dispatchEvent(new Event("error"));
++  t.dispatchEvent(new Event("securitypolicyviolation"));
++  assert.equal(n, 2);
++});
++
++test("forgetFragment replaces the address with its path and query: the token's fragment leaves history (U7R-NC-5)", () => {
++  const calls = [];
++  L.forgetFragment({ pathname: "/", search: "?smoke=1&room=10", hash: `#t=${TOKEN}` }, { replaceState: (...a) => calls.push(a) });
++  assert.deepEqual(calls, [[null, "", "/?smoke=1&room=10"]]);
++});
 diff --git a/spikes/netcode-proof/web/test/page.test.mjs b/spikes/netcode-proof/web/test/page.test.mjs
 new file mode 100644
-index 0000000..a6b35a5
+index 0000000..f341569
 --- /dev/null
 +++ b/spikes/netcode-proof/web/test/page.test.mjs
-@@ -0,0 +1,36 @@
+@@ -0,0 +1,44 @@
 +// page.test.mjs: Block T3's page state (C1): the record cap and its drop count, the clock step, the counters, the
 +// start message with the measured hooks' timings.
 +import assert from "node:assert/strict";
@@ -4978,25 +5309,61 @@ index 0000000..a6b35a5
 +  assert.deepEqual(s.counters, [["joined", 1], ["steps", 42]]);
 +});
 +
++test("the drawn page_csp_violations is the Worker's count plus the page's own (U7R-NC-7)", () => {
++  const s = new M.PageState();
++  s.csp = 2;
++  assert.deepEqual(s.rows(), [], "no row before the Worker's first counters");
++  s.apply({ kind: "counters", names: ["joined", "page_csp_violations"], values: [1, 3] });
++  assert.deepEqual(s.rows(), [["joined", 1], ["page_csp_violations", 5]]);
++});
++
 +test("the start message carries the link and the measured hooks' timings; the measured dist arms no bite", () => {
 +  const link = { suite: "smoke", room: "10", transport: "wt", attempt: 0, token: token(), wrongHash: false, bite: null };
 +  assert.deepEqual(M.startMessage(link, "127.0.0.1"),
 +    { kind: "start", link, host: "127.0.0.1", wtTimeoutMs: 1500, mdsPeriodMs: 10000 });
 +  assert.deepEqual(M.BITE_IDS, []);
 +});
+diff --git a/spikes/netcode-proof/web/test/reap.test.mjs b/spikes/netcode-proof/web/test/reap.test.mjs
+new file mode 100644
+index 0000000..0ec8a23
+--- /dev/null
++++ b/spikes/netcode-proof/web/test/reap.test.mjs
+@@ -0,0 +1,22 @@
++// reap.test.mjs: the e2e drivers' failure path (U7R-NC-4): every child they started is SIGKILLed and the current load's
++// tokens file removed, so an unhandled rejection leaves no npt-host on 127.0.0.1:31000 and no token under .gate/.
++import assert from "node:assert/strict";
++import { spawn } from "node:child_process";
++import { existsSync, writeFileSync } from "node:fs";
++import { join } from "node:path";
++import { test } from "node:test";
++import { CHILDREN, reap, track } from "../e2e/room.mjs";
++import { scratch } from "./helpers.mjs";
++
++test("reap: each tracked child SIGKILLed, the set emptied, the load's tokens file removed (U7R-NC-4)", async () => {
++  const dir = scratch("reap");
++  writeFileSync(join(dir, "tokens"), "0 test-only\n");
++  const kids = [0, 1].map(() => track(spawn(process.execPath, ["-e", "setTimeout(() => {}, 60000)"], { stdio: "ignore" })));
++  const exits = kids.map((k) => new Promise((ok) => k.on("exit", (code, signal) => ok(signal))));
++  assert.equal(CHILDREN.size, 2);
++  reap(dir);
++  assert.deepEqual(await Promise.all(exits), ["SIGKILL", "SIGKILL"]);
++  assert.equal(CHILDREN.size, 0);
++  assert.equal(existsSync(join(dir, "tokens")), false);
++  reap(null);
++});
 diff --git a/spikes/netcode-proof/web/test/worker.test.mjs b/spikes/netcode-proof/web/test/worker.test.mjs
 new file mode 100644
-index 0000000..79e8f80
+index 0000000..11cb0fb
 --- /dev/null
 +++ b/spikes/netcode-proof/web/test/worker.test.mjs
-@@ -0,0 +1,238 @@
+@@ -0,0 +1,339 @@
 +// worker.test.mjs: Block T3's Worker engine over a fake clock, fake transports and the fake core (u7-brief.md rev 1.1
 +// sections 1 and 3; C-U7-3; C1, C9): the join on one transport, Playing, the records, stamping, the bounded queue, the
 +// timer from next_due_ns, the trap, the caps.
 +import assert from "node:assert/strict";
 +import { test } from "node:test";
 +import { TICK_NS, TYPE, makeCore } from "./fake-core.mjs";
-+import { FakeClock, FakeWs, FakeWt, connectDeps, flush } from "./fakes.mjs";
++import { FakeClock, FakeWs, FakeWt, connectDeps, flush, hookedWritable } from "./fakes.mjs";
 +import { checkLine, load, token } from "./helpers.mjs";
 +
 +const W = await load("worker.js");
@@ -5018,7 +5385,7 @@ index 0000000..79e8f80
 +    post: (m) => posts.push(m),
 +  });
 +  const r = {
-+    c, core, posts,
++    c, core, posts, e,
 +    start: () => e.start({ kind: "start", link: link(o.link), host: "127.0.0.1", wtTimeoutMs: o.timeoutMs === undefined ? 1500 : o.timeoutMs,
 +      mdsPeriodMs: o.mdsPeriodMs === undefined ? 10000 : o.mdsPeriodMs }),
 +    lines: () => posts.filter((p) => p.kind === "records").flatMap((p) => p.lines),
@@ -5035,10 +5402,17 @@ index 0000000..79e8f80
 +  void r.start();
 +  await r.c.advance(100);
 +  const wt = FakeWt.made[0];
++  o.before?.(wt, r.c);
 +  wt.open();
 +  await r.c.advance(0);
 +  return { r, wt };
 +}
++
++/** The counter `name` in the last counters post (undefined when absent). */
++const counter = (r, name) => {
++  const k = r.counters();
++  return k?.values[k.names.indexOf(name)];
++};
 +
 +test("WebTransport: the Join on the control stream, datagrams on the writer, then Playing and attempt.ok 1", async () => {
 +  const { r, wt } = await wtSession();
@@ -5074,6 +5448,100 @@ index 0000000..79e8f80
 +  assert.deepEqual(seen.map((x) => x.arrivalNs), [BigInt(at * 1e6), BigInt(at * 1e6)]);
 +  assert.deepEqual(seen.map((x) => x.channel), [0, 1]);
 +  for (let i = 1; i < steps.length; i++) assert.equal(steps[i].prevSendNs, steps[i - 1].nowNs, `step ${i}`);
++});
++
++test("the send time is stamped after the wake's sends: each write taking 1 ms moves prev_send_ns on by it (C-U7-3, U7R-TE-2 (b))", async () => {
++  const { r } = await wtSession({ before: (wt, c) => wt.useHook({ onWrite: () => void (c.t += 1) }) });
++  await r.c.advance(300);
++  const steps = r.core.log.steps;
++  assert.ok(steps.filter((s) => s.sent > 0).length >= 8, "wakes that sent");
++  for (let i = 1; i < steps.length; i++) {
++    assert.equal(steps[i].prevSendNs, steps[i - 1].nowNs + BigInt(steps[i - 1].sent) * 1_000_000n, `step ${i}`);
++  }
++});
++
++test("JoinAccepted alone, with no clock sample, writes no attempt.ok (PM-0006-15's one echo; U7R-TE-8)", async () => {
++  const { r, wt } = await wtSession();
++  wt.bidis[0].push(JOIN_ACCEPTED);
++  await r.c.advance(2000);
++  assert.equal(r.statuses().at(-1), "WebTransport · Joined");
++  assert.equal(r.events("attempt").length, 0);
++});
++
++test("a stuck datagram writer: 64 writes in flight, every later one dropped and counted (U7R-TE-8)", async () => {
++  const { r, wt } = await wtSession({ before: (w) => w.useHook({ stuck: true }) });
++  await r.c.advance(3000);
++  const sent = r.core.log.steps.reduce((n, s) => n + s.sent, 0) - 1;
++  assert.ok(sent > 100, String(sent));
++  assert.equal(wt.dg.written.length, 64, "64 in flight, none after");
++  const dropped = counter(r, "page_datagram_send_dropped");
++  assert.ok(dropped > 0 && dropped <= sent - 64, `${dropped} of ${sent - 64}`);
++});
++
++test("a 5th full-state stream open at once is refused and counted; the four keep reading (U7R-TE-8)", async () => {
++  const { r, wt } = await wtSession();
++  for (let i = 0; i < 5; i++) wt.pushUni([FULL_STATE]);
++  await r.c.advance(1100);
++  assert.equal(counter(r, "page_uni_refused"), 1);
++  assert.equal(r.core.log.steps.flatMap((s) => s.records).filter((x) => x.channel === 2).length, 4);
++});
++
++test("WebSocket over its 1 MiB buffer: datagrams dropped and counted; a control message ends the session (U7R-TE-8)", async () => {
++  for (const at of ["after the Join", "before the Join"]) {
++    const r = rig({ link: { transport: "ws" } });
++    void r.start();
++    await r.c.advance(100);
++    const ws = FakeWs.made[0];
++    if (at === "before the Join") ws.bufferedAmount = 1_048_577;
++    ws.open();
++    await r.c.advance(0);
++    const before = ws.sent.length;
++    ws.bufferedAmount = 1_048_577;
++    await r.c.advance(1100);
++    if (at === "after the Join") {
++      assert.ok(before >= 1 && ws.sent.length === before, "nothing sent once the buffer is over");
++      assert.ok(counter(r, "page_datagram_send_dropped") > 0);
++      assert.equal(r.statuses().at(-1), "WebSocket · Connecting");
++    } else {
++      assert.equal(ws.sent.length, 0);
++      assert.equal(r.statuses().at(-1), "Ended: the WebSocket's send buffer is full");
++    }
++  }
++});
++
++test("a session whose datagrams offer createWritable() writes through it (Firefox's path; U7R-TE-8)", async () => {
++  const via = [];
++  const { wt } = await wtSession({ before: (w) => void (w.datagrams.createWritable = () => hookedWritable(via)) });
++  assert.ok(via.length >= 1);
++  assert.equal(wt.dg.written.length, 0, "not the plain writable");
++});
++
++test("securitypolicyviolation in the Worker counts in page_csp_violations (U7R-NC-7)", async () => {
++  const { r } = await wtSession();
++  assert.equal(counter(r, "page_csp_violations"), undefined, "no counters post yet");
++  r.e.cspViolation();
++  await r.c.advance(1000);
++  assert.equal(counter(r, "page_csp_violations"), 1);
++});
++
++test("the partial second is written at the end (U7R-NC-6)", async () => {
++  const { r, wt } = await wtSession();
++  wt.datagrams.maxDatagramSize = 1000;
++  await r.c.advance(1500);
++  wt.dg.push(new Array(1100).fill(2));
++  await r.c.advance(10);
++  wt.close();
++  await r.c.advance(10);
++  const secs = r.lines().map((l) => JSON.parse(l)).filter((x) => x.k === "second");
++  assert.deepEqual(secs.map((x) => [x.sec, x.v.recv_over_max_count]), [[0, 0], [1, 1]]);
++});
++
++test("second stays on the Worker clock's grid when its timer runs late: no sec skipped over 300 s (U7R-NC-6)", async () => {
++  const { r } = await wtSession({ before: (_, c) => void (c.lateMs = 7) });
++  await r.c.advance(300_000);
++  const secs = r.lines().map((l) => JSON.parse(l)).filter((x) => x.k === "second").map((x) => x.sec);
++  assert.ok(secs.length >= 298, String(secs.length));
++  assert.deepEqual(secs, secs.map((_, i) => i));
 +});
 +
 +test("the timer follows next_due_ns: about 30 wakes a second", async () => {
