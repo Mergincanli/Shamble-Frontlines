@@ -1,7 +1,7 @@
 //! Which crate may depend on which, read from the manifests' own text (ADR 0005's foundation line; ADR 0002 part 3).
 //!
 //! `content` depends on nothing: the reader of the game's content files is all our own code (Mustafa's
-//! CONTENT-SOURCE (c), 2026-11-26), and the simulation will depend on this crate, so anything `content` depended on
+//! CONTENT-SOURCE (c), 2026-11-26), and the simulation depends on this crate, so anything `content` depended on
 //! would be in the simulation's tree too. The rule names direct dependencies only, so the manifest's text is the
 //! whole input: no cargo call, and nothing that needs a package to be on disk.
 //!
@@ -10,11 +10,13 @@
 //! by name, so it reaches him before it reaches a build (security-auditor's finding on the batch: the feature
 //! compare stays silent when `std` is turned on in every build alike, and a version bump trips nothing).
 //!
-//! The content crate's rule is stricter than "no normal dependency": no table of any kind but `[package]` and `[lints]`. One change
-//! is known to come: 4b-2's step that writes the content's TypeScript types gives this crate exactly one
-//! dev-dependency, the type writer (the one line `ts-rs = { workspace = true }` under `[dev-dependencies]`: its
-//! derive must stand beside the types it reads). That change edits this rule in the same commit, after
-//! security-auditor's answer on its exact content.
+//! The content crate's rule is stricter than "no normal dependency": its manifest has three tables, `[package]`,
+//! `[dev-dependencies]` and `[lints]`, and the second holds exactly one line, the type writer
+//! (`ts-rs = { workspace = true }`: its derive must stand beside the types it reads, as in the protocol crate). A
+//! dev-dependency is in no build players get (cargo leaves it out of a build with no test in it), and the derive
+//! is written under `cfg(test)`, so it puts no code into the crate itself. That one line came in with the step
+//! that writes the content kinds' TypeScript types, after security-auditor's answer on its exact content
+//! (2026-11-27: the two files by their digests).
 
 use std::path::Path;
 
@@ -48,15 +50,24 @@ fn manifest_of(krate: &str) -> String {
     std::fs::read_to_string(&path).unwrap_or_else(|error| panic!("{}: {error}", path.display()))
 }
 
+/// Every table the content crate's manifest may have, and the one line its tests' table holds.
+const CONTENT_TABLES: [&str; 3] = ["package", "dev-dependencies", "lints"];
+const TYPE_WRITER: &str = "ts-rs = { workspace = true }";
+
 #[test]
-fn the_content_crate_depends_on_nothing() {
-    let (tables, package_keys) = tables_and_package_keys(&manifest_of("content"));
-    // Every table the manifest may have. A dependency table of any kind (normal, dev, build, per target), a
-    // feature table or a patch is a new table, and fails here by its name.
+fn the_content_crate_depends_on_nothing_and_its_tests_on_the_type_writer_alone() {
+    let manifest = manifest_of("content");
+    let (tables, package_keys) = tables_and_package_keys(&manifest);
+    // A dependency table of any other kind (normal, build, per target), a feature table or a patch is a new
+    // table, and fails here by its name.
     assert_eq!(
-        tables,
-        ["package", "lints"],
+        tables, CONTENT_TABLES,
         "crates/content/Cargo.toml has a table this rule does not allow"
+    );
+    assert_eq!(
+        table(&manifest, "dev-dependencies"),
+        [TYPE_WRITER],
+        "the content crate's tests depend on the type writer and on nothing else, with no feature of their own"
     );
     // No build script and no native library: neither `build` nor `links` may be set.
     assert_eq!(
@@ -198,7 +209,10 @@ fn the_rule_reads_what_it_should_refuse() {
     // The check can fail: each kind of dependency table, and a build script, is seen by name.
     for planted in [
         "[dependencies]\nprotocol = { path = \"../protocol\" }\n",
-        "[dev-dependencies]\nts-rs = { workspace = true }\n",
+        "[dev-dependencies]\nts-rs = { workspace = true }\nproptest = \"1\"\n",
+        "[dev-dependencies]\nts-rs = { workspace = true, features = [\"serde-compat\"] }\n",
+        "[dev-dependencies]\nproptest = \"1\"\n",
+        "[dev-dependencies.ts-rs]\nworkspace = true\n",
         "[build-dependencies]\ncc = \"1\"\n",
         "[target.'cfg(unix)'.dependencies]\nlibc = \"0.2\"\n",
         "[features]\nloose = []\n",
@@ -206,8 +220,19 @@ fn the_rule_reads_what_it_should_refuse() {
         let manifest =
             format!("[package]\nname = \"content\"\n\n{planted}\n[lints]\nworkspace = true\n");
         let (tables, _) = tables_and_package_keys(&manifest);
-        assert_ne!(tables, ["package", "lints"], "{planted}");
+        // Refused by its tables, or (the tests' own table) by a line that is not the type writer's.
+        let lines = table(&manifest, "dev-dependencies");
+        assert!(
+            tables != CONTENT_TABLES || lines != [TYPE_WRITER],
+            "{planted}"
+        );
     }
+    // The one table and line that are allowed pass, so the loop above refuses for a reason.
+    let allowed = format!(
+        "[package]\nname = \"content\"\n\n[dev-dependencies]\n{TYPE_WRITER}\n\n[lints]\nworkspace = true\n"
+    );
+    assert_eq!(tables_and_package_keys(&allowed).0, CONTENT_TABLES);
+    assert_eq!(table(&allowed, "dev-dependencies"), [TYPE_WRITER]);
     // A dependency spelled as a key before any table is seen too.
     let dotted = "dependencies.protocol = { path = \"../protocol\" }\n[package]\nname = \"content\"\n[lints]\n";
     assert_eq!(tables_and_package_keys(dotted).0.len(), 3);

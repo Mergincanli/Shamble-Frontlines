@@ -283,8 +283,10 @@ export function missingOverflowOverrides(treeText, cargoToml, root) {
  * narrower `-p` list than the one the tree was asked for (CI's release test line is one). Throws without a `sim`.
  *
  * A known clash, kept loud: ADR 0002 part 5 plans a feature that only dev-dependencies turn on (the generated
- * types). The day it reaches `sim` or one of its dependencies this compare refuses it and every build stops; the
- * step that first nests generated types decides which of the two gives way.
+ * types). The day it reaches `sim` or one of its dependencies this compare refuses it and every build stops. The
+ * content kinds' generated types did not need it: `content`, on which `sim` depends, takes the type writer as a
+ * dev-dependency with no feature, and its derive stands under `cfg(test)`, so no feature reaches `sim`'s tree and
+ * the lists are the same with and without it (security-auditor's check of 2026-11-27).
  */
 export function simFeatureList(treeText, closureTree = treeText) {
   const parse = (text) => text.split("\n").map((line) => /^(\d+)(.*?)( \(command-line\))?$/.exec(line)).filter((line) => line !== null);

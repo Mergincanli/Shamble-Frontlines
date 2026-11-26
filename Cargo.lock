@@ -64,6 +64,9 @@ dependencies = [
 [[package]]
 name = "content"
 version = "0.0.0"
+dependencies = [
+ "ts-rs",
+]
 
 [[package]]
 name = "devtools"
