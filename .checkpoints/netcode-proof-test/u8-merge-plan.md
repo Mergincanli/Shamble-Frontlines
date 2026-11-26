@@ -98,6 +98,11 @@ needs no go of his (as U4r's and U4f's); PR #40 keeps its own go.
   3e1cd5b53d4c224020233f8e7edc3a1ec3b795edc729dd257101fff0742ea531 (377,866 B, 43 files, base 03d9ff3: U8's M5 fix,
   u8-fix-m5.md); M5 runs `node --test 'ops/**/*.test.mjs'` (101 expected) and `bash ops/tests/wrappers.test.sh` first,
   then `env CARGO_INCREMENTAL=0 node check.mjs`; C1 stands; the rest of the steps as above. Done lines follow below.
+- DONE 05:2x (restart): the part-clean in the card's form (no ask): "Removed 5660 files, 6.7GiB total"; the lock and
+  CACHEDIR.TAG there, no debug folder; free 7,823 to 14,021 MiB (M5 builds cold). M0: no agent runs, no cargo or rustc
+  (pgrep empty), the lane lock free (flock -n), main still 07d673b; the saver bzb64iuso stopped by TaskStop. M1: the
+  patch's sha256 3e1cd5b5...a531 (= the restart line). Next: this line saved (it pushes the saver's terminated autosave),
+  H0, the base light run, then M3.
 - (was) RUNNING since 00:35:4x: M5 (background shell b5xy9vavj; .gate/u8-merge/m5-check.log; fmt and clippy PASS by 00:37);
   u8-report.md drafted (its M5_RESULT and M7_RESULT to fill). If the chat was compacted meanwhile: read the log's end;
   all PASS and the ops lines 0 fail: go on to M7 (gate, repo map, the link removed), then M8 and M9; a FAIL: M6.
