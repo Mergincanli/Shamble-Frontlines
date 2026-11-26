@@ -105,7 +105,7 @@ _Last updated: 2026-11-26 (change-set 4b-1's docs pass, second part, by lane 1's
   whether its maps do), at the latest in Slice 3's change-set that sets the command codec for online play (PM-0001-51),
   beside 3B-ACKS and 3B-OUTAGE-256. No numbered change-set holds it yet. Also 4B-FEATURE-POINTER, 4B-DEPART-3, 4B-PM5-3,
   4B-CI-CONTENT (the CI Builder), 4B-OLD-TIMERS, 4B-TIME-REEXPORT, 4B-FACING-ZERO, 4B-SPAWN-SLOTS, 4B-PLAN-4B2,
-  4B-FUZZ-REACH, 4B-REFUSAL-TABLE, 4B-SCAN-CFG-TEST, 4B-OLD-READERS. Closed at its merge: 4A-S3-READ's read side.
+  4B-FUZZ-REACH, 4B-REFUSAL-TABLE, 4B-SCAN-CFG-TEST, 4B-OLD-READERS, 4B-MEMORY-UNIT. Closed at merge: 4A-S3-READ.
 
 ## Open risks (their text: `docs/STATUS_ARCHIVE.md`, "Open bugs and risks", a live section)
 - **Kit:** kit-v3-5's merge-check limits (Windows names, gitignored names, case-only twins, symlinks, more than 100

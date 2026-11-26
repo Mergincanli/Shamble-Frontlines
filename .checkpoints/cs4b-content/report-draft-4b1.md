@@ -1,7 +1,6 @@
 # Advisor report: cs4b1-content (2026-11-26, branch `claude/cool-pasteur-oiqk1r`, base main 3b949c1)
 
-Change-set 4b-1, "Content", the first of 4b's two pull requests (his SIZE-4B (b)). Draft pull request [[PR]],
-lane 1, by the chat he calls Builder V4. The branch is the cloud session's stand-in for `cs/4b-content`. Risk tier 1
+Change-set 4b-1, "Content", the first of 4b's two pull requests (his SIZE-4B (b)). Pull request #75, lane 1, by the chat he calls Builder V4. The branch is the cloud session's stand-in for `cs/4b-content`. Risk tier 1
 (game code, tests and scripts; one manifest batch, our own new crate with no dependency, held until
 security-auditor's answer on its exact content; no CI, kit or gate file is touched). **Nothing under
 `content/source/` changes** (his SOURCE-GO answer asks a report's first lines to say so): no `content/` folder
@@ -26,8 +25,8 @@ exists yet. Nothing a player sees, hears or feels changes, so there is no browse
 4b-1's written size is 2.17 times its designs' count (4a: 2.4 times), 286 lines under its stop line. By step: the
 manifests and the foundation check 92; the reader, the writer, the bundle and the movement kind 2,796; the proofs
 and the fuzz run 1,936 (the sheet gave them 800: the generator of broken files with its expected refusals is about
-1,450 lines alone); the map kind 1,044; the links check 223; the time unit 501; the two review rounds' fix passes
-573 (341 and 232). Nothing left 4b-1 by its "what leaves first" list. His one sentence at two thirds of the line
+1,450 lines alone); the map kind 1,044; the links check 223; the time unit 501; after the steps 572 (the planted
+defects' commit took one line out; round 1's fix pass added 341, round 2's 232). Nothing left 4b-1 by its "what leaves first" list. His one sentence at two thirds of the line
 came late, at 6,592: the count passed 4,967 inside the map step, whose checks were still running; it should have
 come then.
 
@@ -36,7 +35,7 @@ The plan said about 49 hours of this chat's work to the early look inside 4c, by
 in 15 hours, first commit to merge). Measured today for 4b-1: the readers' and the advisor agent's rounds on the
 sheet 1 hour 45 minutes (12:25 to 14:11 UTC); the five steps, 6,592 lines with the full local checks after each, 1
 hour 32 minutes (14:11 to 15:43 UTC); the close (planted defects, two review rounds at the highest effort, two fix
-passes, the verifier, the docs pass, this report) [[CLOSE]]. On that pace: 4b-2 (about 8,100 written lines at
+passes, the verifier, the docs pass, this report) [[CLOSE]]. On that pace: 4b-2 (about 8,140 written lines at
 4b-1's ratio, a hold for security-auditor's answer on the collision library, a short browser check) about 6 to 8
 hours; 4c up to the early look (the soldier walks and turns to the mouse, the camera panel works) about 3 to 5
 hours. **So the first build he can move a soldier in is about 9 to 13 hours of this chat's work away, plus the
@@ -52,7 +51,9 @@ every timer of the game will count in.
 
 ## Outcome
 **DONE.** The loader, its two kinds, the aim's reach, the time unit and the links check are built and proven on
-generated files; two review rounds found no Critical or High; [[OUTCOME-TAIL]]
+generated files; two review rounds found no Critical or High; all 35 planted defects were caught; the verifier
+found the code and every check result to hold. It waits for the advisor agent's verdict on the final head and
+for his go.
 
 ## Plan and approval
 - The plan is change-set 4's approved plan (Walk), cut by his WALK-CUT (a) and SIZE-4B (b), and for 4b the
@@ -68,8 +69,10 @@ generated files; two review rounds found no Critical or High; [[OUTCOME-TAIL]]
   dependency; the tools crate gains it and drops two unused edges; one new lockfile entry) was not committed or
   built before security-auditor approved its three digests; round 2 found them unchanged. The collision
   library's batch is out of the tree and waits for 4b-2.
-- His answers that bind 4b-1 are in `docs/DECISIONS.md` word for word (2026-11-26, 12:21:17, 13:05:03 and
-  14:09:13 UTC), written by script from the chat's saved messages and compared byte for byte.
+- His words that bind 4b-1 are in `docs/DECISIONS.md` word for word (2026-11-26: 12:21:17, 13:05:03 and 14:09:13
+  UTC, his answers; 15:51:38 UTC, VISION-RULE version 2, whose point 4 binds this docs pass; his Export of
+  15:07:24 UTC is recorded with them), written by script from the chat's saved messages and compared byte for
+  byte.
 
 ## What changed
 47 files under `crates/` and `packages/`, and `Cargo.lock` (one path crate); no file of the legacy game, no CI,
@@ -135,15 +138,18 @@ in the notes; CI ran them again):
 | The type checks (types, Worker, page, browser specs) | clean |
 | The browser tests in Chromium | 18 pass in 208 s |
 | The recordings are what their scripts make | yes |
-| CI on the final head: gate, toolchain (Chromium and Firefox) | [[CI-FINAL]] |
-CI was also green on the pushed heads d21b161, bdc85ca, 0d4505f, ef2edec, 495204a and [[CI-21E]] (gate and
-toolchain; the toolchain run on fdd9f0a was cancelled by the next push, four minutes later).
+| CI on the final code (head 21e1550): gate, toolchain (Chromium and Firefox) | green (next line); the head that holds this report differs from it in docs and notes only, and its runs are in the pull request's description |
+CI was also green on the pushed heads d21b161, bdc85ca, 0d4505f, ef2edec, 495204a and 21e1550 (gate and
+toolchain; 21e1550 holds the final code: gate run 45868324364, toolchain run 45868324356, 7 min 17 s, Chromium
+and Firefox). The toolchain run on fdd9f0a was cancelled by the next push, four minutes later.
 
 **The reader and the writer against a browser engine** (`content-corpus.txt`, `content-trees.txt`: written by
 Node's engine, and each browser checks every number against its own engine too):
 - 26,653 numbers: the old tuning file's 2,038 as written; 5,000 doubles from random bits; 5,000 decimals in many
-  spellings; 2,000 that lie exactly between two shortest texts, at 2 to 25 binary places; every power of two
-  with the double under and over it, both signs (12,586 lines); 29 edges. The reader gives each one's bits, the
+  spellings; 2,000 whose exact decimal form ends in a 5 one place past the engine's text, at 2 to 25 binary
+  places (1,998 of them lie between two texts that are both theirs, by the verifier's own script; the other two
+  are plus and minus 2^-24, where only one of the two is); every power of two with the double under and over
+  it, both signs (12,586 lines); 29 edges. The reader gives each one's bits, the
   writer each one's text: natively, in WebAssembly under Node (both profiles), in Chromium, and in Firefox in CI.
 - 400 random trees: the canonical writer's text equals `JSON.stringify` with sorted keys and an indent of two.
 - Apart from the corpus, rust-reviewer ran the writer over 31,750,551 doubles against Node's own text: 2
@@ -151,8 +157,9 @@ Node's engine, and each browser checks every number against its own engine too):
 
 **Every class of broken file gets the refusal its class says** (`content_proofs.rs`): 37 classes (valid files,
 maps and bundles among them), 500 seeded cases each (the three heavy classes 50), each case with the reason, the
-file, the line, the column and the field worked out by the generator, never by the loader (test-engineer's read:
-"the records are typed by hand, the layout and echo are its own, and the caps are written as numbers"). One
+file, the line, the column and the field worked out by the generator, never by the loader (test-engineer's read
+confirms it: the records are typed by hand, the layout and the echo are the generator's own, the caps are
+written as numbers; only the two points named under "Not verified" lean on the code under test). One
 digest per class is committed; every run, native and WebAssembly, checks each record against its class again
 and must give the same digests, so writing the digests again cannot hide a wrong record. Three more seeds (40
 cases a class) pass as well.
@@ -176,8 +183,8 @@ above its asserted minimum. Three other seeds were run by hand at step 3.
 Asserted: held at most the input plus 4 MiB; at most 2 s a megabyte (a backstop against a hang). A separate test
 holds the cost of the duplicate-key search: 16,383 different keys take 1.6 times one key 16,383 times (2.3 in
 debug), and more than 20 is refused (the pairwise search is one of the planted defects below). In WebAssembly under Node the
-seven take 226 ms (release) and 3.4 s (dev), and the module's memory ends at 49 MiB: both asserted as backstops
-only (see "Not verified").
+seven take 226 ms (release) and 3.4 s (dev), and the module's memory ends at 49.2 million bytes (46.9 MiB): both
+asserted as backstops only (see "Not verified").
 
 **The map's rules and the aim's reach:** each rule has its class of broken maps; `aim_reach.rs` holds the reach
 against the aim point's own number types (a wider field fails it by name, so the reach cannot stay behind when
@@ -201,14 +208,19 @@ text not in canonical form, the reach one centimetre too wide twice, nine millim
 off its grid, an id twice, a panic on a path only mutation reaches, a duration cut and not rounded, the two time
 units apart, a link read on the Rust and on the Node side), 5 for round 1's fixes, 5 for round 2's, and one
 reader that differs in WebAssembly only (the native classes stay green: the control; the Node compare against
-the native digests names the class). test-engineer planted three more in a copy, each caught by its class.
+the native digests names the class). test-engineer planted five of its own in a copy: three were caught by
+their class (the node cap one too high, the files cap one too high, a shape 1 mm past the bounds); **two were
+not caught** (a duplicate-key search over every pair; no map in any fuzz input). Those are two of its Medium
+findings: fixed, and now the plants g and j of the run above. The verifier planted two more in a copy, both
+caught (an id of 65 bytes; the check for at least one spawn removed).
 
 ## Reviews
-Opus at the highest effort; each reviewer's notes are in the branch's notes at [[NOTES]]. Two rounds, within the
+Every reviewer at the highest effort; each reviewer's notes are in the branch's notes at [[NOTES]]. Two rounds, within the
 budget; **no Critical or High in either**; no third round.
 
-**Round 1, on ef2edec** (rust-reviewer, engine-architect, security-auditor): six Medium, thirteen Low and nits;
-all thirteen departures "fine" (the ninth on a condition, below).
+**Round 1, on ef2edec** (rust-reviewer, engine-architect, security-auditor): six Medium, thirteen Low and nits.
+Of the thirteen departures twelve are "fine" (the ninth on a condition, below); the seventh, the writer's tie
+rule, is right as a rule and was wrong for two doubles (rust-reviewer's first Medium, the first row).
 | Finding | What | Outcome |
 |---|---|---|
 | rust-reviewer, Medium | the writer's tie rule was wrong for plus and minus 2^-24 | fixed: the even text is read back; the powers of two are in the corpus |
@@ -220,7 +232,8 @@ all thirteen departures "fine" (the ninth on a condition, below).
 | Lows | device names as ids; the echo's raw quote; the plain read by path twice; the dependency rule's two gaps; an unread `group` key; wording; no time asserted in WebAssembly | all fixed, but three follow-ups: the time unit's re-export at step 6, the facing's zero at step 8, 4c's spawn count |
 
 **Round 2, on d36e416** (the same three on what changed) **and test-engineer's one read of the whole:** every
-round-1 finding closed, but for the CI steps and the facing's zero (follow-ups). Four new Medium, the rest Low:
+round-1 finding closed, but for the CI steps and the facing's zero (follow-ups). Five new Medium (rust-reviewer
+one, security-auditor one, test-engineer three), the rest Low:
 | Finding | What | Outcome |
 |---|---|---|
 | rust-reviewer, Medium | my widened corpus held fewer real ties than before (none past four binary places) and no negative power of two; the notes' two claims about it were not true | fixed: ties are kept only when the engine's own text proves them, at 2 to 25 places; both signs; the script's test asserts both |
@@ -231,12 +244,25 @@ round-1 finding closed, but for the CI steps and the facing's zero (follow-ups).
 | Lows | the content scan's gaps (calls after a path, the assert macros, a test mark on a match arm, the guard read by name only, the simulation's escape); the links scan; one rounding tie; a limit case tied to its name by position; wording | fixed |
 | Lows, not fixed | one sentence per refusal pinned in a table (today one is pinned, the rest only by the digests); a whole file marked test-only is not seen as tests by the scan (it fails closed); two older tests outside this change-set read vectors around the plain read | follow-ups |
 
-**The verifier:** [[VERIFIER]]
+**The verifier: FAIL on this report's first draft, on wording and counts only; the code and every check result
+hold.** It ran everything itself: the full local checks (196 and 195 Rust tests, the packages' tests, 33
+boundary tests, 18 browser tests, the players' file's digest), the million-input fuzz run (the same histogram;
+the caps' bytes the same in all seven rows; times noisy), the corpus's check and its own count of it, the time
+report, the written lines (7,164), his words (the script's check, and every quote of his in this report against
+`docs/DECISIONS.md`), five plants against the run's log, two plants of its own in a copy (both caught), and
+eleven "fixed" rows in the code (all present). Its findings on the draft, all corrected in this text: one Medium
+(the draft said test-engineer's own plants were all caught: two of its five were not, which is what its two
+findings were) and seven Low (the fix passes' line count off by one; "four" new Medium where the table lists
+five; a memory size written in the wrong unit, which the comment of `content.test.mjs` shares and keeps until
+4b-2; words of test-engineer's set in quotation marks that are not in its notes; a sentence that read his
+VISION-RULE list as saying more than it does; his message of 15:51:38 missing from the list of what binds;
+"all thirteen departures fine" where the seventh was a finding). VERIFIER-RECHECK
 
-**The advisor agent on the final head:** [[ADVISOR]]
+**The advisor agent on the final head:** its verdict is given on the head that holds this report, so it stands
+in the pull request's description and in the chat, with that head's full id.
 
 ## Decisions and deviations
-**Departures from the sheet, each judged in round 1:**
+**Departures from the sheet, each judged in round 1 (twelve fine; the seventh fixed):**
 1. The proofs live in the tools crate, not in `crates/content/tests/`: the WebAssembly side runs the same
    generator, and the content crate depends on nothing.
 2. `Field` and `Range` live in `read.rs`.
@@ -265,7 +291,7 @@ round-1 finding closed, but for the CI steps and the facing's zero (follow-ups).
   `aux`, a name Windows keeps for a device, as a valid id. The generator has its own copy of the rule now,
   written apart from the loader's.
 - **The limit cases are made one at a time** (asked by no finding): held together they took the test module's
-  memory to 72 MiB, over the 64 MiB its test asserts. The ceiling is to measure the loader, not the list.
+  memory to 72.5 million bytes (69 MiB), over the 64 MiB its test asserts. The ceiling is to measure the loader, not the list.
 - **The verdicts file was written again twice**, each time after a change meant to move it: round 1's (new
   refusals for device names, the echoed quote, the map's shape) and round 2's, where only the fuzz line moved
   (it folds the stage's number) and no class's digest did.
@@ -336,7 +362,10 @@ round-1 finding closed, but for the CI steps and the facing's zero (follow-ups).
   of ADR 0005's "written back as the same text" with two exceptions (minus zero is written `0`; a corpus input
   that is not canonical is written as the engine writes it). The archive block has all three whole.
 - Closed here: 4a's risk that a recording test reads through a link.
-- [[STATUS-NOTE]]
+- **STATUS is 124 lines; his limit is 120** (125 on main before this change-set; 134 after its docs pass's
+  first part). Lane 1's lines are down as far as they go, their long form moved to the archive by script. What
+  is left over is other lanes' lines about pull requests that have merged (#69, #73, #74): about 8 lines if
+  reworded, named line by line in the docs pass's notes, and not reworded here (the question STATUS-LEN below).
 
 ## Proposed next step
 4b-2 (steps 6 to 12): the collision library under his FEATURE-COMPARE (a) conditions, the built-file check, his
@@ -351,7 +380,8 @@ VISION-RULE message: "so that this rule needs no rework later? Do not build it w
 - (a) **Not in 4b.** The mark comes with Slice 2's sight check as one added field of the map kind, with the
   format's version going up by one. 4b-2's collision world keeps, for every solid piece, which shape of the map
   it came from, so the mark can be looked up later with no rebuild of the world. Until then every shape blocks
-  movement, shots and sight alike, which is what his list says for walls, buildings and static objects.
+  movement, shots and sight alike, which, for sight, is what his point 2f says of walls, buildings and static
+  objects (his point 3 leaves shots open).
 - (b) In 4b-1 now: every shape carries the mark, read and checked, used by nothing until Slice 2 (about 60
   lines; round 1 just removed a key of that kind because nothing read it).
 - (c) In 4b-2, with the collision world: the mark is stored per solid piece, still used by nothing.
@@ -371,8 +401,23 @@ file's durations for the time unit.)
 - **Recommendation: (C)** (game-designer's; the old tuning file calls its numbers "Starting values, not
   decisions"). Nothing waits on this before change-set 8.
 
+**STATUS-LEN: who shortens the other lanes' stale lines in STATUS?**
+- Why it matters: STATUS stands at 124 lines against your limit of 120, and the 4 lines over are not this
+  lane's: they are the guard and CI chats' lines about #69, #73 and #74, which have merged. One of them holds the
+  open Critical finding R4-1 and your interim rule, so rewording it is not a mechanical move.
+- (a) **Their own chats do it** at their next docs pass (the Guard fix chat's next change-set is queued); STATUS
+  stays 4 over until then.
+- (b) This chat's docs pass rewords them now, in 4b-1 (about 8 lines freed; R4-1's sentence and your interim rule
+  kept word for word), and your Advisor checks those lines at the merge check.
+- (c) Your Advisor words them and a chat pastes them in.
+- **Recommendation: (a).** The lines are about a security finding another chat owns; 4 lines over for a day is
+  the smaller risk. It does not hold the merge.
+
 ## For Mustafa
-1. **Your go for the merge of pull request [[PR]] at head `[[FINAL-FULL]]`**, after your Advisor's merge check.
-   [[FOR-1]] No browser check: nothing a player sees, hears or feels changes. I merge it by a merge commit with
-   that id as the expected head, on your word in this chat.
-2. Your answers to SIGHT-FLAG (before 4b-2's step 10) and DUR-1 (before change-set 8). Neither holds the merge.
+1. **Your go for the merge of pull request #75**, for the head the advisor agent approved, after your Advisor's
+   merge check. That head's full id is in the pull request's description and in this chat's message (a report
+   cannot hold the id of the commit that holds it); gate and toolchain must be green on it. No browser check:
+   nothing a player sees, hears or feels changes. I merge it by a merge commit with that id as the expected
+   head, on your word in this chat.
+2. Your answers to SIGHT-FLAG (before 4b-2's step 10), DUR-1 (before change-set 8) and STATUS-LEN. None holds
+   the merge.

@@ -2167,6 +2167,10 @@ _Last updated: 2026-11-26 (change-set 4b-1's docs pass, first part, by lane 1's 
   - 4B-OLD-READERS (security-auditor, round 2; outside this change-set): two older readers of committed vectors go
     around the plain read, `packages/sim-worker/boundary/rules.test.mjs` and
     `packages/e2e/tests/rules/wasm-rules.spec.ts` [verified 2026-11-26 at 2039e3c: `rules.test.mjs:15` reads the vectors with `readFileSync`; `wasm-rules.spec.ts:33` hands Playwright a vector by its path with `route.fulfill`].
+  - 4B-MEMORY-UNIT (the verifier, on the final code; for 4b-2's first commit): the comment of
+    `packages/sim-worker/boundary/content.test.mjs` gives the test module's memory as "49 MiB"; it is 49.2 million
+    bytes, 46.9 MiB. The asserted ceiling (64 MiB) is right; only the comment's unit is wrong, and it stays until
+    4b-2 so that 4b-1's reviewed code does not move for a comment.
   - Closed by 4b-1, at its merge: 4A-S3-READ's read side (the block "From change-set 4a" above, its dated pointer).
 
 ## Decisions pending: the rest
