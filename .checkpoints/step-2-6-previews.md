@@ -250,6 +250,20 @@ his LANE-RULES). Its brief: his paste of the start block (start-block-new-chat.m
   MERGE-74: main is taken in once, at the next head #72 needs (the docs pass before ready, or at his word sooner), so
   one merge and one review cover all of main's moves while #72 waits on ORDER-WALL and the two merges under the wall.
   Told him once.
+- HIS MESSAGE "FOR BUILDER V5" (2026-11-26, 19:20 Amsterdam; message 28f1a938-6439-4d86-90fc-e55a3e06c26a, 18:16:41
+  UTC, 1075 bytes, sha256 e63bf1f0d730a0d22109ed9ff30145c9e3cf4df05428fa101c22392d6028bff2; saved whole by
+  scripts/save_msg.py in mustafa-2026-11-26T1920-order-wall.md; into DECISIONS at the take-in): ORDER-WALL (a), the
+  token sitting stays before #72's merge, nothing in the approved design changes; the first check merge is done (#76
+  at 19:00 under the new rule, main 2671595fc823750a83c58f5b5b122128eb500387); the key waits only for the PR Advisor's
+  next merge (the Guard fix chat's small docs pull request, its 07:45 run tomorrow); do now the docs update in lane 2's
+  own files and write the token sitting's message; holding the take-in is right (Builder V4's #75 moves main tonight).
+- T11, done on it: the runbook's hand-over section made true (L5); the report updated (the hand-over, Outcome, the
+  three merges and the three moved ROADMAP entries (L1), the merges' evidence, the head reviews, his answers to the new
+  chat (MAIN-WALL message at 17:31:13 UTC, L3), the accidental rewind, Risks 1 and 2, next step, Decisions needed, For
+  Mustafa); the token sitting's message written (token-sitting-message.md: (a) the environment page, the token, (b) the
+  two secrets, (c) the other secret pages, (d) the fresh run by the STATUS end-date commit and the re-runs, (e)
+  WALL_TEST and wall-test.yml out). Left for the take-in: DECISIONS (his messages to the new chat: 15:05, "A" for
+  MERGE-74, 17:31, 19:20), STATUS (#72's row, lane 2's lines; L4: 125 lines), ROADMAP's step 2.6 entry, REPO_MAP.
 - Item 6c checked 2026-11-26 after the push: no pull request of the Guard fix chat's protection for main is open or
   merged (the 12 most recently updated pull requests read with gh api). The token sitting waits.
 
@@ -259,10 +273,11 @@ c. Wait for the Guard fix chat's protection for main to merge (his TOKEN-TONIGHT
    not merged by his click on the real token, ask him again first (MAIN-WALL (b)). Then, by his MERGE-74 (a): take
    main in once (3b949c1 or newer, MAIN-WALL and #74 together), by the scripted method (resolve/verify/control), the
    advisor agent's review of that merge, before the token sitting's message. DONE: MAIN-WALL on (~17:15 UTC); main
-   taken in (851f004). NOW (his 17:31 UTC message): the token sitting waits for one day-session merge and one PR
-   Advisor merge under the new rule; "your own next merge from a day session counts as the first", which would put
-   #72's merge before the token sitting: the order (and what it changes: wall-test.yml, condition (d), previews on
-   main without a token) goes to him as ORDER-WALL before anything acts on it.
+   taken in (851f004). His ORDER-WALL (a): the token sitting stays before #72's merge. The first check merge is #76;
+   the key waits only for the PR Advisor's next merge (expected at its 07:45 run, 2026-11-27). When he says it is
+   through, two things only: (1) one take-in of main (2671595 or newer, #75 likely) with the shared docs (DECISIONS:
+   his messages to the new chat; STATUS; ROADMAP's step 2.6 entry; REPO_MAP; L4), the advisor agent's review covering
+   851f004..that head; (2) the sitting: send token-sitting-message.md (its {…} filled), then steps d and e below.
 d. The token sitting, one message to him in this order (the security-auditor's conditions): (a) reload the `preview`
    environment page, screenshot (bypass box unticked, "Selected branches and tags", "1 branch and 0 tags allowed",
    `main`, no custom rule); (b) both secrets only by "Add environment secret"; (c) after the secrets, the Actions,

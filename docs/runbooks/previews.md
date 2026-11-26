@@ -30,10 +30,12 @@ three planted branch jobs reached the environment's test secret at 22:29 UTC. Af
 GitHub refused all three at 22:56 UTC ("Branch ... is not allowed to deploy to preview due to environment protection
 rules"). The likely cause was the unsaved bypass box; the `main` rule may also have been saved only after 22:29.
 
-## Before the hand-over step is on main
-Until main's `toolchain` workflow hands its build over (the CI Builder chat's step, asked on issue #59), every preview
-run ends in `check` with the notice "no build to preview: main's toolchain workflow does not hand one over yet" and
-writes no comment. That is expected.
+## The hand-over from `toolchain`
+Since PR #74 (2026-11-26; the CI Builder chat's step, asked on issue #59), main's `toolchain` workflow ends, on pull
+requests from this repository only, with a check that the tested build holds only plain files and folders, then hands
+it over as the artifact `preview-site`, kept 7 days. The `check` job fetches it from that run. If the hand-over step
+ever leaves main's `toolchain.yml`, every preview run ends in `check` with the notice "no build to preview: main's
+toolchain workflow does not hand one over yet" and writes no comment.
 
 ## When something fails
 Open the Actions tab, choose the workflow `preview`, and find the run started by the pull request's `toolchain` run.
