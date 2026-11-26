@@ -94,6 +94,10 @@ needs no go of his (as U4r's and U4f's); PR #40 keeps its own go.
   (`git diff --quiet H0 -- spikes/` exit 0). C1's result stands (independent of the merge). Next: the advisor's ruling
   in the 04:50 window (with MAIN-67's step 7), then U8's builder (ac59cce3e5d002441) fixes r1.sh's room_settings and the
   pin, then this merge again from M0.
+- RESTART FROM M0, 05:1x (advisor-u8-m5-ruling.md section 2 (a)-(f)): M1 now binds wip/u8-build.patch sha256
+  3e1cd5b53d4c224020233f8e7edc3a1ec3b795edc729dd257101fff0742ea531 (377,866 B, 43 files, base 03d9ff3: U8's M5 fix,
+  u8-fix-m5.md); M5 runs `node --test 'ops/**/*.test.mjs'` (101 expected) and `bash ops/tests/wrappers.test.sh` first,
+  then `env CARGO_INCREMENTAL=0 node check.mjs`; C1 stands; the rest of the steps as above. Done lines follow below.
 - (was) RUNNING since 00:35:4x: M5 (background shell b5xy9vavj; .gate/u8-merge/m5-check.log; fmt and clippy PASS by 00:37);
   u8-report.md drafted (its M5_RESULT and M7_RESULT to fill). If the chat was compacted meanwhile: read the log's end;
   all PASS and the ops lines 0 fail: go on to M7 (gate, repo map, the link removed), then M8 and M9; a FAIL: M6.
