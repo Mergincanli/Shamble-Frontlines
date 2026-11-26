@@ -1,8 +1,8 @@
 # The 14:50 UTC window (2026-11-26): the order and the messages, drafted 12:5x UTC by the main session
 LEAN-MODE: new agents, and resumed agents with new work, only 14:50-15:20 UTC; at most 3 at once. Step 0: df, `git
 rev-parse HEAD` (fill `<head>`), no merge of mine in progress (else the launches wait for its push, inside 15:20).
-- **Order:** A and B and C together at 14:5x. When B ends (if before 15:20, his S14-PUSH answered and B's verdict
-  APPROVE or conditions applied word for word), D in B's slot. If Builder 2's merge reached its step 9 before 14:50,
+- **Order:** A and B and C together at 14:5x. When B ends (if before 15:20, and B's verdict APPROVE or its conditions
+  applied word for word; his S14-PUSH (a) is in, history.md:8090-8106), D in B's slot. If Builder 2's merge reached its step 9 before 14:50,
   NB2-C10's reviewer read (one reviewer agent on 72651a3c's last 67 judge lines: advisor-nb2-merge.md:121-126) takes
   D's slot, and D goes to 19:50.
 - Every message carries, word for word: "git and gh always start their own command, with no other program in front of
@@ -40,8 +40,9 @@ policy strings inside his words?); item 1c's list and its `<S14>` fill (S14-PUSH
 item 2's test design; the round. Also rule: may item 2's four-way proof be a scratch run under .gate/, recorded in the
 builder's notes and not counted in the 41, so that the one PROMPT-R1.md line always ships (your head read says the
 builder "proves it on a throwaway repository", not that the proof is a committed test)? It may be 15-20 lines alone;
-if yes, the line is never carried, only its test. S14-PUSH's options for `<S14>`: (a) s14/ whole; (b) a derived
-summary (a new item, re-checked); (c) neither (S14 NOT-RUN at R1). Write
+if yes, the line is never carried, only its test. His S14-PUSH answer (history.md:8090-8106) is (a), s14/ whole,
+with two conditions, now item 1e: check that 1e meets both conditions as worded and that item 1 fits 41 lines. He
+also wrote "U8-F1's builder may start in the 14:50 UTC window on this answer." Write
 .checkpoints/netcode-proof-test/advisor-u8-f1-brief.md: APPROVE, APPROVE WITH CONDITIONS (each worded to apply word
 for word) or REVISE. End your turn at once: the builder takes your slot.
 

@@ -8086,3 +8086,21 @@ Unchanged: lean mode, and git and gh always start their own command, with no oth
   chat first, as before. #70 (merged 12:22:01 UTC; main 2483e9a) gets the full take-in (MAIN-52): MAIN-68. Lean mode
   and the interim sentence unchanged.
   Transcript line 102607 (a queue-operation enqueue at 12:21:19.506Z), 1012 characters.
+
+## Mustafa, 2026-11-26 13:04 UTC (his label: 14:00 Amsterdam), in this chat: S14-PUSH (a) with two conditions, U8-F1's builder in the 14:50 window, /compact then "ready" (word for word)
+```text
+From Mustafa, 26 November, 14:00 Amsterdam (written with my Advisor).
+
+1. S14-PUSH: (a). R1's results push carries the s14 folder whole, through the same redaction check. My Advisor read ops/sbin/npt-s14 and ops/runs/s14/probe.py on your branch: the folder holds the kernel's release (uname -r, no host name), the net.ipv4 settings, the load, the TCP counters and the message times, and its only addresses are the two documentation addresses between the namespaces.
+2. Two conditions. The redaction check runs on the s14 folder itself before the push, and its result is in the run's record. If a later change puts anything into that folder that names the server (a host name, a routed address, a hardware address), it stops and comes to me first.
+3. U8-F1's builder may start in the 14:50 UTC window on this answer.
+4. Next from me: /compact once you have recorded this, then "ready" for Builder 2's merge when you are back.
+5. Rule unchanged: git and gh always start their own command, with no other program in front of them.
+```
+- **Read as** (the main session's reading, not his words): S14-PUSH (a): R1's pushed list gains s14/ whole. Its
+  conditions bind U8-F1 and every later change: (1) before the push, the redaction check runs on the s14 folder
+  itself, and its printed result is kept in the run's record; (2) a change that would put anything naming the server
+  into that folder (a host name, a routed address, a hardware address) stops and goes to him first, so U8-F1 pins
+  what the folder may hold by a test. U8-F1's builder may start in the 14:50 UTC window. Next: his /compact after this
+  record, then his "ready" for Builder 2's merge. The interim rule unchanged.
+  Transcript line 103266 (a queue-operation enqueue at 13:04:13.574Z), 1026 characters.

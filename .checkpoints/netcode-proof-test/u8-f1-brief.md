@@ -1,8 +1,9 @@
 # U8-F1: the head read's fix list (brief, drafted 2026-11-26 12:4x UTC by the main session; for the advisor's one check)
 Sources: advisor-u8-head.md (APPROVE WITH FINDINGS): section 3 (SR-1, SR-2), section 4 (ADV-U8H-1 to -4) and "U8-F1, in
 every form". His answer, word for word in history.md:8068-8088: "RESULTS-PUSH: (b). Only numbers leave the server and
-the push stays summaries. U8's new stop is 6,230 lines." `<S14>` is filled at launch from his S14-PUSH answer; with no
-answer at launch, this brief waits for the next window.
+the push stays summaries. U8's new stop is 6,230 lines." His S14-PUSH answer, word for word in history.md:8090-8106:
+"(a). R1's results push carries the s14 folder whole, through the same redaction check." with two conditions (item
+1e), and "U8-F1's builder may start in the 14:50 UTC window on this answer."
 
 ## 0. Base and size
 - Base `<base>`: the branch head at launch (U8 merged at 05c63a8: 43 files under spikes/netcode-proof/ops/, 6,189 added
@@ -24,15 +25,25 @@ answer at launch, this brief waits for the next window.
       ds-selftest/ws_split.txt, one `<name> <value>` line each, numbers only; a missing event prints one line saying so.
    c. The pushed list, word for word the same in PROMPT-R1.md section 6 step 2 (ops/operator/PROMPT-R1.md:121-123) and
       R1.md section 7 (ops/runs/R1.md:288-294), in place of "npt-judge's summaries and the redacted records":
-      `collect/`, `probe/presence.txt`, `ds-selftest/ws_split.txt`, `bringup/facts.txt`<S14>. With his S14-PUSH
-      (a): `, and s14/ whole (R1.md:190-193's copied folder: numbers and kernel settings)`. With (b): `, and
-      s14/summary.json`, a derived summary built by an item 1e added to this brief at launch (its lines counted, the
-      brief checked again, so U8-F1 waits for the next window). With (c): nothing, and R1.md section 5's model-side
-      line says S14 reads NOT-RUN at R1 (no path here: the laptop has no Rust).
+      `collect/`, `probe/presence.txt`, `ds-selftest/ws_split.txt`, `bringup/facts.txt`, `s14/` whole (R1.md:190-193's
+      copied folder: his S14-PUSH (a)) and `s14-redact.txt` (item 1e).
    d. Tests: one asserts the two lists equal (test 5's file, which holds PROMPT-R1.md's checks); r1sh.test.mjs reads
       presence.txt's new lines from a fixture P1 log (an `l2_summary` and the four reads) and ws_split.txt's from a
       fixture `ws_split` event. One plant each (drop a field from the print, or one name from one list): the test
       fails by name; restored by sha256.
+   e. **S14-PUSH (a)'s two conditions**, his words: "The redaction check runs on the s14 folder itself before the
+      push, and its result is in the run's record. If a later change puts anything into that folder that names the
+      server (a host name, a routed address, a hardware address), it stops and comes to me first."
+      - PROMPT-R1.md section 6 step 2, before the push: the clone's redact-check run on `<results>\r1\s14` itself; its
+        printed result saved as `s14-redact.txt` in the pushed set, its last line in step 4's three-line summary; a
+        finding means no push: stop and tell him.
+      - A test in ops/tests/s14.test.mjs pins what the folder can hold: every file npt-s14 and r1.sh's s14 block write
+        into it, kernel.txt's sources (uname -r, the listed net.ipv4 settings, `tc qdisc show`, /proc/loadavg),
+        probe.py's JSON keys, and its only addresses (198.51.100.1 and .2). Any other writer, key or address fails it
+        by name, with a message that such a change goes to Mustafa first (his S14-PUSH condition). One plant (an added
+        `uname -n` line): fails by name; restored by sha256.
+   Item 1, 1e included, is never carried. If item 1 alone would pass 41, stop before it does and report what grew,
+   why, and the cheaper option (his stop).
 2. **SR-1, with SR-2:** one line in PROMPT-R1.md section 6 step 2, just before the push, in PowerShell:
    `git -C <results> rev-parse --git-path hooks`, `<results>` being the folder the push uses. It must print the clone's
    own hooks folder, the one holding pre-push; anything else: stop and tell him. Not `git config --get core.hooksPath`:
