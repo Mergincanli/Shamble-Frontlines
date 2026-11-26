@@ -3,7 +3,10 @@
 //! a random number (change-set 8) the seed moves only the whole-state column; the input streams make the shared
 //! columns differ too.
 
+use std::path::Path;
+
 use devtools::compare::{Column, first_difference};
+use devtools::files::read_plain;
 use devtools::recording::{Recording, parse_hashes};
 use devtools::replay::{Replay, replay};
 use devtools::scripts::{first_loop, looped};
@@ -33,15 +36,11 @@ fn two_matches_stepped_in_turn_each_give_their_own_hashes() {
         }
     }
     // And the first of them is the committed recording: its hashes are the file's.
-    let name = |suffix: &str| {
-        format!(
-            "{}/recordings/first-loop.{suffix}",
-            env!("CARGO_MANIFEST_DIR")
-        )
-    };
-    let bytes = std::fs::read(name("rec")).expect("the committed recording");
+    let folder = Path::new(env!("CARGO_MANIFEST_DIR")).join("recordings");
+    let bytes = read_plain(&folder, "first-loop.rec").expect("the committed recording");
     assert_eq!(Recording::decode(&bytes).as_ref(), Ok(&first));
-    let hashes = std::fs::read_to_string(name("hashes")).expect("its hashes file");
+    let hashes = read_plain(&folder, "first-loop.hashes").expect("its hashes file");
+    let hashes = String::from_utf8(hashes).expect("its hashes file is text");
     let file = parse_hashes(&bytes, &hashes).expect("its hashes file reads");
     assert_eq!(file, together[0]);
 }

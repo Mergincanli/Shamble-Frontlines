@@ -63,10 +63,11 @@ pub fn made() -> Result<Vec<(String, Vec<u8>)>, String> {
 /// Refuses what is in the tree and is no plain file: a link there could lead a read or a write anywhere, and the
 /// repository's tree is not trusted. Nothing there yet is fine.
 fn plain(folder: &Path, name: &str) -> Result<(), String> {
-    // The folder is asked for by its own path: a path that ends in a separator would be followed through a link.
+    // The folder is asked for by its own path: a path that ends in a separator would be followed through a link,
+    // so the path is put together again from its parts, which leaves a last separator out.
     let is_folder = name.is_empty();
-    let path = if is_folder {
-        folder.to_path_buf()
+    let path: std::path::PathBuf = if is_folder {
+        folder.components().collect()
     } else {
         folder.join(name)
     };
@@ -79,6 +80,34 @@ fn plain(folder: &Path, name: &str) -> Result<(), String> {
         )),
         Err(_) => Ok(()),
     }
+}
+
+/// The most bytes one read of a committed file takes: far above any file of the folder.
+pub const MAX_READ_BYTES: u64 = 64 * 1024 * 1024;
+
+/// A committed file's bytes, read only when the folder and the file are what they are by their own type: a plain
+/// folder and a plain file in it, never a link (Mustafa's LINKS-CHECK (c), 2026-11-26: the tests that read the
+/// recordings refuse anything that is not a plain file, as the folder check does). Every test that reads a recording
+/// reads it through here; `tests/recordings.rs` scans their sources for another way in.
+///
+/// # Errors
+/// A name that is a path, a folder or a file that is a link or of another type, a file that is not there or is
+/// larger than a read takes, each by name.
+pub fn read_plain(folder: &Path, name: &str) -> Result<Vec<u8>, String> {
+    if name.is_empty() || name == "." || name == ".." || name.contains(['/', '\\']) {
+        return Err(format!("{name:?} is not a file's name"));
+    }
+    plain(folder, "")?;
+    plain(folder, name)?;
+    let path = folder.join(name);
+    let found = std::fs::symlink_metadata(&path).map_err(|error| format!("{name}: {error}"))?;
+    if found.len() > MAX_READ_BYTES {
+        return Err(format!(
+            "{name}: {} bytes, more than a read takes",
+            found.len()
+        ));
+    }
+    std::fs::read(&path).map_err(|error| format!("{name}: {error}"))
 }
 
 /// Writes every file into `folder`, which must exist. Making the recordings again is deliberate: it is done in the
@@ -108,12 +137,8 @@ pub fn check(folder: &Path) -> Result<(), String> {
     plain(folder, "")?;
     let mut wrong = Vec::new();
     for (name, bytes) in &files {
-        if let Err(why) = plain(folder, name) {
-            wrong.push(why);
-            continue;
-        }
-        match std::fs::read(folder.join(name)) {
-            Err(error) => wrong.push(format!("{name}: {error}")),
+        match read_plain(folder, name) {
+            Err(why) => wrong.push(why),
             Ok(found) if found == *bytes => {}
             Ok(found) => wrong.push(format!(
                 "{name} differs{}",

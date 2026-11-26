@@ -10,10 +10,12 @@ import * as dev from "../../../.gate/rules-module/dev/devtools.js";
 import * as release from "../../../.gate/rules-module/release/devtools.js";
 import { initSync, Sim, tick_hz } from "../pkg/sim_wasm.js";
 import { firstDifference, readHashes, readRecording, replayOn, replayStep } from "../src/recording.ts";
+import { readPlainFile } from "./plain-file.ts";
 
-const folder = new URL("../../../crates/devtools/recordings/", import.meta.url);
-const file = (name) => readFileSync(new URL(name, folder));
-const names = readdirSync(folder).filter((name) => name.endsWith(".rec")).map((name) => name.slice(0, -4));
+// The committed recordings, each read only when it is a plain file in a plain folder (plain-file.ts).
+const recordings = new URL("../../../crates/devtools/recordings/", import.meta.url);
+const file = (name) => Buffer.from(readPlainFile(recordings, name));
+const names = readdirSync(recordings).filter((name) => name.endsWith(".rec")).map((name) => name.slice(0, -4));
 const VECTOR_TICK = 900;
 initSync({ module: readFileSync(new URL("../pkg/sim_wasm_bg.wasm", import.meta.url)) });
 const modules = [["release", release], ["dev", dev]].map(([profile, glue]) => {
