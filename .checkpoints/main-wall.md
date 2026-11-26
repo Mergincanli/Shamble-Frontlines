@@ -45,8 +45,16 @@
     repositories" (so click 2 needs nothing); the Claude authorization page. GUARD-SETTINGS not needed (risk 4 covers
     his own account only). Missing: Settings > Actions > General.
 
+13. His clicks 1, 3, 4, 5 done (screenshots): sandbox-1126 public, outside-contributor approval on; the test chat on
+    his university account holds only sandbox-1126; ruleset-1 imported (Active, bypass empty, default branch, the
+    copied rules); ruleset-2 (Active, Repository admin Exempt, default branch, Restrict updates only). The test chat
+    put its setup in its pull request 1 (it cannot push to main), gate and smoke green there; it cannot read rulesets
+    or rule records (no tool), so T0 and the rule records come from his screenshots. Still missing: the real
+    repository's Settings > Actions > General.
+
 ## Current step
-His clicks 1, 3 (the test chat and the brief), 4, 5; the Actions > General screenshot.
+He merges the sandbox's pull request 1 (screenshot of the merge box first), answers the test chat (paste-ready text
+given), sends T0 screenshots; then the tests run.
 
 ## Next steps
 1. Plan (.checkpoints/main-wall/plan.md, no gap detail); the advisor agent's review; his go on the plan.
