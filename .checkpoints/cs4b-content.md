@@ -12,7 +12,7 @@
   `git push origin cs/4b-content:claude/cool-pasteur-oiqk1r`, alone in its command; never a plain `git push`. The
   session's start folder is never switched · **Base:** origin/main 2483e9a741c4e552323c36523831a2f35de4002e (the
   merge of 4a, pull request #70)
-- **Last update:** 2026-11-26 18:00 Amsterdam (from the clock)
+- **Last update:** 2026-11-26 18:02 Amsterdam (from the clock)
 
 ## Sizes and stop lines (his answer of 2026-11-26, 14:09:13 UTC: SIZE-4B (b); which number is which)
 - **4b is two pull requests**, in engine-architect's cut; "each stands on its own: lines left over in 4b-1 do not
@@ -377,6 +377,29 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
       - R2-RR-5 Low: the scan of `files.rs` counts only `File::open(` and `fs::read(`. FIX: the other reads too.
       - Its note: `is_id` also refuses device names for shape, spawn and region ids, which are no file names:
         harmless.
+    - **security-auditor, round 2: DONE** (`security-auditor-review-4b1-round2.md`): no Critical or High;
+      dependencies PASS (the lockfile and both manifests are step 1's approved digests; the pass adds nothing).
+      SA-1 to SA-7 all closed (its fifteen-texts bundle now holds the input plus 4,662 bytes; it was twice the
+      input). New:
+      - R2-SA-1 Medium: **"held at most the input plus 4 MiB" is still true only for the five limit cases.** A
+        list keeps room for four members after its first, so an object of one member holds 288 bytes for 6
+        bytes of input: one file of 528 chains of 30 such objects (96,103 bytes) holds 4,619,314 (328,907
+        over); a bundle with that file and as many such nodes under an unknown key of its second entry
+        (1,413,367 bytes) holds 9,321,393 (3,713,722 over). Bounded all the same (about the input plus 10 MB at
+        worst): no denial of service. FIX in the last pass: every list is cut to its length when it closes
+        (measured by it in a copy: the input plus 1.10 MB and plus 1.06 MB), and both shapes join the limit
+        cases. It must be in before a bundle is read while the game runs (4b-2's Worker).
+      - R2-SA-2 Low: the content scan's gaps (the same as R2-RR-2), and its check of the lint guard looks for the
+        lints' names, not for "deny". FIX in the last pass.
+      - R2-SA-3 Low: `files.rs` says every reader this change-set added goes through the plain read; three
+        tests read committed SOURCES with `std::fs` (`recordings.rs`, `dependency_rules.rs`, `rules_scan.rs`); a
+        link swapped in after the check is followed (it needs a local writer: outside the threat model, and
+        the docs do not say so); the scan counts only `fs::read(`. FIX: the wording and the scan; the race is
+        said, not closed.
+      - Its notes: departure 9's condition (4c refuses a map with too few spawns) is not yet in STATUS's 4b-1
+        block (the docs pass's second part adds it); the CI clippy step should not wait past 4b-2's merge;
+        outside this change-set, `rules.test.mjs` and `wasm-rules.spec.ts` (older) still read vectors without
+        the helper (a follow-up).
 
 ## Slips of this chat's own rules, for the report
 - One git command did not start its own shell call: `git add .checkpoints/cs4b-content/review-brief-4b1.md` stood
@@ -428,5 +451,5 @@ in); the advisor agent on the head; `.checkpoints/` out of the head; the draft p
   gh always start their own command, one git per shell call. The board add-on is active.
 
 ## Running work
-- test-engineer (its read of the whole), security-auditor and engine-architect (round 2) are running; no edit to
-  the tree until they are done. No saver runs: the main session commits the notes by hand.
+- test-engineer (its read of the whole) and engine-architect (round 2) are running; no edit to the tree until
+  they are done. No saver runs: the main session commits the notes by hand.
