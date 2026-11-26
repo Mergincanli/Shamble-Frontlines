@@ -68,3 +68,29 @@ against main does not hold on the larger sweep; the 6 forms cannot start their p
 in the report, follow-up, no push. ADV-R4-3 Low: the option table's header comment still describes the old xargs rule;
 rides item 3. ADV-R4-4 Low: the replace-string check relies on a property that holds today only because another rule
 asks first; follow-up. The detail of every id is in the handback and the scratchpad, never here.
+
+## Round 4 plan change: hooks-r4c (2026-11-26; branch head 450a46e; a plan-change review, not a round; no form named)
+Checked myself: the real hook files still equal 9ad6bc9's; guard.mjs unchanged; the copy's suite 1551/1551; red 17
+with hooks-r4b's guard and red 45 with 9ad6bc9's guard, each under the copy's tests (red9, red10: their guard files
+hash-equal to those two); size against main guard +55/-14, tests +111/-3 = 166 added (stop line 200); the wide
+differential rerun (253,080 lines, session and agent): hooks-r4b to hooks-r4c only stricter, no throw; against main,
+looser only in ADV-R4-2's set (6 deny to pass, 85 session deny to ask), nothing new. The guard diff against hooks-r4b
+is the rule U precondition named once (same expression), the ADV-R4-1 check after the gw block (adds an ask or an
+agent refusal only, no early pass), and the ADV-R4-3 comment. The new reason reuses unwrap()'s reason text, as the
+front check already does. Its silence when a read-only program follows matches his line (a) exactly; recorded.
+
+Verdict: APPROVE hooks-r4c (sha256 prefixes: guard b1ab3110, tests 7c0f0f36). ADV-R4-1 and ADV-R4-3 closed in the
+copy. ADV-R4-2 and ADV-R4-4 stay Low follow-ups; INPUT-RUN stays the named limit.
+
+Hunk list and order, confirmed (guard: three hunks against 9ad6bc9; tests: four):
+1. Guard, one Edit: unwrap()'s changed lines, declarations and every use together.
+2. Guard, one Edit: rule U's block from the precondition line through the end of the new ADV-R4-1 block, the unchanged
+   gw block inside it (the new check uses the precondition).
+3. Guard, one comment-only Edit: ADV-R4-3.
+4. Tests: the rows block, the R2-1 row, the mutant block. The re-pointed SAME-GAP anchor lies about 14 lines above the
+   mutant block: one Edit spanning both or its own fourth Edit, either is fine.
+After each guard Edit the guard stays loadable and no looser than 9ad6bc9 (the state after 1 is hooks-r4b's logic).
+Conditions: the earlier ones stand (the real files equal 9ad6bc9's before the first Edit; text byte for byte from the
+copy; each Edit asked of Mustafa with its exact text; no commit until the last test Edit; cmp both files against the
+copy; the three kit suites with the same counts as the copy and main plus the new rows; the gate --no-smoke, CI runs
+smoke; ONE commit). Round 4 (security-auditor) then reviews what changed since round 3 on that commit's head.

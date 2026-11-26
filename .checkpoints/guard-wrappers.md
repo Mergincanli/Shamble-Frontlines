@@ -42,8 +42,12 @@
     in a separate chat or by his clicks (never a second repository here); MAIN-WALL's plan says where GUARD-KIT's parts
     ride; guard loaded in this chat (answered: a harmless call refused by the guard's own message)
 
+22. The advisor agent: hooks-r4c APPROVE (plan-change review; hunk order confirmed) · notes advisor-plan.md
+23. Applied: 3 guard Edits, 4 test Edits, each asked; cmp equal to hooks-r4c (guard b1ab3110…, tests 7c0f0f36…);
+    1551/127/33; gate PASS --no-smoke; one commit · 83bc2417
+
 ## Current step
-hooks-r4c: wide sweep running; then the advisor agent's review of hooks-r4c.
+security-auditor round 4 (the last) on 83bc2417, on what changed since round 3 (9ad6bc9).
 
 ## Next steps
 1. On APPROVE (and ≤200 added lines of code and tests): the guard edit (asks Mustafa), then the tests; push both together.
