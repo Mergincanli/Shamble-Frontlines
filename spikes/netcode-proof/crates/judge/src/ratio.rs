@@ -84,6 +84,20 @@ impl Ratio {
         Ok(Ratio::new(if neg { -num } else { num }, den))
     }
 
+    /// `self + o`, or `None` where the exact sum does not fit i128 (the `+` operator stops the judge there): for a
+    /// figure that adds fractions of unrelated denominators.
+    pub fn checked_add(self, o: Ratio) -> Option<Ratio> {
+        let left = self.num.checked_mul(o.den)?;
+        let num = left.checked_add(o.num.checked_mul(self.den)?)?;
+        Some(Ratio::new(num, self.den.checked_mul(o.den)?))
+    }
+
+    /// `self * o`, or `None` where the exact product does not fit i128.
+    pub fn checked_mul(self, o: Ratio) -> Option<Ratio> {
+        let num = self.num.checked_mul(o.num)?;
+        Some(Ratio::new(num, self.den.checked_mul(o.den)?))
+    }
+
     /// Divides by a positive integer.
     pub fn div_int(self, n: i128) -> Ratio {
         Ratio::new(self.num, checked(self.den.checked_mul(n)))
@@ -133,10 +147,34 @@ impl Sub for Ratio {
 }
 
 impl Ord for Ratio {
+    /// Exact at every size: the cross products where they fit i128, else `cmp_wide` (a figure that divides one sum
+    /// of fractions by another, as -10's cost ratio does, can pass them).
     fn cmp(&self, o: &Ratio) -> Ordering {
-        let l = checked(self.num.checked_mul(o.den));
-        let r = checked(o.num.checked_mul(self.den));
-        l.cmp(&r)
+        match (self.num.checked_mul(o.den), o.num.checked_mul(self.den)) {
+            (Some(l), Some(r)) => l.cmp(&r),
+            _ => cmp_wide((self.num, self.den), (o.num, o.den)),
+        }
+    }
+}
+
+/// `a.0 / a.1` against `b.0 / b.1`, both denominators above 0, with no product formed: the whole parts first, then
+/// the remainders, compared through their reciprocals with the order turned round (Euclid's steps, so it ends).
+fn cmp_wide(mut a: (i128, i128), mut b: (i128, i128)) -> Ordering {
+    let mut turned = false;
+    loop {
+        let (whole_a, rest_a) = (a.0.div_euclid(a.1), a.0.rem_euclid(a.1));
+        let (whole_b, rest_b) = (b.0.div_euclid(b.1), b.0.rem_euclid(b.1));
+        let order = match (whole_a.cmp(&whole_b), rest_a, rest_b) {
+            (Ordering::Equal, 0, 0) => Ordering::Equal,
+            (Ordering::Equal, 0, _) => Ordering::Less,
+            (Ordering::Equal, _, 0) => Ordering::Greater,
+            (Ordering::Equal, _, _) => {
+                (a, b, turned) = ((a.1, rest_a), (b.1, rest_b), !turned);
+                continue;
+            }
+            (order, _, _) => order,
+        };
+        return if turned { order.reverse() } else { order };
     }
 }
 
@@ -187,6 +225,45 @@ mod tests {
         assert_eq!(Ratio::new(1, 3) + Ratio::new(1, 6), Ratio::new(1, 2));
         assert_eq!(Ratio::new(1, 2) - Ratio::new(3, 4), Ratio::new(-1, 4));
         assert_eq!(Ratio::int(7).div_int(2), Ratio::new(7, 2));
+    }
+
+    #[test]
+    fn compares_fractions_whose_cross_products_pass_i128() {
+        let big = 10_i128.pow(30);
+        // 1 + 1/10^30 against 1 + 1/(10^30 + 1): the cross products are near 10^60.
+        let (a, b) = (Ratio::new(big + 1, big), Ratio::new(big + 2, big + 1));
+        assert!(a > b && b < a && a != b);
+        assert_eq!(a.cmp(&a), Ordering::Equal);
+        assert!(Ratio::new(-(big + 1), big) < Ratio::new(-(big + 2), big + 1));
+        assert!(Ratio::new(-(big + 1), big) < b && b > Ratio::int(1));
+        assert!(
+            Ratio::new(big * 7 + 3, big + 7) < Ratio::int(7)
+                && Ratio::int(7) > Ratio::new(big * 7 + 3, big + 7)
+        );
+        // The wide comparison agrees with the cross products wherever those fit.
+        let small: Vec<(i128, i128)> = (-6..=6)
+            .flat_map(|n| (1..=6).map(move |d| (n, d)))
+            .collect();
+        for a in &small {
+            for b in &small {
+                assert_eq!(
+                    cmp_wide(*a, *b),
+                    (a.0 * b.1).cmp(&(b.0 * a.1)),
+                    "{a:?} {b:?}"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn the_checked_sum_and_product_say_when_they_do_not_fit() {
+        let (third, sixth) = (Ratio::new(1, 3), Ratio::new(1, 6));
+        assert_eq!(third.checked_add(sixth), Some(Ratio::new(1, 2)));
+        assert_eq!(third.checked_mul(sixth), Some(Ratio::new(1, 18)));
+        let big = Ratio::new(1, 10_i128.pow(20) + 1);
+        assert_eq!(big.checked_mul(big), None);
+        assert_eq!(big.checked_add(Ratio::new(1, 10_i128.pow(20) + 3)), None);
+        assert_eq!(Ratio::int(i128::MAX).checked_add(Ratio::int(1)), None);
     }
 
     #[test]

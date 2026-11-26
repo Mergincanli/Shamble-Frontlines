@@ -77,9 +77,17 @@ header; tick, second and event records follow in time order. Every record has a 
     never logged (the advisor's U4e round-1 ruling, R1, and round-2 ruling, Q2). Every tick from a client's first
     snapshot to the end of its log is resolved for that client: a hash, or `null` with `tick.s.snap_incomplete` 1 (a
     tick none of whose groups arrived counts too, known from a later header's tick); every client is admitted, and its
-    first snapshot resolved, in the warm-up (a client admitted later is -19's join, built with U6); after the measured
-    phase the clients keep logging until every measured tick is resolved, and a tick still in flight at the stop is not
-    written;
+    first snapshot resolved, in the warm-up, or it is a join (-19's; C-U6-11): the rule runs per session of a slot,
+    from each `admit` record the room's log holds for it (field `slot`; the record's tick `t`, the room's tick at
+    admission) to the slot's next. A session's first snapshot is resolved at or before the room's first measured hash
+    of it. A session that left (the slot's last one too: a client that leaves for good) may leave the room's last
+    hashes unresolved, in flight when it left, only up to its recorded `session_end` (field `slot`, tick `t`: the
+    room's last tick of the session; the first one recorded in the session; the lab's log on L1, the room's on L2),
+    never past it. With no `session_end` (still connected at the stop, or a silent stop) the session's span reaches
+    the room's last measured hash; so the writer records a `session_end` at the tick a session ends, and none for a
+    session still connected at the stop (one at the room log's last tick record or later gives no tail). A slot with no `admit` record is one session with no tail, and the room logs no
+    measured hash for a slot before its first `admit`. After the measured phase the clients keep logging until every
+    measured tick is resolved, and a tick still in flight at the stop is not written;
   - `replay_hash` (only in a `replay` log on x86_64, the x86-64 re-decode of an L2 client's logged bytes, R-8): the
     same as `decoded_hash`, decoded again natively, for the Arm rule.
 - **Events the judge reads for validity** (§4): `admit` (`session`, `in_roster`), `control` (`source`: `socket` or
@@ -100,7 +108,8 @@ header; tick, second and event records follow in time order. Every record has a 
 | `id` | string | `PM-0001-4`, `PM-0004-67`, `PM-0006-14`, … |
 | `title` | string | the row's second cell, shortened if long |
 | `draft` | object | `file` (repository path of the ADR) and `row_sha256` (SHA-256 of the row's whole line, without its line end). The drift test finds the row by its id and fails if the hash differs |
-| `verdict` | string | the mark's kind: `pass` (pass numbers, judged by script), `reported` (no pass number), `person` (judged by a person), `outside` (not in this change-set: always NOT-RUN with `notes`; it has no parts or checks, and may keep its `bites` as data for the change-set that runs it) |
+| `verdict` | string | the mark's kind: `pass` (pass numbers, judged by script), `reported` (no pass number), `person` (judged by a person), `outside` (not in this change-set: always MOVED with `notes`; it has no parts or checks, and may keep its `bites` as data for the change-set that runs it) |
+| `moved` | object | only when the whole mark left this test (2.6): `to`, `why` and `by`. The mark then reads MOVED and is never judged; its other fields stay, as data for the test that takes it |
 | `where` | list of strings | where and when it runs (plan §6.2's key: `C`, `R1` to `R7`, `ML*`, `MAC-r`, `MAC-b`, `MP`); informative |
 | `parts` | list of parts | the evidence the mark needs (2.2); empty for `outside` |
 | `validity` | list of strings | the validity rules of §4 that apply to its runs, beyond the four that apply to every run (a part may add its own: 2.2) |
@@ -125,6 +134,7 @@ A part selects runs and says how many valid runs it needs:
 - `min` is the number of valid runs the part needs (3 for a V-S mark; ADR 0001's V-S).
 - `validity` (optional) lists rules for this part's runs only, beside the mark's: a part's rules add to the mark's and
   never remove any (PM-0001-25's V-S on its flood parts, not its Origin parts).
+- `moved` (optional): the part left this test (2.6); it reads MOVED and its runs are never judged.
 
 ### 2.3 Checks
 ```json
@@ -173,6 +183,8 @@ A part selects runs and says how many valid runs it needs:
   to the next millisecond (k never moves), and prints the numbers in force with M_p, M_m, s and f beside the check.
   Such a check names its parts, each judged by the `ws-practice` rule (§4); a mark has at most one check per letter,
   and the rule makes a run INVALID unless these checks' numbers are the bound's.
+- **`moved`** (optional): the check left this test (2.6) and is skipped wherever checks are chosen. A bite's entry
+  may carry `moved` too (§5).
 - **An empty comparison** (the advisor's Q11 ruling, u4-build-plan.md §4.6): a figure that compares pairs
   (`decoded_hash_mismatch_count`, `twin_hash_mismatch_count`) fails, never passes, when it compared nothing. Its check
   comes out `empty`: the run fails, as on a failure (its gaps listed beside it), and no bite is shown by it (§5).
@@ -196,8 +208,11 @@ from the part's valid runs, never judged (B10).
 - `params.cmd_timing` (`A` or `B`, OQ-0001-6's options) and `params.cc` (`newreno` or `cubic`): start-up settings from
   the room unit's configuration (L2) or the scenario (L1), never changed during a run (A2).
 - `params.killed`: only on a room killed on purpose (PM-0001-27's SIGKILL, PM-0006-22's soak kill), and the exemption
-  from `complete` holds only if npt-super's log records that kill of that slot (built at U6: C4). PM-0001-59's crashed
-  rooms need none: their catch writes the `crash` footer.
+  from `complete` holds only if npt-super's log records that kill of that slot (C4). That check is not built yet:
+  npt-super writes no kill record today, so the judge exempts every log that says `killed`; its home is before R5's
+  -27 and PM-0006-22 runs. PM-0001-27's figure needs the killed room's run in the set, and reads the survivors'
+  ticks of phase `after`: the run script kills the room at the end of the measured window, so `after` begins at the
+  kill. PM-0001-59's crashed rooms need none: their catch writes the `crash` footer.
 - `hs` in a tick record: built at U4j, §1 (B15).
 - `params.burst_spacing_ns` (B1 runs of PM-0001-18): the scheduled interval between burst starts, before each burst's
   random offset; the practice run and its counted run must share it. `params.config_hz` (L2): RS's kernel CONFIG_HZ,
@@ -231,6 +246,26 @@ from the part's valid runs, never judged (B10).
   BETTER: §4), and each moved number as the bound's times f rounded up to the next millisecond, from M_p and the bound's
   line.
 
+### 2.6 Moved (the trim of 2026-11-21 and its re-plan)
+A mark, a part, a check or a bite that left this test for a later one carries
+`"moved": { "to": "<where it is judged instead>", "why": "<why it left>", "by": "<the decision>" }`, none of the
+three blank. Nothing else about it changes: its numbers, series and row hash stay in the file, as data for the test
+that takes it. The judge never judges a moved piece and never lets it read PASS:
+- **a mark** moved whole reads MOVED whatever its runs hold (its reason counts them; none is judged);
+- **a part** reads MOVED and none of its runs is judged;
+- **a check** is skipped wherever checks are chosen (a part's runs, its pooled checks, its setup checks, a bite run);
+- **a bite** is never evaluated, run or not;
+- an `outside` mark takes no label: it left before any trim, and reads MOVED by its kind;
+- a check or a reported statistic that names only moved parts is never judged either: it travels with them.
+
+`--check-marks` refuses a label where the judge would not read it, each with its own message: on a mark and also on a
+part, check or bite of it (a mark moved whole says it once); on every part of a mark (move the mark); on a part of a
+`person` mark (it is judged whole, from its `person` record); on a `ws_bound` check (the bound's line holds its
+number); on a part of a mark with the `ws-practice` rule (a bite run takes its numbers from every measured run of
+its set: move the mark); on a reported statistic (it decides nothing); and on a mark that another names as its
+precondition (`pre:<mark>`), or on a part or check of it (a precondition is judged whole). A kept bite with
+`expect: "invalid"` names a rule of the mark or of a kept part, never one that only a moved part holds.
+
 ## 3. How a verdict is reached
 1. The judge reads every results log under the given folder and keeps, per mark, the runs whose header lists it.
 2. Each run is checked against the validity rules (§4): the mark's and its part's. An invalid run is neither a pass
@@ -241,13 +276,16 @@ from the part's valid runs, never judged (B10).
    empty comparison (§2.3) fails the run as a failure does.
 5. Per part: any valid run that failed makes the part FAIL; else any invalid run makes it INVALID; else anything not
    decidable yet (a figure not built, a precondition that cannot be checked) or fewer than `min` valid runs make it
-   NOT-RUN; otherwise it passes.
-6. Per mark: any part FAIL, or a bite run that passed (§5), makes the mark FAIL; else any part INVALID, or an invalid
-   bite run, makes it INVALID; else any part NOT-RUN, or a bite with no run, makes it NOT-RUN (the verdict names what
-   is missing); else PASS, or STAND-IN when `stand_in` is true and a run had `params.sim` = `stand-in`.
-7. A `reported` mark comes out REPORTED with its statistics when every part has its valid runs; INVALID and NOT-RUN
-   work as above. A `person` mark comes out PASS or FAIL from its `person` event, or NOT-RUN. An `outside` mark is
-   always NOT-RUN.
+   NOT-RUN; otherwise it passes. A moved part (§2.6) is not judged: it reads MOVED.
+6. Per mark, from its kept parts and kept bites: any part FAIL, or a bite run that passed (§5), makes the mark FAIL;
+   else any part INVALID, or an invalid bite run, makes it INVALID; else any part NOT-RUN, or a bite with no run,
+   makes it NOT-RUN (the verdict names what is missing); else, when a part, check or bite of it is moved, MOVED (its
+   first reason names each moved piece and where it went); else PASS, or STAND-IN when `stand_in` is true and a run
+   had `params.sim` = `stand-in`. So a kept failure, invalid run or missing run always shows, and a mark with a moved
+   piece never reads PASS, STAND-IN or REPORTED.
+7. A `reported` mark comes out REPORTED with its statistics when every part has its valid runs; INVALID, NOT-RUN and
+   MOVED work as above. A `person` mark comes out PASS or FAIL from its `person` event, or NOT-RUN. An `outside` mark
+   is always MOVED, and so is a mark moved whole, before any of these steps.
 
 ## 4. Validity rules
 Four rules hold for every run of every mark (plan §6.1, security F1, F3, N11; the advisor's C4), and for every run a
@@ -255,7 +293,8 @@ figure compares with (a twin, a practice run):
 - **complete:** every log of the run ends with its `footer`, unless its header has `params.killed` true (a room the
   run kills on purpose, as PM-0001-27 does); a cut log makes the run INVALID;
 - **build** (C4: plan §4.7's "measured builds never contain them", checked by the judge, not by the run script alone):
-  a run that names a bite (header `bite`) must have role `bite` or `twin` (a bite run's twin runs the same bite) and
+  a run that names a bite (header `bite`) must have role `bite` or `twin` (a bite run's twin runs the same bite; a bite run's `logging-off` twin may name it
+  too, only as the run a twin figure compares that bite run with: PM-0006-20's planted-format bite) and
   at least one log whose `build.features` lists `bites`; in a run that names none (measured, a measured run's twin,
   clean, practice, …) no log may list `bites`. "At least one log": on L2 the bite lives in one binary (RS's room)
   while LG's bots may run the measured build. Either way round, the run is INVALID (a `bite` run naming no bite is
@@ -330,11 +369,18 @@ check fails on a run that holds its validity rules and setup checks, gaps notwit
 (§2.3) shows no bite: a bite run whose only failing checks compared nothing did not test its bite, and is INVALID.
 A bite run from a measured build is INVALID by the build rule (§4).
 
+Moved pieces (§2.6): a moved bite is never evaluated. A bite run that matches only moved parts is not a run of this
+test, so it is left out: it neither shows nor misses its bite, which then has no run. One that matches no part at all
+is judged on the checks that name no `parts`, as before. A moved check shows no bite: a bite run that fails only moved
+checks passed every kept one, so its bite is missed (or undecided, and the mark NOT-RUN, when no kept check applies to
+that run at all).
+
 A bite with `expect: "invalid"` and a `rule` (PM-0001-30's "the validity check itself") targets that validity rule:
 it is shown only when its run is INVALID by that rule alone, every other rule holding; a run that holds the rule makes
 it missed, and the mark FAIL; a run invalid by another rule makes it INVALID.
 
 ## 6. Verdicts (plan §6.1)
 PASS · FAIL · INVALID (a validity rule failed: neither a pass nor a fail, ADR 0001:1497-1498) · STAND-IN (PM-0001-4
-on a lighter sim) · REPORTED (no pass number) · NOT-RUN. Every verdict carries its detail: per part, the runs and
-each check's value against its threshold.
+on a lighter sim) · REPORTED (no pass number) · NOT-RUN · MOVED (the mark, or a part, check or bite of it, left this
+test: §2.6). Every verdict carries its detail: per part, the runs and each check's value against its threshold; a
+moved mark, part, check or bite carries where it went.

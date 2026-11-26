@@ -1,5 +1,5 @@
 //! npt-judge: one verdict per mark from the runs' results logs and `marks.json` (plan §6.1): PASS, FAIL, INVALID,
-//! STAND-IN, REPORTED or NOT-RUN, with nearest-rank percentiles and exact fractions. `marks/README.md` is the
+//! STAND-IN, REPORTED, NOT-RUN or MOVED, with nearest-rank percentiles and exact fractions. `marks/README.md` is the
 //! contract it follows. It depends only on npt-log and serde (plan §4.2), so its verdicts never share code with what
 //! they judge.
 
@@ -9,7 +9,7 @@ pub mod marks;
 mod practice;
 pub mod ratio;
 
-pub use eval::{Verdict, VerdictKind, judge};
+pub use eval::{Verdict, VerdictKind, judge, judge_only};
 pub use marks::{Marks, parse as parse_marks};
 
 use std::io::BufReader;
@@ -45,8 +45,18 @@ pub fn read_logs(dir: &Path) -> Result<Vec<npt_log::Log>, String> {
     Ok(logs)
 }
 
-/// One line per verdict: the mark, the verdict, and its first reason.
+/// One line per verdict: the mark, the verdict, and its first reason. Every control character is escaped, so no text
+/// from a log (a run id in a reason) starts a line of its own on stdout.
 pub fn summary_line(v: &Verdict) -> String {
     let first = v.why.first().map(String::as_str).unwrap_or("");
-    format!("{:<12} {:<9} {first}", v.mark, v.verdict.to_string())
+    let line = format!("{:<12} {:<9} {first}", v.mark, v.verdict.to_string());
+    let mut out = String::with_capacity(line.len());
+    for c in line.chars() {
+        if c.is_control() {
+            out.extend(c.escape_default());
+        } else {
+            out.push(c);
+        }
+    }
+    out
 }

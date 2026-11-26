@@ -14,7 +14,12 @@ each case with the real `marks/marks.json` and checks the verdict and its reason
 | PM-0001-4 | `fail-with-gap` | run 2 is over 16.67 ms and also lacks its overrun counter: the failure stands, the gap listed beside it | FAIL |
 | PM-0001-30 | `base` | the validity bite: a replay with one command past its tick; its run comes out INVALID by `late-zero` alone | bite shown |
 | PM-0001-30 | `missed` | the same bite run with no late command counted: the validity check let it through | FAIL |
-| PM-0006-14 | `base` | the N = 48 session: both bracket runs and one count run padded to 8.33 ms on every tick; N = 36 and 18 not run | NOT-RUN |
+| PM-0001-30 | `base` (the C part) | six measured room logs on the container, 3 recordings x `wt` and `ws`, each naming its other-transport run in `params.twin` (C-U6-9), equal state hashes, `late_count` 0; RS's six runs and the wallclock bite not run | the C part PASS; the mark NOT-RUN |
+| PM-0001-30 | `twin-differs` | recording 2's `ws` run has another hash at tick 2: both runs of the recording fail, each against the other | FAIL |
+| PM-0001-30 | `same-transport` | recording 3's two runs both say `wt` | INVALID (the C part) |
+| PM-0001-30 | `not-mutual` | recording 1's `ws` run names another run as its twin | INVALID (the C part) |
+| PM-0001-30 | `twin-missing` | recording 1's `ws` file holds another run, serving no mark: the `wt` run's twin is not in the set yet | NOT-RUN (the C part) |
+| PM-0006-14 | `base` | the N = 48 session: both bracket runs and one count run padded to 8.33 ms on every tick; its N = 36 and N = 18 parts are moved (`marks/README.md` §2.6), so the mark reads MOVED, with N = 48's count reported | MOVED |
 | PM-0006-14 | `short` | one measured tick of the count run padded to 8.329 ms, short of 8.33 ms | INVALID |
 | PM-0001-4 | `measured-bites-build` | C4: run 1's room log comes from a bites build, naming no bite | INVALID |
 | PM-0001-4 | `measured-names-bite` | C4: run 2 is a measured run that names the B-S bite | INVALID |
@@ -31,7 +36,7 @@ each case with the real `marks/marks.json` and checks the verdict and its reason
 | PM-0001-17 | `slot-unlogged` | slot 1 `null` everywhere with `snap_incomplete` 0, while the room logged its hashes | INVALID |
 | PM-0001-17 | `hashed-and-incomplete` | slot 1's tick 2 has a hash and `snap_incomplete` 1 at once: filed lost though the room sent it a snapshot and the link lost none of it (`snap_lost_unexplained_count` 1), the coverage gap listed beside the failure (INVALID before C62H-BOUND) | FAIL |
 | PM-0001-17 | `short-lists` | 2-entry lists under the header's 48 clients | INVALID |
-| PM-0001-17 | `l1-aarch64-claim` | the L1 client (role C) says aarch64 and logs a hash at tick 9, which the server never logged; an x86-64 replay agrees elsewhere: its only mismatch is that orphan, which counts on every machine (FX-5 (c)); this row does not show the Arm rule's LG key (TE2-1: carry 64 (a)) | FAIL |
+| PM-0001-17 | `l1-aarch64-claim` | the L1 client (role C) says aarch64 and logs a hash at tick 9, which the server never logged; an x86-64 replay agrees elsewhere: its only mismatch is that orphan, which counts on every machine (FX-5 (c)); the Arm rule's LG key is shown by the engine Arm test's role C and ML cases (TE2-1) | FAIL |
 | PM-0001-17 | `lg-cross-arch` | an L2 P2 run (run `l2-p2-1`: RS's room on x86_64, LG's bots on aarch64, a `replay` log on x86_64; 2 clients): slot 1's tick 2 differs on LG and the x86-64 re-decode equals the server's | the L2 P2 part's run valid, 0 mismatches, aarch64-only 1 |
 | PM-0001-17 | `lg-replay-differs` | the same, the re-decode differing too | FAIL |
 | PM-0001-17 | `lg-replay-in-client-log` | LG's bots log carries its own `replay_hash` (no replay log) | INVALID (a name in another process's log) |
@@ -56,6 +61,18 @@ are built in code and judged with the real `marks/marks.json` in `tests/engine.r
 `u4j_ws_one_practice_run_per_build_over_every_set`, `u4j_ws_a_bite_run_takes_its_counted_runs_practice_run`,
 `u4j_ws_the_record_carries_the_marks_bound_line`, `u4j_ws_the_tolerance_and_band_boundaries`).
 
-PM-0006-14 has no pass number, so it is never PASS or FAIL: with all three N run and padded right it is REPORTED
-(the engine tests cover that path); its fixture proves that short padding comes out INVALID (ADR 0006's PM-0006-14 row:
-"npt-judge's fixtures prove that short padding comes out INVALID").
+PM-0006-14 has no pass number, so it is never PASS or FAIL. With the real `marks/marks.json` its N = 36 and N = 18
+parts are moved, so its padded N = 48 session reads MOVED (the `base` case); REPORTED is covered by the engine tests,
+on made-up marks with no moved part. Its fixture proves that short padding comes out INVALID (ADR 0006's PM-0006-14
+row: "npt-judge's fixtures prove that short padding comes out INVALID").
+
+MOVED with the real `marks/marks.json` (`tests/fixtures.rs`): which marks, parts, checks and bites the file labels
+(`the_real_marks_file_labels_what_the_trim_moved`); a label added at every position of a passing case never reads PASS
+(`a_label_anywhere_on_a_passing_mark_never_reads_pass`, on PM-0001-4 `base` and PM-0006-11 `base`); and a label on a
+bite hides no kept FAIL or INVALID (`a_moved_bite_hides_no_kept_failure_or_invalid_run`).
+
+U6j's figures (the 19 built in part b: -10, -12, -13, -15, -24, -27, -38, -59, PM-0006-17, -19 and -20's) have no
+fixture folder: no writer logs their series yet, so each is proven on logs made up in code, in `tests/engine.rs`
+(`u6j_...`, `alloc_twin_diff_count_...`), with a pass, a fail and a gap case, and a waiting case where it compares
+with a run not in the set yet. -19's join rule (C-U6-11) is there too (`c_u6_11_...`); -30's other-transport twins
+have the fixtures above.

@@ -3,8 +3,8 @@
 
 use crate::figures;
 use crate::marks::{
-    Against, BoundNumber, Combine, Cond, Kind, Mark, Marks, Measure, Part, Rule, Source, Stat,
-    Threshold, Window,
+    Against, BoundNumber, Combine, Cond, Kind, Mark, Marks, Measure, Moved, Part, Rule, Source,
+    Stat, Threshold, Window,
 };
 use crate::practice;
 use crate::ratio::Ratio;
@@ -81,6 +81,8 @@ pub(crate) enum Missing {
     Gap(String),
     NotBuilt(String),
     Empty(String),
+    /// A figure that fails with no number to show (`figures::Lack::Fail`): its check fails, its reason printed.
+    Fail(String),
 }
 
 fn header_value(h: &Header, key: &str) -> Option<Value> {
@@ -261,6 +263,12 @@ fn collect_some(
     }
 }
 
+/// A run's `tick.v.work_ns` over its measured ticks (PM-0006-19's rule and figure pool them): a gap if it has none.
+pub(crate) fn measured_work(run: &Run<'_>) -> Result<Vec<i64>, String> {
+    let work = Source::TickV("work_ns".to_owned());
+    collect_some(run, &work, Window::Measured, &BTreeMap::new())
+}
+
 /// The 1-based nearest rank of quantile `q` among `n` values: ⌈q × n⌉ (plan §6.1).
 pub fn nearest_rank(n: usize, q: Ratio) -> usize {
     let n = n as i128;
@@ -292,12 +300,14 @@ pub(crate) fn stat_of(stat: &Stat, cond: Option<Cond>, values: &[i64]) -> Ratio 
     }
 }
 
-/// A measure over one or more runs (more than one for a pooled check or a pooled reference).
+/// A measure over one or more runs (more than one for a pooled check or a pooled reference). `parts` is what a
+/// figure may read beside its run and set: the mark's kept parts' valid runs, or none.
 fn measure(
     m: &Measure,
     runs: &[&Run<'_>],
     set: &[&Run<'_>],
     from: &BTreeMap<String, Value>,
+    parts: &figures::Parts<'_, '_>,
 ) -> Result<Ratio, Missing> {
     match m {
         Measure::Series {
@@ -329,7 +339,7 @@ fn measure(
             Ok(stat_of(stat, *cond, &values))
         }
         Measure::Figure(name) => match runs {
-            [run] => figures::compute(name, run, set),
+            [run] => figures::compute(name, &figures::Inputs { run, set, parts }),
             _ => Err(Missing::NotBuilt(format!(
                 "figure {name} cannot be pooled over runs"
             ))),
@@ -391,14 +401,16 @@ fn reference(
         ));
     }
     let as_text = |e: Missing| match e {
-        Missing::Gap(s) | Missing::NotBuilt(s) | Missing::Empty(s) => s,
+        Missing::Gap(s) | Missing::NotBuilt(s) | Missing::Empty(s) | Missing::Fail(s) => s,
     };
+    // A reference is a series' statistic, never a figure (marks.rs refuses `against` on one): no parts to read.
+    let none = figures::Parts::new();
     match against.combine {
-        Combine::Pooled => measure(m, &refs, set, from).map_err(as_text),
+        Combine::Pooled => measure(m, &refs, set, from, &none).map_err(as_text),
         Combine::Mean | Combine::Median => {
             let mut values = Vec::new();
             for r in &refs {
-                values.push(measure(m, &[*r], set, from).map_err(as_text)?);
+                values.push(measure(m, &[*r], set, from, &none).map_err(as_text)?);
             }
             values.sort();
             let n = values.len();
@@ -484,10 +496,17 @@ fn eval_check(
         note,
         setup: check.setup,
     };
-    let value = match measure(&check.measure, runs, set, &check.from) {
+    let value = match measure(&check.measure, runs, set, &check.from, ctx.parts) {
         Ok(v) => v,
         Err(Missing::Gap(why)) => return out(Outcome::Gap, None, String::new(), Some(why)),
         Err(Missing::NotBuilt(why)) => return out(Outcome::Cannot, None, String::new(), Some(why)),
+        Err(Missing::Fail(why)) => {
+            let needs = match &check.threshold {
+                Threshold::Value(t) => needs_text(&t.to_string()),
+                Threshold::Against { .. } => String::new(),
+            };
+            return out(Outcome::Fail, None, needs, Some(why));
+        }
         Err(Missing::Empty(why)) => {
             let needs = match &check.threshold {
                 Threshold::Value(t) => needs_text(&format!("{t} over at least 1 compared")),
@@ -538,6 +557,12 @@ fn field_bool(f: &BTreeMap<String, Value>, name: &str) -> Option<bool> {
 /// The rules that hold for every run: consistent headers, complete logs, the roster, capabilities, and the build
 /// (the advisor's C4): a measured build never names a bite, and a bite never runs without the bites build.
 pub(crate) fn always_rules(run: &Run<'_>) -> Vec<String> {
+    every_run_rules(run, &["bite", "twin"])
+}
+
+/// [`always_rules`] with the roles that may name a bite given. Only `figures::twin_of` passes another list: a bite
+/// run's logging-off twin runs the same bite on the same build (PM-0006-20's planted-format bite).
+pub(crate) fn every_run_rules(run: &Run<'_>, may_name_a_bite: &[&str]) -> Vec<String> {
     let mut why = Vec::new();
     if !run.inconsistent.is_empty() {
         why.push(format!(
@@ -551,7 +576,7 @@ pub(crate) fn always_rules(run: &Run<'_>) -> Vec<String> {
         .any(|l| l.header.build.features.iter().any(|f| f == "bites"));
     match run.bite {
         Some(id) => {
-            if run.role != "bite" && run.role != "twin" {
+            if !may_name_a_bite.contains(&run.role) {
                 why.push(format!(
                     "build: a {} run names the bite {id}; only a bite run or a bite run's twin may",
                     run.role
@@ -930,12 +955,17 @@ fn rule(
             let mut pooled = Vec::new();
             let mut each = Vec::new();
             for r in &off {
-                match collect_some(
-                    r,
-                    &Source::TickV("work_ns".to_owned()),
-                    Window::Measured,
-                    &BTreeMap::new(),
-                ) {
+                // An "off" run holds the rules every run holds, as any run another is compared with.
+                let broken = always_rules(r);
+                if !broken.is_empty() {
+                    why.push(format!(
+                        "PM-0006-19: logging-off run {} is invalid: {}",
+                        r.id,
+                        broken.join("; ")
+                    ));
+                    return;
+                }
+                match measured_work(r) {
                     Ok(v) => {
                         each.push((r.id, stat_of(&p99, None, &v)));
                         pooled.extend(v);
@@ -961,6 +991,7 @@ fn rule(
                 why.push(format!("pre:{id}: not in marks.json"));
                 return;
             };
+            // The loader refuses a precondition with a moved part or check (README §2.6), so none is met here.
             let matched = matched_parts(pre, run);
             let checks: Vec<&crate::marks::Check> = pre
                 .checks
@@ -977,8 +1008,14 @@ fn rule(
                 undecided.push(format!("pre:{id}: none of its checks applies to this run"));
                 return;
             }
+            // The parts in reach are the judged mark's, not the precondition's: its checks read none.
+            let none = figures::Parts::new();
+            let pre_ctx = Ctx {
+                parts: &none,
+                ..*ctx
+            };
             for c in checks {
-                let o = eval_check(c, &[run], set, ctx);
+                let o = eval_check(c, &[run], set, &pre_ctx);
                 let note = o.note.clone().unwrap_or_default();
                 match o.outcome {
                     Outcome::Pass => {}
@@ -1028,10 +1065,14 @@ fn validity<'r>(
 
 /// What every judgement may consult: the whole marks file (for preconditions), the mark being judged (whose practice
 /// run the ws-practice rule looks for), and every run the judge reads (where that practice run may be, in any set).
+#[derive(Clone, Copy)]
 pub(crate) struct Ctx<'m> {
     marks: &'m Marks,
     mark: &'m Mark,
     all: &'m [Run<'m>],
+    /// The valid runs of the mark's kept parts, for the figures that read across parts (`figures::Inputs`); empty
+    /// until `judge_mark`'s first pass has found them, and while a precondition's checks are judged.
+    parts: &'m figures::Parts<'m, 'm>,
 }
 
 /// The parts of a mark whose `select` a run matches, its role aside.
@@ -1064,6 +1105,9 @@ pub enum VerdictKind {
     Reported,
     #[serde(rename = "NOT-RUN")]
     NotRun,
+    /// The mark, or a part, check or bite of it, left this test (README §2.6): never PASS, REPORTED or STAND-IN.
+    #[serde(rename = "MOVED")]
+    Moved,
 }
 
 impl fmt::Display for VerdictKind {
@@ -1075,6 +1119,7 @@ impl fmt::Display for VerdictKind {
             VerdictKind::StandIn => "STAND-IN",
             VerdictKind::Reported => "REPORTED",
             VerdictKind::NotRun => "NOT-RUN",
+            VerdictKind::Moved => "MOVED",
         })
     }
 }
@@ -1103,6 +1148,9 @@ pub struct PartOut {
     pub runs: Vec<RunOut>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub pooled: Vec<CheckOut>,
+    /// Where the part went, when it left this test: its verdict is MOVED and it holds no runs.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub moved: Option<Moved>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
@@ -1115,6 +1163,8 @@ pub enum BiteStatus {
     Invalid,
     NotRun,
     Undecided,
+    /// It left this test: never evaluated, run or not.
+    Moved,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -1122,6 +1172,16 @@ pub struct BiteOut {
     pub id: String,
     pub status: BiteStatus,
     pub runs: Vec<RunOut>,
+    /// Where the bite went, when it left this test.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub moved: Option<Moved>,
+}
+
+/// A check that left this test, by name, with where it went.
+#[derive(Debug, Clone, Serialize)]
+pub struct MovedCheck {
+    pub name: String,
+    pub moved: Moved,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -1145,10 +1205,17 @@ pub struct Verdict {
     pub bites: Vec<BiteOut>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub report: Vec<ReportOut>,
+    /// Where the whole mark went, when it left this test.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub moved: Option<Moved>,
+    /// The mark's checks that left this test: skipped wherever checks are chosen.
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub moved_checks: Vec<MovedCheck>,
 }
 
+/// A check counts for a part when it is kept (not moved: README §2.6) and names that part, or names none.
 fn applies(check: &crate::marks::Check, part: &str) -> bool {
-    check.parts.is_empty() || check.parts.iter().any(|p| p == part)
+    check.moved.is_none() && (check.parts.is_empty() || check.parts.iter().any(|p| p == part))
 }
 
 fn part_select(part: &Part) -> BTreeMap<String, Value> {
@@ -1254,6 +1321,14 @@ fn fail_lines(part: &str, r: &RunOut, out: &mut Vec<String>) {
                 c.name,
                 c.note.as_deref().unwrap_or(""),
                 c.needs
+            ));
+            continue;
+        }
+        // A figure that fails with no number (`Missing::Fail`) prints its reason in the value's place.
+        if let (None, Some(why)) = (&c.value, &c.note) {
+            out.push(format!(
+                "{part}: run {}: {}: {why} (needs {})",
+                r.run, c.name, c.needs
             ));
             continue;
         }
@@ -1380,6 +1455,7 @@ fn eval_part(
         why,
         runs,
         pooled,
+        moved: None,
     }
 }
 
@@ -1390,23 +1466,32 @@ fn eval_bite(
     all: &[Run<'_>],
     ctx: &Ctx<'_>,
 ) -> BiteOut {
-    let bite_runs: Vec<&Run<'_>> = serving
+    // A bite run that matches only moved parts is not a run of this test (README §5): it is left out, so it can
+    // neither show the bite nor miss it. A run that matches no part at all stays, judged on the mark-wide checks.
+    let kept_parts = |run: &Run<'_>| {
+        let mut parts = matched_parts(mark, run);
+        let none = parts.is_empty();
+        parts.retain(|p| p.moved.is_none());
+        (none || !parts.is_empty()).then_some(parts)
+    };
+    let bite_runs: Vec<(&Run<'_>, Vec<&Part>)> = serving
         .iter()
         .copied()
         .filter(|r| r.role == "bite" && r.bite == Some(bite.id.as_str()))
+        .filter_map(|r| kept_parts(r).map(|kept| (r, kept)))
         .collect();
     if bite_runs.is_empty() {
         return BiteOut {
             id: bite.id.clone(),
             status: BiteStatus::NotRun,
             runs: vec![],
+            moved: None,
         };
     }
     let mut outs = Vec::new();
     let mut statuses = Vec::new();
-    for run in bite_runs {
-        // A bite run takes the validity of the parts it matches (the advisor's B7 ruling).
-        let matched = matched_parts(mark, run);
+    for (run, matched) in bite_runs {
+        // A bite run takes the validity of the kept parts it matches (the advisor's B7 ruling).
         let rules = rules_of(mark, &matched);
         if let Some(expected) = bite.rule.as_deref() {
             // An expect-invalid bite: shown only when its run is INVALID by that one rule and holds every other.
@@ -1451,7 +1536,7 @@ fn eval_bite(
         }
         let checks = mark.checks.iter().filter(|c| {
             if matched.is_empty() {
-                c.parts.is_empty()
+                c.moved.is_none() && c.parts.is_empty()
             } else {
                 matched.iter().any(|p| applies(c, &p.name))
             }
@@ -1498,6 +1583,7 @@ fn eval_bite(
         id: bite.id.clone(),
         status,
         runs: outs,
+        moved: None,
     }
 }
 
@@ -1506,10 +1592,13 @@ fn report_values(
     parts: &[PartOut],
     members: &BTreeMap<String, Vec<&Run<'_>>>,
     all: &[Run<'_>],
+    figure_parts: &figures::Parts<'_, '_>,
 ) -> Vec<ReportOut> {
     let text = |v: Result<Ratio, Missing>| match v {
         Ok(v) => v.to_string(),
-        Err(Missing::Gap(why) | Missing::NotBuilt(why) | Missing::Empty(why)) => {
+        Err(
+            Missing::Gap(why) | Missing::NotBuilt(why) | Missing::Empty(why) | Missing::Fail(why),
+        ) => {
             format!("not available: {why}")
         }
     };
@@ -1538,16 +1627,28 @@ fn report_values(
                     name: r.name.clone(),
                     part: part.name.clone(),
                     run: format!("pooled over {} runs", valid.len()),
-                    value: text(measure(&r.measure, &valid, &set, &r.from)),
+                    value: text(measure(&r.measure, &valid, &set, &r.from, figure_parts)),
                 });
                 continue;
             }
             for run in &valid {
+                let mut value = text(measure(&r.measure, &[*run], &set, &r.from, figure_parts));
+                // A figure whose row asks for its arithmetic shown prints it beside the value.
+                if let Measure::Figure(name) = &r.measure {
+                    let inputs = figures::Inputs {
+                        run,
+                        set: &set,
+                        parts: figure_parts,
+                    };
+                    if let Some(detail) = figures::detail(name, &inputs) {
+                        value = format!("{value} ({detail})");
+                    }
+                }
                 out.push(ReportOut {
                     name: r.name.clone(),
                     part: part.name.clone(),
                     run: run.id.to_owned(),
-                    value: text(measure(&r.measure, &[*run], &set, &r.from)),
+                    value,
                 });
             }
         }
@@ -1621,9 +1722,33 @@ fn judge_mark(mark: &Mark, all: &[Run<'_>], ctx: &Ctx<'_>) -> Verdict {
         parts: vec![],
         bites: vec![],
         report: vec![],
+        moved: mark.moved.clone(),
+        moved_checks: mark
+            .checks
+            .iter()
+            .filter_map(|c| {
+                c.moved.clone().map(|moved| MovedCheck {
+                    name: c.name.clone(),
+                    moved,
+                })
+            })
+            .collect(),
     };
+    // A mark moved whole (README §2.6) is never judged, whatever its runs hold: a pass here would not be its pass.
+    if let Some(m) = &mark.moved {
+        v.verdict = VerdictKind::Moved;
+        v.why.push(format!(
+            "{}; {} run(s) here list it: counted, not judged",
+            m.line(),
+            serving.len()
+        ));
+        return v;
+    }
     match mark.kind {
         Kind::Outside => {
+            // Outside this test from the start: it left before any trim, so it reads MOVED like the marks that
+            // left later.
+            v.verdict = VerdictKind::Moved;
             v.why
                 .push(format!("outside this change-set: {}", mark.notes));
             return v;
@@ -1636,8 +1761,55 @@ fn judge_mark(mark: &Mark, all: &[Run<'_>], ctx: &Ctx<'_>) -> Verdict {
         }
         Kind::Pass | Kind::Reported => {}
     }
+    // A first pass, for the figures that read across parts or pool a part's runs: each kept part's valid runs,
+    // those that hold their validity rules and its setup checks. Only for a mark that names a figure.
+    let measures = mark.checks.iter().map(|c| &c.measure);
+    let reports = mark.report.iter().map(|r| &r.measure);
+    let reads_figures = measures
+        .chain(reports)
+        .any(|m| matches!(m, Measure::Figure(_)));
+    let mut valid = figures::Parts::new();
+    for part in mark
+        .parts
+        .iter()
+        .filter(|p| reads_figures && p.moved.is_none())
+    {
+        let (rules, select) = (rules_of(mark, &[part]), part_select(part));
+        let holds = |r: &&Run<'_>| {
+            let set = set_of(all, r.set);
+            let v = validity(r, rules.iter().copied(), &set, ctx);
+            let setup = mark
+                .checks
+                .iter()
+                .filter(|c| c.setup && applies(c, &part.name));
+            v.invalid.is_empty()
+                && v.undecided.is_empty()
+                && setup
+                    .map(|c| eval_check(c, &[*r], &set, ctx).outcome)
+                    .all(|o| o == Outcome::Pass)
+        };
+        let members = serving.iter().copied().filter(|r| run_matches(r, &select));
+        let min = usize::try_from(part.min).unwrap_or(usize::MAX);
+        valid.insert(part.name.clone(), (min, members.filter(holds).collect()));
+    }
+    let ctx = &Ctx {
+        parts: &valid,
+        ..*ctx
+    };
     let mut members: BTreeMap<String, Vec<&Run<'_>>> = BTreeMap::new();
     for part in &mark.parts {
+        // A moved part is never judged: no run of it can pass, fail or hold the mark.
+        if let Some(m) = &part.moved {
+            v.parts.push(PartOut {
+                name: part.name.clone(),
+                verdict: VerdictKind::Moved,
+                why: vec![format!("{}: {}", part.name, m.line())],
+                runs: vec![],
+                pooled: vec![],
+                moved: Some(m.clone()),
+            });
+            continue;
+        }
         let s = part_select(part);
         let m: Vec<&Run<'_>> = serving
             .iter()
@@ -1650,11 +1822,21 @@ fn judge_mark(mark: &Mark, all: &[Run<'_>], ctx: &Ctx<'_>) -> Verdict {
     v.bites = mark
         .bites
         .iter()
-        .map(|b| eval_bite(mark, b, &serving, all, ctx))
+        .map(|b| match &b.moved {
+            Some(m) => BiteOut {
+                id: b.id.clone(),
+                status: BiteStatus::Moved,
+                runs: vec![],
+                moved: Some(m.clone()),
+            },
+            None => eval_bite(mark, b, &serving, all, ctx),
+        })
         .collect();
     let part_is = |k: VerdictKind| v.parts.iter().any(|p| p.verdict == k);
     let bite_is = |s: BiteStatus| v.bites.iter().any(|b| b.status == s);
     let mut why = Vec::new();
+    // The order (README §3): what the kept parts and bites show comes first, so a kept failure, invalid run or
+    // missing run is never hidden; then MOVED, so a mark with a moved piece never reads PASS, REPORTED or STAND-IN.
     let kind = if part_is(VerdictKind::Fail) || bite_is(BiteStatus::Missed) {
         VerdictKind::Fail
     } else if part_is(VerdictKind::Invalid) || bite_is(BiteStatus::Invalid) {
@@ -1664,6 +1846,28 @@ fn judge_mark(mark: &Mark, all: &[Run<'_>], ctx: &Ctx<'_>) -> Verdict {
         || bite_is(BiteStatus::Undecided)
     {
         VerdictKind::NotRun
+    } else if mark.any_moved() {
+        // One line naming each moved piece and where it went: the summary line prints the first reason.
+        let pieces: Vec<String> = v
+            .parts
+            .iter()
+            .filter_map(|p| Some(format!("part {:?} to {}", p.name, p.moved.as_ref()?.to)))
+            .chain(
+                v.moved_checks
+                    .iter()
+                    .map(|c| format!("check {:?} to {}", c.name, c.moved.to)),
+            )
+            .chain(
+                v.bites
+                    .iter()
+                    .filter_map(|b| Some(format!("bite {} to {}", b.id, b.moved.as_ref()?.to))),
+            )
+            .collect();
+        why.push(format!(
+            "the kept parts hold; moved, never judged here: {}",
+            pieces.join("; ")
+        ));
+        VerdictKind::Moved
     } else if mark.kind == Kind::Reported {
         VerdictKind::Reported
     } else {
@@ -1699,7 +1903,7 @@ fn judge_mark(mark: &Mark, all: &[Run<'_>], ctx: &Ctx<'_>) -> Verdict {
                 "bite {}: undecided (a check cannot be computed yet)",
                 b.id
             )),
-            BiteStatus::Shown => None,
+            BiteStatus::Shown | BiteStatus::Moved => None,
         };
         let wanted = match kind {
             VerdictKind::Fail => b.status == BiteStatus::Missed,
@@ -1712,9 +1916,9 @@ fn judge_mark(mark: &Mark, all: &[Run<'_>], ctx: &Ctx<'_>) -> Verdict {
         }
     }
     if mark.arm_rule && kind == VerdictKind::Fail {
-        why.push("the Arm rule (ADR 0001): an aarch64-only mismatch is a cross-architecture finding; this judge applies it to the decoded hashes (decoded_hash_mismatch_count, against the x86-64 re-decode), and the shot view test's and throw landing's kinds with their figures (U4h)".to_owned());
+        why.push("the Arm rule (ADR 0001): an LG aarch64 mismatch (the room on x86_64) whose x86-64 re-decode agrees is a cross-architecture finding; this judge applies it to the decoded hashes (decoded_hash_mismatch_count, against the x86-64 re-decode), and the shot view test's and throw landing's kinds with their figures (U4h)".to_owned());
     }
-    v.report = report_values(mark, &v.parts, &members, all);
+    v.report = report_values(mark, &v.parts, &members, all, ctx.parts);
     v.verdict = kind;
     v.why = why;
     v
@@ -1722,10 +1926,18 @@ fn judge_mark(mark: &Mark, all: &[Run<'_>], ctx: &Ctx<'_>) -> Verdict {
 
 /// One verdict per mark, in `marks.json`'s order.
 pub fn judge(marks: &Marks, logs: &[Log]) -> Vec<Verdict> {
+    judge_only(marks, logs, &[])
+}
+
+/// The same for the marks `only` names (every mark when it names none). A precondition (`pre:<mark>`) is looked up
+/// in the whole file all the same, so a mark judged alone still finds the mark its runs must pass.
+pub fn judge_only(marks: &Marks, logs: &[Log], only: &[String]) -> Vec<Verdict> {
     let all = runs(logs);
+    let none = figures::Parts::new();
     marks
         .marks
         .iter()
+        .filter(|m| only.is_empty() || only.contains(&m.id))
         .map(|m| {
             judge_mark(
                 m,
@@ -1734,6 +1946,7 @@ pub fn judge(marks: &Marks, logs: &[Log]) -> Vec<Verdict> {
                     marks,
                     mark: m,
                     all: &all,
+                    parts: &none,
                 },
             )
         })

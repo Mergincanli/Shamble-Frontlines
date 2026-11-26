@@ -110,7 +110,7 @@ fn judges_a_folder_and_writes_the_verdicts() {
     assert_eq!(lines.len(), 2, "{stdout}");
     assert!(lines[0].starts_with("PM-0001-4    PASS"), "{stdout}");
     assert!(
-        lines[1].starts_with("PM-0001-39   NOT-RUN   outside this change-set"),
+        lines[1].starts_with("PM-0001-39   MOVED     outside this change-set"),
         "{stdout}"
     );
     let json: serde_json::Value =
@@ -137,6 +137,84 @@ fn judges_a_folder_and_writes_the_verdicts() {
     assert_eq!(code, 0, "a FAIL is a verdict, not an error");
     assert!(stdout.starts_with("PM-0001-4    FAIL"), "{stdout}");
     let _ = std::fs::remove_dir_all(&dir);
+}
+
+/// MOVED on the command line (README §2.6): the summary line and the JSON say what moved and where, for a mark moved
+/// whole and for a kept mark with a moved part, whose kept part passes.
+#[test]
+fn moved_marks_and_parts_show_in_the_summary_and_the_json() {
+    let dir = temp_dir("moved");
+    let draft = serde_json::json!({"file": "docs/adr/0001-multiplayer-netcode.md", "row_sha256": "0".repeat(64)});
+    let moved = |to: &str| serde_json::json!({"to": to, "why": "it left", "by": "NPT-TRIM"});
+    let check = serde_json::json!({"name": "tick p99", "series": "tick.v.work_ns", "stat": "p99", "op": "<=", "value": 100});
+    let marks = serde_json::json!({
+        "schema": 1, "drafts_commit": "a".repeat(40),
+        "marks": [
+            {"id": "PM-0001-4", "title": "tick budget", "verdict": "pass", "draft": draft,
+             "parts": [{"name": "S30", "select": {"layer": "L1"}, "min": 1},
+                       {"name": "RD", "moved": moved("the named desktop"), "select": {"machine.role": "RD"}, "min": 1}],
+             "checks": [check]},
+            {"id": "PM-0001-47", "title": "the clock", "verdict": "pass", "moved": moved("Slice 3"), "draft": draft,
+             "parts": [{"name": "L1", "select": {"layer": "L1"}, "min": 1}],
+             "checks": [check]}
+        ]
+    });
+    let path = dir.join("marks.json");
+    std::fs::write(&path, marks.to_string()).expect("marks");
+    write_log(&dir.join("logs").join("room.jsonl"), 90);
+    let out = dir.join("verdicts.json");
+    let (code, stdout, stderr) = judge(&[
+        "--marks",
+        path.to_str().unwrap(),
+        "--logs",
+        dir.join("logs").to_str().unwrap(),
+        "--out",
+        out.to_str().unwrap(),
+    ]);
+    assert_eq!(code, 0, "{stderr}");
+    let lines: Vec<&str> = stdout.lines().collect();
+    assert_eq!(
+        lines[0],
+        "PM-0001-4    MOVED     the kept parts hold; moved, never judged here: part \"RD\" to the named desktop",
+        "{stdout}"
+    );
+    assert_eq!(
+        lines[1],
+        "PM-0001-47   MOVED     moved to Slice 3: it left (NPT-TRIM); 0 run(s) here list it: counted, not judged",
+        "{stdout}"
+    );
+    let json: serde_json::Value =
+        serde_json::from_str(&std::fs::read_to_string(&out).unwrap()).unwrap();
+    assert_eq!(json[0]["verdict"], "MOVED");
+    assert!(json[0].get("moved").is_none(), "the mark itself is kept");
+    assert_eq!(json[0]["parts"][0]["verdict"], "PASS");
+    assert_eq!(json[0]["parts"][1]["verdict"], "MOVED");
+    assert_eq!(json[0]["parts"][1]["moved"]["to"], "the named desktop");
+    assert_eq!(json[1]["verdict"], "MOVED");
+    assert_eq!(json[1]["moved"]["to"], "Slice 3");
+    assert!(json[1].get("parts").is_none(), "a moved mark is not judged");
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
+/// `--only` on a mark with a precondition (JDG-ONLY-1): PM-0001-4's runs must pass PM-0001-2's checks, and the mark
+/// judged alone still finds PM-0001-2 in the file. The real marks.json on PM-0001-4's committed base case.
+#[test]
+fn only_keeps_a_marks_precondition_in_reach() {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let marks = root.join("../../marks/marks.json");
+    let logs = root.join("fixtures/pm-0001-4/base");
+    let (code, stdout, stderr) = judge(&[
+        "--marks",
+        marks.to_str().unwrap(),
+        "--logs",
+        logs.to_str().unwrap(),
+        "--only",
+        "PM-0001-4",
+    ]);
+    assert_eq!(code, 0, "{stderr}");
+    let lines: Vec<&str> = stdout.lines().collect();
+    assert_eq!(lines.len(), 1, "{stdout}");
+    assert!(lines[0].starts_with("PM-0001-4    PASS"), "{stdout}");
 }
 
 #[test]

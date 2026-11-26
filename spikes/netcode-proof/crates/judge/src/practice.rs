@@ -1,7 +1,7 @@
 //! PM-0001-18's WebSocket part (`marks/README.md` §2.5 and §4, the `ws-practice` rule): the run-structured bound's
 //! machine-readable line, the practice run's outcome record, and the factor the judge applies to the bound. The rules
 //! are the advisor's on Mustafa's WS-BAR (2026-11-07): one unjudged practice run per build, its slowdown s = M_p / M_m,
-//! the numbers moved by f = max(1, s) only while s is within the tolerance, never set by hand.
+//! the numbers moved by f = max(1, s), or 1 for FAR BETTER, only while s is within the tolerance, never set by hand.
 
 use crate::eval::{Run, always_rules, nearest_rank};
 use crate::marks::{BoundNumber, Check, Mark, Measure, Threshold};
