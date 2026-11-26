@@ -33,8 +33,11 @@
    must not skip gate and smoke"). Asked him EXCEPTION-SCOPE: sessions act as his account, so an exception for his
    account very likely reaches every session too (to measure). No click done by him yet.
 
+10. Mustafa (2026-11-26, in this chat): "EXCEPTION-SCOPE: ok go with D": no exception; the plan stands as approved
+    (his condition of 2026-11-25 20:35 stays: his account does not skip gate and smoke).
+
 ## Current step
-Waiting for Mustafa: EXCEPTION-SCOPE; then the plan is revised and reviewed again before his go.
+Waiting for Mustafa: his go on the plan (not yet given in so many words) and T4-BASELINE; then click 0.
 
 ## Next steps
 1. Plan (.checkpoints/main-wall/plan.md, no gap detail); the advisor agent's review; his go on the plan.
@@ -48,6 +51,7 @@ Waiting for Mustafa: EXCEPTION-SCOPE; then the plan is revised and reviewed agai
 ## Decisions taken
 - MAIN-WALL next; the wall first · Mustafa · 2026-11-25 20:35
 - Order: MAIN-WALL, guard (R4-1 + GUARD-KIT), review tracks + SOURCE-GO (a) · Mustafa · 2026-11-26 15:05
+- EXCEPTION-SCOPE (d): no exception for his account on today's rule · Mustafa · 2026-11-26 ("ok go with D")
 - THROWAWAY-PUBLIC (a): public throwaway, neutral names, deleted as soon as the results are reviewed · Mustafa · 2026-11-26 (his answer "a" in this chat)
 
 ## Running work
