@@ -154,4 +154,7 @@ him again (his MAIN-WALL (b)).
   preferably nothing after it (no cd, no pipe, no loop); agents' briefs say the same.
 - In the main folder, only `git switch -c <new> origin/main`, `git merge --ff-only origin/main` and
   `git pull --ff-only origin main`; every other merge happens in a worktree under .gate/.
+- The background saver (checkpoint.mjs watch) stopped at its time limit (2026-11-26 00:56:35 UTC, nothing unsaved)
+  and stays off until his GIT-IN-NODE answer: it runs git inside node. Until then checkpoints are committed and
+  pushed by hand, each git call alone.
 - At most 3 agents at a time; Opus; effort xhigh for infra/security design work on the drafts' parts.
