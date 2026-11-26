@@ -1,126 +1,185 @@
-# 4b, "Content and the world": the sheet for the advisor agent's re-read (2026-11-26, main 2483e9a)
+# 4b, "Content and the world": the sheet for the advisor agent's re-read, revision 2 (2026-11-26, main 2483e9a)
 
-The plan is `.checkpoints/cs4-walk/plan.md`, revision 4, section 5 (with 3, 9, 11, 14, 17), approved by the advisor
-agent and by his go of 2026-11-25. Section 3, item 1 asks that each later part starts only after the advisor agent
-has read the plan again against that day's main and after his answers that part needs, and that the re-read carries
-the part's exact symbols to add and to remove. This sheet is that: what moved since the plan, his answers applied,
-the symbols step by step, the manifest batch, and what I ask the advisor agent to rule on. Nothing is edited yet.
+Revision 1 got: step 0 approved under conditions C1 to C7; steps 1 to 9 to revise (R1 to R11)
+(`advisor-reread.md`). This revision answers each R, takes in the three reads the re-read asked for
+(`netcode-architect-read.md`, `engine-architect-read.md`; `rust-reviewer-step0.md` is still being written and
+touches only section F), his two messages of today (`cs4-walk/mustafa-2026-11-26-go-merge-70.md`,
+`mustafa-2026-11-26-source-go.md`), and the folded test list (`test-list.md`). Section H says where each R is met.
+**No file of 4b is edited yet.** The manifest batch of revision 1 is out of the working tree again (saved byte for
+byte under `.gate/cs4b/batch/`; its diff and digests are in the notes).
 
-## A. What moved since the plan
-- **Main is 2483e9a**: 4a is merged (pull request #70). 4a left for 4b (STATUS, "From change-set 4a"): 4A-NA-4B and
-  4A-EA-4B (content through the constructor only; `first-loop` made anew with its frozen content set while every
-  hash line stays byte for byte; `sha256.rs` moves whole into the content crate if the players' file must compute
-  the content's SHA-256: it need not in 4b, the bundle's hash is change-set 8's).
-- **The hash has no buffer** (4a's fix pass): `World::shared_hash(&self)` and `state_hash(&self)` feed FNV-1a from
-  the visitor. 4b adds no state, so no hash line changes; the static world is not state (ADR 0004 part 3).
-- **The root `Cargo.toml` is not protected by the guard today** (`protectedRel` in `.claude/hooks/routine-guard.mjs`
-  names no manifest): section 14's "risk tier 2 if the guard protects it by then" does not apply; the manifest batch
-  is risk tier 1, with security-auditor's dependency check before anything is built or pushed (his DEP-HOLD).
-- The devtools crate's three path edges of 3b (`client-endpoint`, `protocol`, `room`) are still unused at 2483e9a
-  (docs-keeper's check at fb5d0ff; I re-check with `cargo tree`'s input before the batch): dropped in the batch.
+## A. Two things step 0 found, both with Mustafa now (`question-2026-11-26-feature-compare.md`)
+1. **FEATURE-COMPARE.** Your C1 was right, and there is a second difference no design saw: the build's feature
+   compare is red with the collision library whatever its `std` is (`deps-feature-compare.txt`). Natively only:
+   `safe_arch` (the x86 backend of `wide`, which no feature removes) and `thiserror`'s `default` and `std` (from
+   ts-rs in test builds). With `std` on, `default` still differs and six more packages enter the lockfile, one a
+   second `hashbrown`. Asked of him: two named exceptions, or the type tests in a cargo command of their own, or
+   stop. rust-reviewer is reading the exceptions' exact wording.
+2. **SIZE-4B.** By the designs' way of counting, 4b with today's additions is about 7,050 lines (section G), not
+   5,410: about 12,700 planned at 1.8 and about 16,900 written at 4a's measured 2.4, against a stop line of
+   12,200. Asked of him: one pull request, or two. This sheet is written so that both answers work: the steps are
+   grouped as engine-architect's seam draws them (**4b-1**, steps 1 to 5, with no outside package; **4b-2**,
+   steps 6 to 12, with the collision library). If he keeps one pull request the order is the same and the first
+   edit waits for FEATURE-COMPARE and the dependency check.
 
-## B. His answers of 2026-11-26 (`.checkpoints/cs4-walk/mustafa-2026-11-26-go-merge-70.md`), applied to 4b
-1. **CONTENT-SOURCE (c):** "all our own. Keep the reader to what the content files need and refuse everything
-   else, duplicate keys included. Fuzz it before the first value rests on it." Applied:
-   - No outside package enters for content: no serde, serde_json, garde, schemars. The only new outside package of
-     4b is the collision library with its tree. (ts-rs stays a test-only dependency of the content crate for the
-     generated types, as it is for `protocol`: never in a shipped build; said to the advisor agent as a question
-     below.)
-   - **The reader's grammar is cut to what the content files need (my proposal, for the advisor agent's ruling and
-     engine-architect's review):** objects, arrays, strings and numbers only. Refused by name: `null`, `true` and
-     `false` (no content field of 4b or 4c is a boolean or nullable; a later kind that needs one adds it with its
-     test), duplicate keys, a byte-order mark, a trailing comma, comments, NaN and Infinity, a leading zero, depth
-     beyond 32, any byte above 0x7E or below 0x20 inside a string, and every string escape except the three the
-     bundle's own text needs (`\"`, `\\`, `\n`: a canonical file has no tab and no carriage return). Numbers keep
-     the whole RFC 8259 grammar, because the reader's proof (content item 1, PM-0005-2) parses 12,038 numbers
-     with exponents and extremes to the same bits as `JSON.parse`.
-   - **The fuzz run comes before any value rests on the reader:** step 3b (10,000 broken files refused the same
-     way natively and in WebAssembly; a bounded run of 1,000,000 random and mutated inputs with no panic) is green
-     before step 6 commits the first content file and before step 7 hands content to the simulation. The plan's
-     order already has 3b before 6 and 7; the sheet makes it a rule: no file under `content/` (but
-     `content/source/`, which the game never loads) is committed before 3b's run is in the notes.
-2. **DEPART-4 (a), two notes.** Entry 5 ("the 48 is one named constant"): 4c's block; 4b names nothing with 48.
-   Entry 6 ("until the aim codec widens, the loader refuses a playable map larger than its reach, and STATUS names
-   the change-set that widens it"): in 4b's map kind, stage 6 (whole-set checks): the map's `bounds` must lie inside
-   the aim point's reach as `protocol` gives it, x and z within plus or minus 327.67 m and y within 0 to 655.35 m,
-   read from one pair of constants beside `AimPoint` (so the rule moves when the codec does), refused as
-   `MapBeyondAim { file, axis, value, reach }`; a test plants a map 1 cm too wide. **Which change-set widens the
-   aim codec is not named in any design** (question 1 below).
-3. **EARLY-LOOK-ORDER (b):** inside 4c only. Nothing of 4b moves; the schema writer and the Testlines tool's
-   report-only modes stay in 4b (unless 4b's own ladder fires).
-4. **LINKS-CHECK (c):** "about 15 lines in 4b". `devtools::files::plain` (the check `files::check` already uses)
-   becomes the one way the Rust tests read a recording (`tests/recordings.rs`, `two_processes.rs`,
-   `two_instances.rs`, `hash_cost.rs` if it reads one), and the two TypeScript readers of recordings
-   (`boundary/replay.test.mjs`, `e2e/tests/replay/determinism.spec.ts`) refuse a path whose `lstat` is not a plain
-   file before they read it; one test per language plants a link. The repository-wide check stays 4A-S3-READ's
-   follow-up for step 2.3.
-5. **FIREFOX-REPLAY (a):** his, to the CI Builder chat. This chat writes no CI or test-setup file for it.
-6. **His Export at 30 steps** comes before step 6; DIFF-LIST is printed from it by the notes' script and asked then.
+## B. His words, applied
+1. **CONTENT-SOURCE (c)**, and his second message: "A tool script reads my Export with the platform's own JSON
+   reader, the game's reader stays as narrow as you proposed, and the Rust tool proves the written content file is
+   canonical. No new package comes in ... The game never loads the Export itself." Section C is the reader;
+   section D is every file that is not content.
+2. **"Fuzz it before the first value rests on it."** The reader's proofs and the bounded fuzz run (step 3) are
+   green before the first file under `content/` is committed (step 8) and before content reaches the simulation
+   (step 9). Any change to the reader after step 3 runs step 3 again before the next step that rests on it, and
+   the final head's run is in the report (your R2.4).
+3. **DEPART-4 (a), two notes.** Entry 5 (the 48 as one named constant): 4c's block. Entry 6: section E.
+4. **EARLY-LOOK-ORDER (b)**: nothing of 4b moves. **FIREFOX-REPLAY (a)**: his, to the CI Builder. **LINKS-CHECK
+   (c)**: step 5. **SOURCE-GO (a)**: no kit file from this chat; every pull request that changes anything under
+   `content/source/` says so in the first lines of its report.
+5. His Export at 30 steps before the data step (step 8); DIFF-LIST is printed from it and asked then.
 
-## C. The steps, with what each adds and removes (names from the designs; the plan's sizes by the designs' count)
-| Step | Adds | Removes or changes |
-|---|---|---|
-| 0 manifests (about 110 lines of configuration) | `crates/content/Cargo.toml` (no dependency; dev-dependency `ts-rs`, workspace); root `Cargo.toml`: `parry3d` in `[workspace.dependencies]`, one `overflow-checks` block per runtime package of the tree; `crates/sim/Cargo.toml`: `content`, `parry3d`; `crates/sim-wasm`, `crates/devtools`: `content`; `Cargo.lock` | `crates/devtools/Cargo.toml`: the three unused path edges. Section D has the exact text |
-| 1 built-file check (340 / 320) | `build-checks.mjs`: `wasmFunctionNames`, `wasmCodeOpcodes`, `wasmTargetFeatures`, `wasmImports`, `fusedMultiplyAddProblems({ twin, production, imports })`, `bannedMathsProblems`, `linkedLibmFunctions` (a report), `nativeTargetProblems` (no `target_feature="fma"` or `"avx2"` in `rustc --print cfg` under the build's environment); `build.mjs`: the call in `buildWasm()` after the bindings tool, on every build; `build-checks.test.mjs`: one planted module per rule and a control each, from a small module writer in the test; `crates/sim/tests/rules_scan.rs`: two rules (the collision library's names only inside `crates/sim/src/collision.rs`; `fma`, `fmaf` and `libm::fma*` refused like `mul_add`); `simFeatureList` and `simFeatureDifferences` compare by name and version (3A-FEATURE-VERSION) | nothing removed; `CARGO_OVERRIDES` gains `ENSURE_NO_PANIC` (the libm build script reads it: rust-reviewer, block 1) |
-| 2 reader and writer (790 / 500) | `crates/content/src/`: `lib.rs` (the lint guard from its first line), `json.rs` (`parse(bytes) -> Result<Tree, Error>`, `Tree`, `Node`, line and column on every node), `number.rs` (the number grammar, `parse_number`, `number_text`), `write.rs` (`canonical(&Tree) -> String`), `read.rs` (`Object`, typed getters with field paths), `field.rs` (`Field`, `Range`, the tables), `schema.rs` (`schema(&[Field]) -> String`, JSON Schema 2020-12), `error.rs` (`Error` with file and line and column or field path; `message()`) | nothing |
-| 3 bundle and kinds (360 / 290) | `bundle.rs` (`Bundle`, `parse_bundle`, `freeze -> ContentSet`, the caps 1 MiB a file and 8 MiB a bundle, `MAX_DEPTH = 32`), `movement.rs` (`Movement`, format `shamble-movement` version 1, fields with his Export's names and units: section 11 of the plan), `map.rs` (`MapDocument`, `Shape::{Box, Ramp}`, `Spawn`, `Region`, format `shamble-map` version 1, at most 16 spawns, 512 shapes; the aim-reach rule of B.2), `ts_export.rs` (test-only: the types and schemas into `packages/types/src/generated/content/`) | `packages/types/src/index.ts` exports the new types |
-| 3b the reader's proofs (20 / 530) | `crates/content/tests/corpus.rs`, `broken.rs`, `fuzz_bounded.rs`; `devtools::wasm::content_corpus`, `content_verdicts` (test-only exports); `packages/sim-worker/boundary/content.test.mjs`; `packages/e2e/tests/rules/` gains the corpus in Chromium | nothing |
-| 4 time unit (240 / 80) | `crates/content/src/time.rs` (`units_from_seconds(f64) -> Result<u32, DurationError>`), `crates/sim/src/time.rs` (`UNITS_PER_SECOND: u32 = 3000`, `UNITS_PER_TICK`, with const assertions for 30 and 60 Hz), `crates/devtools/src/bin/time_report.rs` (`--check`) with its reviewed list of the old game's duration paths and the committed table | nothing |
-| 5 tools (250 / 140) | `crates/devtools/src/bin/content_bundle.rs` (writes `content.json`; `--check` refuses a file under `content/` that is not byte for byte its canonical rewrite; skips `content/source/` by name and refuses any other folder it does not know), `testlines.rs` (`--check`, `write`, `compare-old`, `table`), each with its core as a library function a plain test runs | nothing |
-| 6 data (not counted) | `content/source/`: his new Export, its manifest, `testlines-table.json`; `content/movement/soldier.json` by `testlines write`; `content/maps/test-scene.json` by hand from the Art sheet's sizes and the marks' shapes | the 60-step Export in the notes stays a note; no value of it is carried |
-| 7 content to the simulation (290 / 260) | `Sim::new(seed, mode, pad_bytes, bundle: &[u8])` and `Sim::create` with `CreateError::Content(String)`; `LocalMatch::new(setup, ..., &ContentSet)`; `build.mjs` runs `content-bundle` and copies `content.json`; `build-checks.mjs` refuses a page folder without it; `packages/client/src/app/content.ts` (one fetch, the bundle's bytes to the Worker in `start`); `worker-link.ts`, `packages/sim-worker/src/messages.ts` (`start` gains `bundle: ArrayBuffer`), `host.ts`/`worker.ts` | the boundary pin: `Sim`'s constructor takes four arguments; no new export |
-| 8 static collision world (260 / 170) | `crates/sim/src/collision.rs` (the one module that names the library: `StaticWorld::build(&MapDocument) -> Result<StaticWorld, WorldError>`, shapes in id order, `Bvh::from_leaves(Binned)`, depth at most 31 refused, `tree_bytes()` for PM-0004-32, `cast_ray`), `crates/sim/src/vec.rs` (`V3`, our own small vector type); tests: the tree's bytes and 10,000 rays the same natively and in WebAssembly | nothing |
-| 9 the page's scene (230 / 230) | `packages/client/src/render/scene.ts` (boxes, wedges, regions from the map; greys by the default he can veto), `picture.ts`: `setContent` (map only in 4b; the camera joins in 4c), the readout's content rows; browser tests: the scene appears; a broken bundle shows the loader's sentence | `render/empty-scene.ts` is replaced by `scene.ts` |
-| LINKS-CHECK (c) (about 15 lines) | as B.4 | |
+## C. The reader's grammar (engine-architect's read, answer 1; your R2)
+- **Bytes.** A document holds only 0x0A and 0x20 to 0x7E. Outside strings only space and line feed are white space.
+  Values: object, array, string, number. A document's top value is an object.
+- **Refusals, each with its own name:** `RefusedLiteral { word }` (null, true, false, NaN, Infinity),
+  `ByteOrderMark`, `Comment`, `TrailingComma`, `TopLevelNotObject`, `TrailingData`, `Empty`, `Unterminated`,
+  `Whitespace { byte }` (tab, carriage return), `RefusedEscape { byte }`, `BadKey`, `DuplicateKey`, `TooDeep`,
+  `TooManyNodes`, `TooLarge`, `UnexpectedByte { byte, expected }` for the rest.
+- **Escapes: exactly `\"` and `\n`.** They exist only because the bundle embeds each file's text; no content
+  string of its own may hold a quote, a backslash or a line feed (the key, id and enum grammars), so `\\` is
+  refused like `\/ \t \r \b \f \u`.
+- **Numbers.** `number.rs` keeps the whole RFC 8259 grammar for the corpus proof (`parse_number`, PM-0005-2), and
+  `number_text(x)` is ECMAScript's Number::toString for every finite x. The loader refuses at the token, in this
+  order: longer than 25 bytes (`NumberNotCanonical`, unparsed); `NumberGrammar`; `NumberNotFinite` (`1e400`);
+  `number_text(x) != text` (`NumberNotCanonical { text, canonical }`: `1.50`, `1E5`, `-0`, `9007199254740993`).
+  So no content holds -0; -0 stays a parse case of the corpus, and PM-0005-3's "same text as its input" gets that
+  one stated exception. The separate 2^53 rule goes (such a text is not canonical); a scan checks that every
+  number field has finite bounds below 2^53.
+- **The whole document is canonical or refused:** after the tree is built, `write::canonical_into` streams against
+  the source bytes; the first difference is `NotCanonical { expected, found }` with its line and column. The bundle
+  and every file pass through it, and `content-bundle --check` calls the same `content::load_file`, so the tool
+  and the loader agree by construction.
+- **Keys** `[a-z][a-z0-9_]{0,63}`; **ids** `[a-z0-9][a-z0-9_-]{0,63}`; fixed lists where code branches on the value
+  (shape `type`, `rises_toward`, region `kind`, `format`).
+- **Caps:** bundle 8,388,608 raw bytes; each file 1,048,576 decoded bytes, counted while decoding; `MAX_FILES` 16;
+  `MAX_NODES` 16,384 per document; `MAX_DEPTH` 32; `regions` at most 64. Duplicate keys: when an object closes
+  its members are sorted by (key bytes, position) and equal neighbours refused; no hashed map anywhere in the
+  crate (the scan's rule is extended to it).
+- **The error record:** `Error { file, line, col, path, kind }`; `record()` is one line in a fixed field order,
+  doubles as 16 hex digits, and it is what the native and WebAssembly verdicts are compared on, with `message()`
+  (cut to 512 bytes; input echoes at most 64 bytes, every byte outside 0x20 to 0x7E and the backslash as `\xNN`).
+- One correction to revision 1: the Testlines table maps `stamina.stamina_on` (a yes/no value) to a content field.
+  It becomes a row the script asserts (the Export must say yes) and no content field: no field of 4b or 4c is a
+  boolean.
 
-Sizes: the designs' own count 5,410; planned (holds the 1.8) 9,750; stop line 12,200. The ladder as the plan fixes
-it (9,750: the schema writer with its tests and the schema half of PM-0005-7 and PM-0005-8 to 4d; 11,000: step 9
-whole to the start of 4c). The cut grammar of B.1 makes step 2 smaller, not larger (no `\u` escapes, no UTF-8
-decoding, no booleans).
+## D. Files that are not content: scripts on the platform's own JSON reader (your R1; ruling F.6)
+All in Node, in `packages/client/scripts/` (the client package's own test run picks up `scripts/*.test.mjs`; CI's
+job already runs it; Python writes another number text: `1e+16` where JavaScript writes `10000000000000000`). None
+is under `tools/` (a pull request there can merge without him) or under `content/`.
+- `legacy-extract.mjs` (step 2): reads `docs/legacy-tuning.json` (it holds true, false, null and one string that
+  is not ASCII) and writes two committed plain-text extracts with `--check`:
+  `crates/devtools/vectors/legacy-numbers.txt` (a header line with the tuning file's sha256 and the count 2,038,
+  then each number's text as written, from the reviver's source text) and
+  `crates/devtools/vectors/legacy-durations.txt` (`<path> <s|ms> <text>`, for a reviewed list of paths that is a
+  constant in the script). Rust reads only these two extracts, never the tuning file.
+- `testlines.mjs` (step 7): `--check` (the test runs it on the real files), `write`, `compare-old`, `table`. One
+  constant write target, `content/movement/soldier.json`; links refused; reads capped; written to a new temporary
+  file and renamed; the Export's sha256 pinned in the script; values compared with `Object.is`; it writes
+  `JSON.stringify(sortedKeys(value), null, 2) + "\n"`, and `content-bundle --check` (Rust) then judges that file.
+  The plan's Rust `testlines` program is dropped.
+- 4d's legacy import (PM-0005-14 walks every leaf of the tuning file) is a script by the same rule: said here so
+  that 4d's re-read finds it.
+- **Who confirms the reviewed list of duration paths** (your R11): game-designer, as a read, before step 4's
+  table is committed.
 
-## D. The manifest batch (step 0), exactly; uncommitted and unbuilt until security-auditor has answered on it
-- Root `Cargo.toml`, `[workspace.dependencies]`: `content = { path = "crates/content" }` is NOT added (the other
-  crates name each other by path today; the same here); added: `parry3d = { version = "=0.31.1", default-features =
-  false, features = ["dim3", "f32", "alloc", "enhanced-determinism"] }` with a comment naming ADR 0004 part 10 and
-  why `std` is off (rust-reviewer, block 1; `"std"` joins only if the library does not build without it for both
-  targets, and that is a second ask of security-auditor on the changed content).
-- Root `Cargo.toml`: one `[profile.release.package.<name>] overflow-checks = true` block for each package
-  `cargo tree -p sim-wasm --target wasm32-unknown-unknown -e normal,no-proc-macro --prefix none` lists after the
-  resolve (rust-reviewer's paper list with `std` off: approx, arrayvec, bitflags, bytemuck, byteorder, downcast-rs,
-  either, equivalent, foldhash, glam, glamx, hash32, hashbrown, heapless, indexmap, libm, log, num-complex,
-  num-traits, ordered-float, parry3d, rstar, serde_core, simba, smallvec, stable_deref_trait, static_assertions,
-  wide; thiserror has one) and one for safe_arch (native tests only). The build's own check
-  (`missingOverflowOverrides`) decides the list; the paper list is the expectation.
-- `crates/content/Cargo.toml`: a package like `protocol`'s; `[dev-dependencies] ts-rs = { workspace = true }`.
-- `crates/sim/Cargo.toml`: `[dependencies] content = { path = "../content" }` and `parry3d = { workspace = true }`.
-- `crates/sim-wasm/Cargo.toml` and `crates/devtools/Cargo.toml`: `content = { path = "../content" }` (the
-  constructor parses the bundle; the tools and the test module's corpus exports).
-- `crates/devtools/Cargo.toml`: `client-endpoint`, `protocol` and `room` removed if `cargo check` of today's
-  devtools sources still passes without them (checked before the batch is shown to security-auditor).
-- `Cargo.lock`: by `cargo metadata --format-version 1` without `--locked`, which adds the new packages and moves no
-  locked one (it downloads package files to read their manifests and runs nothing of theirs); every later cargo
-  command with `--locked`. Expected: 31 new packages with `std` off (33 with it), each from crates.io with its
-  checksum. `libm` is not declared by us in 4b: 4c's easing brings our first own call and declares it there.
-- No `package.json` or npm lockfile changes in 4b.
+## E. The aim's reach (his DEPART-4 note; your F.1, F.8, C3; two readers disagree on one centimetre)
+- The rule is the map kind's own whole-set check, `content::map::check_aim_reach(&MapDocument)`, run from
+  `bundle::freeze` on `bounds`; refused as `MapBeyondAim { axis, value, reach }`. It is not in
+  `StaticWorld::build`: 4c's simulation-only 2 km test builds a `MapDocument` in code and never meets the loader.
+- **The constants live in `content`** (it may not depend on `protocol`): `AIM_REACH_CM: i32 = 32_767` for x and z,
+  `AIM_HEIGHT_MAX_CM: i32 = 65_535`, the floor at 0. **I take netcode-architect's symmetric reach** (plus and
+  minus 327.67 m: his accepted entry says "327.67 m from the map's origin", and `i16::MIN` has no positive twin,
+  which bites crates that deny arithmetic side effects), not engine-architect's exact type edge (-327.68 m). The
+  1 cm narrowing on the negative side is stated in the constant's comment. Every bound is a whole number of
+  centimetres (`BoundNotWholeCentimetres`), so a client that rounds and clamps in integers never lands outside
+  the map, and bounds may equal the reach.
+- **The tie test** is `crates/devtools/tests/aim_reach.rs`: `devtools` already has a `protocol` edge with no user
+  (declared in 3b), so the test becomes that edge's first user and `sim-wasm`'s manifest is not touched before
+  step 9. It builds an `AimPoint` from the limits through each field's own type and checks per axis that one
+  past the edge does not fit (32,768 for x and z; -32,769; 65,536 and -1 for y): a wider field type makes it fit
+  and the test goes red; a field that is no integer does not compile.
+- Six planted refusals (minimum and maximum of x and of z, y below 0, y above 655.35) and six accepted bounds.
+- **The STATUS line** (your ruling F.1, sharpened by netcode-architect; told to him in one line, his to overrule):
+  "4B-AIM-REACH: the loader refuses a playable map beyond the aim's reach (x and z plus or minus 327.67 m, y 0 to
+  655.35 m). The aim widens in the first change-set whose map leaves that square (none in Slice 1; Slice 2's plan
+  says whether its maps do), at the latest in Slice 3's change-set that sets the command codec for online play
+  (PM-0001-51), beside 3B-ACKS and 3B-OUTAGE-256. No numbered change-set holds it yet."
 
-## E. Evidence, reviewers and his check (unchanged from the plan, section 17)
-Logic by tests on the real code, each with its planted defect, run by a plants script; the players' file's size and
-sha256 at each step; the legacy gate untouched and green; the toolchain job's commands by hand before each push with
-code. Before step 1: test-engineer and security-auditor read the test list (not a review round). Reviewers:
-rust-reviewer, engine-architect, security-auditor; then test-engineer, graphics-engineer, perf-auditor. His short
-browser check (Brave, once Firefox): the scene, "errors: 0", the content rows, "Copy report".
+## F. The collision library's batch (steps 6 and 7 of this sheet; your C1 to C7)
+As revision 1's section D, with your conditions: the lockfile by `cargo update --workspace` (done once: 33
+registry packages at the versions the paper reading named; `serde` and `serde_derive` are locked through
+indexmap's never-built edge); the overflow blocks from the WebAssembly tree and the host tree by the build's own
+function (28 and `safe_arch`); `std` off unless his FEATURE-COMPARE answer or rust-reviewer's read says otherwise;
+the devtools edges: `client-endpoint` and `room` are dropped on the grep's proof (no path of either anywhere in
+`crates/devtools`), `protocol` stays (section E); `room` gets no content edge, in 4b or in 4c (it takes
+`sim::StaticWorld` and `sim::Rules`; `sim` re-exports `content::{MapDocument, Movement}` for room's tests);
+`content`'s only dependency is ts-rs, test-only, and it enters with its first user (step 11). The whole batch
+goes to security-auditor with its digests before anything is committed, pushed or built.
+**The foundation line's check** (your R5; ADR 0005's line, placed in 4b): a test in `devtools`
+(`tests/dependency_rules.rs`) reads the manifests' text and `cargo metadata --locked`'s output: `content` has no
+normal dependency; `sim`'s normal dependencies are `content` and `parry3d`; planted: `protocol` added to
+`content`'s dependencies (the plants script rewrites the lockfile offline and puts both files back byte for byte).
+Its `content` half lands with step 1, its `sim` half with step 6.
 
-## F. What I ask the advisor agent to rule on
-1. **The change-set that widens the aim codec** (his DEPART-4 note on entry 6: STATUS must name it). No design
-   names one. My proposal: change-set 7, the one that rebuilds the command path before online play (his DEPART-3
-   (a): "the compression must land before online play"; 3B-ACKS and 3B-OUTAGE-256 sit there too), recorded in
-   STATUS as a follow-up 4B-AIM-REACH with the loader's rule. If that is his to decide, say so and I ask him.
-2. **The cut grammar of B.1**: is it the right reading of "Keep the reader to what the content files need and
-   refuse everything else", and may it stand before engine-architect's review of the code, or does engine-architect
-   read it first?
-3. **ts-rs as the content crate's test-only dependency** for the generated types: within "all our own" (it is the
-   workspace's existing test-only tool, never in a shipped build), or should the types be written by our own
-   schema writer's sibling?
-4. **The manifest batch of D**, as the content security-auditor is asked about: complete, and nothing in it that
-   4b does not use.
-5. Anything in section 5 that today's main or his answers make untrue.
+## G. The steps, in order, with what each adds and removes
+Sizes are **by the designs' way of counting** (code / tests), with today's additions inside; planned and written
+sizes follow the table. Marks of the plan's section 9 are placed on their step (your R8).
+
+**4b-1 (steps 1 to 5): no outside package.**
+| Step | Adds | Changes or removes | Marks |
+|---|---|---|---|
+| 1 the content crate, manifests (about 15 lines of configuration) | `crates/content/Cargo.toml` (no dependency), `src/lib.rs` (`#![forbid(unsafe_code)]`, the lint guard with `arithmetic_side_effects`); `crates/devtools/Cargo.toml`: `content`; `Cargo.lock`: the one path crate; the foundation check's `content` half | `crates/devtools/Cargo.toml`: `client-endpoint`, `room` removed. A manifest change: held until security-auditor's answer on exactly it (his DEP-HOLD) | ADR 0005's foundation line (the `content` half) |
+| 2 the reader and the writer (1,180 / 770) | `json.rs` (`parse`, `Tree`, `Node`, line and column, the caps, the key stack), `number.rs` (`parse_number`, `number_text`), `write.rs` (`canonical`, `canonical_into`), `read.rs` (`Object`, typed getters, integer getters that refuse 1.5, -1 and above `u32`), `field.rs` (`Field`, `Range`; no `description` or `default` columns yet: they come with the schema writer), `error.rs` (`Error`, `Kind`, `Echo`, `record()`, `message()`), `bundle.rs` (`parse_bundle`, `write`, `freeze -> ContentSet`, the path rule `^(movement|maps)/<id>\.json$` built from the kind list, paths strictly increasing, stem equals id, folder equals kind, no extra key), `movement.rs` (`Movement`, format `shamble-movement` 1, his Export's names and units), `map.rs` (`MapDocument`, `Shape::{Box, Ramp}`, `Spawn`, `Region`, format `shamble-map` 1, at most 16 spawns, 512 shapes, 64 regions; every box at least 1 cm thick, ramps rising, spawns and shapes inside `bounds`; `check_aim_reach`); `load_file`; `packages/client/scripts/legacy-extract.mjs` with its test and the two extracts | the scan (`crates/sim/tests/rules_scan.rs`): its hashed-map, clock and unwrap rules also read `crates/content/src` | CD-1, CD-2, CD-4, CD-5 on the two kinds; PM-0005-3; PM-0005-5 (a scan of the field tables: every array has a bound); PM-0005-7's Rust half (ranges at the next float up and down) |
+| 3 the reader's proofs (20 / 780) | `crates/content/tests/corpus.rs` (the 2,038 old numbers as written and 10,000 made ones; texts for the random half from V8, expected text `JSON.stringify(JSON.parse(t))`), `broken.rs` (the seeded generator: every class of `test-list.md` with its expected record, at least 500 files a class, 1,000 controls), `tests/aim_reach` in devtools; `crates/devtools/tests/content_fuzz.rs` (the bounded run: 1,000,000 inputs in release with the debug count in the test's name, at least 90 % structure-aware mutations, a per-stage histogram with minimums, the slowest input, seed and index printed on failure); test-only exports `devtools::wasm::{content_corpus, content_verdicts, content_limits}`; `packages/sim-worker/boundary/content.test.mjs`; `packages/e2e/tests/rules/content.spec.ts` (Chromium, and Firefox by today's setup: a Firefox red goes to him before any change) | nothing | content items 1 and 2; PM-0005-1, -2, -4, -6 |
+| 4 the time unit (240 / 100) | `crates/content/src/time.rs` (`units_from_seconds(f64) -> Result<u32, DurationError>`), `crates/sim/src/time.rs` (`UNITS_PER_SECOND: u32 = 3000`, `UNITS_PER_TICK`, const assertions for 30 and 60 Hz), `crates/devtools/src/bin/time_report.rs` (`--check`; reads `legacy-durations.txt`; writes the committed table `crates/devtools/vectors/time-report.txt`); a devtools test that `content`'s 3,000 is `sim`'s | nothing | PM-0004-11 |
+| 5 the links check (15 / 40) | `devtools::files::read_plain(folder, name) -> Result<Vec<u8>, FilesError>` (public; the folder and the file plain files by their own type, a missing file an error, the read bounded); `packages/sim-worker/boundary/plain-file.mjs` (one Node helper) | `tests/recordings.rs:18`, `two_instances.rs:42` and `:44`, `two_processes.rs:113` and `:115`, `files.rs:115` read through it; `boundary/replay.test.mjs:15` and `e2e/tests/replay/determinism.spec.ts:68`, `:70`, `:72` through the helper (read once, digest from the same bytes). Two planted-link tests (Rust under `cfg(unix)`, Node by `symlinkSync`; the TypeScript one fails, never skips, under CI) and a text scan that no reader of a recording bypasses the helpers: these come on top of his "about 15 lines", as evidence, and the report says so | his LINKS-CHECK (c) |
+
+**4b-2 (steps 6 to 12): the collision library and the world.**
+| Step | Adds | Changes or removes | Marks |
+|---|---|---|---|
+| 6 the library's manifest batch (about 110 lines of configuration) | section F: root `Cargo.toml` (the `parry3d` line, the overflow blocks), `crates/sim/Cargo.toml` (`content`, `parry3d`), `crates/sim-wasm/Cargo.toml` (`content`), `Cargo.lock` (33 registry packages); the foundation check's `sim` half; the feature compare by name and version (3A-FEATURE-VERSION) and whatever his FEATURE-COMPARE answer allows, each exception with a fixture and a near miss | held until security-auditor's answer | ADR 0005's foundation line (whole); PM-0004-74's compare |
+| 7 the built-file check (420 / 470) | `build-checks.mjs`: `wasmFunctionNames`, `wasmCodeOpcodes`, `wasmTargetFeatures`, `wasmImports`, `fusedMultiplyAddProblems`, `bannedMathsProblems`, `libmProblems` (any `libm` function outside an allow-list file fails), `walkedStamp`; `build.mjs`: the names, target-features and instruction rules on the twin before the bindings tool, the imports rule on the production file, the dev-profile twin always, the stamp, and `buildPage` refusing a page whose Wasm is not the stamped file; `build-checks.test.mjs`: one planted module per rule and a control each; `rules_scan.rs`: the library's names only inside `crates/sim/src/collision.rs` (exact path, no `pub use` or alias), `fma`, `fmaf` and `libm::fma*` refused; native: a test asserting `!cfg!(target_feature = "fma")`, `"avx2"`, `"fma4"` in `sim`, `content` and `devtools`, and `compile_error!` under the first two in `sim` (not under `simd128`: the instruction walk refuses it and 4d's reading needs it) | `CARGO_OVERRIDES` gains `ENSURE_NO_PANIC`; **no `nativeTargetProblems`** (it could not fail: your R6) | 3A-FMA-CHECK (his MUL-ADD: in the pull request that brings the first outside crate); PM-0004-23's build check |
+| 8 the tools and the data (320 / 225; data not counted) | `crates/devtools/src/bin/content_bundle.rs` (writes `content.json` to the path `build.mjs` gives; `--check`; the walk refuses links, FIFOs, unknown folders, a nested `source`); `packages/client/scripts/testlines.mjs` with its test (section D); `content/source/` (his new Export, its manifest, `testlines-table.json`); `content/movement/soldier.json` by the script; `content/maps/test-scene.json` by hand from the Art sheet's sizes | nothing. **Needs his Export at 30 steps and his yes to DIFF-LIST.** The report's first lines say that `content/source/` changes | his point 8 (a to g); PM-0002-29 |
+| 9 content to the simulation (350 / 400) | `Sim::create` and `Sim::new` take `(seed, mode, pad_bytes, bundle: &[u8])`; `CreateError::Content(content::Error)` (the type loses `Copy` and `Eq`), `message(&self)`, a test of the check order (seed, mode, content, padding); `packages/client/src/app/content.ts` (one fetch; a copy kept before the transfer; `JSON.parse` only after the Worker's `ready`); `start` gains `bundle: ArrayBuffer`, refused unless it is one of 1 to 8,388,608 bytes, before the glue copies it; `build.mjs` runs `content-bundle` and copies `content.json`; `build-checks.mjs` refuses a page folder without it, entries that are no plain files, a `content.json` over 8 MiB; a source scan for `innerHTML` and its kin; **the frozen content of `first-loop`** (netcode-architect's route (i)): `crates/devtools/recordings/first-loop.content.json`, an input written only by `make_recordings --freeze first-loop`, listed in the manifest with its length and sha256; the recording's header (format version 1 stays) carries that sha256 in the content-hash field it already has, and the map id; `Replay::new(recording, bundle)` and every runner check the bundle against the header before `Sim::new`; test-module exports `replay_hashes(rec, bundle)`, `replay_state_at(rec, bundle, tick)` | every caller of the constructor: `sim-wasm/src/lib.rs` (:71-105 and its tests), `local_match.rs` tests, `tests/step_alloc.rs:79`, `devtools/src/replay.rs:91`, `bin/replay.rs`, `bin/make_recordings.rs`, `wasm.rs`, `tests/recordings.rs` (its scratch copy takes the bundle too), `two_instances.rs`, `two_processes.rs`; `worker.ts:19-26`, `messages.ts`, `worker-link.ts`, `boot.ts`; `boundary/sim-wasm.test.mjs`, `replay.test.mjs`, `determinism.spec.ts`; `checkReplayable` refuses a header of zeros. **Proof that loading content changed no state:** `first-loop.hashes` lines 2 to 1,801, `first-loop.vector.txt` whole and the recording's 1,800 step records equal main 2483e9a's, compared with `git show`'s copies; by design line 1's digest, the header's hash and map id and three manifest lines change. Planted: one content byte folded into the shared state at construction fails at step 1 natively, in Node and in Chromium (never with `make_recordings` run under the plant); a valid bundle that differs in one value is refused by name before `Sim::new` | 4A-NA-4B, 4A-EA-4B; the boundary pin: no new export |
+| 10 the static collision world (280 / 260) | `crates/sim/src/collision.rs` (`StaticWorld::build(&MapDocument) -> Result<StaticWorld, WorldError>`, shapes in id order, the binned tree, depth at most 31 refused, `tree_bytes()`, `cast_ray`), `crates/sim/src/vec.rs` (`V3`); `CreateError::MapMissing`, `CreateError::World`; `LocalMatch::new(&setup, 0, pad, loopback(), world)` with `static_world()`; the dump with a committed known-answer hash, a map with shapes permuted, a document built in code with -0, the ray classes, hand-made hostile documents; the fuzz extended to `ContentSet -> StaticWorld::build` | `room` untouched (`Room::new(setup, NO_CONTENT)` stays) | PM-0004-32; PM-0004-33 (partial: the cast paths are 4c's; the built-file check's result is recorded again here, where the library is first linked) |
+| 11 the schema writer and the generated types (110 / 210) | `schema.rs`, the field tables' `description` and `default` columns, `ts_export.rs` (test-only) with `content`'s dev-dependency ts-rs, `packages/types/src/generated/content/` and its `schema/` folder (a link named `schema` and a `.json` link refused), `packages/types/src/index.ts` | 3A-PART5-CLASH is not reached (content's types nest only inside content, under test configuration, as `protocol`'s do: engine-architect's read) | PM-0005-7's schema half; PM-0005-8. **The first ladder rung moves exactly this step to 4d** |
+| 12 the page's scene (230 / 260) | `packages/client/src/render/scene.ts`, `picture.ts`'s `setContent` (the map only; the camera joins in 4c), the readout's content rows, a development hook that lists the drawn objects; browser tests: the scene equals the map; a bundle that `JSON.parse` accepts and the loader refuses shows the loader's sentence as text and an empty scene | `render/empty-scene.ts` replaced | **The second ladder rung moves exactly this step to the start of 4c** |
+
+**Sizes, each named.** By the designs' way of counting: 4b-1 about 3,300 (1,455 code, 1,690 tests, the rest
+scripts and configuration); 4b-2 about 3,750; together about **7,050** (the plan's 5,410 and about 1,640 from
+today's test list, conditions and the scripts). Planned at 1.8: about 5,950 and 6,750. At 4a's measured 2.4: about
+7,950 and 9,000 written. If he takes two pull requests: stop lines of 7,450 and 8,450 (planned times 1.25); the
+ladder's two rungs both sit in 4b-2 (step 11 at its planned size, step 12 at planned plus 1,250), and 4b-1 gets one
+rung of its own, shown to him with the split: at 5,950 written lines the time unit (step 4) moves whole to 4b-2,
+since nothing in 4b-1 rests on it. If he keeps one pull request: the plan's rungs at 9,750 and 11,000, steps 11
+and 12 being the last two steps so that a fired rung moves code not yet written (your R7), and the stop line at
+12,200 would be reached during step 9 or 10 at 4a's rate. The count is taken at each step's end against that
+step's budget and said in the step's summary.
+
+## H. Where each of your points is met
+C1: section A.1, with him. C2, C3, C4: sections E and F. C5, C6, C7: section F. R1: section D. R2: section C and
+B.2; engine-architect's read is done. R3: step 9's row. R4: netcode-architect's read is done; its wording for
+DEPART-4 entry 3 ("...stay code until change-set 7, which rebuilds the room's command scheduling behind one seam
+and the client endpoint's sending; there they become content values within capacities the code keeps, with
+defaults equal to today's 8, 8 and 2") goes into the dated pointer of 4b's docs pass. R5: section F. R6: step 7.
+R7: section G. R8: the marks columns; 3A-PART5-CLASH at step 11; the aim rule outside `StaticWorld::build`. R9:
+step 5. R10: the sentence "the compression must land before online play" is netcode-architect's wording of
+DEPART-3's list, never his words; it is quoted nowhere as his. R11: step 3 (Firefox), section D (game-designer's
+read), and the two one-line answers were given to him in the chat.
+
+## I. What I ask of you
+1. APPROVE or REVISE for steps 1 to 5 (they can start the moment he answers SIZE-4B with two pull requests; with
+   one pull request they wait for FEATURE-COMPARE and the dependency check as well).
+2. The one-centimetre choice of section E (symmetric reach).
+3. The tie test in `devtools` and not `sim-wasm` (it changes your C3 by using the edge `devtools` already has).
+4. Steps 6 to 12: APPROVE now with FEATURE-COMPARE's wording to follow as an addendum when rust-reviewer's read and
+   his answer are in, or hold them until then.

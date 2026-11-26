@@ -85,3 +85,10 @@ request.** Then the first one brings no outside package at all.
   about 7,500 to 7,800 written at 4a's measured rate. A stop line each of the planned size times 1.25.
 - If he keeps one pull request ((a) or (c)), the order inside it is unchanged and the first edit waits for
   FEATURE-COMPARE and the dependency check.
+
+## Corrected 2026-11-26, with the revised sheet (`reread-sheet.md`, revision 2, section G): SIZE-4B's numbers
+Counted step by step for the revised sheet, by the designs' way of counting: **4b-1 about 3,300 lines, 4b-2 about
+3,750, together about 7,050** (the earlier lines of this file said 6,360, and 3,100 to 3,250 a half: too low).
+Planned at 1.8: about 5,950 and 6,750. Written at 4a's measured rate (2.4 times): about 7,950 and 9,000. For two
+pull requests the stop lines (planned times 1.25) would be **7,450 and 8,450**; for one pull request the planned
+size is about 12,700, already past today's stop line of 12,200 before any growth.

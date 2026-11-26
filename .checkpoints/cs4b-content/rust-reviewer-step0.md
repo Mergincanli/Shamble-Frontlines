@@ -54,3 +54,17 @@ no parry3d/glam/glamx/simba/wide/libm/num-traits/num-complex/approx/sim/content)
 Plants: M1 name-match instead of exact -> N-i-1/2 red; M2 drop (i)'s WebAssembly refusal -> N-i-3 red; M3 excuse in any build -> N-i-5/N-ii-4 red;
 M4 drop the version key -> N-ii-1 red; M5 excuse both directions -> N-ii-3 red; M6 add `wide feature "std"` -> G red. Tree plant T-1 (scratch
 worktree, scratch lockfile): sim dev-dependency glam =0.33.12 features ["std"] -> refused naming `glam feature "std"`; control C-1: the batch passes.
+
+## The batch moved (coordinator, during the read)
+- The batch left the worktree's root for a copy: .gate/rr-4b/ws/ inside the worktree (digests equal deps-batch.sha256, checked). My runs at 13:12-13:23 UTC (t1, f1-f3, serde inversions, built-packages, duplicates, overflow compare) all show parry3d and 35 overrides, so the batch was still in the root when they ran; all rerun on the copy at 13:29-13:33 anyway.
+- This agent's working folder resets between calls, so "cd, then cargo" ran in the root (it printed the tree WITHOUT parry3d: the root holds no batch now). Reruns used `cargo tree --manifest-path <copy>/Cargo.toml --locked --offline ...` from the root (same rust-toolchain.toml, sha256 fed068c3...714e in both).
+- Rerun results: t1 identical; f1, f2, f3, f3-closure identical (paths normalised) -> lists 71/71/76 and the five entries stand; serde/serde_derive print nothing for wasm32 and x86_64-unknown-linux-gnu; built packages identical (47); copy's Cargo.lock 56 packages, duplicates syn only, 0 clock/random crates; overrides 35, none missing in four views, none naming an uncompiled crate.
+- My scratch is /home/user/Shamble-Frontlines/.gate/rr-4b/ (the main checkout's .gate, gitignored), not the worktree's .gate/rr-4b/ where the copy now sits.
+- [Q4 input] engine-architect's read (answer 6): the whole parry batch and the built-file check move to the second pull request (SIZE-4B). Effect: 4b-1's manifests (content only, no registry package) keep sim's closure free of thiserror and safe_arch, so the compare stays green without any exception; FEATURE-COMPARE then decides 4b-2 only. Agrees with my block 6 rule (the built-file check ships with the first outside crate). Answer 4 unchanged.
+
+## Recommendation
+FEATURE-COMPARE: (a), narrowed to exact entries with versions (Q3 block), landing in the same pull request as parry3d (4b-2 if the split is taken); parry3d's std stays off; if the first compile of std-off fails, std on and the `std` entry of rule (ii) is dropped.
+
+## Not verified
+Nothing compiled: no-std+alloc parry, thiserror no-std derive, symbol absence of wide/safe_arch, sizes: all by reading. The std-on trial (six packages) taken from the main session's report, not rerun. cargo metadata not run (serde, serde_derive not on disk; would fetch). RustSec, licences, checksums against crates.io: security-auditor's. wide's own sources beyond u32x4 add, safe_arch's sources: not read.
+DONE
