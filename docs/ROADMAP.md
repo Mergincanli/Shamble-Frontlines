@@ -257,7 +257,16 @@ stands as written (a fail with today's rifle prototype, not waived) and the chec
 ## Recent work
 *(Newest first, a few lines each. Older items fold into "Build history" above.)*
 
-**Change-set 4a of the build plan, The recording [2026-11-25]** — cs4a-recording (the first of change-set 4's four
+**The second guard fix: nothing in front of git or gh unread [2026-11-25 to 11-26, waiting for his go]** —
+guard-wrappers (risk tier 2; his SAME-GAP (a); the chat he calls the Guard fix chat): the day guard reads the options of
+every wrapper and keyword it strips from one table; an unknown form, or a line at the turn limit, asks in a session and
+refuses a subagent; git or gh behind a program it does not strip asks; xargs asks unless a read-only program follows;
+the direct git helper check. Guard tests 1551/1551; 166 added lines of code and tests (stop line 200). Four
+security-auditor rounds, the fourth by his leave; it left R4-1 open (Critical, one more spelling, recorded by class
+only), and by his R4-END (1) what is approved merges. Next, in his order: MAIN-WALL, then R4-1's fix with GUARD-KIT,
+then the review tracks. Report `docs/reports/2026-11-26-guard-wrappers.md`.
+
+**Change-set 4a of the build plan, The recording [2026-11-25 to 11-26, MERGED]** — cs4a-recording (the first of change-set 4's four
 parts, his WALK-CUT (a); the recording came here from the old change-set 3c by his ORDER-3C (c)), by lane 1, built by
 the chat he calls Builder V4: a recorded match replays to the same hashes, tick by tick, natively (one process; two
 more processes with different hash-map seeds, with a 36,000-step run; two matches in turn) and in WebAssembly on the
@@ -268,21 +277,21 @@ straight from the state's one visitor, with no buffer; the hash report (PM-0004-
 15 planted defect checks were caught at their targets and 4 controls held. A player sees nothing new: no browser
 check. 3,300 written lines against the stop line of 3,400 (his STOP-4A (a); the designs counted 1,365); the size
 ladder moved 3B-HOSTILE-ALLOC to the link simulator's change-set. Five reviewers in two rounds, all APPROVE in round 2.
-Report `docs/reports/2026-11-25-cs4a-recording.md`. PR #70; it merges on his go for the head the advisor agent approves, after his Advisor's merge check.
+Report `docs/reports/2026-11-25-cs4a-recording.md`. Merged: PR #70, 2483e9a, 2026-11-26 12:22:01 UTC by `merged_at`.
 
-**The small CI pull request after change-set 3a [2026-11-24 to 11-25, waiting for his go]** — ci-after-3a, by the
+**The small CI pull request after change-set 3a [2026-11-24 to 11-25, MERGED]** — ci-after-3a, by the
 chat he calls CI Builder (risk tier 2; CI and the test configuration only): the `toolchain` job runs every crate's
 release tests (E1), checks the committed vector files against their two generators (3A-GEN-CHECK), builds `devtools`
 for wasm32 on a line of its own (3A-RULES-STEP's CI half) and runs the rule tests in the runner image's Mozilla
 Firefox 160.0 (FIREFOX-TESTS (b), his FIREFOX-SOURCE (c)). The first GitHub run was red as he had foreseen (the
 runner's Firefox gives the page no WebGL), so by his rule decided in advance Firefox runs the rule tests only and its
 drawing tests are a follow-up (FF-DRAW). Green on code head 832268e (Chromium 16 passed, Firefox 2). Report
-`docs/reports/2026-11-25-ci-after-3a.md`; waits for the advisor agent's review of the final head and his go.
+`docs/reports/2026-11-25-ci-after-3a.md`. Merged: PR #71, 07d673b, 2026-11-25 20:49:09 UTC by `merged_at`.
 
-**Guard fix: a wrapper's option values [2026-11-25, waiting for his go]** — guard-env-fix (PR #69, risk tier 2; SEC-U7B-1): the day guard reads env, nice and stdbuf options with their values, so git and gh behind them no longer skip its check;
-a form it cannot read asks the main session and refuses an agent; routines unchanged. Guard tests 1247/1247; security-auditor APPROVE in round 2; the verifier PASS WITH NOTES; waits for the advisor agent's review of the final head and his go.
+**Guard fix: a wrapper's option values [2026-11-25, MERGED]** — guard-env-fix (PR #69, risk tier 2; SEC-U7B-1): the day guard reads env, nice and stdbuf options with their values, so git and gh behind them no longer skip its check;
+a form it cannot read asks the main session and refuses an agent; routines unchanged. Guard tests 1247/1247; security-auditor APPROVE in round 2; the verifier PASS WITH NOTES. Merged: PR #69, 311c0484, 2026-11-25 16:34:48 UTC by `merged_at`, by merge commit, on his go for head 08bb20af.
 
-**ADR 0006's small revision after the preview hosting check [2026-11-25, in flight]** — adr0006-header-row, by
+**ADR 0006's small revision after the preview hosting check [2026-11-25, MERGED]** — adr0006-header-row, by
 lane 2 (the chat he calls Builder V2), on his ONE-OFF-HEADER (a) and STEP4-COUNT (b) (docs only; an ADR draft, so his
 go): the header mark (PM-0006-2) is judged on production's own addresses, with the reason in the row; production's
 one-off links have the host's header recorded, not judged. Part 1 weighs Workers static assets in a short paragraph
@@ -293,7 +302,7 @@ message of 2026-11-25, 11:07:07 UTC in `docs/DECISIONS.md`. Report `docs/reports
 PR #67. His answers of 2026-11-25 (14:55 Amsterdam): PASS-WORDS (a), with PM-0006-7 and checklist step 4 reported as
 "recorded, the question is not answered"; step 4 achieved (recorded, the question is not answered); WORKERS-NEXT
 (a), keep Pages. Main's #68 taken in by one
-merge commit; waits for the advisor agent's approval of that head and his go.
+merge commit. Merged: PR #67, c1da1bd, 2026-11-25 17:13:00 UTC by `merged_at`.
 
 **Change-set 3b of the build plan, The loop closes [2026-11-24 to 11-25, MERGED]** — cs3b-loop-closes (the second
 half of change-set 3, his SIZE-3 (b)), by lane 1, built by the chat he calls Builder V3: the page's keys go to the
@@ -311,7 +320,7 @@ decided, (a) with two conditions. Report `docs/reports/2026-11-25-cs3b-the-loop-
 the expected head 5e02ee73 (the last commit, which Builder V3 reported its advisor agent had approved); gate, smoke and
 toolchain green on it before the merge (the merge commit's message).
 
-**The preview hosting check, ADR 0006's spike 1 [2026-11-15 to 11-24, in flight]** — preview-hosting-check
+**The preview hosting check, ADR 0006's spike 1 [2026-11-15 to 11-25, MERGED]** — preview-hosting-check
 (SPIKE_PLAN entry 6), by lane 2, run by the chat he calls Builder V2 in his throwaway test repository
 Mergincanli/shamble-preview-check on a test Cloudflare Pages project: 56 runs over the rehearsal and two days of
 sittings. A closed pull request's links were gone within 24 hours, through the cleanup job (without it the host kept

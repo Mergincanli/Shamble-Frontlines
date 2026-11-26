@@ -110,7 +110,7 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     answer to the session's recommendations; for main: DOCS-54 (a), NS-TRAILER (b) and NS-FIRST (b)", the question
     shown under it as the session's text). This item leaves "Queued" when the change-set that carries it out merges.
   - The Guard fix chat's queue (session_019YNMUUc6oiiNVygR9H56Q7; each message whole under "Decisions, newest first",
-    copied by script from its saved file in `.checkpoints/guard-wrappers/`, readable at commit <SHA-NOTES>), in his
+    copied by script from its saved file in `.checkpoints/guard-wrappers/` (readable at commit <SHA-NOTES>)), in his
     order of 2026-11-26, 14:09:28 UTC (item 4), which also adds SOURCE-GO (a) to the review tracks:
     > 4. Order after this merge: MAIN-WALL first, because it is the wall behind the guard and the preview links' token sitting waits for it. Then one guard change-set with R4-1's fix and GUARD-KIT together. Then the review tracks, which also get one more line: a change under content/source/ needs my go (SOURCE-GO (a)). If security-auditor says R4-1 cannot wait behind MAIN-WALL, tell me why in two lines before you start, and I decide.
     - MAIN-WALL (his message of 2026-11-25, 19:36:42 UTC, items 2 and 3):
@@ -194,10 +194,10 @@ queued item leaves "Queued" when the change-set that carries it out merges._
   `.checkpoints/guard-wrappers/mustafa-2026-11-26T1505-r4-end.md` (readable at commit <SHA-NOTES>), which the chat
   copied by script from its transcript). What it answers, in the chat's words (not his): the chat's stop after review
   round 4 (its checkpoint, step 25): round 4 left R4-1 open as a Critical, so by his words of 2026-11-25, 23:59
-  Amsterdam (item 3, the entry of 23:01:07 UTC below) the chat came back with two options only, (1) merge what is
-  approved or (2) drop the change; its recommendation is not in the pushed notes. Point 3 answers GUARD-KIT's question
-  on asks in Auto mode for a chat's own command, from his own test; points 4 to 7 set the order and the work. Copied by
-  script (1905 bytes, sha256 e5b0b258803c94cb0f5efb071f120ad792c996d021e34c39d861ea04f64f9398):
+  Amsterdam (item 3, the entry of 23:01:07 UTC below) the chat came back with two options only, merge what is approved
+  or drop the change; its recommendation is not in the pushed notes. Point 3 answers GUARD-KIT's question on asks in
+  Auto mode for a chat's own command, from his own test; points 4 to 7 set the order and the work. Copied by script
+  (1905 bytes, sha256 e5b0b258803c94cb0f5efb071f120ad792c996d021e34c39d861ea04f64f9398):
 > From Mustafa, 26 November, 15:05 Amsterdam (written with my Advisor).
 >
 > 1. R4-END: (1). Merge what is approved. No fifth round. R4-1 is recorded as an open Critical by its class only, in STATUS and in the report; its detail goes into no pushed file, pull request, board post or memory.
@@ -220,11 +220,11 @@ queued item leaves "Queued" when the change-set that carries it out merges._
   done."; message 7114411c-dd6a-44ce-a901-d05b104e84fb, whole; copied by script from the chat's saved file
   `.checkpoints/guard-wrappers/mustafa-2026-11-26T1320-guard-kit.md` (readable at commit <SHA-NOTES>), which the chat
   copied by script from its transcript). What it answers, in the chat's words (not his): nothing this chat asked;
-  GUARD-KIT's question is Builder V2's (its notes, named in his item 2, are on lane 2's branch and were not read by this
-  docs pass). His order after this merge was set again at 14:09:28 UTC (the entry above): R4-1's fix and GUARD-KIT go
-  together, after MAIN-WALL. Records, not his words: the chat's answer to item 4 (its checkpoint, step 21): the guard is
-  loaded, shown by a harmless call that the guard refused with its own message. Copied by script (1478 bytes, sha256
-  ca68f88e8ddcfcfc652211c15d6db6fdfb702b661b2f8d7d1745bbb04c2ea9a4):
+  GUARD-KIT's question is Builder V2's [assumed: from the sources his item 2 names] (its notes, named in his item 2, are
+  on lane 2's branch and were not read by this docs pass). His order after this merge was set again at 14:09:28 UTC (the
+  entry above): R4-1's fix and GUARD-KIT go together, after MAIN-WALL. Records, not his words: the chat's answer to item
+  4 (its checkpoint, step 21): the guard is loaded, shown by a harmless call that the guard refused with its own
+  message. Copied by script (1478 bytes, sha256 ca68f88e8ddcfcfc652211c15d6db6fdfb702b661b2f8d7d1745bbb04c2ea9a4):
 > For the Guard fix chat, from Mustafa (written with the main Advisor, 26 November, 13:20 Amsterdam). Nothing here interrupts round 4; read it when the round is done.
 > 1. A finding from Builder V2: its guard has not run since 15 November, because a second repository was added to that chat, and a chat with two repositories loads no repository hooks. So for MAIN-WALL's measurement on a throwaway repository: never add a second repository to your chat. The measurement runs in a separate chat that holds only the throwaway repository, or by my own clicks, and its results reach you by my paste. Say in MAIN-WALL's plan which.
 > 2. GUARD-KIT: (a), a plan-first kit change-set: every chat shows at its start whether the guard is loaded; find out whether an ask in auto mode reaches me at all; a rule that a chat writing this repository holds no second repository. Sources: .checkpoints/step-2-6-previews/questions-2026-11-26-guard.md and build-notes.md sections B15 and B16 on claude/optimistic-albattani-mdoonz.
@@ -429,9 +429,9 @@ queued item leaves "Queued" when the change-set that carries it out merges._
   copied by script from the chat's saved file `.checkpoints/guard-wrappers/mustafa-2026-11-25T1825-review-tracks.md`
   (readable at commit <SHA-NOTES>), which the chat copied by script from its transcript). What it answers, in the chat's
   words (not his): nothing the chat asked. It is a brief, queued ("Queued, in Mustafa's words", above); what its point 3
-  lists is what that plan proposes, not a rule in force. His order of 2026-11-26, 14:09:28 UTC (the entry at the top)
-  puts it after MAIN-WALL and the next guard change-set, with SOURCE-GO (a) added to it. Copied by script (4784 bytes,
-  sha256 aee18b7553ab813013ac3678fed175c600cf8676db9bb898641525580bc33625):
+  lists is what that plan proposes, not a rule in force. His order of 2026-11-26, 14:09:28 UTC (that entry, above) puts
+  it after MAIN-WALL and the next guard change-set, with SOURCE-GO (a) added to it. Copied by script (4784 bytes, sha256
+  aee18b7553ab813013ac3678fed175c600cf8676db9bb898641525580bc33625):
 > FOR THE GUARD FIX CHAT. From Musti, written with my Advisor, 25 November, 18:25 Amsterdam.
 >
 > Your next change-set after the second guard change-set: the review tracks and who merges. Risk tier 2. Plan first, and no rule file is edited before my go on the plan. If the second guard change-set has not started, it still goes first.

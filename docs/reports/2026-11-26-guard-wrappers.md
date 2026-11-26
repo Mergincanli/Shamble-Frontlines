@@ -52,10 +52,8 @@ value) fixed. r2 on 52e3c7e APPROVE; R2-1 fixed in round 3; R2-2, R2-3 Low defer
 R3-2 Critical fixed in round 4 (his R3-WAY (a)); R3-3 to R3-6 Low deferred. r4 on 83bc2417 REVISE: **R4-1 Critical,
 open**: one more spelling hides git, gh or xargs from the guard's reading, for a session and a subagent; part is
 this change-set's class, part older; open on main too. R4-2 Low (a cost class; fails closed with onFailure) deferred.
-Its answer on order: R4-1 can wait behind MAIN-WALL (only a day-session subagent could use it, and only by breaking
-the interim rule in a form the PR review can see); not covered meanwhile: git commands that rewrite a lane branch or
-change a kit file locally get no ask through that spelling. The advisor agent's Lows: ADV-R4-2 (above), ADV-R4-3
-fixed, ADV-R4-4 deferred.
+Its answer on order: R4-1 can wait behind MAIN-WALL (branch protection, the PR review and his go keep it off main).
+The advisor agent's Lows: ADV-R4-2 (above), ADV-R4-3 fixed, ADV-R4-4 deferred.
 
 ## Decisions and deviations
 - His decisions: CAP (a) and SAME-GAP (a) (17:05); SA-D-DIRECT (a) (20:35); R3-WAY (a) and a last round 4 (23:59);
