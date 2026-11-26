@@ -12,7 +12,7 @@
   `git push origin cs/4b-content:claude/cool-pasteur-oiqk1r`, alone in its command; never a plain `git push`. The
   session's start folder is never switched · **Base:** origin/main 2483e9a741c4e552323c36523831a2f35de4002e (the
   merge of 4a, pull request #70)
-- **Last update:** 2026-11-27 00:06 Amsterdam (from the clock)
+- **Last update:** 2026-11-27 00:24 Amsterdam (from the clock)
 
 ## Sizes and stop lines (his answer of 2026-11-26, 14:09:13 UTC: SIZE-4B (b); which number is which)
 - **4b is two pull requests**, in engine-architect's cut; "each stands on its own: lines left over in 4b-1 do not
@@ -757,6 +757,47 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
     design says the lower id wins; I proposed our own depth-first walk with our own slab test and the tie by
     index. Also asked: which `libm` routines the tree's build links (for `maths-allowed.mjs`), and how to hold
     the depth of 31.
+  - **rust-reviewer's design read for step 10: APPROVE the walk of our own, with our own leaf tests, under
+    four conditions; the maths allow-list stays empty at step 10** (2026-11-27, 00:24;
+    `rust-reviewer-step10.md`; its probe crate, with the root's parry3d line word for word and every locked
+    version, built for wasm32 in release and dev and run natively and in Node, is under
+    `.gate/rust-reviewer-step10-scratch/`).
+    - **Why not the library's ray search (measured):** it prunes a node whose score equals the best, so a tied
+      leaf is never tested: with two boxes at one distance it returned the higher index in 10,889 of 20,000
+      maps. It also loses hits: a zero direction component becomes 8,388,608 instead of infinity, so a ray
+      lying in a box's face plane fails the node test (a downward ray at x = 1.000 over the box [0, 1]: no hit,
+      where the library's own box test and our walk give 654.0); over 60,000 random rays it was wrong 5 times.
+      Aim points are whole centimetres and faces whole millimetres, so that is a real case for PM-0004-54.
+    - **Its conditions:** (a) one slab function for nodes and for box leaves, on the leaf's stored corners:
+      subtract, then divide; a zero component is an inclusive range check; t starts at +0.0; comparisons
+      written out (the scan bans `min` and `max`). (b) A node is pruned only when its entry is greater than the
+      best. (c) The hit kept is the lowest (distance, index). (d) A ramp's distance is clamped to at least its
+      own box's entry.
+    - **Why it is sound:** node entry <= child entry <= leaf distance (correctly rounded subtraction and
+      division are monotonic; a parent box is the exact min and max of its children), so no ancestor of the
+      answer is pruned whatever order the walk takes. Its probe: the lower index in 20,000 of 20,000 ties; no
+      hit of the library's missed in 60,000 rays; 739 rays differ by one unit in the last place (the library
+      multiplies by 1/dir); 10,000 rays native against release wasm, 0 differences.
+    - **Leaf tests ours, not the library's:** its box test works in a centred frame (the centre and the half
+      size round), multiplies by 1/dir, and its normal on a tie links `sqrtf`; its ramp test is an iteration
+      with tolerances (on a face a box could share, its distance equalled the box's in 1,228 of 1,881 rays).
+      The two descriptions of a ramp (ours for rays, the library's polyhedron for 4c's sweeps) are built from
+      the same six f32 corners, and our distance is tested against the library's within 1e-4 m (measured gap at
+      most 5.05e-5 m).
+    - **The tree:** `from_leaves` (Binned), `traverse`, `mins`, `maxs`, `leaf_data`, `is_leaf` and
+      `subtree_depth` link no `libm` routine in release or dev (checked with the project's own rule and an
+      empty list). The build reads only the boxes' bits, their order and their ids: no hasher, no address, no
+      thread count. Tree dumps were equal natively, in release wasm and in dev wasm for 3, 17 and 512 boxes.
+      Narrowing: `as` once per corner in `StaticWorld::build`; those f32 corners are stored and used for the
+      tree and the leaf tests alike; -0.0 becomes +0.0 there (a file cannot hold it, a document built in code
+      can). Every millimetre within 655.35 m narrows to a distinct f32 in order.
+    - **Depth:** `subtree_depth(0)` (public, exact; a leaf counts 1). **A legal map can exceed 31:** 34
+      one-centimetre cubes in a geometric chain give depth 34 (its file `deep-core1-group1.txt` in the probe
+      folder, in millimetres): the refusal is real and has a ready test map. At depth 31 or less the
+      library's walk stacks stay inline (30 of 32 slots); nothing it built allocated.
+    - **One Low:** the example entry in `maths-allowed.mjs`'s comment (`libm::math::sqrtf`) would not cover the
+      real path (`libm::math::sqrt::sqrtf`): the comment is corrected with step 10's commit.
+    - Not checked by it: Chromium (Node only), AArch64, 4c's capsule paths, the speed of the walk.
   - **A change of order, for the advisor agent's next read:** the part of step 10 that needs no content file
     (the static world from a map document, its tree's bytes, the ray cast, on maps made in tests) is built
     before step 9, because step 8's second part and step 9 both rest on his DIFF-LIST answer (the content files,
@@ -776,8 +817,25 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   client 129, 34 boundary tests, 18 browser tests in 206 s; **2,627 written lines of 4b-2**). Then to
   security-auditor for its judgement, and to him in the update and the report (a package inside
   the batch he said yes to; no version of the three he pinned is touched).
-- **To do before 4b-2 merges:** the licence texts for the hosted build (a follow-up for lane 2); a STATUS
-  follow-up to take `heapless` 0.9.4 or later when `rstar` or parry3d next move.
+- **security-auditor's judgement on the advisories: Low; keep the pinned versions; the build rule is the right
+  control; no decision of his is needed, and he is told** (2026-11-27, 00:16;
+  `security-auditor-advisories.md`). It read rustsec.org itself (the page for -0577 matches the saved record; a
+  tenth, older advisory on the package, RUSTSEC-2020-0145, is fixed from 0.6.1 on). Its reading: heapless is
+  used only by rstar and rstar only by parry3d; parry3d names rstar in two lines of the one file that needs
+  `spade`; cargo resolves the same features on wasm32, x86-64 and AArch64 Linux with test dependencies in (no
+  `spade`, no `std`), so a native server is in the same position; of the nine only `vec::IntoIter::drop` lies
+  on rstar's own path, and its defect needs an element whose clean-up panics, which rstar's has not; both twins
+  hold only names of the newer scheme and none of either crate. **Its two gaps, both Low, both closed in the
+  commit e3acb41 (pushed 2026-11-27, about 00:23; the gate passes; the full local checks passed whole; **2,695
+  written lines of 4b-2**):** (a) a name in the older scheme would hide a trait's method from the rule: a twin that
+  holds any such name is refused now; (b) the native builds are never read: `dependency_rules.rs` now holds
+  that only the simulation's manifest names the library, that `Cargo.lock` holds no `spade`, and rstar 0.13.1
+  and heapless 0.8.0 by version, with a failure that says to read the advisories again. Two more plants (U2,
+  U3), both caught. **For STATUS at the docs pass:** take heapless 0.9.4 or later when rstar or parry3d next
+  move; the nine ids as named ignores, with this reason, once cargo-deny or cargo-audit runs in CI.
+- **HEAPLESS-ADVISORY, as asked of him in the chat (00:05): withdrawn as a decision**, on security-auditor's
+  judgement; it stays in the update and the report as a thing he is told.
+- **To do before 4b-2 merges:** the licence texts for the hosted build (a follow-up for lane 2).
 - **GREY-COLOURS: (a), the default greys stand** (his message of 2026-11-26, 21:16:26 UTC, one letter: "a",
   `cs4-walk/mustafa-2026-11-26-grey-colours.md`; read as his answer to the one question the chat's update before
   it asked, whose options were (a) the default greys stand and (b) he gives other colours before step 12). No
@@ -793,6 +851,8 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   test run). All reads. Since then every git command stands alone in its call.
 - One more, at step 7 (2026-11-26, about 22:40 Amsterdam): a `git status --short | head` stood after a `grep` in
   one call. A read. Told to him in the step's update.
+- The card's entry for commit e3acb41 was first written with a push time of 00:31 when the clock read 00:24: a
+  time ahead of the clock, typed and not read. Corrected before it was committed.
 - The chat's update of 2026-11-27 was headed "00:06 Amsterdam" and was written before 00:05:10 by the machine's
   clock (the next event's own time stamp): a minute or two ahead of the clock. Told to him.
 - Commit 2f058b2's message gives the written lines as 2,626; the count, taken after the commit instead of

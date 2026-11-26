@@ -93,6 +93,10 @@ PLANTS = [
      ["the players' file passes with the bindings' own imports"]),
     ("U1", "defect", "the rule on crates that may not be linked finds nothing", [(CHECKS, "    return UNLINKED_CRATES.filter((crate) => steps.has(crate)).map(", "    return UNLINKED_CRATES.filter(() => false).map(")], UNIT,
      ["a function of a crate the players' file is built without is refused"]),
+    ("U2", "defect", "a twin's names in the older scheme are read as if the rules saw them whole", [(CHECKS, "    ...(older.length === 0 ? [] : [", "    ...(older.length >= 0 ? [] : [")], UNIT,
+     ["a clean twin passes, and each rule refuses its own planted module by name"]),
+    ("U3", "defect", "a second asker of the library is not seen when its line is indented or is a table of its own", [("crates/devtools/tests/dependency_rules.rs", ".any(|line| !line.trim_start().starts_with('#') && line.contains(\"parry3d\"))", ".any(|line| line.starts_with(\"parry3d\"))")], ("cargo", "test", "-p", "devtools", "--locked", "--test", "dependency_rules"),
+     ["the_rule_reads_what_it_should_refuse"]),
     # Step 8, the tools.
     ("T1", "defect", "the content walk takes a link, a pipe or a folder for a file", [(WALK, "            if !kind.is_file() {", "            if kind.is_dir() && kind.is_file() {")], FILES,
      ["whatever_is_not_a_kinds_folder_with_plain_id_files_is_refused_before_it_is_read"]),
