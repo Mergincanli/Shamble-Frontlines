@@ -1947,7 +1947,7 @@ _STATUS's "Waiting on Mustafa" lines for the same two pull requests, moved the s
 - **From MAIN-WALL** (the chat he calls the Guard fix chat, session_019YNMUUc6oiiNVygR9H56Q7; branch
   `claude/confident-gates-tbnq38` standing in for `cs/main-wall`; risk tier 2: repository settings by his clicks, no code;
   report `docs/reports/2026-11-26-main-wall.md`; the notes in `.checkpoints/main-wall.md` and `.checkpoints/main-wall/`
-  (readable at commit <SHA-NOTES>). Class words only: the gap's detail stays out of pushed notes (his words of
+  (readable at commit 68b690f130c6a7c5cd770d5fabd088091f9110e6). Class words only: the gap's detail stays out of pushed notes (his words of
   2026-11-25, 19:36:42 UTC, item 3). The ids are security-auditor's (SA-MW-) and the plan's (T1e, T10)):
   - security-auditor's results review (APPROVE, mode Exempt), Lows: SA-MW-R1 (the outsider's refusal proven by
     GitHub's refusal text and elimination, the rule record unavailable: an inference, named); SA-MW-R2 (the isolation
@@ -2062,7 +2062,7 @@ _STATUS's "Waiting on Mustafa" lines for the same two pull requests, moved the s
 _The advisor agent's rulings (not Mustafa's), the five carry-forwards, and the old ADR and design lines, moved from
 STATUS's "Decisions pending"; his decisions and the queue of his words are in `docs/DECISIONS.md`._
 - **Taken by the advisor agent for MAIN-WALL** (not his; its notes `.checkpoints/main-wall/advisor-plan.md` (readable at
-  commit <SHA-NOTES>); ids only): the plan REVISE (text only, C1-C7: this chat reads no rulesets, so T10's read-back and
+  commit 68b690f130c6a7c5cd770d5fabd088091f9110e6); ids only): the plan REVISE (text only, C1-C7: this chat reads no rulesets, so T10's read-back and
   click 4's fallback are his and the designer's two read-only reads are recorded as a departure; two change-sets, the
   review tracks' merge-on-green only after click 11 and T10; security-auditor's answer on R4-1 recorded; his test card;
   guard-wrappers' F2-F7 named; the security review; the SHA read), with THROWAWAY-PUBLIC put to him; the re-review

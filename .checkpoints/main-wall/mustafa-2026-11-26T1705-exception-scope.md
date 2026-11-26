@@ -1,1 +1,0 @@
-EXCEPTION-SCOPE: ok go with D
