@@ -2,7 +2,7 @@
 _Mustafa and the Advisor read this first. At most 120 lines (Mustafa's STATUS-DIET, 2026-11-10): the phase, in flight,
 next, waiting on Mustafa, the routines' state, pointers. His decisions, word for word, newest first:
 `docs/DECISIONS.md`. The rest: `docs/STATUS_ARCHIVE.md`. Kept current by docs-keeper after every change-set._
-_Last updated: 2026-11-26 (change-set 4b-1's docs pass, first part, by lane 1's docs-keeper, on its branch with main 3b949c1 merged in: 4b-1 in flight, in review round 1; VISION-RULE's follow-up and pointers; 4b-1's follow-ups and the builder's two questions; the merged #73's and #74's rows, waiting bullets and top lines moved to the archive by script under OLD-LINES, with lane 1's replaced lines; the reviews' outcomes come in the main session's own pass)._
+_Last updated: 2026-11-26 (change-set 4b-1's docs pass, second part, by lane 1's docs-keeper, on code 2039e3c: 4b-1 reviewed; the reviews' follow-ups; lane 1's lines shortened, their long form moved to the archive by script; its first part moved the merged #73's and #74's lines there under OLD-LINES)._
 
 ## Phase
 - **v2 phase 0** (`docs/V2_PHASE0_BRIEF.md`; the rebuild: `docs/VISION_V2.md`): the process upgrades (kit-v3-0 to
@@ -29,15 +29,13 @@ _Last updated: 2026-11-26 (change-set 4b-1's docs pass, first part, by lane 1's 
 | PR | Work | Branch | State | Waiting on |
 |---|---|---|---|---|
 | #40 | the netcode proof test (SPIKE_PLAN item 1; a throwaway spike, `spikes/netcode-proof/`) | `claude/netcode-proof-test-plan-hcky5g` | draft; U1-U3 done; U4: U4d2 merged, U4r's build on its fourth builder copy; main 4d21c1a merged in (7685b2b) (its checkpoint at d0d1cfd, read 2026-11-14 01:05 UTC) | its units, runs and report; his OK of each run's plan and cost cap |
-| none yet | change-set 4b-1, "Content" (the first of 4b's two pull requests, his SIZE-4B (b)), by lane 1 (the chat he calls Builder V4): the content crate `crates/content` with no dependency (one reader for a cut grammar of JSON, the canonical writer, the bundle, the movement kind, the map kind with its own exact rules and the aim's reach, the time unit's conversion), the simulation's time unit, the reader's proofs and a bounded fuzz run natively, under Node and in the browsers, the old tuning's numbers and durations extracted by script, the time unit's rounding report, and the links check (his LINKS-CHECK (c)); 6,591 written lines against the stop line 7,450 | `claude/cool-pasteur-oiqk1r` (stands in for `cs/4b-content`) | risk tier 1, no browser check; built (code head ef2edec, main 3b949c1 merged in), in review round 1 (rust-reviewer, engine-architect, security-auditor; test-engineer follows) | the reviews and their fix pass, the verifier; the advisor agent's verdict on the final head; then his go for that head |
+| none yet | change-set 4b-1, "Content" (the first of 4b's two pull requests, his SIZE-4B (b)), by lane 1 (the chat he calls Builder V4): the content crate, the time unit, the reader's proofs and fuzz run, the links check (the list: REPO_MAP, ROADMAP) | `claude/cool-pasteur-oiqk1r` (stands in for `cs/4b-content`) | risk tier 1, no browser check; reviewed (two rounds, no Critical or High); the verifier and the advisor agent's verdict on the final head are in its report | his go for the head the advisor agent approves |
 
 ## Next
 1. In his order (ORDER (b), 2026-11-10): his unit walk of 2026-11-09 (a docs change-set: UNITS.md §0 and LOOP_V2),
    then the Slice 1 note of 2026-11-10, each in a fresh chat. His words: `docs/DECISIONS.md`, "Queued".
-2. v2: the netcode proof test (#40); step 2.3's chat stays stopped. Walk (his WALK-CUT (a); no 3c: his ORDER-3C (c),
-   `docs/DECISIONS.md`): 4a merged (#70); **4b-1 in review**; 4b-2 (steps 6 to 12: the collision library and world, his
-   Export's data, the page's scene; after a short re-read by the advisor agent); 4c the first soldier; 4d sights; then
-   the link simulator, before change-set 7. The first builder chat stays paused; Slice 3 waits for #40.
+2. v2: the netcode proof test (#40); step 2.3's chat stays stopped; the first builder chat paused. Walk (his WALK-CUT
+   (a)): 4a merged; **4b-1 reviewed**; then 4b-2, 4c, 4d, the link simulator, change-set 7 (ROADMAP, "Next / open").
 3. Lane 2 (Builder V2), his order of 2026-11-25: #66 and #67 (ADR 0006's revision) merged (09faefa, c1da1bd);
    step 2.6's plan (its first edit after his go on the revised row); the carry of his look decisions when
    his block comes; one plan for the look test page and the model-check tool (EARLY-LOOK (a)), built after his go.
@@ -45,18 +43,10 @@ _Last updated: 2026-11-26 (change-set 4b-1's docs pass, first part, by lane 1's 
    with R4-1's fix and GUARD-KIT, then the review tracks with SOURCE-GO (a); each plan first.
 
 ## Waiting on Mustafa
-- Change-set 4b-1 (no browser check): his go for the head the advisor agent approves; and the builder's two questions,
-  in its report. **SIGHT-FLAG**: should 4b already give each map object a "blocks sight" flag? The builder and
-  engine-architect recommend not in 4b: it comes in Slice 2 with the sight check. **DUR-1**: which fire rate counts as
-  the old game's? The old code never carried a timer's leftover time, so the Shabzon fired about 720 shots a minute at
-  60 frames a second where its table value of 0.072 s gives 833; it binds change-set 8; game-designer's read
-  (`.checkpoints/cs4b-content/game-designer-durations.md`, gone from the tree at the pull request's close, readable at
-  the branch's commits) recommends the table's value now, tuned by play.
-- Answered on 2026-11-26 (`docs/DECISIONS.md`, 12:21:17, 13:05:03 and 14:09:13 UTC): CONTENT-SOURCE, DEPART-4,
-  EARLY-LOOK-ORDER, LINKS-CHECK, SOURCE-GO, SIZE-4B, FEATURE-COMPARE; FIREFOX-REPLAY (carried by #74). STEP-60: his
-  Export at 30 steps is in (15:07:24 UTC; saved whole in the chat's notes); DIFF-LIST is asked at 4b-2's data step
-  (step 8). Later, from 4a's report: MOVE-RULES, NO-SOURCE, RESUME-FLASH, TUNE-HOME, SPRINT-DELAY-4; the two
-  `docs/UNITS.md` §0 lines the Hornet's entry clashes with (his unit walk).
+- 4b-1, reviewed (two rounds, no Critical or High; the verifier and the advisor agent on its final head: its report):
+  his go; the builder's SIGHT-FLAG ("blocks sight" flag in 4b?), DUR-1 (the old fire rate?): long form, the archive.
+- Later, from 4a's report: MOVE-RULES, NO-SOURCE, RESUME-FLASH, TUNE-HOME, SPRINT-DELAY-4; the two `docs/UNITS.md` §0
+  lines the Hornet's entry clashes with (his unit walk); DIFF-LIST at 4b-2's data step (his Export at 30 steps is in).
 - His to give: ACCT-3's roles and CLAUDE.md line (his third account, counted like the other two); his go before anything
   goes to the Rust project (3A-RUST-REPORT); ADR 0004 part 7's pointer sentence, shown first (3A-PART7-POINTER).
 - Lane 2, at his own timing (TR-END met): the test
@@ -109,13 +99,13 @@ _Last updated: 2026-11-26 (change-set 4b-1's docs pass, first part, by lane 1's 
   "for the next edit of ADR 0001 (part 9 (c) and its table Q14: hiding enemies by line of sight is now asked for, so
   R2-INT-OQ5's cost measurement at 48 players becomes due; part 9 (f): shots and their traces reach every player who can
   have them on screen, hidden shooter or not), of ADR 0004 part 13 and of ADR 0003's cutaway rule."
-- **From change-set 4b-1** (in review; the archive's block "From change-set 4b-1"; the 4B- ids are its docs pass's):
+- **From change-set 4b-1** (the archive's block "From change-set 4b-1"; the 4B- ids are its docs pass's):
   4B-AIM-REACH: the loader refuses a playable map beyond the aim's reach (x and z plus or minus 327.67 m, y 0 to
   655.35 m). The aim widens in the first change-set whose map leaves that square (none in Slice 1; Slice 2's plan says
   whether its maps do), at the latest in Slice 3's change-set that sets the command codec for online play (PM-0001-51),
-  beside 3B-ACKS and 3B-OUTAGE-256. No numbered change-set holds it yet. ADR 0002's next revision: 4B-FEATURE-POINTER;
-  the drafts' next revision: 4B-DEPART-3, 4B-PM5-3 (his acceptance); the CI Builder: 4B-CI-CONTENT; 4d's import and
-  change-set 8: 4B-OLD-TIMERS. Closed by 4b-1's step 4, at its merge: 4A-S3-READ's read side.
+  beside 3B-ACKS and 3B-OUTAGE-256. No numbered change-set holds it yet. Also 4B-FEATURE-POINTER, 4B-DEPART-3, 4B-PM5-3,
+  4B-CI-CONTENT (the CI Builder), 4B-OLD-TIMERS, 4B-TIME-REEXPORT, 4B-FACING-ZERO, 4B-SPAWN-SLOTS, 4B-PLAN-4B2,
+  4B-FUZZ-REACH, 4B-REFUSAL-TABLE, 4B-SCAN-CFG-TEST, 4B-OLD-READERS. Closed at its merge: 4A-S3-READ's read side.
 
 ## Open risks (their text: `docs/STATUS_ARCHIVE.md`, "Open bugs and risks", a live section)
 - **Kit:** kit-v3-5's merge-check limits (Windows names, gitignored names, case-only twins, symlinks, more than 100
@@ -126,9 +116,9 @@ _Last updated: 2026-11-26 (change-set 4b-1's docs pass, first part, by lane 1's 
   attempts and was cancelled in 1 (a runner DNS outage). #64's browser tests use a Chrome that moves with the image. ci-preview-handover's upload runs after the cut on what the cut wrote (CUT-ESCAPE, accepted; PH-SA-2), and its artifact is readable by signed-in users for 7 days.
 - **v2:** the decision drafts' risks (the asset pipeline and several LOOK_V2 techniques not researched); R1-R6's (R3-R6
   spot-checked; unread sources); change-set 3a's (MUL-ADD first); 3b's (no bound yet on how late a command runs, before
-  online play; releases worked out, not counted); 4a's (two planted divergences only in a stand-in or native form; the
-  recording tests' link read, 4A-S3-READ, closed on 4b-1's branch, at its merge). **Legacy (frozen):** 3a's ranked list (PR #15); bot navigation; the
-  editor and map bugs; the first-deploy tutorial; the wall-clock reads (an input for ADR 0004 part 4).
+  online play; releases worked out, not counted); 4a's (two planted divergences only in a stand-in or native form);
+  4b-1's (the fuzz run cannot reach the caps, 4B-FUZZ-REACH). **Legacy (frozen):** 3a's ranked list (PR #15); bot
+  navigation; the editor and map bugs; the first-deploy tutorial; the wall-clock reads (an input for ADR 0004 part 4).
 - **Preview hosting (lane 2):** PHC-HEADER (the header mark; revised by #67, merged); PHC-PROBE-MAIL.
 
 ## Where STATUS's old sections went: the table is at the end of `docs/STATUS_ARCHIVE.md` (moved there 2026-11-18)

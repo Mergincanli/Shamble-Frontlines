@@ -294,7 +294,7 @@ run 45373057216 with smoke, toolchain run 45373056953). #63 and #62 closed with 
   Walk as its own small change-set, merged before change-set 7 starts. Walk is four change-sets by his WALK-CUT (a):
   4a the recording, 4b content and the world, 4c the first soldier (he plays), 4d sights (`docs/STATUS.md`, "Next").
 - **Pointer, 2026-11-26 (change-set 4b-1's docs pass; not his words):** change-set 4a is merged (PR #70); 4b is two
-  pull requests by his SIZE-4B (b) (`docs/DECISIONS.md`, 2026-11-26, 14:09:13 UTC): 4b-1, Content, is in review; next
+  pull requests by his SIZE-4B (b) (`docs/DECISIONS.md`, 2026-11-26, 14:09:13 UTC): 4b-1, Content, is reviewed; next
   is 4b-2 (the collision library and the static collision world, the built-file check, his Export's values into the
   content and the simulation, the page drawing the scene from the map), after a short re-read by the advisor agent;
   then 4c, 4d and the link simulator (`docs/STATUS.md`, "Next").
@@ -317,12 +317,14 @@ run 45373057216 with smoke, toolchain run 45373056953). #63 and #62 closed with 
 ## Recent work
 *(Newest first, a few lines each. Older items fold into "Build history" above.)*
 
-**Change-set 4b-1 of the build plan, Content [2026-11-26, in review]** — cs4b-content, the first of 4b's two pull
+**Change-set 4b-1 of the build plan, Content [2026-11-26, reviewed]** — cs4b-content, the first of 4b's two pull
 requests (his SIZE-4B (b)), by lane 1, the chat he calls Builder V4: the content crate with no dependency (one reader
 for a cut grammar of JSON that refuses everything else, the canonical writer, the bundle with the movement and map
 kinds, the map's exact rules and the aim's reach, the time unit of 3,000 a second), held against a browser engine's
-own numbers and trees and by a bounded fuzz run, natively, under Node and in the browsers; the links check (his
-LINKS-CHECK (c)). 6,591 written lines against the stop line 7,450; no browser check. In review round 1. Next: 4b-2.
+answers for 26,653 numbers and 400 trees, by seven limit cases and by a million-input fuzz run in ten stages,
+natively, under Node and in the browsers; the source scan reads the content crate; the links check (his LINKS-CHECK
+(c)). 7,164 written lines against the stop line 7,450; no browser check. Two review rounds, no Critical or High; the
+planted defects 35 of 35 caught. Report `docs/reports/2026-11-26-cs4b1-content.md`. Next: 4b-2.
 
 **The preview hand-over step [2026-11-26, in flight]** — ci-preview-handover, by the chat he calls CI Builder, on his
 block of 2026-11-26 (risk tier 2; CI and the test configuration only): at the end of the `toolchain` job, on pull

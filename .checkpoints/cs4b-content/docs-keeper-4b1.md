@@ -47,3 +47,20 @@ Started 2026-11-26 16:10 UTC (date -u). Worktree `.gate/lane1-takeover`, branch 
 3. STATUS: state "reviewed (two rounds, no Critical or High)"; shrink lane 1's lines (moves by script); list other
    lanes' stale lines with lines freed. repo-map-check.
 ## Done (part 2)
+- REPO_MAP row for the report, held back (the check refuses a path not yet in the tree); paste it above the `2026-11-25-ci-after-3a.md` row in the report's commit, then run the check:
+  | `docs/reports/2026-11-26-cs4b1-content.md` | The report of change-set 4b-1 of the build plan, Content (the main session's; the first of 4b's two pull requests): the content crate with its own reader and canonical writer, the map kind and the aim's reach, the time unit and its rounding report, the reader's proofs and the bounded fuzz run, the links check; the two review rounds, the planted defects, the size against the stop line, the follow-ups |
+- P2.1 DONE: REPO_MAP by `docs-keeper-4b1-repomap2.mjs` + one node edit (sim/src/time.rs row): "in review" dropped
+  (16), tags at 2039e3c, content row (Form, device names, lists cut, tie read-back, at/facing), rules_scan.rs row
+  (content scan), files.rs (open once, name check), content_proofs (LIMIT_CASES 7, STAGES 10), content_fuzz (CI runs
+  it; key-twice test), vectors (26,653; verdicts 37 classes + fuzz), Node/browser rows (plain read). Checked: corpus
+  header 26653, verdicts 39 lines, LIMIT_CASES [&str; 7], STAGES [&str; 10], 7,164 by git numstat sum.
+- P2.2 DONE: archive block header (reviewed, 2039e3c, plants 35/35, report path); 4B-CI-CONTENT corrected+extended;
+  new 4B-TIME-REEXPORT, 4B-FACING-ZERO, 4B-SPAWN-SLOTS, 4B-PLAN-4B2, 4B-FUZZ-REACH, 4B-REFUSAL-TABLE, 4B-SCAN-CFG-TEST,
+  4B-OLD-READERS. ROADMAP 4b-1 entry and Next pointer: reviewed.
+- P2.3 DONE: STATUS by `docs-keeper-4b1-status2.mjs` (moved byte for byte to the archive's "In flight", end, one dated
+  block: line 5, row 32, Next 37-40, Waiting 48-59, From 4b-1 112-118, risks v2 127-131) + one hand edit of the new
+  4b-1 waiting bullet. STATUS 134 -> 124. VISION-RULE and 4B-AIM-REACH checked word for word. Other lanes' stale lines
+  (not moved): Phase day guard 16-22 (7 lines; ~4 freed by a 3-line rewrite keeping R4-1 + interim rule); follow-ups
+  93 (#69), 94 (#74), 95-97 (#73) about merged PRs (5 lines -> a 3-line pointer with the open ids: 2 freed); pointers
+  90-92 (3 -> 2: 1 freed); Waiting 52-53 lane 2 TR-END wrap (1 freed); main's CI read on 2483e9a (24-26) stale, 0 freed.
+- repo-map-check OK (234 entries). Status: part 2 DONE.
