@@ -1,0 +1,68 @@
+# U8-F1: the head read's fix list (brief, drafted 2026-11-26 12:4x UTC by the main session; for the advisor's one check)
+Sources: advisor-u8-head.md (APPROVE WITH FINDINGS): section 3 (SR-1, SR-2), section 4 (ADV-U8H-1 to -4) and "U8-F1, in
+every form". His answer, word for word in history.md:8068-8088: "RESULTS-PUSH: (b). Only numbers leave the server and
+the push stays summaries. U8's new stop is 6,230 lines." `<S14>` is filled at launch from his S14-PUSH answer; with no
+answer at launch, this brief waits for the next window.
+
+## 0. Base and size
+- Base `<base>`: the branch head at launch (U8 merged at 05c63a8: 43 files under spikes/netcode-proof/ops/, 6,189 added
+  lines). A new builder in a fresh worktree (isolation: worktree), not U8's builder ac59cce3e5d002441: its worktree
+  (03d9ff3) holds those 43 files untracked, so its fast-forward would be refused (ffcheck 12:4x: 44 ADDED present).
+- The stop: 6,230, so U8-F1 adds at most 41 lines (the added column of `git diff --numstat <base>` over every file it
+  touches, tests included). Before an item would pass 41, stop and carry the rest, last item first: item 3, then item 2
+  (SR-2 goes with SR-1). Item 1 is the Medium and is never carried. Say what was carried and why.
+
+## 1. What is built (in this order; each with its test passing before the next)
+1. **ADV-U8H-1 under (b): the two self-tests' numbers printed into the summaries on RS.**
+   a. probe_presence (ops/runs/r1.sh:606-677) also prints, for P1 only, each field of its `l2_summary` event (ImpairSocket's
+      self-test: plan.md:1256's "printed E, its max and the counters") and the four P1_READS values (r1.sh:615), one
+      `P1 <name> <value>` line each, after the verdict lines. Numbers and the two policy strings only; no other log text.
+      Its output already goes to probe/presence.txt (r1.sh:592).
+   b. ds_selftest (r1.sh:700-712) writes its `ws_split` event's fields (condition 10's read) into
+      ds-selftest/ws_split.txt, one `<name> <value>` line each, numbers only; a missing event prints one line saying so.
+   c. The pushed list, word for word the same in PROMPT-R1.md section 6 step 2 (ops/operator/PROMPT-R1.md:121-123) and
+      R1.md section 7 (ops/runs/R1.md:288-294), in place of "npt-judge's summaries and the redacted records":
+      `collect/`, `probe/presence.txt`, `ds-selftest/ws_split.txt`, `bringup/facts.txt`<S14>. With (a): `, and s14/
+      whole (R1.md:190-193's copied folder; numbers only)`. With (b): nothing, and R1.md section 5's model-side line
+      reads that the model side runs from the laptop's raw archive in a sitting after R1.
+   d. Tests: one asserts the two lists equal (test 5's file, which holds PROMPT-R1.md's checks); r1sh.test.mjs reads
+      presence.txt's new lines from a fixture P1 log (an `l2_summary` and the four reads) and ws_split.txt's from a
+      fixture `ws_split` event. One plant each (drop a field from the print, or one name from one list): the test
+      fails by name; restored by sha256.
+2. **SR-1, with SR-2:** one line in PROMPT-R1.md section 6 step 2, just before the push, in PowerShell:
+   `git -C <results> rev-parse --git-path hooks`, `<results>` being the folder the push uses. It must print the clone's
+   own hooks folder, the one holding pre-push; anything else: stop and tell him. Not `git config --get core.hooksPath`:
+   settings.json:55's deny matches it in PowerShell (advisor-u8-head.md section 3). The proof: a test on a throwaway
+   repository in a temporary folder (never this repository). A hooks path set (i) by `git config core.hookspath <x>`
+   in lower case, (ii) with `--worktree` (extensions.worktreeConfig on), (iii) by `--file .git/config`, and (iv)
+   through GIT_CONFIG_COUNT, GIT_CONFIG_KEY_0 and GIT_CONFIG_VALUE_0 in the child's environment must each change the
+   printed path; the test fails if any one does not. The test starts git itself (execFileSync with `cwd` and `env`).
+   The `-C` in the line is text for his laptop, never a command run here.
+3. **ADV-U8H-2:** one clause in R1.md: the advisor applies plan.md:1256's slack-value rule at R1's report, from
+   presence.txt's printed reads (item 1a prints them).
+
+Not in U8-F1: ADV-U8H-3 (the two stale comments stay; the main session reads the delay clock thread's vCPU before Stop
+B's fill); ADV-U8H-4 (the report's notes, the main session's); NC-R3-1 (carried: U8's report); TE-5 (Stop B).
+
+## 2. How it is tested (in the worktree's spikes/netcode-proof; no cargo: U8-F1 touches no Rust)
+- The nine ops test files that need no browser package (92 pass at `<base>`; `node --test` names them; not
+  `node --test ops/`, which fails on Node 22.23), plus the new tests: all pass, the count recorded.
+- `bash ops/tests/wrappers.test.sh`: "315 ok, 0 failed". `node ops/operator/redact-check.mjs .`: 0 findings.
+- `node check.mjs --only refs,self,redact`: PASS (refs moves only if a file is added).
+- browser.test.mjs is not run (it needs ops/browser/node_modules); U8-F1 touches no file under ops/browser/.
+
+## 3. Rules (word for word)
+Write files with the Write and Edit tools only (no sed, no shell redirect, no python writes; never `cargo fmt` writing
+files: apply rustfmt's diff by Edit); an agent with no Edit tool rewrites its notes file whole with Write. git and gh
+always start their own command, with no other program in front of them. Never switch the main folder; never `cd` into
+another worktree; no `git -C` and no `git -c`; no shell loops, not even read-only ones; run each long call in the
+background with a long timeout and read its log when told it ended. Notes after each item in your worktree's
+.checkpoints/netcode-proof-test/u8-f1-build.md. No commit: the main session takes the snapshot.
+
+## 4. At the end
+The items, tests, plants, the added lines against 41, anything carried, and what is open, in a short summary.
+
+## 5. Its round
+security-auditor at xhigh, one short read of the new PROMPT-R1.md and R1.md lines (the pushed set's exposure and
+redaction; the re-read line): U8-F1's one round. The advisor reads its pushed head. He approves both files by hand at
+Stop B.
