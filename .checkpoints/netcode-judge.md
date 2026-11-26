@@ -7,7 +7,7 @@
 - **Branch:** `claude/practical-ride-igo41n` (this cloud session's own branch, the stand-in for `cs/netcode-judge`), in
   the worktree `.gate/netcode-judge`. **Base:** the netcode branch `claude/netcode-proof-test-plan-hcky5g`: first at
   e2c0e896 (parts a and b), now at its merged head 591e2cb0ab07 (NPT-L2-ONEWAY).
-- **Last update:** 2026-11-26 about 19:25 UTC, merged; NPT-L2-ONEWAY's plan with the advisor agent.
+- **Last update:** 2026-11-26 about 19:50 UTC, NPT-L2-ONEWAY built (1a637408), the reviewer's read running.
 
 ## Rules in force (my summary; his words are in the Netcode Builder 2 chat, 2026-11-24, never retyped here)
 - **Fence:** edits only in `spikes/netcode-proof/crates/judge/`, `spikes/netcode-proof/marks/` and these notes. In
@@ -214,13 +214,26 @@
     Mustafa's go; its tip was 0e621dae, untouched since 25 November) · this branch fast-forwarded to the netcode
     head 591e2cb0ab07 and pushed (19:1x UTC); marks.json there is still c3396db2….
 
+31. NPT-L2-ONEWAY's plan and its review (2026-11-26) · `plan-oneway.md` · the advisor agent: APPROVE with 4
+    conditions (the notes line is his two sentences, both copied by script; half a base above a written bound is a
+    gap; the netcode-architect's read covers the sign and the half against the model and the probe's stamps, the
+    round trip staying, the made-up logs, and it runs the tests and five plants itself; the final commit pushed
+    without a skip marker, its report with the commands, GitHub's three conclusions and the line count against 400).
+32. NPT-L2-ONEWAY built · 1a637408671126d6306500b33d5496257f477c75 (pushed) · eval.rs `one_way_bound` and its use
+    in `eval_check`; marks.rs `ONE_WAY_SERIES`, `Measure::one_way_place`, the loader's refusal of pooled and against;
+    four `oneway_...` tests (made-up logs and the real marks.json); README 2.3's bullet, three SERIES.md rows;
+    marks.json: one field (PM-0001-3's notes, by `oneway-note.mjs`), sha256 now
+    a41ee58398274840c20eac3f09ab144fe8bc84dda5f7c7233fd5fd7589ea24f2 (before: c3396db2…). 136 judge tests (19 + 4 +
+    87 + 26); eleven plants, each failing a test and taken back. From 591e2cb0: 368 added, 6 deleted (my stop: 400).
+    NOTE: `moved-table.mjs` rebuilds marks.json from the old base and would drop this line: do not run it again.
+
 ## Current step
-**NPT-L2-ONEWAY (his message of 25 November, item 4; his (a) in the netcode chat, history.md:7907):** on the real
-network (L2) the one-way delay checks of PM-0001-3 read against the profile's one-way delay minus half the leg's
-measured base round trip; no tolerance changes; the round-trip checks unchanged. One small change-set inside the
-fence. **Plan written: `.checkpoints/netcode-judge/plan-oneway.md`; with the advisor agent for its review (no judge
-or marks edit before its APPROVE).** Then the build, one reviewer's read, the final checks, the advisor's read of
-the head, and the commit id to Mustafa; the netcode chat merges it on his word. Ready before R1's report.
+**NPT-L2-ONEWAY is built at 1a637408.** Running since about 19:50 UTC: the one reviewer's read (netcode-architect,
+notes `netcode-architect-oneway.md`) and `check.mjs` whole on 1a637408 (output in the session's scratch folder).
+Then: a fix pass if needed, the final checks (judge tests, clippy, fmt, --check-marks, check.mjs whole, GitHub's
+gate, smoke and toolchain on the final SHA), the advisor agent's read of the head, the commit id to Mustafa; the
+netcode chat merges it on his word. Ready before R1's report. Board thread for this piece:
+thr_2e70def4-84c4-45e7-addf-a17221c3deff (state doing).
 **When I wait on him (his rule from 2026-11-25):** the full question as a file in these notes, pushed; the board
 thread set to needs-musti with a due label; the post names the file and the commit.
 **For the report (collected while building):**
