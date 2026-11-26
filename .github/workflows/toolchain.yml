@@ -7,7 +7,10 @@
 # CI-WASM: before the cut, the wasm-bindgen tool's archive is fetched and checked against Mustafa's values and by
 # GitHub's own check of the release; its one program is installed root-owned. Inside the cut the page is built with
 # it; then the boundary tests, the type checks of the Worker, the page and the browser specs, and the browser tests
-# run (in the runner image's Google Chrome: nothing is downloaded for them).
+# run in the runner image's Google Chrome, then the tests the firefox project of playwright.config.ts names run in its
+# Mozilla Firefox (Mustafa's FIREFOX-SOURCE (c); Playwright drives that Firefox over WebDriver BiDi): nothing is
+# downloaded for them. Inside the cut the job also runs every crate's release tests, the two vector generators' checks
+# and a wasm32 build of the test-only crate (devtools) on its own line.
 name: toolchain
 
 on:
@@ -156,8 +159,14 @@ jobs:
               SHAMBLE_WRITE_TYPES=1 cargo test --workspace --locked
               changed=$(git status --porcelain --untracked-files=all -- packages/types/src/generated)
               [ -z "$changed" ] || { echo "writing the generated types again changed:"; echo "$changed"; exit 1; }
-              cargo test --release -p sim -p protocol --locked
+              cargo test --release -p sim -p protocol -p room -p client-endpoint -p sim-wasm -p devtools --locked
+              echo "== the two vector generators checks: the committed files equal what each generator makes (nothing written)"
+              python3 --version
+              python3 -I -B crates/devtools/vectors/make_chacha8_vectors.py --check
+              python3 -I -B crates/devtools/vectors/make_f32_vectors.py --check
               cargo build --locked --target wasm32-unknown-unknown -p sim -p protocol -p room -p client-endpoint -p sim-wasm
+              echo "== the test-only module (devtools) built for wasm32 on its own line, so a native-only dependency fails here by name"
+              cargo build --locked --target wasm32-unknown-unknown -p devtools --lib
               npm ci --offline --ignore-scripts --no-audit --no-fund
               npm test --workspaces
               npx --no -- tsc --version
@@ -193,5 +202,12 @@ jobs:
               /opt/google/chrome/chrome --version
               SHAMBLE_DIST="$PWD/.gate/dist-development" SHAMBLE_CHROMIUM=/opt/google/chrome/chrome \
                 npx --no -- playwright test -c packages/e2e/playwright.config.ts --project=chromium --workers=1 --retries=0 \
+                  --reporter=list --global-timeout=300000
+              echo "== the tests the firefox project names, in the runner image Mozilla Firefox, the same limits (never the allocation spec)"
+              if ! cache=$(/usr/sbin/ldconfig -p); then echo "libEGL.so.1: not checked, ldconfig -p failed (printed, not judged)"; elif printf "%s\n" "$cache" | grep -F "libEGL.so.1 "; then :; else echo "libEGL.so.1: not in the loader cache of this runner (printed, not judged)"; fi
+              [ -f /usr/lib/firefox/firefox ] && [ ! -L /usr/lib/firefox/firefox ] || { echo "/usr/lib/firefox/firefox is not a plain file"; exit 1; }
+              /usr/lib/firefox/firefox --version
+              SHAMBLE_DIST="$PWD/.gate/dist-development" SHAMBLE_FIREFOX=/usr/lib/firefox/firefox \
+                npx --no -- playwright test -c packages/e2e/playwright.config.ts --project=firefox --workers=1 --retries=0 \
                   --reporter=list --global-timeout=300000
             '
