@@ -277,6 +277,77 @@ _STATUS's "Waiting on Mustafa" lines for the same two pull requests, moved the s
 - ci-preview-handover (CI Builder): his go for the head the advisor agent approves, after his Advisor has opened the draft and watched the first run (the push run on d12e3a8 green; the pull request run is the first to run the two new steps); a red on the new steps or on Firefox's replay test comes to him first; if the run fails at its start because the action is not allowed, the chat tells him which setting to change (his 15:05 points 5 and 7).
 - guard-wrappers: his go for the head id the advisor agent approves, after his Advisor's merge check (no browser check).
 
+_And lane 1's own lines that change-set 4b-1's docs pass replaced in STATUS (lane 1 wrote them), moved by the same script, byte for byte, so their words stay on record: "Next" item 2 as it stood, the "Waiting on Mustafa" bullet from 4a's report (its answered items now point at `docs/DECISIONS.md`), and the bullet for RELEASE-COUNT (decided on 2026-11-25; its condition 3B-RELEASE-DRAFTS stays open, listed in the archive's "Follow-ups", the bullet "From change-set 3b", which STATUS's "Merged pull requests' bullets" points at):_
+
+2. v2: the netcode proof test (#40); step 2.3's chat stays stopped. 3b (#68), the small CI pull request (#71) and 4a (#70) merged.
+   **No change-set 3c:** his ORDER-3C (c), 2026-11-25, 16:59:52 UTC (`docs/DECISIONS.md`): "Split 3c at its seam." The
+   recording is change-set 4a (#70); "The link simulator follows Walk as its own small change-set and is merged before
+   change-set 7 starts." Walk is four change-sets (his WALK-CUT (a)): 4a the recording, 4b content and the world, 4c the
+   first soldier (he plays; an early look inside it), 4d sights; then the link simulator, then 7. Change-set 4's plan,
+   section 8 (where to read it: 4a's report), places each 3c item by name. The first builder chat stays paused; Slice 3 waits for #40 and picks how commands are timed.
+
+- From 4a's report (#70, merged 2026-11-26, 2483e9a): EARLY-LOOK-ORDER (his go's point 4: "I decide then"); before 4b's first edit
+  CONTENT-SOURCE and DEPART-4; FIREFOX-REPLAY (it widens the Firefox entry he cut to the rule tests; answered by his block of 2026-11-26, 13:20 Amsterdam; carried by ci-preview-handover); LINKS-CHECK
+  (4A-S3-READ). STEP-60 (a): his Export at 30 steps before 4b's step 6, then DIFF-LIST. Later: MOVE-RULES, NO-SOURCE,
+  RESUME-FLASH, TUNE-HOME, SPRINT-DELAY-4; the two `docs/UNITS.md` §0 lines the Hornet's entry clashes with (his unit
+  walk).
+- **RELEASE-COUNT, decided by him on 2026-11-25: (a), accept as built** (`docs/DECISIONS.md`, 11:38:37 UTC), with
+  two conditions: no report calls any part of the presses mark passed; and the two drafts are made to agree at
+  their next revision, which comes to him before it is written (**3B-RELEASE-DRAFTS**, his).
+
+_Moved from STATUS (2026-11-26, change-set 4b-1's docs pass, second part, to bring STATUS toward his 120 lines): lane 1's own lines (lane 1 wrote them), moved by script, byte for byte, where STATUS now has short forms: its first part's "Last updated" line, 4b-1's in-flight row as it stood before the reviews, "Next" item 2, the "Waiting on Mustafa" bullets with the long form of the builder's questions SIGHT-FLAG and DUR-1 and what he answered on 2026-11-26, the "From change-set 4b-1" follow-ups bullet and the "v2" open-risks bullet as they stood:_
+
+| PR | Work | Branch | State | Waiting on |
+|---|---|---|---|---|
+| none yet | change-set 4b-1, "Content" (the first of 4b's two pull requests, his SIZE-4B (b)), by lane 1 (the chat he calls Builder V4): the content crate `crates/content` with no dependency (one reader for a cut grammar of JSON, the canonical writer, the bundle, the movement kind, the map kind with its own exact rules and the aim's reach, the time unit's conversion), the simulation's time unit, the reader's proofs and a bounded fuzz run natively, under Node and in the browsers, the old tuning's numbers and durations extracted by script, the time unit's rounding report, and the links check (his LINKS-CHECK (c)); 6,591 written lines against the stop line 7,450 | `claude/cool-pasteur-oiqk1r` (stands in for `cs/4b-content`) | risk tier 1, no browser check; built (code head ef2edec, main 3b949c1 merged in), in review round 1 (rust-reviewer, engine-architect, security-auditor; test-engineer follows) | the reviews and their fix pass, the verifier; the advisor agent's verdict on the final head; then his go for that head |
+
+_Last updated: 2026-11-26 (change-set 4b-1's docs pass, first part, by lane 1's docs-keeper, on its branch with main 3b949c1 merged in: 4b-1 in flight, in review round 1; VISION-RULE's follow-up and pointers; 4b-1's follow-ups and the builder's two questions; the merged #73's and #74's rows, waiting bullets and top lines moved to the archive by script under OLD-LINES, with lane 1's replaced lines; the reviews' outcomes come in the main session's own pass)._
+
+2. v2: the netcode proof test (#40); step 2.3's chat stays stopped. Walk (his WALK-CUT (a); no 3c: his ORDER-3C (c),
+   `docs/DECISIONS.md`): 4a merged (#70); **4b-1 in review**; 4b-2 (steps 6 to 12: the collision library and world, his
+   Export's data, the page's scene; after a short re-read by the advisor agent); 4c the first soldier; 4d sights; then
+   the link simulator, before change-set 7. The first builder chat stays paused; Slice 3 waits for #40.
+
+- Change-set 4b-1 (no browser check): his go for the head the advisor agent approves; and the builder's two questions,
+  in its report. **SIGHT-FLAG**: should 4b already give each map object a "blocks sight" flag? The builder and
+  engine-architect recommend not in 4b: it comes in Slice 2 with the sight check. **DUR-1**: which fire rate counts as
+  the old game's? The old code never carried a timer's leftover time, so the Shabzon fired about 720 shots a minute at
+  60 frames a second where its table value of 0.072 s gives 833; it binds change-set 8; game-designer's read
+  (`.checkpoints/cs4b-content/game-designer-durations.md`, gone from the tree at the pull request's close, readable at
+  the branch's commits) recommends the table's value now, tuned by play.
+- Answered on 2026-11-26 (`docs/DECISIONS.md`, 12:21:17, 13:05:03 and 14:09:13 UTC): CONTENT-SOURCE, DEPART-4,
+  EARLY-LOOK-ORDER, LINKS-CHECK, SOURCE-GO, SIZE-4B, FEATURE-COMPARE; FIREFOX-REPLAY (carried by #74). STEP-60: his
+  Export at 30 steps is in (15:07:24 UTC; saved whole in the chat's notes); DIFF-LIST is asked at 4b-2's data step
+  (step 8). Later, from 4a's report: MOVE-RULES, NO-SOURCE, RESUME-FLASH, TUNE-HOME, SPRINT-DELAY-4; the two
+  `docs/UNITS.md` §0 lines the Hornet's entry clashes with (his unit walk).
+
+- **From change-set 4b-1** (in review; the archive's block "From change-set 4b-1"; the 4B- ids are its docs pass's):
+  4B-AIM-REACH: the loader refuses a playable map beyond the aim's reach (x and z plus or minus 327.67 m, y 0 to
+  655.35 m). The aim widens in the first change-set whose map leaves that square (none in Slice 1; Slice 2's plan says
+  whether its maps do), at the latest in Slice 3's change-set that sets the command codec for online play (PM-0001-51),
+  beside 3B-ACKS and 3B-OUTAGE-256. No numbered change-set holds it yet. ADR 0002's next revision: 4B-FEATURE-POINTER;
+  the drafts' next revision: 4B-DEPART-3, 4B-PM5-3 (his acceptance); the CI Builder: 4B-CI-CONTENT; 4d's import and
+  change-set 8: 4B-OLD-TIMERS. Closed by 4b-1's step 4, at its merge: 4A-S3-READ's read side.
+
+- **v2:** the decision drafts' risks (the asset pipeline and several LOOK_V2 techniques not researched); R1-R6's (R3-R6
+  spot-checked; unread sources); change-set 3a's (MUL-ADD first); 3b's (no bound yet on how late a command runs, before
+  online play; releases worked out, not counted); 4a's (two planted divergences only in a stand-in or native form; the
+  recording tests' link read, 4A-S3-READ, closed on 4b-1's branch, at its merge). **Legacy (frozen):** 3a's ranked list (PR #15); bot navigation; the
+  editor and map bugs; the first-deploy tutorial; the wall-clock reads (an input for ADR 0004 part 4).
+
+_Moved from STATUS (2026-11-26, change-set 4b-1's take-in of main 2671595 under pull request #75; his word of 18:16:35 UTC: "fold your own lines by script"): lane 1's own lines as they stood on the branch at 2e28217, byte for byte, where STATUS now holds a shorter form (its top line, its two "Waiting on Mustafa" bullets, the list of ids of "From change-set 4b-1"); and main's lines of lane 1's that the branch's lines replace and that were not in this archive yet:_
+
+_Last updated: 2026-11-26 (change-set 4b-1's docs pass, second part, by lane 1's docs-keeper, on code 2039e3c: 4b-1 reviewed; the reviews' follow-ups; lane 1's lines shortened, their long form moved to the archive by script; its first part moved the merged #73's and #74's lines there under OLD-LINES)._
+- 4b-1, reviewed (two rounds, no Critical or High; the verifier and the advisor agent on its final head: its report):
+  his go; the builder's SIGHT-FLAG ("blocks sight" flag in 4b?), DUR-1 (the old fire rate?): long form, the archive.
+- Later, from 4a's report: MOVE-RULES, NO-SOURCE, RESUME-FLASH, TUNE-HOME, SPRINT-DELAY-4; the two `docs/UNITS.md` §0
+  lines the Hornet's entry clashes with (his unit walk); DIFF-LIST at 4b-2's data step (his Export at 30 steps is in).
+  beside 3B-ACKS and 3B-OUTAGE-256. No numbered change-set holds it yet. Also 4B-FEATURE-POINTER, 4B-DEPART-3, 4B-PM5-3,
+  4B-CI-CONTENT (the CI Builder), 4B-OLD-TIMERS, 4B-TIME-REEXPORT, 4B-FACING-ZERO, 4B-SPAWN-SLOTS, 4B-PLAN-4B2,
+  4B-FUZZ-REACH, 4B-REFUSAL-TABLE, 4B-SCAN-CFG-TEST, 4B-OLD-READERS, 4B-MEMORY-UNIT. Closed at merge: 4A-S3-READ.
+  online play; releases worked out, not counted); 4a's (the recording tests still follow a link, 4A-S3-READ; two planted
+  divergences only in a stand-in or native form). **Legacy (frozen):** 3a's ranked list (PR #15); bot navigation; the
+
 ## Targets
 - **v2 (VISION_V2 §3, read with MODES-3 (a): the starting sizes are totals; Mustafa, 2026-10-31):** start with two teams
   with 2–8 players in total (1v1 to 4v4) and three teams with 6–18 in total (2v2v2 to 6v6v6); the goal 12v12v12 or
@@ -1829,6 +1900,12 @@ _STATUS's "Waiting on Mustafa" lines for the same two pull requests, moved the s
     endless device a test reads until memory runs out); the folder check refuses such a link, so CI cannot go green
     with one, and the exposure is a test run on a hostile branch. Its fix is a repository-wide "no tracked links"
     check: a gate change, risk tier 2.
+    _Dated pointer, 2026-11-26 (4b-1's docs pass): the read side is **done** on 4b-1's branch by its step 4, his
+    LINKS-CHECK (c) ("about 15 lines in 4b", the entry of 2026-11-26, 12:21:17 UTC), closed when 4b-1 merges: the Rust
+    tests read a recording only through `devtools::files::read_plain`, the Node tests and the browser spec only through
+    `packages/sim-worker/boundary/plain-file.ts`, both refusing anything that is not a plain file in a plain folder, with
+    planted links on both sides and a text scan in `tests/recordings.rs` [verified 2026-11-26 at ef2edec]. The
+    repository-wide "no tracked links" check stays for the gate step 2.3 (the chat's reading of LINKS-CHECK (c) in its checkpoint, not his words)._
   - 4A-FIREFOX-REPLAY (a wish for the CI Builder; his word first, engine-architect's E2-4, for 4a's report's
     "Decisions needed" as FIREFOX-REPLAY): the replay spec needs no WebGL, so one line in the browser tests' setup
     would run the recording in Firefox too, a second engine; that widens the Firefox entry he accepted as cut to the
@@ -2057,6 +2134,98 @@ _STATUS's "Waiting on Mustafa" lines for the same two pull requests, moved the s
   next kit change-set: R2-2, R2-3, R3-3 to R3-6, ADV-R4-2, ADV-R4-4, R4-2, SA-c, SA-e, shell function definitions.
 - **From #60, #61, #64, change-set 3a (#65), guard-env-fix (#69) and ci-after-3a (#71)** (moved by script, OLD-LINES): the archive's "Moved from STATUS (2026-11-25...)" and "(2026-11-26, ci-preview-handover's docs pass)".
 - **From guard-env-fix (#69):** SA-R2-2 (very long lines against the hook timeout; answered in guard-wrappers' report, nothing changed without his word), V-2 (the folder tracking after a split-string value), the reason-text nit. Closed by guard-wrappers at its merge: GEF-SAME (what is left of its class: R4-1) and SA-R1-3; CAP decided, his (a) of 2026-11-25.
+- **From change-set 4b-1, "Content"** (lane 1, the chat he calls Builder V4; branch `claude/cool-pasteur-oiqk1r`
+  standing in for `cs/4b-content`; pull request #75; risk tier 1, no browser check; reviewed, two rounds, no
+  Critical or High (rust-reviewer, engine-architect and security-auditor in both, test-engineer's read in round 2);
+  final code 2039e3c; the planted defects' whole run on the final code caught 35 of 35, the 1 control held
+  (`.checkpoints/cs4b-content/plants-4b1.txt`); report `docs/reports/2026-11-26-cs4b1-content.md`. Written by 4b-1's
+  docs pass, first part (before the reviews) and second part (after them), 2026-11-26. The 4B- ids are this docs
+  pass's, not his; each item names its source and who found it. The notes files named here leave the tree at the pull
+  request's close and stay readable at the branch's commits):
+  - 4B-AIM-REACH (fixed at the plan's re-read, its text as given to this docs pass; his DEPART-4 (a), entry 6's note, the
+    entry of 2026-11-26, 12:21:17 UTC: "STATUS names the change-set that widens it"): the loader refuses a playable map
+    beyond the aim's reach (x and z plus or minus 327.67 m, y 0 to 655.35 m). The aim widens in the first change-set
+    whose map leaves that square (none in Slice 1; Slice 2's plan says whether its maps do), at the latest in Slice 3's
+    change-set that sets the command codec for online play (PM-0001-51), beside 3B-ACKS and 3B-OUTAGE-256. No numbered
+    change-set holds it yet. Built in 4b-1: `crates/content/src/map.rs` refuses bounds beyond `AIM_REACH_CM` (32,767)
+    on x and z or above `AIM_HEIGHT_MAX_CM` (65,535) (`BeyondAim`), and `crates/devtools/tests/aim_reach.rs` fails by
+    name when the aim point's field widens [verified 2026-11-26 at 2039e3c: `map.rs:35-38`, `aim_reach.rs`'s header].
+  - 4B-FEATURE-POINTER (his FEATURE-COMPARE (a), the entry of 2026-11-26, 14:09:13 UTC, point 4, which ends "Recorded as
+    a dated pointer for ADR 0002's next revision."): the two named exceptions to the build's check that the simulation's
+    features are the same in every build, with his conditions in that entry, are a dated pointer for ADR 0002's next
+    revision. The exceptions themselves are built in 4b-2 (step 6), not in 4b-1.
+  - 4B-DEPART-3 (the re-read sheet's section H, `.checkpoints/cs4b-content/reread-sheet.md` lines 185 to 190): the dated
+    pointer for the plan's departure DEPART-4 entry 3, at the drafts' next revision, in this order. (1) Entry 3 as he
+    accepted it (DEPART-4 (a), the entry of 2026-11-26, 12:21:17 UTC), the plan's own text
+    (`.checkpoints/cs4-walk/plan.md` lines 694 to 697): “DEPART-3, which he accepted for change-set 3, said of the
+    network draft (its line 221): "three limits are code, not data, until the content crate exists in change-set 4".
+    The crate exists from 4b, and the three limits stay code until change-set 7, which rebuilds the room's command
+    scheduling behind one seam, so that they move once (engine-architect's proposal; netcode-architect confirms it at
+    4b's re-read)”. (2) netcode-architect confirmed it at 4b's re-read (`.checkpoints/cs4b-content/netcode-architect-read.md`,
+    its CONFIRM of change-set 7). (3) netcode-architect's sharper sentence, netcode-architect's and not his, as the
+    sheet sets it out: “...stay code until change-set 7, which rebuilds the room's command scheduling behind one seam
+    and the client endpoint's sending; there they become content values within capacities the code keeps, with
+    defaults equal to today's 8, 8 and 2”. If that sentence should become the departure itself, it goes to him as a
+    question (the sheet's own rule).
+  - 4B-PM5-3 (the builder's reading, for his acceptance at the drafts' next revision): ADR 0005's PM-0005-3 asks for the
+    corpus "written back as the same text as its input"; 4b-1 reads it with two stated exceptions: -0, written "0"; and
+    a corpus input that is not already canonical, written back as the engine writes it [verified 2026-11-26 at 2039e3c:
+    `crates/content/src/number.rs:263`, the pair `(-0.0, "0")`].
+  - 4B-CI-CONTENT (two requests for the CI Builder; this chat writes no CI file; found by rust-reviewer, RR-2, and
+    security-auditor, SA-5, in round 1, and test-engineer, TE-8): (1) a clippy step in the `toolchain` job, so that
+    the content crate's lint guard is held by CI and not only by the source scan and by hand (security-auditor: not
+    later than 4b-2's merge); (2) `-p content` in the job's release test line. The million-input fuzz run DOES run in
+    CI: the release line holds `-p devtools`; only clippy and the content crate's own release tests run by hand
+    (test-engineer's TE-8, correcting the first part of this docs pass, which said otherwise) [verified 2026-11-26 at
+    2039e3c: `.github/workflows/toolchain.yml:162` names `sim`, `protocol`, `room`, `client-endpoint`, `sim-wasm` and
+    `devtools`, not `content`; no `clippy` in the file].
+  - 4B-OLD-TIMERS (game-designer's note for the builder, `.checkpoints/cs4b-content/game-designer-durations.md` lines 91
+    to 93): some of the old game's timers are typed into its functions and are in no table (a bot's lunge cooldown
+    2.5 s, fire locks of 0.1 to 0.2 s, among others), so the time unit's report cannot see them; 4d's import and
+    change-set 8 meet them.
+  - 4B-TIME-REEXPORT (engine-architect, EA-4, round 1; for 4b-2's step 6): the simulation re-exports the content
+    crate's time unit when `sim` first depends on `content`; until then the number 3,000 stands twice, held equal by
+    `crates/devtools/tests/time_unit.rs` [verified 2026-11-26 at 2039e3c: `crates/sim/src/time.rs`'s header says so].
+  - 4B-FACING-ZERO (engine-architect, EA-6, rounds 1 and 2; for 4b-2's step 8, before the first map file is written):
+    which way a spawn's `facing_deg` of 0 points is pinned then; a spawn's `at` is pinned now (the point on the ground
+    between the feet: `map.rs`'s `Spawn`). By its round 2 the line must state that 0 faces +z and degrees grow toward
+    +x (the old game's own convention), and how the simulation reads an angle without a std sine is chosen before the
+    first map file, since a tighter grid later is a version step
+    (`.checkpoints/cs4b-content/engine-architect-review-4b1-round2.md`).
+  - 4B-SPAWN-SLOTS (security-auditor, round 1, its condition on the plan's departure 9, the loader asking for at least
+    one spawn only; for 4c): 4c's match setup refuses, by name, a map with fewer spawns than the match has slots.
+  - 4B-PLAN-4B2 (engine-architect's notes, no findings; for 4b-2's plan): step 9's TypeScript cap of 8,388,608 bytes
+    needs its own tie to the Rust cap; the bundle's outer shape has no Rust struct for the type writer; `f64::round`
+    (`map.rs`, `time.rs`) enters the players' file at step 9, so step 7's libm rule must allow it or the code rounds
+    in whole numbers [verified 2026-11-26 at 2039e3c: `map.rs:225`, `time.rs:33`].
+  - 4B-FUZZ-REACH (security-auditor, round 1; a stated limit): the fuzz run cannot reach the caps (its inputs are a few
+    kilobytes), full map lists, more than one map in a bundle, or long strings, and it measures no coverage; the caps
+    are held by the seven limit cases instead.
+  - 4B-REFUSAL-TABLE (test-engineer, TE-7, Low): one sentence per refusal pinned in a table; today one refusal's
+    sentence is pinned, the others only by the digests, which the by-hand rewrite replaces without showing what
+    changed.
+  - 4B-SCAN-CFG-TEST (engine-architect, round 2; for 4b-2's steps 6, 7 and 9): the source scan does not see a file
+    under a file-level `#![cfg(test)]` as test code (it fails closed), and step 9 plans one in the content crate
+    (`ts_export.rs`); when the build lints of steps 6 and 7 land, their hashed-map and clock half must cover the
+    content crate too.
+  - 4B-OLD-READERS (security-auditor, round 2; outside this change-set): two older readers of committed vectors go
+    around the plain read, `packages/sim-worker/boundary/rules.test.mjs` and
+    `packages/e2e/tests/rules/wasm-rules.spec.ts` [verified 2026-11-26 at 2039e3c: `rules.test.mjs:15` reads the vectors with `readFileSync`; `wasm-rules.spec.ts:33` hands Playwright a vector by its path with `route.fulfill`].
+  - 4B-MEMORY-UNIT (the verifier, on the final code; for 4b-2's first commit): the comment of
+    `packages/sim-worker/boundary/content.test.mjs` gives the test module's memory as "49 MiB"; it is 49.2 million
+    bytes, 46.9 MiB. The asserted ceiling (64 MiB) is right; only the comment's unit is wrong, and it stays until
+    4b-2 so that 4b-1's reviewed code does not move for a comment.
+  - 4B-SIGHT-MARK (his SIGHT-FLAG, answered; `docs/DECISIONS.md`, 2026-11-26, 18:16:35 UTC; his words: "(a). Not in
+    4b. Keep one follow-up line so that Slice 2's plan adds the mark. Which things carry it is still open in my rule
+    (fences, and whether shots follow sight)."): Slice 2's plan adds the "blocks sight" mark to the map kind, with the
+    sight check that reads it. Until then every shape blocks movement, shots and sight alike; 4b-2's collision world
+    is planned to keep, for every solid piece, the shape it came from (engine-architect's review of 4b-1), so that the
+    mark needs no rebuild of the world.
+  - 4B-FIRE-RATE (his DUR-1, answered; `docs/DECISIONS.md`, 2026-11-26, 18:16:35 UTC; his words: "(C). The table value
+    is the rate for now, and I tune it by play in Testlines. A tuned value reaches the game through my Export, as
+    before."): for change-set 8 (the guns): a gun's interval is its table value, with the timer's leftover carried
+    (ADR 0004 part 4); no value is rewritten to match the old game's rate at 60 frames a second.
+  - Closed by 4b-1, at its merge: 4A-S3-READ's read side (the block "From change-set 4a" above, its dated pointer).
 
 ## Decisions pending: the rest
 _The advisor agent's rulings (not Mustafa's), the five carry-forwards, and the old ADR and design lines, moved from
@@ -2430,6 +2599,8 @@ _From STATUS's "Routines", moved here on 2026-11-23 by docs-keeper's script, byt
   and `round1-fold.md` in `.checkpoints/cs4a-recording/`, folded into 4a's report before the pull request is ready):
   1. The tests that read the recordings still follow a link (4A-S3-READ): CI cannot go green with one, since the folder
      check refuses it; the repository-wide check is a gate change for step 2.3.
+     _Dated pointer, 2026-11-26 (4b-1's docs pass): closed on 4b-1's branch by its step 4, at its merge; the
+     repository-wide check stays for step 2.3 (the follow-up 4A-S3-READ's dated pointer, "Follow-ups")._
   2. Two planted divergences are shown in a weaker form: plant E (a WebAssembly-only difference) is a stand-in, and
      the search for a sine input where the two targets differ was not run; plant D (an outside draw) was planted
      natively only. Their real forms run again on movement in 4c (4A-TE-4C).

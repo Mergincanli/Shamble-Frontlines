@@ -4,6 +4,7 @@
 //! field and its shared bytes (the word-size vector: the same text on a 32-bit and a 64-bit target). `manifest.txt` lists
 //! every file with its length and SHA-256.
 
+use std::io::Read as _;
 use std::path::Path;
 
 use sim::state_hash::fnv1a_64;
@@ -63,10 +64,11 @@ pub fn made() -> Result<Vec<(String, Vec<u8>)>, String> {
 /// Refuses what is in the tree and is no plain file: a link there could lead a read or a write anywhere, and the
 /// repository's tree is not trusted. Nothing there yet is fine.
 fn plain(folder: &Path, name: &str) -> Result<(), String> {
-    // The folder is asked for by its own path: a path that ends in a separator would be followed through a link.
+    // The folder is asked for by its own path: a path that ends in a separator would be followed through a link,
+    // so the path is put together again from its parts, which leaves a last separator out.
     let is_folder = name.is_empty();
-    let path = if is_folder {
-        folder.to_path_buf()
+    let path: std::path::PathBuf = if is_folder {
+        folder.components().collect()
     } else {
         folder.join(name)
     };
@@ -81,6 +83,63 @@ fn plain(folder: &Path, name: &str) -> Result<(), String> {
     }
 }
 
+/// The most bytes one read of a committed file takes: far above any file of the folder.
+pub const MAX_READ_BYTES: u64 = 64 * 1024 * 1024;
+
+/// A name that is one file's name and no path.
+fn file_name(name: &str) -> Result<(), String> {
+    if name.is_empty() || name == "." || name == ".." || name.contains(['/', '\\']) {
+        return Err(format!("{name:?} is not a file's name"));
+    }
+    Ok(())
+}
+
+/// A committed file's bytes, read only when the folder and the file are what they are by their own type: a plain
+/// folder and a plain file in it, never a link (Mustafa's LINKS-CHECK (c), 2026-11-26: the tests that read the
+/// recordings refuse anything that is not a plain file, as the folder check does). The file is opened once, and what
+/// is judged again and read is the opened file itself, at most `MAX_READ_BYTES` of it. The tests that read a
+/// committed recording or a committed vector read through here; `tests/recordings.rs` scans the sources of the
+/// recordings' readers by name, which holds what those files say and not what a new reader elsewhere does. Two
+/// things this does not do. The tests that read the repository's own sources (the manifest rule, the two source
+/// scans) read them with `std::fs`: a link there could stall such a test, never hand it a recording. And a link
+/// put in the file's place between the check and the open is followed: that takes a second writer on the machine
+/// while the test runs, where this guards the tree as it was checked out.
+///
+/// # Errors
+/// A name that is a path, a folder or a file that is a link or of another type, a file that is not there or is
+/// larger than a read takes, each by name.
+pub fn read_plain(folder: &Path, name: &str) -> Result<Vec<u8>, String> {
+    file_name(name)?;
+    plain(folder, "")?;
+    plain(folder, name)?;
+    let said = |error: std::io::Error| format!("{name}: {error}");
+    let file = std::fs::File::open(folder.join(name)).map_err(said)?;
+    if !file.metadata().map_err(said)?.is_file() {
+        return Err(format!("{name:?} is not a plain file"));
+    }
+    let mut bytes = Vec::new();
+    let read = file.take(MAX_READ_BYTES + 1).read_to_end(&mut bytes);
+    read.map_err(said)?;
+    if bytes.len() as u64 > MAX_READ_BYTES {
+        return Err(format!(
+            "{name}: more than the {MAX_READ_BYTES} bytes a read takes"
+        ));
+    }
+    Ok(bytes)
+}
+
+/// Writes one file into `folder`, which must exist, never through a link standing in the folder's or the file's
+/// place.
+///
+/// # Errors
+/// A name that is a path, a path that is a link or no plain file, or a file that could not be written.
+pub fn write_plain(folder: &Path, name: &str, bytes: &[u8]) -> Result<(), String> {
+    file_name(name)?;
+    plain(folder, "")?;
+    plain(folder, name)?;
+    std::fs::write(folder.join(name), bytes).map_err(|error| format!("{name}: {error}"))
+}
+
 /// Writes every file into `folder`, which must exist. Making the recordings again is deliberate: it is done in the
 /// commit that changes the simulation on purpose, after `--check` has named the first step that moved, and the
 /// change-set's report says why; a change-set that means no change leaves every file byte for byte as it was.
@@ -89,10 +148,8 @@ fn plain(folder: &Path, name: &str) -> Result<(), String> {
 /// What `made` gives, a path that is a link or no plain file, or a file that could not be written.
 pub fn write(folder: &Path) -> Result<Vec<String>, String> {
     let files = made()?;
-    plain(folder, "")?;
     for (name, bytes) in &files {
-        plain(folder, name)?;
-        std::fs::write(folder.join(name), bytes).map_err(|error| format!("{name}: {error}"))?;
+        write_plain(folder, name, bytes)?;
     }
     Ok(files.into_iter().map(|(name, _)| name).collect())
 }
@@ -108,12 +165,8 @@ pub fn check(folder: &Path) -> Result<(), String> {
     plain(folder, "")?;
     let mut wrong = Vec::new();
     for (name, bytes) in &files {
-        if let Err(why) = plain(folder, name) {
-            wrong.push(why);
-            continue;
-        }
-        match std::fs::read(folder.join(name)) {
-            Err(error) => wrong.push(format!("{name}: {error}")),
+        match read_plain(folder, name) {
+            Err(why) => wrong.push(why),
             Ok(found) if found == *bytes => {}
             Ok(found) => wrong.push(format!(
                 "{name} differs{}",

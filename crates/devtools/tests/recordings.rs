@@ -5,7 +5,7 @@
 use std::path::{Path, PathBuf};
 
 use devtools::compare::{Column, first_difference};
-use devtools::files::{MANIFEST, check, made, vector_text, write};
+use devtools::files::{MANIFEST, check, made, read_plain, vector_text, write};
 use devtools::recording::{Recording, parse_hashes};
 use devtools::replay::Replay;
 use devtools::scripts::{RECORDINGS, VECTOR_TICK};
@@ -15,7 +15,7 @@ fn folder() -> PathBuf {
 }
 
 fn read(name: &str) -> Vec<u8> {
-    std::fs::read(folder().join(name)).unwrap_or_else(|error| panic!("{name}: {error}"))
+    read_plain(&folder(), name).unwrap_or_else(|why| panic!("{why}"))
 }
 
 #[test]
@@ -147,4 +147,110 @@ fn the_check_names_each_file_that_differs_is_missing_or_is_not_listed() {
     // The manifest itself is checked like every other file.
     let manifest = changed("manifest", flip(MANIFEST, 30)).expect_err("a changed manifest");
     assert_eq!(manifest, "manifest.txt differs");
+}
+
+/// Mustafa's LINKS-CHECK (c), 2026-11-26: the tests that read the recordings refuse anything that is not a plain
+/// file. The links are planted in a scratch folder; no file they point at is opened.
+#[cfg(unix)]
+#[test]
+fn the_plain_read_refuses_a_link_a_folder_and_a_name_that_is_a_path() {
+    let scratch = Path::new(env!("CARGO_TARGET_TMPDIR")).join("plain-read");
+    let _ = std::fs::remove_dir_all(&scratch);
+    let folder = scratch.join("recordings");
+    std::fs::create_dir_all(folder.join("sub.rec")).expect("scratch folders");
+    std::fs::write(folder.join("a.rec"), b"the recording").expect("a scratch file");
+    std::fs::write(scratch.join("outside.txt"), b"not a recording").expect("a scratch file");
+    let link = |to: &Path, at: PathBuf| std::os::unix::fs::symlink(to, at).expect("a link");
+    link(&scratch.join("outside.txt"), folder.join("link.rec"));
+    link(Path::new("/dev/zero"), folder.join("zero.rec"));
+    link(&folder, scratch.join("linked"));
+    assert_eq!(read_plain(&folder, "a.rec"), Ok(b"the recording".to_vec()));
+    let refused = |folder: &Path, name: &str| read_plain(folder, name).expect_err(name);
+    // A link to a file outside, and a link to a file that never ends: refused unopened.
+    for name in ["link.rec", "zero.rec", "sub.rec"] {
+        let why = refused(&folder, name);
+        assert!(
+            why.ends_with(&format!("{name}\" is a link or not a plain file")),
+            "{why}"
+        );
+    }
+    assert!(refused(&folder, "missing.rec").starts_with("missing.rec: "));
+    for name in ["", ".", "..", "../outside.txt", "sub.rec/a", "a\\b"] {
+        assert!(
+            refused(&folder, name).ends_with("is not a file's name"),
+            "{name}"
+        );
+    }
+    // The same file through a folder that is a link, with and without a separator at the path's end.
+    for linked in ["linked", "linked/"] {
+        let why = refused(&scratch.join(linked), "a.rec");
+        assert!(
+            why.ends_with("is a link or not a plain folder"),
+            "{linked}: {why}"
+        );
+    }
+    std::fs::remove_dir_all(&scratch).expect("the scratch folder goes");
+}
+
+/// No reader of a committed recording goes around the plain read: the two tests that only read make no file-system
+/// call of their own; this file reads the committed folder (`folder()`) through `read_plain` alone; the library opens
+/// a file in one place; and the two readers under Node go through their own helper, every other read there being of
+/// a WebAssembly file. A text scan, so it holds what the sources say, not what a new reader elsewhere might do.
+#[test]
+fn the_committed_recordings_are_read_only_through_the_plain_read() {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let source =
+        |path: &str| String::from_utf8(std::fs::read(root.join(path)).expect(path)).expect(path);
+    // The words looked for are put together here, so that this test does not find itself.
+    let (call, read, committed) = (
+        ["fs", "::"].concat(),
+        ["fs", "::read"].concat(),
+        ["folder", "()"].concat(),
+    );
+    for path in ["tests/two_instances.rs", "tests/two_processes.rs"] {
+        let text = source(path);
+        assert!(
+            !text.contains(&call) && text.contains("read_plain(&folder, "),
+            "{path}"
+        );
+    }
+    let own = source("tests/recordings.rs");
+    let around = own
+        .lines()
+        .find(|line| line.contains(&read) && line.contains(&committed));
+    assert_eq!(around, None);
+    assert!(own.contains("read_plain(&folder(), name)"));
+    let library = source("src/files.rs");
+    let plain_read = library
+        .split_once("pub fn read_plain")
+        .and_then(|(_, rest)| rest.split_once("\n}\n"));
+    // One place opens a file, inside `read_plain`; nothing reads a path whole, or opens one another way.
+    let (open, whole) = (["File", "::open("].concat(), format!("{read}("));
+    let others = [
+        ["read_to", "_string"].concat(),
+        ["Open", "Options"].concat(),
+    ];
+    assert!(
+        others.iter().all(|way| !library.contains(way)),
+        "{others:?}"
+    );
+    let opened = plain_read.map(|(body, _)| body.matches(&open).count());
+    let counts = (
+        library.matches(&open).count(),
+        library.matches(&whole).count(),
+    );
+    assert_eq!((counts, opened), ((1, 0), Some(1)));
+    for path in [
+        "../../packages/sim-worker/boundary/replay.test.mjs",
+        "../../packages/e2e/tests/replay/determinism.spec.ts",
+    ] {
+        let text = source(path);
+        assert!(text.contains("readPlainFile(recordings, "), "{path}");
+        for line in text.lines().filter(|line| line.contains("readFileSync(")) {
+            assert!(
+                line.contains(".wasm"),
+                "{path} reads a file that is no WebAssembly file: {line}"
+            );
+        }
+    }
 }

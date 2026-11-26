@@ -11,9 +11,10 @@ publish.workspace = true
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-client-endpoint = { path = "../client-endpoint" }
+# The content proofs the test module runs in WebAssembly, the bounded fuzz run and the time report.
+content = { path = "../content" }
+# For the test that ties the content crate's aim reach to the aim point's own number types (tests/aim_reach.rs).
 protocol = { path = "../protocol" }
-room = { path = "../room" }
 sim = { path = "../sim" }
 # For the panic hook as players get it, linked into the test module, and for the local match's own step, which the
 # replay runner and the link simulator's tests run unchanged.

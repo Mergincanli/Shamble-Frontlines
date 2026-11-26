@@ -240,6 +240,17 @@ after the advisor agent's APPROVE of e5ca735; CI green on main (gate run 900 wit
 merge he accepted the four things that went wrong and the five Mediums as follow-ups, and answered WRITE-MODE (a) and
 REC-OLD (a), with one limit (`docs/DECISIONS.md`, 2026-11-18, 20:20:09 UTC).
 
+**Change-set 2 of the build plan, First page [2026-11-18 to 11-19, MERGED]** — cs2-first-page (foundation
+step 2.5, first half), by lane 1: the Rust simulation (a tick counter and the match seed), built as WebAssembly with
+wasm-bindgen 0.2.130, runs in one module Web Worker at 30 ticks a second and hands the page one block per tick; the
+page makes no Wasm call, draws an empty lit ground with a 1 m grid on three.js 0.187.0's WebGPU renderer (WebGL 2 as
+the fallback), names its backend and has a development readout; a small server for a built page on this computer
+only; the build checks the wasm-bindgen tool's file before every run; browser tests in `packages/e2e` (not in CI
+yet). Two review rounds, no Critical or High open; report `docs/reports/2026-11-19-cs2-first-page.md`. His browser
+check in Brave and Firefox: errors 0, WebGPU started in both (`docs/reports/2026-11-19-cs2-browser-check.md`). Merged:
+PR #61, f5030a3, 2026-11-19 15:10:54 UTC, by merge commit, on his go of 14:28:25 UTC for head 4cf30ce; CI green on
+main (gate run 934 with smoke, toolchain run 232).
+
 - **Kit: KEPT-LOGS (2026-11-15):** kept-logs-rule (PR #53, 53272a1, on his KL-MERGE (a)): `.claude/CHECKPOINTS.md` §11 and `.claude/scripts/kept-logs.mjs`: a day session may pack and remove a closed run set's raw logs and the one old build cache, nothing else; SA-KL-1 to -4 and KLT-1 to -8 left open by his word.
 - **UI theme step 1 (2026-10-02):** menu = dossier, pause = clipboard, Field manual; `wr-*` CSS in both pages; awaiting Brave. (Audit phase 2, 2026-09-26, is the "Bug & optimization run" above.)
 - **Performance / hygiene:** pooled FX, GPU resources disposed on map rebuild, player-following shadow frustum; kill vignette captured on the GPU (`vigShot` corner render + `drawImage`); hot paths use `hyp2`/`hyp3` and change-only DOM writes (`_sd`/`_so`/`_st`); ~4.9 MB/s residual GC churn (AUDIT_BUGS_PERF CS11; measured — `AUDIT_BUGS_PERF.md`); an early kill-vignette attempt (readbacks queued via `_vigQueue`/`vigStep()`) did not remove the hitch and was superseded by the GPU capture.
@@ -271,6 +282,11 @@ REC-OLD (a), with one limit (`docs/DECISIONS.md`, 2026-11-18, 20:20:09 UTC).
   (`docs/DECISIONS.md`) splits it; the recording is change-set 4a (PR #70, in flight), and the link simulator follows
   Walk as its own small change-set, merged before change-set 7 starts. Walk is four change-sets by his WALK-CUT (a):
   4a the recording, 4b content and the world, 4c the first soldier (he plays), 4d sights (`docs/STATUS.md`, "Next").
+- **Pointer, 2026-11-26 (change-set 4b-1's docs pass; not his words):** change-set 4a is merged (PR #70); 4b is two
+  pull requests by his SIZE-4B (b) (`docs/DECISIONS.md`, 2026-11-26, 14:09:13 UTC): 4b-1, Content, is reviewed; next
+  is 4b-2 (the collision library and the static collision world, the built-file check, his Export's values into the
+  content and the simulation, the page drawing the scene from the map), after a short re-read by the advisor agent;
+  then 4c, 4d and the link simulator (`docs/STATUS.md`, "Next").
 - **Superseded by v2** (paused in issue #16; where things stand: `docs/STATUS.md` and `docs/V2_PHASE0_BRIEF.md`). **Queue (Advisor, 2026-10-15; updated 2026-10-16 after 3a):** greybox phase: three-teams (0. team-prep-fixes, merged → 3a three-teams-core, merged 2026-10-17 → **N1** (next; editor Play never rebuilds the nav grid; a one-line change-set) → **R19** (navBuild building-cell fix; right after N1, before 3b; Night queue item 2, NEEDS PLAN) → 3b three-teams-hud → 3c spawn-and-buy; editor v2 comes after the playable greybox loop, per the Advisor's queue) → **"ramps as slopes in SIM"** (its own change-set, before octopon-3-greybox; lets `_botFireWorld` go) → **NC-7 blast reach by line of sight** (to the target's nearest surface, ignoring the target's own box; before the octopon-3 playtests) → octopon-3-greybox → harvest-economy → bot-replan-storm → uplinks → win-and-scoring → scale test on the Octopon-3 greybox (N = 12, 24, 36, 48). Paused until the greybox loop is playable: tutorial-field-manual, ui-step-2, ui-step-3, build-spike, ADR run. house-textures-seeded: low priority, unslotted.
 - **From the 3a report** (approved unattended work is listed in the [Night queue, issue #16](https://github.com/Mergincanli/Shamble-Frontlines/issues/16)): the `navBuild` building-cell fix with bot replanning (R19: 27.5 % of Cabana objective routes cross a roof bots can't climb) is now approved into the queue as item 2, NEEDS PLAN (Advisor 2026-10-17, R19-ORDER). Advisor LOS-SIZE: the bots' sight-check budget for 48 soldiers is sized in the 48-player performance change-set, with measured cost, together with the `updateSoldierAnim` split (CS11) and the soldier draw-call reduction (about 120 per on-screen soldier); that work is still proposed, not approved, and comes before `TUNE.teams.size` rises. Advisor K4-MEASURE: bot fairness between teams is judged by target searches per bot per second and the share of time with a target (`tools/perfbots.js` fairness), plus which team's bot fires first in mutual sightings (not in the tools yet; R19's plan adds it). After N1 and R19: 3b three-teams-hud, 3c spawn-and-buy, as planned.
 - **Core loop v2 (Oct 2026):** see LOOP_V2.md; greybox prototype first (§11).
@@ -290,6 +306,15 @@ REC-OLD (a), with one limit (`docs/DECISIONS.md`, 2026-11-18, 20:20:09 UTC).
 ## Recent work
 *(Newest first, a few lines each. Older items fold into "Build history" above.)*
 
+**Change-set 4b-1 of the build plan, Content [2026-11-26, reviewed]** — cs4b-content, the first of 4b's two pull
+requests (his SIZE-4B (b)), by lane 1, the chat he calls Builder V4: the content crate with no dependency (one reader
+for a cut grammar of JSON that refuses everything else, the canonical writer, the bundle with the movement and map
+kinds, the map's exact rules and the aim's reach, the time unit of 3,000 a second), held against a browser engine's
+answers for 26,653 numbers and 400 trees, by seven limit cases and by a million-input fuzz run in ten stages,
+natively, under Node and in the browsers; the source scan reads the content crate; the links check (his LINKS-CHECK
+(c)). 7,164 written lines against the stop line 7,450; no browser check. Two review rounds, no Critical or High; the
+planted defects 35 of 35 caught. Report `docs/reports/2026-11-26-cs4b1-content.md`. Next: 4b-2.
+
 **Main's wall [2026-11-26, the wall on; docs in flight]** — main-wall (MAIN-WALL, risk tier 2: repository settings by his
 clicks, no code; the Guard fix chat): a second ruleset on main, "main-wall (only the owner updates main)", lets only his
 account update main; "Shamble Ruleset 1" is unchanged, so a pull request with gate and smoke green stays required for
@@ -306,6 +331,7 @@ v7.0.2 pinned by commit (his UPLOAD-SOURCE (a), GUARD-STEP (a), HIDDEN-FILES (b)
 test joins the rule tests in Firefox (FIREFOX-REPLAY: 3 passed in the container's Firefox 161). CUT-ESCAPE stays
 accepted, its fix a follow-up (his words). Written at d12e3a8 on his CI-WRITE-3 (a); CI: the push run on d12e3a8 green (toolchain 45836151624, gate and smoke 45836152061): the set-up passed with the upload action named, the two new steps skipped on a push, the runner's Firefox 160 "3 passed (12.5s)" with the replay test "first-loop.rec: 1800 steps, every shared hash as in the file", the job 5 min 45 s; the pull request run, the first that runs the two new steps, after the draft is opened. Report
 `docs/reports/2026-11-26-ci-preview-handover.md`; waits for the advisor agent's review of the final head and his go.
+_Pointer (2026-11-26, 4b-1's docs pass): merged as PR #74, merge commit 3b949c1 (its own time 15:24:22 UTC, read with `git log`)._
 
 **The second guard fix: nothing in front of git or gh unread [2026-11-25 to 11-26, MERGED (#73, 4a62873e)]** —
 guard-wrappers (risk tier 2; his SAME-GAP (a); the chat he calls the Guard fix chat): the day guard reads the options of
@@ -418,14 +444,3 @@ faults each red at its own step; with it his browser check of #61 and his words 
 review rounds, no Critical or High; report `docs/reports/2026-11-19-ci-wasm.md`. Merged: PR #64, 1ec6f6c, 2026-11-24
 10:15:31 UTC, by merge commit, by his main Advisor on his tap after his go for head 8aadfb0; CI green on main (gate
 run 45373057216 with smoke, toolchain run 45373056953). #63 and #62 closed with it.
-
-**Change-set 2 of the build plan, First page [2026-11-18 to 11-19, MERGED]** — cs2-first-page (foundation
-step 2.5, first half), by lane 1: the Rust simulation (a tick counter and the match seed), built as WebAssembly with
-wasm-bindgen 0.2.130, runs in one module Web Worker at 30 ticks a second and hands the page one block per tick; the
-page makes no Wasm call, draws an empty lit ground with a 1 m grid on three.js 0.187.0's WebGPU renderer (WebGL 2 as
-the fallback), names its backend and has a development readout; a small server for a built page on this computer
-only; the build checks the wasm-bindgen tool's file before every run; browser tests in `packages/e2e` (not in CI
-yet). Two review rounds, no Critical or High open; report `docs/reports/2026-11-19-cs2-first-page.md`. His browser
-check in Brave and Firefox: errors 0, WebGPU started in both (`docs/reports/2026-11-19-cs2-browser-check.md`). Merged:
-PR #61, f5030a3, 2026-11-19 15:10:54 UTC, by merge commit, on his go of 14:28:25 UTC for head 4cf30ce; CI green on
-main (gate run 934 with smoke, toolchain run 232).
