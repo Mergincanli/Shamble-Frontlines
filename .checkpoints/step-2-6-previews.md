@@ -270,6 +270,24 @@ his LANE-RULES). Its brief: his paste of the start block (start-block-new-chat.m
   under .github/, .claude/, CLAUDE.md or the gate files; the shared docs again (DECISIONS, REPO_MAP, ROADMAP, STATUS).
   Held, by his 19:20 item 4: one take-in when he says the PR Advisor's merge is through. Whether #77 is that merge is
   not this chat's to judge (the Guard fix chat tells him).
+- HIS MESSAGE (2026-11-27, 12:50 Amsterdam; message 9c6143e3-d741-4e88-817f-ee0b778d14d0, 12:25:00 UTC, 1054 bytes,
+  sha256 24672637ac42b3c9dd53f0314b39fb34646665cbfde475f998744af7266a461f; mustafa-2026-11-27T1250-token-release.md):
+  the PR Advisor merged #77 under the new rule (18:52:17 UTC, 47bb79e9): TOKEN-RELEASE (c) met; take main in once,
+  b9aad01, with the shared docs fixes, STATUS at 120 or fewer; the advisor agent's review; then the token sitting with
+  today's dates; HOOK-PUSH (b), a standing yes to push the main-folder branch while it holds only main's commits.
+- T13: HOOK-PUSH used: claude/zen-bardeen-m030ws pushed (4a62873, main's commits only; GitHub had no such branch any
+  more: "[new branch]"). Take-in: merge commit f5c39e3 (parents 157f888c, b9aad01; base 3b949c1), resolve75.py (every
+  block one-sided by origin; DECISIONS by entry 155/162/174/181; main's change-set 2 move stands; the CI-WASM entry
+  (PR #64, 10 lines) moved byte for byte to Build history after change-set 2, OLD-LINES (a)), verify75.py PASS,
+  control75.py (three plants caught); vs 157f888c main's 58 files, vs main the branch's 84; five sha256; 175 tests;
+  repo map OK (242); gate PASS (--no-smoke); main b9aad01 by ls-remote before the commit. Then the shared docs fixes
+  (one commit on top): DECISIONS gains his six messages to Builder V5 by scripts/add_v5.py (read by uuid from the
+  transcript, quoted whole, read back byte for byte; inserted newest first: 2026-11-26 13:07:08 (the start block),
+  14:09:35, 15:53:35, 17:31:13, 18:16:41, 2026-11-27 12:25:00 UTC); STATUS lane 2's five lines (Last updated, #72's row, Next 3,
+  Waiting, risks) one for one: 120 lines (L4 closed); ROADMAP's step 2.6 entry; REPO_MAP's report and runbook rows;
+  the report (main b9aad01, the fourth take-in and the CI-WASM move, his answers, risk 2, next step, Decisions, For
+  Mustafa). Next: push; the advisor agent's review of the head (scope 851f004..head); then the token sitting message
+  with today's dates (start 2026-11-27, end 2027-02-25; STATUS reminder from 2027-02-11).
 - Item 6c checked 2026-11-26 after the push: no pull request of the Guard fix chat's protection for main is open or
   merged (the 12 most recently updated pull requests read with gh api). The token sitting waits.
 

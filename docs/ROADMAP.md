@@ -370,16 +370,16 @@ _Pointer (2026-11-26, ci-preview-handover's docs pass): merged as PR #70, 2483e9
 (`merged_at`), by merge commit, with the head 420b16b; gate, smoke and toolchain green on main (runs 45818982040 and
 45818982052)._
 
-**Step 2.6, the preview links per pull request [2026-11-25 to 11-26, built, no live link yet, not merged]** — step-2-6-previews
-(foundation step 2.6), by lane 2, the chat he calls Builder V2, on his go of 2026-11-25 for plan revision 2 (risk tier
-2: CI workflows, hosting, a deploy token): every pull request from this repository is to get a public, unlisted preview link
-of its tested build on Cloudflare Pages, in a previews-only account, with one comment holding the link and no click per
-preview. Built: `.github/workflows/preview.yml` and `preview-close.yml` (his texts, by sha256), `hosting/` (one script,
-175 tests), the runbook `docs/runbooks/previews.md`; gate, smoke, toolchain and `preview / tests` green on code head
-84a3ea44. Two review rounds closed (infra-engineer and security-auditor APPROVE; the test-engineer's narrow REVISE
-fixed, no third round). Draft PR #72, stopped until his GUARD-OFF answer (the chat ran without the guard since
-2026-11-15); the token sitting waits for the Guard fix chat's protection for main; the first live link needs the CI
-Builder's hand-over step (asked on #59). Report `docs/reports/2026-11-26-step-2-6-previews.md`.
+**Step 2.6, the preview links per pull request [2026-11-25 to 11-27, built, at its token sitting, not merged]** — step-2-6-previews
+(foundation step 2.6), by lane 2, Builder V2 and from 2026-11-26 the chat he calls Builder V5 (only this repository, by
+his GUARD-OFF (a)), on his go of 2026-11-25 for plan revision 2 (risk tier 2: CI workflows, hosting, a deploy token):
+every pull request from this repository is to get a public, unlisted preview link of its tested build on Cloudflare
+Pages, in a previews-only account, with one comment holding the link and no click per preview. Built:
+`.github/workflows/preview.yml` and `preview-close.yml` (his texts, by sha256), `hosting/` (one script, 175 tests), the
+runbook `docs/runbooks/previews.md`; gate, smoke, toolchain and `preview / tests` green on code head 84a3ea44. Two review
+rounds closed. Main taken in four times (the last b9aad01), the CI Builder's hand-over step (#74) on main and run here;
+MAIN-WALL on and both check merges done; the token sitting comes before the merge (his ORDER-WALL (a)). Draft PR #72.
+Report `docs/reports/2026-11-26-step-2-6-previews.md`.
 
 **The small CI pull request after change-set 3a [2026-11-24 to 11-25, MERGED]** — ci-after-3a, by the
 chat he calls CI Builder (risk tier 2; CI and the test configuration only): the `toolchain` job runs every crate's

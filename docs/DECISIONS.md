@@ -180,6 +180,37 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     his words stand in `docs/EDITOR_V2.md` §3, "Decided 2026-11-05".
 
 ## Decisions, newest first
+- **Taken by Mustafa, 2026-11-27, 12:25:00 UTC: TOKEN-RELEASE (c) met (the PR Advisor merged #77 under the new rule on
+  2026-11-26 at 18:52:17 UTC, merge commit 47bb79e9); take main in once (b9aad01) with the shared docs fixes, STATUS at
+  120 lines or fewer; then the token sitting with today's dates; HOOK-PUSH (b), a standing yes to push the chat's
+  main-folder branch while it holds only main's own commits** (the builder chat he calls Builder V5, lane 2 of the
+  build, session_019YNMUUMZBxnFZJY9gp6qxy, a Claude Code chat with only this repository; his label: "FOR BUILDER V5.
+  From Mustafa, 27 November, 12:50 Amsterdam (written with my Advisor)."; message 9c6143e3-d741-4e88-817f-ee0b778d14d0,
+  whole; extracted by script from the chat's transcript). Records, not his words: HOOK-PUSH answers the chat's optional
+  question of 2026-11-27 about the stop hook's repeated ask to push that branch. Copied by script (1054 bytes, sha256
+  24672637ac42b3c9dd53f0314b39fb34646665cbfde475f998744af7266a461f):
+> FOR BUILDER V5. From Mustafa, 27 November, 12:50 Amsterdam (written with my Advisor).
+>
+> 1. The PR Advisor's merge under the new rule is through. It merged #77 (the Guard fix chat's small docs pull request) on 26 November at 19:52 Amsterdam (18:52:17 UTC), merge commit 47bb79e9f5ecd54c32d6cf82131b9aebf5421ec3. My Advisor checked it on GitHub and in the Guard fix chat's notes. With #76 both check merges are done, so my TOKEN-RELEASE (c) is met.
+> 2. Take main in now, once: b9aad01954be666340a7ec5c6e9fc9353b11abf1 (#77 and Builder V4's #75), with the shared docs fixes. Main's STATUS is at 120 lines, so yours ends at 120 or fewer. Then the advisor agent's review of that head.
+> 3. Then send me the token sitting as your one message, with today's dates filled in.
+> 4. HOOK-PUSH: (b), as a standing yes. You may push your main folder's branch whenever it holds only main's own commits and no work of yours. Everything else still goes only to #72's branch.
+> 5. Rule unchanged: git and gh always start their own command, with no other program in front of them.
+- **Taken by Mustafa, 2026-11-26, 18:16:41 UTC: ORDER-WALL (a): the token sitting stays before #72's merge; the first
+  check merge is #76; the key waits only for the PR Advisor's next merge; meanwhile lane 2's own docs and the token
+  sitting's message; the take-in of main held** (the builder chat he calls Builder V5, lane 2 of the build,
+  session_019YNMUUMZBxnFZJY9gp6qxy, a Claude Code chat with only this repository; his label: "FOR BUILDER V5. From
+  Mustafa, 26 November, 19:20 Amsterdam (written with my Advisor)."; message 28f1a938-6439-4d86-90fc-e55a3e06c26a,
+  whole; extracted by script from the chat's transcript). Records, not his words: the question is the chat's ORDER-WALL
+  (`.checkpoints/step-2-6-previews/questions-2026-11-26-order-wall.md` at d79ae76). Copied by script (1075 bytes, sha256
+  e63bf1f0d730a0d22109ed9ff30145c9e3cf4df05428fa101c22392d6028bff2):
+> FOR BUILDER V5. From Mustafa, 26 November, 19:20 Amsterdam (written with my Advisor).
+>
+> 1. ORDER-WALL: (a). The token sitting stays before #72's merge. Nothing in the approved design changes.
+> 2. The first check merge is done: the Guard fix chat merged #76 at 19:00 under the new rule (main 2671595fc823750a83c58f5b5b122128eb500387). The key now waits only for the PR Advisor's next merge. I asked the Guard fix chat for a small docs pull request tonight that the PR Advisor can merge at its 07:45 run tomorrow.
+> 3. Do not wait idle for it. Do now every part of your docs update that sits in your own files (the report, the runbook's out-of-date section), and write the token sitting's one message with the security-auditor's five steps. Then only two things are left when I tell you the second merge is through: one take-in of main with the shared docs fixes, and the sitting.
+> 4. Holding the take-in of main until then is right. Builder V4's #75 will move main again tonight.
+> 5. Rule unchanged: git and gh always start their own command, with no other program in front of them.
 - **Taken by Mustafa, 2026-11-26, 18:16:35 UTC: main moved under pull request #75 (to
   2671595fc823750a83c58f5b5b122128eb500387, the Guard fix chat's #76), so it cannot merge at 2e282176: the chat takes
   main in once, with no rebase and no force push; in the four clashing docs files both sides are kept, main's text
@@ -215,6 +246,15 @@ queued item leaves "Queued" when the change-set that carries it out merges._
 > Okay,
 >
 > done: just send your block to builder v5
+- **Taken by Mustafa, 2026-11-26, 17:31:13 UTC: MAIN-WALL is on since about 17:15 UTC (only his account can update main;
+  pull request, gate and smoke stay required for everyone); work that stores no credential resumes; the token sitting
+  waits until one day-session merge and one PR Advisor merge have gone through under the new rule** (the builder chat he
+  calls Builder V5, lane 2 of the build, session_019YNMUUMZBxnFZJY9gp6qxy, a Claude Code chat with only this repository;
+  no label; message 7aaec862-9cf9-4f10-acb5-7880f06c8af1, whole; extracted by script from the chat's transcript).
+  Records, not his words: the chat then asked ORDER-WALL (whether #72 itself would be that first day-session merge),
+  answered below at 18:16:41 UTC. Copied by script (472 bytes, sha256
+  ffa7a8f56cb9e716a59c283c5614bba9183564e45a12e401adb4ee2cdd7bdb33):
+> From Mustafa: main's new rule (MAIN-WALL) is on since 26 November, about 17:15 UTC: only my account can update main; pull request, gate and smoke stay required for everyone. You can resume all work that stores no credential now. The token sitting (storing the hosting key) waits until one day-session merge and one PR Advisor merge have both gone through under the new rule; the Guard fix chat will tell me when. Your own next merge from a day session counts as the first.
 - **Taken by Mustafa, 2026-11-26, 17:27:17 UTC: done, except deleting the throwaway repository (sandbox-1126); he asks whether to delete it now** (the chat he calls the Guard fix chat, session_019YNMUUc6oiiNVygR9H56Q7, a Claude Code chat on Opus 5.5 on the branch `claude/confident-gates-tbnq38`; message 2f215f0d-dfd4-45bd-8228-40c62c019460, whole; copied by script from the chat's saved file `.checkpoints/main-wall/mustafa-2026-11-26T1827-done-all.md` (readable at commit 68b690f130c6a7c5cd770d5fabd088091f9110e6), which the chat saved by script from its transcript). What it answers, in the chat's words (not his): the chat's ask it answers is not in the pushed notes; what "done all" covers is not recorded here. Copied by script (62 bytes, sha256 4fa09f1d7576542889ea7bf2f0ea2ff8c446e5eff4ad1678c61446dcee5e8739):
 > done all, except deleting the sandbox.
 > Want me to do that now?
@@ -249,6 +289,14 @@ queued item leaves "Queued" when the change-set that carries it out merges._
 > The rule: a second rule on main where only the repository admin, meaning your account, may update main. Today's rule stays exactly as it is, so a pull request, gate and smoke stay required for everyone, you included.
 > > No, there will be an exception for me where its not required for my account.
 > Add this and let me know what needs to be done (I haven't followed the steps you've given me yet:
+- **Taken by Mustafa, 2026-11-26, 15:53:35 UTC: MERGE-74 (a): main, with #74's change to
+  `.github/workflows/toolchain.yml`, is taken into #72 once, after MAIN-WALL merges** (the builder chat he calls Builder
+  V5, lane 2 of the build, session_019YNMUUMZBxnFZJY9gp6qxy, a Claude Code chat with only this repository; no label;
+  message 03254f5d-9cb8-44c2-9b41-b580ef8e4065, whole; extracted by script from the chat's transcript). Records, not his
+  words: the question is the chat's MERGE-74 (`.checkpoints/step-2-6-previews/questions-2026-11-26-merge-74.md` at
+  e58d049): (a) wait and take main in once after MAIN-WALL; (b) take it in now and again after. Copied by script (1
+  bytes, sha256 559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd):
+> A
 - **Taken by Mustafa, 2026-11-26, 15:51:38 UTC: VISION-RULE, version 2: a player sees an enemy only when their own
   soldier has a clear line of sight to that enemy (the character's sight, not the camera's view): his answer to the
   open design questions R2-INT-OQ1 and R4-LOS-OQ2; the rule in ten points (a white vision cone from the soldier,
@@ -325,6 +373,22 @@ queued item leaves "Queued" when the change-set that carries it out merges._
 > 4. After the merge, tell me main's new id in one line. Then start MAIN-WALL's plan, in the order I gave.
 > 5. For your information: the CI Builder's pull request #74 changes the same five docs files (DECISIONS, STATUS, STATUS_ARCHIVE, ROADMAP, REPO_MAP). It takes main in after your merge. Nothing for you to do there.
 > 6. Rule unchanged: git and gh always start their own command, with no other program in front of them.
+- **Taken by Mustafa, 2026-11-26, 14:09:35 UTC: GUARD-PROMPT (a): the guard's prompt reached him in Auto mode with its
+  reason text, and he answered no; Builder V2 told of the takeover; MAIN-WALL is the Guard fix chat's next change-set
+  after its current guard pull request; until it is merged, nothing under .github/ and no token sitting** (the builder
+  chat he calls Builder V5, lane 2 of the build, session_019YNMUUMZBxnFZJY9gp6qxy, a Claude Code chat with only this
+  repository; his label: "From Mustafa, 26 November, 15:05 Amsterdam (written with my Advisor)."; message
+  d3c924a4-7594-4631-a5b9-6cfc6f7ad7af, whole; extracted by script from the chat's transcript). Records, not his words:
+  the question he answers is the chat's GUARD-PROMPT (`.checkpoints/step-2-6-previews/questions-2026-11-26-new-chat.md`
+  at e200d51). The same 738 bytes reached the chat a second time at 15:10:01 UTC (message
+  46bc5952-2195-40ae-ac19-dd011f9ddc66), after an accidental rewind, his words; the work done between stood. Copied by
+  script (738 bytes, sha256 4f0f6821a0a5020f47c440ebcaa9d2fabc1a75d12b41b625e518ff348b579ed7):
+> From Mustafa, 26 November, 15:05 Amsterdam (written with my Advisor).
+>
+> 1. GUARD-PROMPT: (a). The prompt read "Hook PreToolUse:Bash requires confirmation for this command" and under it the guard's reason text beginning "the main folder stays on main's reviewed rules: git merge would move it (only origin/main merges into the main folder". I answered no. The chat was in Auto mode.
+> 2. Builder V2 is told that you have taken over.
+> 3. The protection for main (MAIN-WALL) is the Guard fix chat's next change-set after its current guard pull request merges. I tell you when it is merged. Until then: nothing under .github/, no token sitting.
+> 4. Rule unchanged: git and gh always start their own command, with no other program in front of them.
 - **Taken by Mustafa, 2026-11-26, 14:09:28 UTC: R4-END (1): merge what is approved, with no fifth review round; R4-1 is
   recorded as an open Critical by its class only, in STATUS and in the report, and its detail goes into no pushed file,
   pull request, board post or memory; the report lists ADV-R4-2's 91 lines by kind; the interim rule stays until R4-1's
@@ -414,6 +478,88 @@ queued item leaves "Queued" when the change-set that carries it out merges._
 > 6. CUT-ESCAPE stays on record as accepted. Put its later fix (the cut's code as its own throwaway user) into STATUS as a follow-up.
 > 7. Then as before: the docs pass, the report, and the pull request's title and text in your notes. My Advisor opens the draft and watches the first run. A red on the new steps or on Firefox's replay test comes to me first.
 > 8. Rule unchanged: git and gh always start their own command, with no other program in front of them.
+- **Taken by Mustafa, 2026-11-26, 13:07:08 UTC: the start block for the new lane-2 builder chat (his GUARD-OFF (a)): the
+  guard check as its first act; the branch and its head; the approved texts with their sha256; what is left, in order
+  (the take-in of main, the wait for the Guard fix chat's protection for main, the token sitting with the
+  security-auditor's conditions, the verifier, ready, his go and the merge, M5 to M11); the rules** (the builder chat he
+  calls Builder V5, lane 2 of the build, session_019YNMUUMZBxnFZJY9gp6qxy, a Claude Code chat with only this repository;
+  his label: "For the new lane-2 builder, from Mustafa (written by Builder V2 at my request, 26 November)."; message
+  0822f9bd-22ea-48df-826b-8f6514f0b31e, whole, his paste, with the line "Branch head: ..." he added at its end;
+  extracted by script from the chat's transcript). Records, not his words: Builder V2 wrote the block at his request
+  (`.checkpoints/step-2-6-previews/start-block-new-chat.md` at dc00c79a); the chat's first act met the guard's ask,
+  which he answered no (his GUARD-PROMPT (a), below). Copied by script (6898 bytes, sha256
+  31bc712be3a235821aa98c01f6addc46c5f2ceff431258ed8ef7ac5eae3f00aa):
+> For the new lane-2 builder, from Mustafa (written by Builder V2 at my request, 26 November).
+>
+> You take over foundation step 2.6, a preview link for every pull request, from Builder V2
+> (session_019YNMUSYpJGi1xxCjKgr4e5). Builder V2 had two repositories, so the guard never loaded there; you have one.
+>
+> 1. First act, while I watch: show that the guard's ask reaches me. In your main folder run exactly
+>    `git merge --ff-only HEAD~1` as its own command. The guard asks me before any main-folder merge of anything but
+>    origin/main; I should see a prompt, and I will answer "no". If it ran anyway it would change nothing (HEAD~1 is
+>    already inside HEAD), and that would show the ask did not reach me. If no prompt reaches me, or the auto-mode
+>    classifier refuses it first, tell me, do no sensitive step, and ask me in chat before each sensitive step instead.
+>    Run it before any commit in your main folder: on a branch one commit past origin/main the probe passes unasked.
+> 2. The branch: PR #72's branch `claude/optimistic-albattani-mdoonz`. I allow you to commit and push there; Builder V2
+>    stops pushing to it once you tell me you have taken over. Work on it in a worktree
+>    (`git worktree add .gate/step-2-6 claude/optimistic-albattani-mdoonz` after `git fetch origin
+>    claude/optimistic-albattani-mdoonz`, each its own command), never by switching your main folder. Push nowhere else.
+>    After the fetch, `git rev-parse origin/claude/optimistic-albattani-mdoonz` must equal the commit Builder V2 named
+>    when it handed me this block: stop and tell me if it differs. If a push to that branch is refused, stop and tell me.
+> 3. Read first: CLAUDE.md; on that branch the checkpoint `.checkpoints/step-2-6-previews.md`, the build notes
+>    `.checkpoints/step-2-6-previews/build-notes.md` (B12 to B16), the report
+>    `docs/reports/2026-11-26-step-2-6-previews.md` and `docs/runbooks/previews.md`; in `docs/DECISIONS.md` my entries
+>    of 25 and 26 November for step 2.6.
+> 4. Done: plan revision 2 (c40f3f9) and my go of 25 November; the request to the CI Builder on #59; `hosting/` (the
+>    script, 175 tests, the header file, Wrangler's manifest and lockfile); the three workflow texts byte for byte
+>    (9ded5a87); draft PR #72; my sitting (the previews account, the project, the environment `preview` limited to
+>    `main`, its bypass box saved unticked); M1 passed on its second try; review rounds 1 and 2 closed; the report and
+>    the docs pass; the advisor agent's reviews of the heads. Code head 84a3ea44; the branch head is the commit Builder V2
+>    named when it handed me this block (item 2's check).
+> 5. The approved texts and their sha256 (check them before and after every step):
+>    - `.github/workflows/preview.yml` 31119c06e7d095baa3c99ed54bbc1a2c72d05b8b3cab88ffd4512dc12acd3abc (my NEW-TEXT (a))
+>    - `.github/workflows/preview-close.yml` c2f1fa90511db0f558d4e9287d64e189877f8cbc03eb27e6efbe08787fe20e66
+>    - `.github/workflows/wall-test.yml` 3af067068060971beba8444346fdb836b7779a41403ac09d25e43027e8b18507 (throwaway:
+>      it leaves at the token sitting)
+>    - `hosting/package.json` b47551b125f78a667a031dd0718a025981c1395c036be3c330b5239aef7b9726 and
+>      `hosting/package-lock.json` df24ffc392062d041d4be8f9ac5b51be7a6696e0c5a8cbfc3bac0dc07a4924fc (the
+>      security-auditor's dependency check)
+> 6. Left, in order:
+>    a. The guard check (item 1); then tell me in one line that you have taken over, with its result.
+>    b. Take main in: main moved to 2483e9a7 (#70, lane 1's change-set 4a), and #72 conflicts in the shared docs only
+>       (DECISIONS, REPO_MAP, ROADMAP, STATUS, STATUS_ARCHIVE; no rules or CI file). One merge commit in your worktree,
+>       keeping both sides' text and the other lane's lines byte for byte. While #72 conflicts, GitHub starts no
+>       pull-request runs on it.
+>    c. Wait for the Guard fix chat's protection for main (my TOKEN-TONIGHT (b), MAIN-WALL-AGAIN (a)). If it is not
+>       merged by my click on the real token, ask me again first (my MAIN-WALL (b)).
+>    d. The token sitting: one message to me, in this order (the security-auditor's conditions): (a) reload the
+>       `preview` environment page and send a screenshot (bypass box unticked, "Selected branches and tags", "1 branch
+>       and 0 tags allowed", `main`, no custom rule); (b) both secrets only by "Add environment secret"; (c) after the
+>       secrets, the Actions, Dependabot and Codespaces secret pages show no CLOUDFLARE_ name (screenshots); (d) you
+>       re-run M1, a fresh run and a re-run: the refusal line through the annotations API and zero steps for all three
+>       jobs, a deployment record with status failure expected; (e) delete the secret WALL_TEST, and `wall-test.yml`
+>       leaves the branch (a change under `.github/`: the guard asks me). The token's start and end dates go in their own
+>       fields, never the single-date chip, 90 days apart; its end date goes into STATUS with a reminder 14 days before.
+>    e. The verifier on the final diff; fold the checkpoint into the report and delete `.checkpoints/step-2-6-previews*`
+>       in the last commit before ready; a head without [skip ci]; the advisor agent's review of that head; ready.
+>    f. My go after my Advisor's merge check; merge with the approved head as the expected head.
+>    g. After this PR and the CI Builder's hand-over step (#59) are both merged: M5 to M11 (the first live link and its
+>       comment, the served headers, reconcile, the month's count against Cloudflare's list minus the wall-test records).
+> 7. Rules: git and gh always start their own command, with no other program in front of them. GIT-IN-NODE (a): main's
+>    tracked kit scripts may run git; a script you write never runs git and never writes a protected file. In the main
+>    folder only `git switch -c <new> origin/main`, `git merge --ff-only origin/main` and `git pull --ff-only origin
+>    main`. Never push to another chat's branch (PR #72's branch, item 2, is now yours); never touch spikes/. The token
+>    goes from Cloudflare's page into GitHub's secret box and nowhere else. Keep the environment wall's detail out of
+>    every pushed file. No account ID, e-mail address, Windows user name, Access ID or `kid` value in repository files.
+>    When you wait on me, save the full question as a file in your notes, push it, and name the file and the commit in
+>    your message.
+> 8. From the advisor agent's last review: on your first checkpoint update, replace the checkpoint's leftover lines
+>    (the old Next list, "Waiting for his five answers", "the saver stays off until GIT-IN-NODE"); for 6b go by git's
+>    own conflict list (it shows four: DECISIONS, REPO_MAP, ROADMAP, STATUS; STATUS_ARCHIVE merges cleanly).
+> 9. Watch PR #72's activity once you have taken over; if you are told another session watches it, tell me (Builder V2
+>    stops watching when I tell it you have taken over).
+>
+> Branch head: dc00c79aa1863d39dd31c1b9300bdb79a8142960
 - **Taken by Mustafa, 2026-11-26, 13:05:03 UTC: SOURCE-GO (a): the rule that a change under content/source/ needs his
   go is written into the review-tracks rule change the Guard fix chat has queued; it is no condition for 4b's merge
   and this chat writes no kit file for it; until that rule is merged, main's rule that game feel and balance go to him

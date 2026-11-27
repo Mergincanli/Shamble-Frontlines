@@ -1,4 +1,4 @@
-# Advisor report: step-2-6-previews (2026-11-26, branch claude/optimistic-albattani-mdoonz, PR #72, main last taken in 3b949c1)
+# Advisor report: step-2-6-previews (2026-11-26, branch claude/optimistic-albattani-mdoonz, PR #72, main last taken in b9aad01)
 The branch stands in for `cs/step-2-6-previews` (a cloud chat limited to a `claude/…` branch). Code head 84a3ea44.
 B-numbers point to the build notes, `.checkpoints/step-2-6-previews/build-notes.md` at commit 2fd80d69 (B1 to B16);
 they leave the branch at "ready" and stay readable at that commit.
@@ -17,10 +17,10 @@ Foundation step 2.6: every pull request from this repository gets a public, unli
 on Cloudflare Pages, with one comment holding the link, and no click per preview.
 ## Outcome
 PARTIAL. Built, reviewed in two rounds, green in CI. The CI Builder's hand-over step is on main (#74, 2026-11-26) and
-ran on this pull request. Not yet done: one more take-in of main (with the shared docs: his messages to the new chat
-into DECISIONS, STATUS, ROADMAP, REPO_MAP), the token sitting, the throwaway `wall-test.yml` out, the verifier, ready,
-his go and the merge; then the first live link. The token sitting waits for the PR Advisor's next merge under MAIN-WALL
-(his words of 2026-11-26, 19:20 Amsterdam), and stays before #72's merge (his ORDER-WALL (a)).
+ran on this pull request. MAIN-WALL is on and both check merges under it are done (#76; #77 by the PR Advisor): his
+TOKEN-RELEASE (c) is met (2026-11-27). Not yet done: the token sitting, the throwaway `wall-test.yml` out, the
+verifier, ready, his go and the merge; then the first live link. The token sitting stays before #72's merge (his
+ORDER-WALL (a)).
 ## Plan and approval
 Plan revision 2 (c40f3f9): a `workflow_run` workflow on main's files, an environment `preview` limited to `main`, a
 previews-only Cloudflare account, guards G1 to G9. The advisor agent approved; his go 2026-11-25 19:36:53 UTC: TRIGGER
@@ -33,16 +33,19 @@ changed line 50 (`node --test hosting/preview.test.mjs`; `hosting/` fails on Nod
 - `hosting/preview.mjs`: one script, eight commands, Node built-ins only. `hosting/preview.test.mjs`: 175 tests (G9's
   lint of preview.yml included). `hosting/_headers`; `hosting/package.json` + lockfile: Wrangler 4.164.0 (DEP-HOLD:
   the security-auditor's APPROVE on both sha256).
-- `docs/runbooks/previews.md` (its hand-over section made true after #74); `docs/DECISIONS.md` (his six messages, by
-  script); `docs/REPO_MAP.md` rows; STATUS and ROADMAP (lane 2's lines; change-set 0's merged entry, ROADMAP lines
-  371-377, moved byte for byte to Build history lines 202-208 by script, under his OLD-LINES (a)).
-- Main taken in three times, each by one merge commit whose docs were resolved by script, lines moved and never
+- `docs/runbooks/previews.md` (its hand-over section made true after #74); `docs/DECISIONS.md` (his six messages to
+  Builder V2 and his six to Builder V5, each by script from the chat's transcript); `docs/REPO_MAP.md` rows; STATUS and
+  ROADMAP (lane 2's lines; change-set 0's merged entry, ROADMAP lines 371-377, moved byte for byte to Build history
+  lines 202-208 by script, under his OLD-LINES (a)).
+- Main taken in four times, each by one merge commit whose docs were resolved by script, lines moved and never
   retyped, and checked line by line against the base, the branch and main, with planted defects caught
-  (`.checkpoints/step-2-6-previews/scripts/` resolve, verify, control 70, 73, 74): 6c812700 (main 2483e9a7, #70),
-  90c939f4 (4a62873, #73), 851f004 (3b949c1, #74; its `toolchain.yml` equals main's). Lines each merge moved under his
-  OLD-LINES (a), byte for byte, from ROADMAP's "Recent work" to "Build history" (the file's rule: 8 to 12 entries):
-  "Part 15 of the build plan, the second lane, to main" (PR #57; 6c812700), "Change-set 1 of the build plan, Types"
-  (PR #58; 90c939f4), "The kit hold and two CI edits" (merged; 851f004). STATUS keeps one "Last updated" line per lane.
+  (`.checkpoints/step-2-6-previews/scripts/` resolve, verify, control 70, 73, 74, 75): 6c812700 (main 2483e9a7, #70),
+  90c939f4 (4a62873, #73), 851f004 (3b949c1, #74; its `toolchain.yml` equals main's), f5c39e3 (b9aad01: #76, #77,
+  #75). Lines each merge moved under his OLD-LINES (a), byte for byte, from ROADMAP's "Recent work" to "Build
+  history" (the file's rule: 8 to 12 entries): "Part 15 of the build plan, the second lane, to main" (PR #57;
+  6c812700), "Change-set 1 of the build plan, Types" (PR #58; 90c939f4), "The kit hold and two CI edits" (merged;
+  851f004), "CI builds the WebAssembly and runs the tests that need it" (PR #64; f5c39e3). STATUS keeps one "Last
+  updated" line per lane and ends at main's 120 lines.
 - No game file, no `.claude/`, no gate file. Gate check 3: +0 -0 symbols.
 ## Evidence
 - Gate PASS (checks 1-4, 5b-5d; 5a smoke cannot start locally: the container's Chromium does not match tools'
@@ -81,34 +84,34 @@ changed line 50 (`node --test hosting/preview.test.mjs`; `hosting/` fails on Nod
   outside this diff and not a follow-up. The advisor agent: ESCALATE; his answers of 2026-11-26 settle it (below). In
   the new chat an ask reached him in Auto mode with the guard's reason (his GUARD-PROMPT (a)): one observation, not
   the kit-wide answer, which stays with the Guard fix chat (his GUARD-KIT (a)).
-- His answers to the new chat (in its notes now, into `docs/DECISIONS.md` at the next take-in of main): GUARD-PROMPT
-  (a); MERGE-74 (a), main with #74's `toolchain.yml` taken in once, after MAIN-WALL; ORDER-WALL (a), the token sitting
-  before #72's merge. MAIN-WALL is on since about 17:15 UTC (his message of 17:31:13 UTC); the first check merge under
-  it is #76 (main 2671595); the token waits for the PR Advisor's next merge.
+- His answers to the new chat (`docs/DECISIONS.md`, 2026-11-26 and 11-27): GUARD-PROMPT (a); MERGE-74 (a), main with
+  #74's `toolchain.yml` taken in once, after MAIN-WALL; ORDER-WALL (a), the token sitting before #72's merge; MAIN-WALL
+  on since about 17:15 UTC (his message of 17:31:13 UTC); the check merges #76 (a day session) and #77 (the PR
+  Advisor, 18:52:17 UTC): his TOKEN-RELEASE (c) met; HOOK-PUSH (b), the chat may push its main-folder branch while it
+  holds only main's own commits.
 - Process: on 2026-11-26 his message of 15:05 Amsterdam reached the new chat twice (an accidental rewind, his words):
   the first run's work (a merge of main, its review, three notes commits) stood on GitHub and was checked, not redone.
-- Main moved again after 851f004 (#76; #75 is expected): taken in once, with the shared docs, before the token
-  sitting (his words of 19:20 Amsterdam, item 4).
+- Main moved again after 851f004 (#76, #77, #75): taken in once, with the shared docs, as f5c39e3 (his words of
+  2026-11-27, 12:50 Amsterdam, item 2).
 - Left, by the advisor agent's review (D1): lane 2's STATUS lines are long single lines, as other lanes' are.
 ## Risks
 1. A guard that seems on but is not (Builder V2's chat), and asks that may not reach him in auto mode (kit-wide): his
    GUARD-KIT (a) gives it to the Guard fix chat; in the new chat the guard runs and its ask reached him.
-2. No token exists yet: it waits for the PR Advisor's next merge under MAIN-WALL (on since 2026-11-26), and the
-   environment rule (M1) must still hold when it comes (the sitting re-checks it).
+2. No token exists yet: his TOKEN-RELEASE (c) is met, so the sitting comes next; the environment rule (M1) must still
+   hold then (the sitting re-checks it with the key stored).
 3. Unproven until live: M5 to M11 (the first link, the comment, the headers served, reconcile, the count).
 ## Proposed next step
-When he says the PR Advisor's merge under MAIN-WALL is through: one take-in of main with the shared docs (his messages
-to the new chat into DECISIONS; STATUS, ROADMAP, REPO_MAP), the advisor agent's review; then the token sitting, one
-message ready in the notes (`token-sitting-message.md`) with the security-auditor's conditions in order (a reload and
-screenshot of the environment page; both secrets by "Add environment secret"; no CLOUDFLARE_ secret elsewhere; M1
-re-run, a fresh run and a re-run; WALL_TEST and `wall-test.yml` removed); the token's end date into STATUS; then the
-verifier, the checkpoint folded in here, ready, the advisor agent's review of that head, his go.
+The advisor agent's review of the take-in head; then the token sitting, one message (`token-sitting-message.md` in the
+notes) with the security-auditor's conditions in order (a reload and screenshot of the environment page; both secrets
+by "Add environment secret"; no CLOUDFLARE_ secret elsewhere; M1 re-run, a fresh run and a re-run; WALL_TEST and
+`wall-test.yml` removed); the token's end date into STATUS; then the verifier, the checkpoint folded in here, ready,
+the advisor agent's review of that head, his go.
 ## Decisions needed
 None open. His answers of 2026-11-26 (`docs/DECISIONS.md`): GUARD-OFF (a), a new chat with only this repository takes
 over the sensitive steps; MAIN-WALL-AGAIN (a), it stands until the token sitting; GUARD-KIT (a), the Guard fix chat
 after its protection for main; GIT-IN-NODE (a), main's tracked kit scripts may run git, a chat's own scripts never run
-git and never write a protected file; TAG-CHECK (a), untested, with the reason above. To the new chat (DECISIONS at the
-next take-in): GUARD-PROMPT (a), MERGE-74 (a), ORDER-WALL (a).
+git and never write a protected file; TAG-CHECK (a), untested, with the reason above. To the new chat: GUARD-PROMPT
+(a), MERGE-74 (a), ORDER-WALL (a), TOKEN-RELEASE (c) met, HOOK-PUSH (b).
 ## For Mustafa
-1. Tell the new chat when the PR Advisor's merge under MAIN-WALL is through (the Guard fix chat tells you).
-2. Then the token sitting: one message with the security-auditor's five steps, in order.
+1. The token sitting: one message from the new chat with the security-auditor's five steps, in order.
+2. Then your go after your Advisor's merge check, for the head the advisor agent approves.
