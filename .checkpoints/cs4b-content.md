@@ -1439,6 +1439,28 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   EA-4 (`BUNDLE_FORMAT`, `BUNDLE_VERSION`, `content-ties.test.mjs`). Collision 9, content 43, the tools' tests 15,
   the page's app tests 35 pass. **Official count 8,241, raw 8,259**: 209 under the stop line. Left: NA-1, EA-2,
   TE-3, TE-5, TE-7, TE-8, then the checks.
+  **At 21:00 UTC (from the clock), notes commit f14905f** (pushed 21:01 UTC): the patch now holds 22 source files
+  (957 lines), with NA-1 (the boundary's replay checks what it can replay before the content and the constructor),
+  EA-2 (a test ties the generated types to the schemas: the same keys, corner lengths and words), TE-3 (a link test
+  that cannot make its link fails under CI, never skips), TE-5 (the seven hostile bundles each pinned to the
+  loader's own sentence, read from the players' file by `hostile-sentences.mjs`, never typed), TE-7 (the schema
+  test's title). TE-8 in the plants script: C21 and C26 build the players' file clean first; 17 new entries: W14 to
+  W16 (RR-1's reach, cap and NaN guard), C38 (TE-1: two rows of equal Export values trade fields; no content
+  change, so only the table's names can see it) with its two controls C39 and C40 (the second route and the
+  hand-over's own check pass it), C41 to C49 (EA-1 twice, SA-2, SA-1, SA-3, EA-4, EA-2, RR-2, TE-5), the clean
+  controls C50 (every boundary test) and C51 (the replay, isolation and content specs in Chromium). C4 now runs the
+  hand-over's own check alone (`-t`): the new table-name test in the same file catches C4's pair. The new entries'
+  words are a failure's own where the runner prints them only then (cargo's `---- <test> stdout`, vitest's
+  `<file> > <test>`, Playwright's frame of the failing line). Anchors: 100 edits of 101 plants, 0 wrong. **The 20
+  changed or new plants by name, 21:01 to 21:04 UTC** (`.gate/plants-fixpass.out`): 15 caught, 0 not caught; 5
+  held, 0 did not; every file put back (30 files by sha256); the players' file rebuilt to its digest from before
+  (2e8866474b22...); the source tree's status the same before and after, and its diff byte for byte the saved patch.
+  C38 caught on the test's own line (`movement.speed_up_time_to_90pct_s: expected 'stop_time_to_10pct_s' to be
+  'speed_up_time_to_90pct_s'`); C39 and C40 held, so both value routes pass that swap, which is what TE-1 found.
+  Found in the log: Playwright's frame of a failing line also prints its neighbours, so C43's and C44's first
+  words (each one's own line of code) stood in both frames and told neither apart. They now read the assertion's
+  own message (`-   403,` in the diff, `Expected: not 500`); run again at 21:05 UTC: both caught. **Official count
+  8,348, raw 8,366** (21:05 UTC; 102 under the stop line). **Running from 21:05 UTC:** the full local checks.
 
 ## Slips of this chat's own rules, for the report
 - One git command did not start its own shell call: `git add .checkpoints/cs4b-content/review-brief-4b1.md` stood
@@ -1645,12 +1667,14 @@ never a test cut or thinned to fit CI's limit (his CI-TIME); a toolchain run sto
 in two lines.
 
 ## Current step
-4b-2 (2026-11-27, 21:07 Amsterdam, from the clock; Builder V6). **Steps 6 to 11 done; step 12 moved to the start
+4b-2 (2026-11-27, 22:01 Amsterdam, from the clock; Builder V6). **Steps 6 to 11 done; step 12 moved to the start
 of 4c by his STEP12-GO (a), received 20:03:18 UTC.** On this seat: 35e96ad (main in), 5cef19f (step 8's second
 part), step 9 in three cuts (ccde0d4, e1e2dd4, fbbd84d), step 10's wiring (885d382, with c68b8d5 and dcb5e6b),
 step 11 (46c192f): each with its full local checks, the gate and CI green (CI on 46c192f: gate and smoke green,
-its toolchain run read at the next step). **Official count 7,978, raw 7,996, of 8,450.** In hand: **the close**
-(HAND-OVER item 5), from its first point.
+its toolchain run read at the next step). **Official count 7,978 at step 11, raw 7,996, of 8,450.** In hand: **the
+close** (HAND-OVER item 5): the plants' whole run twice (done), review round 1 (done, six reviewers), its one fix
+pass (in progress: every fix written and unit-tested, saved as the notes' patch at f14905f; the plants for the
+fixes running; then the checks and the code commit), then round 2 on what changed.
 
 ## Next steps (the sheet's revision 3, section G; each step ends with the count of written lines)
 - **4b-1:** 1 the content crate's manifests · 2 the reader, the writer, the bundle, the two kinds, the old tuning's
@@ -1703,5 +1727,9 @@ its toolchain run read at the next step). **Official count 7,978, raw 7,996, of 
   plain text), and the reviewers for step 12 (graphics-engineer, perf-auditor, art-director) are not called.
 
 ## Running work
-- None. rust-reviewer's read of cut C's two names ended (DONE). Its own disassembly run filled the disk for a
-  while (its notes' warning: never `llvm-objdump -d` on the twins); it deleted that output, 54 GB free again.
+- From 21:01 UTC: the plants script on the fix pass's 20 changed or new plants (W14 to W16, C4, C21, C26, C38 to
+  C51), on f14905f's tree with the fix pass applied; it edits source files one plant at a time and puts each back,
+  so nothing else touches `crates/`, `packages/` or `content/` until it ends. Then: the format and lint checks, the
+  count, the full local checks, the gate, the code commit (the patch out of the notes), the plants' whole run.
+- rust-reviewer's read of cut C's two names ended (DONE). Its own disassembly run filled the disk for a while (its
+  notes' warning: never `llvm-objdump -d` on the twins); it deleted that output, 54 GB free again.

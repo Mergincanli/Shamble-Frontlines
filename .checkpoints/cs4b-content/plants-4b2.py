@@ -328,7 +328,8 @@ PLANTS = [
     ("C37", "control", "the clean schemas: the content crate's export tests", [], CONTENT_LIB("ts_export"), []),
     # The fix pass of round 1 (Builder V6, 2026-11-27): each fix shown red on the defect it closes.
     # The words are the failure's own where the runner prints them only for a failure: cargo's "---- <test> stdout"
-    # block, vitest's "<file> > <test>" line, Playwright's frame of the failing line.
+    # block, vitest's "<file> > <test>" line, the assertion's own message (Playwright's frame of the failing line
+    # shows its neighbours too, so a frame's text tells no line from the next).
     ("W14", "defect", "a ray beyond the reach is cast (rust-reviewer's overflow)", [(WORLD_RS, "            .all(|value| -RAY_REACH <= *value && *value <= RAY_REACH);", "            .all(|value| value.is_finite());")], COLLISION,
      ["collision::tests::a_ray_beyond_the_reach_and_a_ramp_beyond_f32_give_no_hit stdout"]),
     ("W15", "defect", "an endless limit is taken as endless", [(WORLD_RS, "        let limit = if limit > RAY_REACH { RAY_REACH } else { limit };", "        let limit = limit;")], COLLISION,
@@ -345,10 +346,10 @@ PLANTS = [
      ["content.test.ts > however the match ends before the Worker's ready"]),
     ("C43", "defect", "another site's ask for /content.json starts the content tool", [(VITE_FILE, '      if (from !== undefined && from !== "same-origin" && from !== "none") {', '      if (from === "never") {')],
      chain((ENV, WASM), (DEV_ENV, chromium("tests/skeleton/isolation.spec.ts"))),
-     ["under Vite's dev server", "expect([crossSite.status(), await crossSite.text()])"]),
+     ["under Vite's dev server", "-   403,"]),
     ("C44", "defect", "an address that reads as no path makes the plugin's own error page", [(VITE_FILE, '  try {\n    return new URL(url ?? "/", "http://127.0.0.1").pathname;\n  } catch {\n    return undefined;\n  }', '  return new URL(url ?? "/", "http://127.0.0.1").pathname;')],
      chain((ENV, WASM), (DEV_ENV, chromium("tests/skeleton/isolation.spec.ts"))),
-     ["under Vite's dev server", "status()).not.toBe(500)"]),
+     ["under Vite's dev server", "Expected: not 500"]),
     ("C45", "defect", "the tools check the file's own folder only, not the folders above it", [(TESTLINES_FILE, '  for (const part of ["", ...(relative === "" ? [] : relative.split(path.sep))]) {', '  for (const part of [""]) {')], HAND,
      ["testlines.test.mjs > the hand-over's files > no file is read or written through a link"]),
     ("C46", "defect", "the page's bundle version is not the loader's", [(CONTENT_TS_FILE, "export const BUNDLE_VERSION = 1;", "export const BUNDLE_VERSION = 2;")], PAGE_TIES,
