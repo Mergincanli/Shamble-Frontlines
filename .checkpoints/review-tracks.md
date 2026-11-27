@@ -153,6 +153,28 @@
     with no GitHub connector). Main moved to b8f02b01 (#78; kit files unchanged, DECISIONS +54): take it in before
     docs-keeper writes DECISIONS.
 
+## Applies (the source of truth for what is in: a row is "in" only with its commit; every other row is NOT applied)
+Source for every apply: .gate/review-tracks/build/ (gitignored; CLAUDE.md there is CLAUDE.md.new). After each apply:
+node --check (scripts), the file compared with the copy once its last edit is in, one commit of that file only
+("review-tracks apply N of 11 (not finished)"), the card updated, checkpoint.mjs save (pushes). The change-set is
+finished only when all 11 rows are in, cmp of all eight files against the copy is clean, the suites and the gate pass.
+If the copy is lost: rebuild it from the applied rows plus the plan; never guess a row's text.
+| N | File | How | State |
+|---|---|---|---|
+| 1 | .claude/scripts/track.mjs | Write (new file) | not applied |
+| 2 | .claude/scripts/track.test.mjs | Write (new file) | not applied |
+| 3 | .claude/hooks/routine-guard.test.mjs | Edit: import line and the fake (:18-:97) | not applied |
+| 4 | .claude/hooks/routine-guard.test.mjs | Edit: the new block appended after :3875 | not applied |
+| 5 | .claude/hooks/routine-guard.mjs | Edit: the mcp() call at :460 passes the hook input | not applied |
+| 6 | .claude/hooks/routine-guard.mjs | Edit: :1501-:1593, GUARD-MARK, mcp(), merge check, passAllows | not applied |
+| 7 | .claude/hooks/routine-guard.mjs | Edit: gh() at :1448-:1458 (needs row 6's definitions) | not applied |
+| 8 | .claude/hooks/guard.mjs | Edit: the allow output | not applied |
+| 9 | .claude/agents/security-auditor.md | Edit: :54 | not applied |
+| 10 | .claude/agents/advisor.md | Write (whole file) | not applied |
+| 11 | CLAUDE.md | Edit: :62-:139 | not applied |
+Order why: the guard runs live from disk in this session, so its call site (5) goes in before mcp() reads the input (6),
+and gh() (7) after the definitions it uses (6); each state in between parses and fails toward a refusal or a prompt.
+
 ## Current step
 Narrow re-checks of the second fix pass (advisor agent: track hunks, guard SA-RC-5/6, the advisor.md line-end gloss;
 security-auditor: its SA-RC fixes). In parallel, his answers: ADDITIONS-OK, SIZE-LINE (past the stop line); SA-PA-5,

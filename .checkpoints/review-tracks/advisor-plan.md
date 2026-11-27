@@ -273,3 +273,23 @@ budget: after it, only a Critical or High reopens.
 - Third saved-file shape: accepted as a named tolerance in ADDITIONS-OK (24 saved files hold a "---" line).
 - Size: 1003 plus the last fix, past about 980: SIZE-LINE to him, recommend (a) go as is.
 - Not run: settings S4 (copy), security-auditor's probes (its own re-check).
+
+---
+
+# Re-check of the third fix pass (changed hunks only, 2026-11-27). Not a new review round.
+
+**Verdict: APPROVE of these hunks; the copy is ready for the applies.**
+- Run myself in the copy: routine-guard 1581/1581, track 85/85, checkpoint 33/33, kept-logs 9 pass (10 tests, 0 fail).
+  Read mcp(), kept()/parts(), the saved-file header regex, git()/tg() env and the usage line; new tests at
+  routine-guard.test.mjs 3917-3925, 4032-4033, mutants 4062-4063; track.test.mjs 163, 191-192. Not run: fix-mutate,
+  fix-words20, fix-hist, sa-recheck7/8 (taken from the caller and security-auditor).
+- RC2-C1: met. Merge and auto-merge refused on every server but exact `github` (case too); subagent merge refused on
+  any connector before mergeCheck; `/github/i` holds only the comment-edit check.
+- RC2-M1: met. kept() = header + every `>` line; quoteOf/new-entry/otherAdded unchanged (first run).
+- SA-RC-8: met. Header slice before the first "\n---\n" must be exactly "# title, blank, _Copied by script..._"; JS `$`
+  without m is end of input; tail-only quote floors.
+- SA-RC-7: met. GIT_GRAFT_FILE=/dev/null in git(); tg() runs in a history-less temp repo (no graft reach). Usage line ok.
+- RC3-L1 (Low, follow-up, no push): the comment-edit check keys on /github/i, so a GitHub server under a name without
+  "github" edits a comment unchecked in a day session (routines refuse other servers). Fail-safe side: an edited PASS
+  no longer counts. MERGE-SCOPE class.
+- Open with him: SIZE-LINE (1019 vs about 980, recommend (a)), ADDITIONS-OK.
