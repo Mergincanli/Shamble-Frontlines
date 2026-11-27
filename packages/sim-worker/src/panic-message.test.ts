@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { PANIC_TEXT_ROOM, readPanicMessage, trapMessage } from "./panic-message.ts";
+import { cutText, ERROR_TEXT_UNITS, PANIC_TEXT_ROOM, readPanicMessage, THROWN_TEXT_UNITS, trapMessage } from "./panic-message.ts";
 
 /** A memory with a panic buffer at `ptr`: the length word, the room word, then the text's bytes. */
 function memoryWith(ptr: number, text: Uint8Array, options: { length?: number; room?: number; bytes?: number } = {}) {
@@ -61,4 +61,27 @@ test("the Worker's sentence after a throw: the panic's own text, or else what wa
   expect(trapMessage({ buffer: new ArrayBuffer(0) }, 0, new RangeError("the block is 8 bytes and the buffer for it is 16"))).toBe(
     "the block is 8 bytes and the buffer for it is 16",
   );
+});
+
+test("a thrown text is cut to its bound with a mark, in code units and never inside a character; a panic's text is not", () => {
+  const quiet = { buffer: new ArrayBuffer(4096) };
+  expect(THROWN_TEXT_UNITS).toBe(512);
+  // 1 MiB of text: its start and the mark, 512 code units in all.
+  const cut = trapMessage(quiet, 64, new Error("k".repeat(1 << 20)));
+  expect([cut.length, cut.endsWith("..."), cut.startsWith("kkk")]).toEqual([512, true, true]);
+  // A text at the bound passes whole (a loader's longest sentence); one unit more is cut.
+  expect(trapMessage(quiet, 64, new Error("a".repeat(512)))).toBe("a".repeat(512));
+  expect(trapMessage(quiet, 64, new Error("a".repeat(513)))).toBe(`${"a".repeat(509)}...`);
+  // A character of two code units across the cut goes whole: no lone half is left.
+  const pair = cutText(`${"a".repeat(508)}😀${"b".repeat(10)}`);
+  expect(pair).toBe(`${"a".repeat(508)}...`);
+  expect(cutText(`${"a".repeat(507)}😀${"b".repeat(10)}`)).toBe(`${"a".repeat(507)}😀...`);
+  // The panic's text is bounded by its buffer and told whole, the longest a whole room's text.
+  const full = memoryWith(64, utf8("p".repeat(PANIC_TEXT_ROOM)));
+  const told = trapMessage(full, 64, new Error("unreachable executed"));
+  expect(told).toBe(`the simulation stopped: ${"p".repeat(PANIC_TEXT_ROOM)}`);
+  expect([told.length, ERROR_TEXT_UNITS]).toEqual([1040, 1040]);
+  // A room of characters that take two bytes each decodes to fewer code units than bytes: the bound holds for every text.
+  const wide = trapMessage(memoryWith(64, utf8("é".repeat(PANIC_TEXT_ROOM / 2))), 64, null);
+  expect(wide.length).toBeLessThanOrEqual(ERROR_TEXT_UNITS);
 });

@@ -180,6 +180,80 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     his words stand in `docs/EDITOR_V2.md` §3, "Decided 2026-11-05".
 
 ## Decisions, newest first
+- **Taken by Mustafa, 2026-11-27, 20:03:18 UTC: STEP12-GO (a): the page's scene (4b-2's step 12), with the map's
+  reading field by field, moves to the start of change-set 4c, and 4b-2 closes with its steps 6 to 11** (the builder
+  chat he calls Builder V6, lane 1 of the build, session_01WLuqnt1v3UNwSqbJsJre7u, a Claude Code chat on his second
+  personal account; message 3d79e861-0462-4a7e-9d54-9735283d94fc, whole; copied by script from the chat's saved file
+  `.checkpoints/cs4-walk/mustafa-2026-11-27-step12-go.md` (readable at commit c442a806d83dceac6a272b22ad67b7f01de476fa
+  of the branch `claude/ecstatic-wozniak-5cbdzs`), which the chat copied by script from its transcript). What it
+  answers, in the chat's words (not his): Builder V6's question STEP12-GO (the chat's updates after step 11's commit
+  46c192f, about 17:17 to 17:22 UTC): the page's scene (step 12) does not fit under his 8,450 stop line (count 7,978
+  after step 11, look ahead about 9,630); options (a) move the scene, with the map's reading, to the start of 4c and
+  close 4b-2 now with steps 6 to 11 (no Brave check), (b) build it in 4b-2 with a stop line of about 9,700 and his
+  Brave check, (c) something else; recommended (a). Copied by script (1 bytes, sha256
+  559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd):
+> A
+- **Taken by Mustafa, 2026-11-27, 14:02:23 UTC: GUARD-RETRY (a): the guard check run once more while he watched, and
+  he denied it; then the takeover and the first report** (the builder chat he calls Builder V6, lane 1 of the build,
+  session_01WLuqnt1v3UNwSqbJsJre7u, a Claude Code chat on his second personal account; message
+  cf299802-cbd9-4b95-bef9-e72c73e559e6, whole; copied by script from the chat's saved file
+  `.checkpoints/cs4-walk/mustafa-2026-11-27-guard-retry.md` (readable at commit
+  c442a806d83dceac6a272b22ad67b7f01de476fa of the branch `claude/ecstatic-wozniak-5cbdzs`), which the chat copied by
+  script from its transcript). What it answers, in the chat's words (not his): GUARD-RETRY (asked in the chat's first
+  answer, after the guard check's first run went through): (a), the same command once more while he watched, and he
+  denied it (the chat's record: the guard's ask at 14:02:31 UTC, his reject at 14:02:44 UTC). His item 1 came with its
+  three choices still in angle brackets, none picked: what he saw at 14:57:52 Amsterdam is not recorded. His item 3:
+  after his deny, the takeover and the six-line first report. Copied by script (401 bytes, sha256
+  9dc2f4811b0b035290c2903c460023e0576cf755f0b36f1c755902fceafee5df):
+> From Mustafa (written with my Advisor).
+> 1. What I saw at 14:57:52: <the prompt, and I pressed Allow by mistake / the prompt, and I pressed nothing / no prompt at all>.
+> 2. GUARD-RETRY: (a). Run the same command once more now. I am watching and I deny it.
+> 3. After my deny, start the takeover and send the six-line first report. If the command runs again without my deny, stay stopped and write nothing.
+- **Taken by Mustafa, 2026-11-27, 13:57:21 UTC: the seat of change-set 4b-2 moves to Builder V6, on his second
+  personal account (all three of his Claude accounts are his and count the same); the guard check while he watches;
+  the work from `claude/cool-pasteur-oiqk1r` at 7f5ba3966def8c36e2c3863c6b2fda7b4b9a9169 on a branch of the chat's
+  own, Builder V4 pushing nothing more there; DIFF-LIST (a): the list as printed from his Export at 30 steps is his,
+  its movement values become the game's starting movement table, and a later Export replaces them the same way;
+  CI-TIME: main taken in once after #78, never a test cut or thinned to fit the limit; VISION-RULE, an addition that
+  sharpens point 2c of version 2 (sight starts at the soldier's eyes at the height of the face; an enemy is seen only
+  when a straight line from those eyes to the enemy's body is free, height counting at both ends; what is seen follows
+  where the eyes are at that moment, a jump over a hedge included), with the exact eye height and the body points the
+  line is tested against left open, and no code now; saving at least every 25 minutes, the agents' work too; a merge
+  only on his go for the exact head after the advisor agent approved it, his Advisor opening and merging the pull
+  request when the chat cannot; git and gh always start their own command, and every file a shell command writes is
+  named by its full path** (the builder chat he calls Builder V6, lane 1 of the build,
+  session_01WLuqnt1v3UNwSqbJsJre7u, a Claude Code chat on his second personal account; message
+  40991c6e-a7bc-4f3f-bef1-ae6770e860e0, whole; copied by script from the chat's saved file
+  `.checkpoints/cs4-walk/mustafa-2026-11-27-builder-v6.md` (readable at commit
+  c442a806d83dceac6a272b22ad67b7f01de476fa of the branch `claude/ecstatic-wozniak-5cbdzs`), which the chat copied by
+  script from its transcript). What it answers, in the chat's words (not his): DIFF-LIST (asked 2026-11-26, 23:11
+  Amsterdam; .checkpoints/cs4b-content/question-2026-11-26-diff-list.md): (a), his item 7: the list as printed from
+  his Export at 30 steps is his, and its movement values become the game's starting movement table; a later Export
+  replaces them the same way. The other items are standing instructions for this seat: who it is and its model (1, 2),
+  the guard check (3), where the work is (4), what to read and the first report (5, 6), CI-TIME (8: take main in once
+  when #78 is on main), VISION-RULE, an addition to record at the docs pass with no code now (9; his open points: the
+  exact eye height, which reaches the game through his Export, and which points of an enemy's body the line is tested
+  against), saving every 25 minutes and SEAT-OUT (10), pull requests (11), the rules unchanged (12). Copied by script
+  (4683 bytes, sha256 6fec61facacc9fe88af4205c0e2321b1751afedabebe6f5fa4cacdc94e1b6603):
+> FOR BUILDER V6. From Mustafa, 27 November, 14:45 Amsterdam (written with my Advisor).
+>
+> 1. WHO YOU ARE: lane 1's builder on my second personal account. You take over change-set 4b-2 ("the world") from Builder V4, a chat on my first personal account whose usage is used up until Tuesday. All three of my Claude accounts are mine and count the same.
+> 2. MODEL: this chat runs on Opus 5.5 at effort max, with the advisor tool on Fable 5.2, until Sunday 29 November. From Sunday I switch it to Fable 5.2. Agents as CLAUDE.md says. Say in your first report which model serves this chat, read from the session's record and not guessed.
+> 3. GUARD CHECK, before anything else and while I watch: run the one command `git merge --ff-only HEAD~1` in your start folder. The guard must ask me, and I deny it. If no prompt comes, stop and tell me. This chat holds only this repository and gets no second one.
+> 4. WHERE THE WORK IS: branch claude/cool-pasteur-oiqk1r, last commit 7f5ba3966def8c36e2c3863c6b2fda7b4b9a9169. If you find a newer commit there, use the newest and tell me its id. Builder V4 pushes nothing more there, and you never push there (my rule: one account per branch). Make your own branch start at exactly that commit, in a worktree and never by switching your start folder's branch. Say its name in your first report.
+> 5. READ, in this order: CLAUDE.md; on that branch `.checkpoints/cs4b-content.md` whole, with its HAND-OVER section; then what the hand-over names. Everything you need is in the branch. Start no step again that the card calls done: 4,956 written lines of 4b-2 are built, pushed and green through commit 5c6738a.
+> 6. FIRST REPORT, before any edit, in six lines: the model; the guard check's result; your branch's name and that its tip is the commit above; the count of written lines as the card has it; the next step by the card; whether this chat has a tool to open and to merge pull requests. Then continue without waiting for me, unless something differs from the card.
+> 7. DIFF-LIST: (a). Yes. The list as printed from my Export at 30 steps (`.checkpoints/cs4b-content/question-2026-11-26-diff-list.md`) is mine, and its movement values become the game's starting movement table. A later Export replaces them the same way. Save this message by script, as the card describes for my other messages. That unblocks "On his yes, in this order".
+> 8. CI-TIME: the CI Builder's pull request #78 raises the toolchain job's limit from 15 to 25 minutes. When it is on main, take main in once. It is clean today, because 4b-2 has changed no shared doc yet. Until then: if a toolchain run stops at the 15-minute limit, tell me in two lines. Never cut or thin a test to fit the limit.
+> 9. VISION-RULE, an addition to record at your docs pass. No code now. It sharpens point 2c of version 2:
+>    a. My soldier's sight starts at the soldier's eyes, at the height of the face. Not at the feet, not at the gun and not at the camera.
+>    b. I see an enemy only when a straight line from my soldier's eyes to that enemy's body is free. Height counts at both ends of that line: cover lower than the line does not hide the enemy, cover that reaches above it does.
+>    c. So what I see follows where my soldier's eyes are at that moment. When my soldier jumps and the eyes rise above a hedge, an enemy behind it is seen for as long as the eyes have a free line over it, and is gone again when they drop. Higher and lower ground work the same way.
+>    d. It mimics real life: you see someone only when your own eyes have a free line to them.
+>    e. I tried it in Testlines (step F, the value "Eyes above the feet") and it works as I want. Open: the exact eye height, which reaches the game through my Export, and which points of an enemy's body the line is tested against.
+> 10. SAVING: commit and push at least every 25 minutes, the agents' work too. Keep the card's HAND-OVER section current, because this seat will move between my accounts again. When I send SEAT-OUT, you stop at a whole point and report your last commit's id. The card mentions the agent board: you post nothing there, I have not set it up for this chat.
+> 11. PULL REQUESTS: a merge only on my go for the exact head, after the advisor agent approved that head. If this chat cannot open or merge a pull request, put the title and text in the notes at the close, and my Advisor opens the draft and merges on my tap.
+> 12. Rules unchanged: git and gh always start their own command, with no other program in front of them. In a shell command, spell out every file you write with its full path: no variable, substitution or wildcard in the name of a file that is written, moved, copied or deleted, or use the Write and Edit tools.
 - **Taken by Mustafa, 2026-11-27, 12:37:33 UTC: a standing rule against needless guard prompts: in a shell command
   every file that is written, moved, copied or deleted is spelled out with its full path, with no variable,
   substitution or wildcard in its name, or the Write and Edit tools are used, so the guard can see it is not a kit or
@@ -222,6 +296,37 @@ queued item leaves "Queued" when the change-set that carries it out merges._
 > 4. Open the draft pull request yourself if this chat can. If it cannot, put the title and text in your notes and my Advisor opens it.
 > 5. When the advisor agent and the security-auditor approved the head and gate, smoke and toolchain are green on it, tell me its full id. On my go for that id you mark it ready and merge it with that id as the expected head. If GitHub refuses the merge, tell me and work around nothing.
 > 6. Rule unchanged: git and gh always start their own command, with no other program in front of them.
+- **Taken by Mustafa, 2026-11-26, 23:43:38 UTC: a standing instruction: the chat's own work and its agents' work are
+  committed and pushed at least every 25 minutes, so that his other account can continue it; the work is not cut to
+  save usage** (the builder chat he calls Builder V4, lane 1 of the build, session_019YNMUVZR6ociHFWjByxkrq, a Claude
+  Code chat; message aba2bec8-67fc-4ff9-b94e-79588e8a01ef, whole; copied by script from the chat's saved file
+  `.checkpoints/cs4-walk/mustafa-2026-11-27-save-every-25-minutes.md` (readable at commit
+  c442a806d83dceac6a272b22ad67b7f01de476fa of the branch `claude/ecstatic-wozniak-5cbdzs`), which the chat copied by
+  script from its transcript). What it answers, in the chat's words (not his): A standing instruction, not an answer
+  to a question: the chat's own work and its agents' work are committed and pushed at least every 25 minutes; the work
+  itself is not cut. DIFF-LIST stays open: this message does not answer it. Copied by script (234 bytes, sha256
+  b7ef0394d0f9f18ed7876490ef9dbb804a84dc71cd0228c909eaca593dd48eea):
+> We're at 94% usage, make sure to save your and the agents work every 25 minutes, this way my other account can continue with what you were making. (Do not see this as a reason to cut your work to save usage, just continue as you were)
+- **Taken by Mustafa, 2026-11-26, 21:16:26 UTC: GREY-COLOURS (a): the default greys of the first scene stand (he gives
+  no other colours)** (the builder chat he calls Builder V4, lane 1 of the build, session_019YNMUVZR6ociHFWjByxkrq, a
+  Claude Code chat; message 1154af89-79ae-4995-8956-f92be309c9e7, whole; copied by script from the chat's saved file
+  `.checkpoints/cs4-walk/mustafa-2026-11-26-grey-colours.md` (readable at commit
+  c442a806d83dceac6a272b22ad67b7f01de476fa of the branch `claude/ecstatic-wozniak-5cbdzs`), which the chat copied by
+  script from its transcript). What it answers, in the chat's words (not his): the chat's one open question at the end
+  of its update on 4b-2's step 6: GREY-COLOURS (do you veto the greys of the first scene? (a) the default greys stand;
+  (b) you give other colours before step 12), with the chat's recommendation (a). Copied by script (1 bytes, sha256
+  ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb):
+> a
+- **Taken by Mustafa, 2026-11-26, 18:52:56 UTC: his go for the merge of pull request #75 (change-set 4b-1, "Content")
+  at head 2542b1a0c109e54c514cf63d1c2e2de8932a1a7b** (the builder chat he calls Builder V4, lane 1 of the build,
+  session_019YNMUVZR6ociHFWjByxkrq, a Claude Code chat; message f987d57d-6bbb-4ea7-af96-d48d9729ed3a, whole; copied by
+  script from the chat's saved file `.checkpoints/cs4-walk/mustafa-2026-11-26-go-merge-75.md` (readable at commit
+  c442a806d83dceac6a272b22ad67b7f01de476fa of the branch `claude/ecstatic-wozniak-5cbdzs`), which the chat copied by
+  script from its transcript). What it answers, in the chat's words (not his): the chat's three-line report and its
+  ask for his go for the merge of pull request #75 at head 2542b1a0c109e54c514cf63d1c2e2de8932a1a7b, which the advisor
+  agent had approved, with gate, smoke and toolchain green on it. Copied by script (19 bytes, sha256
+  93f61521c0469aad8beacef7ef685667cde7023862cd8ff9d1c794cce26cc2ae):
+> you can go merge it
 - **Taken by Mustafa, 2026-11-26, 18:16:35 UTC: main moved under pull request #75 (to
   2671595fc823750a83c58f5b5b122128eb500387, the Guard fix chat's #76), so it cannot merge at 2e282176: the chat takes
   main in once, with no rebase and no force push; in the four clashing docs files both sides are kept, main's text

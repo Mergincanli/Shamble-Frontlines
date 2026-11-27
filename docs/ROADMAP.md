@@ -251,6 +251,34 @@ check in Brave and Firefox: errors 0, WebGPU started in both (`docs/reports/2026
 PR #61, f5030a3, 2026-11-19 15:10:54 UTC, by merge commit, on his go of 14:28:25 UTC for head 4cf30ce; CI green on
 main (gate run 934 with smoke, toolchain run 232).
 
+**CI builds the WebAssembly and runs the tests that need it [2026-11-19 to 11-24, MERGED]** — ci-wasm
+(risk tier 2; planned by the first builder chat, carried by a thread of his project, built by the chat he calls
+Builder V3): before the network cut the `toolchain` job fetches the wasm-bindgen tool's archive by his TOOL-SOURCE
+values, runs GitHub's own check on it and installs its one program root-owned; inside the cut it builds the page
+twice, then runs the boundary tests, five type checks and the 12 browser tests in the runner image's Chrome (CI does
+not pin the test counts). Two CI writes on his yes (the first stopped at its install check on `/opt`), three planted
+faults each red at its own step; with it his browser check of #61 and his words of 2026-11-19 and 2026-11-23. Two
+review rounds, no Critical or High; report `docs/reports/2026-11-19-ci-wasm.md`. Merged: PR #64, 1ec6f6c, 2026-11-24
+10:15:31 UTC, by merge commit, by his main Advisor on his tap after his go for head 8aadfb0; CI green on main (gate
+run 45373057216 with smoke, toolchain run 45373056953). #63 and #62 closed with it.
+
+**Change-set 3a of the build plan, Rules and boundaries [2026-11-24, MERGED]** — cs3a-rules-boundaries (the first
+half of change-set 3, his SIZE-3 (b)), by lane 1, built by the chat he calls Builder V3: the simulation's rules under
+tests. A scan of `crates/sim/src` refuses a float method outside ADR 0004 part 7's list, a hash map, a clock and
+per-target code; our own ChaCha8 (his RNG-SOURCE (c)) matches the 8 published vectors and a 160,384-byte stream file;
+38 float operations on 10,048 inputs are exact natively and in WebAssembly, but for 16 `mul_add` results below the
+smallest normal float in WebAssembly, pinned as a toolchain defect, with `mul_add` refused in `sim` (his MUL-ADD (a));
+the panic hook's text reaches the page; a test-only WebAssembly module, built outside every package; the build refuses
+a runtime crate without its overflow override and a feature set that differs between builds, and the runner's Wasm is
+the container's byte for byte. A player sees nothing new beyond two lines of the development readout. 3,562 added
+lines (stop line 4,100), 96 planted defects caught; CI green on 8619d539 and on the corrected head 8d277cf2; three
+review rounds, the third on one High, now closed; the verifier PASS and the advisor agent APPROVE on 8d277cf2; his
+browser check: errors 0 in Brave and Firefox (`docs/reports/2026-11-24-cs3a-browser-check.md`); report
+`docs/reports/2026-11-24-cs3a-rules-boundaries.md`. Merged: PR #65, 28254a7, 2026-11-24 22:40:39 UTC, by merge
+commit, by his main Advisor on his tap of 22:40:00 UTC (his go: `docs/DECISIONS.md`, 22:44:50 UTC), with the expected
+head 1624f084 (the last commit, after the advisor agent's read); gate, smoke and toolchain green on main (read 22:45
+UTC).
+
 - **Kit: KEPT-LOGS (2026-11-15):** kept-logs-rule (PR #53, 53272a1, on his KL-MERGE (a)): `.claude/CHECKPOINTS.md` §11 and `.claude/scripts/kept-logs.mjs`: a day session may pack and remove a closed run set's raw logs and the one old build cache, nothing else; SA-KL-1 to -4 and KLT-1 to -8 left open by his word.
 - **UI theme step 1 (2026-10-02):** menu = dossier, pause = clipboard, Field manual; `wr-*` CSS in both pages; awaiting Brave. (Audit phase 2, 2026-09-26, is the "Bug & optimization run" above.)
 - **Performance / hygiene:** pooled FX, GPU resources disposed on map rebuild, player-following shadow frustum; kill vignette captured on the GPU (`vigShot` corner render + `drawImage`); hot paths use `hyp2`/`hyp3` and change-only DOM writes (`_sd`/`_so`/`_st`); ~4.9 MB/s residual GC churn (AUDIT_BUGS_PERF CS11; measured — `AUDIT_BUGS_PERF.md`); an early kill-vignette attempt (readbacks queued via `_vigQueue`/`vigStep()`) did not remove the hitch and was superseded by the GPU capture.
@@ -287,6 +315,10 @@ main (gate run 934 with smoke, toolchain run 232).
   is 4b-2 (the collision library and the static collision world, the built-file check, his Export's values into the
   content and the simulation, the page drawing the scene from the map), after a short re-read by the advisor agent;
   then 4c, 4d and the link simulator (`docs/STATUS.md`, "Next").
+- **Pointer, 2026-11-27 (change-set 4b-2's docs pass; not his words):** change-set 4b-1 is merged (PR #75); 4b-2,
+  the world, is built (steps 6 to 11) and reviewed; the page drawing the scene from the map, with the map's reading
+  field by field, moved to the start of 4c by his STEP12-GO (a) (`docs/DECISIONS.md`, 2026-11-27, 20:03:18 UTC);
+  then 4c, 4d and the link simulator (`docs/STATUS.md`, "Next").
 - **Superseded by v2** (paused in issue #16; where things stand: `docs/STATUS.md` and `docs/V2_PHASE0_BRIEF.md`). **Queue (Advisor, 2026-10-15; updated 2026-10-16 after 3a):** greybox phase: three-teams (0. team-prep-fixes, merged → 3a three-teams-core, merged 2026-10-17 → **N1** (next; editor Play never rebuilds the nav grid; a one-line change-set) → **R19** (navBuild building-cell fix; right after N1, before 3b; Night queue item 2, NEEDS PLAN) → 3b three-teams-hud → 3c spawn-and-buy; editor v2 comes after the playable greybox loop, per the Advisor's queue) → **"ramps as slopes in SIM"** (its own change-set, before octopon-3-greybox; lets `_botFireWorld` go) → **NC-7 blast reach by line of sight** (to the target's nearest surface, ignoring the target's own box; before the octopon-3 playtests) → octopon-3-greybox → harvest-economy → bot-replan-storm → uplinks → win-and-scoring → scale test on the Octopon-3 greybox (N = 12, 24, 36, 48). Paused until the greybox loop is playable: tutorial-field-manual, ui-step-2, ui-step-3, build-spike, ADR run. house-textures-seeded: low priority, unslotted.
 - **From the 3a report** (approved unattended work is listed in the [Night queue, issue #16](https://github.com/Mergincanli/Shamble-Frontlines/issues/16)): the `navBuild` building-cell fix with bot replanning (R19: 27.5 % of Cabana objective routes cross a roof bots can't climb) is now approved into the queue as item 2, NEEDS PLAN (Advisor 2026-10-17, R19-ORDER). Advisor LOS-SIZE: the bots' sight-check budget for 48 soldiers is sized in the 48-player performance change-set, with measured cost, together with the `updateSoldierAnim` split (CS11) and the soldier draw-call reduction (about 120 per on-screen soldier); that work is still proposed, not approved, and comes before `TUNE.teams.size` rises. Advisor K4-MEASURE: bot fairness between teams is judged by target searches per bot per second and the share of time with a target (`tools/perfbots.js` fairness), plus which team's bot fires first in mutual sightings (not in the tools yet; R19's plan adds it). After N1 and R19: 3b three-teams-hud, 3c spawn-and-buy, as planned.
 - **Core loop v2 (Oct 2026):** see LOOP_V2.md; greybox prototype first (§11).
@@ -306,10 +338,23 @@ main (gate run 934 with smoke, toolchain run 232).
 ## Recent work
 *(Newest first, a few lines each. Older items fold into "Build history" above.)*
 
+**Change-set 4b-2 of the build plan, The world [2026-11-26 to 11-27, reviewed]** — cs4b-content, the second of 4b's
+two pull requests (his SIZE-4B (b)), by lane 1 (Builder V4, then the chat he calls Builder V6), steps 6 to 11: the
+collision library (parry3d `=0.31.1`, behind one module of `sim`) with its pinned batch and dependency rules; the
+built-file check on the players' WebAssembly (no fused multiply-add, vector instructions, host maths or foreign
+imports); his Testlines Export at 30 steps as the soldier's movement table, written by script (his DIFF-LIST (a)),
+and the test scene's map; one content bundle per match, judged by the game's loader in the constructor; the test scene's static
+collision world, the same tree and rays natively, under Node and in the browsers; the content kinds' TypeScript
+types and JSON Schemas. Step 12, the page's scene with the map's reading field by field, moved to the start of 4c
+(his STEP12-GO (a)). 8,408 written lines against the stop line 8,450; nothing a player sees changes, no browser
+check. Two review rounds, Lows left as follow-ups (STATUS); planted defects 104 of 104 caught, 19 controls held.
+Report `docs/reports/2026-11-27-cs4b2-world.md`.
+
 **CI-TIME [2026-11-27, reviewed]** — #78, by the chat he calls CI Builder: the `toolchain` job's time limit 15 to 25
 minutes (`.github/workflows/toolchain.yml:38`, his exact text approved in advance; nothing else; the 5-minute browser
 stops stay), since Builder V4's newest head took 13 minutes. The advisor agent, security-auditor and infra-engineer
 approved; it merges on his go. Report: `docs/reports/2026-11-27-ci-time.md`.
+_Pointer (2026-11-27, 4b-2's docs pass): merged as PR #78, merge commit b8f02b0 (its own time 13:55:47 UTC, read with `git log`)._
 
 **Change-set 4b-1 of the build plan, Content [2026-11-26, reviewed]** — cs4b-content, the first of 4b's two pull
 requests (his SIZE-4B (b)), by lane 1, the chat he calls Builder V4: the content crate with no dependency (one reader
@@ -319,6 +364,7 @@ answers for 26,653 numbers and 400 trees, by seven limit cases and by a million-
 natively, under Node and in the browsers; the source scan reads the content crate; the links check (his LINKS-CHECK
 (c)). 7,164 written lines against the stop line 7,450; no browser check. Two review rounds, no Critical or High; the
 planted defects 35 of 35 caught. Report `docs/reports/2026-11-26-cs4b1-content.md`. Next: 4b-2.
+_Pointer (2026-11-27, 4b-2's docs pass): merged as PR #75, merge commit b9aad01 (its own time 2026-11-26 18:53:13 UTC, read with `git log`)._
 
 **Main's wall [2026-11-26, the wall on; docs in flight]** — main-wall (MAIN-WALL, risk tier 2: repository settings by his
 clicks, no code; the Guard fix chat): a second ruleset on main, "main-wall (only the owner updates main)", lets only his
@@ -327,6 +373,7 @@ every merge, his included. Measured first on a public throwaway repository (dele
 the plan (security-auditor: REVISE, text only, all applied) and both approved the results; rollback is one settings switch. Open: T10 (a day-session and a PR
 Advisor merge under the wall). Then, by his SPEED-ORDER (b), the review tracks, then the guard change-set. Report
 `docs/reports/2026-11-26-main-wall.md`; TECHNICAL §8c.
+_Pointer (2026-11-27, 4b-2's docs pass): its docs merged as PR #76, merge commit 2671595 (2026-11-26 18:00:25 UTC), and T10's record as PR #77, 47bb79e (18:52:17 UTC), read with `git log`._
 
 **The preview hand-over step [2026-11-26, in flight]** — ci-preview-handover, by the chat he calls CI Builder, on his
 block of 2026-11-26 (risk tier 2; CI and the test configuration only): at the end of the `toolchain` job, on pull
@@ -421,31 +468,3 @@ that change no reading. Two review rounds on the build, the verifier PASS WITH N
 by his HISTORY-ID (a)); waits for the advisor agent's review of its final head and his go.
 _Pointer (2026-11-25): merged as PR #66, 09faefa, 2026-11-25 11:10:11 UTC (`merged_at`), by merge commit, a normal
 merge on his go of 11:07:07 UTC (his HISTORY-ID (a)), with the expected head d7937de._
-
-**Change-set 3a of the build plan, Rules and boundaries [2026-11-24, MERGED]** — cs3a-rules-boundaries (the first
-half of change-set 3, his SIZE-3 (b)), by lane 1, built by the chat he calls Builder V3: the simulation's rules under
-tests. A scan of `crates/sim/src` refuses a float method outside ADR 0004 part 7's list, a hash map, a clock and
-per-target code; our own ChaCha8 (his RNG-SOURCE (c)) matches the 8 published vectors and a 160,384-byte stream file;
-38 float operations on 10,048 inputs are exact natively and in WebAssembly, but for 16 `mul_add` results below the
-smallest normal float in WebAssembly, pinned as a toolchain defect, with `mul_add` refused in `sim` (his MUL-ADD (a));
-the panic hook's text reaches the page; a test-only WebAssembly module, built outside every package; the build refuses
-a runtime crate without its overflow override and a feature set that differs between builds, and the runner's Wasm is
-the container's byte for byte. A player sees nothing new beyond two lines of the development readout. 3,562 added
-lines (stop line 4,100), 96 planted defects caught; CI green on 8619d539 and on the corrected head 8d277cf2; three
-review rounds, the third on one High, now closed; the verifier PASS and the advisor agent APPROVE on 8d277cf2; his
-browser check: errors 0 in Brave and Firefox (`docs/reports/2026-11-24-cs3a-browser-check.md`); report
-`docs/reports/2026-11-24-cs3a-rules-boundaries.md`. Merged: PR #65, 28254a7, 2026-11-24 22:40:39 UTC, by merge
-commit, by his main Advisor on his tap of 22:40:00 UTC (his go: `docs/DECISIONS.md`, 22:44:50 UTC), with the expected
-head 1624f084 (the last commit, after the advisor agent's read); gate, smoke and toolchain green on main (read 22:45
-UTC).
-
-**CI builds the WebAssembly and runs the tests that need it [2026-11-19 to 11-24, MERGED]** — ci-wasm
-(risk tier 2; planned by the first builder chat, carried by a thread of his project, built by the chat he calls
-Builder V3): before the network cut the `toolchain` job fetches the wasm-bindgen tool's archive by his TOOL-SOURCE
-values, runs GitHub's own check on it and installs its one program root-owned; inside the cut it builds the page
-twice, then runs the boundary tests, five type checks and the 12 browser tests in the runner image's Chrome (CI does
-not pin the test counts). Two CI writes on his yes (the first stopped at its install check on `/opt`), three planted
-faults each red at its own step; with it his browser check of #61 and his words of 2026-11-19 and 2026-11-23. Two
-review rounds, no Critical or High; report `docs/reports/2026-11-19-ci-wasm.md`. Merged: PR #64, 1ec6f6c, 2026-11-24
-10:15:31 UTC, by merge commit, by his main Advisor on his tap after his go for head 8aadfb0; CI green on main (gate
-run 45373057216 with smoke, toolchain run 45373056953). #63 and #62 closed with it.

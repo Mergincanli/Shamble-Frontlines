@@ -1,11 +1,25 @@
 //! The simulation: state, phases, tick and the navigation runtime (ADR 0002 part 3; ADR 0004). It depends on
-//! `content` only, with no transport, no async runtime and no clock. So far it holds the world (a tick counter, the
+//! `content` and on the collision library only, with no transport, no async runtime and no clock. So far it holds the world (a tick counter, the
 //! one player's applied command and the match seed), its step, its state hash and the generator of its random
 //! streams (foundation step 2.5).
 
+// The simulation's native build runs on the instructions every x86-64 processor has. With the fused multiply-add or
+// the wide vector set switched on for a whole build, code in the collision library's tree would compile to other
+// instructions than it does in WebAssembly and on the machine beside it (Mustafa's MUL-ADD (a), 2026-11-24; ADR 0004
+// part 7). Nothing of ours turns them on: this refuses a build where a flag from outside did, whatever passed it
+// (a variable, a cargo config file). The native tests of the crates that do not build this one assert the same
+// (`tests/native_target.rs`); the WebAssembly build's vector instructions are the built-file check's to refuse (it
+// reads the file).
+#[cfg(any(target_feature = "fma", target_feature = "avx2"))]
+compile_error!(
+    "the simulation is built without the fma and avx2 target features: unset RUSTFLAGS, target-cpu and target-feature"
+);
+
+pub mod collision;
 pub mod rng;
 pub mod state_hash;
 pub mod time;
+pub mod vec;
 pub mod world;
 
 pub use rng::ChaCha8;

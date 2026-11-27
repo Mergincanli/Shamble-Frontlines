@@ -1,0 +1,20 @@
+{
+  "ads_speed_multiplier": 0.55,
+  "air_control_pct": 100,
+  "body_radius_m": 0.4,
+  "format": "shamble-movement",
+  "gravity_m_per_s2": 24,
+  "id": "soldier",
+  "jump_reach_m": 3.071,
+  "push_radius_m": 0.4,
+  "push_strength_per_s": 8,
+  "speed_up_time_to_90pct_s": 0.164,
+  "sprint_multiplier": 1.52,
+  "sprint_returns_at_pct": 30,
+  "sprint_time_from_full_s": 7,
+  "stamina_refill_time_s": 5,
+  "step_up_m": 0.55,
+  "stop_time_to_10pct_s": 0.164,
+  "version": 1,
+  "walk_speed_m_per_s": 6.3
+}

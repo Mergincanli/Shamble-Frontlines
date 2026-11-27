@@ -1,0 +1,22 @@
+shamble-static-world 1 12 2000 9
+map 0 shapes 0 depth 0 tree cbf29ce484222325 rays 0 946675ff6c9829e5
+map 1 shapes 1 depth 1 tree 301944f7ffaa10ad rays 403 3d91c50f4ce587f7
+map 2 shapes 2 depth 2 tree 4db92b1422fa01dd rays 382 1cb12360b1c44fb2
+map 3 shapes 3 depth 3 tree c8394007d17172ed rays 410 b6afe94f3d898e2f
+map 4 shapes 17 depth 6 tree cdbc4cda3ed12b54 rays 434 411440a8912813c5
+map 5 shapes 64 depth 9 tree 9f5b8115d0112507 rays 520 ebad71d4c58266ef
+map 6 shapes 200 depth 11 tree cba4985a6b017b72 rays 752 f5846c18275eaf5f
+map 7 shapes 512 depth 12 tree 4d8389880ef1b6ec rays 1049 44ba1e72738645f6
+map 8 shapes 512 depth 14 tree 3c5e632805dce0a8 rays 1069 e58f34a53e78f13c
+map 9 shapes 300 depth 11 tree 38373c3230c7ec80 rays 907 549b040f923c4fb1
+map 10 shapes 100 depth 10 tree 0d1a1ea8a5f5edb1 rays 654 244b12376c440420
+map 11 shapes 31 depth 7 tree 9cbd34f486b89951 rays 471 518ab427458f796b
+hostile 0 shapes 512 depth 10 tree 5c81cea21747e44d
+hostile 1 shapes 512 depth 13 tree 58c83febdf33d1cc
+hostile 2 shapes 512 depth 10 tree b214a133fb7e0f8f
+hostile 3 shapes 512 depth 10 tree 8476846f885ae687
+hostile 4 shapes 512 depth 11 tree d38d0a3b5a6c11e1
+hostile 5 shapes 512 depth 10 tree 5ca12d59dc26be08
+hostile 6 shapes 512 depth 10 tree 664b5575d54bff95
+hostile 7 shapes 34 refused: the tree over the map's shapes is 34 deep, and at most 31 is taken: its shapes are spread too unevenly
+hostile 8 shapes 31 depth 31 tree 4b64fdd8ae70558a

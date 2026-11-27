@@ -1,3 +1,4 @@
-first-loop.rec: bytes 122487  sha256 1c05e6b8b2a2cdda54b4196cf38ae4864613d8998217dff800e86e315bdc6cf1
-first-loop.hashes: bytes 69180  sha256 6ac4b9cca47049510ddc6bf170c8241120f93a680f967027ec8df893cf8d565e
+first-loop.content.json: bytes 8375  sha256 b9901bc9e0244aee8888fc965284c2fe952abc8b38a49c6621d575df8ecd7fd3
+first-loop.rec: bytes 122497  sha256 200a793d997df58c77a7c26a76575c743a844c9ce887c8535eb6162388dee0df
+first-loop.hashes: bytes 69180  sha256 18fbc3a8f07cd25dec051087fd7bf9ff053cd634c1b3b611dc4c2490b8dc099b
 first-loop.vector.txt: bytes 249  sha256 b766f0c1af1634e9c336208dc512ad99e3e19d49070ad7613e07d69d848c9a6f

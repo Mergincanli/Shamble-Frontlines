@@ -14,6 +14,7 @@ use std::alloc::{GlobalAlloc, Layout, System};
 use std::cell::Cell;
 
 use client_endpoint::post::Post;
+use sim::collision::StaticWorld;
 use sim::{BUTTONS, MatchSetup, SEED_BYTES};
 use sim_wasm::local_match::{LocalMatch, loopback};
 
@@ -76,7 +77,13 @@ fn a_tick_of_the_local_match_takes_no_memory_once_the_match_is_warm() {
         seed,
         start_tick: 0,
     };
-    let mut local = LocalMatch::new(&setup, 0, 0, loopback()).expect("no padding is allowed");
+    // The match is made on the content crate's test map, as a local match always holds its map's static world.
+    let bundle = content::bundle::test_bundle();
+    let set = content::load(bundle.as_bytes()).expect("the test bundle loads");
+    let world =
+        StaticWorld::build(set.map("test-scene").expect("the test map")).expect("it builds");
+    let mut local =
+        LocalMatch::new(&setup, 0, 0, loopback(), world).expect("no padding is allowed");
     let mut presses = [0u8; BUTTONS];
     let mut step = |local: &mut LocalMatch, number: u32| {
         // A press every tick, round the buttons, and every bit pattern of the held buttons in turn.

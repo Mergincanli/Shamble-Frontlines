@@ -13,11 +13,16 @@ pub mod panic;
 
 use client_endpoint::post::Post;
 use local_match::{LocalMatch, loopback};
+use sim::collision::{StaticWorld, WorldError};
 use sim::{MatchSetup, SEED_BYTES, TICK_HZ};
 use wasm_bindgen::prelude::*;
 
 /// Local play: the client endpoint and a local server in one Worker (ADR 0002 part 6). The only mode so far.
 pub const MODE_LOCAL: u32 = 0;
+
+/// The map a local match is played on, by its id in the content: the one map the game's content holds so far (the
+/// first recording's header names the same id). A mode that names its map comes with a later change-set.
+pub const LOCAL_MAP: &str = "test-scene";
 
 /// Ticks per second, for the host's readout: the simulation's own build-time constant, asked once.
 #[wasm_bindgen]
@@ -27,12 +32,18 @@ pub fn tick_hz() -> u32 {
 }
 
 /// Why a `Sim` was not created.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum CreateError {
     /// The seed is not `SEED_BYTES` long; it holds this many bytes.
     SeedLength(usize),
     /// A mode that does not exist yet.
     Mode(u32),
+    /// The content bundle is not one the game's loader takes: its refusal, with the file and the place in it.
+    Content(content::Error),
+    /// The content holds no map with the id `LOCAL_MAP`.
+    MapMissing,
+    /// The map makes no static collision world: why.
+    World(WorldError),
     /// More padding than the block writer takes.
     PadBytes(u32),
 }
@@ -40,7 +51,7 @@ pub enum CreateError {
 impl CreateError {
     /// The reason in plain words, for the Worker's error message. It never holds the seed.
     #[must_use]
-    pub fn message(self) -> String {
+    pub fn message(&self) -> String {
         match self {
             Self::SeedLength(found) => {
                 format!("the match seed must be {SEED_BYTES} bytes and is {found}")
@@ -48,11 +59,30 @@ impl CreateError {
             Self::Mode(mode) => {
                 format!("mode {mode} does not exist: only local play ({MODE_LOCAL})")
             }
+            // The loader's own sentence, whole: it begins "the content is refused: " and is at most 512 bytes.
+            Self::Content(error) => error.message(),
+            Self::MapMissing => {
+                format!(
+                    "the content holds no map \"{LOCAL_MAP}\", the map a local match is played on"
+                )
+            }
+            Self::World(error) => {
+                format!(
+                    "the map \"{LOCAL_MAP}\" makes no collision world: {}",
+                    error.message()
+                )
+            }
             Self::PadBytes(pad) => {
                 format!("{pad} bytes of block padding is above the writer's cap")
             }
         }
     }
+}
+
+/// The static collision world of the local match's map, built once from the content the loader took.
+fn local_world(set: &content::ContentSet) -> Result<StaticWorld, CreateError> {
+    let map = set.map(LOCAL_MAP).ok_or(CreateError::MapMissing)?;
+    StaticWorld::build(map).map_err(CreateError::World)
 }
 
 /// One local match in the Worker. Its state is the local match's (`local_match`): the client endpoint, the local
@@ -64,21 +94,32 @@ pub struct Sim {
 
 impl Sim {
     /// Checks what the host passed and builds the match at tick 0, its join already on its way. The block is whole
-    /// from the start; the host's first `rebase` says when the first tick is due.
+    /// from the start; the host's first `rebase` says when the first tick is due. `bundle` is the match's content
+    /// (`content.json`): it crosses once, here, so no call can swap it mid-match; the game's own loader judges it.
+    /// The match holds the static collision world of the content's map `LOCAL_MAP`; nothing of the content enters
+    /// the match's state, and no step queries the world yet (change-set 4c).
     ///
     /// # Errors
-    /// A seed of the wrong length, a mode that does not exist, or too much padding.
-    pub fn create(seed: &[u8], mode: u32, pad_bytes: u32) -> Result<Self, CreateError> {
+    /// A seed of the wrong length, a mode that does not exist, a bundle the loader refuses, a bundle without the map,
+    /// a map that makes no world, or too much padding, checked in that order.
+    pub fn create(
+        seed: &[u8],
+        mode: u32,
+        pad_bytes: u32,
+        bundle: &[u8],
+    ) -> Result<Self, CreateError> {
         let seed =
             <[u8; SEED_BYTES]>::try_from(seed).map_err(|_| CreateError::SeedLength(seed.len()))?;
         if mode != MODE_LOCAL {
             return Err(CreateError::Mode(mode));
         }
+        let set = content::load(bundle).map_err(CreateError::Content)?;
+        let world = local_world(&set)?;
         let setup = MatchSetup {
             seed,
             start_tick: 0,
         };
-        let local = LocalMatch::new(&setup, 0, pad_bytes, loopback());
+        let local = LocalMatch::new(&setup, 0, pad_bytes, loopback(), world);
         local
             .map(|local| Self { local })
             .ok_or(CreateError::PadBytes(pad_bytes))
@@ -95,13 +136,14 @@ impl Sim {
 impl Sim {
     /// Creates the match. `seed` is 32 bytes the Worker drew; `mode` is `MODE_LOCAL` (a `u32`: a whole number below
     /// 2^32 arrives as the host passed it, and JavaScript turns anything else into one first, so the host passes the
-    /// constant); `pad_bytes` pads the block for the hand-off readings (the game passes 0).
+    /// constant); `pad_bytes` pads the block for the hand-off readings (the game passes 0); `bundle` is the content
+    /// the page fetched, which the Worker has already held to its size limit.
     ///
     /// # Errors
     /// As `Sim::create`, as a JavaScript `Error` with the reason in plain words.
     #[wasm_bindgen(constructor)]
-    pub fn new(seed: &[u8], mode: u32, pad_bytes: u32) -> Result<Sim, JsError> {
-        Self::create(seed, mode, pad_bytes).map_err(|error| JsError::new(&error.message()))
+    pub fn new(seed: &[u8], mode: u32, pad_bytes: u32, bundle: &[u8]) -> Result<Sim, JsError> {
+        Self::create(seed, mode, pad_bytes, bundle).map_err(|error| JsError::new(&error.message()))
     }
 
     /// Where the block lies in linear memory. The buffer never moves, so the host asks once.
@@ -155,6 +197,11 @@ mod tests {
 
     const SEED: [u8; SEED_BYTES] = [7; SEED_BYTES];
 
+    /// The test bundle (`content::bundle::test_bundle`): the content every test match here is made on.
+    fn bundle() -> Vec<u8> {
+        content::bundle::test_bundle().into_bytes()
+    }
+
     /// The block's words: the tick, the layout's hash, then the echo and the link's counts.
     fn words(sim: &Sim) -> Vec<u32> {
         let fours = sim.local().block().as_chunks::<4>().0;
@@ -163,7 +210,7 @@ mod tests {
 
     #[test]
     fn a_new_match_holds_a_valid_block_at_tick_zero() {
-        let sim = Sim::create(&SEED, MODE_LOCAL, 0).expect("a good seed and mode");
+        let sim = Sim::create(&SEED, MODE_LOCAL, 0, &bundle()).expect("a good seed and mode");
         assert_eq!(sim.block_len(), 44);
         assert_eq!(words(&sim), [&[0, LAYOUT_HASH][..], &[0; 9]].concat());
         assert_eq!(sim.block_ptr(), sim.local().block().as_ptr());
@@ -172,7 +219,7 @@ mod tests {
 
     #[test]
     fn each_step_is_one_tick_in_the_block_and_gives_the_next_due_time() {
-        let mut sim = Sim::create(&SEED, MODE_LOCAL, 0).expect("a good seed and mode");
+        let mut sim = Sim::create(&SEED, MODE_LOCAL, 0, &bundle()).expect("a good seed and mode");
         let place = sim.block_ptr();
         let period = 1000.0 / f64::from(TICK_HZ);
         assert_eq!(sim.rebase(1000.0), 1000.0 + period);
@@ -191,7 +238,7 @@ mod tests {
     /// own byte, and only the low 16 held bits.
     #[test]
     fn what_the_page_posts_comes_back_in_the_block_s_echo() {
-        let mut sim = Sim::create(&SEED, MODE_LOCAL, 0).expect("a good seed and mode");
+        let mut sim = Sim::create(&SEED, MODE_LOCAL, 0, &bundle()).expect("a good seed and mode");
         sim.step(0.0);
         for button in 0..16u32 {
             // One press of this button, on top of the ones before it, with only its own bit held.
@@ -215,9 +262,11 @@ mod tests {
     /// tick by tick, and one button held differently makes it differ.
     #[test]
     fn the_shared_hash_is_the_local_server_s_and_covers_no_seed() {
-        let mut a = Sim::create(&SEED, MODE_LOCAL, 0).expect("a good seed and mode");
-        let mut b = Sim::create(&[9; SEED_BYTES], MODE_LOCAL, 0).expect("a good seed and mode");
-        let mut held_otherwise = Sim::create(&SEED, MODE_LOCAL, 0).expect("a good seed and mode");
+        let mut a = Sim::create(&SEED, MODE_LOCAL, 0, &bundle()).expect("a good seed and mode");
+        let mut b =
+            Sim::create(&[9; SEED_BYTES], MODE_LOCAL, 0, &bundle()).expect("a good seed and mode");
+        let mut held_otherwise =
+            Sim::create(&SEED, MODE_LOCAL, 0, &bundle()).expect("a good seed and mode");
         for tick in 0..20u32 {
             let hash = a.shared_hash();
             assert_eq!(hash, b.shared_hash());
@@ -240,7 +289,8 @@ mod tests {
 
     #[test]
     fn padding_makes_the_block_longer_and_stays_zero() {
-        let mut sim = Sim::create(&SEED, MODE_LOCAL, 4096).expect("4 KiB of padding is allowed");
+        let mut sim =
+            Sim::create(&SEED, MODE_LOCAL, 4096, &bundle()).expect("4 KiB of padding is allowed");
         assert_eq!(sim.block_len(), 44 + 4096);
         sim.input(1, 0xFFFF, u32::MAX, u32::MAX, u32::MAX, u32::MAX);
         sim.step(0.0);
@@ -250,7 +300,7 @@ mod tests {
 
     #[test]
     fn a_bad_seed_mode_or_padding_is_refused_with_a_plain_reason() {
-        let refused = |seed: &[u8], mode, pad| Sim::create(seed, mode, pad).err();
+        let refused = |seed: &[u8], mode, pad| Sim::create(seed, mode, pad, &bundle()).err();
         assert_eq!(
             refused(&[7; 31], MODE_LOCAL, 0),
             Some(CreateError::SeedLength(31))
@@ -287,5 +337,105 @@ mod tests {
         ] {
             assert!(!error.message().contains("7, 7"));
         }
+    }
+
+    /// The content crosses here once, and the game's own loader judges it: a bundle it refuses makes no match, and
+    /// the reason is the loader's own sentence, with the file and the place in it.
+    #[test]
+    fn a_bundle_the_loader_refuses_makes_no_match_and_says_the_loader_s_words() {
+        let refused = |bundle: &[u8]| Sim::create(&SEED, MODE_LOCAL, 0, bundle).err();
+        for bundle in [&b""[..], b"{}", b"not a bundle", &[0xff, 0xfe]] {
+            let error = refused(bundle).expect("refused");
+            let CreateError::Content(why) = &error else {
+                panic!("{error:?}");
+            };
+            assert_eq!(error.message(), why.message());
+            assert!(error.message().starts_with("the content is refused: "));
+        }
+        // A movement file that is not in canonical form, inside a bundle the writer made: named by its file.
+        let text = content::movement::TEST_TEXT.replace(": 100,", ": 100.0,");
+        let unformed = content::bundle::write(&[("movement/test-soldier.json", &text)]);
+        let message = refused(unformed.as_bytes()).expect("refused").message();
+        assert!(message.contains("movement/test-soldier.json"), "{message}");
+        assert!(refused(&bundle()).is_none());
+    }
+
+    /// The six checks run in a fixed order, seed, mode, content, map, world, padding: each case below fails all the
+    /// ones after its own, and only its own is named. (No map a test makes here reaches the world's check: the
+    /// world's own tests make its refusals, and its sentence is held below.)
+    #[test]
+    fn the_checks_run_in_the_order_seed_mode_content_map_padding() {
+        let bad = b"{}";
+        let first = |seed: &[u8], mode, pad, bundle: &[u8]| {
+            Sim::create(seed, mode, pad, bundle)
+                .err()
+                .map(|error| std::mem::discriminant(&error))
+        };
+        let kind = |error: CreateError| Some(std::mem::discriminant(&error));
+        assert_eq!(
+            first(&[7; 31], 1, u32::MAX, bad),
+            kind(CreateError::SeedLength(0))
+        );
+        assert_eq!(first(&SEED, 1, u32::MAX, bad), kind(CreateError::Mode(0)));
+        let loaded = content::load(bad).expect_err("refused");
+        assert_eq!(
+            first(&SEED, MODE_LOCAL, u32::MAX, bad),
+            kind(CreateError::Content(loaded))
+        );
+        // A bundle the loader takes, with no map: the map's check comes before the padding's. (The world's check
+        // stands between the two; no map made here reaches it: the world's own tests make its refusals.)
+        let mapless =
+            content::bundle::write(&[("movement/test-soldier.json", content::movement::TEST_TEXT)]);
+        assert_eq!(
+            first(&SEED, MODE_LOCAL, u32::MAX, mapless.as_bytes()),
+            kind(CreateError::MapMissing)
+        );
+        assert_eq!(
+            first(&SEED, MODE_LOCAL, u32::MAX, &bundle()),
+            kind(CreateError::PadBytes(0))
+        );
+    }
+
+    /// The match holds the static world of the content's map `LOCAL_MAP`: the same world the map builds on its own.
+    #[test]
+    fn the_match_holds_the_static_world_of_the_local_map() {
+        let sim = Sim::create(&SEED, MODE_LOCAL, 0, &bundle()).expect("a good seed and mode");
+        let set = content::load(&bundle()).expect("the test bundle loads");
+        let built =
+            StaticWorld::build(set.map(LOCAL_MAP).expect("the test map")).expect("it builds");
+        let held = sim.local().static_world();
+        assert_eq!(held.solids().len(), built.solids().len());
+        assert_eq!(held.tree_depth(), built.tree_depth());
+        assert_eq!(held.tree_bytes(), built.tree_bytes());
+        assert!(!held.solids().is_empty());
+    }
+
+    /// A bundle whose maps have other ids makes no match, and says which map it looked for; a map that makes no
+    /// world says the world's own reason.
+    #[test]
+    fn a_bundle_without_the_local_map_makes_no_match() {
+        let other = content::map::TEST_TEXT.replace("\"id\": \"test-scene\"", "\"id\": \"other\"");
+        assert_ne!(other, content::map::TEST_TEXT);
+        let bundle = content::bundle::write(&[
+            ("maps/other.json", &other),
+            ("movement/test-soldier.json", content::movement::TEST_TEXT),
+        ]);
+        assert!(content::load(bundle.as_bytes()).is_ok());
+        assert_eq!(
+            Sim::create(&SEED, MODE_LOCAL, 0, bundle.as_bytes()).err(),
+            Some(CreateError::MapMissing)
+        );
+        assert_eq!(
+            CreateError::MapMissing.message(),
+            "the content holds no map \"test-scene\", the map a local match is played on"
+        );
+        let deep = WorldError::TooDeep(32);
+        assert_eq!(
+            CreateError::World(deep).message(),
+            format!(
+                "the map \"test-scene\" makes no collision world: {}",
+                deep.message()
+            )
+        );
     }
 }

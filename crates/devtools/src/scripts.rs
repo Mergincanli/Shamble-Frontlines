@@ -6,6 +6,27 @@
 use sim::{SEED_BYTES, TICK_HZ};
 
 use crate::recording::{Header, Recording, Step, TEST_SEED_MARK};
+use crate::sha256::sha256;
+
+/// What a recording's header names of the content its match ran on (netcode-architect's route (i), change-set 4b):
+/// the sha256 of the bundle's exact bytes, and the id of the map in it the match is played on. A committed
+/// recording's bundle lies frozen beside it (`<name>.content.json`, which only `make_recordings --freeze` writes).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Content {
+    pub sha256: [u8; 32],
+    pub map_id: String,
+}
+
+impl Content {
+    /// The content of `bundle`'s exact bytes, played on its map `map_id`.
+    #[must_use]
+    pub fn of(bundle: &[u8], map_id: &str) -> Self {
+        Self {
+            sha256: sha256(bundle),
+            map_id: map_id.to_owned(),
+        }
+    }
+}
 
 /// The page's buttons, as `packages/client/src/input/keyboard.ts` numbers them.
 const W: u32 = 1 << 0;
@@ -52,9 +73,9 @@ impl Jitter {
 /// in one tick and now and then six at once, which the endpoint's pacer has to spread; a page that is fast (several
 /// posts between two ticks, so post numbers are skipped) and now and then slow (no new post, so the same one is
 /// handed in again); host times a tick apart with up to 6 ms of jitter, never running backwards. The counts wrap
-/// past 255 on the way.
+/// past 255 on the way. Its header names `content`, the content the match runs on.
 #[must_use]
-pub fn looped(name: &str, steps: u32, salt: u64) -> Recording {
+pub fn looped(name: &str, steps: u32, salt: u64, content: &Content) -> Recording {
     let mut jitter = Jitter(0x5348_4D42_4C52_4543 ^ salt);
     let turn = (salt % 8) as u32;
     let mut counts = [0u8; 16];
@@ -112,8 +133,8 @@ pub fn looped(name: &str, steps: u32, salt: u64) -> Recording {
             start_tick: 0,
             first_sequence: 0,
             tick_rate: TICK_HZ as u16,
-            content_hash: [0; 32],
-            map_id: String::new(),
+            content_hash: content.sha256,
+            map_id: content.map_id.clone(),
         },
         steps: made,
     }
@@ -121,15 +142,16 @@ pub fn looped(name: &str, steps: u32, salt: u64) -> Recording {
 
 /// The first recording: one minute of the loop.
 #[must_use]
-pub fn first_loop() -> Recording {
-    looped("first-loop", 1_800, 0)
+pub fn first_loop(content: &Content) -> Recording {
+    looped("first-loop", 1_800, 0, content)
 }
 
-/// A script: it makes one recording, the same every time.
-pub type Script = fn() -> Recording;
+/// A script: it makes one recording on the content it is given, the same every time.
+pub type Script = fn(&Content) -> Recording;
 
-/// Every committed recording: its name and the script that makes it.
-pub const RECORDINGS: [(&str, Script); 1] = [("first-loop", first_loop)];
+/// Every committed recording: its name, the map of its frozen content its match is played on, and the script that
+/// makes it.
+pub const RECORDINGS: [(&str, &str, Script); 1] = [("first-loop", "test-scene", first_loop)];
 
 /// The tick whose shared bytes each recording's word-size vector pins.
 pub const VECTOR_TICK: u32 = 900;
@@ -147,10 +169,29 @@ mod tests {
         assert_eq!(test_seed(&"n".repeat(40))[8..], [b'n'; 24]);
     }
 
+    /// The test bundle's content, on its map.
+    fn test_content() -> Content {
+        Content::of(content::bundle::test_bundle().as_bytes(), "test-scene")
+    }
+
+    #[test]
+    fn a_recording_s_header_names_the_content_it_is_given() {
+        let content = test_content();
+        assert_eq!(
+            content.sha256,
+            sha256(content::bundle::test_bundle().as_bytes())
+        );
+        let header = first_loop(&content).header;
+        assert_eq!(
+            (header.content_hash, header.map_id),
+            (content.sha256, content.map_id)
+        );
+    }
+
     /// The script holds what its text says it holds: checked on the steps themselves.
     #[test]
     fn the_first_loop_holds_what_its_description_says() {
-        let recording = first_loop();
+        let recording = first_loop(&test_content());
         let steps = &recording.steps;
         assert_eq!(steps.len(), 1_800);
         assert!(recording.encode().is_ok());
@@ -192,7 +233,7 @@ mod tests {
         assert!(gaps().all(|gap| gap > 27.0 && gap < 40.0));
         assert!(gaps().any(|gap| gap < 30.0) && gaps().any(|gap| gap > 36.0));
         // Another salt is another stream of the same kind.
-        let other = looped("first-loop", 1_800, 3);
+        let other = looped("first-loop", 1_800, 3, &test_content());
         assert_ne!(other.steps, recording.steps);
         assert_eq!(other.header, recording.header);
     }

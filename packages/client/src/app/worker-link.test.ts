@@ -49,11 +49,17 @@ function setUp() {
   return { link, sent, clock, port, ready, deliver };
 }
 
-test("it starts the Worker, and posts no input before the Worker is ready", () => {
+test("it starts the Worker on the bundle, given away with the post, and posts no input before the Worker is ready", () => {
   const { link, sent, ready } = setUp();
-  link.start(4096);
+  const bundle = new ArrayBuffer(16);
+  link.start(4096, bundle);
   link.frame(NO_KEYS);
-  expect(sent.map((entry) => entry.message)).toEqual([{ type: "start", padBytes: 4096 }]);
+  expect(sent).toHaveLength(1);
+  expect(sent[0]?.message).toEqual({ type: "start", padBytes: 4096, bundle });
+  // The very buffer, and in the transfer list: the bytes move to the Worker and are not copied.
+  expect(sent[0]?.message.type === "start" && sent[0].message.bundle).toBe(bundle);
+  expect(sent[0]?.transfer).toHaveLength(1);
+  expect(sent[0]?.transfer[0]).toBe(bundle);
   expect(ready()).toBe("");
   expect(link).toMatchObject({ ready: true, blockBytes: 44, tickHz: 30 });
 });
@@ -152,6 +158,9 @@ test("a block of the wrong length, an error from the Worker and an unknown messa
   for (const [message, said] of [
     [{ type: "block", buffer: block(1, LAYOUT_HASH, 48), startAt: 0, doneAt: 0 }, "a block of 48 bytes, not 44"],
     [{ type: "error", message: "unreachable executed" }, "unreachable executed"],
+    // An error longer than any text this build's Worker tells (a whole panic buffer after its lead, 1,040 code
+    // units): the page says its own fixed sentence, never the long text.
+    [{ type: "error", message: "e".repeat(1041) }, "the Worker sent a message the page does not know"],
     [{ type: "surprise" }, "the Worker sent a message the page does not know"],
     [{ type: "report", stats: { ticks: 5 } }, "the Worker sent a message the page does not know"],
     [null, "the Worker sent a message the page does not know"],
@@ -189,6 +198,24 @@ test("the match ends once, whoever ends it first, and nothing is posted to the W
   expect(other.link.end("")).toBe(true);
   expect(other.link.failure).not.toBe("");
   expect(other.link.end("again")).toBe(false);
+});
+
+test("the Worker's own error event ends the match with the browser's text cut to the Worker's bound for a thrown text", () => {
+  const long = setUp();
+  long.ready();
+  // 1 MiB of the browser's text: its start and the mark, 512 code units in all.
+  const said = long.link.workerError("w".repeat(1 << 20));
+  expect([said.length, said.endsWith("..."), long.link.failure === said, long.port.terminated]).toEqual([512, true, true, 1]);
+  // A second cause after the end is no second error.
+  expect(long.link.workerError("again")).toBe("");
+  // A short text whole; an event with an empty text, or with none (a script that did not load gives a plain event,
+  // whose `message` is undefined), says so.
+  const short = setUp();
+  expect(short.link.workerError("Failed to load the Worker's script")).toBe("Failed to load the Worker's script");
+  const none = setUp();
+  expect(none.link.workerError("")).toBe("the Worker failed");
+  const plain = setUp();
+  expect(plain.link.workerError(undefined)).toBe("the Worker failed");
 });
 
 test("what the link knows can be read and not written from outside", () => {

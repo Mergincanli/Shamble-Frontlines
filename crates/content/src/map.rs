@@ -25,6 +25,8 @@ pub const FORMAT: &str = "shamble-map";
 pub const VERSION: u32 = 1;
 /// The most entries each list of a map may hold.
 pub const MAX_SPAWNS: u32 = 16;
+/// The fewest spawns a map may hold (the shapes and the regions may be none).
+pub const MIN_SPAWNS: u32 = 1;
 pub const MAX_SHAPES: u32 = 512;
 pub const MAX_REGIONS: u32 = 64;
 
@@ -53,18 +55,24 @@ pub const CORNER_GRID: Grid = Grid { per_metre: 1_000, thinnest: 10 };
 
 /// Any coordinate: wide bounds that keep a typing mistake out. The map's own bounds are held to the aim's reach.
 pub const COORDINATE: Range = Range::closed(-10_000.0, 10_000.0);
-/// The way a spawn faces, in degrees from 0 up to 360. Which way 0 points and which way it turns is pinned in the
-/// change that writes the first map file (4b-2's data step), before any spawn is written: no code reads it yet.
+/// The way a spawn faces, in degrees from 0 up to 360. **0 faces +z, and the degrees grow toward +x**: 90 faces +x,
+/// 180 faces -z, 270 faces -x (seen from above with +x to the right and +z toward the viewer, that is a turn
+/// against the clock). It is the old game's own convention, kept so that a place and a facing mean what they meant
+/// there: its soldiers turn by `rotation.y = Math.atan2(dir.x, dir.z)` (`legacy/shamble-game.js:2710`, `:2758`; the
+/// harvester the same, `:871`). Pinned here before the first map file is written (the advisor agent's condition on
+/// 4b-2); no code reads a facing yet, and the change that first does turns it into the simulation's own direction
+/// without a sine or a cosine of the standard library (ADR 0004 part 7).
 #[rustfmt::skip]
 pub const FACING: Field = Field { name: "facing_deg", unit: "deg", range: Range { min: 0.0, max: 360.0, min_inclusive: true, max_inclusive: false } };
 
-/// The fixed words of a map, in the order of the types below.
-const FORMS: [&str; 2] = ["box", "ramp"];
-const TOWARDS: [&str; 4] = ["+x", "-x", "+z", "-z"];
-const GROUNDS: [&str; 2] = ["street", "grass"];
+/// The fixed words of a map, in the order of the types below (the schema writer lists the same words).
+pub(crate) const FORMS: [&str; 2] = ["box", "ramp"];
+pub(crate) const TOWARDS: [&str; 4] = ["+x", "-x", "+z", "-z"];
+pub(crate) const GROUNDS: [&str; 2] = ["street", "grass"];
 
 /// One map, read and checked.
 #[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(test, derive(ts_rs::TS))]
 pub struct MapDocument {
     pub id: String,
     pub bounds: Bounds,
@@ -75,6 +83,7 @@ pub struct MapDocument {
 
 /// A box by its lowest and its highest corner, x, y and z.
 #[derive(Debug, Clone, Copy, PartialEq)]
+#[cfg_attr(test, derive(ts_rs::TS))]
 pub struct Bounds {
     pub min: [f64; 3],
     pub max: [f64; 3],
@@ -82,6 +91,7 @@ pub struct Bounds {
 
 /// Where a soldier starts: `at` is the point on the ground between the feet, the soldier's own origin.
 #[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(test, derive(ts_rs::TS))]
 pub struct Spawn {
     pub id: String,
     pub at: [f64; 3],
@@ -90,16 +100,21 @@ pub struct Spawn {
 
 /// A solid piece of the world.
 #[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(test, derive(ts_rs::TS))]
 pub struct Shape {
     pub id: String,
     pub min: [f64; 3],
     pub max: [f64; 3],
+    /// In the file its keys stand beside the others: `type`, and a ramp's `rises_toward`.
+    #[cfg_attr(test, ts(flatten))]
     pub form: Form,
 }
 
 /// What fills a shape's box: all of it, or a wedge that is as high as the box on the side it rises toward and
 /// meets the floor of the box on the other.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(test, derive(ts_rs::TS))]
+#[cfg_attr(test, ts(tag = "type", rename_all = "lowercase"))]
 pub enum Form {
     Box,
     /// A named field, as the file has it (`rises_toward`), so that the generated types can say the same.
@@ -109,15 +124,21 @@ pub enum Form {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(test, derive(ts_rs::TS))]
 pub enum Toward {
+    #[cfg_attr(test, ts(rename = "+x"))]
     PlusX,
+    #[cfg_attr(test, ts(rename = "-x"))]
     MinusX,
+    #[cfg_attr(test, ts(rename = "+z"))]
     PlusZ,
+    #[cfg_attr(test, ts(rename = "-z"))]
     MinusZ,
 }
 
 /// A patch of ground that is only drawn, by its lowest and highest corner in x and z.
 #[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(test, derive(ts_rs::TS))]
 pub struct Region {
     pub id: String,
     pub kind: Ground,
@@ -126,6 +147,8 @@ pub struct Region {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(test, derive(ts_rs::TS))]
+#[cfg_attr(test, ts(rename_all = "lowercase"))]
 pub enum Ground {
     Street,
     Grass,
@@ -314,8 +337,16 @@ pub fn check(map: &MapDocument) -> Result<(), Error> {
             );
         }
     }
-    if map.spawns.is_empty() {
-        return refuse("spawns".to_owned(), Kind::TooFew { len: 0, min: 1 });
+    // Held to MIN_SPAWNS itself, so that the schema's fewest and the loader's are one number.
+    let spawns = u32::try_from(map.spawns.len()).unwrap_or(u32::MAX);
+    if spawns < MIN_SPAWNS {
+        return refuse(
+            "spawns".to_owned(),
+            Kind::TooFew {
+                len: spawns,
+                min: MIN_SPAWNS,
+            },
+        );
     }
     for (at, spawn) in map.spawns.iter().enumerate() {
         let field = |axis: usize| format!("spawns[{at}].at[{axis}]");
@@ -372,6 +403,13 @@ pub fn check(map: &MapDocument) -> Result<(), Error> {
         map.regions.iter().map(|region| region.id.as_str()),
     )
 }
+
+/// A valid map file's text in canonical form with made-up sizes, for this crate's tests and the tools' (never a
+/// content file: no value of the game rests on it). Its id is the one local play asks for, `test-scene`, so a bundle
+/// made of it (`bundle::test_bundle`) serves every caller that replays no committed recording. Its shapes are no
+/// map's of the game: a test that rests on a map's shapes names the map it uses.
+#[doc(hidden)]
+pub const TEST_TEXT: &str = "{\n  \"bounds\": {\n    \"max\": [\n      50,\n      20,\n      50\n    ],\n    \"min\": [\n      -50,\n      0,\n      -50\n    ]\n  },\n  \"format\": \"shamble-map\",\n  \"id\": \"test-scene\",\n  \"regions\": [],\n  \"shapes\": [\n    {\n      \"id\": \"step\",\n      \"max\": [\n        1,\n        0.55,\n        1\n      ],\n      \"min\": [\n        0,\n        0,\n        0\n      ],\n      \"type\": \"box\"\n    }\n  ],\n  \"spawns\": [\n    {\n      \"at\": [\n        0,\n        0,\n        -5\n      ],\n      \"facing_deg\": 90,\n      \"id\": \"a\"\n    }\n  ],\n  \"version\": 1\n}\n";
 
 #[cfg(test)]
 pub(crate) mod tests {

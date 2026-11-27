@@ -1,5 +1,6 @@
 import { expect, test } from "vitest";
-import { isPageToWorker, isWorkerStats, isWorkerToPage, MODE_LOCAL, type PageToWorker, type WorkerStats, type WorkerToPage } from "./messages.ts";
+import { isPageToWorker, isWorkerStats, isWorkerToPage, MAX_BUNDLE_BYTES, MODE_LOCAL, type PageToWorker, type WorkerStats, type WorkerToPage } from "./messages.ts";
+import { ERROR_TEXT_UNITS } from "./panic-message.ts";
 
 test("local play is mode 0", () => {
   expect(MODE_LOCAL).toBe(0);
@@ -7,12 +8,14 @@ test("local play is mode 0", () => {
 
 /** An input post with nothing held and no press; a test changes what it is about. */
 const INPUT: PageToWorker = { type: "input", post: 1, held: 0, p0: 0, p1: 0, p2: 0, p3: 0, returned: [] };
+/** A start with a bundle of `bytes` bytes (what they hold is the Wasm's loader's to judge, not this check's). */
+const start = (bytes: number, padBytes = 0): unknown => ({ type: "start", padBytes, bundle: new ArrayBuffer(bytes) });
 
 test("every message the page may send is accepted", () => {
   const full = 0xffff_ffff;
   const good: PageToWorker[] = [
-    { type: "start", padBytes: 0 },
-    { type: "start", padBytes: 65536 },
+    { type: "start", padBytes: 0, bundle: new ArrayBuffer(1) },
+    { type: "start", padBytes: 65536, bundle: new ArrayBuffer(MAX_BUNDLE_BYTES) },
     { ...INPUT, post: 0 },
     { type: "input", post: full, held: 0xffff, p0: full, p1: full, p2: full, p3: full, returned: [new ArrayBuffer(8), new ArrayBuffer(8)] },
     { type: "visibility", hidden: true },
@@ -23,7 +26,11 @@ test("every message the page may send is accepted", () => {
 });
 
 test("anything else is refused", () => {
+  // A buffer the page has already given away: it is still an ArrayBuffer, and holds no byte.
+  const detached = new ArrayBuffer(8);
+  structuredClone(detached, { transfer: [detached] });
   const bad: unknown[] = [
+    { type: "start", padBytes: 0, bundle: detached },
     null,
     undefined,
     "start",
@@ -32,10 +39,17 @@ test("anything else is refused", () => {
     {},
     { type: "stop" },
     { type: "start" },
-    { type: "start", padBytes: -1 },
-    { type: "start", padBytes: 1.5 },
-    { type: "start", padBytes: 0x1_0000_0000 },
-    { type: "start", padBytes: "8" },
+    start(8, -1),
+    start(8, 1.5),
+    start(8, 0x1_0000_0000),
+    { type: "start", padBytes: "8", bundle: new ArrayBuffer(8) },
+    // The bundle: missing, empty, one byte over the loader's cap, a view instead of its buffer, a shared buffer, text.
+    { type: "start", padBytes: 0 },
+    start(0),
+    start(MAX_BUNDLE_BYTES + 1),
+    { type: "start", padBytes: 0, bundle: new Uint8Array(8) },
+    { type: "start", padBytes: 0, bundle: new SharedArrayBuffer(8) },
+    { type: "start", padBytes: 0, bundle: "{}" },
     // The old shape, a post without one of its numbers, and each number outside its range.
     { type: "input", sequence: 1, returned: [] },
     { ...INPUT, returned: undefined },
@@ -83,6 +97,8 @@ test("every message the Worker may send is accepted", () => {
     { type: "block", buffer: new ArrayBuffer(8), startAt: 5_000_000, doneAt: 5_000_000.25 },
     { type: "error", message: "" },
     { type: "error", message: "panicked at crates/sim/src/world.rs:42:14:\nattempt to add with overflow" },
+    // The longest text the Worker tells: a whole panic buffer after its lead.
+    { type: "error", message: "e".repeat(ERROR_TEXT_UNITS) },
     { type: "report", stats: STATS },
   ];
   for (const message of good) expect(isWorkerToPage(message), message.type).toBe(true);
@@ -112,6 +128,8 @@ test("anything else from the Worker is refused", () => {
     { type: "block", buffer: new ArrayBuffer(8), startAt: "0", doneAt: 0 },
     { type: "error" },
     { type: "error", message: 42 },
+    // One code unit longer than any text this build's Worker tells.
+    { type: "error", message: "e".repeat(ERROR_TEXT_UNITS + 1) },
     { type: "report" },
     { type: "report", stats: null },
     { type: "report", stats: { ticks: 5 } },

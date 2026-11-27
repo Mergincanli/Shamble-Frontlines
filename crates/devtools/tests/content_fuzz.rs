@@ -5,7 +5,10 @@
 //! that checks the files under `content/` will call it). Nine inputs in ten are a valid bundle or file changed the
 //! way content gets broken (`devtools::content_proofs::fuzz_input`); one in ten is random. Every input must leave no
 //! panic and keep the loader's promises (`fuzz_judge`); each stage of the loader must settle its share of the
-//! verdicts, or the run did not reach it; the slowest input is named. A failure prints the seed, the input's number
+//! verdicts, or the run did not reach it; the slowest input is named. Every map of an input the loader takes goes on
+//! into the static world's builder (`devtools::world_proofs::fuzz_worlds`): no panic there either, no refusal but a
+//! tree's depth, and a world that answers a ray onto each of its shapes as a search of every shape does (4b-2's
+//! step 10; the worlds built are counted, so a run that reached none fails). A failure prints the seed, the input's number
 //! and its bytes, so it can be made again. The full count runs where debug assertions are off (`cargo test
 //! --release`, which keeps overflow checks on); a debug run takes fewer, and each test's name says which it ran.
 //! `SHAMBLE_FUZZ_SEED` runs another seed by hand.
@@ -24,6 +27,7 @@ use std::time::{Duration, Instant};
 
 use content::{load, load_file};
 use devtools::content_proofs::{LIMIT_CASES, STAGES, fuzz_input, fuzz_judge, limit_case};
+use devtools::world_proofs::{WORLD_VERDICTS, fuzz_worlds};
 
 thread_local! {
     /// The bytes this thread holds now, and the most it has held since `peak` last started. A constant start
@@ -165,25 +169,45 @@ fn the_search_for_a_key_that_is_there_twice_does_not_walk_every_pair() {
 /// run with no map in it passed.
 const SHARES: [u64; STAGES.len()] = [900, 0, 1_000, 5, 700, 1_600, 150, 300, 80, 10];
 
-type Tally = ([u64; STAGES.len()], (Duration, u64, usize));
+/// The worlds built in 10,000 inputs, at the least: about half of what the run gave when the worlds joined it (its
+/// printed line). No share for a tree too deep: mutation does not reach one (the chain of cubes among the hostile
+/// maps of `tests/static_world.rs` does).
+const WORLDS_BUILT: u64 = 250;
 
-/// One worker's inputs, judged: how many verdicts each stage settled, and the slowest input (its time, its number,
-/// its length). The first input that leaves a panic or breaks a promise ends the run, named.
+type Tally = (
+    [u64; STAGES.len()],
+    [u64; WORLD_VERDICTS.len()],
+    (Duration, u64, usize),
+);
+
+/// One worker's inputs, judged: how many verdicts each stage settled, what the world's builder made of the maps
+/// that were taken, and the slowest input (its time, its number, its length). The first input that leaves a panic
+/// or breaks a promise ends the run, named.
 fn judge_all(seed: u64, indices: impl Iterator<Item = u64>) -> Tally {
-    let (mut stages, mut slowest) = ([0; STAGES.len()], (Duration::ZERO, 0, 0));
+    let (mut stages, mut worlds, mut slowest) = (
+        [0; STAGES.len()],
+        [0; WORLD_VERDICTS.len()],
+        (Duration::ZERO, 0, 0),
+    );
     for index in indices {
         let (path, bytes) = fuzz_input(seed, index);
         let started = Instant::now();
-        let judged = catch_unwind(|| fuzz_judge(path.as_deref(), &bytes));
+        let judged = catch_unwind(|| {
+            let stage = fuzz_judge(path.as_deref(), &bytes)?;
+            fuzz_worlds(path.as_deref(), &bytes).map(|built| (stage, built))
+        });
         let took = started.elapsed();
         let why = match judged {
-            Ok(Ok(stage)) => {
+            Ok(Ok((stage, built))) => {
                 stages[stage] += 1;
+                for (sum, more) in worlds.iter_mut().zip(built) {
+                    *sum += more;
+                }
                 slowest = slowest.max((took, index, bytes.len()));
                 continue;
             }
             Ok(Err(why)) => why,
-            Err(_) => "the loader panicked".to_owned(),
+            Err(_) => "the loader or the world's builder panicked".to_owned(),
         };
         let hex: String = bytes.iter().map(|byte| format!("{byte:02x}")).collect();
         panic!(
@@ -191,7 +215,7 @@ fn judge_all(seed: u64, indices: impl Iterator<Item = u64>) -> Tally {
             bytes.len()
         );
     }
-    (stages, slowest)
+    (stages, worlds, slowest)
 }
 
 fn run(inputs: u64) {
@@ -209,7 +233,7 @@ fn run(inputs: u64) {
     });
     let (took, index, bytes) = tallies
         .iter()
-        .map(|tally| tally.1)
+        .map(|tally| tally.2)
         .max()
         .unwrap_or_default();
     // By the wall clock with the workers side by side: a reading that names an input to look at, not a measure.
@@ -225,6 +249,20 @@ fn run(inputs: u64) {
             "{name} settled {had} in 10,000 verdicts, under its {share}"
         );
     }
+    let worlds = |verdict: usize| tallies.iter().map(|tally| tally.1[verdict]).sum::<u64>();
+    let built = worlds(0) * 10_000 / inputs;
+    println!(
+        "  maps sent on to the world's builder: {} gave {}, {} gave {} ({built} built in 10,000 inputs; at least \
+         {WORLDS_BUILT})",
+        worlds(0),
+        WORLD_VERDICTS[0],
+        worlds(1),
+        WORLD_VERDICTS[1]
+    );
+    assert!(
+        built >= WORLDS_BUILT,
+        "{built} worlds built in 10,000 inputs, under {WORLDS_BUILT}"
+    );
 }
 
 #[cfg(not(debug_assertions))]

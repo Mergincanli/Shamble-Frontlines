@@ -16,7 +16,8 @@ const [corpus, trees, verdicts] = ["content-corpus.txt", "content-trees.txt", "c
 // The dev profile is not optimised: its own limit, far above what it took here (the printed lines).
 const LIMIT_MS = 300_000;
 // The module's memory only grows. Its heaviest input is a bundle at the 8 MiB cap, held three times at once (its
-// files as the test makes them, its text, and the tree the loader reads it into): 49 MiB when this was written.
+// files as the test makes them, its text, and the tree the loader reads it into): 49.2 million bytes (46.9 MiB)
+// when this was written.
 // A backstop against gross growth, and no more: the generator's own inputs set the high-water mark, so a loader
 // that holds twice a string's size ends at the same number (planted by test-engineer). What the loader holds for
 // each input is proven natively, by the counting allocator of crates/devtools/tests/content_fuzz.rs.

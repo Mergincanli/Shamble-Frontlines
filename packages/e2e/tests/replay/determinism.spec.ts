@@ -7,18 +7,21 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { expect, test } from "@playwright/test";
 import { readPlainFile } from "../../../sim-worker/boundary/plain-file.ts";
-import { checkReplayable, firstDifference, readHashes, readRecording } from "../../../sim-worker/src/recording.ts";
+import { checkContent, checkReplayable, firstDifference, readHashes, readRecording } from "../../../sim-worker/src/recording.ts";
 
 const root = fileURLToPath(new URL("../../../..", import.meta.url));
 const recordings = path.join(root, "crates/devtools/recordings");
 const pkg = path.join(root, "packages/sim-worker/pkg");
 const ORIGIN = "http://replay.invalid";
 
-/** The Worker: the bindings' own calls, as the live host makes them, and the shared hash after each step. */
+/**
+ * The Worker: the bindings' own calls, as the live host makes them (the match made on the recording's frozen
+ * content), and the shared hash after each step.
+ */
 const WORKER = `import init, { Sim, tick_hz } from "/sim_wasm.js";
 onmessage = async ({ data }) => {
   await init({ module_or_path: "/sim_wasm_bg.wasm" });
-  const sim = new Sim(Uint8Array.from(data.seed), 0, 0);
+  const sim = new Sim(Uint8Array.from(data.seed), 0, 0, Uint8Array.from(data.content));
   if (data.steps.length > 0) sim.rebase(data.steps[0][0]);
   const hashes = data.steps.map(([now, post, held, p0, p1, p2, p3]) => {
     sim.input(post, held, p0, p1, p2, p3);
@@ -51,7 +54,7 @@ test("every recording replays in the browser's WebAssembly, on the file players 
     return route.fulfill({ status: 404, body: "" });
   });
   await page.goto(`${ORIGIN}/`);
-  const replay = (seed: number[], steps: Step[]): Promise<Outcome> =>
+  const replay = (seed: number[], steps: Step[], content: number[]): Promise<Outcome> =>
     page.evaluate(
       (data) =>
         new Promise<Outcome>((resolve, reject) => {
@@ -60,7 +63,7 @@ test("every recording replays in the browser's WebAssembly, on the file players 
           worker.onerror = (event): void => reject(new Error(event.message));
           worker.postMessage(data);
         }),
-      { seed, steps },
+      { seed, steps, content },
     );
 
   const names = readdirSync(recordings).filter((name) => name.endsWith(".rec"));
@@ -70,19 +73,22 @@ test("every recording replays in the browser's WebAssembly, on the file players 
     const bytes = readPlainFile(recordings, name);
     const recording = readRecording(bytes, 30);
     checkReplayable(recording);
+    // The frozen content beside it is the content its header names, by its sha256 (WebCrypto); the match is made on it.
+    const content = readPlainFile(recordings, name.replace(/\.rec$/, ".content.json"));
+    await checkContent(recording, content);
     const hashes = readHashes(new TextDecoder().decode(readPlainFile(recordings, name.replace(/\.rec$/, ".hashes"))));
     // The hashes file names its recording by digest: it is this recording's.
     const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", Uint8Array.from(bytes)));
     expect(hashes.recordingSha256).toBe(Array.from(digest, (byte) => byte.toString(16).padStart(2, "0")).join(""));
     const expected = hashes.lines;
     const steps = recording.steps.map((step): Step => [step.hostMs, step.post, step.held, ...step.presses]);
-    const got = await replay([...recording.seed], steps);
+    const got = await replay([...recording.seed], steps, [...content]);
     expect(got.tickHz).toBe(recording.tickRate);
     expect(got.hashes).toHaveLength(expected.length);
     expect(firstDifference(expected, got.hashes.map((hash) => BigInt(`0x${hash}`)))).toBeNull();
     // The check can fail, and it names the step: one held button changed in step 46's post is found at step 46.
     const changed = steps.map((step, index): Step => (index === 45 ? [step[0], step[1], step[2] ^ 1, step[3], step[4], step[5], step[6]] : step));
-    const other = await replay([...recording.seed], changed);
+    const other = await replay([...recording.seed], changed, [...content]);
     expect(firstDifference(expected, other.hashes.map((hash) => BigInt(`0x${hash}`)))).toBe(46);
     console.log(`${name}: ${got.hashes.length} steps, every shared hash as in the file, in ${await page.evaluate(() => navigator.userAgent)}`);
   }

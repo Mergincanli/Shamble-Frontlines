@@ -11,6 +11,8 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 client-endpoint = { path = "../client-endpoint" }
+# The constructor reads the match's content bundle (one content set per match: ADR 0005 CD-7).
+content = { path = "../content" }
 protocol = { path = "../protocol" }
 room = { path = "../room" }
 sim = { path = "../sim" }

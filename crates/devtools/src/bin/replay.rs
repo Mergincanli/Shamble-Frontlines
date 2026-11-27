@@ -1,4 +1,6 @@
-//! Replays a recording natively: `cargo run -p devtools --bin replay -- <what> <recording.rec> [...]`.
+//! Replays a recording natively: `cargo run -p devtools --bin replay -- <what> <recording.rec> [...]`. A recording
+//! is replayed on the frozen content beside it, `<name>.content.json` for `<name>.rec`, which must be the content its
+//! header names.
 //!
 //! - `hashes <rec>` prints the hashes file this build gives for it;
 //! - `check <rec> <hashes>` compares this build with a hashes file and exits 1 at the first step that differs;
@@ -15,16 +17,23 @@ use devtools::replay::{replay, state_at};
 fn run(arguments: &[&str]) -> Result<String, String> {
     let read = |path: &str| std::fs::read(path).map_err(|error| format!("{path}: {error}"));
     let recording = |bytes: &[u8]| Recording::decode(bytes).map_err(|error| error.to_string());
+    // The frozen content beside the recording.
+    let content = |rec: &str| match rec.strip_suffix(".rec") {
+        Some(stem) => read(&format!("{stem}.content.json")),
+        None => Err(format!("{rec}: a recording's file name ends in .rec")),
+    };
     match *arguments {
         ["hashes", rec] => {
             let bytes = read(rec)?;
-            let lines = replay(&recording(&bytes)?).map_err(|error| error.to_string())?;
+            let lines =
+                replay(&recording(&bytes)?, &content(rec)?).map_err(|error| error.to_string())?;
             Ok(hashes_text(&bytes, &lines))
         }
         ["check", rec, hashes] => {
             let bytes = read(rec)?;
             let expected = parse_hashes(&bytes, &String::from_utf8_lossy(&read(hashes)?))?;
-            let got = replay(&recording(&bytes)?).map_err(|error| error.to_string())?;
+            let got =
+                replay(&recording(&bytes)?, &content(rec)?).map_err(|error| error.to_string())?;
             let shared = first_difference(&expected, &got, Column::Shared);
             match shared.or_else(|| first_difference(&expected, &got, Column::Whole)) {
                 None => Ok(format!("{} steps, every hash as in the file\n", got.len())),
@@ -44,8 +53,8 @@ fn run(arguments: &[&str]) -> Result<String, String> {
         }
         ["state", rec, tick] => {
             let tick = tick.parse().map_err(|_| format!("{tick} is no tick"))?;
-            let lines =
-                state_at(&recording(&read(rec)?)?, tick).map_err(|error| error.to_string())?;
+            let lines = state_at(&recording(&read(rec)?)?, &content(rec)?, tick)
+                .map_err(|error| error.to_string())?;
             lines.ok_or_else(|| format!("the recording never reaches tick {tick}"))
         }
         _ => {
