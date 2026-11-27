@@ -178,7 +178,7 @@ If the copy is lost: rebuild it from the applied rows plus the plan; never guess
 | 3 | .claude/hooks/routine-guard.test.mjs | Edit: import line and the fake (:18-:97) | IN: 99851dd0 (two edits: :18-:62, then the gh fake's comment pin; the file equals the copy's first 3884 lines) |
 | 4 | .claude/hooks/routine-guard.test.mjs | Edit: the new block appended after :3875 | IN: d21ff347 (the whole file equals the copy; its new tests fail until rows 5-8 are in) |
 | 5 | .claude/hooks/routine-guard.mjs | Edit: the mcp() call at :460 passes the hook input | IN: a9120a17 (the old mcp() ignores the extra argument) |
-| 6 | .claude/hooks/routine-guard.mjs | Edit: :1501-:1593, GUARD-MARK, mcp(), merge check, passAllows | not applied |
+| 6 | .claude/hooks/routine-guard.mjs | Edit: :1501-:1593, GUARD-MARK, mcp(), merge check, passAllows | HALF: 6a IN 3e701b26 (GUARD-MARK and mcp()); 6b NOT applied (merge check, toolchain, passAllows) |
 | 7 | .claude/hooks/routine-guard.mjs | Edit: gh() at :1448-:1458 (needs row 6's definitions) | not applied |
 | 8 | .claude/hooks/guard.mjs | Edit: the allow output | not applied |
 | 9 | .claude/agents/security-auditor.md | Edit: :54 | not applied |
