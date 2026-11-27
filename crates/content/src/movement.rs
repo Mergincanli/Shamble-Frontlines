@@ -35,6 +35,7 @@ pub const FIELDS: [Field; 15] = [
 
 /// One movement table, read and checked.
 #[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(test, derive(ts_rs::TS))]
 pub struct Movement {
     pub id: String,
     pub walk_speed_m_per_s: f64,

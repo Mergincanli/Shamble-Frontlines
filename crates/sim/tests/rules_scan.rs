@@ -692,8 +692,9 @@ const TEST_ITEMS: [&str; 13] = [
     "mod", "fn", "use", "impl", "struct", "enum", "const", "static", "type", "trait", "unsafe", "async", "extern",
 ];
 
-/// For each token, whether it stands in test-only code: the item that follows `#[cfg(test)]`, to its closing brace,
-/// or to its `;` when it has no body. A `#[cfg(test)]` on anything that is no item (a match arm, a field, a
+/// For each token, whether it stands in test-only code: a whole file whose first line is `#![cfg(test)]` (the
+/// content crate's export test of its generated types is one), or the item that follows `#[cfg(test)]`, to its
+/// closing brace, or to its `;` when it has no body. A `#[cfg(test)]` on anything that is no item (a match arm, a field, a
 /// statement) marks nothing: what follows it is read as code the game runs.
 fn in_tests(t: &[Token]) -> Vec<bool> {
     const MARK: [&str; 7] = ["#", "[", "cfg", "(", "test", ")", "]"];
@@ -714,6 +715,11 @@ fn in_tests(t: &[Token]) -> Vec<bool> {
         }
         at
     };
+    // A file that starts with `#![cfg(test)]` is test-only as a whole: the mark on the file itself, to the letter.
+    const FILE_MARK: [&str; 8] = ["#", "!", "[", "cfg", "(", "test", ")", "]"];
+    if (0..FILE_MARK.len()).all(|k| text(k) == FILE_MARK[k]) {
+        return vec![true; t.len()];
+    }
     let mut inside = vec![false; t.len()];
     let mut at = 0;
     while at < t.len() {
@@ -833,7 +839,12 @@ fn the_content_crate_keeps_its_rules() {
 }
 
 #[rustfmt::skip]
-const CONTENT_BITES: [(&str, &str); 17] = [
+const CONTENT_BITES: [(&str, &str); 20] = [
+    // A file is test-only as a whole only by `#![cfg(test)]` itself, at its start: another condition, or the
+    // words further down, mark nothing.
+    ("#![cfg(not(test))]\nfn f(x: Option<u8>) -> u8 { x.unwrap() }", "2: `unwrap`"),
+    ("#![cfg(any(test, debug_assertions))]\nfn f(x: Option<u8>) -> u8 { x.unwrap() }", "2: `unwrap`"),
+    ("fn g() {}\n#![cfg(test)]\nfn f(x: Option<u8>) -> u8 { x.unwrap() }", "3: `unwrap`"),
     ("fn f(x: Option<u8>) -> u8 { Option::unwrap(x) }", "`unwrap`"),
     ("fn f(x: Result<u8, u8>) -> u8 { Result::expect(x, \"it is there\") }", "`expect`"),
     ("fn f(x: Result<u8, u8>) -> u8 { x.unwrap_err() }", "`unwrap_err`"),
@@ -854,7 +865,8 @@ const CONTENT_BITES: [(&str, &str); 17] = [
 ];
 
 #[rustfmt::skip]
-const CONTENT_CONTROLS: [&str; 8] = [
+const CONTENT_CONTROLS: [&str; 9] = [
+    "//! A test-only file, like the export test of the generated types.\n\n#![cfg(test)]\n\nuse std::fs;\nfn f(x: Option<u8>) -> u8 { assert!(x.is_some()); fs::read(\"x\").expect(\"a file\"); x.unwrap() }",
     "#[cfg(test)]\n#[allow(dead_code)]\npub(crate) const X: [u8; 2] = [Some(1_u8).unwrap(), 2];\nfn f() {}",
     "#[cfg(test)]\npub fn g(x: Option<u8>) -> u8 { assert!(x.is_some()); x.unwrap() }\nfn f() {}",
     "fn f(x: Option<u8>) -> u8 { x.unwrap_or(0) }",

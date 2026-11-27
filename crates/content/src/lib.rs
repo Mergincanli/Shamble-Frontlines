@@ -31,6 +31,8 @@ pub mod movement;
 pub mod number;
 pub mod read;
 pub mod time;
+#[cfg(test)]
+mod ts_export;
 pub mod write;
 
 pub use bundle::{ContentSet, Document, load, load_file};

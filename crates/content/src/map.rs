@@ -70,6 +70,7 @@ const GROUNDS: [&str; 2] = ["street", "grass"];
 
 /// One map, read and checked.
 #[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(test, derive(ts_rs::TS))]
 pub struct MapDocument {
     pub id: String,
     pub bounds: Bounds,
@@ -80,6 +81,7 @@ pub struct MapDocument {
 
 /// A box by its lowest and its highest corner, x, y and z.
 #[derive(Debug, Clone, Copy, PartialEq)]
+#[cfg_attr(test, derive(ts_rs::TS))]
 pub struct Bounds {
     pub min: [f64; 3],
     pub max: [f64; 3],
@@ -87,6 +89,7 @@ pub struct Bounds {
 
 /// Where a soldier starts: `at` is the point on the ground between the feet, the soldier's own origin.
 #[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(test, derive(ts_rs::TS))]
 pub struct Spawn {
     pub id: String,
     pub at: [f64; 3],
@@ -95,16 +98,21 @@ pub struct Spawn {
 
 /// A solid piece of the world.
 #[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(test, derive(ts_rs::TS))]
 pub struct Shape {
     pub id: String,
     pub min: [f64; 3],
     pub max: [f64; 3],
+    /// In the file its keys stand beside the others: `type`, and a ramp's `rises_toward`.
+    #[cfg_attr(test, ts(flatten))]
     pub form: Form,
 }
 
 /// What fills a shape's box: all of it, or a wedge that is as high as the box on the side it rises toward and
 /// meets the floor of the box on the other.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(test, derive(ts_rs::TS))]
+#[cfg_attr(test, ts(tag = "type", rename_all = "lowercase"))]
 pub enum Form {
     Box,
     /// A named field, as the file has it (`rises_toward`), so that the generated types can say the same.
@@ -114,15 +122,21 @@ pub enum Form {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(test, derive(ts_rs::TS))]
 pub enum Toward {
+    #[cfg_attr(test, ts(rename = "+x"))]
     PlusX,
+    #[cfg_attr(test, ts(rename = "-x"))]
     MinusX,
+    #[cfg_attr(test, ts(rename = "+z"))]
     PlusZ,
+    #[cfg_attr(test, ts(rename = "-z"))]
     MinusZ,
 }
 
 /// A patch of ground that is only drawn, by its lowest and highest corner in x and z.
 #[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(test, derive(ts_rs::TS))]
 pub struct Region {
     pub id: String,
     pub kind: Ground,
@@ -131,6 +145,8 @@ pub struct Region {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(test, derive(ts_rs::TS))]
+#[cfg_attr(test, ts(rename_all = "lowercase"))]
 pub enum Ground {
     Street,
     Grass,

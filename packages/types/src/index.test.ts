@@ -2,6 +2,7 @@ import { expect, test } from "vitest";
 import * as types from "./index.ts";
 import type { AimPoint, Command, Input, Join, JoinAccepted, JoinRejected, RejectReason } from "./index.ts";
 import type { LayoutCheck, OwnState, Snapshot, SnapshotAck, ViewTime } from "./index.ts";
+import type { Bounds, Ground, MapDocument, Movement, Region, Shape, Spawn, Toward } from "./index.ts";
 
 test("the package exports the layout, its hash and the check", () => {
   expect(Object.keys(types).sort()).toEqual(["BLOCK_BYTES", "BLOCK_LAYOUT", "LAYOUT_HASH", "checkLayoutHash"]);
@@ -52,4 +53,44 @@ test("values of the eleven message types build (their shapes are proven by tsc, 
   expect(accepted.content_hash).toHaveLength(32);
   expect(input.commands[0]?.aim).toBe(aim);
   expect(snapshot.baseline_tick).toBeNull();
+});
+
+// As above: tsc proves the shapes. A content file is JSON, so these are a file's own keys: a shape's `type` and a
+// ramp's `rises_toward` stand beside its corners, and the fixed words are the file's own.
+test("values of the eight content types build as a content file writes them (their shapes are proven by tsc)", () => {
+  const bounds: Bounds = { min: [-32, 0, -24], max: [80, 20, 24] };
+  const spawn: Spawn = { id: "street_1", at: [-20, 0, -0.9], facing_deg: 90 };
+  const toward: Toward = "-z";
+  const box: Shape = { id: "step", min: [30, 0, -10], max: [32, 0.55, -8], type: "box" };
+  const ramp: Shape = { id: "roof", min: [-12, 2.6, -5.8], max: [-5.9, 4.7, -3.6], type: "ramp", rises_toward: toward };
+  // @ts-expect-error a ramp says which side it rises toward
+  const flat: Shape = { id: "roof", min: [0, 0, 0], max: [1, 1, 1], type: "ramp" };
+  // @ts-expect-error a shape is a box or a ramp
+  const wedge: Shape = { id: "roof", min: [0, 0, 0], max: [1, 1, 1], type: "wedge" };
+  // @ts-expect-error a corner has three numbers
+  const thin: Shape = { id: "wall", min: [0, 0], max: [1, 1, 1], type: "box" };
+  const ground: Ground = "street";
+  const region: Region = { id: "corner_street", kind: ground, min: [-32, -2.15], max: [20, 2.15] };
+  const map: MapDocument = { id: "test-scene", bounds, spawns: [spawn], shapes: [box, ramp], regions: [region] };
+  const movement: Movement = {
+    id: "test-soldier",
+    walk_speed_m_per_s: 5,
+    sprint_multiplier: 1.5,
+    speed_up_time_to_90pct_s: 0.2,
+    stop_time_to_10pct_s: 0.2,
+    air_control_pct: 100,
+    body_radius_m: 0.5,
+    jump_reach_m: 3,
+    gravity_m_per_s2: 20,
+    step_up_m: 0.5,
+    sprint_time_from_full_s: 6,
+    stamina_refill_time_s: 4,
+    sprint_returns_at_pct: 25,
+    push_strength_per_s: 10,
+    push_radius_m: 0.5,
+    ads_speed_multiplier: 0.5,
+  };
+  expect(map.shapes.map((shape) => shape.type)).toEqual(["box", "ramp"]);
+  expect([flat.type, wedge.id, thin.min.length]).toEqual(["ramp", "roof", 2]);
+  expect(Object.keys(movement)).toHaveLength(16);
 });
