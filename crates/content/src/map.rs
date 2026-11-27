@@ -394,6 +394,11 @@ pub fn check(map: &MapDocument) -> Result<(), Error> {
     )
 }
 
+/// A valid map file's text in canonical form with made-up sizes, for this crate's tests and the tools' (never a
+/// content file: no value of the game rests on it). Its id is the one local play asks for, `test-scene`, so a bundle
+/// made of it (`bundle::test_bundle`) serves every caller that replays no committed recording.
+pub const TEST_TEXT: &str = "{\n  \"bounds\": {\n    \"max\": [\n      50,\n      20,\n      50\n    ],\n    \"min\": [\n      -50,\n      0,\n      -50\n    ]\n  },\n  \"format\": \"shamble-map\",\n  \"id\": \"test-scene\",\n  \"regions\": [],\n  \"shapes\": [\n    {\n      \"id\": \"step\",\n      \"max\": [\n        1,\n        0.55,\n        1\n      ],\n      \"min\": [\n        0,\n        0,\n        0\n      ],\n      \"type\": \"box\"\n    }\n  ],\n  \"spawns\": [\n    {\n      \"at\": [\n        0,\n        0,\n        -5\n      ],\n      \"facing_deg\": 90,\n      \"id\": \"a\"\n    }\n  ],\n  \"version\": 1\n}\n";
+
 #[cfg(test)]
 pub(crate) mod tests {
     use super::*;

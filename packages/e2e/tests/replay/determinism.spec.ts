@@ -7,7 +7,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { expect, test } from "@playwright/test";
 import { readPlainFile } from "../../../sim-worker/boundary/plain-file.ts";
-import { checkReplayable, firstDifference, readHashes, readRecording } from "../../../sim-worker/src/recording.ts";
+import { checkContent, checkReplayable, firstDifference, readHashes, readRecording } from "../../../sim-worker/src/recording.ts";
 
 const root = fileURLToPath(new URL("../../../..", import.meta.url));
 const recordings = path.join(root, "crates/devtools/recordings");
@@ -70,6 +70,8 @@ test("every recording replays in the browser's WebAssembly, on the file players 
     const bytes = readPlainFile(recordings, name);
     const recording = readRecording(bytes, 30);
     checkReplayable(recording);
+    // The frozen content beside it is the content its header names, by its sha256 (WebCrypto).
+    await checkContent(recording, readPlainFile(recordings, name.replace(/\.rec$/, ".content.json")));
     const hashes = readHashes(new TextDecoder().decode(readPlainFile(recordings, name.replace(/\.rec$/, ".hashes"))));
     // The hashes file names its recording by digest: it is this recording's.
     const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", Uint8Array.from(bytes)));

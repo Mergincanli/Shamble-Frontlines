@@ -9,18 +9,25 @@ use devtools::compare::{Column, first_difference};
 use devtools::files::read_plain;
 use devtools::recording::{Recording, parse_hashes};
 use devtools::replay::{Replay, replay};
-use devtools::scripts::{first_loop, looped};
+use devtools::scripts::{Content, first_loop, looped};
 
 #[test]
 fn two_matches_stepped_in_turn_each_give_their_own_hashes() {
-    let (first, second) = (first_loop(), looped("second-loop", 1_500, 5));
-    let alone = [&first, &second].map(|recording| replay(recording).expect("it replays"));
+    // Both play on the first recording's frozen content.
+    let folder = Path::new(env!("CARGO_MANIFEST_DIR")).join("recordings");
+    let bundle = read_plain(&folder, "first-loop.content.json").expect("the frozen content");
+    let content = Content::of(&bundle, "test-scene");
+    let (first, second) = (
+        first_loop(&content),
+        looped("second-loop", 1_500, 5, &content),
+    );
+    let alone = [&first, &second].map(|recording| replay(recording, &bundle).expect("it replays"));
     // The two are different matches: their hashes differ in both columns from the first step with a command.
     for column in [Column::Shared, Column::Whole] {
         assert!(first_difference(&alone[0], &alone[1], column).is_some());
     }
-    let mut a = Replay::new(&first).expect("it replays");
-    let mut b = Replay::new(&second).expect("it replays");
+    let mut a = Replay::new(&first, &bundle).expect("it replays");
+    let mut b = Replay::new(&second, &bundle).expect("it replays");
     let mut together = [Vec::new(), Vec::new()];
     // In turn, and unevenly: one step of the first, then up to two of the second.
     for round in 0..1_800u32 {
@@ -36,7 +43,6 @@ fn two_matches_stepped_in_turn_each_give_their_own_hashes() {
         }
     }
     // And the first of them is the committed recording: its hashes are the file's.
-    let folder = Path::new(env!("CARGO_MANIFEST_DIR")).join("recordings");
     let bytes = read_plain(&folder, "first-loop.rec").expect("the committed recording");
     assert_eq!(Recording::decode(&bytes).as_ref(), Ok(&first));
     let hashes = read_plain(&folder, "first-loop.hashes").expect("its hashes file");

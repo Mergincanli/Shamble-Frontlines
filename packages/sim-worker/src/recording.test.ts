@@ -1,24 +1,30 @@
 import { expect, test } from "vitest";
 import type { Sim } from "../pkg/sim_wasm.js";
-import { checkReplayable, firstDifference, readHashes, readRecording, replayOn, STEP_BYTES, type Replayable } from "./recording.ts";
+import { checkContent, checkReplayable, firstDifference, readHashes, readRecording, replayOn, STEP_BYTES, type Replayable } from "./recording.ts";
 
 // The players' own type is what a replay drives: when its `input` takes more numbers, this line stops compiling
 // until `Replayable` and `replayStep` pass them. Types only: no test here needs the built file.
 export const players: (sim: Sim) => Replayable = (sim) => sim;
 
 const HEADER_BYTES = 87;
+/** The map a replayable recording names: its header is this many bytes longer, and its steps start at `STEPS_AT`. */
+const MAP_ID = "test-scene";
+const STEPS_AT = HEADER_BYTES + MAP_ID.length;
 
-/** A recording's bytes, written here by hand from the format's text: three steps, no map. */
-function bytesOf(change: (view: DataView, bytes: Uint8Array) => void = () => {}, steps = 3): Uint8Array {
-  const bytes = new Uint8Array(HEADER_BYTES + steps * STEP_BYTES);
+/** A recording's bytes, written here by hand from the format's text: three steps, no content, no map unless given. */
+function bytesOf(change: (view: DataView, bytes: Uint8Array) => void = () => {}, steps = 3, mapId = ""): Uint8Array {
+  const header = HEADER_BYTES + mapId.length;
+  const bytes = new Uint8Array(header + steps * STEP_BYTES);
   const view = new DataView(bytes.buffer);
   bytes.set(new TextEncoder().encode("SHMBLREC"), 0);
   view.setUint16(8, 1, true);
   bytes.set(new TextEncoder().encode("TESTSEEDunit"), 10);
   view.setUint16(48, 30, true);
-  view.setUint32(HEADER_BYTES - 4, steps, true);
+  view.setUint8(82, mapId.length);
+  bytes.set(new TextEncoder().encode(mapId), 83);
+  view.setUint32(header - 4, steps, true);
   for (let index = 0; index < steps; index += 1) {
-    const at = HEADER_BYTES + index * STEP_BYTES;
+    const at = header + index * STEP_BYTES;
     view.setFloat64(at, 100 + 33.5 * index, true);
     view.setUint32(at + 8, 7 + index, true);
     view.setUint32(at + 12, 0x8001, true);
@@ -28,6 +34,17 @@ function bytesOf(change: (view: DataView, bytes: Uint8Array) => void = () => {},
   change(view, bytes);
   return bytes;
 }
+
+/** A recording this build replays: its header names content (a made-up hash) and a map. */
+const replayable = (change: (view: DataView, bytes: Uint8Array) => void = () => {}, steps = 3): Uint8Array =>
+  bytesOf(
+    (view, bytes) => {
+      bytes.fill(0xc4, 50, 82);
+      change(view, bytes);
+    },
+    steps,
+    MAP_ID,
+  );
 
 test("a recording's bytes read as the format says", () => {
   const recording = readRecording(bytesOf(), 30);
@@ -127,7 +144,7 @@ test("a replay makes the live host's calls in the live host's order, and refuses
       return hash;
     },
   };
-  expect(replayOn(sim, readRecording(bytesOf(undefined, 2), 30))).toEqual([1n, 2n]);
+  expect(replayOn(sim, readRecording(replayable(undefined, 2), 30))).toEqual([1n, 2n]);
   expect(calls).toEqual([
     "rebase 100",
     "input 7 32769 67305985 0 0 4278190080",
@@ -137,30 +154,45 @@ test("a replay makes the live host's calls in the live host's order, and refuses
     "step 133.5",
     "shared_hash",
   ]);
-  const cannot = (change: (view: DataView, bytes: Uint8Array) => void): string => {
+  const why = (bytes: Uint8Array): string => {
     try {
-      checkReplayable(readRecording(bytesOf(change), 30));
+      checkReplayable(readRecording(bytes, 30));
     } catch (error) {
       return error instanceof Error ? error.message : String(error);
     }
     return "replayable";
   };
+  const cannot = (change: (view: DataView, bytes: Uint8Array) => void): string => why(replayable(change));
   const start = "this build cannot replay this recording's ";
   expect(cannot(() => {})).toBe("replayable");
   // A recording built in memory with a seed that is no test seed, and one with a move: `replayOn` refuses both
   // before it makes a call.
   const before = calls.length;
-  const read = readRecording(bytesOf((view) => view.setUint32(HEADER_BYTES + 32, 1, true)), 30);
+  const read = readRecording(replayable((view) => view.setUint32(STEPS_AT + 32, 1, true)), 30);
   expect(() => replayOn(sim, read)).toThrow(`${start}move: the input call does not take it yet`);
   expect(() => replayOn(sim, { ...read, seed: new Uint8Array(32).fill(7) })).toThrow(`${start}seed: a replay takes a public test seed only`);
   expect(calls).toHaveLength(before);
   expect(cannot((view) => view.setUint32(42, 1, true))).toBe(`${start}start tick: a match starts at tick 0`);
   expect(cannot((view) => view.setUint16(46, 1, true))).toBe(`${start}first command sequence: a match starts at sequence 0`);
-  expect(cannot((view) => view.setUint8(81, 1))).toBe(`${start}content: this build takes none`);
-  expect(cannot((view) => view.setUint32(HEADER_BYTES + 32, 1, true))).toBe(`${start}move: the input call does not take it yet`);
-  expect(cannot((view) => view.setUint32(HEADER_BYTES + 2 * STEP_BYTES + 56, 1, true))).toBe(`${start}aim: the input call does not take it yet`);
-  expect(cannot((view) => view.setUint32(HEADER_BYTES + 60, 1, true))).toBe(`${start}view time: the input call does not take it yet`);
-  expect(cannot((view) => view.setUint32(HEADER_BYTES + 64, 1, true))).toBe(`${start}view time: the input call does not take it yet`);
+  // A header that names no content, or no map, is refused: a match runs on both.
+  const none = `${start}content: its header names none (a match runs on content and a map)`;
+  expect(cannot((_, bytes) => bytes.fill(0, 50, 82))).toBe(none);
+  expect(why(bytesOf((_, bytes) => bytes.fill(0xc4, 50, 82)))).toBe(none);
+  expect(why(bytesOf(() => {}, 3, MAP_ID))).toBe(none);
+  expect(cannot((view) => view.setUint32(STEPS_AT + 32, 1, true))).toBe(`${start}move: the input call does not take it yet`);
+  expect(cannot((view) => view.setUint32(STEPS_AT + 2 * STEP_BYTES + 56, 1, true))).toBe(`${start}aim: the input call does not take it yet`);
+  expect(cannot((view) => view.setUint32(STEPS_AT + 60, 1, true))).toBe(`${start}view time: the input call does not take it yet`);
+  expect(cannot((view) => view.setUint32(STEPS_AT + 64, 1, true))).toBe(`${start}view time: the input call does not take it yet`);
+});
+
+test("the content a replay is given is the one its recording's header names, by its sha256", async () => {
+  const bundle = new TextEncoder().encode("a bundle's bytes");
+  const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", bundle));
+  const named = readRecording(bytesOf((_, bytes) => bytes.set(digest, 50), 3, MAP_ID), 30);
+  await expect(checkContent(named, bundle)).resolves.toBeUndefined();
+  const other = "the content is not the recording's: its sha256 is not the content hash the header names";
+  await expect(checkContent(named, new TextEncoder().encode("a bundle's bytez"))).rejects.toThrow(other);
+  await expect(checkContent(named, new Uint8Array(0))).rejects.toThrow(other);
 });
 
 test("the first difference is the first step whose shared hash differs, or that one side lacks", () => {

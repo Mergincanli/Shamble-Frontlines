@@ -37,28 +37,29 @@ fn read_recording(bytes: &[u8]) -> Result<Recording, String> {
     Recording::decode(bytes).map_err(|error| format!("error: {error}"))
 }
 
-/// The hashes file this module gives for a recording, both columns: the same runner as the native one, compiled to
-/// WebAssembly. The whole-state column is why it lives here and not on the players' file, which gives the shared
-/// hash only.
+/// The hashes file this module gives for a recording on `bundle`, the content its header names, both columns: the
+/// same runner as the native one, compiled to WebAssembly. The whole-state column is why it lives here and not on
+/// the players' file, which gives the shared hash only.
 #[wasm_bindgen]
 #[must_use]
-pub fn replay_hashes(recording: &[u8]) -> String {
+pub fn replay_hashes(recording: &[u8], bundle: &[u8]) -> String {
     let replayed = read_recording(recording)
-        .and_then(|read| replay(&read).map_err(|error| format!("error: {error}")));
+        .and_then(|read| replay(&read, bundle).map_err(|error| format!("error: {error}")));
     match replayed {
         Ok(lines) => hashes_text(recording, &lines),
         Err(why) => why,
     }
 }
 
-/// The vector file's text for `tick` as this module gives it (`files::vector_text`): the state as lines, one named
-/// field each (the seed is never among them), then the shared state's bytes and their hash. Compared line by line
-/// with the native text, it shows which fields two targets disagree on.
+/// The vector file's text for `tick` as this module gives it (`files::vector_text`), the recording replayed on
+/// `bundle`: the state as lines, one named field each (the seed is never among them), then the shared state's bytes
+/// and their hash. Compared line by line with the native text, it shows which fields two targets disagree on.
 #[wasm_bindgen]
 #[must_use]
-pub fn replay_state_at(recording: &[u8], tick: u32) -> String {
-    let text = read_recording(recording)
-        .and_then(|read| vector_text(&read, tick).map_err(|error| format!("error: {error}")));
+pub fn replay_state_at(recording: &[u8], bundle: &[u8], tick: u32) -> String {
+    let text = read_recording(recording).and_then(|read| {
+        vector_text(&read, bundle, tick).map_err(|error| format!("error: {error}"))
+    });
     text.unwrap_or_else(|why| why)
 }
 

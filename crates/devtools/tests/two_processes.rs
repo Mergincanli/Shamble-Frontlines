@@ -15,7 +15,7 @@ use devtools::compare::{Column, first_difference};
 use devtools::files::read_plain;
 use devtools::recording::{Recording, TickHashes, parse_hashes};
 use devtools::replay::replay;
-use devtools::scripts::{RECORDINGS, looped};
+use devtools::scripts::{Content, RECORDINGS, looped};
 
 /// The variable that, with the parent's own arguments, makes a run of this program a child.
 const ROLE: &str = "SHAMBLE_TWO_PROCESSES_CHILD";
@@ -30,10 +30,19 @@ fn child_report() -> String {
     use std::fmt::Write;
     let fingerprint = RandomState::new().hash_one(0x5348_4D42u32);
     let mut report = format!("\n{LINE}fingerprint {fingerprint:016x}\n");
-    let long = looped(LONG.0, LONG.1, 9);
-    let scripted = RECORDINGS.iter().map(|(name, script)| (*name, script()));
-    for (name, recording) in scripted.chain([(LONG.0, long)]) {
-        for step in replay(&recording).expect("it replays") {
+    // Every recording on its own frozen content; the long match on the first one's.
+    let folder = Path::new(env!("CARGO_MANIFEST_DIR")).join("recordings");
+    let frozen = |name: &str| {
+        read_plain(&folder, &format!("{name}.content.json")).expect("the frozen content")
+    };
+    let first = frozen("first-loop");
+    let long = looped(LONG.0, LONG.1, 9, &Content::of(&first, "test-scene"));
+    let scripted = RECORDINGS.iter().map(|(name, map_id, script)| {
+        let bundle = frozen(name);
+        (*name, script(&Content::of(&bundle, map_id)), bundle)
+    });
+    for (name, recording, bundle) in scripted.chain([(LONG.0, long, first.clone())]) {
+        for step in replay(&recording, &bundle).expect("it replays") {
             let (tick, shared, whole) = (step.tick, step.shared, step.whole);
             // Writing into a `String` cannot fail.
             let _ = writeln!(report, "{LINE}{name} {tick} {shared:016x} {whole:016x}");
@@ -95,7 +104,7 @@ fn two_more_processes_give_the_same_hashes_as_each_other_and_as_the_files() {
         "not valid: the two processes did not differ in their hash-map state"
     );
     // Step for step, in both columns: the two children agree, and the first step that differs is named.
-    let names = RECORDINGS.iter().map(|(name, _)| *name).chain([LONG.0]);
+    let names = RECORDINGS.iter().map(|(name, _, _)| *name).chain([LONG.0]);
     for name in names {
         let (a, b) = (steps_of(&one, name), steps_of(&two, name));
         for column in [Column::Shared, Column::Whole] {

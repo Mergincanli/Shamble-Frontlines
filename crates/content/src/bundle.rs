@@ -250,10 +250,36 @@ pub fn write(files: &[(&str, &str)]) -> String {
     ])))
 }
 
+/// The test bundle: the two kinds' test files (`map::TEST_TEXT`, whose map is `test-scene`, and
+/// `movement::TEST_TEXT`), for the crates' tests and the tools' (never content: no value of the game rests on it).
+/// It is the one bundle every caller passes that replays no committed recording; a committed recording replays on
+/// the frozen bundle its header names.
+#[must_use]
+pub fn test_bundle() -> String {
+    write(&[
+        ("maps/test-scene.json", crate::map::TEST_TEXT),
+        ("movement/test-soldier.json", crate::movement::TEST_TEXT),
+    ])
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::movement::TEST_TEXT;
+
+    #[test]
+    fn the_test_bundle_loads_and_holds_the_map_local_play_asks_for() {
+        let set = load(test_bundle().as_bytes()).expect("the test bundle loads");
+        assert_eq!(set.map("test-scene").map(|map| map.shapes.len()), Some(1));
+        assert!(set.movement("test-soldier").is_some());
+        // Its map file is in canonical form: the loader would refuse it otherwise, and a file holds it as it is.
+        assert_eq!(
+            crate::write::canonical(
+                &crate::json::parse(crate::map::TEST_TEXT.as_bytes()).expect("the test map parses")
+            ),
+            crate::map::TEST_TEXT
+        );
+    }
 
     fn kind_of(bundle: &str) -> Kind {
         load(bundle.as_bytes()).expect_err("refused").kind

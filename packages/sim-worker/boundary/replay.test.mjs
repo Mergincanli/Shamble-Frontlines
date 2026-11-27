@@ -2,14 +2,15 @@
 // on the file players get, every committed recording replays to its hashes file's shared column through the
 // bindings' own calls; on the test-only module, the same runner as the native one gives the whole hashes file and the
 // state at the vector's tick, byte for byte the committed text. Like the other boundary tests it needs the build and
-// never skips. The recordings are read from disk when the test runs.
+// never skips. The recordings are read from disk when the test runs, each with the frozen content its header names
+// (`<name>.content.json`).
 import { createHash } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
 import { expect, test } from "vitest";
 import * as dev from "../../../.gate/rules-module/dev/devtools.js";
 import * as release from "../../../.gate/rules-module/release/devtools.js";
 import { initSync, Sim, tick_hz } from "../pkg/sim_wasm.js";
-import { firstDifference, readHashes, readRecording, replayOn, replayStep } from "../src/recording.ts";
+import { checkContent, firstDifference, readHashes, readRecording, replayOn, replayStep } from "../src/recording.ts";
 import { readPlainFile } from "./plain-file.ts";
 
 // The committed recordings, each read only when it is a plain file in a plain folder (plain-file.ts).
@@ -23,25 +24,30 @@ const modules = [["release", release], ["dev", dev]].map(([profile, glue]) => {
   return [profile, glue];
 });
 
-/** A committed recording, read and checked against its hashes file's first line. */
+/** A committed recording, read and checked against its hashes file's first line, with its frozen content. */
 function committed(name) {
   const bytes = file(`${name}.rec`);
   const hashes = readHashes(file(`${name}.hashes`).toString("utf8"));
   expect(hashes.recordingSha256).toBe(createHash("sha256").update(bytes).digest("hex"));
-  return { bytes, recording: readRecording(bytes, tick_hz()), expected: hashes.lines };
+  return { bytes, recording: readRecording(bytes, tick_hz()), expected: hashes.lines, content: file(`${name}.content.json`) };
 }
 
 test("the manifest lists every recording's files with their length and digest, and there is at least one", () => {
   expect(names).toContain("first-loop");
   const manifest = file("manifest.txt").toString("utf8");
-  for (const name of names.flatMap((name) => [`${name}.rec`, `${name}.hashes`, `${name}.vector.txt`])) {
+  for (const name of names.flatMap((name) => [`${name}.content.json`, `${name}.rec`, `${name}.hashes`, `${name}.vector.txt`])) {
     const bytes = file(name);
     expect(manifest).toContain(`${name}: bytes ${bytes.length}  sha256 ${createHash("sha256").update(bytes).digest("hex")}\n`);
   }
 });
 
-test.each(names)("%s replays on the players' file to its hashes file, step for step", (name) => {
-  const { recording, expected } = committed(name);
+test.each(names)("%s replays on the players' file to its hashes file, step for step", async (name) => {
+  const { recording, expected, content } = committed(name);
+  // The frozen content beside it is the content its header names; any other bundle is refused before a match exists.
+  await checkContent(recording, content);
+  const other = Uint8Array.from(content);
+  other[other.length - 2] ^= 1;
+  await expect(checkContent(recording, other)).rejects.toThrow("the content is not the recording's: its sha256 is not the content hash the header names");
   const sim = new Sim(recording.seed, 0, 0);
   const got = replayOn(sim, recording);
   expect(got).toHaveLength(recording.steps.length);
@@ -93,19 +99,22 @@ test("two matches on one module instance, stepped in turn, each give the hashes 
 test.each(modules)("the test-only module, %s profile, gives the committed hashes and the state at the vector's tick", (_, glue) => {
   for (const name of names) {
     const bytes = file(`${name}.rec`);
+    const content = file(`${name}.content.json`);
     // Both columns: the whole state's hash too, which the players' file never gives.
-    expect(glue.replay_hashes(bytes)).toBe(file(`${name}.hashes`).toString("utf8"));
+    expect(glue.replay_hashes(bytes, content)).toBe(file(`${name}.hashes`).toString("utf8"));
     // The state field by field and its shared bytes (the word-size vector): the same text as the native one.
-    expect(glue.replay_state_at(bytes, VECTOR_TICK)).toBe(file(`${name}.vector.txt`).toString("utf8"));
-    expect(glue.replay_state_at(bytes, 0)).toContain("tick = 0\nplayer.buttons = 0\n");
-    expect(glue.replay_state_at(bytes, 4_000_000)).toBe("error: the recording never reaches tick 4000000");
+    expect(glue.replay_state_at(bytes, content, VECTOR_TICK)).toBe(file(`${name}.vector.txt`).toString("utf8"));
+    expect(glue.replay_state_at(bytes, content, 0)).toContain("tick = 0\nplayer.buttons = 0\n");
+    expect(glue.replay_state_at(bytes, content, 4_000_000)).toBe("error: the recording never reaches tick 4000000");
   }
-  // What is no recording comes back as a reason, never a trap.
-  expect(glue.replay_hashes(new Uint8Array(5))).toBe("error: the bytes end inside the recording's header");
+  // What is no recording, or content that is not the recording's, comes back as a reason, never a trap.
+  const content = file("first-loop.content.json");
+  expect(glue.replay_hashes(new Uint8Array(5), content)).toBe("error: the bytes end inside the recording's header");
   const real = Uint8Array.from(file("first-loop.rec"));
+  expect(glue.replay_hashes(real, new Uint8Array(0))).toBe("error: the content is not the recording's: its sha256 is not the content hash the header names");
   real.set(new TextEncoder().encode("REALSEED"), 10);
-  expect(glue.replay_hashes(real)).toContain("error: the seed does not start with TESTSEED");
-  expect(glue.replay_state_at(real, 1)).toContain("error: the seed does not start with TESTSEED");
+  expect(glue.replay_hashes(real, content)).toContain("error: the seed does not start with TESTSEED");
+  expect(glue.replay_state_at(real, content, 1)).toContain("error: the seed does not start with TESTSEED");
 });
 
 test("the state hash's cost in WebAssembly is read and printed (PM-0004-21's report: a reading)", () => {
