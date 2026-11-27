@@ -252,3 +252,43 @@ call, git and gh first; no test, cargo, gate, mutant or plant run; no git variab
   since f1b46682), mergeable true, mergeable_state "blocked" (draft and protection), not "dirty".
 - The PR's final head will need its own CI before any close, since [skip ci] saves get none. That is noted for the
   close, not for this read.
+
+## Verdict on the pushed head (fix f1b466825e8caf9b86aa8a626ac0786d4fba230d in save 1d4e81a69cc06a182cea99232bd3bb02a8a4d49c)
+**APPROVE WITH FINDINGS.** Critical 0, High 0, Medium 0, Low 2.
+- Every item of my round-1 ruling is in the commit.
+- SEC-UM4-1 is fixed at both layers. Its proof is red first by name, with each helper site restored alone and each
+  mutant killed on the right assert, and the vulnerable runs touched only scratch victims.
+- CI is green on the pushed save.
+
+Findings:
+- **UM4H2-1 (Low):** the commit message's "repo map OK" has no kept log. The result cannot differ, since no file was
+  added, moved or deleted. The report says "printed, not kept"; no push.
+- **UM4H2-2 (Low, robustness, not security):** the refs step reads with the inherited env.
+  - check.mjs:2730 runs `git ls-files -z` in ROOT with the inherited env. Under an exported GIT_DIR it would read that
+    repository's list.
+  - Mostly that ends in a loud exit 2 (a listed path missing under ROOT throws; check.mjs:2808-2809). A wrong result is
+    possible only in contrived cases, such as a worktree's GIT_DIR from a hook.
+  - Nothing is written.
+  - Folded into UM4R-2's STATUS follow-up, which now reads: the redact and refs steps get `withoutGitVars`, pinned, when
+    next touched.
+
+- **UM-4 closes:** yes, on this head.
+  - Left: the report (um4-report.md) with UM4H2-1's wording, "+88 against an estimate of +45 to 60", and the carries:
+    T-3, UM4R-2 widened by UM4H2-2, T-5 to infra-engineer after the close, and the security seat's memory line.
+- **SEC-UM4-1 and PR #40's closing list:** it does NOT go on the list.
+  - It is fixed in the PR, both halves, as proven above.
+  - advisor.md step 4 counts a security finding as left open only when it is "not fixed in the PR". The same holds for
+    SEC-UM4-2 and SEC-UM4-3, both fixed.
+  - UM4R-2 and UM4H2-2 are robustness follow-ups: nothing is written and nothing passes wrongly. They are not security
+    findings left open.
+  - The list stays as it is: SEC-U6B-3, SEC-U6C-R2-1, SEC-U6C-R2-2 and U6c's page-host item.
+
+## Decisions needed
+- None. OPS-GIT-ENV-B never arose: all three helper sites stayed at 0 net (numstat 1 1 and 2 2), so U8 is at 6,282 of
+  its 6,284 stop.
+
+## For Mustafa
+- Nothing. (Already told in round 1, for his reading: a line rewritten in place at 0 net does not pass his stop. That
+  reading is what kept OPS-GIT-ENV-B from arising.)
+
+Status: COMPLETE 2026-11-27 21:13 UTC
