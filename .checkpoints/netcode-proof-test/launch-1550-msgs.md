@@ -144,8 +144,15 @@ B's form (advisor-u8-f1-head.md block 4), each its own call:
   /home/user/Shamble-Frontlines/.claude/worktrees/agent-a7fe1b9f436f36bb1` (no output, no refusal); `ls -d` of the path:
   "No such file or directory"; `git worktree list --porcelain` no longer names it; df 8,037 MiB free.
 
+- NB DONE 14:16 (advisor-nb2b-merge.md, last line "Status: COMPLETE 2026-11-27T14:16Z"): APPROVE WITH CONDITIONS
+  NB2B-1 to -11 (2 Medium, 9 Low); Q4: MAIN-69, then UM-4, then the merge.
+- Usage after the four resumes: 0.83 at 14:16, 0.86 at 14:19 (0.52 at 13:56; resetsAt 1795794600, 15:50 UTC). By his
+  13:55 item 1's limit, no no-save stretch (F1, MAIN-69, UM-4, NB2-ONEWAY) starts before the reset.
+
 ## C: a2b7636a57dff4206 (resumed; it checked MAIN-68's plans: advisor-main-68b.md): the check of MAIN-69's plan
 Into the seat B and D freed (NB still running: 2 agents at once). Sent 14:14 UTC (resumed: "Resuming agent a2b7636").
+DONE 14:19 (advisor-main-69.md, last line "Status: COMPLETE 2026-11-27T14:19Z"): APPROVE WITH CONDITIONS M69-1 to
+M69-6, all Low, applied word for word as main-69-plan.md rev 0.2.
 The check of MAIN-69's plan (main-69-plan.md): taking main b8f02b0 (#78 ci-time) into the lane.
 As the advisor (main's .claude/agents/advisor.md, by `git show origin/main:.claude/agents/advisor.md`; read only, no
 cargo, no git write), check .checkpoints/netcode-proof-test/main-69-plan.md, a delta on main-68-plan.md rev 4 as you

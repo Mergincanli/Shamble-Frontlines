@@ -1,11 +1,56 @@
-# MAIN-69: take main b8f02b0 (#78 ci-time) into the lane: the plan (rev 0.1, DRAFT)
-Status: DRAFT, 2026-11-27 14:1x UTC, for the advisor agent's check (C a2b7636a57dff4206, the seat that checked MAIN-68's
-plans: advisor-main-68b.md), in the first seat that frees (at most 3 agents at once). Nothing below runs before that
-check. A delta on main-68-plan.md rev 4: its steps, forms and stop rules hold except where this file differs.
+# MAIN-69: take main b8f02b0 (#78 ci-time) into the lane: the plan (rev 0.2, as checked)
+Status: AS CHECKED 14:19 UTC: APPROVE WITH CONDITIONS M69-1 to M69-6, all Low, for main's tip
+b8f02b0149cc928964e54e194cd9c4d68f52bd94 (advisor-main-69.md, last line "Status: COMPLETE 2026-11-27T14:19Z"; it checked
+rev 0.1, sha256 3c54354c…dbb). The conditions stand below word for word and govern wherever the steps differ. The
+answers: Q1 yes (the light run, no whole check.mjs run); Q2 yes (no guard tests); Q3 keep the plain `git merge
+origin/main`, the checks after git's own commit (`--no-commit` would make the guard ask him: routine-guard.mjs:1425-1428
+passes only the plain and `--ff-only` forms); Q4 yes, step 7 may ride B's or NB's seat (both advisor agents), never D;
+Q5 no screenshot. On record: ADV-M69-0 (C's earlier `--quiet` reads re-read by `--name-only`, all hold) and ADV-M69-7
+(the light recipe's `--quiet` bars become `--name-only` when its conditions are next applied).
+Rev 0.1 was the main session's draft (14:1x UTC), checked by C a2b7636a57dff4206. A delta on main-68-plan.md rev 4: its
+steps, forms and stop rules hold except where this file differs.
+
+## As checked: M69-1 to M69-6 (advisor-main-69.md, "Conditions (paste-ready)"), word for word
+- **M69-1 (Low): the whole-tree bars, at step 5 after the content checks, each alone, in printing forms:**
+  - `git diff --name-only origin/main HEAD -- . ':(exclude)spikes/' ':(exclude).checkpoints/' ':(exclude)docs/'`
+    prints nothing;
+  - `git diff --name-only origin/main HEAD -- docs/` prints the usual six names (DECISIONS.md, REPO_MAP.md, STATUS.md,
+    STATUS_ARCHIVE.md, design/netcode-proof-messages.md, design/ws-reconnect.md);
+  - `git diff --name-only H0 HEAD -- spikes/ docs/design/ .checkpoints/` prints nothing.
+
+  These are MAIN-66's C1 (c). They prove "PR #40's diff against main holds no .github/ path".
+- **M69-2 (Low): step 7's baseline.** It is main's toolchain run 46011355903, job 140547396571, compared line for line as
+  M67-3 gives it (the `test result:` lines, the vitest `Test Files` and `Tests` lines, every Playwright "passed" line).
+  Its lines should also equal job 140114848934's: #78 changes only the time limit. #74's two pull-request steps keep rev
+  4's step-6 bar. Record the toolchain job's run time beside the 25-minute limit.
+- **M69-3 (Low): a move of main found at step 1.** P-2 and TAKEIN-CODE (b) apply with "the same conflicts" read as
+  none: step 1's anchor bar (one tree line, no CONFLICT line) must still hold. A move that brings any conflict stops
+  before step 2 for a check.
+  - Under TAKEIN-CODE (b), "reviewed and merged on main" is read from the merge's message or report: it names the
+    advisor agent's approval of the merged head and his go. Without that, the move stops before step 2.
+  - Each move taken in by (b) or by P-2 (a) gets one line to him naming its pull requests. The advisor's read of the
+    pushed head stays.
+- **M69-4 (Low): the resume line (C5 (a)), word for word.**
+
+  "MAIN-69 approved (advisor-main-69.md), running steps 1-7 for main b8f02b0149cc928964e54e194cd9c4d68f52bd94; usage at
+  step 1: <figure>, <go or no-go>. If `ls -d /home/user/Shamble-Frontlines/.git/MERGE_HEAD` lists the file, a merge
+  stopped in progress: no save, no `git merge --abort`, no reset; the advisor rules. If `git rev-parse HEAD^2` prints
+  b8f02b0149cc928964e54e194cd9c4d68f52bd94 and `git ls-remote origin refs/heads/claude/netcode-proof-test-plan-hcky5g`
+  prints another SHA than `git rev-parse HEAD`, resume at step 5. advisor-main-69.md and this card may show unstaged:
+  leave them; step 6's card save takes them. Anything else: the advisor rules."
+- **M69-5 (Low): no `--quiet` bar.** Every bar this take-in inherits from rev 4 in a `--quiet` form runs as
+  `--name-only` and must print nothing. This means step 6's DEP-HOLD line (C68B-3), in its own call: `git diff
+  --name-only origin/main HEAD -- Cargo.lock Cargo.toml crates packages package.json package-lock.json` prints nothing.
+  Its control is step 5's six-path line.
+- **M69-6 (Low): "Why" cites his words.** history.md:2055-2057, word for word there: "Take main in when main changes
+  code, CI or rules". The main session's reading at :2082-2086 may stand beside them.
+- Added by the main session after the check (the advisor tool, 14:1x): both workflows cancel a running run on a new push
+  to the same ref (gate.yml:15-17, toolchain.yml:23-25), so step 6's save waits until the four CI runs of the follow-up
+  F1 (operator-rewordings.md, its last section), if pushed first, read completed; F1's commit is named under H0.
 
 ## Why
-- MAIN-52 (history.md:2084-2085): main is taken in when it changes code, CI or rules. #78 changes
-  .github/workflows/toolchain.yml, a CI file.
+- His words (MAIN-52, history.md:2055-2057, word for word there): "Take main in when main changes code, CI or rules".
+  The main session's reading at :2082-2086 stands beside them. #78 changes .github/workflows/toolchain.yml, a CI file.
 - Neither lighter form fits. TAKEIN-CODE (b) (his 13:55 UTC message, history.md:8168; the conditions of
   msg-2026-11-27.md:71-77) is for a code move between a checked plan and its merge, and its list leaves CI out. The
   light recipe covers "only a move of main whose new merges touch only docs .md files" (light-takein-recipe.md:9-10).

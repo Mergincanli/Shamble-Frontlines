@@ -1,5 +1,10 @@
 # NB2-ONEWAY: take Builder 2's one-way delay work into the netcode branch (plan, 2026-11-27 12:4x UTC)
-Status: DRAFT, for the advisor agent's check in the 15:50 window (a10848a10f73ed39e, the seat that wrote NB2-C1 to
+CHECKED 14:16 UTC: APPROVE WITH CONDITIONS NB2B-1 to NB2B-11 (advisor-nb2b-merge.md, last line "Status: COMPLETE
+2026-11-27T14:16Z"; NB2B-1 and -2 Medium: redact bar base + 0, not + 5; the usage re-read just before step 2's send,
+after his reply). Its conditions govern wherever this file differs; they are applied here by Edit before step 1. Q4: MAIN-69,
+then UM-4, then this merge. Q2: a test-engineer read of `git diff 1a637408 c56afd07` over the judge and marks folders,
+before the report.
+Status was: DRAFT, for the advisor agent's check in the 15:50 window (a10848a10f73ed39e, the seat that wrote NB2-C1 to
 -C12; launch-1550-msgs.md, section NB). Nothing is run before that check. A delta on nb2-merge-plan.md: its steps,
 numbers, stop rules and risks hold except where this file differs. The order (the advisor tool, 12:3x): UM-4's build
 first, after the 15:50 seats finish; this merge after UM-4's push, in the next gap that fits, before R1's report.
