@@ -233,3 +233,33 @@ to make `git worktree remove` pass. The rest of section 6 stands as amended here
   not to make a git step pass.
 
 Status: COMPLETE 01:09 UTC
+
+## u7-amend's removal, ruled (2026-11-27, 05:5x UTC)
+**Accepted as it stands. One record line is owed; no check is owed, and nothing goes to him beyond the day message's
+list.**
+- **The facts, re-read now:**
+  - `git worktree list` no longer names .gate/u7-amend, and the folder is gone (`ls -d`: no such file).
+  - Before the undo, its two files held 56b3e1b's blobs (da7a5596… for Cargo.lock and 25759d8d… for
+    crates/client-wasm/Cargo.toml, read at 01:06). Those are the lane's own blobs at HEAD, so the discarded edits'
+    content is committed, byte for byte.
+  - After the undo, they held c21582d's blobs f6e0fef… and e4d5ff3… (`git rev-parse c21582d:<path>` agrees), as the M9
+    line records.
+  - Nothing is lost. The folder held no evidence (section 6 B).
+  - cli-target is gone and cli-root is kept (`ls .gate/u7-0b`).
+- **Why it stands:**
+  - It was done under the form then in force (section 6 B, written 01:01) and finished before the re-rule withdrew it
+    (01:09). It was carried out as written, with its hash checks, and it touched only the main session's own scratch
+    worktree.
+  - It differs from the 11-25 case: no agent was told to discard anything, no tracked file of the lane was touched, and
+    the undone content was already committed.
+  - Undoing it is impossible and would gain nothing.
+  - The re-rule binds from 01:09 on, for every later removal: no delete, move or revert to make a git step pass.
+- **Owed: the record line.** u7-merge-plan.md's M9 line (:241-245) already says it: "REMOVED 01:09 by the first ruling's
+  form … a recorded departure, nothing lost". Add the same fact in one line to u7-report.md's cleanups, or to the card's
+  done line, citing this block, so the report does not say the folder stays until PR #40's close.
+- **No line for him on its own.** It is a cleanup of a scratch copy, with no rule of his broken (his interim rule and
+  the Write/Edit rule hold: Edit restored the files, and git started its own command). It goes in the day message's
+  cleanups as one clause ("u7-amend removed, by the form in force then").
+- **Not owed:** a check of the lane's two files. They are unchanged by the removal: the worktree held its own copies.
+
+Status: COMPLETE 2026-11-27T05:59Z

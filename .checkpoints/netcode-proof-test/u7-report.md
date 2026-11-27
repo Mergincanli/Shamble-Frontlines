@@ -207,6 +207,10 @@ snapshot read: a hand read is enough).
   before Stop B's fill.
 - ADV-U7S-2: a real-page control for the three shipped calls, at the next T5 (ii) run if one comes. ADV-U7S-7: `fail`'s
   call to `reap` is not shown, and TE-7's refused-by-name test has no plant (recorded here).
+- The cleanups (u7-merge-plan.md's last M9 line): cli-target cleaned (441.1 MiB). .gate/u7-amend removed at 01:09 by
+  the advisor's first form, a minute before its re-rule withdrew that step; its ruling at 05:59 lets it stand, done by
+  the form in force then, nothing lost (advisor-u7-head.md, "u7-amend's removal, ruled"). U7's builder worktree: by the
+  re-ruled form ("Item 6, re-ruled") in a later window.
 
 ## The builder's slips (none touched evidence)
 - ADV-U7S-3 (Medium, process): his interim rule broken once: the last `git status` ran after `cd`, `sha256sum` and
