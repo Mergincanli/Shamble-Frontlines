@@ -31,7 +31,7 @@ use content::{load, load_file};
 use sim::state_hash::fnv1a_64;
 use sim::{ChaCha8, SEED_BYTES};
 
-fn hold(holds: bool, why: impl FnOnce() -> String) -> Result<(), String> {
+pub(crate) fn hold(holds: bool, why: impl FnOnce() -> String) -> Result<(), String> {
     if holds { Ok(()) } else { Err(why()) }
 }
 
@@ -447,6 +447,12 @@ impl Map {
         let one_line = format!("{{\"bounds\": {{\"max\": {}, \"min\": {}}}, \"format\": \"shamble-map\", \"id\": \"{id}\", \"regions\": [{regions}], \"shapes\": [{shapes}], \"spawns\": [{spawns}], \"version\": 1}}", list(&max), list(&min));
         json::parse(one_line.as_bytes()).map_or(one_line.clone(), |top| canonical(&top)).into_bytes()
     }
+}
+
+/// A map document as the file the generator writes for it: its path and its text.
+pub(crate) fn map_file(document: &MapDocument) -> (String, Vec<u8>) {
+    let map = Map::of(document.clone());
+    (map.path(), map.text())
 }
 
 /// Where `token` stands in a text, `past` bytes into it: the line and the column, both from 1.
@@ -1126,8 +1132,11 @@ pub fn verdicts(seed: u64, per_class: u32) -> Result<String, String> {
     let (inputs, mut digest) = (u64::from(per_class) * 4, 0_u64);
     for index in 0..inputs {
         let (path, bytes) = fuzz_input(seed, index);
-        let stage = fuzz_judge(path.as_deref(), &bytes)
-            .map_err(|why| format!("the fuzz run's input {index} of seed {seed}: {why}"))?;
+        let named = |why| format!("the fuzz run's input {index} of seed {seed}: {why}");
+        let stage = fuzz_judge(path.as_deref(), &bytes).map_err(named)?;
+        // What is taken goes on into the static world's builder, on this target too (the digest holds the loader's
+        // verdict alone; the worlds' own bytes are compared by `world_proofs`).
+        crate::world_proofs::fuzz_worlds(path.as_deref(), &bytes).map_err(named)?;
         digest = fnv1a_64(&[&digest.to_le_bytes()[..], &bytes, &[stage as u8]].concat());
     }
     let _ = writeln!(text, "the fuzz run's first inputs|{inputs}|{digest:016x}");

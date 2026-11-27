@@ -1,7 +1,7 @@
 // The static world's proof in the browser's own engine (PM-0004-32): the trees the test-only module builds and the
-// rays it casts, in its release profile, against the native build's committed lines (its dev profile runs the same
-// check under Node: packages/sim-worker/boundary/static-world.test.mjs). No server hands the module out: this spec
-// answers a made-up address from the module's folder.
+// rays it casts, the hostile maps among them, in its release profile, against the native build's committed lines
+// (its dev profile runs the same check under Node: packages/sim-worker/boundary/static-world.test.mjs). No server
+// hands the module out: this spec answers a made-up address from the module's folder.
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { expect, test } from "@playwright/test";
@@ -27,7 +27,7 @@ test("the static world's trees and rays in the browser's WebAssembly are the nat
     return route.fulfill({ status: 404, body: "" });
   });
   await page.goto(`${ORIGIN}/`);
-  const outcome = await page.evaluate(async (): Promise<{ same: string; changed: string; maps: number; tookMs: number }> => {
+  const outcome = await page.evaluate(async (): Promise<{ same: string; changed: string; maps: number; hostile: number; tookMs: number }> => {
     const lines = await (await fetch("/static-world.txt")).text();
     // Not a name the type checker can follow: the module exists only once the build has made it.
     const address = "/devtools.js";
@@ -38,10 +38,11 @@ test("the static world's trees and rays in the browser's WebAssembly are the nat
     // The compare bites: the full world's ray digest with its last digit changed.
     const line = lines.split("\n")[8] ?? "";
     const changed: string = glue.static_world(lines.replace(line, `${line.slice(0, -1)}${line.endsWith("0") ? "1" : "0"}`));
-    return { same, changed, maps: lines.split("\n").length - 2, tookMs: Math.round(performance.now() - started) };
+    const starting = (word: string): number => lines.split("\n").filter((each) => each.startsWith(word)).length;
+    return { same, changed, maps: starting("map "), hostile: starting("hostile "), tookMs: Math.round(performance.now() - started) };
   });
   console.log(`the static world's proof: ${JSON.stringify({ ...outcome, changed: outcome.changed.slice(0, 60) })}`);
-  expect(outcome).toMatchObject({ same: "", maps: 12 });
+  expect(outcome).toMatchObject({ same: "", maps: 12, hostile: 9 });
   expect(outcome.changed).toMatch(/^this build gives\n {2}map 7 shapes 512 depth \d+ tree [0-9a-f]{16} rays \d+ [0-9a-f]{16}\nand the file has\n {2}map 7 /);
   expect(outcome.tookMs).toBeLessThan(60_000);
 });
