@@ -81,6 +81,9 @@ going; free disk; usage read.
   else under spikes/; a re-wrap changes a line in place only as B6's section 2 allows. The ops tests, wrappers "315 ok,
   0 failed" and redact 0 findings in the counted run. A net line more, or a change to redact-check.mjs (with the
   pre-push hook's pinned hash), stops before the edit and goes to him.
+- **B2 DONE: Y0 = 87cb8677d51535ea5000f2fbb7e7b2f86144dbee** (22:2x; 4 files, +5 -3: PROMPT-R1.md `2 1`, R1.md `1 0`,
+  the two stand-ins `1 1`); counted run .gate/stopb/y0-counted.log (diff 2479dba3..., re-read equal before the
+  commit); gate .gate/stopb/y0-gate.txt PASS; A2 reported first (no server file moves).
 - **B2, Y0:** applied by Edit; the counted run `--only self,ops,redact,refs` through main-run.sh; the gate; one commit
   naming both notes and both stand-ins; pushed by the save; CI green.
 - **The closing list** [C3]: DONE 22:10 UTC: PR #40's body read whole, only its list changed (SEC-U8F1-3, SEC-U8F1-4,
