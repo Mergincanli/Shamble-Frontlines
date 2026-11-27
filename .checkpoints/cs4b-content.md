@@ -1174,8 +1174,13 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
     its frozen content, with the proof that no state changed) is built and in its final checks, while step 9's last
     cut, step 10's wiring and the look ahead before steps 11 and 12 remain."
 
-- **Step 9, cut C: the match is made on the content bundle: COMMITTED** (2026-11-27, about 16:28 UTC; its commit is
-  the one that removes `cutC-wip.patch`). **An order change, for the advisor agent's final read:** it was committed
+- **Step 9, cut C: the match is made on the content bundle: DONE** (commit
+  **fbbd84daa7539df6b0662e01db4ecee1a468b501**, pushed 2026-11-27 by 16:27:24 UTC, when CI's first job started on it).
+  **After the commit, on the same files:** the full local checks passed whole (16:23:36 to 16:30:25 UTC: 227 Rust
+  tests twice, 226 in release, format and clippy clean, client 148, sim-worker 53, types 8, net 1, boundary 38, the
+  type checks, 29 browser tests in 207 s, the recordings what their scripts make, the players' file 217,692 bytes in
+  both pages); the gate passes with smoke. CI on fbbd84d: gate and smoke green; the toolchain run started 16:27:26
+  UTC. **An order change, for the advisor agent's final read:** it was committed
   and pushed while its full local checks were still running (they were past formatting, clippy, every Rust test,
   the release tests and both page builds, at the boundary tests): this environment's Stop hook asks that every change
   be committed and pushed before a turn ends, as his saving rule does; `step9-order.md` says the full checks come
@@ -1303,13 +1308,12 @@ again here. SEAT-OUT from him: stop at a whole point and report the last commit'
    `cs4b-content/step9-order.md`** (each ends green; the advisor agent is told of the cuts at its final read).
    Done already: its manifest line with
    the dependency rule (c09f459, as security-auditor approved it on two digests) and the generated content types
-   with their export test (6290c85), the page folder's plain files and the markup-sink scan (5c6738a). Left:
-   the constructor's bundle argument and every caller, the page's `content.ts`, the build running
-   `content_bundle` and refusing a page folder without `content.json` or with one over 8 MiB, the frozen
-   content of `first-loop`. When content is first linked into
-   the players' file the built-file check will name `C::round` (content's `f64::round`) and perhaps
-   `C::__multi3`: each gets an entry in `maths-allowed.mjs` with its reason, or the code changes; rust-reviewer
-   decides. The first recording's frozen content, the constructor's new argument and every caller: the row.
+   with their export test (6290c85), the page folder's plain files and the markup-sink scan (5c6738a). **All
+   three cuts DONE: A ccde0d4 (CI green), B e1e2dd4 (CI green), C fbbd84d** (the card's entries "Step 9, cut A",
+   "cut B" and "cut C"; the rulings behind C: `rust-reviewer-cutC.md` (the two maths names) and
+   `advisor-cutC.md` (the caps, the page's parse, the dev route), with the sheet and the test list revised in
+   writing). Before step 10's first code push: CI on fbbd84d read green, and on its log the two Q3 points of
+   `advisor-cutC.md` (the dev-server cases compile nothing; the network cut does not stop `cargo run --locked`).
 3. **Step 10's wiring** (the row at `reread-sheet.md:168`): `CreateError::MapMissing` and `::World`, the local
    match holding the world of the map `test-scene`, and the built-file check's result recorded where the library
    is first linked into the players' file. (The fuzz run through `StaticWorld::build` and the hostile documents
@@ -1370,50 +1374,13 @@ never a test cut or thinned to fit CI's limit (his CI-TIME); a toolchain run sto
 in two lines.
 
 ## Current step
-4b-2 (2026-11-27, 16:44 Amsterdam, from the clock; Builder V6). DIFF-LIST is answered (a). Done and pushed on this
-seat: 35e96ad (main in), 5cef19f (step 8's second part), ccde0d4 (step 9, cut A: the page carries the bundle; CI
-green), e1e2dd4 (step 9, cut B: the recording's frozen content; CI green, read 15:44 UTC: gate, smoke, and the
-toolchain run 15:28:54 to 15:38:37 UTC). **Official count with cut C's work so far 5,760 (raw 5,778) of 8,450**
-(`cs4b-content/count-4b2.mjs` on the saved numstat; past two thirds, his sentence given). In hand: cut C of
-`cs4b-content/step9-order.md`. **Done in it, not committed, saved as `cs4b-content/cutC-wip.patch`** (taken with
-`git diff -- crates packages`; put back with `git apply` on e1e2dd4's tree): point a (the constructor takes the
-bundle: `CreateError::Content`, `message(&self)`, the order test) and point b (the one other Rust caller,
-devtools' `Replay::new`, passes the frozen content it already checked; `step_alloc.rs` makes a `LocalMatch`, not a
-`Sim`: step 10's); the bindings' 16 tests and the devtools tests (20 groups) pass. rust-reviewer's decision
-(`cs4b-content/rust-reviewer-cutC.md`, DONE): both names are allow-list entries, no code change, so 4b-1's proofs
-stand; its two entries are in `maths-allowed.mjs`, word for word, with the test's pin. **At 15:59 UTC (count 5,920,
-raw 5,938):** the wasm-only build passes with content linked (the production file's rules ran on it for the first
-time: nothing refused); the players' file is 217,692 bytes, sha256 04733d44fe90d57619f81ed1efed6ac5cef0b90228753affc9253e0c9fa96185
-(54,514 before: the content loader and the standard library's number reading and writing; recorded, not gated, by
-ADR 0002's G7). The constructor's content refusal is the loader's own sentence, whole (a first version put "the
-content is refused: " in front of the loader's sentence, which already begins so). Point c done (the start message's
-bundle, 1 to 8,388,608 bytes, a plain ArrayBuffer, checked before the glue copies it; the Worker passes it to `new
-Sim`), the link's `start(padBytes, bundle)` transfers it, the boundary tests (six refusal classes, each an Error and
-no trap, the module usable after; the cap read from the loader's own refusal; a 1 MiB key within 512 characters; both
-replays on the frozen content) and the Chromium replay spec on the frozen content: Worker 52, page 139 (before the
-link's test), boundary 37 tests pass. **Waiting for the advisor agent** (`cs4b-content/advisor-cutC-brief.md`, its
-notes `advisor-cutC.md`): Q1 the message caps (the page's bound above "about 512"), Q2 the page's parse (the map's
-field-by-field reading moved to step 12), Q3 the dev server's `/content.json` form. **The advisor agent ruled at
-about 16:00 UTC: APPROVE on all three, with conditions** (`cs4b-content/advisor-cutC.md`, DONE; the conditions are
-listed in its answer and are being built: code units, the bounds tied by tests, the Worker's own error event cut too,
-fixed page sentences, own-field reading with no cast, the parse in the real page on `ready` and not kept, the sheet
-revised in writing, the plugin's folder made by it, its middleware before Vite's, GET `/content.json` only).
-**At 16:10 UTC (count 6,495, raw 6,513; the patch holds 23 files, three new ones marked with `git add -N`):** built
-and unit-tested: the bounds (`panic-message.ts`: `THROWN_TEXT_UNITS` 512, `ERROR_TEXT_UNITS` 1,040, `cutText`), the
-page's check of an `error`'s length, `WorkerLink.workerError`, `content.ts` (fetch, copy, `readBundle`,
-`PageContent`) with `content.test.ts`, `boot.ts`, the dev server's plugin in `vite.config.mjs` (build.mjs exports
-`writeContentBundle` and `DEV_CONTENT_DIR`), the isolation spec's `/content.json` lines, a new Chromium spec
-`packages/e2e/tests/skeleton/content.spec.ts`; the Worker, page and spec type checks pass. **At 16:23 UTC:** the
-development page built; the whole Chromium suite ran (228 s): 28 of 29, and the 29th ("a Worker that cannot be
-loaded") caught a defect of cut C's own (a script that does not load gives a plain event with no `message`; the
-link's `workerError` now takes `undefined`, with a test); after the fix the page and content specs pass, 15 of 15.
-The plants script has cut C's plants C17 to C27 (the fold natively, in Node and in Chromium; the Worker's start
-check, its cap, the thrown-text cut, the page's error bound, the read before `ready`, the fixed fetch sentence, the
-dev server's route; one control): **10 of 10 caught, 1 control held, every file put back, the players' file rebuilt
-to 04733d44... as before** (the script now builds the players' file before the plants and checks its digest after).
-The isolation spec asks for `/content.json` before the page loads, so a missing route fails on its own check, not on
-a timeout. The sheet (rows 9 and 12, Q2.4) and the test list (the departure, Q1.5) are revised in writing. Next: the
-full local checks, the gate, the count, the commit and push (CI on e1e2dd4 is green), then the plants' whole run.
+4b-2 (2026-11-27, 17:31 Amsterdam, from the clock; Builder V6). DIFF-LIST is answered (a). Done and pushed on this
+seat: 35e96ad (main in), 5cef19f (step 8's second part), and **step 9 whole in three cuts**: ccde0d4 (cut A, CI
+green), e1e2dd4 (cut B, CI green), **fbbd84d (cut C: the match is made on the content bundle; its full local checks
+and the gate passed; CI: gate and smoke green, the toolchain run under way from 16:27:26 UTC)** (the card's entries
+"Step 9, cut A", "cut B" and "cut C"). **Official count 6,504, raw 6,522, of 8,450** (`cs4b-content/count-4b2.mjs`).
+Next: CI on fbbd84d read green, with the two Q3 points of `advisor-cutC.md` on its log; then step 10's wiring
+(HAND-OVER item 3) and its count; then the look ahead before steps 11 and 12.
 
 ## Next steps (the sheet's revision 3, section G; each step ends with the count of written lines)
 - **4b-1:** 1 the content crate's manifests · 2 the reader, the writer, the bundle, the two kinds, the old tuning's
