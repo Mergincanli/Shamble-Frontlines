@@ -9,8 +9,8 @@ Step 0 at the window, each its own call, in printing forms (EXIT-SILENT, exit-si
 it); `git ls-remote origin refs/heads/main` still b9aad01 (else MAIN-52 first, nothing below); `git status --short
 --branch` shows HEAD = origin and nothing else; ListAgents; `df -m /home/user`; the saver running (bj5t1t1dh ends
 about 13:23: if it ended, restart it in the card's form). Then the advisor tool once on this file.
-The order: D and B at once (B only reads, so D's are the only git steps in a worktree, as B's form asks); at most 3
-agents. Everything new starts before 16:20 (LEAN-MODE); what
+The order: D, B and NB at once (B and NB only read, so D's are the only git steps in a worktree, as B's form asks);
+at most 3 agents. UM-4's build (the main session) starts only after all three files read COMPLETE and are saved. Everything new starts before 16:20 (LEAN-MODE); what
 misses 16:20 waits for the next window. A refused resume of D is not replaced by a fresh agent (a fresh agent is not in
 that worktree): it means fallback (b), the worktree stays until PR #40's close.
 Every message carries the two standing sentences word for word, and the EXIT-SILENT sentence after them.
@@ -70,6 +70,24 @@ Write .checkpoints/netcode-proof-test/advisor-ops-reword-head.md (plan first, th
 "Decisions needed" and "For Mustafa", then, once both blocks are written, the last line `Status: COMPLETE <date and UTC
 time>`.
 Re-checked at sending: (to fill: main; HEAD = origin, clean; CI on the pushed head).
+Write files with the Write and Edit tools only (no sed, no shell redirect, no python writes; never `cargo fmt` writing
+files: apply rustfmt's diff by Edit); an agent with no Edit tool rewrites its notes file whole with Write. git and gh
+always start their own command, with no other program in front of them. In this tool a command that exits non-zero
+without printing can show nothing at all, the same as a pass (seen with `test`, `git diff --quiet` and `grep -q`): use
+only forms whose output carries the answer (`git diff --name-only` or `--stat`, `ls -d`, `cmp -s`, sha256 lists), and
+quote that output.
+
+## NB: a10848a10f73ed39e (resumed; it wrote advisor-nb2-merge.md's NB2-C1 to -C12): the check of NB2-ONEWAY's merge plan
+Not sent. With D and B (3 at once), before 16:20.
+As the advisor (main's .claude/agents/advisor.md, by `git show origin/main:.claude/agents/advisor.md`; read only, no
+cargo, no git write), check .checkpoints/netcode-proof-test/nb2b-merge-plan.md: the plan for Mustafa's word of
+2026-11-27 12:25 UTC (history.md:8133-8151, word for word there) to merge Builder 2's one-way delay work at tip
+29a901994f5b65c23a17162422770aaacc0ca44e "by the same steps and bars as the last merge". It is a delta on your
+nb2-merge-plan.md and its conditions. Rule APPROVE, APPROVE WITH CONDITIONS or REVISE, and answer its Q1-Q3.
+Write .checkpoints/netcode-proof-test/advisor-nb2b-merge.md (plan first, then each block as it is done); end with
+"Decisions needed" and "For Mustafa", then, once every block is written, the last line `Status: COMPLETE <date and
+UTC time>`.
+Re-checked at sending: (to fill: main; HEAD = origin, clean; Builder 2's tip still 29a90199).
 Write files with the Write and Edit tools only (no sed, no shell redirect, no python writes; never `cargo fmt` writing
 files: apply rustfmt's diff by Edit); an agent with no Edit tool rewrites its notes file whole with Write. git and gh
 always start their own command, with no other program in front of them. In this tool a command that exits non-zero

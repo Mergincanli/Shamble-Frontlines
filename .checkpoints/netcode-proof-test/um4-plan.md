@@ -3,8 +3,9 @@ Status: rev 0.3, APPROVED WITH CONDITIONS UM4-1 to UM4-8 (advisor-um4-plan.md, A
 all applied word for word by Edit 11:2x UTC; Q1-Q4 answered there (Q4: the web step's form; npm ci's built-in audit
 falls under "npm audit, never retried in any wording"). C ran 11:09 (its result read) and U7's builder worktree was
 removed 11:1x. (Rev 0.2, 08:5x UTC: the advisor tool's points folded in: a light base run first, npm's cleared form
-with no audit, the order after U7's builder worktree, the node_modules facts, Q4.) Nothing is built before his
-U8-FILLS answer (msg-2026-11-28.md: whether UM-4's lines count against U8's 6,282 stop). The parts are
+with no audit, the order after U7's builder worktree, the node_modules facts, Q4.) His U8-FILLS answer came 12:25 UTC: (a), UM-4 outside U8's stop
+(history.md:8133-8151); the build runs after the 15:50 window's three seats finish (the advisor tool, 12:3x). It was:
+nothing built before his U8-FILLS answer (msg-2026-11-28.md: whether UM-4's lines count against U8's 6,282 stop). The parts are
 A's UM-4 (advisor-u7-merge.md:39-54), word for word in their order; the file and line numbers are today's (U7's merge
 moved check.test.mjs's pin from :2785 to :2847).
 
@@ -113,7 +114,8 @@ puts them inside check.mjs, so a whole run cannot leave them out.
 ## Size (for U8-FILLS)
 About 20-30 added lines by estimate: the step and its missing-folder line in check.mjs (about 12-18), the list entry
 and two tests in check.test.mjs (about 10-14); dependency-check.md is notes. Counted exactly at step 5 by `git diff
---numstat`. If his answer counts UM-4 against the stop, the build stops before step 1 and the size goes to him.
+--numstat`. His U8-FILLS (a) (12:25 UTC) puts UM-4 outside U8's stop, so its lines are counted and named, not
+stopped on.
 
 ## Risks
 - The glob form runs browser.test.mjs, which needs the install: step 3 comes before step 5's counted run, and step
