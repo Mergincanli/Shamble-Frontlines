@@ -136,3 +136,4 @@ returns no decision on main and on the copy (pre-existing, not widened; the hunk
 "__" segment, exact mcp__github__<name>) on a scratch copy: all shapes refused, the github merge still reaches the
 merge check; suite 1580/1581 (only the mutation runner's text anchor for the changed line fails, expected).
 Class: standard merge names closable here; other merge-capable tool names stay for Mustafa as on main.
+SA-RC-9 hunk (build copy, 2026-11-27): APPROVE; closed for standard merge names (merge/auto-merge by last part, exact mcp__github__); RC3-L1 fold checked (comment-edit read on any connector, fail-closed on a non-GitHub tool, no widening); remainder class for Mustafa unchanged; probes sa-recheck9, sa-recheck11.

@@ -162,6 +162,8 @@
     advisor's RC3-L1. The class's remainder that no name rule can close stays for him, as on main. Suites: guard 1581
     (one more mutation case), track 85, checkpoint 33, kept-logs 9; its probe: every shape refused. Narrow
     confirmation by security-auditor running; rows 1-3 do not depend on it.
+32. security-auditor: APPROVE of the SA-RC-9 hunk (matches its trial; probes: every shape refused; a non-GitHub tool
+    of that name fails closed). All 11 rows ready; waiting for his switch to Accept edits and his go.
 
 ## Applies (the source of truth for what is in: a row is "in" only with its commit; every other row is NOT applied)
 Source for every apply: .gate/review-tracks/build/ (gitignored; CLAUDE.md there is CLAUDE.md.new). After each apply:
