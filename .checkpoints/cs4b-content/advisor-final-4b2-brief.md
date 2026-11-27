@@ -22,8 +22,8 @@ asking every change committed, each check then passing on the same files); every
 "Decisions and deviations".
 
 **Reviews.** Round 1 on c442a80 (six reviewers) and its fix pass (70f11e1); round 2 on what changed (five
-reviewers, every one PASS, Lows only) and its fix pass ([after: the code commit]). **No reviewer read round 2's fix
-pass itself:** please read it (`git diff 70f11e130ee9dc0aabbb61a01bb9d3a6c013418e [after] -- . ":(exclude).checkpoints"`);
+reviewers, every one PASS, Lows only) and its fix pass (914f3b4, the final code). **No reviewer read round 2's fix
+pass itself:** please read it (`git diff 70f11e130ee9dc0aabbb61a01bb9d3a6c013418e 914f3b4fc5298968b775c81f0fb15ca270a88040 -- . ":(exclude).checkpoints"`);
 its one change to the players' file is `crates/content/src/map.rs`'s spawns check (now held to `MIN_SPAWNS` itself);
 its change to the ramp's guard in `crates/sim/src/collision.rs` is product code that no step calls yet, so not in
 that file (the verifier's wording).
@@ -36,8 +36,11 @@ that file (the verifier's wording).
   race on the developer's own disk, while a tool runs by hand). Accept both as recorded risks, or not.
 - **Q2.** The final head as a whole: APPROVE for his go, or not.
 
-**Evidence on the final code [after]:** the full local checks, the gate with smoke, CI (gate, smoke, toolchain), the
-plants' whole run, the verifier's PASS, the official count (`advisor-count-rule.md`).
+**Evidence on the final code, 914f3b4:** the full local checks passed (21:49 to 21:56 UTC); the gate PASS with smoke;
+CI green (gate and smoke, run 46073641654; toolchain, run 46073641671, 8 min 48 s); the plants' whole run, 104 caught
+of 104 and 19 held of 19 (`plants-4b2.txt`); the verifier PASS (its notes `verifier-4b2.md`: four Low wording
+corrections, each made); the official count 8,408 of 8,450 (`advisor-count-rule.md`). The final head adds only the
+docs pass (`docs/`), the report, and the notes' removal: CI runs on it as well (the main session reads it).
 
 **The notes** are out of the final head (`.claude/CHECKPOINTS.md` §9); read them at the notes commit [after] with
 `git show <that commit>:.checkpoints/cs4b-content.md` (the card) and the same for each notes file the report names.

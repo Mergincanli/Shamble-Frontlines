@@ -7,13 +7,14 @@ go counts only for that id. This chat cannot open or merge a pull request (your 
 draft from the title and text in `.checkpoints/cs4b-content/pr-text-4b2.md` at the commit that holds this file, and
 merges on your tap, by merge commit, with that final id as the expected head.
 
-**Why it matters.** It brings his Export's movement values into the game as its first content, the content's one
+**Why it matters.** It brings your Export's movement values into the game as its first content, the content's one
 bundle into every match through the constructor, the test scene's static collision world (the same bits on every
 target), and the check on the file players get. Nothing a player sees changes in a match that runs (the page's scene
 moved to 4c by your STEP12-GO (a)), so there is no Brave check.
 
-**What stands behind it.** The report `docs/reports/2026-11-27-cs4b2-world.md`; two review rounds (eleven reviews:
-every one PASS by the end, Lows only left as follow-ups); the verifier PASS on the final code; the full local checks, the gate with
+**What stands behind it.** The report `docs/reports/2026-11-27-cs4b2-world.md`; two review rounds (six reviewers,
+then five on what changed, every one of those five PASS; Lows only left as follow-ups); the verifier PASS on the
+final code; the full local checks, the gate with
 smoke and CI (gate, smoke, toolchain) green on the final code 914f3b4; the plants' whole run on it, 104 planted
 defects caught of 104 and 19 controls held of 19; 8,408 written lines of your 8,450.
 

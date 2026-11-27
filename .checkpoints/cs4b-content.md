@@ -1602,7 +1602,27 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   source's status empty after it. **CI on 914f3b4: green**: gate and smoke (run 46073641654), the toolchain run
   (46073641671) 21:58:02 to 22:06:50 UTC (8 min 48 s, under its 25-minute limit). **From 22:04 UTC:** the verifier (`verifier-brief-4b2.md`, its notes `verifier-4b2.md`) and
   docs-keeper (`docs-keeper-brief-4b2.md`, its notes `docs-keeper-4b2.md`) side by side; the report's draft brought
-  to the final code before the verifier reads it.
+  to the final code before the verifier reads it. **The verifier: PASS** on 914f3b4 (`verifier-4b2.md`, DONE, its
+  hand-back at about 22:18 UTC): its own full local checks passed (Rust 236 twice and 235 in release; client 153,
+  sim-worker 53, types 13, net 1; boundary 39; 29 Chromium tests; the players' file 257,421 bytes, a624ff32b1cc...,
+  95,441 instructions); the count 8,408 and raw 8,426; his six messages word for word; the tools on the real files;
+  the recordings unchanged since e1e2dd4 and as main's by `recordings-proof.mjs`; the plants' result file against
+  the log (W14, W17, C38, C52, C57) and two plants of its own in a copy (the ramp's guard on `above` alone; two rows
+  of equal values and different groups trading fields), each caught; every finding of both rounds in the draft,
+  none softened, eleven "fixed" rows confirmed in the code. Its four Lows, each made: F6 (the PR text's old count
+  and plants), F11 (the CI time range), F17 ("its one change to shipped code" left out `collision.rs`: now "to the
+  players' file"), F18 (security-auditor's own label L2-2). Not checked by it: CI, Firefox, the legacy smoke, earlier
+  heads' checks, test-engineer's round-1 word "REVISE" (its hand-back, not its notes), the ray's new paths in
+  WebAssembly. Pushed at 33afa2a; the board has the line. **docs-keeper: DONE** (`docs-keeper-4b2.md`, its scripts
+  `docs-keeper-4b2-adr.mjs`, `-roadmap.mjs`, `-repomap.mjs`, `-status.mjs`): the ADR index's pointers to his
+  VISION-RULE addition (his two open points quoted word for word), ROADMAP's 4b-2 entry and merge pointers, REPO_MAP
+  (26 rows added, 22 corrected; the map check OK, 264 entries cover 110 paths), STATUS at 120 lines (the merged
+  #75 to #78's rows moved to the archive by script under his OLD-LINES (a); 4b-2's row; 16 new 4B- ids), the
+  archive's "From change-set 4b-2" block and 4b-2's risks. The main session then set STATUS's row to say the
+  advisor agent's verdict comes in the chat (the report sits in the final head, so it cannot hold that verdict).
+  The report `docs/reports/2026-11-27-cs4b2-world.md` written from the draft, its follow-ups with their ids. **This
+  commit is the last notes commit** (the docs pass, the report, the pull request's text and the go-question file);
+  the next takes `.checkpoints/` out of the head and names this commit in the report.
 
 ## Slips of this chat's own rules, for the report
 - One git command did not start its own shell call: `git add .checkpoints/cs4b-content/review-brief-4b1.md` stood
@@ -1673,7 +1693,9 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   git call is a bare `git` line (the shell stands in the worktree). (18) At 22:08:59 UTC a `date` stood before a
   `git diff --stat -- docs` in one call. A read. Told to him: from then on a git call holds git alone, the clock read
   in a call of its own. (19) At 22:13 UTC a `sleep 3` stood before the same `git diff --stat -- docs` in one call. A
-  read. Told to him.
+  read. Told to him. (20) The agents' own, each told in its hand-back, all reads: security-auditor's round 2 three git
+  calls after `cd … &&` or `;`; test-engineer's round 2 one `git log` after other commands; docs-keeper's first reads
+  as `cd <worktree>; git …`.
 
 ## HAND-OVER: where another session picks this up (written 2026-11-27, 00:44 Amsterdam; kept current)
 His words of 2026-11-27, 00:43 Amsterdam (2026-11-26, 23:43:38 UTC; `cs4-walk/mustafa-2026-11-27-save-every-25-
@@ -1836,10 +1858,13 @@ its toolchain run read at the next step). **Official count 7,978 at step 11, raw
 close** (HAND-OVER item 5): the plants' whole run twice (done), review round 1 (done, six reviewers), its one fix
 pass (done: code commit **70f11e1**, 21:19 UTC; the full local checks, the gate, the plants' whole run 97 of 97 and
 17 of 17; official count 8,347; CI green on its code), round 2 on what changed (done: five reviewers, every one PASS,
-Lows only), its one fix pass (written and planted, 12 of 12 caught and 2 of 2 held; official count 8,408; the full
-local checks running from 21:49 UTC; then the gate, the code commit, the whole run, CI); then the verifier and
-docs-keeper, the report, the last notes commit (the go-question file and the pull request's text), the notes out
-of the head, the advisor agent on that head, his go. **The notes out of the head** (`.claude/CHECKPOINTS.md` §9.3: a
+Lows only), its one fix pass (done: code commit **914f3b4**, the final code; the full local checks, the gate, the
+plants' whole run 104 of 104 and 19 of 19, CI green; official count 8,408), the verifier (done: PASS); docs-keeper
+(running from 22:04 UTC); the report (`docs/reports/2026-11-27-cs4b2-world.md`, written from the draft, its last
+marks: the follow-ups' ids and the notes commit's id); then the last notes commit (the docs, the report, the
+go-question file and the pull request's text), the notes out of the head (its id named in the report), the advisor
+agent on that head (`advisor-final-4b2-brief.md`), the board (needs-musti, naming the question file and its commit),
+his go. **The notes out of the head** (`.claude/CHECKPOINTS.md` §9.3: a
 ready head holds no `.checkpoints/` file): both `.checkpoints/cs4-walk*` and `.checkpoints/cs4b-content*` leave it,
 as 4b-1's final head 2542b1a did ("the take-in's notes leave the head"; main holds no `.checkpoints/` file); `git
 ls-tree -r --name-only HEAD -- .checkpoints` must print nothing; 4c brings back from history what it needs.
