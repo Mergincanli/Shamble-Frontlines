@@ -1580,7 +1580,7 @@ async function githubWrite(name, ti, role, io) {
   return deny(`routine (pr-advisor): ${name} is not on the PR Advisor's GitHub list`);
 }
 
-async function mergeCheck(ti, role, io) {
+async function mergeCheck(ti, role, io, input = {}) {
   const sha = String(ti.expectedHeadSha ?? '');
   if (!/^[0-9a-f]{40}$/.test(sha)) return deny('merge: pass the approved head as expectedHeadSha (the full 40-character SHA)');
   const repo = `${ti.owner}/${ti.repo}`;
@@ -1592,7 +1592,7 @@ async function mergeCheck(ti, role, io) {
   const cr = ghJson(io, `repos/${repo}/commits/${sha}/check-runs?per_page=100`);
   const runs = cr.check_runs ?? [];
   if (!Number.isInteger(cr.total_count) || cr.total_count > runs.length) return deny(`merge: the check list on ${sha.slice(0, 7)} was not read whole (${cr.total_count} reported, ${runs.length} read)`);
-  for (const nm of ['gate', 'smoke']) {
+  for (const nm of ['gate', 'smoke', 'toolchain']) {
     const rs = runs.filter((r) => r.name === nm);
     if (!rs.length) return deny(`merge: no ${nm} check on ${sha.slice(0, 7)}`);
     if (rs.some((r) => r.status !== 'completed')) return deny(`merge: ${nm} is still running on ${sha.slice(0, 7)}`);
@@ -1615,7 +1615,23 @@ async function mergeCheck(ti, role, io) {
     const hit = names.find((f) => !mergeAllowed(f));
     if (hit) return deny(`routine (pr-advisor): the PR changes ${hit}; only plain docs and tools paths merge here, everything else merges from a day session on Mustafa's go`);
   }
+  if (!role && !input.agent_id) { try { if (passAllows(repo, ti.pullNumber, sha, runs, io)) return { allow: `merge: his Advisor's merge check names #${ti.pullNumber} ${sha.slice(0, 7)}; the guard's checks passed (review tracks, MERGE-PROMPT (d))` }; } catch { /* silence: the prompt */ } }
   return null;
+}
+
+// MERGE-PROMPT (d): a day-session merge skips the prompt only on a real PASS: by Mergincanli, a user, first line exactly
+// the PR and its full head, never edited, posted after the gate run on that head finished; every comment read, every
+// page (gh does the paging). Anything else, or a failed read, is silence: the normal prompt, where his go is a tap.
+// The first line ends at a newline, with or without a carriage return before it (text typed on GitHub's web page).
+export const COMMENTS_JQ = '.[] | {u: .user.login, t: .user.type, c: .created_at, m: .updated_at, b: .body} | @json';
+function passAllows(repo, n, sha, runs, io) {
+  const done = runs.filter((r) => r.name === 'gate').map((r) => Date.parse(r.completed_at));
+  if (!done.length || done.some((t) => !Number.isFinite(t))) return false;
+  const after = Math.max(...done), want = `Advisor merge check: PASS #${n} ${sha}`;
+  const r = io.gh(['api', '--paginate', `repos/${repo}/issues/${n}/comments?per_page=100`, '--jq', COMMENTS_JQ]);
+  if (r.code !== 0) return false;
+  return r.out.split('\n').filter(Boolean).map((l) => JSON.parse(l)).some((c) => c.u === 'Mergincanli' && c.t === 'User' && c.c === c.m
+    && Date.parse(c.c) > after && String(c.b).split(/\r?\n/)[0] === want);
 }
 
 // ---------- the real io ----------
