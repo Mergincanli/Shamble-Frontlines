@@ -1446,10 +1446,20 @@ function mainFolderMove(sub, args, vcwd, io, input, line = {}) {
 
 async function gh(argv, role, io, vcwd = io.projectDir, input = {}) {
   const sub = argv[1] ?? '', sub2 = argv[2] ?? '';
+  // gh takes -R/--repo before its noun and before its verb (gh -R o/r pr comment, gh pr -R o/r comment): the first two
+  // words after the flags are the noun and the verb
+  const words = [];
+  for (let k = 1; k < argv.length && words.length < 2; k++) { if (!argv[k].startsWith('-')) words.push(argv[k]); else if (/^(-R|--repo)$/.test(argv[k])) k++; }
+  const [noun = '', verb = ''] = words;
   if (['auth', 'secret', 'variable', 'ssh-key', 'gpg-key', 'extension', 'codespace'].includes(sub)) return deny(`gh ${sub} is not allowed here`);
   if (sub === 'repo' && /^(edit|delete|rename|archive|unarchive|fork|set-default|sync|deploy-key)$/.test(sub2)) return deny(`gh repo ${sub2} is not allowed here`);
   if ((sub === 'alias' || sub === 'config') && sub2 === 'set') return deny(`gh ${sub} set is not allowed here`);
   if (sub === 'pr' && sub2 === 'merge') return deny('gh pr merge is not allowed: merge with the GitHub MCP merge tool and the approved SHA as expectedHeadSha');
+  // GUARD-MARK on the plain gh forms (SA-RT3-1): the merge-check line, or a body read from a file, is refused
+  if ((noun === 'pr' && /^(comment|review|edit|close|reopen)$/.test(verb)) || (noun === 'issue' && /^(comment|edit|close|reopen)$/.test(verb))) {
+    if (hasMark(argv.join(' '))) return deny(MARK_DENY);
+    if (argv.some((t) => /^(--body-file(=|$)|-[^-]*F)/.test(t))) return deny(`gh ${noun} ${verb} with a body from a file is refused here (review tracks, GUARD-MARK); pass the body inline or use the GitHub MCP tools`);
+  }
   if (sub === 'api') {
     let method = 'GET', write = false, endpoint = null;
     for (let i = 2; i < argv.length; i++) {
