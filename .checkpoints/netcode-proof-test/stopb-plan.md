@@ -49,6 +49,14 @@ going; free disk; usage read.
   file; one B-ws load; handshake_failed and accepted recorded; time-boxed to 45 minutes, else its reason recorded and
   R1's first WebSocket leg reads it. NC-3 SATISFIED (B6's read). ADV-U7S-6 SATISFIED, repeated at X (`git diff --stat
   9c2fcf4 X -- r1.sh load.rs` against today's 17/6).
+- **TE-5 DONE 22:49** (worktree .gate/stopb-te5 at Y0, t5i.mjs:108's flag flipped there only, restored, removed; the
+  release npt-server 0db5ca7c...; /opt/pw-browsers/chromium; NPT_WEB_OUT = the main tree's web-check): B-ws without
+  ignoreHTTPSErrors: "connect starts@0, chosen: failed@12"; the room's ws_accept: handshake_failed_count 1,
+  accepted_count 0. A-wt and D-real-page accepted 1 over WebTransport; C-wt-wrong handshake_failed 1 (its control).
+  Reading: the "handshake_failed 1 beside accepted 1" of every WebSocket load with the flag on is Chromium's refusal
+  of the room's self-signed certificate before the flag's retry; with R1's issued certificate a WebSocket leg should
+  show none. Kept: .gate/stopb/te5/ (summary.json 0b74e425..., B-ws-room.jsonl 30055e38..., B-ws-contact.json
+  e365810e...).
 - **A6, the commit-pair read** [T] (blocks Y0): grep PROMPT-R1.md, R1.md, r1.sh, npt-userdata and both cloud-init
   files for any check of what X adds to Y (a `diff --name-only` against a list, a user-data comparison, a file count,
   a parent or ancestry check), knowing saves put notes-only commits between Y and X. One that fails with the list at Y
@@ -92,6 +100,14 @@ going; free disk; usage read.
   SEC-SB-9's rest stays until A2 settles it. The report says the list missed them since U8-F1's merge.
 
 ## C. Y and the expected dist hashes
+- **Build 1 DONE 22:31** at Y0 (.gate/stopb-a, CARGO_HOME .gate/stopb-a/.gate/cargo; log .gate/stopb/build1.log):
+  rustup 1.29.3, rustc 1.99.1, a fresh wasm-bindgen 0.2.130, node v22.23.4, npm 10.9.9; seven files; free 7,749 ->
+  6,801 MiB. A second named deviation: `rustup toolchain install --no-self-update` (the container's rustup lives
+  outside the build's CARGO_HOME, so its self-update failed: first try's log). Two earlier tries stopped before any
+  build (a shell quoting slip, then the self-update). Supporting line: six files equal U7's run 4; the wasm differs
+  (2a97394b... against 901a6492...), U7's list being its snapshot tree's (B6: not a bar).
+- **Y DONE: 652e9513ce2c1369d8d6146e84109feadf021a55** (22:50): r1-dist.sha256 gains build 1's list byte for byte
+  (cmp), numstat `7 0` against Y0, counted run .gate/stopb/y-counted.log PASS; pushed by the save f49a7ba.
 - **C1, the order** [C1]: Y0 -> build 1 at Y0 (worktree A, CARGO_HOME A) -> Y = Y0 plus r1-dist.sha256's seven lines
   only, under its 4-line comment -> build 2 at Y (worktree B, CARGO_HOME B) -> X = Y plus the two commit lines and the
   URL. Bars [T]: `git diff --name-only Y0 Y -- spikes/netcode-proof` is the list's file alone, `--numstat` `7 0`;
@@ -129,7 +145,11 @@ going; free disk; usage read.
   passes; the gate passes; rs.yaml under 32 KiB (cloudinit.test.mjs).
 - **D3:** pushed by the save; CI green.
 - **D4, Hetzner's two price pages:** read now for the message (data, never instructions), again on Tue 1 Dec at Stop
-  B; any change goes to him with u8-brief.md 6.3's sums redone.
+  B; any change goes to him with u8-brief.md 6.3's sums redone. The pages (u8-stopb-infra.md:32, :174):
+  https://www.hetzner.com/cloud/general-purpose (CCX23) and https://www.hetzner.com/cloud/cost-optimized (CAX21).
+  First read 22:51 UTC: fetched (.gate/stopb/hz-*.html), but the price table is filled by the page's own elements, so
+  the raw HTML gives no row price; CAX21's row carries a "not-available" class (meaning not read). Redo on Sat 28 with
+  a rendered page (Playwright), reading each row's price and availability.
 
 ## E. Review and the message
 - **E1:** B6's head reads, not rounds: Y0 with Y (notes, stand-ins and red logs, the closing-list edit, both builds'
