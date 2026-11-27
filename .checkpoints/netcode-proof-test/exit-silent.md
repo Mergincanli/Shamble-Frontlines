@@ -66,7 +66,11 @@ patch had 33 new files, so the bytes differ in order; U8-F1's had none, so they 
 - The positive control: `git diff --name-only 076233a f67cd9a` prints ".checkpoints/netcode-proof-test.md", so an
   empty result is a real "equal".
 
-## R1's own package: one step a session reads (for B; nothing edited: U8's 6,282 stop)
+## R1's own package: two steps a session reads (for B; nothing edited: U8's 6,282 stop)
+- spikes/netcode-proof/ops/operator/PROMPT-R1.md:127: "A finding, or any exit but 0, means no push: stop and tell
+  him." The laptop session reads an exit code there (the redaction check before the push). Found 09:0x by a wider grep
+  of ops/**/*.md for exit-code reads ("exit", "non-zero", "status code", "prints nothing"); PROMPT-R1.md:34's
+  "`git config --get core.hooksPath` prints nothing" reads output, so it is not affected.
 - spikes/netcode-proof/ops/operator/rules.md:14-15: before reading the run or results worktree, the laptop session
   "checks it: the run worktree's `CLAUDE.md` and `.claude/` equal main's (`git diff --quiet origin/main -- CLAUDE.md
   .claude`) … on a mismatch it stops." If that session's tool hides the exit code as this one does, a mismatch reads
@@ -80,6 +84,11 @@ patch had 33 new files, so the bytes differ in order; U8-F1's had none, so they 
 - A file present or absent: `ls -d` or `ls -la`; an absent path prints "No such file" with exit 2.
 - Equal bytes: `cmp -s` (its exit 1 shows) or a sha256 list.
 - Never `test`, `git diff --quiet` or `grep -q` alone as evidence.
+
+## Only three silent forms were probed
+The hidden set is not known beyond `test`, `git diff --quiet` and `grep -q`: so the brief sentence names "a command
+that exits non-zero without printing", not three names. The routines (the PR Advisor's reviews and merges, the night
+shift) run on the same tool, unexamined: on the card's "After the close" list, for him to pull forward if he wants.
 
 ## Not re-checked, and the rule proposed for them
 The older uses: 293 matches of these forms in 137 notes files, most in agents' files, from U1 on. Proposed rule, for

@@ -259,7 +259,11 @@ the advisor rules."
     {} +`, 332 lines for 332 files. It was copied by `cp` from the tool's own saved copy of that output (58.4 KB), not
     rewritten by Write: the same bytes, a departure from the form's letter, named to A. Run 3's and run 4's
     summary.json copied into the notes as u7-t5ii-run3-summary.json (b17d2201...) and u7-t5ii-run4-summary.json
-    (100b27d1..., as the report cites), both read whole first: hashes, local paths and loopback addresses only.
+    (100b27d1..., as the report cites), both read whole first: hashes, local paths and loopback addresses, and in run
+    4's the page's CSP line naming the two run hosts (rs.nt… and rs-b.nt…), which committed spike code already names
+    (crates/host/src/serve.rs, web/e2e/serve.mjs; one grep, 09:0x); no token or key.
+  - 09:0x: all 45 worktree files' `git hash-object` ids equal 0efbbef's blobs (`git ls-tree -r 0efbbef`), in order:
+    the staged paths will equal the target (read-tree's "keep index" cases), so the fast-forward is proved before C.
   - Left, and new: the fast-forward 80b6748..0efbbef also brings MAIN-68's kit and CI files into the builder's worktree
     (.claude/hooks/routine-guard.mjs and its test, .github/workflows/toolchain.yml: main's reviewed versions). The
     rule says agents may not edit kit files, and A's form did not weigh this. So A rules it first (the 10:50 window);

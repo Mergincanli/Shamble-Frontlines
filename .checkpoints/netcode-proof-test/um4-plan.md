@@ -56,9 +56,10 @@ puts them inside check.mjs, so a whole run cannot leave them out.
    npm's "added N packages" line is recorded; with `--no-audit` there is no audit line (U8's "4 moderate" stays
    security's reading of the same lock, security-u8-deps.md C3 (c)). It replaces the link form of choice 15 (i) for
    later runs; the kept install in agent-abf71d95fc07b3522 stays until PR #40's close.
-4. **(c) The dependency record.** One note section in dependency-check.md (the install's form, both sha256s before
-   and after, npm's two lines), with no bare sha256 line: no manifest or lockfile changes, so DEP-HOLD holds nothing,
-   and no new security read is needed (the form and the lock were cleared at U8).
+4. **(c) The dependency record.** One note section in dependency-check.md (the install's form as run, both sha256s
+   before and after, npm's "added N packages" line, and the audit line only if Q4's answer is U8's form), with no bare
+   sha256 line: no manifest or lockfile changes, so DEP-HOLD holds nothing. The lock was cleared at U8; the command's
+   flags are Q4's (U8's form, or the web step's flags on it), so whether a new security read is needed is Q4's too.
 5. **The counted run:** one main-run.sh call, `env CARGO_INCREMENTAL=0 node check.mjs` alone: all 13 steps pass. The
    bars, by B's C1 rule: the `ops` step's counts equal U8-F1's M5 (104 of 104; "315 ok, 0 failed"); test, web and
    wasm (they read only spikes/ content) equal U8-F1's M5 strictly, provided `git diff --name-only ddb06ff HEAD --
@@ -87,8 +88,12 @@ and two tests in check.test.mjs (about 10-14); dependency-check.md is notes. Cou
 - Q1: the missing-folder line's test by a stand-in for the folder check (no test touches the real folder): enough?
 - Q2: the install's place, before the counted run and after the step's red and green: right order?
 - Q3: anything in UM-4's (a)-(e) this plan leaves out or adds?
-- Q4: does `npm ci`'s built-in audit request fall under "npm audit, never retried in any wording"? The plan avoids
-  it by `--no-audit` (the web step's cleared form); is dropping the audit line from step 3's record right?
+- Q4: two cleared forms exist. U8's for ops/browser (security-u8-deps.md C3 (a) and (c): `npm ci --ignore-scripts`,
+  `npm_config_ignore_scripts` in the environment; npm's built-in audit then runs, and its expected output is exactly
+  the 4 moderate lines) and the web step's (check.mjs:2666-2667, security-u7-deps.md (3)-(4): the same plus
+  `--no-audit --no-fund`). Which form, and does `npm ci`'s built-in audit request fall under "npm audit, never retried
+  in any wording"? Rev 0.2 takes the web step's flags on U8's command, so no audit runs and step 3 records no audit
+  line.
 
 ## Done lines (one per step, by Edit)
 (none yet: the plan's check first, at 10:50)
