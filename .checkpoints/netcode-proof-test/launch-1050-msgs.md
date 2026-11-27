@@ -1,5 +1,5 @@
 # The 10:50 UTC window, 2026-11-27: the messages (written 08:5x UTC, rev 3 09:1x after two advisor-tool reads; sent only inside the window)
-**Status: B and A1 SENT 10:58 UTC (both resumed); B DONE 11:02, A1 DONE 11:05 ("go", no conditions); A2 and C SENT 11:08 UTC (both resumed).** Each message below gets a "Sent HH:MM UTC" line when it goes; the window has run only
+**Status: B and A1 SENT 10:58 UTC (both resumed); B DONE 11:02, A1 DONE 11:05 ("go", no conditions); A2 and C SENT 11:08 UTC (both resumed); C DONE 11:09 (three reads matched; `git add` of the 45; `git merge --ff-only` 80b6748..0efbbef, 231 files; `git status --short` empty; no refusal); the remove DONE 11:1x (its three gates met; `git worktree list --porcelain` no longer names it; `ls -d` "No such file or directory"; branch ref kept at 0efbbef).** Each message below gets a "Sent HH:MM UTC" line when it goes; the window has run only
 for the messages that carry one (this file existing does not mean the window ran). An agent's file is done only when
 its last line reads "Status: COMPLETE <date and UTC time>"; without it the file is half-written and that agent is
 resumed from it.
