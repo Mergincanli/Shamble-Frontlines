@@ -3882,3 +3882,223 @@ test('real git (fix pass 4, P4-S4): a worktree under .gate/ or the scratchpad ca
     rmSync(dir, { recursive: true, force: true });
   }
 });
+
+// ---------- the review tracks: GUARD-MARK, toolchain, MERGE-PROMPT (d) ----------
+const PASS = `Advisor merge check: PASS #27 ${SHA}`;
+const okc = (extra = {}) => ({ u: 'Mergincanli', t: 'User', c: '2026-11-27T11:00:00Z', m: '2026-11-27T11:00:00Z', b: `${PASS}\nchecked: x`, ...extra });
+for (const [name, comments, want] of [
+  ['a real PASS skips the prompt', [okc()], 'allow'],
+  ['an edited PASS does not', [okc({ m: '2026-11-27T12:00:00Z' })], null],
+  ['a PASS by a bot does not', [okc({ t: 'Bot' })], null],
+  ['a PASS by another user does not', [okc({ u: 'someone' })], null],
+  ['a PASS posted before the gate run finished does not', [okc({ c: '2026-11-27T09:00:00Z', m: '2026-11-27T09:00:00Z' })], null],
+  ['a PASS naming another PR does not', [okc({ b: `Advisor merge check: PASS #5 ${SHA}` })], null],
+  ['a PASS naming another head does not', [okc({ b: `Advisor merge check: PASS #27 ${'b'.repeat(40)}` })], null],
+  ['a PASS with a trailing space does not', [okc({ b: `${PASS} ` })], null],
+  ['a PASS in another case does not', [okc({ b: PASS.toLowerCase() })], null],
+  ['FOR HIS GO is never a go', [okc({ b: `Advisor merge check: FOR HIS GO #27 ${SHA}` })], null],
+  ['no comments: the prompt', [], null],
+  ['an unreadable comment list: the prompt', null, null],
+  ['a PASS typed with Windows line ends skips the prompt', [okc({ b: `${PASS}\r\nchecked: x` })], 'allow'],
+  ['a PASS ending in a lone carriage return does not', [okc({ b: `${PASS}\r` })], null],
+  ['a PASS after other comments still counts', [okc({ b: 'first' }), okc({ u: 'someone', b: PASS }), okc()], 'allow'],
+  ['an unparsable comment line: the prompt, never a refusal', [okc(), 'not json'], null],
+]) {
+  test(`review tracks: ${name}`, async () => {
+    const d = await decide(merge(), fakeIo({ role: '', comments }));
+    assert.equal(d?.allow !== undefined ? 'allow' : d, want, JSON.stringify(d));
+  });
+}
+test('review tracks: a PASS between two gate runs on the head is too early', async () => {
+  const checks = [['gate', 'completed', 'success', '2026-11-27T10:00:00Z'], ['gate', 'completed', 'success', '2026-11-27T12:00:00Z'], ['smoke', 'completed', 'success']];
+  assert.equal(await decide(merge(), fakeIo({ role: '', comments: [okc()], checks })), null);
+  assert.notEqual((await decide(merge(), fakeIo({ role: '', comments: [okc({ c: '2026-11-27T13:00:00Z', m: '2026-11-27T13:00:00Z' })], checks })))?.allow, undefined);
+});
+test('review tracks: GUARD-MARK and the subagent rule hold on a GitHub server under another name, and the line on any connector', async () => {
+  const other = (name, input, extra = {}) => ev(`mcp__plugin_engineering_github__${name}`, { owner: 'Mergincanli', repo: 'Shamble-Frontlines', ...input }, extra);
+  assert.match((await decide(other('add_issue_comment', { issue_number: 27, body: PASS }), fakeIo()))?.deny ?? '', /GUARD-MARK/);
+  assert.match((await decide(other('merge_pull_request', { pullNumber: 27 }, { agent_id: 'a1' }), fakeIo()))?.deny ?? '', /subagent never merges/);
+  for (const n of ['merge_pull_request', 'enable_pr_auto_merge']) {
+    assert.match((await decide(other(n, { pullNumber: 27, expectedHeadSha: SHA }), fakeIo({ comments: [okc()] })))?.deny ?? '', /only through the github connector/, n);
+    assert.match((await decide(ev(`mcp__gh__${n}`, { owner: 'Mergincanli', repo: 'Shamble-Frontlines', pullNumber: 27, expectedHeadSha: SHA }), fakeIo({ comments: [okc()] })))?.deny ?? '', /only through the github connector/, `a name without github: ${n}`);
+  }
+  assert.match((await decide(ev('mcp__gh__merge_pull_request', { pullNumber: 27 }, { agent_id: 'a1' }), fakeIo()))?.deny ?? '', /subagent never merges/);
+  for (const n of ['mcp__a__b__merge_pull_request', 'mcp__gh__x__enable_pr_auto_merge', 'mcp__github__x__merge_pull_request'])
+    assert.match((await decide(ev(n, { owner: 'Mergincanli', repo: 'Shamble-Frontlines', pullNumber: 27, expectedHeadSha: SHA }), fakeIo({ comments: [okc()] })))?.deny ?? '', /only through the github connector/, `a prefixed tool name: ${n}`);
+  assert.match((await decide(ev('mcp__github__x__merge_pull_request', { pullNumber: 27 }, { agent_id: 'a1' }), fakeIo()))?.deny ?? '', /subagent never merges/);
+  assert.match((await decide(ev('mcp__a__b__update_issue_comment', { owner: 'Mergincanli', repo: 'Shamble-Frontlines', comment_id: 999, body: 'x' }), fakeIo()))?.deny ?? '', /could not be read/);
+  assert.match((await decide(other('update_issue_comment', { comment_id: 999, body: 'x' }), fakeIo()))?.deny ?? '', /could not be read/);
+  assert.match((await decide(ev('mcp__Miro__board_create', { name: PASS }), fakeIo()))?.deny ?? '', /GUARD-MARK/);
+  assert.equal(await decide(other('add_issue_comment', { issue_number: 27, body: 'looks good' }), fakeIo()), null, 'other text: the normal prompt');
+  assert.equal(await decide(ev('mcp__Miro__board_create', { name: 'plan' }), fakeIo()), null);
+});
+test('review tracks: a subagent never merges, even with a real PASS', async () => {
+  const d = await decide({ ...merge(), agent_id: 'a1' }, fakeIo({ role: '', comments: [okc()] }));
+  assert.match(d?.deny ?? '', /subagent never merges/);
+});
+test('review tracks: the PR Advisor never gets an allow; its own rules stand', async () => {
+  const d = await decide(merge(), fakeIo({ role: 'pr-advisor', comments: [okc()] }));
+  assert.equal(d, null);
+});
+test('review tracks: toolchain is required at a merge', async () => {
+  for (const opts of [{ noToolchain: true },
+    { checks: [['gate', 'completed', 'success'], ['smoke', 'completed', 'success'], ['toolchain', 'completed', 'failure']] },
+    { checks: [['gate', 'completed', 'success'], ['smoke', 'completed', 'success'], ['toolchain', 'completed', 'cancelled'], ['toolchain', 'completed', 'success']] }]) {
+    const d = await decide(merge(), fakeIo({ role: '', comments: [okc()], ...opts }));
+    assert.match(d?.deny ?? '', /toolchain/, JSON.stringify(opts));
+  }
+});
+for (const [who, extra] of [['a day session', {}], ['a subagent', { agent_id: 'a1' }], ['the PR Advisor', { role: 'pr-advisor' }], ['the night shift', { role: 'night-shift' }]]) {
+  test(`review tracks: GUARD-MARK refuses ${who} writing the merge-check line`, async () => {
+    const io = fakeIo({ role: extra.role ?? '' });
+    for (const input of [gw('add_issue_comment', { issue_number: 27, body: PASS }), gw('add_issue_comment', { issue_number: 27, body: 'advisor  MERGE check : pass #27 x' }),
+      gw('create_pull_request', { title: 't', head: 'cs/x', base: 'main', body: `x\n${PASS}` }), gw('pull_request_review_write', { method: 'create', pullNumber: 27, body: PASS }),
+      gw('issue_write', { method: 'update', issue_number: 27, labels: [PASS] })]) {
+      const d = await decide({ ...input, ...(extra.agent_id ? { agent_id: extra.agent_id } : {}) }, io);
+      assert.match(d?.deny ?? '', /GUARD-MARK/, `${who}: ${JSON.stringify(input.tool_input)}`);
+    }
+  });
+}
+test('review tracks: GUARD-MARK lets other text and the status line through, and checks comment edits', async () => {
+  assert.equal(await decide(gw('add_issue_comment', { issue_number: 27, body: `Advisor merge check: FOR HIS GO #27 ${SHA}` }), fakeIo()), null);
+  assert.equal(await decide(gw('add_issue_comment', { issue_number: 27, body: 'the advisor approved this head' }), fakeIo()), null);
+  const edit = gw('update_issue_comment', { comment_id: 222, body: 'x' });
+  assert.equal(await decide(edit, fakeIo()), null);
+  const io = fakeIo(); const g = io.gh;
+  io.gh = (args) => (args.some((a) => a.endsWith('/issues/comments/222')) ? { code: 0, out: JSON.stringify({ body: PASS }) } : g(args));
+  assert.match((await decide(edit, io))?.deny ?? '', /GUARD-MARK/);
+  assert.match((await decide(gw('update_issue_comment', { comment_id: 999, body: 'x' }), fakeIo()))?.deny ?? '', /could not be read/);
+});
+test('review tracks: GUARD-MARK on the plain gh forms', async () => {
+  assert.match((await decide(sh(`gh pr comment 27 --body "${PASS}"`), fakeIo()))?.deny ?? '', /GUARD-MARK/);
+  assert.match((await decide(sh('gh pr comment 27 --body-file note.md'), fakeIo()))?.deny ?? '', /from a file/);
+  assert.match((await decide(sh('gh issue comment 27 -F note.md'), fakeIo()))?.deny ?? '', /from a file/);
+  assert.equal(await decide(sh('gh pr comment 27 --body "looks good"'), fakeIo()), null);
+  // SA-PA-1: the closing and reopening comments, a flag before the verb, an attached or clustered -F
+  for (const c of [`gh pr close 27 -c "${PASS}"`, `gh pr reopen 27 --comment "${PASS}"`, `gh issue close 27 -c "${PASS}"`,
+    `gh issue reopen 27 --comment="${PASS}"`, `gh pr -R ${REPO} comment 27 -b "${PASS}"`, `gh pr --repo=${REPO} comment 27 -b "${PASS}"`, `gh -R ${REPO} pr comment 27 -b "${PASS}"`]) {
+    assert.match((await decide(sh(c), fakeIo()))?.deny ?? '', /GUARD-MARK/, c);
+  }
+  for (const c of ['gh pr comment 27 -Fnote.md', 'gh pr comment 27 -eF note.md', `gh pr -R ${REPO} comment 27 --body-file note.md`]) {
+    assert.match((await decide(sh(c), fakeIo()))?.deny ?? '', /from a file/, c);
+  }
+  for (const c of ['gh pr close 27', 'gh pr close 27 -c "superseded by #28"', 'gh pr create --body-file x.md', 'gh pr create -F x.md']) {
+    assert.equal(await decide(sh(c), fakeIo()), null, c);
+  }
+  // SA-PA-2: a deep or huge input never throws; past the budget it is refused
+  let deep = PASS; for (let i = 0; i < 6000; i++) deep = [deep];
+  assert.match((await decide(gw('add_issue_comment', { issue_number: 27, extra: deep, body: 'x' }), fakeIo()))?.deny ?? '', /GUARD-MARK/);
+  assert.match((await decide(gw('add_issue_comment', { issue_number: 27, extra: Array(20000).fill('x'), body: 'x' }), fakeIo()))?.deny ?? '', /GUARD-MARK/);
+});
+const ALLOWING = 'export const decide = () => ({ allow: "fake allow" }); export const realIo = () => ({});';
+const ALLOW_CHECKS = (run) => {
+  const day = JSON.parse(run(ALLOWING, preTool, '').stdout).hookSpecificOutput;
+  assert.deepEqual([day.permissionDecision, day.permissionDecisionReason], ['allow', 'fake allow'], 'day PreToolUse: an allow');
+  for (const role of [PRA, NIGHT]) assert.equal(run(ALLOWING, preTool, role).stdout, '', `${role}: an allow is never printed in a routine`);
+  assert.equal(run(ALLOWING, JSON.stringify({ hook_event_name: 'ConfigChange', source: 'project_settings' }), '').stdout, '', 'ConfigChange: never an allow');
+};
+test('review tracks: guard.mjs prints an allow only for a day session PreToolUse', () => ALLOW_CHECKS((rules, stdin, role) => launcherWith(readFileSync(join(HERE, 'guard.mjs'), 'utf8'), rules, stdin, role)));
+test("review tracks, mutation: guard.mjs's day-only allow is needed", () => {
+  const src = readFileSync(join(HERE, 'guard.mjs'), 'utf8');
+  const from = "if (event === 'PreToolUse' && !role) process.stdout.write(";
+  assert.equal(src.split(from).length - 1, 1, 'the target text occurs exactly once');
+  assert.throws(() => ALLOW_CHECKS((rules, stdin, role) => launcherWith(src.replace(from, "if (event === 'PreToolUse') process.stdout.write("), rules, stdin, role)),
+    { name: 'AssertionError', message: /an allow is never printed in a routine/ });
+});
+
+// Every new rule is needed by some check (the same shape as the other mutation runs)
+const RT_CHECKS = [
+  [merge(), { comments: [okc()] }, (d) => d?.allow !== undefined],
+  [merge(), { comments: [okc({ m: '2026-11-27T12:00:00Z' })] }, (d) => d === null],
+  [merge(), { comments: [okc({ t: 'Bot' })] }, (d) => d === null],
+  [merge(), { comments: [okc({ u: 'someone' })] }, (d) => d === null],
+  [merge(), { comments: [okc({ c: '2026-11-27T09:00:00Z', m: '2026-11-27T09:00:00Z' })] }, (d) => d === null],
+  [merge(), { comments: [okc({ b: `${PASS} ` })] }, (d) => d === null],
+  [merge(), { role: 'pr-advisor', comments: [okc()] }, (d) => d === null],
+  [{ ...merge(), agent_id: 'a1' }, { comments: [okc()] }, (d) => /subagent never merges/.test(d?.deny ?? '')],
+  [merge(), { noToolchain: true, comments: [okc()] }, (d) => /toolchain/.test(d?.deny ?? '')],
+  [gw('add_issue_comment', { issue_number: 27, body: PASS }), {}, (d) => /GUARD-MARK/.test(d?.deny ?? '')],
+  [gw('add_issue_comment', { issue_number: 27, body: 'advisor  MERGE check : pass' }), {}, (d) => /GUARD-MARK/.test(d?.deny ?? '')],
+  [gw('update_issue_comment', { comment_id: 999, body: 'x' }), {}, (d) => /could not be read/.test(d?.deny ?? '')],
+  [sh(`gh pr comment 27 --body "${PASS}"`), {}, (d) => /GUARD-MARK/.test(d?.deny ?? '')],
+  [sh('gh pr comment 27 --body-file note.md'), {}, (d) => /from a file/.test(d?.deny ?? '')],
+  [sh('gh pr comment 27 -eF note.md'), {}, (d) => /from a file/.test(d?.deny ?? '')],
+  [sh(`gh pr close 27 -c "${PASS}"`), {}, (d) => /GUARD-MARK/.test(d?.deny ?? '')],
+  [sh(`gh issue reopen 27 -c "${PASS}"`), {}, (d) => /GUARD-MARK/.test(d?.deny ?? '')],
+  [sh(`gh pr -R ${REPO} comment 27 -b "${PASS}"`), {}, (d) => /GUARD-MARK/.test(d?.deny ?? '')],
+  [gw('add_issue_comment', { issue_number: 27, extra: Array(20000).fill('x'), body: 'x' }), {}, (d) => /too large.*GUARD-MARK/.test(d?.deny ?? '')],
+  [merge(), { comments: [okc({ b: `${PASS}\r\nchecked: x` })] }, (d) => d?.allow !== undefined],
+  [merge(), { comments: [okc(), 'not json'] }, (d) => d === null],
+  [merge(), { comments: [okc()], checks: [['gate', 'completed', 'success', '2026-11-27T10:00:00Z'], ['gate', 'completed', 'success', '2026-11-27T12:00:00Z'], ['smoke', 'completed', 'success']] }, (d) => d === null],
+  [ev('mcp__plugin_engineering_github__merge_pull_request', { owner: 'Mergincanli', repo: 'Shamble-Frontlines', pullNumber: 27 }, { agent_id: 'a1' }), {}, (d) => /subagent never merges/.test(d?.deny ?? '')],
+  [ev('mcp__Miro__board_create', { name: PASS }), {}, (d) => /GUARD-MARK/.test(d?.deny ?? '')],
+  [ev('mcp__plugin_engineering_github__merge_pull_request', { owner: 'Mergincanli', repo: 'Shamble-Frontlines', pullNumber: 27, expectedHeadSha: SHA }), { comments: [okc()] }, (d) => /only through the github connector/.test(d?.deny ?? '')],
+  [ev('mcp__gh__enable_pr_auto_merge', { owner: 'Mergincanli', repo: 'Shamble-Frontlines', pullNumber: 27 }), {}, (d) => /only through the github connector/.test(d?.deny ?? '')],
+  [ev('mcp__gh__merge_pull_request', { pullNumber: 27 }, { agent_id: 'a1' }), {}, (d) => /subagent never merges/.test(d?.deny ?? '')],
+  [ev('mcp__plugin_engineering_github__update_issue_comment', { owner: 'Mergincanli', repo: 'Shamble-Frontlines', comment_id: 999, body: 'x' }), {}, (d) => /could not be read/.test(d?.deny ?? '')],
+  [ev('mcp__a__b__merge_pull_request', { owner: 'Mergincanli', repo: 'Shamble-Frontlines', pullNumber: 27, expectedHeadSha: SHA }), { comments: [okc()] }, (d) => /only through the github connector/.test(d?.deny ?? '')],
+  [ev('mcp__github__x__merge_pull_request', { pullNumber: 27 }, { agent_id: 'a1' }), {}, (d) => /subagent never merges/.test(d?.deny ?? '')],
+  [ev('mcp__github__x__merge_pull_request', { owner: 'Mergincanli', repo: 'Shamble-Frontlines', pullNumber: 27, expectedHeadSha: SHA }), { comments: [okc()] }, (d) => /only through the github connector/.test(d?.deny ?? '')],
+  [ev('mcp__a__b__update_issue_comment', { owner: 'Mergincanli', repo: 'Shamble-Frontlines', comment_id: 999, body: 'x' }), {}, (d) => /could not be read/.test(d?.deny ?? '')],
+];
+const markedEdit = async (m) => {
+  const io = fakeIo(); const g = io.gh;
+  io.gh = (args) => (args.some((a) => a.endsWith('/issues/comments/222')) ? { code: 0, out: JSON.stringify({ body: PASS }) } : g(args));
+  return /GUARD-MARK/.test((await m.decide(gw('update_issue_comment', { comment_id: 222, body: 'x' }), io))?.deny ?? '');
+};
+const RT_MUTANTS = [
+  ['a subagent never merges', "if (last === 'merge_pull_request' && input.agent_id) return deny(", 'if (false) return deny('],
+  ['GUARD-MARK on writes', "if (!GITHUB_READ.test(name) && name !== 'merge_pull_request' && hasMark(ti)) return deny(hasMark(ti) === 'big' ? MARK_BIG : MARK_DENY);", ''],
+  ['a merge only through the github connector', "if (/^(merge_pull_request|enable_pr_auto_merge)$/.test(last) && tool !== `mcp__github__${last}`) return deny(", 'if (false) return deny('],
+  ['the merge connector is the exact tool name', "tool !== `mcp__github__${last}`", "server !== 'github'"],
+  ['the size case has its own message', "hasMark(ti) === 'big' ? MARK_BIG : MARK_DENY", 'MARK_DENY'],
+  ['GUARD-MARK on edits', 'if (hasMark(ghJson(io, `repos/${ti.owner}/${ti.repo}/issues/comments/${ti.comment_id}`).body)) return deny(MARK_DENY);', ''],
+  ['an unreadable edit is refused', "catch { return deny('a comment edit is checked", "catch { return null; ('a comment edit is checked"],
+  ['spacing is folded', ".replace(/\\s+/g, '')", ''],
+  ['toolchain is required', "for (const nm of ['gate', 'smoke', 'toolchain']) {", "for (const nm of ['gate', 'smoke']) {"],
+  ['the PASS is by Mergincanli', "c.u === 'Mergincanli' && ", ''],
+  ['the PASS is by a user', "c.t === 'User' && ", ''],
+  ['the PASS is unedited', 'c.c === c.m', 'true'],
+  ['the PASS follows the gate run', '&& Date.parse(c.c) > after', ''],
+  ['the PASS line is exact', "String(c.b).split(/\\r?\\n/)[0] === want", "String(c.b).includes('PASS')"],
+  ['a carriage return ends the first line too', 'String(c.b).split(/\\r?\\n/)[0]', "String(c.b).split('\\n')[0]"],
+  ['the comment list is read whole', "['api', '--paginate', `repos/${repo}/issues/${n}/comments", "['api', `repos/${repo}/issues/${n}/comments"],
+  ['the comment read keeps updated_at', "m: .updated_at, b: .body} | @json'", "m: .created_at, b: .body} | @json'"],
+  ['the comment read keeps the user type', 't: .user.type,', 't: "User",'],
+  ['the latest gate run counts', 'Math.max(...done)', 'Math.min(...done)'],
+  ['a failed allow read is silence', 'catch { /* silence: the prompt */ }', 'catch (e) { throw e; }'],
+  ['GUARD-MARK on every connector', "if (!GITHUB_READ.test(name) && name !== 'merge_pull_request' && hasMark(ti))", "if (server === 'github' && !GITHUB_READ.test(name) && name !== 'merge_pull_request' && hasMark(ti))"],
+  ['the comment-edit check on any connector', "if (last === 'update_issue_comment') {", "if (server === 'github' && name === 'update_issue_comment') {"],
+  ['the merge rules read the last part of the name', "const last = tool.split('__').pop();", 'const last = name;'],
+  ['the allow is for day sessions only', 'if (!role && !input.agent_id) { try {', 'if (!input.agent_id) { try {'],
+  ['the plain gh forms are read', "if (hasMark(argv.join(' '))) return deny(MARK_DENY);", ''],
+  ['a body from a file is refused', 'if (argv.some((t) => /^(--body-file(=|$)|-[^-]*F)/.test(t))) return deny(', 'if (false) return deny('],
+  ['a clustered -F is a body file', '/^(--body-file(=|$)|-[^-]*F)/', '/^(--body-file(=|$)|-F$)/'],
+  ['gh pr close and reopen are read', '/^(comment|review|edit|close|reopen)$/.test(verb)', '/^(comment|review|edit)$/.test(verb)'],
+  ['gh issue close and reopen are read', "(noun === 'issue' && /^(comment|edit|close|reopen)$/.test(verb))", "(noun === 'issue' && /^(comment|edit)$/.test(verb))"],
+  ['the words skip -R and its value', "else if (/^(-R|--repo)$/.test(argv[k])) k++;", ''],
+  ['the scan has a budget', "if (n > 10000) return 'big';", ''],
+];
+test('review tracks, mutation runs: every new rule is needed by some check', async () => {
+  const src = readFileSync(join(HERE, 'routine-guard.mjs'), 'utf8');
+  for (const [input, opts, ok] of RT_CHECKS) assert.ok(ok(await decide(input, fakeIo(opts))), `unmutated: ${JSON.stringify(input.tool_input)}`);
+  assert.ok(await markedEdit({ decide }), 'unmutated: a marked comment edit');
+  const dir = mkdtempSync(join(tmpdir(), 'guard-rt-mut-'));
+  const survivors = [];
+  try {
+    for (const [i, [label, from, to]] of RT_MUTANTS.entries()) {
+      assert.equal(src.split(from).length - 1, 1, `mutant "${label}": its target text occurs exactly once`);
+      const file = join(dir, `m${i}.mjs`);
+      writeFileSync(file, src.replace(from, to));
+      const m = await import(pathToFileURL(file).href);
+      let caught = !(await markedEdit(m).catch(() => false));
+      for (const [input, opts, ok] of RT_CHECKS) {
+        if (caught) break;
+        let d; try { d = await m.decide(input, fakeIo(opts)); } catch { d = 'threw'; }
+        if (!ok(d)) caught = true;
+      }
+      if (!caught) survivors.push(label);
+    }
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+  assert.deepEqual(survivors, [], `mutants no check catches: ${survivors.join('; ')}`);
+});
