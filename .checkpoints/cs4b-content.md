@@ -1294,7 +1294,13 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   stamp's design says; run by name after a clean build (as Builder V4 ran it) it held. P15 to P18 stand before it
   and are caught on the markup scan's own words, which run before the stamp's check. The fix, after this run ends
   (the running script holds a planted source file at any moment): P19 builds the players' file first, then the page
-  (a chain, as C18 and C19), and the whole run is made again; both runs are told in the report.
+  (a chain, as C18 and C19), and the whole run is made again; both runs are told in the report. **The first whole
+  run ended at 20:14:33 UTC** (about six minutes): **83 defect checks caught, 0 not caught; controls 10 held, 1 did
+  not hold (P19, as above)**; every file put back (28 files by sha256); the players' file rebuilt to 3660132b...;
+  the clean tree green (the players' build, the build checks' tests, the source scan: exits 0, 0, 0); its result
+  file kept as `cs4b-content/plants-4b2-run1.txt`. P19 fixed, the anchors 85 of 85, the tree clean: **the second
+  whole run started before 20:15:06 UTC** (the clock read right after; a first version of this line said "20:16",
+  typed ahead of the clock: slip 9), on the same code (c442a80).
 
 ## Slips of this chat's own rules, for the report
 - One git command did not start its own shell call: `git add .checkpoints/cs4b-content/review-brief-4b1.md` stood
@@ -1343,7 +1349,9 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   was committed. (8) **The chat told him twice, at step 10's end, that CI's 13 min 2 s run left "two minutes
   under the 15-minute limit".** Wrong: the toolchain job's limit is 25 minutes since #78 (his CI-TIME,
   `toolchain.yml:38`), which this branch took in at 35e96ad; the run was 11 min 58 s under it. Found at the close
-  (20:10 UTC) while writing the reviewers' brief; corrected to him in the next chat message.
+  (20:10 UTC) while writing the reviewers' brief; corrected to him in the next chat message. (9) A card line said
+  the second plants run started "20:16 UTC" when the clock then read 20:15:06: typed ahead of it, corrected before
+  it was committed.
 
 ## HAND-OVER: where another session picks this up (written 2026-11-27, 00:44 Amsterdam; kept current)
 His words of 2026-11-27, 00:43 Amsterdam (2026-11-26, 23:43:38 UTC; `cs4-walk/mustafa-2026-11-27-save-every-25-

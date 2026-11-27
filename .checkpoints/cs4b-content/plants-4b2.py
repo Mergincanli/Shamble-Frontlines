@@ -194,7 +194,9 @@ PLANTS = [
      ["a link to a file and a link to a folder are refused by name, wherever they lie"]),
     ("P18", "defect", "the scan of the sources no longer knows innerHTML", [(CHECKS, '  ["innerHTML", /innerHTML/i],\n', "")], UNIT,
      ["each word is refused by its own name, in code, in a text and in a comment alike"]),
-    ("P19", "control", "the production page builds from the clean sources", [], PAGE, []),
+    # The page's step needs a walked players' file: in a whole run P14's refused build leaves no stamp (by design), so
+    # the control builds the players' file first, then the page (found by the whole run of 2026-11-27).
+    ("P19", "control", "the production page builds from the clean sources, after a clean build of the players' file", [], chain((ENV, WASM), (ENV, PAGE)), []),
     # Step 10, the judge of a taken map's world, the hostile maps and the fuzz run's worlds.
     ("W10", "defect", "of 512 boxes met at one distance the first visited answers a ray, not the lowest index (the hostile row names it; the same box 512 times does not)", [(WORLD_RS, "t < hit.t || (t == hit.t && shape < hit.shape)", "t < hit.t")], PROOF,
      ["every_hostile_map_is_one_the_judge_passes", "a search of every shape says shape 0"]),
