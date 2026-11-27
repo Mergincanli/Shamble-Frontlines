@@ -74,7 +74,10 @@ the advisor rules."
   - The base run at H0: `bash .checkpoints/netcode-proof-test/main-run.sh
     /home/user/Shamble-Frontlines/.gate/u8-f1-merge/light-base.log node check.mjs --only refs,marks,self,redact`
     (run_in_background, timeout 7200000): N0 (refs; the count recorded as N0 (2,139 at U7's M5; notes since may move it)), the marks line, self, redact items (464). A
-    failure stops the merge here: nothing is staged; the saver restarted; the log to the advisor.
+    failure stops the merge here: nothing is staged; the saver restarted; the log to the advisor. A count off its
+    expectation (the advisor tool, 06:0x): refs not 2,139 or redact items not 464: recorded, and on (C1); self not 80
+    or marks not 81: stop for the advisor (spikes/ is proven unchanged, so a move there means the environment or
+    docs/adr/ moved); any step FAIL: stop, as written.
 - **M1:** the patch's sha256 is 4d6a248425aebb25b317cf2da363e00915e8f2b13eb6f26a6a259a5e0f3f7164.
 - **M2:** `git diff --quiet 77ffc95 H0 --` the 6 paths: exit 0 (each unchanged on the lane since 77ffc95).
 - **M3a (its own call, right before M3; advisor-u7-head.md section 3, word for word):** "`git update-index --refresh`.
@@ -184,3 +187,14 @@ the advisor rules."
   debug folder, free 7,796 to 14,370 MiB. The saver b507lg9fc ran out 06:01:14 ("watch stopped: time is up"; its last
   autosave bea1d82), not restarted. PR #40 re-subscribed 05:58, its rules event read 05:59 (0 review threads; no check
   runs on the notes-only head; main b9aad01 in the branch). Next: this line saved, the advisor tool, then M0.
+- DONE 06:1x: M0: no agent or workflow running (B and A complete; ListAgents none at 05:5x); no cargo, rustc or npt
+  process (`pgrep -l`, exit 1 each, 06:06); the lane lock free (`flock -n`, exit 0); HEAD 0f8aefd = origin before
+  this edit, clean but the new notes; `git fetch origin main`: FETCH_HEAD b9aad01 (no move); no .git/index.lock; free
+  14,370 MiB; the resume line on the card (line 8); the saver ran out 06:01:14 ("watch stopped: time is up"), no
+  `checkpoint.mjs watch` process (`pgrep -f`, exit 1). M1: `sha256sum`
+  4d6a248425aebb25b317cf2da363e00915e8f2b13eb6f26a6a259a5e0f3f7164 (= the plan's). The advisor tool (06:0x): go, with
+  nine points: the report's U7-alignments line rewritten to what was checked (rs.yaml read at this merge; the URL
+  contract not verified, with a proposal for B's head read); M0's base-run expectation line added; M7-M9's U7 done
+  lines and the tracked wip/ files read before M7 and M8; UM-4's lines and U8-FILLS checked during M5. Chat about 30 %
+  by estimate (no result event in the last two pages). Next: this line saved (H0), `git diff --quiet 6968215 H0 --
+  spikes/`, the base run, M2, then M3a.

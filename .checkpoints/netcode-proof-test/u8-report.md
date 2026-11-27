@@ -70,11 +70,16 @@ stop set for U8 (history.md:7703-7722); nothing carried.
 - NC-R3-1 (Low): r1.sh:438-452, save_log unguarded under set -e: a follow-up.
 - For the advisor's head read (read: advisor-u8-head.md): the policy-name INVALID (an unasked addition beyond the four
   reads, plan.md:1256), and the fix's two files (r1.sh, ops/tests/r1sh.test.mjs) with plants P8-P10.
-- U7's alignments (ADV-U8H-4), checked at U7's merge, as found: the URL contract in ops/browser/config.mjs (C1 at U7's
-  merge tested save() and config.mjs against the judge: a verdict, no read error; ADV-U7S-5's stale comment at
-  config.mjs:60 stays open, U8-F1 does not touch config.mjs); `node build.mjs` in cloud-init/rs.yaml (:198-200 build in
-  the spike's web/ with `npm ci --ignore-scripts`, then `node build.mjs`, U7's web/build.mjs, after :194's
-  wasm-bindgen-cli 0.2.130, the version build.mjs pins).
+- U7's alignments (ADV-U8H-4), as found:
+  - `node build.mjs` in cloud-init/rs.yaml, read at this merge (2026-11-27): :198-200 build in the spike's web/ with
+    `npm ci --ignore-scripts`, then `node build.mjs` (U7's web/build.mjs), after :194's wasm-bindgen-cli 0.2.130, the
+    version build.mjs pins. Not run here: the two-path dist build before Stop B's fill runs it (SEC-SB-5).
+  - The URL contract in ops/browser/config.mjs: not verified. No run has driven the real page through config.mjs's
+    URLs: U7's T5 (ii) driver builds its own (web/e2e/t5ii.mjs:290, its `link()`); web/test/lib.test.mjs:207 pins only
+    the status texts U8's PAGE reads; U7's merge's C1, like U8's (line 40 above), was a form test of save() against the
+    judge. Proposed, for the advisor's head read of this merge to rule: the main session runs U8's smoke.mjs against
+    U7's dist in the container before Stop B's fill (it writes no U8 file), else R1's first leg is the first such run.
+    ADV-U7S-5's stale comment at config.mjs:60 stays open (U8-F1 does not touch config.mjs).
 - The `ops` step and how later trees get webdriverio (an install by U8's one form, or the step reporting its absence):
   at that commit's head read.
 - Not run on a VM yet; `node --test ops/` fails on Node 22.23: use the glob form.
