@@ -264,6 +264,12 @@ his LANE-RULES). Its brief: his paste of the start block (start-block-new-chat.m
   two secrets, (c) the other secret pages, (d) the fresh run by the STATUS end-date commit and the re-runs, (e)
   WALL_TEST and wall-test.yml out). Left for the take-in: DECISIONS (his messages to the new chat: 15:05, "A" for
   MERGE-74, 17:31, 19:20), STATUS (#72's row, lane 2's lines; L4: 125 lines), ROADMAP's step 2.6 entry, REPO_MAP.
+  Pushed as c37a40c (push run: the planted branch job refused, annotation read; the comment covers it).
+- T12, main moved again (2026-11-26 18:52 and 18:53 UTC: #77 from the Guard fix chat's branch, then #75, Builder V4's;
+  main b9aad01; read 2026-11-27 04:12 UTC after the push.merge_conflict wake): docs and code of other lanes; nothing
+  under .github/, .claude/, CLAUDE.md or the gate files; the shared docs again (DECISIONS, REPO_MAP, ROADMAP, STATUS).
+  Held, by his 19:20 item 4: one take-in when he says the PR Advisor's merge is through. Whether #77 is that merge is
+  not this chat's to judge (the Guard fix chat tells him).
 - Item 6c checked 2026-11-26 after the push: no pull request of the Guard fix chat's protection for main is open or
   merged (the 12 most recently updated pull requests read with gh api). The token sitting waits.
 
