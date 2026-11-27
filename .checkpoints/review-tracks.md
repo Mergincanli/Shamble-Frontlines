@@ -231,7 +231,9 @@ and gh() (7) after the definitions it uses (6); each state in between parses and
     (2026-11-27 13:55:39); PASS-FORGE pending.
 
 ## Current step (saved at 99% usage, 2026-11-27 ~15:10 UTC)
-39. Docs pass running: docs-keeper in the worktree .gate/rt-sync (DECISIONS five entries by script, STATUS, ROADMAP,
+40. Docs pass DONE and committed (8562c4b8): words check 5/5 ok, repo map OK; PASS-FORGE markers to update: STATUS :34 :47
+    :110, archive :2266 :2443-2446, ROADMAP :343; answers-context.md committed with the notes.
+39. (earlier) Docs pass running: docs-keeper in the worktree .gate/rt-sync (DECISIONS five entries by script, STATUS, ROADMAP,
     REPO_MAP; notes docs-keeper-pass.md). Its docs edits are NOT committed yet. The report draft is written
     (docs/reports/2026-11-27-review-tracks.md in the worktree, copy: .checkpoints/review-tracks/report-draft.md).
     Waiting: his PASS-FORGE answer (asked 2026-11-27 ~14:55 UTC; (a) recommended by me and the advisor agent,
