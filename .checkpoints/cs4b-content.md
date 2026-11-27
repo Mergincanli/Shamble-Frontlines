@@ -1279,8 +1279,12 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   3660132b...0644, 257,421 bytes) and none of three descriptions, the id pattern or the dialect address in its bytes
   (0 hits each: Q2's condition 4). **Official count at step 11's end 7,978, raw 7,996: under the second rung
   (8,000), and the look ahead before step 12 (7,978 + about 1,300 with the map's reading + 350) is about 9,630, past
-  8,450: the work stops before step 12 and asks him** (the card's rule). Its full local checks and the gate: running
-  at the time of writing.
+  8,450: the work stops before step 12 and asks him** (the card's rule; STEP12-GO asked in the chat). **Committed
+  46c192f**, pushed by 17:10:41 UTC (CI's first job on it); after the commit, on the same files, the full local checks
+  passed whole (17:09:36 to 17:16:25 UTC: 235 Rust tests twice, 228 + 6 = 234 in release, format and clippy clean,
+  the generated files written again with the same digests, types 12, boundary 39, 29 browser tests in 208 s, the
+  recordings what their scripts make, the players' file 257,421 bytes in both pages); the gate passes with smoke; CI:
+  gate and smoke green, the toolchain run started 17:10:41 UTC.
 
 ## Slips of this chat's own rules, for the report
 - One git command did not start its own shell call: `git add .checkpoints/cs4b-content/review-brief-4b1.md` stood
