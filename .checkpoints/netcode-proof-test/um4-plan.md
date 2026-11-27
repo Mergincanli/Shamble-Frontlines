@@ -176,6 +176,12 @@ puts them inside check.mjs, so a whole run cannot leave them out.
   /home/user/Shamble-Frontlines/.gate/um4/commit-msg.txt`, no skip marker), pushed by the checkpoint save; then the
   saver's restart and CI on the pushed head; the review round (test-engineer, security-auditor's short read) and the
   advisor's read of the pushed head after the usage settles (the advisor tool, 15:5x).
+- Step 7 DONE 16:37 UTC: 8fb32bc8 pushed by the save 787eb984 (no skip marker); CI on 787eb984 all four success: gate
+  46034034986 (push) and 46034043528 (pull request), toolchain 46034034877 (push) and 46034043538 (pull request). No
+  workflow names spikes/ or netcode-proof (grep over .github/: no match), so CI never runs check.mjs: the ops step is
+  proven by step 5's local counted run, not by CI. Left: the review round (test-engineer: the step, its tests and 2b's
+  log; security-auditor: the short read) and B's read of 787eb984, in one window of three seats after NB2-ONEWAY's push
+  (the advisor tool, 16:3x), or before it if his reply has not come by 17:30 UTC.
 
 ## Size (for U8-FILLS)
 About 20-30 added lines by estimate: the step and its missing-folder line in check.mjs (about 12-18), the list entry
