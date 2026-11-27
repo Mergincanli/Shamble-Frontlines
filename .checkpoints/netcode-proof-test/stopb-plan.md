@@ -27,8 +27,9 @@ going; free disk; usage read.
   with his word. A fix past 6,284 or in crates/host goes to him as a decision before X; a fix in a file the servers
   build comes before Y0.
 - **A3 DONE 22:2x.** Read 1: u6c-r2-netcode.md:90-93 ("Nothing moves 122 s or 0.20 h"), :237-238 (the bound: one-way
-  plus half jitter under about 9 s); crates/l1/src/lib.rs:177-202 gives P2 50+10, P3 75+15, P4 100+20, B1 50+10 ms
-  (RTT/2 plus jitter/2), the largest 120 ms: every profile far inside, so the 0.20 h stands. Read 2: NC-SB-16's count is
+  plus half jitter under about 9 s); crates/l1/src/lib.rs:177-202 gives RTT and jitter of P2 100 +-20, P3 150 +-30,
+  P4 200 +-40, B1 100 +-20 ms: even a full RTT plus its jitter (at most 240 ms) is far inside, so the 0.20 h stands
+  (how the probe halves RTT into one-way was not read; the bound holds either way). Read 2: NC-SB-16's count is
   server/src/probe.rs:84-91 `window_total` (send at interval/2 + i x interval until `packets` lie outside the burst),
   L1's loop at lab/src/probe.rs:124-131 in its logic, pinned on a burst profile by probe_tests.rs:59-78
   (`window_total(1_000_000, 100_000, Some((50 * SEC, SEC)))` = 1,010,000, "B1: the burst's 10,000 on top").
