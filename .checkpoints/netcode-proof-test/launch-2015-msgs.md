@@ -4,7 +4,9 @@ runs. Usage 0.58 at 20:09:41 (reset 20:50). The advisor tool read this plan firs
 split by owner, the variable list from a printed source, the proof bars, the rest by name.
 
 ## B5: the head read of UM-4's fix pass (resume a3de649cd25e474df once CI on 1d4e81a reads all success)
-Sent: (not yet)
+Sent: 21:0x UTC by SendMessage, CI filled (gate push 46066802730, gate pull request 46066808752, toolchain push
+46066803492, toolchain pull request 46066808757: all success, attempt 1; PR #40 "blocked", a draft, not "dirty"); done
+when advisor-um4-fix-head.md's last line reads "Status: COMPLETE".
 
 ```text
 UM-4 fix pass: your head read, from the main session (2026-11-27 21:0x UTC), as your ruling's section 5 says (not a round). Your rules as before (main's advisor.md, unchanged since c9bd268; main b8f02b0149cc928964e54e194cd9c4d68f52bd94). Read only, effort xhigh. Your one output file: /home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/advisor-um4-fix-head.md: plan first, a notes line after each check, each finished block saved at once, the last line "Status: COMPLETE <UTC time>". Write files with the Write and Edit tools only. No `git -C`, no cd into a worktree; one simple command per Bash call, git first in its own command; run no cargo, test, gate, light run, plant or mutant; never export GIT_DIR or any other git variable in a command; read nothing from the web; name variable names only, never values.
