@@ -26,6 +26,12 @@ going; free disk; usage read.
   list and B's two notes' exact text, into stopb-a2-security.md. Each item: fixed where (file, owner, stop) or carried
   with his word. A fix past 6,284 or in crates/host goes to him as a decision before X; a fix in a file the servers
   build comes before Y0.
+- **A3 DONE 22:2x.** Read 1: u6c-r2-netcode.md:90-93 ("Nothing moves 122 s or 0.20 h"), :237-238 (the bound: one-way
+  plus half jitter under about 9 s); crates/l1/src/lib.rs:177-202 gives P2 50+10, P3 75+15, P4 100+20, B1 50+10 ms
+  (RTT/2 plus jitter/2), the largest 120 ms: every profile far inside, so the 0.20 h stands. Read 2: NC-SB-16's count is
+  server/src/probe.rs:84-91 `window_total` (send at interval/2 + i x interval until `packets` lie outside the burst),
+  L1's loop at lab/src/probe.rs:124-131 in its logic, pinned on a burst profile by probe_tests.rs:59-78
+  (`window_total(1_000_000, 100_000, Some((50 * SEC, SEC)))` = 1,010,000, "B1: the burst's 10,000 on top").
 - **A3, two reads, no run** [C4]: (1) the existing reading (u6c-r2-netcode.md:90-93, :162) with its limits: P0 and P1
   only, before H1; P2-P4's and B1's one-way delay plus half jitter, each read from its profile file, against the
   ~9 s bound (:237-238); probe and load code since 17964a3d: only load.rs's MAX_LEAD (U7). (2) NC-SB-16's pin:
