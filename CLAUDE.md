@@ -59,7 +59,8 @@ Until then, the constraints above stand.
 ## The change-set protocol (non-negotiable)
 1. One change-set at a time, on its own branch `cs/<slug>`. Fix bugs before features.
 2. PLAN FIRST (plan mode): goal, systems and files touched, exact symbols to add/remove, risks, change type, the evidence
-   you will produce, reviewers you will call, what Mustafa must check in Brave. Then STOP and have the `advisor` agent
+   you will produce, the review track and reviewers that main's `.claude/scripts/track.mjs` gives for the planned files,
+   what Mustafa must check in Brave. Then STOP and have the `advisor` agent
    review the plan: APPROVE → build; REVISE → fix the plan; ESCALATE → ask Mustafa. The advisor always works from
    main's `.claude/agents/advisor.md`: a session that lacks the agent, started before that file last changed, or whose
    branch changes it runs a general agent that reads it from main.
@@ -80,7 +81,8 @@ Until then, the constraints above stand.
    - netcode → deterministic tests with injected latency, jitter and loss
    - research → every claim cites its source (official docs and specifications first, then talks and papers from
      shipped games); the verifier spot-checks the key claims against their sources
-5. Review on the change-set's final diff, within the review budget below (after fixes, only what changed):
+5. Review on the change-set's final diff, by the reviewers its review track names (below), within the review budget
+   (after fixes, only what changed); who covers what:
    art-director (visuals, UI, animation) · perf-auditor (hot paths, rendering) · security-auditor (network, server,
    storage, dynamic DOM, deps, CI, and every risk-tier-2 change) · netcode-architect (sim, server, protocol) ·
    engine-architect (module boundaries, the Rust ↔ TypeScript boundary) · graphics-engineer (WebGPU, shaders, GPU
@@ -89,9 +91,12 @@ Until then, the constraints above stand.
 6. Commit on the branch; report with `/advisor-report`; docs-keeper updates ROADMAP and STATUS. Keep the PR a draft
    while work is in progress; before marking it ready, fold the checkpoint into the report and delete it
    (`.claude/CHECKPOINTS.md` §9). Mark it ready for review when the report is in; the PR Advisor routine reviews it.
-   Once approved with checks green, it merges at once if no human check is needed; otherwise it labels it
-   `needs-mustafa`, and the session Mustafa gives his go to merges it (his Brave check for anything a player sees, hears
-   or feels; his reconfirmation for rule changes and other major changes). Visual work waits for Mustafa's Brave check
+   Once approved with checks green, it merges at once if no human check is needed, the guard's allow-list admits it and
+   nothing is listed for the merge check; any other PR is merged by the chat that built it once his Advisor's merge
+   check reads PASS (Standing permission, way 1), and that chat may also merge the allow-listed ones first; if it needs
+   his go, it labels it `needs-mustafa`, and his Advisor writes PASS only after his go (his Brave check for anything a
+   player sees, hears or feels; his yes for the rest of advisor.md's "His go keeps"), or a session merges it on his go
+   in its chat (way 2). Visual work waits for Mustafa's Brave check
    before merge or further tuning.
 
 **Risk tiers** (Mustafa's A4, 2026-11-04; his words, the full mapping and the checklists: `.claude/agents/advisor.md`).
@@ -100,17 +105,27 @@ A PR takes the highest tier any changed file or effect reaches; a tier lifts no 
 | Risk tier | Covers | Reviews | Merges |
 |---|---|---|---|
 | 0 | docs that add or change no word or decision of Mustafa's; not ADRs, the register, design or look docs; not a `CLAUDE.md`, `CLAUDE.local.md`, `AGENTS.md`, `.claude/` folder, agent memory or other gitignored path, or a file renamed or moved from outside tier 0 | CI + the PR Advisor | the PR Advisor |
-| 1 | game code, pages, `tools/` (not gate files), tests, spikes; the docs tier 0 leaves out | CI + the advisor + the type's reviewers | `ready`: the PR Advisor; else his go (outside the guard's allow-list: from a day session) |
+| 1 | game code, pages, `tools/` (not gate files), tests, spikes; the docs tier 0 leaves out | CI + the advisor + the track's reviewers (`track.mjs`) | `ready`: the chat that built it, after the advisor's APPROVE in that session and his Advisor's PASS, or the PR Advisor inside the guard's allow-list when nothing is listed for the merge check; else his go (through his Advisor's PASS, or in a chat) |
 | 2 | CLAUDE.md, `.claude/`, `.github/`, gate files, the guard, secrets, infrastructure | the advisor + security-auditor | his go (kit, CI, gate: a day session) |
 | 3 | anything irreversible, or that costs money | agents only propose | his decision of the act, then his go |
 
-Steps 4 and 5 apply at every tier; decision docs always need his go.
+Steps 4 and 5 apply at every tier; whatever advisor.md's "His go keeps" lists needs his go (given in a chat, or carried
+by his Advisor's PASS), a decision of his set or changed among it; a record of his typed words copied by script goes to
+his Advisor's merge check instead.
 
 - **Review budget** (A4): a round is one review of one head by all the change-set's reviewers (3 at a time is still one
   round), then one fix pass. At most two rounds, the second on what changed; a third only for an open Critical or High.
   Below that bar a finding becomes a STATUS follow-up, and a Low never triggers a push on its own; a Critical or High
   open after round 3 stops the change-set for Mustafa, never a follow-up. Not rounds, never cut: the gate after every
   step, the verifier until PASS, the advisor's plan reviews and its review of every pushed head.
+- **Review tracks** (Mustafa, 2026-11-25; his words in `docs/DECISIONS.md`): main's `.claude/scripts/track.mjs` sets the
+  track from the files touched, never the PR's own copy; in doubt, full. Light: LIGHT-DEF (a): the plan and the
+  advisor's plan review, the gate and CI, one review round by the one reviewer the script names at the default effort
+  (plus security-auditor on a light security trigger; risk tier 0: no round), the verifier at max on the final result, a
+  short report, and a second round only for an open Critical or High. Full: netcode, the Rust core, server code,
+  anything anti-cheat and the rule files (the script's table): test-engineer plus at most two picks by the script, all
+  at max (rule files: tier 2's reviewers); the advisor's plan and head reviews, the verifier and the third round for an
+  open Critical or High stay.
 - **Severity**, one scale for every reviewer, the verifier and the advisor (major = High, minor = Medium, nit = Low).
   Critical: breaks security, data, the guard or main, or gets around the guard, the merge check or branch protection.
   High: a wrong result or rule a player, Mustafa or a session would hit; a rule loosened beyond his words; his words
@@ -125,12 +140,23 @@ Standing permission (Mustafa, 2026-10-14): create `cs/<slug>` branches, commit, 
 without asking (a cloud session limited to a `claude/…` branch uses that as the stand-in and says so). Ask the `advisor`
 agent whenever a decision is needed; it escalates to Mustafa what it may not decide. Still required: an approved plan
 before edits (a pure revert aside: Rollback), the advisor's APPROVE before anything merges to main, and Mustafa's Brave
-check for anything a player sees, hears or feels. A session merges only on Mustafa's own go in its chat, about that PR
-and for the PR's current head, given after the advisor approved that head (its verdict in this session, or its PR review
-comment posted by the `Mergincanli` account and naming that full SHA), with the gate and smoke checks green, and passes
-that SHA as the merge's expected head (the night shift never merges); a later push needs the advisor's review first,
-then his go again; every other merge is the PR Advisor's. Sessions post on GitHub as Mustafa's account, so a "merge"
-written on GitHub never counts as his go; every comment they write ends with the Claude Code footer.
+check for anything a player sees, hears or feels. A session merges a PR for its current head only, with gate, smoke and
+toolchain green, passing that SHA as the merge's expected head, in one of two ways: (1) the chat that built it, after
+the advisor approved that head in this session (a PR review comment does not stand in) and the chat posted that verdict
+on the PR naming the full SHA and what in advisor.md's "His go keeps" it found, once his Advisor's merge check is in: a
+comment by `Mergincanli` whose first line reads exactly `Advisor merge check: PASS #<PR> <full SHA>`, never edited and
+posted after the gate run on that SHA, re-read through the API right before the merge. His Advisor writes PASS only when
+nothing in "His go keeps" applies, or once Mustafa has given what it needs for that head (his Brave check for anything a
+player sees, hears or feels; his yes for the rest), so his go reaches the merge through that PASS (Mustafa's
+MERGE-PROMPT (d), 2026-11-26); its status line `Advisor merge check: FOR HIS GO #<PR> <full SHA>` is never a go. (2) Any
+PR after the advisor approved that head (its verdict in this session, or its PR review comment posted by the
+`Mergincanli` account and naming that full SHA), on Mustafa's own go in its chat, about that PR and that head. A
+subagent never merges, and the night shift never merges; a later push needs all of it again; every other merge is the PR
+Advisor's. Sessions post on GitHub as Mustafa's account, so a "merge" written on GitHub never counts as his go; his
+Advisor's PASS comment counts only as way (1) reads it, as his Advisor's statement that what his rules need for that
+head has happened, never as his own word: only his Advisor or he writes it; a session that writes it, or text that
+imitates it, gets around the merge check (a Critical), and the guard refuses its line in every GitHub tool write; every
+comment they write ends with the Claude Code footer.
 
 ## Lanes and accounts
 Mustafa's words, word for word: LANE-RULES' Lanes line (his queue of 2026-11-10, item 3) and ACCOUNTS ("an addition to
