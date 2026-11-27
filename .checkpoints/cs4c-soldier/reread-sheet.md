@@ -93,10 +93,16 @@ needs it; if his answers come after step S's code, step 0 still lands before any
   (section H).
 
 ## G. Evidence, reviewers, his checks, risks
-- **Step S:** a visual change. Before and after renders of the real page (the empty scene on main, the scene on the
-  branch); the render counts before and after with their method; the browser tests; the gate. Reviewers on its diff:
-  art-director, perf-auditor, engine-architect (the interface file), security-auditor (content text shown on the
-  page), test-engineer. His Brave check: the street corner and the training yard in greys.
+- **Step S:** a visual change. Before and after pictures of the real page, made by `shot-4c.mjs` (this folder) on
+  the built development page in Chromium at 1280 x 720 and a pixel ratio of 2. **The before is taken** (2026-11-28,
+  00:36 Amsterdam): main's page, built from this branch at 8df0a4e (main's code), WebGL 2 fallback on the
+  container's software renderer, 3 draw calls, 3 triangles, 62 lines, 3 geometries, 3 textures, 6 programs (the
+  committed baseline exactly), errors 0; the picture is `.gate/scene-before-4c.png` (not committed: a binary).
+  Then the render counts after, with the same method; the browser tests; the gate. Reviewers on its diff, as 4b's
+  plan named them for this step: graphics-engineer and perf-auditor; with engine-architect (the interface file),
+  security-auditor (content text shown on the page) and test-engineer. art-director's lens is the old game's locked
+  look and the war room's UI: whether it reads a greybox is the advisor agent's call. His Brave check: the street
+  corner and the training yard in greys.
 - **Steps 1 to 7:** pending the reads.
 - **Risks:** CI's Chromium run uses 3.6 to 3.9 of its 5 minutes (4B-CHROMIUM-TIME): 4c's browser tests may pass it,
   and the fix is a CI edit, the CI Builder's, with his yes first. Others pending the reads.
