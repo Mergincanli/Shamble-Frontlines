@@ -8149,3 +8149,13 @@ FOR THE NETCODE CHAT. From Mustafa, 27 November, 12:50 Amsterdam (written with m
   29a90199 at 12:2x). (4) For the readings PR before R5 (the card's Open findings). (5) The interim rule unchanged.
   Written 12:50 Amsterdam (11:50 UTC) by his header; transcript line 113258 (a queue-operation enqueue at
   12:25:15.618Z), 1549 characters.
+
+## Mustafa, 2026-11-27 12:37 UTC, in this chat, typed while a turn ran: FULL-PATHS, a standing rule (word for word)
+```text
+From Mustafa, 27 November (written with my Advisor). A standing rule against needless guard prompts: in a shell command, spell out every file you write with its full path. No variable, substitution or wildcard in the name of a file that is written, moved, copied or deleted. Or use the Write and Edit tools for it. Then the guard can see it is not a kit or gate file and does not ask me. This changes nothing else: writes to kit and gate files still ask me first.
+```
+- **Read as** (the main session's reading, not his words): FULL-PATHS: every file a shell command writes, moves,
+  copies or deletes is named by its full path, with no variable, substitution or wildcard in the name, or the Write
+  and Edit tools do it; kit and gate writes still ask him first. It binds this session and every agent: each brief
+  carries his three rule sentences word for word.
+  Transcript line 113476 (a queue-operation remove at 12:37:29.264Z, when the running turn took it), 463 characters.

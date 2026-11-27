@@ -50,7 +50,10 @@ first, after the 15:50 seats finish; this merge after UM-4's push, in the next g
    e2. marks.json at T: the pipe hash a41ee583…, and its diff against 591e2cb the one hunk above; else stop, to him.
    f. Free disk at least 8,192 MiB: the approved dev part-clean first (UM-4's run leaves it under again), measured.
    g. The saver stopped by TaskStop, then `pgrep -c -f checkpoint.mjs` printing 0 (replaces `pgrep -f` exit 1).
-   h, i. As before: the card's resume line, H0, then .gate/nb2b-merge/light-base.log (refs, marks, self, redact).
+   h, i. As before: the card's resume line, H0, then `mkdir -p /home/user/Shamble-Frontlines/.gate/nb2b-merge` and the
+      base light run into /home/user/Shamble-Frontlines/.gate/nb2b-merge/light-base.log (refs, marks, self, redact).
+      Every file a shell command writes is named by its full path (his FULL-PATHS rule, 11-27, history.md:8155); the
+      merge message file is written by Write.
 2. The command named to him first, the board line set, the turn ended, his reply awaited (NB2-PROMPT (a)); T read
    again just before sending: `git merge --no-ff -F /home/user/Shamble-Frontlines/.gate/nb2b-merge/merge-msg.txt
    29a901994f5b65c23a17162422770aaacc0ca44e`, the message file naming his word (history.md:8133-8151), T and c56afd07.

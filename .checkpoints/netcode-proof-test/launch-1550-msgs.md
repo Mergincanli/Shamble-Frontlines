@@ -13,7 +13,9 @@ The order: D, B and NB at once (B and NB only read, so D's are the only git step
 at most 3 agents. UM-4's build (the main session) starts only after all three files read COMPLETE and are saved. Everything new starts before 16:20 (LEAN-MODE); what
 misses 16:20 waits for the next window. A refused resume of D is not replaced by a fresh agent (a fresh agent is not in
 that worktree): it means fallback (b), the worktree stays until PR #40's close.
-Every message carries the two standing sentences word for word, and the EXIT-SILENT sentence after them.
+Every message carries the two standing sentences word for word, the EXIT-SILENT sentence after them, and his
+FULL-PATHS rule last (11-27 12:37 UTC, history.md:8155, word for word). The main session's own shell writes follow it
+too (D's keep-first `cp -a` and the remove already name full paths).
 
 ## Before D (the main session, each its own call; any difference from 11:1x's result stops, nothing sent)
 1. `node .checkpoints/netcode-proof-test/ffcheck.mjs /home/user/Shamble-Frontlines/.claude/worktrees/agent-a7fe1b9f436f36bb1 77ffc95101e186f75c57a1e8770b3ab7a9442820 28ea74ef458d0a5c7211634a481e2b5253a56f8c`:
@@ -49,7 +51,9 @@ files: apply rustfmt's diff by Edit); an agent with no Edit tool rewrites its no
 always start their own command, with no other program in front of them. In this tool a command that exits non-zero
 without printing can show nothing at all, the same as a pass (seen with `test`, `git diff --quiet` and `grep -q`): use
 only forms whose output carries the answer (`git diff --name-only` or `--stat`, `ls -d`, `cmp -s`, sha256 lists), and
-quote that output.
+quote that output. His rule: "in a shell command, spell out every file you write with its full path. No variable,
+substitution or wildcard in the name of a file that is written, moved, copied or deleted. Or use the Write and Edit
+tools for it."
 Re-checked at sending: (to fill: main; HEAD = origin, clean; the three checks above).
 
 ## B: a3de649cd25e474df (resumed; it ruled the rewordings in advisor-u8-f1-head.md block 3): their head read
@@ -75,7 +79,9 @@ files: apply rustfmt's diff by Edit); an agent with no Edit tool rewrites its no
 always start their own command, with no other program in front of them. In this tool a command that exits non-zero
 without printing can show nothing at all, the same as a pass (seen with `test`, `git diff --quiet` and `grep -q`): use
 only forms whose output carries the answer (`git diff --name-only` or `--stat`, `ls -d`, `cmp -s`, sha256 lists), and
-quote that output.
+quote that output. His rule: "in a shell command, spell out every file you write with its full path. No variable,
+substitution or wildcard in the name of a file that is written, moved, copied or deleted. Or use the Write and Edit
+tools for it."
 
 ## NB: a10848a10f73ed39e (resumed; it wrote advisor-nb2-merge.md's NB2-C1 to -C12): the check of NB2-ONEWAY's merge plan
 Not sent. With D and B (3 at once), before 16:20.
@@ -93,7 +99,9 @@ files: apply rustfmt's diff by Edit); an agent with no Edit tool rewrites its no
 always start their own command, with no other program in front of them. In this tool a command that exits non-zero
 without printing can show nothing at all, the same as a pass (seen with `test`, `git diff --quiet` and `grep -q`): use
 only forms whose output carries the answer (`git diff --name-only` or `--stat`, `ls -d`, `cmp -s`, sha256 lists), and
-quote that output.
+quote that output. His rule: "in a shell command, spell out every file you write with its full path. No variable,
+substitution or wildcard in the name of a file that is written, moved, copied or deleted. Or use the Write and Edit
+tools for it."
 
 ## After D (the main session; not bound to the window, as it starts no agent; only when D's step 3 printed nothing)
 B's form (advisor-u8-f1-head.md block 4), each its own call:

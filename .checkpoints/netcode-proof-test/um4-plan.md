@@ -2,7 +2,9 @@
 Status: rev 0.3, APPROVED WITH CONDITIONS UM4-1 to UM4-8 (advisor-um4-plan.md, A2 a0530735048f1620a, 11:15 UTC),
 all applied word for word by Edit 11:2x UTC; Q1-Q4 answered there (Q4: the web step's form; npm ci's built-in audit
 falls under "npm audit, never retried in any wording"). C ran 11:09 (its result read) and U7's builder worktree was
-removed 11:1x. (Rev 0.2, 08:5x UTC: the advisor tool's points folded in: a light base run first, npm's cleared form
+removed 11:1x. His FULL-PATHS rule (11-27 12:37 UTC, history.md:8155) holds at the build: steps 0, 2b and 5
+write /home/user/Shamble-Frontlines/.gate/um4/light-base.log, /home/user/Shamble-Frontlines/.gate/um4/absent.log and
+the counted run's log by their full paths, the folder by `mkdir -p /home/user/Shamble-Frontlines/.gate/um4`. (Rev 0.2, 08:5x UTC: the advisor tool's points folded in: a light base run first, npm's cleared form
 with no audit, the order after U7's builder worktree, the node_modules facts, Q4.) His U8-FILLS answer came 12:25 UTC: (a), UM-4 outside U8's stop
 (history.md:8133-8151); the build runs after the 15:50 window's three seats finish (the advisor tool, 12:3x). It was:
 nothing built before his U8-FILLS answer (msg-2026-11-28.md: whether UM-4's lines count against U8's 6,282 stop). The parts are
