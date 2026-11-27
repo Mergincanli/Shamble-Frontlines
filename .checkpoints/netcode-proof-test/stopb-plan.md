@@ -1,8 +1,7 @@
 # Stop B's preparation: the owed items, the two notes, Y0, Y, the dist hashes, the fill X, the message (rev 0.2, 2026-11-27 22:1x UTC)
-Status: rev 0.2, B6's REVISE applied (advisor-stopb-plan.md, COMPLETE 22:00 UTC; one High, STOPB-1). Lines changed
-since rev 0.1 carry their condition: [C1]-[C7] (B6's), [T] (the advisor tool's points, 22:0x). Started now, as B6
-allowed: A1, A2's seat, A3's reads, A4, B1's dry run, C2's prints, D4's first read, E2's drafting, the closing-list edit
-and TE-5. B2 onward (Y0, the builds, Y, X) waits for B6's re-check of the changed lines.
+Status: rev 0.3: rev 0.2 (B6's REVISE applied: advisor-stopb-plan.md, COMPLETE 22:00 UTC; one High, STOPB-1) passed
+B6's re-check at 22:12 UTC with R1-R3, applied here [R1]-[R3]. Tags: [C1]-[C7] B6's, [T] the advisor tool's (22:0x).
+Y0 is cut only when A2 has reported (a fix after Y0 costs new Y0, Y, X and both builds).
 
 ## Why now
 - His NO WAITING FOR WINDOWS (history.md:8163-8186) and his 21:34 and 21:35 words (history.md:8241-8257): continue
@@ -49,6 +48,15 @@ going; free disk; usage read.
   or with those commits is a U8 line in Y0, to him first. None found: one line for B6.
 
 ## B. The two notes and the stand-ins: Y0
+- **B1 DONE 22:15** [R1]: worktree .gate/stopb-dry at 9897cb37; ops/browser installed in the cleared form (`npm ci
+  --ignore-scripts --no-audit --no-fund --prefix <its ops/browser>`, npm_config_ignore_scripts=true; 167 packages).
+  Base: self 88/88, ops 104/104, wrappers 315 ok 0 failed, redact 464 items 0 findings, refs 2188 (= the real tree's
+  counted run, .gate/um4-fix/counted.log). Red (.gate/stopb/dry-f0-red*.log): the three fills without stand-ins fail
+  exactly two tests by name, browser.test.mjs:169 "item 9 ..." ('Missing expected exception.') and r1sh.test.mjs:424
+  "2.9 SEC-SB-5 ..." (no "the expected list is empty"). Green with the notes and stand-ins: X, Y and Y0 shapes all
+  4/4, the same counts (dry-x.log, dry-y.log, dry-y0.log); redact passes on the real URL. Numstat at X: rs.yaml and
+  lg.yaml `1 1`, R1.md `3 2` (note `1 0`, URL `2 2`), PROMPT-R1.md `2 1`, r1-dist.sha256 `7 0`, stand-ins `1 1` each.
+  The worktree is removed after its files are restored (no --force).
 - **B1, the full dry run** [C2][T]: in a git worktree under .gate/ (not a copy, so refs and redact read real git state),
   three shapes, each through `node check.mjs --only self,ops,redact,refs`:
   Y0 (the notes and stand-ins, unfilled); Y (plus U7's real seven list lines, u7-report.md:134-141, commit zeros);
@@ -78,7 +86,8 @@ going; free disk; usage read.
   only, under its 4-line comment -> build 2 at Y (worktree B, CARGO_HOME B) -> X = Y plus the two commit lines and the
   URL. Bars [T]: `git diff --name-only Y0 Y -- spikes/netcode-proof` is the list's file alone, `--numstat` `7 0`;
   build 2's list equals Y's committed non-comment lines byte for byte; `git diff --name-only Y X --
-  spikes/netcode-proof` is exactly rs.yaml, lg.yaml and R1.md, `--numstat` `1 1` each, hunks printed. A difference
+  spikes/netcode-proof` is exactly rs.yaml, lg.yaml and R1.md, `--numstat` `1 1` for each cloud-init file and, for
+  R1.md, net 0 with its hunk inside :92-93 (`2 2`: the URL cannot join :92 under the wrap) [R2], hunks printed. A difference
   goes to B6 before X with both lists. Y and X each pushed with CI green.
 - **C2, the tools** (read before the check, all matching rs.yaml's pins): rustup 1.29.3, rustc 1.99.1 (the spike's
   rust-toolchain.toml), wasm-bindgen 0.2.130 (build.mjs refuses otherwise), node v22.23.4, npm 10.9.9. Re-printed in
@@ -92,9 +101,11 @@ going; free disk; usage read.
   among RUSTFLAGS, CARGO_ENCODED_RUSTFLAGS, RUSTC_WRAPPER, CARGO_BUILD_*, CARGO_PROFILE_*, CARGO_TARGET_DIR,
   CARGO_NET_OFFLINE and RUSTUP_TOOLCHAIN printed first, all unset but rs.yaml's prefixes; free disk before and after
   build 1; literal paths. Q3: `cargo fetch --locked` into CARGO_HOME B through the proxy; a copy only if refused.
-- **The npm deviation** [T]: rs.yaml:198's `npm ci --ignore-scripts` makes npm's built-in audit call, which this lane
-  never runs; here it runs as `npm ci --ignore-scripts --no-audit --no-fund` (the form of every earlier install on the
-  lane, dependency-check.md). The flags change no installed byte, so the dist is the same; named in the report.
+- **The npm deviation** [T][R3]: rs.yaml:199's `npm ci --ignore-scripts` makes npm's built-in audit call, which this
+  lane never runs; here it runs as `npm ci --ignore-scripts --no-audit --no-fund` (the form of every earlier install on
+  the lane, dependency-check.md:62, :163). The flags change no installed byte, so the dist is the same; named in the
+  report. rs.yaml:199 is kept as merged (B6's re-check, option 2), unless A2 rates RS's audit call a finding (then
+  `1 1` in Y0).
 - **The lists:** rs.yaml:221's form (`find . -type f -print0 | LC_ALL=C sort -z | xargs -0 sha256sum` in web/dist),
   seven files. Supporting line, not a bar: against U7's seven (u7-report.md:134-141). Worktrees removed after X.
 
