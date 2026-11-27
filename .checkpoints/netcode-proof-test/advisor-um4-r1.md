@@ -47,6 +47,12 @@ Decisions needed; For Mustafa; status line. One simple command per Bash call, gi
   `node --test` in the self step) skips its files unless NODE_TEST_CONTEXT is removed from the child's env.
 - The lane runner is /home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/main-run.sh (no copy in the spike
   folder); .gate/um4/ holds absent.log, counted.log, light-base.log, ops-pass.log, commit-msg.txt.
+- Read after the advisor tool's second check:
+  - ops/operator/pre-push only reads refs from stdin, hashes the copy and pipes to `node "$COPY" --pre-push`. It makes
+    no git call of its own.
+  - redact-check.mjs's git (:290-292) is called only from stagedItems (:313-318: `diff --cached`, `show`) and
+    prePushItems (:321-338: `rev-list`, `log`, `diff`, `diff-tree`, `show`), at :376-377. All of them only read.
+  - The folder mode, which is the redact step's second run on HERE, walks the disk (walk, :279-287) and runs no git.
 - advisor tool (consulted before the blocks): wildcard over the 15-name list (S's list names GIT_NAMESPACE, not in
   git's 15); (b) in place at 0 net; a victim test for (b), never vacuous; the redact step's wall named; the redact
   tests' effect reasoned, not probed. Taken below; my own reasons are given per item.
@@ -96,9 +102,12 @@ Decisions needed; For Mustafa; status line. One simple command per Bash call, gi
   - Never put the container's config back by guess.
 - The redact step (check.mjs:2741-2746) gets no env change in this pass:
   - Its wall is (b) below: the source fix plus the victim test, which cover its runs and direct runs alike.
-  - What is left under an exported GIT_DIR is a FAIL, the safe direction. The reason: redact-check.mjs's own git
-    (:291, through main() in the tests and through the pre-push hook) honours GIT_DIR by design, since a pre-push hook
-    must read the repository git names.
+  - What is left under an exported GIT_DIR, once (b) lands, is reads.
+    - redact-check.mjs's own git (:291, through main() in the tests and through the pre-push hook) honours GIT_DIR by
+      design, since a pre-push hook must read the repository git names. Its calls only read (Notes).
+    - The step's second run, the folder scan, runs no git.
+    - So the only effect left is that the step's test run reads the wrong repository and fails: the safe direction.
+      This is read from the code, not run.
   - Stripping it now would need runner injection, a pin and a mutant, for a step outside UM-4 and for a safe-direction
     FAIL only. Carried as UM4R-2 (Low; below).
 
@@ -114,8 +123,10 @@ Decisions needed; For Mustafa; status line. One simple command per Bash call, gi
   - Each helper's first call is `git init` in its own folder, so every later call finds that folder's own .git.
   - If init fails, execFileSync throws before any other call.
   - Leaving out `GIT_*` already closes the only route to another repository.
-- Left as they are: the pre-push spawn (operator.test.mjs:162) and redact-check.mjs:291. They only read, and a hook
-  must honour the GIT_DIR git exports to it.
+- Left as they are: the pre-push spawn (operator.test.mjs:162) and redact-check.mjs:291.
+  - They only read. The hook makes no git call of its own, and redact-check's git is `diff --cached`, `show`,
+    `rev-list`, `log`, `diff` and `diff-tree`, at :313-338 (Notes).
+  - A hook must honour the GIT_DIR git exports to it.
 - The stop: U8 stays at 6,282 lines (6,284 once Stop B's two notes are built), since every site is 0 net.
   - This rests on 0 net at all three sites, not on whose file each one is.
   - My reading: a line rewritten in place at 0 net does not pass his stop. It is his to reverse, so he is told in one
@@ -149,8 +160,15 @@ Decisions needed; For Mustafa; status line. One simple command per Bash call, gi
   - Each child's env is process.env without `GIT_*` and without NODE_TEST_CONTEXT, plus GIT_DIR and GIT_INDEX_FILE
     naming the victim. Those two variables exist only in that child env object.
   - It asserts that the victim is unchanged byte for byte (snapshot, .git included).
-  - It asserts that each child printed `# tests N` with N above 0. Without that assert, NODE_TEST_CONTEXT left in would
-    give the "called recursively ... skipping running files" pass with no tests run.
+  - It asserts that the children's TAP output names the three temporary-repository tests, as `ok` or `not ok`, title
+    for title:
+    - operator.test.mjs:151's "pre-push: passes a clean push, refuses an address, a tampered copy and a missing copy";
+    - redact-check.test.mjs:157's "--staged reads the index, and --pre-push reads the pushed commits and their
+      messages";
+    - redact-check.test.mjs:193's "--pre-push reads a merge commit's own changes".
+  - A bare `# tests N > 0` is not enough. A file that dies at import still reports one test, and NODE_TEST_CONTEXT left
+    in gives the "called recursively ... skipping running files" pass. Either way the victim would be untouched with
+    nothing run.
   - It does not assert the children's exit codes. Their hook-reading tests honour GIT_DIR by design and may fail.
   - It is red by its own name on the shipped helpers.
   - Each of the three sites (operator.test.mjs:157, redact-check.test.mjs:161, :197), restored alone, turns it red. Log
@@ -242,9 +260,11 @@ Decisions needed; For Mustafa; status line. One simple command per Bash call, gi
   dependency-check.md's UM-4 record. It replaces my proposed "counted another way" wording.
 - **UM4R-2 (Low, mine, new), carried as a STATUS follow-up.** The redact step (check.mjs:2741-2746) passes the whole
   env.
-  - Under an exported GIT_DIR it would FAIL, the safe direction, once (b) lands.
+  - Under an exported GIT_DIR, once (b) lands, its test run would read the wrong repository and FAIL, the safe
+    direction. Every git call left there only reads, and the folder scan runs none (Notes; read, not run).
   - Leave `GIT_*` out there too, pinned, when that step is next touched.
-  - This is not a security finding left open: SEC-UM4-1's damage is closed at the source by (b).
+  - It is a robustness item, not a security finding: nothing is written and nothing passes wrongly. PR #40's class does
+    not hinge on it either way. SEC-UM4-1 alone, if left open, would set that class.
 
 ## 5. A second round: not wanted. APPROVE one round (DONE)
 - NPT-TRIM (history.md:7590): "One review round per unit ... A second round only for an open Critical or High."
@@ -259,6 +279,10 @@ Decisions needed; For Mustafa; status line. One simple command per Bash call, gi
 ## 6. The fix pass's form and its size: APPROVE (DONE)
 - The form: one commit on the lane's branch, as UM-4's fix pass. The main session builds it; no builder worktree is
   needed for this size. One push, then CI, then my head read.
+  - Before any edit, um4-plan.md records the fix pass's file list and symbols. The list adds two files the plan does
+    not name, ops/tests/operator.test.mjs and ops/operator/redact-check.test.mjs, along with the new exported filter
+    function, opsStep's new `base` parameter and the new tests' titles.
+  - This ruling approves that scope. The plan line is its record, so it needs no new plan check.
   - The checkpoint saves its steps.
   - Before the commit, the red logs and mutant logs sit under /home/user/Shamble-Frontlines/.gate/um4-fix/.
 - The size by estimate, against U8-FILLS (a):
@@ -327,4 +351,4 @@ Decisions needed; For Mustafa; status line. One simple command per Bash call, gi
 2. For your reading only: I read a line rewritten in place at 0 net (added less removed, your stop's own count) as not
    passing your 6,284 stop. If you read it otherwise, say so, and the three lines wait for OPS-GIT-ENV-B.
 
-Status: COMPLETE 2026-11-27 20:33 UTC
+Status: COMPLETE 2026-11-27 20:36 UTC
