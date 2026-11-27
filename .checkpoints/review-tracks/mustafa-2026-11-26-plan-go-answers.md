@@ -1,0 +1,3 @@
+PLAN-GO: a
+MERGE-PROMPT: A
+WAKE-END: a

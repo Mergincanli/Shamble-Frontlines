@@ -1,0 +1,1 @@
+What does it mean if the guard ever fails to load a merge that goes through? explain in laymens terms before I decide
