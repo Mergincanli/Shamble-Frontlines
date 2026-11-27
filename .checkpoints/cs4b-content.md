@@ -1213,7 +1213,8 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   Amsterdam): the same minute, now with its source. (3) The chat told him the baseline checks "started 14:22
   UTC"; the log's own birth time is 14:18:25 UTC. Corrected to him in the chat. (4) At about 15:41 UTC one
   `git status --short` stood after a `cd` and before an `ls` in one call. A read. Since then each git command
-  stands alone in its call.
+  stands alone in its call. (5) The correction sent to the advisor agent at cut C says "15:58 UTC"; it was written
+  before the clock read 15:57:53: a time typed ahead of the clock (the brief now says so).
 
 ## HAND-OVER: where another session picks this up (written 2026-11-27, 00:44 Amsterdam; kept current)
 His words of 2026-11-27, 00:43 Amsterdam (2026-11-26, 23:43:38 UTC; `cs4-walk/mustafa-2026-11-27-save-every-25-
@@ -1350,9 +1351,20 @@ bundle: `CreateError::Content`, `message(&self)`, the order test) and point b (t
 devtools' `Replay::new`, passes the frozen content it already checked; `step_alloc.rs` makes a `LocalMatch`, not a
 `Sim`: step 10's); the bindings' 16 tests and the devtools tests (20 groups) pass. rust-reviewer's decision
 (`cs4b-content/rust-reviewer-cutC.md`, DONE): both names are allow-list entries, no code change, so 4b-1's proofs
-stand; its two entries are in `maths-allowed.mjs`, word for word, with the test's pin. Next: the wasm-only build
-(the production file's rules run with content linked for the first time: a refusal there is security-auditor's
-stop), then points c to g.
+stand; its two entries are in `maths-allowed.mjs`, word for word, with the test's pin. **At 15:59 UTC (count 5,920,
+raw 5,938):** the wasm-only build passes with content linked (the production file's rules ran on it for the first
+time: nothing refused); the players' file is 217,692 bytes, sha256 04733d44fe90d57619f81ed1efed6ac5cef0b90228753affc9253e0c9fa96185
+(54,514 before: the content loader and the standard library's number reading and writing; recorded, not gated, by
+ADR 0002's G7). The constructor's content refusal is the loader's own sentence, whole (a first version put "the
+content is refused: " in front of the loader's sentence, which already begins so). Point c done (the start message's
+bundle, 1 to 8,388,608 bytes, a plain ArrayBuffer, checked before the glue copies it; the Worker passes it to `new
+Sim`), the link's `start(padBytes, bundle)` transfers it, the boundary tests (six refusal classes, each an Error and
+no trap, the module usable after; the cap read from the loader's own refusal; a 1 MiB key within 512 characters; both
+replays on the frozen content) and the Chromium replay spec on the frozen content: Worker 52, page 139 (before the
+link's test), boundary 37 tests pass. **Waiting for the advisor agent** (`cs4b-content/advisor-cutC-brief.md`, its
+notes `advisor-cutC.md`): Q1 the message caps (the page's bound above "about 512"), Q2 the page's parse (the map's
+field-by-field reading moved to step 12), Q3 the dev server's `/content.json` form. Not built until it rules:
+`content.ts`, `boot.ts`, the caps, the plugin. Then: the plant, the full checks, the gate, the commit.
 
 ## Next steps (the sheet's revision 3, section G; each step ends with the count of written lines)
 - **4b-1:** 1 the content crate's manifests · 2 the reader, the writer, the bundle, the two kinds, the old tuning's

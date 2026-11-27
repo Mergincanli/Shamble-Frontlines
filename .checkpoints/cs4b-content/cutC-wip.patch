@@ -12,7 +12,7 @@ index 5c8bb2c..9f81dfd 100644
          if let Some(first) = recording.steps.first() {
              sim.rebase(first.host_ms);
 diff --git a/crates/sim-wasm/src/lib.rs b/crates/sim-wasm/src/lib.rs
-index d4e267f..43a4c28 100644
+index d4e267f..95a2196 100644
 --- a/crates/sim-wasm/src/lib.rs
 +++ b/crates/sim-wasm/src/lib.rs
 @@ -27,12 +27,14 @@ pub fn tick_hz() -> u32 {
@@ -40,15 +40,16 @@ index d4e267f..43a4c28 100644
          match self {
              Self::SeedLength(found) => {
                  format!("the match seed must be {SEED_BYTES} bytes and is {found}")
-@@ -48,6 +50,7 @@ impl CreateError {
+@@ -48,6 +50,8 @@ impl CreateError {
              Self::Mode(mode) => {
                  format!("mode {mode} does not exist: only local play ({MODE_LOCAL})")
              }
-+            Self::Content(error) => format!("the content is refused: {}", error.message()),
++            // The loader's own sentence, whole: it begins "the content is refused: " and is at most 512 bytes.
++            Self::Content(error) => error.message(),
              Self::PadBytes(pad) => {
                  format!("{pad} bytes of block padding is above the writer's cap")
              }
-@@ -64,16 +67,25 @@ pub struct Sim {
+@@ -64,16 +68,25 @@ pub struct Sim {
  
  impl Sim {
      /// Checks what the host passed and builds the match at tick 0, its join already on its way. The block is whole
@@ -77,7 +78,7 @@ index d4e267f..43a4c28 100644
          let setup = MatchSetup {
              seed,
              start_tick: 0,
-@@ -95,13 +107,14 @@ impl Sim {
+@@ -95,13 +108,14 @@ impl Sim {
  impl Sim {
      /// Creates the match. `seed` is 32 bytes the Worker drew; `mode` is `MODE_LOCAL` (a `u32`: a whole number below
      /// 2^32 arrives as the host passed it, and JavaScript turns anything else into one first, so the host passes the
@@ -95,7 +96,7 @@ index d4e267f..43a4c28 100644
      }
  
      /// Where the block lies in linear memory. The buffer never moves, so the host asks once.
-@@ -155,6 +168,11 @@ mod tests {
+@@ -155,6 +169,11 @@ mod tests {
  
      const SEED: [u8; SEED_BYTES] = [7; SEED_BYTES];
  
@@ -107,7 +108,7 @@ index d4e267f..43a4c28 100644
      /// The block's words: the tick, the layout's hash, then the echo and the link's counts.
      fn words(sim: &Sim) -> Vec<u32> {
          let fours = sim.local().block().as_chunks::<4>().0;
-@@ -163,7 +181,7 @@ mod tests {
+@@ -163,7 +182,7 @@ mod tests {
  
      #[test]
      fn a_new_match_holds_a_valid_block_at_tick_zero() {
@@ -116,7 +117,7 @@ index d4e267f..43a4c28 100644
          assert_eq!(sim.block_len(), 44);
          assert_eq!(words(&sim), [&[0, LAYOUT_HASH][..], &[0; 9]].concat());
          assert_eq!(sim.block_ptr(), sim.local().block().as_ptr());
-@@ -172,7 +190,7 @@ mod tests {
+@@ -172,7 +191,7 @@ mod tests {
  
      #[test]
      fn each_step_is_one_tick_in_the_block_and_gives_the_next_due_time() {
@@ -125,7 +126,7 @@ index d4e267f..43a4c28 100644
          let place = sim.block_ptr();
          let period = 1000.0 / f64::from(TICK_HZ);
          assert_eq!(sim.rebase(1000.0), 1000.0 + period);
-@@ -191,7 +209,7 @@ mod tests {
+@@ -191,7 +210,7 @@ mod tests {
      /// own byte, and only the low 16 held bits.
      #[test]
      fn what_the_page_posts_comes_back_in_the_block_s_echo() {
@@ -134,7 +135,7 @@ index d4e267f..43a4c28 100644
          sim.step(0.0);
          for button in 0..16u32 {
              // One press of this button, on top of the ones before it, with only its own bit held.
-@@ -215,9 +233,9 @@ mod tests {
+@@ -215,9 +234,9 @@ mod tests {
      /// tick by tick, and one button held differently makes it differ.
      #[test]
      fn the_shared_hash_is_the_local_server_s_and_covers_no_seed() {
@@ -147,7 +148,7 @@ index d4e267f..43a4c28 100644
          for tick in 0..20u32 {
              let hash = a.shared_hash();
              assert_eq!(hash, b.shared_hash());
-@@ -240,7 +258,7 @@ mod tests {
+@@ -240,7 +259,7 @@ mod tests {
  
      #[test]
      fn padding_makes_the_block_longer_and_stays_zero() {
@@ -156,7 +157,7 @@ index d4e267f..43a4c28 100644
          assert_eq!(sim.block_len(), 44 + 4096);
          sim.input(1, 0xFFFF, u32::MAX, u32::MAX, u32::MAX, u32::MAX);
          sim.step(0.0);
-@@ -250,7 +268,7 @@ mod tests {
+@@ -250,7 +269,7 @@ mod tests {
  
      #[test]
      fn a_bad_seed_mode_or_padding_is_refused_with_a_plain_reason() {
@@ -165,7 +166,7 @@ index d4e267f..43a4c28 100644
          assert_eq!(
              refused(&[7; 31], MODE_LOCAL, 0),
              Some(CreateError::SeedLength(31))
-@@ -288,4 +306,57 @@ mod tests {
+@@ -288,4 +307,55 @@ mod tests {
              assert!(!error.message().contains("7, 7"));
          }
      }
@@ -180,10 +181,8 @@ index d4e267f..43a4c28 100644
 +            let CreateError::Content(why) = &error else {
 +                panic!("{error:?}");
 +            };
-+            assert_eq!(
-+                error.message(),
-+                format!("the content is refused: {}", why.message())
-+            );
++            assert_eq!(error.message(), why.message());
++            assert!(error.message().starts_with("the content is refused: "));
 +        }
 +        // A movement file that is not in canonical form, inside a bundle the writer made: named by its file.
 +        let text = content::movement::TEST_TEXT.replace(": 100,", ": 100.0,");
@@ -275,3 +274,461 @@ index 0c196b5..cebd5cc 100644
 +    why: "The toolchain's 128-bit integer multiply (the low 128 bits of a product), which WebAssembly has no instruction for. Called by the loader's number reading and writing, when a bundle loads, never per tick: core's f64 from text (dec2flt, Eisel-Lemire's 64 x 64-bit products), core's shortest and exact texts of an f64 (flt2dec, Grisu: crates/content/src/number.rs, number_text, and the refusal sentences of crates/content/src/error.rs), core's text of a u128, and the tie rule for number texts (number.rs, even_of_a_tie: 5 to the decimals times the odd mantissa, checked). Integer arithmetic: the product modulo 2^128 is one number on every target, and Rust defines checked_mul's overflow, so the bits are the same natively, in every browser and on a server. The routine here is 64-bit integer multiplies, additions, shifts and compares only, no float. rust-reviewer, 2026-11-27: the twin's own body in Node 22 (V8) matched BigInt's product on 900,144 operand pairs.",
 +  },
 +];
+diff --git a/packages/client/src/app/worker-link.test.ts b/packages/client/src/app/worker-link.test.ts
+index 4c3c9f3..100cba1 100644
+--- a/packages/client/src/app/worker-link.test.ts
++++ b/packages/client/src/app/worker-link.test.ts
+@@ -49,11 +49,17 @@ function setUp() {
+   return { link, sent, clock, port, ready, deliver };
+ }
+ 
+-test("it starts the Worker, and posts no input before the Worker is ready", () => {
++test("it starts the Worker on the bundle, given away with the post, and posts no input before the Worker is ready", () => {
+   const { link, sent, ready } = setUp();
+-  link.start(4096);
++  const bundle = new ArrayBuffer(16);
++  link.start(4096, bundle);
+   link.frame(NO_KEYS);
+-  expect(sent.map((entry) => entry.message)).toEqual([{ type: "start", padBytes: 4096 }]);
++  expect(sent).toHaveLength(1);
++  expect(sent[0]?.message).toEqual({ type: "start", padBytes: 4096, bundle });
++  // The very buffer, and in the transfer list: the bytes move to the Worker and are not copied.
++  expect(sent[0]?.message.type === "start" && sent[0].message.bundle).toBe(bundle);
++  expect(sent[0]?.transfer).toHaveLength(1);
++  expect(sent[0]?.transfer[0]).toBe(bundle);
+   expect(ready()).toBe("");
+   expect(link).toMatchObject({ ready: true, blockBytes: 44, tickHz: 30 });
+ });
+diff --git a/packages/client/src/app/worker-link.ts b/packages/client/src/app/worker-link.ts
+index a502596..9ad9057 100644
+--- a/packages/client/src/app/worker-link.ts
++++ b/packages/client/src/app/worker-link.ts
+@@ -208,8 +208,12 @@ export class WorkerLink {
+     return this.#pauses;
+   }
+ 
+-  start(padBytes: number): void {
+-    this.#port.postMessage({ type: "start", padBytes }, []);
++  /**
++   * Starts the match on the content bundle's bytes. They are transferred, not copied: after this call the page holds
++   * them no more (a copy the page wants to read is made before).
++   */
++  start(padBytes: number, bundle: ArrayBuffer): void {
++    this.#port.postMessage({ type: "start", padBytes, bundle }, [bundle]);
+   }
+ 
+   /**
+diff --git a/packages/e2e/tests/replay/determinism.spec.ts b/packages/e2e/tests/replay/determinism.spec.ts
+index 5fb0b5d..abca3e1 100644
+--- a/packages/e2e/tests/replay/determinism.spec.ts
++++ b/packages/e2e/tests/replay/determinism.spec.ts
+@@ -14,11 +14,14 @@ const recordings = path.join(root, "crates/devtools/recordings");
+ const pkg = path.join(root, "packages/sim-worker/pkg");
+ const ORIGIN = "http://replay.invalid";
+ 
+-/** The Worker: the bindings' own calls, as the live host makes them, and the shared hash after each step. */
++/**
++ * The Worker: the bindings' own calls, as the live host makes them (the match made on the recording's frozen
++ * content), and the shared hash after each step.
++ */
+ const WORKER = `import init, { Sim, tick_hz } from "/sim_wasm.js";
+ onmessage = async ({ data }) => {
+   await init({ module_or_path: "/sim_wasm_bg.wasm" });
+-  const sim = new Sim(Uint8Array.from(data.seed), 0, 0);
++  const sim = new Sim(Uint8Array.from(data.seed), 0, 0, Uint8Array.from(data.content));
+   if (data.steps.length > 0) sim.rebase(data.steps[0][0]);
+   const hashes = data.steps.map(([now, post, held, p0, p1, p2, p3]) => {
+     sim.input(post, held, p0, p1, p2, p3);
+@@ -51,7 +54,7 @@ test("every recording replays in the browser's WebAssembly, on the file players
+     return route.fulfill({ status: 404, body: "" });
+   });
+   await page.goto(`${ORIGIN}/`);
+-  const replay = (seed: number[], steps: Step[]): Promise<Outcome> =>
++  const replay = (seed: number[], steps: Step[], content: number[]): Promise<Outcome> =>
+     page.evaluate(
+       (data) =>
+         new Promise<Outcome>((resolve, reject) => {
+@@ -60,7 +63,7 @@ test("every recording replays in the browser's WebAssembly, on the file players
+           worker.onerror = (event): void => reject(new Error(event.message));
+           worker.postMessage(data);
+         }),
+-      { seed, steps },
++      { seed, steps, content },
+     );
+ 
+   const names = readdirSync(recordings).filter((name) => name.endsWith(".rec"));
+@@ -70,21 +73,22 @@ test("every recording replays in the browser's WebAssembly, on the file players
+     const bytes = readPlainFile(recordings, name);
+     const recording = readRecording(bytes, 30);
+     checkReplayable(recording);
+-    // The frozen content beside it is the content its header names, by its sha256 (WebCrypto).
+-    await checkContent(recording, readPlainFile(recordings, name.replace(/\.rec$/, ".content.json")));
++    // The frozen content beside it is the content its header names, by its sha256 (WebCrypto); the match is made on it.
++    const content = readPlainFile(recordings, name.replace(/\.rec$/, ".content.json"));
++    await checkContent(recording, content);
+     const hashes = readHashes(new TextDecoder().decode(readPlainFile(recordings, name.replace(/\.rec$/, ".hashes"))));
+     // The hashes file names its recording by digest: it is this recording's.
+     const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", Uint8Array.from(bytes)));
+     expect(hashes.recordingSha256).toBe(Array.from(digest, (byte) => byte.toString(16).padStart(2, "0")).join(""));
+     const expected = hashes.lines;
+     const steps = recording.steps.map((step): Step => [step.hostMs, step.post, step.held, ...step.presses]);
+-    const got = await replay([...recording.seed], steps);
++    const got = await replay([...recording.seed], steps, [...content]);
+     expect(got.tickHz).toBe(recording.tickRate);
+     expect(got.hashes).toHaveLength(expected.length);
+     expect(firstDifference(expected, got.hashes.map((hash) => BigInt(`0x${hash}`)))).toBeNull();
+     // The check can fail, and it names the step: one held button changed in step 46's post is found at step 46.
+     const changed = steps.map((step, index): Step => (index === 45 ? [step[0], step[1], step[2] ^ 1, step[3], step[4], step[5], step[6]] : step));
+-    const other = await replay([...recording.seed], changed);
++    const other = await replay([...recording.seed], changed, [...content]);
+     expect(firstDifference(expected, other.hashes.map((hash) => BigInt(`0x${hash}`)))).toBe(46);
+     console.log(`${name}: ${got.hashes.length} steps, every shared hash as in the file, in ${await page.evaluate(() => navigator.userAgent)}`);
+   }
+diff --git a/packages/sim-worker/boundary/replay.test.mjs b/packages/sim-worker/boundary/replay.test.mjs
+index ec9d591..7f789dc 100644
+--- a/packages/sim-worker/boundary/replay.test.mjs
++++ b/packages/sim-worker/boundary/replay.test.mjs
+@@ -48,7 +48,8 @@ test.each(names)("%s replays on the players' file to its hashes file, step for s
+   const other = Uint8Array.from(content);
+   other[other.length - 2] ^= 1;
+   await expect(checkContent(recording, other)).rejects.toThrow("the content is not the recording's: its sha256 is not the content hash the header names");
+-  const sim = new Sim(recording.seed, 0, 0);
++  // The match is made on that content, as every match is: the bundle crosses once, through the constructor.
++  const sim = new Sim(recording.seed, 0, 0, content);
+   const got = replayOn(sim, recording);
+   expect(got).toHaveLength(recording.steps.length);
+   expect(firstDifference(expected, got)).toBeNull();
+@@ -56,7 +57,7 @@ test.each(names)("%s replays on the players' file to its hashes file, step for s
+ 
+   // The check can fail, and it names the step. A replay that leaves out the input call of step 46 differs at step 46
+   // (its post brings other held keys than the step before: the script's second stretch starts there)...
+-  const skipping = new Sim(recording.seed, 0, 0);
++  const skipping = new Sim(recording.seed, 0, 0, content);
+   skipping.rebase(recording.steps[0].hostMs);
+   const skipped = recording.steps.map((step, index) => {
+     if (index !== 45) return replayStep(skipping, step);
+@@ -71,17 +72,17 @@ test.each(names)("%s replays on the players' file to its hashes file, step for s
+ });
+ 
+ test("two matches on one module instance, stepped in turn, each give the hashes they give alone", () => {
+-  const { recording, expected } = committed("first-loop");
+-  // A second match of another seed and another input stream: the first one's steps from step 600 on, on the first
+-  // one's own times.
++  const { recording, expected, content } = committed("first-loop");
++  // A second match of another seed and another input stream, on the same content: the first one's steps from step
++  // 600 on, on the first one's own times.
+   const turned = recording.steps.map((step, index) => ({ ...recording.steps[(index + 600) % recording.steps.length], hostMs: step.hostMs }));
+   const second = { ...recording, seed: Uint8Array.from(recording.seed, (byte, at) => (at < 8 ? byte : byte ^ 0x5a)), steps: turned };
+-  const alone = new Sim(second.seed, 0, 0);
++  const alone = new Sim(second.seed, 0, 0, content);
+   const secondAlone = replayOn(alone, second);
+   alone.free();
+   expect(firstDifference(expected, secondAlone)).not.toBeNull();
+ 
+-  const [a, b] = [new Sim(recording.seed, 0, 0), new Sim(second.seed, 0, 0)];
++  const [a, b] = [new Sim(recording.seed, 0, 0, content), new Sim(second.seed, 0, 0, content)];
+   a.rebase(recording.steps[0].hostMs);
+   b.rebase(second.steps[0].hostMs);
+   const together = [[], []];
+diff --git a/packages/sim-worker/boundary/sim-wasm.test.mjs b/packages/sim-worker/boundary/sim-wasm.test.mjs
+index cc2a70c..e36623c 100644
+--- a/packages/sim-worker/boundary/sim-wasm.test.mjs
++++ b/packages/sim-worker/boundary/sim-wasm.test.mjs
+@@ -11,11 +11,18 @@ import { beforeAll, expect, test } from "vitest";
+ import * as glue from "../pkg/sim_wasm.js";
+ import { initSync, panic_buffer, Sim, tick_hz } from "../pkg/sim_wasm.js";
+ import { SimHost } from "../src/host.ts";
++import { MAX_BUNDLE_BYTES } from "../src/messages.ts";
+ import { MAX_TICKS_PER_WAKE } from "../src/pacing.ts";
+ import { PANIC_TEXT_ROOM, readPanicMessage } from "../src/panic-message.ts";
+ import { copyBlock } from "../src/read-block.ts";
++import { readPlainFile } from "./plain-file.ts";
+ 
+ const SEED = new Uint8Array(32).fill(7);
++/**
++ * A bundle the game's loader takes: the first recording's frozen content, committed beside it (any bundle the
++ * loader takes would do here; the replay tests hold it to the recording).
++ */
++const BUNDLE = readPlainFile(new URL("../../../crates/devtools/recordings/", import.meta.url), "first-loop.content.json");
+ const PERIOD = 1000 / 30;
+ let wasm;
+ 
+@@ -38,7 +45,7 @@ function wordsOf(buffer, section) {
+ }
+ 
+ test("a block written by Rust passes the page's layout check, from tick 0 on", () => {
+-  const sim = new Sim(SEED, 0, 0);
++  const sim = new Sim(SEED, 0, 0, BUNDLE);
+   expect(tick_hz()).toBe(30);
+   // The host's cap is a quarter of a second of the simulation's own tick rate (ADR 0004 part 5).
+   expect(Math.floor(0.25 * tick_hz())).toBe(MAX_TICKS_PER_WAKE);
+@@ -53,7 +60,7 @@ test("a block written by Rust passes the page's layout check, from tick 0 on", (
+ });
+ 
+ test("two steps advance the tick by two, and each returns the next due time", () => {
+-  const sim = new Sim(SEED, 0, 0);
++  const sim = new Sim(SEED, 0, 0, BUNDLE);
+   // The host's first rebase says when the first tick is due.
+   expect(sim.rebase(1000)).toBeCloseTo(1000 + PERIOD, 9);
+   expect(sim.step(1000 + PERIOD)).toBeCloseTo(1000 + 2 * PERIOD, 9);
+@@ -63,7 +70,7 @@ test("two steps advance the tick by two, and each returns the next due time", ()
+ });
+ 
+ test("what the host hands in comes back in the block: each button's count in its own byte, through the real messages", () => {
+-  const sim = new Sim(SEED, 0, 0);
++  const sim = new Sim(SEED, 0, 0, BUNDLE);
+   sim.step(0);
+   const counts = new Uint8Array(16);
+   for (let button = 0; button < 16; button += 1) {
+@@ -94,8 +101,8 @@ test("what the host hands in comes back in the block: each button's count in its
+ });
+ 
+ test("after the memory grows between two steps, the next block is the block of a run without the growth", () => {
+-  const grown = new Sim(SEED, 0, 1024);
+-  const plain = new Sim(SEED, 0, 1024);
++  const grown = new Sim(SEED, 0, 1024, BUNDLE);
++  const plain = new Sim(SEED, 0, 1024, BUNDLE);
+   grown.step(0);
+   plain.step(0);
+   // One copy before the growth, so a host that keeps its first view is caught here whatever ran before.
+@@ -111,18 +118,69 @@ test("after the memory grows between two steps, the next block is the block of a
+ });
+ 
+ test("padding makes the block longer and it still passes the check", () => {
+-  const sim = new Sim(SEED, 0, 65536);
++  const sim = new Sim(SEED, 0, 65536, BUNDLE);
+   expect(sim.block_len()).toBe(44 + 65536);
+   sim.step(0);
+   expect(checkLayoutHash(blockOf(sim))).toEqual({ ok: true });
+ });
+ 
+-test("a bad seed, mode or padding is refused with a plain reason", () => {
+-  expect(() => new Sim(new Uint8Array(31), 0, 0)).toThrow("the match seed must be 32 bytes and is 31");
+-  expect(() => new Sim(SEED, 1, 0)).toThrow("only local play (0)");
+-  // The whole number counts: 256 must not be cut down to 0, which is local play.
+-  expect(() => new Sim(SEED, 256, 0)).toThrow("mode 256 does not exist");
+-  expect(() => new Sim(SEED, 0, 0xffff_ffff)).toThrow("above the writer's cap");
++/** What the constructor threw, or undefined when it made a match. */
++function refusal(make) {
++  try {
++    make();
++  } catch (error) {
++    return error;
++  }
++  return undefined;
++}
++
++test("each class of refusal is an Error with a plain reason, never a trap, and the module still makes a match after them", () => {
++  const encode = (text) => new TextEncoder().encode(text);
++  // The frozen bundle with one value changed inside its map's text: an id the id grammar refuses, named in place.
++  const frozen = new TextDecoder("utf-8", { fatal: true }).decode(BUNDLE);
++  const renamed = frozen.replace('\\"id\\": \\"test-scene\\"', '\\"id\\": \\"Test-scene\\"');
++  expect(renamed).not.toBe(frozen);
++  const classes = [
++    [() => new Sim(new Uint8Array(31), 0, 0, BUNDLE), "the match seed must be 32 bytes and is 31"],
++    [() => new Sim(SEED, 1, 0, BUNDLE), "only local play (0)"],
++    // The whole number counts: 256 must not be cut down to 0, which is local play.
++    [() => new Sim(SEED, 256, 0, BUNDLE), "mode 256 does not exist"],
++    [() => new Sim(SEED, 0, 0xffff_ffff, BUNDLE), "above the writer's cap"],
++    // The content: no bundle's text, a document that is no bundle, a value of a file refused by its file and place,
++    // and more bytes than the loader takes.
++    [() => new Sim(SEED, 0, 0, encode("not a bundle")), /^the content is refused: /],
++    [() => new Sim(SEED, 0, 0, encode("{}")), /^the content is refused: /],
++    [() => new Sim(SEED, 0, 0, encode(renamed)), /^the content is refused: .+, in maps\/test-scene\.json, line \d+ column \d+, at id$/],
++    [() => new Sim(SEED, 0, 0, new Uint8Array(MAX_BUNDLE_BYTES + 1)), `${MAX_BUNDLE_BYTES + 1} bytes, more than the ${MAX_BUNDLE_BYTES} allowed`],
++  ];
++  for (const [make, reason] of classes) {
++    const error = refusal(make);
++    expect(error, String(reason)).toBeInstanceOf(Error);
++    expect(error, String(reason)).not.toBeInstanceOf(WebAssembly.RuntimeError);
++    expect(error.message).toMatch(reason);
++  }
++  // A key of 1 MiB: the sentence keeps the loader's bound (512 bytes), its echo of the key cut.
++  const long = refusal(() => new Sim(SEED, 0, 0, encode(`{"${"k".repeat(1 << 20)}": 1}`)));
++  expect(long).toBeInstanceOf(Error);
++  expect(long.message).toMatch(/^the content is refused: /);
++  expect(long.message.length).toBeLessThanOrEqual(512);
++  // Nothing panicked, and the same module makes a match and runs it.
++  expect(readPanicMessage(wasm.memory, panic_buffer())).toBe("");
++  const sim = new Sim(SEED, 0, 0, BUNDLE);
++  sim.step(0);
++  expect(checkLayoutHash(blockOf(sim))).toEqual({ ok: true });
++  expect(tickOf(blockOf(sim))).toBe(1);
++});
++
++test("the Worker's cap on a bundle is the loader's own: one byte more is refused for its size, and the cap itself is not", () => {
++  // The Worker refuses a bigger bundle before the glue copies it (messages.ts); the loader's own number is read here.
++  expect(refusal(() => new Sim(SEED, 0, 0, new Uint8Array(MAX_BUNDLE_BYTES + 1))).message).toContain(
++    `${MAX_BUNDLE_BYTES + 1} bytes, more than the ${MAX_BUNDLE_BYTES} allowed`,
++  );
++  // At the cap the size passes: zero bytes are refused for what they are, not for how many.
++  const atCap = refusal(() => new Sim(SEED, 0, 0, new Uint8Array(MAX_BUNDLE_BYTES)));
++  expect(atCap).toBeInstanceOf(Error);
++  expect(atCap.message).not.toContain("more than the");
+ });
+ 
+ test("the panic hook's buffer stands from the module's start: no text, and its room said", () => {
+@@ -177,7 +235,7 @@ test("in the glue, each per-tick call reaches exactly one export", () => {
+ });
+ 
+ test("the host on the real Wasm: two calls per tick, one transferred block per tick, each passing the check", () => {
+-  const sim = new Sim(SEED, 0, 0);
++  const sim = new Sim(SEED, 0, 0, BUNDLE);
+   const calls = { input: 0, step: 0, rebase: 0, block_ptr: 0, block_len: 0 };
+   const counted = Object.fromEntries(
+     ["input", "step", "rebase", "block_ptr", "block_len"].map((name) => [
+diff --git a/packages/sim-worker/src/host.test.ts b/packages/sim-worker/src/host.test.ts
+index c400f00..450a000 100644
+--- a/packages/sim-worker/src/host.test.ts
++++ b/packages/sim-worker/src/host.test.ts
+@@ -193,7 +193,8 @@ test("a report is sent when asked, and a message that makes no sense gets an err
+   host.start();
+   host.onMessage({ type: "report-request" });
+   expect(posts.at(-1)).toMatchObject({ type: "report", stats: { hardwareConcurrency: 8, crossOriginIsolated: false } });
+-  for (const bad of [null, { type: "stop" }, { type: "start", padBytes: 0 }, { type: "input", sequence: -1 }]) {
++  // A second start, well formed, is refused as much as a message of no known shape.
++  for (const bad of [null, { type: "stop" }, { type: "start", padBytes: 0, bundle: new ArrayBuffer(8) }, { type: "input", sequence: -1 }]) {
+     host.onMessage(bad);
+     expect(posts.at(-1)).toEqual({ type: "error", message: "the Worker got a message it does not know" });
+   }
+diff --git a/packages/sim-worker/src/messages.test.ts b/packages/sim-worker/src/messages.test.ts
+index b12d179..a96ef02 100644
+--- a/packages/sim-worker/src/messages.test.ts
++++ b/packages/sim-worker/src/messages.test.ts
+@@ -1,5 +1,5 @@
+ import { expect, test } from "vitest";
+-import { isPageToWorker, isWorkerStats, isWorkerToPage, MODE_LOCAL, type PageToWorker, type WorkerStats, type WorkerToPage } from "./messages.ts";
++import { isPageToWorker, isWorkerStats, isWorkerToPage, MAX_BUNDLE_BYTES, MODE_LOCAL, type PageToWorker, type WorkerStats, type WorkerToPage } from "./messages.ts";
+ 
+ test("local play is mode 0", () => {
+   expect(MODE_LOCAL).toBe(0);
+@@ -7,12 +7,14 @@ test("local play is mode 0", () => {
+ 
+ /** An input post with nothing held and no press; a test changes what it is about. */
+ const INPUT: PageToWorker = { type: "input", post: 1, held: 0, p0: 0, p1: 0, p2: 0, p3: 0, returned: [] };
++/** A start with a bundle of `bytes` bytes (what they hold is the Wasm's loader's to judge, not this check's). */
++const start = (bytes: number, padBytes = 0): unknown => ({ type: "start", padBytes, bundle: new ArrayBuffer(bytes) });
+ 
+ test("every message the page may send is accepted", () => {
+   const full = 0xffff_ffff;
+   const good: PageToWorker[] = [
+-    { type: "start", padBytes: 0 },
+-    { type: "start", padBytes: 65536 },
++    { type: "start", padBytes: 0, bundle: new ArrayBuffer(1) },
++    { type: "start", padBytes: 65536, bundle: new ArrayBuffer(MAX_BUNDLE_BYTES) },
+     { ...INPUT, post: 0 },
+     { type: "input", post: full, held: 0xffff, p0: full, p1: full, p2: full, p3: full, returned: [new ArrayBuffer(8), new ArrayBuffer(8)] },
+     { type: "visibility", hidden: true },
+@@ -23,7 +25,11 @@ test("every message the page may send is accepted", () => {
+ });
+ 
+ test("anything else is refused", () => {
++  // A buffer the page has already given away: it is still an ArrayBuffer, and holds no byte.
++  const detached = new ArrayBuffer(8);
++  structuredClone(detached, { transfer: [detached] });
+   const bad: unknown[] = [
++    { type: "start", padBytes: 0, bundle: detached },
+     null,
+     undefined,
+     "start",
+@@ -32,10 +38,17 @@ test("anything else is refused", () => {
+     {},
+     { type: "stop" },
+     { type: "start" },
+-    { type: "start", padBytes: -1 },
+-    { type: "start", padBytes: 1.5 },
+-    { type: "start", padBytes: 0x1_0000_0000 },
+-    { type: "start", padBytes: "8" },
++    start(8, -1),
++    start(8, 1.5),
++    start(8, 0x1_0000_0000),
++    { type: "start", padBytes: "8", bundle: new ArrayBuffer(8) },
++    // The bundle: missing, empty, one byte over the loader's cap, a view instead of its buffer, a shared buffer, text.
++    { type: "start", padBytes: 0 },
++    start(0),
++    start(MAX_BUNDLE_BYTES + 1),
++    { type: "start", padBytes: 0, bundle: new Uint8Array(8) },
++    { type: "start", padBytes: 0, bundle: new SharedArrayBuffer(8) },
++    { type: "start", padBytes: 0, bundle: "{}" },
+     // The old shape, a post without one of its numbers, and each number outside its range.
+     { type: "input", sequence: 1, returned: [] },
+     { ...INPUT, returned: undefined },
+diff --git a/packages/sim-worker/src/messages.ts b/packages/sim-worker/src/messages.ts
+index b8203fc..669402b 100644
+--- a/packages/sim-worker/src/messages.ts
++++ b/packages/sim-worker/src/messages.ts
+@@ -6,10 +6,21 @@
+ /** The local match: the client endpoint and a local server in one Worker (ADR 0002 part 6). The only mode so far. */
+ export const MODE_LOCAL = 0;
+ 
++/**
++ * The most bytes a content bundle may hold: the game's loader's own cap (`MAX_BUNDLE_BYTES`,
++ * crates/content/src/bundle.rs; the boundary test reads it from the players' Wasm). A bigger one is refused here,
++ * before the glue copies it into the Wasm's memory.
++ */
++export const MAX_BUNDLE_BYTES = 8 * 1024 * 1024;
++
+ /** From the page to the Worker. */
+ export type PageToWorker =
+-  /** Start the match. `padBytes` pads the block for the hand-off readings; the game itself sends 0. */
+-  | { readonly type: "start"; readonly padBytes: number }
++  /**
++   * Start the match. `padBytes` pads the block for the hand-off readings; the game itself sends 0. `bundle` is the
++   * content bundle's bytes as the page fetched them, transferred: the match is made on it once, and the game's
++   * loader in the Wasm takes it whole or refuses it.
++   */
++  | { readonly type: "start"; readonly padBytes: number; readonly bundle: ArrayBuffer }
+   /**
+    * The newest input, once per drawn frame, as plain numbers: `post` counts the page's posts (it is never the
+    * protocol's command sequence), `held` has one bit per button held (16 buttons), and `p0` to `p3` hold the
+@@ -111,6 +122,11 @@ function isCount(value: unknown): value is number {
+   return typeof value === "number" && Number.isInteger(value) && value >= 0 && value <= 0xffff_ffff;
+ }
+ 
++/** A bundle the Worker may hand to the Wasm: a plain `ArrayBuffer` (never a shared one) of 1 to `MAX_BUNDLE_BYTES` bytes. */
++function isBundle(value: unknown): value is ArrayBuffer {
++  return value instanceof ArrayBuffer && value.byteLength >= 1 && value.byteLength <= MAX_BUNDLE_BYTES;
++}
++
+ /**
+  * Whether a message the Worker received is one the page may send. Anything else is answered with an `error`
+  * message and never reaches the Wasm.
+@@ -119,7 +135,7 @@ export function isPageToWorker(value: unknown): value is PageToWorker {
+   if (!isObject(value)) return false;
+   switch (value["type"]) {
+     case "start":
+-      return isCount(value["padBytes"]);
++      return isCount(value["padBytes"]) && isBundle(value["bundle"]);
+     case "input":
+       return (
+         isCount(value["post"]) &&
+diff --git a/packages/sim-worker/src/worker.ts b/packages/sim-worker/src/worker.ts
+index cf79087..d183d9b 100644
+--- a/packages/sim-worker/src/worker.ts
++++ b/packages/sim-worker/src/worker.ts
+@@ -17,13 +17,14 @@ function tell(message: WorkerToPage, transfer: ArrayBuffer[] = []): void {
+   postMessage(message, transfer);
+ }
+ 
+-async function start(padBytes: number): Promise<void> {
++async function start(padBytes: number, bundle: ArrayBuffer): Promise<void> {
+   const wasm = await init();
+   const wasmSide = { memory: wasm.memory, panicBuffer: panic_buffer() };
+   loaded = wasmSide;
+   // The seed is drawn here and goes nowhere else: no message carries it and nothing logs it (ADR 0004 part 8).
+   const seed = crypto.getRandomValues(new Uint8Array(32));
+-  const sim = new Sim(seed, MODE_LOCAL, padBytes);
++  // The content crosses once, here: the game's loader takes the bundle whole or the constructor throws its reason.
++  const sim = new Sim(seed, MODE_LOCAL, padBytes, new Uint8Array(bundle));
+   seed.fill(0);
+   host = new SimHost(
+     sim,
+@@ -53,7 +54,7 @@ addEventListener("message", (event: MessageEvent<unknown>) => {
+     tell({ type: "error", message: "the Worker got a message it does not know" });
+   } else if (data.type === "start" && !starting) {
+     starting = true;
+-    start(data.padBytes).catch((error: unknown) => {
++    start(data.padBytes, data.bundle).catch((error: unknown) => {
+       // Before the Wasm is loaded there is no buffer to read: an empty memory reads as no text.
+       const { memory, panicBuffer } = loaded ?? { memory: { buffer: new ArrayBuffer(0) }, panicBuffer: 0 };
+       tell({ type: "error", message: trapMessage(memory, panicBuffer, error) });
