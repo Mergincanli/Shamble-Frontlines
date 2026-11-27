@@ -58,6 +58,7 @@ import {
   manifestKeyProblems,
   marksProblems,
   NOT_TICK_COUNTS,
+  opsStep,
   readBackCheck,
   readComparison,
   readScan,
@@ -2001,6 +2002,62 @@ test("the web step: npm ci in security's form only when web/ lacks TypeScript 6.
   assert.ok(r.calls.every((c) => !c.args.includes("install")), "never npm install");
 });
 
+// The ops step's stand-in results (UM-4): U8-F1's M5 counts.
+const opsNodeOk = { ok: true, out: "# tests 104\n# pass 104\n", stdout: "# tests 104\n# pass 104\n", status: 0 };
+const opsWrapOk = { ok: true, out: "wrappers.test.sh: 315 ok, 0 failed\n", stdout: "wrappers.test.sh: 315 ok, 0 failed\n", status: 0 };
+
+test("the ops step: U8's operator tests by Node's own glob, then the wrappers' test, both in the spike's folder (UM-4 (a))", () => {
+  assert.equal(STEPS.ops.length, 0, "STEPS.ops(runner) defaults its runner");
+  const r = recorder([opsNodeOk, opsWrapOk]);
+  const s = opsStep(r.runner, () => true);
+  assert.equal(s.ok, true);
+  assert.deepEqual(r.calls.map((c) => [c.cmd, c.args, c.cwd]), [
+    [process.execPath, ["--test", "ops/**/*.test.mjs"], HERE],
+    ["bash", ["ops/tests/wrappers.test.sh"], HERE],
+  ]);
+  assert.match(lastLine(s.out), /^ops: 104 of 104 tests passed; wrappers\.test\.sh: 315 ok, 0 failed$/);
+});
+
+test("the ops step: either part failing fails it, and nothing after the failing part runs, never a skip (UM-4 (a))", () => {
+  for (const [at, what] of [[0, "node tests"], [1, "wrappers test"]]) {
+    const results = [opsNodeOk, opsWrapOk];
+    results[at] = { ok: false, out: "boom\n", stdout: "boom\n", status: 1 };
+    const r = recorder(results);
+    const s = opsStep(r.runner, () => true);
+    assert.equal(s.ok, false, what);
+    assert.equal(r.calls.length, at + 1, what);
+    assert.ok(lastLine(s.out).startsWith(`the ops step's ${what}`), lastLine(s.out));
+  }
+});
+
+test("the ops step: a Node run that selects no test fails it, never passes (UM4-1, the web step's U7R-TE-4 rule)", () => {
+  for (const zero of ["# tests 0\n# pass 0\n", "ran --test\n"]) {
+    const r = recorder([{ ok: true, out: zero, stdout: zero, status: 0 }, opsWrapOk]);
+    const s = opsStep(r.runner, () => true);
+    assert.equal(s.ok, false, zero);
+    assert.equal(r.calls.length, 1, zero);
+    assert.match(lastLine(s.out), /^the ops step's node tests \(none ran\) failed/);
+  }
+});
+
+test("the ops step: the wrappers' last line must read 'wrappers.test.sh: N ok, 0 failed' with N above 0 (UM4-1)", () => {
+  for (const tail of ["wrappers.test.sh: 0 ok, 0 failed\n", "wrappers.test.sh: 314 ok, 1 failed\n", "done\n", ""]) {
+    const r = recorder([opsNodeOk, { ok: true, out: tail, stdout: tail, status: 0 }]);
+    const s = opsStep(r.runner, () => true);
+    assert.equal(s.ok, false, JSON.stringify(tail));
+    assert.match(lastLine(s.out), /^the ops step's wrappers test \(its last line: /);
+  }
+});
+
+test("the ops step: without ops/browser/node_modules it fails with one line naming that install, and runs nothing (UM-4 (d))", () => {
+  const r = recorder([opsNodeOk, opsWrapOk]);
+  const s = opsStep(r.runner, () => false);
+  assert.equal(s.ok, false);
+  assert.equal(r.calls.length, 0);
+  assert.equal(s.out.includes("\n"), false, "one line");
+  assert.match(s.out, /^ops: ops\/browser\/node_modules is missing \(UM-4 \(d\)\): install it first with `npm ci --ignore-scripts --no-audit --no-fund --prefix ops\/browser`/);
+});
+
 const lastLine = (text) => text.trimEnd().split("\n").at(-1);
 const cargoTail = "error: this URL is not a hyperlink\n --> crates/room/src/lib.rs:7:27\nerror: could not document `npt-room`\nwarning: build failed, waiting for other jobs to finish...\n";
 const failed = (out = cargoTail) => ({ ok: false, out, stdout: "", status: 101 });
@@ -2844,7 +2901,7 @@ test("the wasm step's builds, legs and comparisons, in order; a clean run passes
   }
   assert.equal((last.match(/ 1\.5(?:,|$)/g) ?? []).length, w.calls.length, "each timed call's seconds");
   assert.deepEqual(STEPS.wasm.length, 0, "STEPS.wasm(runner) defaults its runner");
-  assert.deepEqual(Object.keys(STEPS), ["fmt", "clippy", "clippy-wasm32", "doc", "test", "deps", "wasm", "refs", "marks", "self", "web", "redact"]);
+  assert.deepEqual(Object.keys(STEPS), ["fmt", "clippy", "clippy-wasm32", "doc", "test", "deps", "wasm", "refs", "marks", "self", "web", "ops", "redact"]);
   // The std-sin catch path: armed at the scan's first catch in the manifest's order, native leg 1 and Wasm leg 1, then
   // the re-show (carry 83 (c)): the hash-map half's native leg 1, clean before its arming tick, against the bitten
   // native leg, its field named by compare's own clean replay against the bitten leg's dump.

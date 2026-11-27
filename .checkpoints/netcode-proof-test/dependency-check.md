@@ -157,3 +157,14 @@ d8af72f767830e066b360725f200dbdf44b1df77d2c7e0bcb5150661c77c000e  spikes/netcode
 # 7. No difference from the answer: nothing goes back to security.
 f949f2bfbffa972d4cc0e9beae5a1ecbc4430cd4f70a9566e4f4306b427dc25a  spikes/netcode-proof/crates/client-wasm/Cargo.toml
 6e6529a86d8c7577ad5905a75c5ff8a157f46eed61ae68b1c1fa530eff5500bc  spikes/netcode-proof/Cargo.lock
+
+# UM-4 (2026-11-27 16:0x UTC): ops/browser's real install, um4-plan.md rev 0.3 steps 3-4. No manifest or lockfile
+# changes, so DEP-HOLD holds nothing, and this section has no bare sha256 line.
+# - The form, as run, in its own call: `env npm_config_ignore_scripts=true npm ci --ignore-scripts --no-audit --no-fund
+#   --prefix /home/user/Shamble-Frontlines/spikes/netcode-proof/ops/browser` (the web step's cleared form,
+#   security-u7-deps.md items (3)-(4); UM4-7).
+# - Before and after, unchanged: package.json sha256 8370495dee2ed77e6a937c6f40c72a5485015428d57f90505f4e440504293c90,
+#   package-lock.json sha256 a0efce8e511a8865d50008172b3f88e9cc072efbe92a85a035340562b7c49524; `git status --short`
+#   unchanged (the root .gitignore's node_modules/ covers the real folder).
+# - npm printed "added 167 packages in 7s" and one deprecation notice (whatwg-encoding@3.1.1). npm audit not run
+#   (`--no-audit`, SEC-U7D-3); security's U8 reading of this lock stands (security-u8-deps.md C2, C3 (c)).

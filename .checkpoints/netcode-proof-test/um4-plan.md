@@ -121,6 +121,62 @@ puts them inside check.mjs, so a whole run cannot leave them out.
    naming UM-4, no skip marker; pushed by a checkpoint save; CI on the pushed head; the advisor's read of the pushed
    head in the next window.
 
+## Done lines (the build, 11-27 from 15:58 UTC; the advisor tool 15:5x: H0 after B2's file COMPLETE, the four reads,
+## a pass run of `--only ops` before the cold run, the resume line by printing reads, no agent inside the stretch)
+- Reads before H0: ops/browser holds no node_modules (`ls -la`: cert14d, config, fallback, lib, mds36, package-lock,
+  package, smoke; no link); A's (d) wording (advisor-u7-merge.md:53): "the step fails with one line naming that
+  install"; `run` joins stdout then stderr into `out` and keeps `stdout` apart (check.mjs:1960-1962), so the wrappers'
+  last line is read from `stdout`; check.test.mjs imports check.mjs's exports in one block (:12-79), so `opsStep` joins
+  that import only once it exists (else the file fails to load and nothing goes red by name): the order is the list
+  assert alone (red), then the plain two-command step with its import and plain test (green), then the zero-count,
+  last-line and absent tests (red by name), then the guards (green).
+- Step 0 (15:58-16:0x): H0 65b2f2965aac4a4c6316049a7bc8e25f9f085adc (the resume line's save; B2 COMPLETE 15:58 in it);
+  ListAgents none; `pgrep -c -f "cargo|rustc|npt-|flock"` 0; HEAD = origin, clean; `git fetch origin main`, then
+  `git rev-parse origin/main` b8f02b0149cc928964e54e194cd9c4d68f52bd94 (MAIN-69's tip); df 14,569 MiB; usage 0.12
+  (15:58); the saver bwjsbqfnx stopped by TaskStop, `pgrep -c -f "checkpoint.mjs watch"` 0; `mkdir -p
+  /home/user/Shamble-Frontlines/.gate/um4`; the light base run into /home/user/Shamble-Frontlines/.gate/um4/light-base.log.
+- The base light run (to 15:59:38 UTC, exit 0): refs 2166 tracked files (N0); marks 81 read and checked, rows
+  unchanged; self 80 of 80; redact 11 of 11 tests, "464 item(s) checked, 0 finding(s)". Step 5's bars by B's C1 rule.
+- Steps 1-2, red by name then green, each `node --test` of check.test.mjs by absolute path:
+  - A, the list assert alone ("ops" after "web" at :2847): 79 of 80, test 71 (it holds the assert) failing on
+    `deepStrictEqual`, the diff "- 'ops'" at index 11, nothing else (red).
+  - B, the plain two-command step (opsStep, OPS_BROWSER_MODULES, the STEPS line after `web`, the header's ops
+    sentence), its import (between NOT_TICK_COUNTS and readBackCheck) and its plain test pinning both calls' program,
+    arguments and folder (HERE) and the summary line: 81 of 81 (green).
+  - C, four more tests: the failing-part guard (passes on B's step), zero count, the wrappers' last line, the missing
+    folder: 82 of 85, failing exactly 58 (zero count), 59 (last line) and 60 (missing folder), each by its own name (red).
+  - D, the three guards in opsStep (the install check first and running nothing, `# tests` above 0, the wrappers'
+    stdout last line `wrappers.test.sh: N ok, 0 failed` with N above 0) and OPS_MISSING's one line naming the install:
+    85 of 85 (green). Self: 80 + 5 new tests.
+- Step 2b (16:02:31 UTC): `node check.mjs --only ops` through main-run.sh into
+  /home/user/Shamble-Frontlines/.gate/um4/absent.log: "FAIL ops ... ops: ops/browser/node_modules is missing (UM-4
+  (d)): install it first with `npm ci --ignore-scripts --no-audit --no-fund --prefix ops/browser`,
+  npm_config_ignore_scripts=true in its environment", "(1 lines)", exit 1.
+- Step 3: sha256 before: package.json 8370495d…3c90, package-lock.json a0efce8e…9524; `git status --short`: the card
+  notes, check.mjs, check.test.mjs; `env npm_config_ignore_scripts=true npm ci --ignore-scripts --no-audit --no-fund
+  --prefix /home/user/Shamble-Frontlines/spikes/netcode-proof/ops/browser`: "added 167 packages in 7s" (one
+  deprecation notice, whatwg-encoding@3.1.1); both sha256 unchanged; `git status --short` unchanged; `ls -d` lists
+  ops/browser/node_modules.
+- The pass run (the advisor tool's addition, 16:03:17 UTC): `--only ops` into
+  /home/user/Shamble-Frontlines/.gate/um4/ops-pass.log: "PASS ops 8.9 s ops: 104 of 104 tests passed; wrappers.test.sh:
+  315 ok, 0 failed", exit 0 (U8-F1's M5 counts).
+- Step 5 started 16:03 into /home/user/Shamble-Frontlines/.gate/um4/counted.log (cold: the part-clean of 14:53).
+  Provisos: `git diff --name-only ddb06ff HEAD -- spikes/` prints d8b57b8's three (ops/operator/PROMPT-R1.md, rules.md,
+  ops/tests/operator.test.mjs; F1's c16777e changed PROMPT-R1.md again), named first; `git status --short
+  --untracked-files=all -- spikes/` lists only check.mjs and check.test.mjs, modified.
+- Step 4 written while step 5 ran (notes only; nothing the run reads): dependency-check.md's UM-4 section.
+- Step 5 (16:03-16:26:19 UTC, exit 0, cold): "check: all 13 steps pass". ops 104 of 104 and "wrappers.test.sh: 315 ok,
+  0 failed" (U8-F1's M5); test 931 and 1,028, 0 failed, 0 skips (U8-F1's M5; d8b57b8's three named first); web 70 of 70;
+  wasm 27,000 ticks, 0 mismatching, both bites caught as before; marks 81, rows unchanged; refs 2166; redact 11 of 11
+  and 464 items, 0 findings (the three = step 0's base run); self 85 of 85 = the base's 80 + the five new tests (step
+  1's C list); fmt, clippy, clippy-wasm32, doc and deps PASS. GATE PASS (`--no-smoke`, base b8f02b0); "repo map OK: 246
+  entries cover 110 required paths". Size: check.mjs +29/-2, check.test.mjs +58/-1 (87 added; the estimate was 20-30:
+  five tests, not two, and the guards' comments), outside U8's stop by his U8-FILLS (a).
+- Step 7: one commit of check.mjs, check.test.mjs, dependency-check.md and this file (`git commit -F
+  /home/user/Shamble-Frontlines/.gate/um4/commit-msg.txt`, no skip marker), pushed by the checkpoint save; then the
+  saver's restart and CI on the pushed head; the review round (test-engineer, security-auditor's short read) and the
+  advisor's read of the pushed head after the usage settles (the advisor tool, 15:5x).
+
 ## Size (for U8-FILLS)
 About 20-30 added lines by estimate: the step and its missing-folder line in check.mjs (about 12-18), the list entry
 and two tests in check.test.mjs (about 10-14); dependency-check.md is notes. Counted exactly at step 5 by `git diff

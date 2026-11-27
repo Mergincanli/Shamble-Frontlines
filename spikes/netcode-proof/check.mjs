@@ -19,8 +19,9 @@
 // bites, hash-map and std-sin, in the bites builds); refs (nothing outside spikes/ references it, §4.2 and §4.9);
 // marks (marks.json compiles in the judge, covers exactly the plan's marks, and every row it hashed is unchanged); self
 // (this file's own tests); web (U7's browser client: npm ci in security's form when web/ has no TypeScript 6.0.3, tsc
-// into .gate/, then its Node tests over that output, never skipped); redact (redact-check's tests, then a scan of the
-// spike's folder). It runs every step and exits 1 if any failed.
+// into .gate/, then its Node tests over that output, never skipped); ops (U8's operator tests by Node's own glob over
+// ops/, then ops/tests/wrappers.test.sh, never skipped, with ops/browser's install present); redact (redact-check's
+// tests, then a scan of the spike's folder). It runs every step and exits 1 if any failed.
 
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
@@ -2679,6 +2680,31 @@ export function webStep(runner = run, base = process.env, installed = installedT
   return { ok: true, out: `${out}${n.out}\nweb: TypeScript ${WEB_TYPESCRIPT}, tsc into .gate/netcode-proof-test/web-check; ${nodeCounts(n.out)}` };
 }
 
+// ops/browser's installed modules: U8's browser driver, which one of ops/'s Node tests needs (UM-4 (b), (d)).
+export const OPS_BROWSER_MODULES = join(HERE, "ops", "browser", "node_modules");
+
+// The ops step (UM-4, u8-brief.md:524): U8's operator tests by Node's own glob over ops/ (`node --test ops/` fails on
+// Node 22.23), then ops/tests/wrappers.test.sh, both in HERE, through `runner`, as the web step. It fails, never skips,
+// when either fails, when no Node test ran, when the wrappers' last line is not their "N ok, 0 failed" summary with N
+// above 0 (UM4-1), and, running nothing, when ops/browser's install is missing (UM-4 (d)). `present` says whether that
+// install is there (check.test.mjs passes its own).
+export const OPS_MISSING =
+  "ops: ops/browser/node_modules is missing (UM-4 (d)): install it first with `npm ci --ignore-scripts --no-audit --no-fund --prefix ops/browser`, npm_config_ignore_scripts=true in its environment";
+export function opsStep(runner = run, present = () => existsSync(OPS_BROWSER_MODULES)) {
+  if (!present()) return { ok: false, out: OPS_MISSING };
+  const n = runner(process.execPath, ["--test", "ops/**/*.test.mjs"], HERE);
+  if (!n.ok) return failedRun(n, `the ops step's node tests (${nodeCounts(n.out)})`);
+  // A glob that selects no test exits 0 with "# tests 0" (U7R-TE-4): that fails, never passes.
+  if (!(Number(n.out.match(/^# tests (\d+)/m)?.[1] ?? 0) > 0)) return failedRun(n, "the ops step's node tests (none ran)");
+  const w = runner("bash", ["ops/tests/wrappers.test.sh"], HERE);
+  if (!w.ok) return failedRun(w, "the ops step's wrappers test", n.out);
+  // `run` joins stdout before stderr (check.mjs:1960-1962): the wrappers' summary is read from stdout.
+  const last = (w.stdout || w.out).trim().split("\n").at(-1) ?? "";
+  const ran = last.match(/^wrappers\.test\.sh: (\d+) ok, 0 failed$/);
+  if (!ran || !(Number(ran[1]) > 0)) return failedRun(w, `the ops step's wrappers test (its last line: ${last})`, n.out);
+  return { ok: true, out: `${n.out}${w.out}\nops: ${nodeCounts(n.out)}; ${last}` };
+}
+
 // Each cargo step takes the runner it calls cargo through (`run` when main calls it), so check.test.mjs pins what each
 // step runs: its commands, its flags, -D warnings included (the rust fix2 review's nit, u4s-carries.md entry 34).
 export const STEPS = {
@@ -2711,6 +2737,7 @@ export const STEPS = {
   },
   self: () => summarized(run(process.execPath, ["--test", join(HERE, "check.test.mjs")], HERE), nodeCounts),
   web: (runner = run) => webStep(runner),
+  ops: (runner = run) => opsStep(runner),
   redact: () => {
     const t = run(process.execPath, ["--test", join(HERE, "ops", "operator", "redact-check.test.mjs")], HERE);
     if (!t.ok) return t;
