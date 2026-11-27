@@ -1,4 +1,4 @@
-# The 10:50 UTC window, 2026-11-27: the messages (written 08:5x UTC, rev 2 09:0x after the advisor tool; sent only inside the window)
+# The 10:50 UTC window, 2026-11-27: the messages (written 08:5x UTC, rev 3 09:1x after two advisor-tool reads; sent only inside the window)
 **Status: WRITTEN, NOT SENT.** Each message below gets a "Sent HH:MM UTC" line when it goes; the window has run only
 for the messages that carry one (this file existing does not mean the window ran). An agent's file is done only when
 its last line reads "Status: COMPLETE <date and UTC time>"; without it the file is half-written and that agent is
@@ -10,7 +10,8 @@ it); `git ls-remote origin refs/heads/main` still b9aad01 (else MAIN-52 first, n
 --branch` shows HEAD = origin and nothing else; ListAgents; `df -m /home/user`; the saver running (biwjo6843 ends about
 10:19: if it ended, restart it in the card's form). Then the advisor tool once on this file.
 The order: B and A1 at once. On A1's hand-back: if its block's first line is "go", C and A2 together; if "fallback (b)"
-or "his", A2 alone. Everything new starts before 11:20 (LEAN-MODE: new work only 10:50-11:20); what misses 11:20 waits
+or "his", A2 alone. A "go" may carry conditions: read A1's whole block and apply each condition to C's message by Edit
+before it goes. Everything new starts before 11:20 (LEAN-MODE: new work only 10:50-11:20); what misses 11:20 waits
 for the next window. At most 3 agents at once. A refused resume is never retried: a fresh general-purpose agent (opus,
 xhigh) with the same message and that seat's notes file instead, inside the window only. U8-F1's builder D
 (a7fe1b9f436f36bb1) is not in this window's sends: B's read may still need it.
@@ -31,15 +32,20 @@ whole. Rule, each in its own block:
    Stop B's fill (it writes no U8 file). Yes, no, or another form.
 3. EXIT-SILENT: this tool can show a command that exits non-zero without printing exactly as it shows a pass (seen
    with `test`, `git diff --quiet` and `grep -q`; other commands not probed). Your 06:00 ruling leaned on two such
-   results (advisor-u8-f1-merge.md:27 and :31); exit-silent.md re-checks both in printing forms, and they hold. Rule
-   (a) its proposed rule for the 293 older uses (yes, no, or a narrower re-check list), and (b) the two steps in R1's
+   results (advisor-u8-f1-merge.md:27 and :31); exit-silent.md re-checks both in printing forms, and they hold. One
+   form to rule too: after the guard refused `git diff --output` ("not allowed here"), the main session hashed the diff
+   by a pipe, `git diff <a> <b> -- spikes/netcode-proof | sha256sum` (git first, read only, nothing written), named
+   before it ran. Rule (a) its proposed rule for the 293 older uses (yes, no, or a narrower re-check list), (b) that
+   pipe (accepted, or what is owed), and (c) the two steps in R1's
    own package where the laptop session reads an exit code: ops/operator/rules.md:14-15 (`git diff --quiet
    origin/main -- CLAUDE.md .claude`, "on a mismatch it stops") and ops/operator/PROMPT-R1.md:127 ("A finding, or any
    exit but 0, means no push"). For each: its fix, and when (a net-zero rewording now, at Stop B's fill, or his).
 4. U8-F1's builder worktree (.claude/worktrees/agent-a7fe1b9f436f36bb1, detached at 77ffc95): may its cleanup go by
-   A's re-ruled form with your Q3 addition? Its notes and scratch folder are on the lane already (`git ls-files` lists
-   u8-f1-build.md and the five u8-f1/ files). Its fast-forward to the lane head would also bring MAIN-68's kit and CI
-   files into that worktree: the question A1 rules for U7's builder in this window. Rule the order and the form.
+   A's re-ruled form with your Q3 addition? Its notes and scratch folder are on the lane already, byte for byte
+   (`git ls-files` lists u8-f1-build.md and the five u8-f1/ files; their six sha256 equal in both places, 09:0x:
+   6220ff52…, fa7cc3d9…, 5e64cb74…, 314da4a1…, a270e3de…, ee51b1f8…). Its fast-forward to the lane head would also
+   bring MAIN-68's kit and CI files into that worktree. A1's ruling on that, for U7's builder in this window, binds
+   both worktrees: rule only the order and the rest of the form.
 Write .checkpoints/netcode-proof-test/advisor-u8-f1-head.md (plan first, then each block as it is done); end with
 "Decisions needed" and "For Mustafa", then, once every block is written, the last line `Status: COMPLETE <date and UTC
 time, as 2026-11-27T11:05Z>`.
@@ -62,8 +68,9 @@ write), two rulings, each its own block, in a new file:
    the keep-first copy, `diff -rq` equal, u7-kept-list.md 332 lines for 332 files. New: that fast-forward also brings
    MAIN-68's kit and CI files into the builder's worktree: `git diff --name-only 80b6748 0efbbef -- .claude/ CLAUDE.md
    CLAUDE.local.md AGENTS.md .github/ tools/` lists .claude/hooks/routine-guard.mjs,
-   .claude/hooks/routine-guard.test.mjs and .github/workflows/toolchain.yml (main's reviewed versions, taken in by
-   MAIN-68). His kit rule (CLAUDE.md, the change-set protocol's item 3): kit and gate files are edited by the main
+   .claude/hooks/routine-guard.test.mjs and .github/workflows/toolchain.yml, taken in by MAIN-68; they are main's
+   reviewed versions: `git diff --name-only b9aad01 0efbbef -- .claude/ .github/ tools/ CLAUDE.md CLAUDE.local.md
+   AGENTS.md` printed nothing (09:0x). His kit rule (CLAUDE.md, the change-set protocol's item 3): kit and gate files are edited by the main
    session, asking him first, and "agents and teammates may not edit them". Rule: "go" (C's three commands, below),
    "fallback (b)" (the worktree stays until PR #40's close), or "his": if "go" needs a wider reading of his words than
    they give, write that entry for "Decisions needed" (a code, the question in plain words, why, the options, your
@@ -107,6 +114,11 @@ Three commands in your own worktree, each its own call, in this order. Paste eac
 Write no file at all in this task, not even a notes line: your two notes are among the staged paths, and any write
 leaves the worktree unclean. If git refuses at any step, stop there and report its message word for word. If step 3
 prints anything at all, paste it and stop. Remove, restore or move nothing.
+First three reads, each its own call; if any differs from its "must", paste it, stop, and stage nothing:
+- `git rev-parse --show-toplevel` must print /home/user/Shamble-Frontlines/.claude/worktrees/agent-a9873cdba07a3219e.
+- `git rev-parse HEAD` must print 80b67487caf2bd588f38a965c615daa11edeecfe.
+- `git status --short --untracked-files=all` must list exactly step 1's 45 paths: the two notes and U7's 33 new files
+  as `??`, U7's 10 changed files as modified (` M`, `M ` or `MM`), and nothing else.
 1. (one line, exactly) `git add -- .checkpoints/netcode-proof-test/u7-build-rs.md .checkpoints/netcode-proof-test/u7-t-build.md spikes/netcode-proof/check.mjs spikes/netcode-proof/check.test.mjs spikes/netcode-proof/crates/bots/src/lib.rs spikes/netcode-proof/crates/bots/src/load.rs spikes/netcode-proof/crates/client-wasm/clippy.toml spikes/netcode-proof/crates/client-wasm/src/engine.rs spikes/netcode-proof/crates/client-wasm/src/lib.rs spikes/netcode-proof/crates/client-wasm/src/script.rs spikes/netcode-proof/crates/client/src/clock.rs spikes/netcode-proof/crates/client/src/lib.rs spikes/netcode-proof/crates/client/tests/sent.rs spikes/netcode-proof/crates/client/tests/trace.rs spikes/netcode-proof/crates/lab/src/scenario.rs spikes/netcode-proof/crates/server/tests/carry.rs spikes/netcode-proof/web/bites/hooks.js spikes/netcode-proof/web/build.mjs spikes/netcode-proof/web/e2e/contact.html spikes/netcode-proof/web/e2e/contact.js spikes/netcode-proof/web/e2e/probe-worker.js spikes/netcode-proof/web/e2e/probe.html spikes/netcode-proof/web/e2e/probe.js spikes/netcode-proof/web/e2e/room.mjs spikes/netcode-proof/web/e2e/serve.mjs spikes/netcode-proof/web/e2e/t5i.mjs spikes/netcode-proof/web/e2e/t5ii.mjs spikes/netcode-proof/web/index.html spikes/netcode-proof/web/src/hooks.ts spikes/netcode-proof/web/src/lib.ts spikes/netcode-proof/web/src/main.ts spikes/netcode-proof/web/src/worker.ts spikes/netcode-proof/web/test/boundary.test.mjs spikes/netcode-proof/web/test/build.test.mjs spikes/netcode-proof/web/test/connect.test.mjs spikes/netcode-proof/web/test/dist.test.mjs spikes/netcode-proof/web/test/fake-core.mjs spikes/netcode-proof/web/test/fakes.mjs spikes/netcode-proof/web/test/fixtures/boundary.json spikes/netcode-proof/web/test/helpers.mjs spikes/netcode-proof/web/test/lib.test.mjs spikes/netcode-proof/web/test/page.test.mjs spikes/netcode-proof/web/test/reap.test.mjs spikes/netcode-proof/web/test/worker.test.mjs spikes/netcode-proof/web/tsconfig.json`
    (the 45 paths ffcheck lists: 35 added, 10 differing).
 2. `git merge --ff-only 0efbbef9d92db56da2e0f2a81771994a6905872b`
@@ -117,7 +129,8 @@ always start their own command, with no other program in front of them. In this 
 without printing can show nothing at all, the same as a pass (seen with `test`, `git diff --quiet` and `grep -q`): use
 only forms whose output carries the answer (`git diff --name-only` or `--stat`, `ls -d`, `cmp -s`, sha256 lists), and
 quote that output.
-After C (the main session): `git worktree list` shows that worktree at 0efbbef; then `git worktree remove
-/home/user/Shamble-Frontlines/.claude/worktrees/agent-a9873cdba07a3219e`, plain, from the main folder (a refusal: the
-worktree stays, the message to A). Its branch ref worktree-agent-a9873cdba07a3219e may stay (if removed, only by `git
+After C (the main session): `git worktree list`. If it no longer names that worktree (the harness removed an unchanged
+agent worktree on its own on 11-26, the card's 15:09 line), record that and run no remove. If it shows it at 0efbbef,
+`git worktree remove /home/user/Shamble-Frontlines/.claude/worktrees/agent-a9873cdba07a3219e`, plain, from the main
+folder (a refusal: the worktree stays, the message to A). Its branch ref worktree-agent-a9873cdba07a3219e may stay (if removed, only by `git
 branch -d`).
