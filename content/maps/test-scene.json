@@ -1,0 +1,495 @@
+{
+  "bounds": {
+    "max": [
+      80,
+      20,
+      24
+    ],
+    "min": [
+      -32,
+      0,
+      -24
+    ]
+  },
+  "format": "shamble-map",
+  "id": "test-scene",
+  "regions": [
+    {
+      "id": "corner_street",
+      "kind": "street",
+      "max": [
+        20,
+        2.15
+      ],
+      "min": [
+        -32,
+        -2.15
+      ]
+    },
+    {
+      "id": "corner_grass_north",
+      "kind": "grass",
+      "max": [
+        20,
+        -2.15
+      ],
+      "min": [
+        -32,
+        -24
+      ]
+    },
+    {
+      "id": "corner_grass_south",
+      "kind": "grass",
+      "max": [
+        20,
+        24
+      ],
+      "min": [
+        -32,
+        2.15
+      ]
+    },
+    {
+      "id": "yard_grass_north",
+      "kind": "grass",
+      "max": [
+        80,
+        16
+      ],
+      "min": [
+        20,
+        -24
+      ]
+    },
+    {
+      "id": "yard_lane",
+      "kind": "street",
+      "max": [
+        80,
+        20
+      ],
+      "min": [
+        20,
+        16
+      ]
+    },
+    {
+      "id": "yard_grass_south",
+      "kind": "grass",
+      "max": [
+        80,
+        24
+      ],
+      "min": [
+        20,
+        20
+      ]
+    }
+  ],
+  "shapes": [
+    {
+      "id": "street_house_a",
+      "max": [
+        -5.9,
+        2.6,
+        -3.6
+      ],
+      "min": [
+        -12,
+        0,
+        -8
+      ],
+      "type": "box"
+    },
+    {
+      "id": "street_house_a_roof_north",
+      "max": [
+        -5.9,
+        4.7,
+        -5.8
+      ],
+      "min": [
+        -12,
+        2.6,
+        -8
+      ],
+      "rises_toward": "+z",
+      "type": "ramp"
+    },
+    {
+      "id": "street_house_a_roof_south",
+      "max": [
+        -5.9,
+        4.7,
+        -3.6
+      ],
+      "min": [
+        -12,
+        2.6,
+        -5.8
+      ],
+      "rises_toward": "-z",
+      "type": "ramp"
+    },
+    {
+      "id": "street_house_b",
+      "max": [
+        0.2,
+        2.6,
+        -3.6
+      ],
+      "min": [
+        -4.4,
+        0,
+        -7.4
+      ],
+      "type": "box"
+    },
+    {
+      "id": "street_house_b_roof_north",
+      "max": [
+        0.2,
+        4.3,
+        -5.5
+      ],
+      "min": [
+        -4.4,
+        2.6,
+        -7.4
+      ],
+      "rises_toward": "+z",
+      "type": "ramp"
+    },
+    {
+      "id": "street_house_b_roof_south",
+      "max": [
+        0.2,
+        4.3,
+        -3.6
+      ],
+      "min": [
+        -4.4,
+        2.6,
+        -5.5
+      ],
+      "rises_toward": "-z",
+      "type": "ramp"
+    },
+    {
+      "id": "street_cover_wall",
+      "max": [
+        -2.9,
+        1,
+        3.45
+      ],
+      "min": [
+        -6,
+        0,
+        3
+      ],
+      "type": "box"
+    },
+    {
+      "id": "yard_step_055",
+      "max": [
+        32,
+        0.55,
+        -8
+      ],
+      "min": [
+        30,
+        0,
+        -10
+      ],
+      "type": "box"
+    },
+    {
+      "id": "yard_step_056",
+      "max": [
+        36,
+        0.56,
+        -8
+      ],
+      "min": [
+        34,
+        0,
+        -10
+      ],
+      "type": "box"
+    },
+    {
+      "id": "yard_ledge_290",
+      "max": [
+        33,
+        2.9,
+        -1
+      ],
+      "min": [
+        30,
+        0,
+        -4
+      ],
+      "type": "box"
+    },
+    {
+      "id": "yard_ledge_305",
+      "max": [
+        38,
+        3.05,
+        -1
+      ],
+      "min": [
+        35,
+        0,
+        -4
+      ],
+      "type": "box"
+    },
+    {
+      "id": "yard_ledge_310",
+      "max": [
+        43,
+        3.1,
+        -1
+      ],
+      "min": [
+        40,
+        0,
+        -4
+      ],
+      "type": "box"
+    },
+    {
+      "id": "yard_thin_wall",
+      "max": [
+        30.2,
+        2.5,
+        10
+      ],
+      "min": [
+        30,
+        0,
+        4
+      ],
+      "type": "box"
+    },
+    {
+      "id": "yard_ramp_gentle",
+      "max": [
+        45,
+        1,
+        8
+      ],
+      "min": [
+        41,
+        0,
+        4
+      ],
+      "rises_toward": "+x",
+      "type": "ramp"
+    },
+    {
+      "id": "yard_platform_gentle",
+      "max": [
+        49,
+        1,
+        8
+      ],
+      "min": [
+        45,
+        0,
+        4
+      ],
+      "type": "box"
+    },
+    {
+      "id": "yard_ramp_steep",
+      "max": [
+        45,
+        1.5,
+        14
+      ],
+      "min": [
+        42,
+        0,
+        10
+      ],
+      "rises_toward": "+x",
+      "type": "ramp"
+    },
+    {
+      "id": "yard_platform_steep",
+      "max": [
+        49,
+        1.5,
+        14
+      ],
+      "min": [
+        45,
+        0,
+        10
+      ],
+      "type": "box"
+    },
+    {
+      "id": "yard_lane_post_00",
+      "max": [
+        25.2,
+        1.5,
+        20.2
+      ],
+      "min": [
+        25,
+        0,
+        20
+      ],
+      "type": "box"
+    },
+    {
+      "id": "yard_lane_post_10",
+      "max": [
+        35.2,
+        1.5,
+        20.2
+      ],
+      "min": [
+        35,
+        0,
+        20
+      ],
+      "type": "box"
+    },
+    {
+      "id": "yard_lane_post_20",
+      "max": [
+        45.2,
+        1.5,
+        20.2
+      ],
+      "min": [
+        45,
+        0,
+        20
+      ],
+      "type": "box"
+    },
+    {
+      "id": "yard_lane_post_30",
+      "max": [
+        55.2,
+        1.5,
+        20.2
+      ],
+      "min": [
+        55,
+        0,
+        20
+      ],
+      "type": "box"
+    },
+    {
+      "id": "yard_lane_post_40",
+      "max": [
+        65.2,
+        1.5,
+        20.2
+      ],
+      "min": [
+        65,
+        0,
+        20
+      ],
+      "type": "box"
+    },
+    {
+      "id": "yard_lane_post_50",
+      "max": [
+        75.2,
+        1.5,
+        20.2
+      ],
+      "min": [
+        75,
+        0,
+        20
+      ],
+      "type": "box"
+    }
+  ],
+  "spawns": [
+    {
+      "at": [
+        -20,
+        0,
+        -0.9
+      ],
+      "facing_deg": 90,
+      "id": "street_1"
+    },
+    {
+      "at": [
+        -20,
+        0,
+        0.9
+      ],
+      "facing_deg": 90,
+      "id": "street_2"
+    },
+    {
+      "at": [
+        -22,
+        0,
+        -0.9
+      ],
+      "facing_deg": 90,
+      "id": "street_3"
+    },
+    {
+      "at": [
+        -22,
+        0,
+        0.9
+      ],
+      "facing_deg": 90,
+      "id": "street_4"
+    },
+    {
+      "at": [
+        27,
+        0,
+        -9
+      ],
+      "facing_deg": 90,
+      "id": "yard_steps"
+    },
+    {
+      "at": [
+        27,
+        0,
+        -2.5
+      ],
+      "facing_deg": 90,
+      "id": "yard_ledges"
+    },
+    {
+      "at": [
+        27,
+        0,
+        7
+      ],
+      "facing_deg": 90,
+      "id": "yard_wall"
+    },
+    {
+      "at": [
+        25,
+        0,
+        18
+      ],
+      "facing_deg": 90,
+      "id": "yard_lane"
+    }
+  ],
+  "version": 1
+}

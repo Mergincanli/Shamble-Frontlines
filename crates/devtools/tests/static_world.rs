@@ -2,14 +2,18 @@
 //! committed lines, the hostile maps' among them (each written as a file, read by the loader, built or refused). The
 //! same check runs in WebAssembly through the test-only module (`packages/sim-worker/boundary/static-world.test.mjs`
 //! under Node, `packages/e2e/tests/rules/static-world.spec.ts` in the browsers), so a target whose tree or whose one
-//! ray differs is named by its map.
+//! ray differs is named by its map. Then the maps under `content/` (from 4b's step 8: the test scene), natively.
 
 use std::path::{Path, PathBuf};
 
 use devtools::files::{read_plain, write_plain};
 use devtools::world_proofs::{HOSTILE, RAYS, SHAPES, check, hostile, judge_taken, made};
+use sim::collision::{MAX_TREE_DEPTH, StaticWorld};
+use sim::state_hash::fnv1a_64;
 
 const FILE: &str = "static-world.txt";
+/// The world of each map under `content/`, one line a map.
+const CONTENT_WORLDS: &str = "content-worlds.txt";
 
 fn folder() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("vectors")
@@ -118,4 +122,42 @@ fn the_check_names_the_first_map_that_differs() {
         "this build gives 22 lines and the file has 5"
     );
     assert_eq!(check(&made), "");
+}
+
+/// The test scene, the first map under `content/` (4b's step 8), through the loader and the world's builder: built
+/// within the depth a world may have, passed by the judge (a ray straight down onto the middle of every shape meets
+/// what a search of every shape meets), and its tree the committed one (`vectors/content-worlds.txt`, natively only;
+/// `SHAMBLE_WRITE_WORLD=1`, and no other value, writes it again after a change to the map that is meant to change
+/// it, and the change-set's report says why).
+#[test]
+fn the_test_scene_builds_the_world_whose_tree_is_committed() {
+    let maps = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../content/maps");
+    let text = read_plain(&maps, "test-scene.json").unwrap_or_else(|why| panic!("{why}"));
+    let Ok(content::Document::Map(map)) = content::load_file("maps/test-scene.json", &text) else {
+        panic!("the loader takes the test scene");
+    };
+    assert_eq!(judge_taken(&map), Ok(true));
+    let world = StaticWorld::build(&map).unwrap_or_else(|why| panic!("{}", why.message()));
+    assert!(
+        world.tree_depth() <= MAX_TREE_DEPTH,
+        "{}",
+        world.tree_depth()
+    );
+    let made = format!(
+        "test-scene shapes {} depth {} tree {:016x}\n",
+        map.shapes.len(),
+        world.tree_depth(),
+        fnv1a_64(&world.tree_bytes())
+    );
+    if std::env::var("SHAMBLE_WRITE_WORLD").as_deref() == Ok("1") {
+        write_plain(&folder(), CONTENT_WORLDS, made.as_bytes()).expect("the worlds' file");
+    }
+    let committed = String::from_utf8(
+        read_plain(&folder(), CONTENT_WORLDS).unwrap_or_else(|why| panic!("{why}")),
+    )
+    .expect("text");
+    assert_eq!(
+        committed, made,
+        "the test scene's world is not the committed one"
+    );
 }

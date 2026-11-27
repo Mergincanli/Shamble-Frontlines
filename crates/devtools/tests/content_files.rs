@@ -1,11 +1,18 @@
 //! The content folder's walk and the bundle tool (`devtools::content_files`), on scratch folders: what a clean tree
-//! gives, and each thing the walk and the loader refuse, with the tree left as it was. The real `content/` joins
-//! this file with the first content files.
+//! gives, and each thing the walk and the loader refuse, with the tree left as it was. Then the repository's own
+//! `content/` (from 4b's step 8: Mustafa's movement table and the test scene), and five of his values reaching the
+//! loader by a second route.
 #![cfg(unix)]
 
 use std::path::{Path, PathBuf};
 
 use devtools::content_files::{BUNDLE, bundle, run, walk};
+use devtools::files::read_plain;
+
+/// The repository's root, from this crate's folder.
+fn repository() -> PathBuf {
+    Path::new(env!("CARGO_MANIFEST_DIR")).join("../..")
+}
 
 /// A map the loader takes, in canonical form (made-up sizes: no value of the game rests on it).
 fn map_text() -> String {
@@ -343,4 +350,121 @@ fn the_bundle_is_written_outside_the_content_folder_and_never_through_a_link() {
         std::fs::read_to_string(&outside).expect("the outside file"),
         "not to be touched"
     );
+}
+
+/// The repository's own `content/`: the walk finds his movement table and the test scene and nothing else, the
+/// loader takes each file and the whole, and the check writes nothing (what `content_bundle --check` says, held in
+/// the job CI already has).
+#[test]
+fn the_repositorys_content_is_his_movement_table_and_the_test_scene_and_the_loader_takes_both() {
+    let content = repository().join("content");
+    let files = walk(&content).unwrap_or_else(|why| panic!("{why}"));
+    let paths: Vec<&str> = files.iter().map(|(path, _)| path.as_str()).collect();
+    assert_eq!(paths, ["maps/test-scene.json", "movement/soldier.json"]);
+    let text = bundle(&files).unwrap_or_else(|why| panic!("{why}"));
+    let set = content::load(text.as_bytes()).expect("the bundle loads");
+    assert!(set.map("test-scene").is_some() && set.movement("soldier").is_some());
+    let said = run(&content, None).unwrap_or_else(|why| panic!("{why}"));
+    assert!(
+        said.starts_with("2 content files, a bundle of ") && said.ends_with("nothing written"),
+        "{said}"
+    );
+}
+
+/// Five of his values reach the loader by a second route (the test list's T-should 8). `testlines.mjs` writes the
+/// movement table and checks it through one table of rows, so a row sent to the wrong field would pass both. Here
+/// each value is found by its own name in his Export's text, apart from that table; read with the standard
+/// library's number reader, not the loader's; and held bit for bit against the field the loader reads. No value is
+/// typed (his rule: the values come from his Export and from nothing else), only names, each pair from the movement
+/// kind's own fields. The five stand once among the table's fifteen values. Three pairs of the others are equal
+/// (the two easing times, body and push radius, step-up and the sights' multiplier): a row swapped within such a
+/// pair would pass this test as well as `--check`.
+#[test]
+fn five_of_his_values_reach_the_loader_by_a_second_route() {
+    let root = repository();
+    let export = String::from_utf8(
+        read_plain(&root.join("content/source"), "testlines-export.json")
+            .unwrap_or_else(|why| panic!("{why}")),
+    )
+    .expect("his Export is text");
+    let soldier = read_plain(&root.join("content/movement"), "soldier.json")
+        .unwrap_or_else(|why| panic!("{why}"));
+    let Ok(content::Document::Movement(movement)) =
+        content::load_file("movement/soldier.json", &soldier)
+    else {
+        panic!("the loader takes the movement table");
+    };
+    let lines: Vec<&str> = export.lines().collect();
+    // In the Export's own layout: `    "<group>": {` inside `  "values": {`, then one line `      "<name>": <number>`
+    // before the group closes.
+    let his = |group: &str, name: &str| -> f64 {
+        let values = lines
+            .iter()
+            .position(|line| *line == "  \"values\": {")
+            .expect("the Export's values");
+        let open = format!("    \"{group}\": {{");
+        let start = values
+            + lines[values..]
+                .iter()
+                .position(|line| *line == open)
+                .unwrap_or_else(|| panic!("values.{group} in his Export"));
+        let end = start
+            + lines[start..]
+                .iter()
+                .position(|line| line.starts_with("    }"))
+                .expect("the group's end");
+        let head = format!("      \"{name}\": ");
+        let found: Vec<&str> = lines[start..end]
+            .iter()
+            .filter_map(|line| line.strip_prefix(head.as_str()))
+            .collect();
+        assert_eq!(
+            found.len(),
+            1,
+            "values.{group}.{name} stands once in its group"
+        );
+        found[0]
+            .trim_end_matches(',')
+            .parse()
+            .unwrap_or_else(|_| panic!("values.{group}.{name} is a number"))
+    };
+    for (group, name, field, loaded) in [
+        (
+            "movement",
+            "walk_speed_m_per_s",
+            "walk_speed_m_per_s",
+            movement.walk_speed_m_per_s,
+        ),
+        (
+            "movement",
+            "sprint_multiplier",
+            "sprint_multiplier",
+            movement.sprint_multiplier,
+        ),
+        (
+            "jump",
+            "gravity_m_per_s2",
+            "gravity_m_per_s2",
+            movement.gravity_m_per_s2,
+        ),
+        (
+            "stamina",
+            "refill_time_from_empty_s",
+            "stamina_refill_time_s",
+            movement.stamina_refill_time_s,
+        ),
+        (
+            "pushing",
+            "push_strength_per_s",
+            "push_strength_per_s",
+            movement.push_strength_per_s,
+        ),
+    ] {
+        let value = his(group, name);
+        assert_eq!(
+            value.to_bits(),
+            loaded.to_bits(),
+            "values.{group}.{name} is {value} in his Export, and the loader's {field} is {loaded}"
+        );
+    }
 }

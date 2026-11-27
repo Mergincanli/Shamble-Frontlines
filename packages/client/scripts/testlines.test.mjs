@@ -1,5 +1,6 @@
 // The hand-over script on made-up values (no value of the game rests on these): what it writes, what its check finds,
-// and every file it refuses to read or write. The real Export joins this file with the first content file.
+// and every file it refuses to read or write. Then the repository's own files (from 4b's step 8): his saved Export,
+// the manifest beside it, the table, and the movement table they give.
 import { createHash } from "node:crypto";
 import { existsSync, lstatSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -262,5 +263,11 @@ describe("the hand-over's files", () => {
     writeFileSync(large, "x".repeat(MAX_READ_BYTES + 1));
     expect(() => readPlain(large)).toThrow(`is larger than the ${MAX_READ_BYTES} bytes a read takes`);
     expect(statSync(large).size).toBe(MAX_READ_BYTES + 1);
+  });
+});
+
+describe("his Export and the game's first movement table, the repository's own files", () => {
+  test("the check holds content/movement/soldier.json to his saved Export through the table: every value, bit for bit, in the writer's form", () => {
+    expect(run("--check")).toBe(`${PATHS.target}: 15 values, each his Export's (sha256 ${EXPORT_SHA256.slice(0, 8)}...)`);
   });
 });
