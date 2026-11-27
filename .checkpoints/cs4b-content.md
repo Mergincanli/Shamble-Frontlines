@@ -1306,7 +1306,9 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   green (exits 0, 0, 0); `cs4b-content/plants-4b2.txt` is this run's. The source tree clean after it.
 - **The close, second point: the reviewers, round 1, on the code head c442a80** (`cs4b-content/review-brief-4b2.md`),
   three at a time: rust-reviewer, security-auditor, netcode-architect; then engine-architect, test-engineer,
-  infra-engineer. Their notes: `cs4b-content/<name>-review-4b2.md`.
+  infra-engineer. Their notes: `cs4b-content/<name>-review-4b2.md`. The first three launched at about 20:20 UTC.
+- **CI on the code head c442a80: green** (gate and smoke 20:08:23 to 20:09:07 UTC; toolchain 20:08:23 to 20:17:26,
+  9 min 3 s).
 
 ## Slips of this chat's own rules, for the report
 - One git command did not start its own shell call: `git add .checkpoints/cs4b-content/review-brief-4b1.md` stood
