@@ -553,3 +553,72 @@ echo until the first block after the return arrives (about P + d, 33 to 50 ms): 
   recommended, in either form.
 - **Recommendations stand as the question file has them:** the main session's (b); mine (a), "(b) if he also wants
   the 3b flash gone". Nothing here decides it.
+
+## Block 6. The order: can steps 2 and 3 come before step 1's movement if MOVE-RULES and NO-SOURCE come late?
+Facts only; the advisor agent rules on any reorder.
+| Piece | Needs step 1 to exist | Needs which of his answers | Touched again later |
+|---|---|---|---|
+| 2a `clamp_move`, `Post::from_numbers`, `Ray` | no | none | no |
+| 2b `sim::aim::aim_point`; the bounds on `StaticWorld` | no (`cast_ray` exists since 4b-2) | none (NO-SOURCE only if the 400 m reach is counted as a value) | the movement reads the same bounds (rust-reviewer's F11): an addition, not a rebuild |
+| 2c the endpoint's own world, its cast, `Sent.aim`, the clamped first aim | no | none | no |
+| 2d the room's two checks and counters | no | none | no |
+| 2e the world into the room and the endpoint (4B-WORLD-ROOM): `Room::new`, `Endpoint::new`, `LocalMatch::new` | no | none | **yes**: step 1 adds the movement's rules and the spawn to the same constructors and their callers (N12; rust-reviewer's F12): a second, small edit of the same sites |
+| 2f the 13-number input, the host, the guard, the replay readers (Rust, TypeScript, the e2e worker) | no | RESUME-FLASH (c) changes the host's two hide lines | no |
+| 2g `PlayerCommand` gains move and aim | no | none | record (i): no hash moves before step 1; record (ii): first-loop's hashes and vector made anew in step 2 and again in step 1 (one generator command each time) |
+| 2h the jump's rule, J1 to J5 (3B-ONE-PER-TICK) | **yes** (the jump is step 1's) | none of the five | it is built with the jump |
+| 2i T2-16, PM-0002-14's page half | needs step 3's owner section and step 4's page | SIZE-4C (c): the second half | no |
+| 3a `OwnSoldier` on the wire: the flag bit, the finite refusal, the decoder's generator | no | none | **its field list, yes**: it is step 1's soldier state, and MOVE-RULES can add or remove a field (block 2.5) |
+| 3b the room's snapshot fill; S4 (PM-0001-17's first piece) | **yes** | none directly | no |
+| 3c the endpoint's decode into the row, the header's count, the owner's section | the writer and its tests no; a soldier to fill it in play, yes | none | no |
+| 3d the block's layout (engine-architect's) | no | none (lane 2's list and the plan's 6.2) | no |
+| 3e the due-time stamp, three blocks, `blend.ts` (B1, B2), the pool of 16 | no | none (rule B serves RESUME-FLASH (a) and (b); (c) and (d) leave the blend as it is) | no |
+| 6 `walk`, `lane-walk`, `walk_reaches.rs`, the plants on movement fields | **yes** | MOVE-RULES (what `walk_reaches.rs` must find), NO-SOURCE (the fields that are frozen) | first-loop made anew at each change of the state's bytes |
+| 4B-RAY-WASM's three lines | no | none | no |
+| 6b the paced replay | its host and guard no (they run on `first-loop`); its real run needs `lane-walk` | none | no |
+| 6c H1, H2 / H3 / the far corner | H1, H2 yes / H3 no (step 2 only) / yes | the far corner's marks follow MOVE-RULES | no |
+**What these facts give:**
+- Of steps 2 and 3, everything but 2h, 3b and a soldier for 3c's row needs neither step 1 nor any of the five answers,
+  except RESUME-FLASH (c) on two host lines. Built before step 1, nothing is built twice in substance; three things are
+  touched twice: the constructors (2e, a few lines per site), the snapshot's soldier field list (3a), and, under
+  record choice (ii) only, first-loop's hashes (2g, a generator command, no hand work).
+- What waits for MOVE-RULES and NO-SOURCE: step 1 itself, 3a's field list, step 6's recordings and their frozen
+  content, `walk_reaches.rs`, the far corner. Neither answer touches anything else in steps 2 and 3.
+- In the meantime no recording holds a move or a ray (first-loop has zeros): the endpoint's cast is proven by unit
+  tests and H3 until `walk` exists. His FEATURE-COMPARE condition binds the change-set, not the step order: `walk`
+  must still land in the pull request that brings step 1 and the cast.
+- Under SIZE-4C (c), 2a to 2g, 3a, 3c's Rust and 3d belong to the first half (page-free), 3e and 2i to the second. Doing
+  second-half work while the first half waits for his go meets the single-branch limit the question file states
+  ("while one waits for him, this chat can only write notes, because it has a single branch"): it can be built, not
+  pushed.
+
+## For the sheet: overlaps and readings not yet listed (flagged, not resolved)
+1. The post's shape: 13 numbers with the move packed in one word (the plan, the recording's format) against
+   engine-architect's design 3.6 (14: `move_x, move_z` as two numbers). I recommend 13 (block 1.1).
+2. The bounds on `StaticWorld`: the aim's cm (mine) and the movement's metres for the floor and the four sides
+   (rust-reviewer's F11): one home, built once (N30).
+3. 4B-RAY-WASM: the checkpoint card puts it in rust-reviewer's read too; mine gives where it runs (the static world's
+   file), rust-reviewer picks the three rays and owns 4B-RAY-COUNTS.
+4. How the room's and the endpoint's tests get a world without naming `content` (N11): a dev-dependency (a manifest
+   change, the dependency hold) or a world made through `sim`. Engine-architect's call; step 2 needs it.
+5. Readings not in DEPART-4's fourteen, for his word: PM-0004-60 at 2,000,000 commands in CI's release line, not 10
+   million nightly through cargo-fuzz, with no id and no float in Walk's commands (N17, block 4.2); PM-0002-14 met in
+   its ray half only until change-set 8 brings the view time (block 1.4); PM-0004-20's hash half on `walk` (one
+   soldier) and its flag-off timing not runnable (N27).
+6. The record's width (N24): whether the World keeps the command's move and aim decides whether step 2 moves any
+   hash. rust-reviewer's and engine-architect's choice; I recommend the narrow record.
+7. The soft push is in no recording (one slot): its cross-target identity needs its own WebAssembly run (N29).
+8. CI: 6b's paced replay needs the CI Builder's answer to 4B-CHROMIUM-TIME first (N15); the 2,000,000-command runs go
+   in the release line, which has room (N16).
+9. Corrections to my own design of 2026-11-25, all applied above: the aim falls back to the ground plane at 400 m (N6);
+   the blend's allowance is the largest of 64, not the 90th percentile (N19); the fraction is measured back from the
+   newer block's due (N21, rule B); the pool is 16; there is no placement counter; first-loop moves with step 1.
+
+## Counts, one line per block (bottom-up, unmultiplied; plus or minus 30 %)
+- Block 1, step 2: 315 code / 630 tests = 945 (plan 385 / 530 = 915).
+- Block 2, step 3: mine 215 / 315 = 530; with engine-architect's layout about 320 / 340 (plan 320 / 340).
+- Block 3, step 6: mine 245 / 170 = 415 (plan 320 / 230 = 550, the rest being the other designs' marks).
+- Block 4, step 6b: 130 / 115 = 245 (plan 130 / 110); step 6c: 45 / 220 = 265 (plan 30 / 180).
+- Block 5, RESUME-FLASH: (a) about 5 / 40 beyond steps 1 and 3; (b) 10 / 20 more; (c) about 5 changed, two tests
+  reversed; (d1) about 25 / 40; (d2) a format version and every recording anew.
+
+DONE

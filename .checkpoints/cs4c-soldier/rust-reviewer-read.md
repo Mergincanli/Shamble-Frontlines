@@ -24,6 +24,9 @@ Task: rust-reviewer's design read for 4c step 1 (the simulation's soldier and mo
 - [F12] Callers outside sim that step 1 changes: room/src/lib.rs:108 (World::new), :219 and queue.rs:137 (PlayerCommand literals), :282 (authority_step), :286-296 (player() into the snapshot's OwnState), :314 and :651 and tests/any_bytes.rs:117 (MatchSetup literals); sim-wasm/src/lib.rs:118, local_match.rs:50/63/98/212/394/407, tests/step_alloc.rs:76; sim/tests/state_hash_alloc.rs:70/94; devtools/src/replay.rs:181 (impl StateSink: a new float method breaks it), devtools/tests/hash_cost.rs:40. world.rs:401-415's known answers (from a script) and the committed first recording (crates/devtools/recordings/first-loop.*, manifest.txt) pin today's state bytes: both change in step 1, not in step 6.
 - [F13] The scan refuses `libm::exp(`: rules_scan.rs:386 `on_a_path = before == "::" && !NOT_FLOATS.contains(&before_2)`; no bite or control names libm except libm::fma (:587). Confirmed F2.
 - [F14, prototype, my scratch rr-sweep-proto.rs, rustc 1.99.1 -O, f32] Our own sweeps against boxes, 2 mm skin, up/across/down step-up, 4 slides; 0.55/0.56/0.30/0.05 m steps at 6.3, 9.576 and 13.27 m/s from three starts each (36 runs): (1) without the rule "touching and moving along or away is no hit" nothing moves at all (resting on the floor at the skin is a hit at t = 0 every sweep); (2) a CAPSULE with edges counted by their normal perches on the step's rounded edge in the down phase and stalls (0.55 m: foot 0.448 to 0.543, x stuck); (3) with edges counted as walls the capsule climbs in two stages, perch then step from the perch: the 0.56 m step is GAINED in all 9 runs (foot 0.5620): PM-0004-30 fails; (4) a vertical CYLINDER (flat foot, same radius and 1.80 m): 0.55 gained (foot 0.5520) and 0.56 stopped at x 29.5980 (= 30 - 0.4 - 0.002) in all 9 runs each; (5) a tie of two boxes sharing the plane x = 30: the lower index wins in both list orders; (6) 10,000 seeded moves at 13.27 m/s into the 0.2 m wall: 0 past its mid-plane (both bodies). Outputs: rr-sweep-proto-capsule.txt, rr-sweep-proto-cylinder.txt beside this file.
+- [F15, prototype round 5] Two more capsule rules over the same 9 runs per height: the down phase landing on a face only: 0.56 stopped, 0.55 NOT gained at 6.3 and 9.576 m/s (6 of 9; x stays 29.5980), gained at 13.27 only; (B) the step raised from the last face's height: 0.55 gained 9 of 9, 0.56 perched on its edge (foot 0.5540, x 29.9202) 9 of 9. Files: rr-sweep-proto-capsule-face.txt, rr-sweep-proto-capsule-base.txt. The prototype has no vertical motion, no ramps, no push.
+- [F16] GROUND is written nowhere: map.rs:3-5 ("bounds is the playable box"; regions "only drawn"); engine-architect's design and the 4b-2 report have no line on it; the page's floor (engine-architect-read N10) and netcode's aim fallback to y = 0 (netcode-architect-read 1.1) assume it.
+- [F17, sibling reads] netcode-architect-read.md 1.1: PlayerCommand gains move_x, move_y: i8 and aim: AimCm (i16, u16, i16) in a new sim/aim.rs, the record stays buttons and presses (option (i)), StaticWorld gains bounds_cm: I take its widths (withdraw my i32). Its :357 takes StateSink's f32 (my F12): agreed. Its :403 and design 1.4 line 155 re-make first-loop in step 1's commit: agreed. engine-architect-read N23 counts the body height under NO-SOURCE and writes "the capsule's height": BODY-SHAPE would change that word only.
 
 ## Block 1. Step 1's pieces against today's code (DONE)
 Counts are written lines, bottom-up, not multiplied (code / tests). "Ours" and "library" are the two sweep routes of
@@ -34,14 +37,21 @@ added). Names of new types are proposals; the module split is engine-architect's
 - **BODY-SHAPE (a finding against plan 6.1, and against my own design's block 3 item 7).** Plan 6.1 says "a vertical
   capsule". My prototype (F14) shows a capsule with the plan's up/across/down step-up gains the 0.56 m step by
   perching on the step's rounded edge and stepping again from the perch (9 of 9 runs, foot 0.5620): PM-0004-30 fails.
-  The query route does not matter here: this is the shape's geometry. Options: (A) a vertical cylinder, flat foot,
-  same radius and height: 0.55 gained and 0.56 stopped in 9 of 9 runs each; stands on a box until its centre is one
-  body radius (0.4 m) past the edge; floats over a ramp at its centre by radius x grade (0.10 m on the gentle ramp,
-  0.20 m on the steep one), unless the foot gets a smaller radius of its own (a number the sandbox has as a code
-  constant, game-designer D12, and NO-SOURCE does not list). (B) keep the capsule and let the step-up remember the
-  height of the last face stood on (a perch is grounded but steps from that base; one hashed field; untried). (C) the
-  capsule, landing only on faces, with the across phase pushed one radius past the contact (moves farther than the
-  velocity: a speed bump; untried). Recommended: (A), the only one tried; ramps untried for all three.
+  The query route does not matter here: this is the shape's geometry. Which acceptance rule gives which result, each
+  over the same 9 runs per step height (F15; files rr-sweep-proto-*.txt): capsule, the step's down phase may land on
+  an edge: 0.55 gained, **0.56 gained** (perch, then a second step from the perch); capsule, the down phase lands on a
+  face only (the rule my 1.5 item 7 first wrote): 0.56 stopped, but **0.55 not gained at 6.3 and 9.576 m/s** (6 of 9;
+  only 13.27 m/s carries the centre past the edge in one tick); (B) capsule, the step raised from the height of the
+  last face stood on: 0.55 gained 9 of 9, the 0.56 step **perched on its edge** (feet at 0.554 m, centre 8 cm short of
+  the face) in 9 of 9: not on top, not on the ground; (A) vertical cylinder, flat foot: 0.55 gained and 0.56 stopped
+  on the ground, 9 of 9 each. Options: (A); (B) with a rule for the perch (it slides off, or the perch counts as
+  stopped by the mark's reading); (C) the capsule with face-only landing and an across phase pushed one radius past
+  the contact (moves farther than the velocity; untried). **(A) changes what MOVE-RULES row 2 told him** ("holds a
+  little past an edge (the body's round foot rests on it)"): with (A) he stands a full 0.4 m past an edge, and floats
+  over a ramp at his centre by radius x grade (0.10 m on the gentle ramp, 0.20 m on the steep one) unless the foot gets
+  a smaller radius of its own, a number NO-SOURCE does not list. So BODY-SHAPE is a point for game-designer and for
+  him, not an engineering pick. This read's engineering view: (A) is the only one that met both steps; ramps,
+  vertical motion and the push are untried for all of them (risk 2).
 - **SWEEP-ROUTE.** (Ours) our own sweeps on today's corners, as the ray is (collision.rs:7-12 gives the reasons, and
   they hold for sweeps: F3); the library keeps the tree (build, walk, depth) and serves as the tests' oracle. (Library)
   parry3d's typed cast (`query::details::cast_shapes_support_map_support_map`, shape_cast_support_map_support_map.rs:10)
@@ -129,8 +139,19 @@ What a sweep needs beyond today's `cast_ray` (collision.rs:300):
    its horizontal edges as flat stadium slabs: about 80 lines, untried. (Capsule: the same with sphere-swept edges,
    F4.)
 2. The floor and the edge (F11): the bounds as solid, held in the sweep beside the tree (floor walkable; sides by
-   MOVE-RULES row 8; top a ceiling).
+   MOVE-RULES row 8; top a ceiling). **GROUND, an open point with an owner (engine-architect, the map kind):** no
+   document says the bounds' bottom is ground. The map kind calls the bounds "the playable box" and the regions
+   "patches of ground that are only drawn" (map.rs:3-5); the page draws a floor at y 0 (engine-architect-read N10)
+   and netcode-architect's aim falls back to the plane y = 0 (netcode-architect-read 1.1); the test scene has no
+   shape under the soldier. Options: (a) the map kind says the bounds' bottom is solid ground (a doc line and a test);
+   (b) maps hold a ground shape (the test scene gains one; 512 shapes still the cap).
 3. "Touching and moving along or away is no hit" (dot(normal, move) >= 0): without it nothing moves (F14 (1)).
+3b. "A box whose top is no higher than the foot plus the skin is floor to a horizontal sweep": both prototype bodies
+   ran with it (without it the round foot rides every edge). A per-box top test cannot work for a ramp (its top is
+   high where the slope under the foot is low): the ramp's rule, and its seams with a platform at x 45, are open.
+3c. The pieces are computed relative to the body's centre (corners minus centre first), so the numbers stay small at a
+   2 km map's corner (PM-0004-39: f32's step there is 0.12 mm against the 2 mm skin; netcode-architect-read 4.3's
+   plant is the skin below that step).
 4. The closest hit over every shape whose grown box the move enters, ties to the lower index, exactly as `cast_ray`
    (collision.rs:329-333); the walk prunes a node whose box grown by the body is entered later than the best hit.
 5. A skin of 2 mm (a code constant); a move that starts inside a shape (a soldier pushed or spawned into one) is
@@ -168,8 +189,9 @@ without one). In order, all f32, + - x / sqrt and comparisons:
 3. Speed: walk or sprint (ads in 4d). Velocity, horizontal: v += (wish x speed - v) x share, share = ease_up with a
    wish, ease_stop without, times air_share in the air (row 8). A speed under 1e-4 m/s is set to exactly 0 (a code
    constant: the state settles at rest and no subnormal number is carried tick after tick).
-4. Jump: requested = jump held or a press edge since the last applied command (`protocol::wrap::press_edges`, as
-   netcode-architect 4.1); if grounded: vy = take_off, grounded = false; every other press of that command is dropped.
+4. Jump: requested = jump held or a press edge since the last applied command: the simulation's own
+   `new.wrapping_sub(old)` on the record's counter (sim depends on content and the collision library only, so not
+   `protocol::wrap::press_edges`, wrap.rs:32-34, which is the same one line); if grounded: vy = take_off, grounded = false; every other press of that command is dropped.
 5. Vertical, the exact arc: dy = vy x dt - half_g_dt2; vy -= g_dt (two roundings each, never fused: MUL-ADD). The
    tick's true top, when vy > 0 and vy - g_dt < 0: y + vy x vy x inv_two_g (F7); it, not the sampled height, is
    what the step-up in the air reaches.
@@ -177,7 +199,8 @@ without one). In order, all f32, + - x / sqrt and comparisons:
    that is no walkable face (a wall, an edge) is flattened to the horizontal first.
 7. The step-up (up by step_up + skin, across, down), on the ground and in the air (plan 6.2 (4): confirmed, with the
    true top of item 5 as its base in the air and BODY-SHAPE's (A) or (B): the plain capsule fails it, F14 (3)).
-   Accepted if the down phase lands on a walkable face and got further than the plain slide.
+   Accepted if the down phase lands on a walkable face and got further than the plain slide (with body (A); with a
+   capsule this rule misses the 0.55 step at walk and sprint, F15, and the edge-landing rule gains the 0.56, F14).
 8. Vertical sweep by dy: falling onto a walkable face lands (vy = 0, grounded); rising into a ceiling stops vy (row 8).
 9. Snap down (row 4 (a)): grounded before, not jumping, no ground found in dy: sweep down by step_up; a walkable face
    snaps; else airborne from rest (the old game's walk-off).
@@ -214,9 +237,10 @@ Debug and test builds assert every float of the state finite after the tick (PM-
 - Count: 430 / 420 (engine-architect 380 / 350; my design 570 / 600 counted the marks glue and the parry adapter).
 
 ### 1.6 The world, the command and their callers
-- `world.rs`: `PlayerCommand` (:40-43) gains `move_x: i8, move_z: i8, aim_cm: [i32; 3]` (netcode-architect 3.3 has
-  `AimCm { x: i16, y: u16, z: i16 }`, the wire's widths: with i32 in the simulation the far-corner test of PM-0004-39
-  runs on the real command; the room widens). No float enters from a command, so PM-0004-24's "refused where it
+- `world.rs`: `PlayerCommand` (:40-43) gains `move_x: i8, move_y: i8, aim: AimCm` as netcode-architect-read.md 1.1
+  has it (`AimCm { x: i16, y: u16, z: i16 }` in a new `aim.rs`, the wire's widths, with the record kept as buttons and
+  presses, its option (i)); agreed, and my earlier i32 withdrawn: the far-corner test feeds aim 0, which the movement
+  does not read (netcode-architect-read 4.3; only the facing reads it). No float enters from a command, so PM-0004-24's "refused where it
   enters" holds by type, and PM-0004-60's fuzz covers integer ranges. `World` (:112-117) gains `soldiers: Soldiers`,
   and, as match constants outside the state, `rules: Rules`, `statics: StaticWorld`, `spawns`; `World::new` (:122)
   takes them (it can no longer be `const fn`); `authority_step` (:149) runs each slot's commands then the push;
@@ -229,11 +253,19 @@ Debug and test builds assert every float of the state finite after the tick (PM-
   (PlayerCommand literals), :282 (authority_step), :286-296 (player() into OwnState); sim-wasm lib.rs:83-122 (the
   constructor builds the constants), local_match.rs:58-64 and :98 (`static_world()` reads the room's now),
   tests/step_alloc.rs:76; sim/tests/state_hash_alloc.rs:70-94; devtools/tests/hash_cost.rs:40; room tests :314,
-  :651, tests/any_bytes.rs:117. Remove: `LocalMatch.world` and its doc (local_match.rs:48-50).
+  :651, tests/any_bytes.rs:117. Callers of the two constructors that change (grep `Room::new(` and `LocalMatch::new(`
+  over crates/): room/src/lib.rs:314 and :655, room/tests/any_bytes.rs:117, sim-wasm/src/local_match.rs:66 (the one
+  product call of `Room::new`), :213, :399, :413, sim-wasm/src/lib.rs:122, sim-wasm/tests/step_alloc.rs:86; the grep
+  finds no call in devtools. Remove: `LocalMatch.world` and its doc
+  (local_match.rs:48-50).
 - The pins that move in step 1, not in step 6 (F12): world.rs:401-415's known answers (a second implementation, a
   script, writes them again) and the committed first recording (crates/devtools/recordings/first-loop.*, its
   manifest): the moment the state holds a soldier their hashes change, so the step that changes the state re-makes
-  them, as its own named sub-step (the advisor agent's ruling, plan 6.2), or CI is red from step 1 to step 6.
+  them, as its own named sub-step (the advisor agent's ruling, plan 6.2), or CI is red from step 1 to step 6. This
+  agrees with netcode-architect's own rule ("in the commit that changes the simulation's behaviour or its state's
+  layout on purpose, every recording is re-made", netcode-architect-cs4.md 1.4, line 155) and its read
+  (netcode-architect-read.md:403: "first-loop moves in step 1's commit"); the conflict is with plan section 6's step 6
+  line, which the sheet corrects.
 - Count: 110 / 70 (sim) plus about 60 / 40 in room, sim-wasm and devtools.
 
 ### 1.7 No trigonometry in the step; nothing allocates (PM-0004-6)
@@ -283,19 +315,34 @@ once, in f64, narrowed once. What proves it: the movement recording on four runs
 vectors (1.8); and a committed sweep proof beside static-world.txt (Block 2). Count: in Block 2.
 
 ### 1.10 Step 1 recounted
-| Piece | Plan's share | This read, route Ours | Route Library |
+| Piece | engine-architect-cs4.md 2.10 | This read, route Ours | Route Library |
 |---|---|---|---|
-| ids, soldiers | | 150 / 140 | same |
-| rules | | 130 / 110 | same |
-| vec, fmath, scan | | 70 / 80 | same |
-| sweeps | | 260 / 260 | 140 / 220 |
-| movement and push | | 430 / 420 | 400 / 420 |
-| world and callers | | 170 / 110 | same |
-| allocation test | | 0 / 90 | 0 / 100 |
-| exp and vectors, list | | 90 / 50 | 100 / 60 |
-| **Step 1** | **1,240 / 1,090** | **1,300 / 1,260** | **1,160 / 1,240** |
+| ids, soldiers | 150 / 120 | 150 / 140 | same |
+| rules (and time, which 4b built) | 120 / 80 | 130 / 110 | same |
+| vec, fmath, scan | 40 / 60 (fmath only) | 70 / 80 | same |
+| sweeps | 260 / 150 (collide.rs) | 260 / 260 | 140 / 220 |
+| movement and push | 380 / 350 | 430 / 420 | 400 / 420 |
+| world and callers | 120 / 60 | 170 / 110 | same |
+| allocation test | 0 / 80 | 0 / 90 | 0 / 100 |
+| exp and vectors, list | (in its 3A rows) | 90 / 50 | 100 / 60 |
+| **Step 1** | plan: **1,240 / 1,090** | **1,300 / 1,260** | **1,160 / 1,240** |
 Plus, outside sim, NO-SOURCE (b)'s fields in the content crate and the Testlines table (Block 3): about 40 / 40.
-Plus Block 2's sweep proof and ray counts: about 90 / 70 (in devtools; step 1 or step 6, the sheet's call).
+Plus Block 2's ray counts and sweep proof: about 90 / 70 (in devtools; step 1 or step 6, the sheet's call).
+**With both: about 1,430 / 1,370 (route Ours) or 1,290 / 1,350 (Library), against the plan's 1,240 / 1,090.**
+
+### 1.11 The three marks that ride on step 1 but are tested in later steps
+- **PM-0004-54** (1,000 downward cursor rays onto the yard's ramps within 1 cm of the slope; plant: ramps queried as
+  boxes, the old game's GC3): its test is step 2's, on netcode-architect's `aim_point` (aim.rs) over today's
+  `cast_ray` and `enter_ramp` (collision.rs:152-204, 300-338). Step 1 provides nothing new for it: the ray exists and
+  is exact on ramps (the library-twin test, collision.rs:886-953, within 0.1 mm).
+- **PM-0004-39** (the yard at a 2 km map's far corner; plant: the skin below f32's step there): its test is step 6c's
+  (netcode-architect-read 4.3, `crates/sim/tests/far_corner.rs`, a map built in code, aim 0). Step 1 provides the
+  sweeps computed relative to the body (1.4 item 3c), a skin of 2 mm (16 f32 steps at 2 km), and no constant that
+  assumes coordinates near the origin. On the plan's ladder (moves to 4d at 13,150 lines).
+- **PM-0004-60** (2,000,000 hostile movement commands, no panic; plant: a client-sent number used as an index): its
+  tests are step 6c's (netcode-architect-read H1 to H3). Step 1 provides: a command of integers only (no float to be
+  NaN), the deny lints on the new modules (1.3), `get` indexing everywhere, saturating and wrapping integer
+  operations only where written, the wish's zero-length check, and the finite assertion each tick.
 
 ## Block 2. 4B-RAY-COUNTS, 4B-RAY-WASM, and the simulation side of 4B-QUERY-RECORDING (DONE)
 **Today.** `crates/devtools/src/world_proofs.rs` casts 2,000 rays into each of 12 seeded maps; `ray()` (:97-150)
@@ -314,8 +361,9 @@ moves the digest once and is then committed as the new truth. That is TE-4's gap
 - A test in crates/devtools/tests/static_world.rs holds a minimum per kind and per answer count, per seeded map with
   at least 17 shapes and over the file. The numbers are set at about half of what the first run with the kinds gives
   (not measured in this read; the test names the run they came from), so a seed change passes and a starved kind
-  fails. Ties need rays into the hostile row map (`hostile(6)`, :297-306, built so that a ray meets 512 shapes at one
-  distance): today `made()` casts no ray into a hostile map (:471-475), so 200 rays go into that one. Plant: `rng.between(0, 4)` in `ray()` (kind 4 never drawn): red on its minimum; a cast that misses every
+  fails. Ties: `judge_taken` already casts one ray per shape into every hostile map and holds the tie rule there (the
+  lowest index of those as high, :264-268; the row map `hostile(6)`, :297-306, is built for it); what is missing is a
+  committed count of those ties, which the hostile line (:423-431) gains. Plant: `rng.between(0, 4)` in `ray()` (kind 4 never drawn): red on its minimum; a cast that misses every
   ray along an axis (`direction[axis] == 0.0` returning None): red.
 - **The casts' first caller** is the client endpoint's aim (step 2, netcode-architect 3.7: from the camera, down onto
   the scene, first hit within 500 m). Its rays are a kind of their own: origin 10 to 40 m above the ground, pitched 35
@@ -363,6 +411,9 @@ Under (b) each row takes its (a) or (c) cell below. Line counts are changes to B
 | 4 slopes and stairs down | snap down by step_up (no new number) | no snap: falls in small hops (the old game, R9) | (a) the steepest walkable grade (NO-SOURCE) |
 | 5 real heights | every shape is solid at its own height (the code above) | walls and houses endlessly high, platforms, ramps and cover standable: the map kind has no field that says which shape is which (map.rs:104-118, F10): a content-kind change, engine-architect's, plus a flag in `Solid` | (c) a field per shape |
 | 8 listed only | two shares and the air share (F9: same bits as (c) today); the head stops at a ceiling (vertical sweep); the bounds are walls, speed into them dropped | one share, full steering; no ceiling test; clamp 1 m inside the bounds, speed kept (game:2779) | none |
+Under (b), rows 2, 3 and 4 share one body and one sweep model (the body's foot, the wall's corners and the slope's
+snap all come from it): a mix such as row 3 (a) with row 2 (c) is not two independent cells but a third model to
+design and test; rows 1, 5 and 8 mix freely.
 Code size by option: all (a) is Block 1. All (c): the sweeps shrink to the grown-box ray plus the down ray (about
 -170 / -150), the movement loses slides, snap and ceilings (about -60 / -60), row 5 (c) adds the content field and its
 reader (about +30 / +30 in `content`, engine-architect's). Rows 6 and 7 are 4d's and change nothing in step 1.
@@ -408,8 +459,8 @@ height, the foot, the push's four guards (the push's core, pairs and sums swept 
 the two numbers that exist, with the guards off).
 
 ## Block 4. Risks, ranked (DONE)
-1. High: the plan's capsule fails PM-0004-30 (a 0.56 m step gained by perch then step, 9 of 9 prototype runs); BODY-SHAPE must be settled before the movement step.
-2. High: nothing of route Ours beyond boxes is tried: the ramp's grown prism, the cylinder's slanted side edges and the seams are unprototyped (cylinder on boxes only, F14).
+1. High: the plan's capsule fails PM-0004-30 under every step rule tried (edge landing: 0.56 gained 9 of 9; face landing: 0.55 missed 6 of 9; base memory: 0.56 perched on its edge 9 of 9); BODY-SHAPE must be settled, with game-designer and him, before the movement step.
+2. High: the prototype ran horizontal moves against boxes only: ramps (the grown prism, the slanted side edges, the floor rule for ramps, the seams at x 45), every vertical motion (the in-air step-up with 3.05 gained and 3.10 refused, landing, the snap, ceilings) and the push are untried, for every body and both routes.
 3. Medium: the cylinder floats over a ramp by radius x grade (0.10 and 0.20 m at the yard's ramps), which he will see; a separate foot radius is a number no question asks for yet.
 4. Medium: route Ours is a departure from the card's "on parry3d's queries" and rewords PM-0004-20 and -35; the advisor agent must accept it or the library route runs, with its EPA allocation on overlap and GJK-tolerance ties (F3).
 5. Medium: the first recording and world.rs's known answers change the moment the state holds a soldier; if their re-making waits for step 6, CI is red from step 1 on.

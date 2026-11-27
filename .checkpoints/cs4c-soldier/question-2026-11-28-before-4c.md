@@ -133,6 +133,33 @@ the advisor agent's review of the plan sheet: first the page's scene with the ma
   changed; (b) leave both lines as they are; (c) his own words for each.
 - **Recommended: (a).** It changes no decision and points the reader to §14.
 
+## Added at 00:55 Amsterdam, after engine-architect's read (`engine-architect-read.md`, blocks 1 and 2)
+### SIZE-4C, two new facts, and the recommendation changed from (c) to (b)
+- **The scene is larger than this file said:** about 740 lines by the designs' count (not 630), so about 1,600 to
+  2,000 written lines. By the plan's rule its stop line would be about 1,665 (not 1,420); a line of about 2,000 would
+  let it finish without a stop. Until he answers, it is held to about 1,420, the number told to him, unless the
+  advisor agent rules on that hold (it was this chat's own limit, not his).
+- **Option (c) delays the first build he can play.** Its first soldier half (the simulation, the command path and the
+  recordings) changes nothing on screen, and with one branch this chat cannot build the page half while that half
+  waits for its reviews, its verifier and his go. Under (b) the same work comes before the early look with no stop.
+- engine-architect found the seam (c) needs (it is clean, on three conditions, one of them netcode-architect's yes
+  that a post with no ray is not counted as a refused ray): halves of about 8,600 to 11,900 and 6,300 to 9,100
+  written lines.
+- **Recommended now: (b).** He sees the scene first, in a small pull request: its build can run tonight (the same code
+  under every option), and its reviews and verifier start the moment he answers (b), so that it is soon ready for his
+  Brave check (its docs commit, with his words of 27 November, follows his answers to PASTE-BREAKS and BOARD-WORDS);
+  then the soldier as one pull request with the early look inside it and no stop before he plays. It is large (about 15,900 to 19,750 written lines against the plan's 16,450),
+  so it is likely to reach that line near its end and come back to him there. (c) stays the choice if smaller pull
+  requests matter more to him than playing early.
+
+### 9. STREET-GREY: may the street and the grass take two greys? (a default he can veto, like GREY-COLOURS)
+- **Why it matters:** both ground kinds lie at height 0, so by "higher is lighter" alone they take one grey and the
+  street does not show, while the plan told him he sees "a street" (the plan's section 2).
+- **Options:** (a) one grey for both, darker than every block: the street shows only when the look comes (change-set
+  6); (b) two neutral greys, one per ground kind, both darker than every block: the street shows; (c) the patches drawn
+  as outlines in the grid's grey, with no fill.
+- **Default: (b).** Unless he says otherwise, the scene is built with (b); it stays inside his "neutral greys".
+
 ## One line, no question
 STEP12-GO is in the register already (`docs/DECISIONS.md:183`, since 4b-2's docs pass), so it is not written again.
 Only his go for 4b-2's merge, his word on merging and his design notes (and his message of 23:59, by BOARD-WORDS) go

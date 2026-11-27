@@ -158,7 +158,11 @@ fn sweep(world: &[(V, V)], o: V, d: V) -> Option<Hit> {
 }
 
 /// One grounded horizontal move with up to four slides and the step-up; returns the new centre.
-fn walk(world: &[(V, V)], c: V, mv: V) -> (V, bool) {
+/// Round 5: FACE=1 lands the step's down phase only on a face; BASE=1 raises the step from `base`, the foot height
+/// of the last face stood on (option (B)), and returns the new base.
+fn walk(world: &[(V, V)], c: V, mv: V, base: f32) -> (V, bool, f32) {
+    let face_only = std::env::var("FACE").is_ok();
+    let with_base = std::env::var("BASE").is_ok();
     let plain = |c: V, mv: V| {
         let (mut c, mut rest) = (c, mv);
         let mut stepped_wanted = false;
@@ -180,18 +184,22 @@ fn walk(world: &[(V, V)], c: V, mv: V) -> (V, bool) {
         (c, stepped_wanted)
     };
     let (slid, blocked) = plain(c, mv);
-    if !blocked { return (slid, false); }
-    let up = [0.0, STEP + SKIN, 0.0];
+    if !blocked { return (slid, false, base); }
+    let foot = c[1] - R - H;
+    let rise = if with_base { base + STEP + SKIN - foot } else { STEP + SKIN };
+    if rise <= 0.0 { return (slid, false, base); }
+    let up = [0.0, rise, 0.0];
     let c1 = match sweep(world, c, up) { None => add(c, up), Some(h) => add(c, scale(up, h.t)) };
     let (c2, _) = plain(c1, mv);
     let down = [0.0, -(c1[1] - c[1]) - SKIN, 0.0];
     match sweep(world, c2, down) {
-        Some(h) if h.n[1] >= WALK_NY => {
+        Some(h) if h.n[1] >= WALK_NY && (!face_only || h.face) => {
             let c3 = add(c2, scale(down, h.t));
             let far = |p: V| { let g = sub(p, c); g[0] * g[0] + g[2] * g[2] };
-            if far(c3) > far(slid) { (c3, true) } else { (slid, false) }
+            let new_base = if h.face { c3[1] - R - H } else { base };
+            if far(c3) > far(slid) { (c3, true, new_base) } else { (slid, false, base) }
         }
-        _ => (slid, false),
+        _ => (slid, false, base),
     }
 }
 
@@ -204,7 +212,8 @@ fn main() {
                 let mut c = [start, SKIN + R + H, -9.0];
                 let mv = [speed / 30.0, 0.0, 0.0];
                 let mut stepped = false;
-                for tick in 0..30 { let (n, s) = walk(&world, c, mv); stepped |= s; c = n; if std::env::var("TRACE").is_ok() && label == "0.55" && speed == 6.3 && start == 27.0 { println!("  tick {tick} x {:.4} foot {:.4} {s}", c[0], c[1] - R - H); } if c[0] > 31.0 { break; } }
+                let mut base = SKIN;
+                for tick in 0..30 { let (n, s, b) = walk(&world, c, mv, base); base = b; stepped |= s; c = n; if std::env::var("TRACE").is_ok() && label == "0.55" && speed == 6.3 && start == 27.0 { println!("  tick {tick} x {:.4} foot {:.4} {s}", c[0], c[1] - R - H); } if c[0] > 31.0 { break; } }
                 let foot = c[1] - R - H;
                 println!("step {label} speed {speed} start {start}: x {:.4} foot {:.4} stepped {stepped}", c[0], foot);
             }

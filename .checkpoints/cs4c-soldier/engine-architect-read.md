@@ -512,3 +512,42 @@ repeated. "Today" is main dae6d107 with 4c-1's scene in.
 - **MOVE-RULES:** no symbol of steps 3 to 5 changes by its rows (rows 6 and 7 are 4d's; the others act inside the
   simulation).
 - B3 DONE. Next: B4, 4B-WORLD-ROOM.
+- N25. Today's owners: `LocalMatch` holds `world: StaticWorld` (local_match.rs:48-50, built by sim-wasm's `local_world`, lib.rs:83-86, handed in at :121, read through `static_world()`, :96-100, by one test, lib.rs:399-410); `Room` holds `World` (room/src/lib.rs:87-88, :105-108) and steps it with `authority_step(commands)` (:282; world.rs:149); `MatchSetup` is the seed and the start tick only (world.rs:26-31). Constructor callers: Room::new 3 (room lib tests 2, room/tests/any_bytes.rs 1), LocalMatch::new 7 (sim-wasm lib 1, local_match tests 5, tests/step_alloc.rs 1).
+- N26. rules_scan.rs reads `crates/sim/src` (and `crates/content/src`): nothing holds the room's or the client endpoint's sources or manifests (rules_scan.rs:6-16, :471-499). Both manifests today: protocol and sim only.
+
+## Block 4. 4B-WORLD-ROOM: where the authority's world lives (DONE)
+- **Ruling: the room owns it.** `Room` gains `statics: StaticWorld` (and, by the same rule, the match's `Rules` and
+  its spawn points, in whatever sim types rust-reviewer's step 1 gives them), taken by value in `Room::new(setup,
+  content_hash, statics, ...)`; `World::authority_step` takes `&StaticWorld` (and `&Rules`) as arguments, borrowed
+  from the room each tick (room/src/lib.rs:282). The movement functions already take `&StaticWorld`, never `&World`
+  (design 2.1), so change-set 7's prediction passes the endpoint's own copy the same way.
+- **Not in `World`:** the static world is never state (collision.rs:1-3; design 2.4: not hashed, rebuilt after a
+  restore). Inside `World` it would ride every copy of the state (change-set 7's resets) and sit among the fields
+  `write_state` hashes. **Not in `LocalMatch`:** the room is also the native server's match; a world held beside it
+  in local play would have to be held beside it again on the server.
+- **Who builds it decides the manifests** (both crates already depend on `sim`, N26): the constructor that loads
+  the content builds sim's types and hands them in: `Sim::create` (sim-wasm/src/lib.rs:105-128) today, the native
+  server's match start later. So **no `[dependencies]` line changes**: room and client-endpoint receive
+  `sim::collision::StaticWorld` through the `sim` they name; only sim-wasm (lib.rs:83) and devtools name `content`.
+  The client endpoint's own copy for the aim cast (step 2) comes the same way: one build, cloned (`StaticWorld` is
+  `Clone`, collision.rs:94-95), one copy for the room and one for the endpoint (plan risk 6: measured).
+- **The one manifest consequence:** room's own tests (room/src/lib.rs tests, room/tests/any_bytes.rs) must now build
+  a world, which needs a `MapDocument`, a content type: `content` joins **room's `[dev-dependencies]`** (test-only,
+  as devtools' protocol line is), which changes Cargo.lock's room entry, so the dependency hold applies
+  (`.claude/CHECKPOINTS.md` section 3, DEP-HOLD: security-auditor on that exact content, `dependency-check.md` before
+  any push). The client endpoint's tests the same, once its endpoint takes a world (step 2).
+- **A rule, since none exists (N26):** a test in devtools (tools may depend on everything), `tests/layering.rs`:
+  the `[dependencies]` tables of crates/room/Cargo.toml and crates/client-endpoint/Cargo.toml name no `content`, and
+  no file under their `src/` names `content` (rules_scan.rs's tokenizer, :127-252, reused, not copied: moved to a
+  shared place if needed); planted: a `content = { path = "../content" }` line in a copy of the manifest text, and a
+  `use content::map::MapDocument;` in a copy of a room source, each must fail. About 25 / 25 lines. It keeps one
+  reader of content in the authority's path: the constructor, through sim's `Rules::take` and `StaticWorld::build`.
+- **What changes:** `Room` (a field, `new`, the step's call); `World::authority_step` (an argument); `LocalMatch`
+  loses `world` and `static_world()` (local_match.rs:48-50, :63, :73, :96-100), and `new` hands the world on;
+  `Sim::create` (lib.rs:121); the tests at lib.rs:399-410 (reads `local().room().statics()`), local_match.rs:203-213,
+  tests/step_alloc.rs:84-86, room's two test sites. 4B-QUERY-RECORDING's first recorded query is then the room's.
+- **When:** with the first step that queries it, step 1's movement inside the room's step: 4c-2 under the seam of
+  block 2.
+- B4 DONE.
+
+DONE
