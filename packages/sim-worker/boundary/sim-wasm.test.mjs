@@ -11,11 +11,18 @@ import { beforeAll, expect, test } from "vitest";
 import * as glue from "../pkg/sim_wasm.js";
 import { initSync, panic_buffer, Sim, tick_hz } from "../pkg/sim_wasm.js";
 import { SimHost } from "../src/host.ts";
+import { MAX_BUNDLE_BYTES } from "../src/messages.ts";
 import { MAX_TICKS_PER_WAKE } from "../src/pacing.ts";
-import { PANIC_TEXT_ROOM, readPanicMessage } from "../src/panic-message.ts";
+import { PANIC_TEXT_ROOM, readPanicMessage, THROWN_TEXT_UNITS, trapMessage } from "../src/panic-message.ts";
 import { copyBlock } from "../src/read-block.ts";
+import { readPlainFile } from "./plain-file.ts";
 
 const SEED = new Uint8Array(32).fill(7);
+/**
+ * A bundle the game's loader takes: the first recording's frozen content, committed beside it (any bundle the
+ * loader takes would do here; the replay tests hold it to the recording).
+ */
+const BUNDLE = readPlainFile(new URL("../../../crates/devtools/recordings/", import.meta.url), "first-loop.content.json");
 const PERIOD = 1000 / 30;
 let wasm;
 
@@ -38,7 +45,7 @@ function wordsOf(buffer, section) {
 }
 
 test("a block written by Rust passes the page's layout check, from tick 0 on", () => {
-  const sim = new Sim(SEED, 0, 0);
+  const sim = new Sim(SEED, 0, 0, BUNDLE);
   expect(tick_hz()).toBe(30);
   // The host's cap is a quarter of a second of the simulation's own tick rate (ADR 0004 part 5).
   expect(Math.floor(0.25 * tick_hz())).toBe(MAX_TICKS_PER_WAKE);
@@ -53,7 +60,7 @@ test("a block written by Rust passes the page's layout check, from tick 0 on", (
 });
 
 test("two steps advance the tick by two, and each returns the next due time", () => {
-  const sim = new Sim(SEED, 0, 0);
+  const sim = new Sim(SEED, 0, 0, BUNDLE);
   // The host's first rebase says when the first tick is due.
   expect(sim.rebase(1000)).toBeCloseTo(1000 + PERIOD, 9);
   expect(sim.step(1000 + PERIOD)).toBeCloseTo(1000 + 2 * PERIOD, 9);
@@ -63,7 +70,7 @@ test("two steps advance the tick by two, and each returns the next due time", ()
 });
 
 test("what the host hands in comes back in the block: each button's count in its own byte, through the real messages", () => {
-  const sim = new Sim(SEED, 0, 0);
+  const sim = new Sim(SEED, 0, 0, BUNDLE);
   sim.step(0);
   const counts = new Uint8Array(16);
   for (let button = 0; button < 16; button += 1) {
@@ -94,8 +101,8 @@ test("what the host hands in comes back in the block: each button's count in its
 });
 
 test("after the memory grows between two steps, the next block is the block of a run without the growth", () => {
-  const grown = new Sim(SEED, 0, 1024);
-  const plain = new Sim(SEED, 0, 1024);
+  const grown = new Sim(SEED, 0, 1024, BUNDLE);
+  const plain = new Sim(SEED, 0, 1024, BUNDLE);
   grown.step(0);
   plain.step(0);
   // One copy before the growth, so a host that keeps its first view is caught here whatever ran before.
@@ -111,18 +118,78 @@ test("after the memory grows between two steps, the next block is the block of a
 });
 
 test("padding makes the block longer and it still passes the check", () => {
-  const sim = new Sim(SEED, 0, 65536);
+  const sim = new Sim(SEED, 0, 65536, BUNDLE);
   expect(sim.block_len()).toBe(44 + 65536);
   sim.step(0);
   expect(checkLayoutHash(blockOf(sim))).toEqual({ ok: true });
 });
 
-test("a bad seed, mode or padding is refused with a plain reason", () => {
-  expect(() => new Sim(new Uint8Array(31), 0, 0)).toThrow("the match seed must be 32 bytes and is 31");
-  expect(() => new Sim(SEED, 1, 0)).toThrow("only local play (0)");
-  // The whole number counts: 256 must not be cut down to 0, which is local play.
-  expect(() => new Sim(SEED, 256, 0)).toThrow("mode 256 does not exist");
-  expect(() => new Sim(SEED, 0, 0xffff_ffff)).toThrow("above the writer's cap");
+/** What the constructor threw, or undefined when it made a match. */
+function refusal(make) {
+  try {
+    make();
+  } catch (error) {
+    return error;
+  }
+  return undefined;
+}
+
+test("each class of refusal is an Error with a plain reason, never a trap, and the module still makes a match after them", () => {
+  const encode = (text) => new TextEncoder().encode(text);
+  // The frozen bundle with one value changed inside its map's text: an id the id grammar refuses, named in place.
+  const frozen = new TextDecoder("utf-8", { fatal: true }).decode(BUNDLE);
+  const renamed = frozen.replace('\\"id\\": \\"test-scene\\"', '\\"id\\": \\"Test-scene\\"');
+  expect(renamed).not.toBe(frozen);
+  const classes = [
+    [() => new Sim(new Uint8Array(31), 0, 0, BUNDLE), "the match seed must be 32 bytes and is 31"],
+    [() => new Sim(SEED, 1, 0, BUNDLE), "only local play (0)"],
+    // The whole number counts: 256 must not be cut down to 0, which is local play.
+    [() => new Sim(SEED, 256, 0, BUNDLE), "mode 256 does not exist"],
+    [() => new Sim(SEED, 0, 0xffff_ffff, BUNDLE), "above the writer's cap"],
+    // The content: no bundle's text, a document that is no bundle, a value of a file refused by its file and place,
+    // and more bytes than the loader takes.
+    [() => new Sim(SEED, 0, 0, encode("not a bundle")), /^the content is refused: /],
+    [() => new Sim(SEED, 0, 0, encode("{}")), /^the content is refused: /],
+    [() => new Sim(SEED, 0, 0, encode(renamed)), /^the content is refused: .+, in maps\/test-scene\.json, line \d+ column \d+, at id$/],
+    [() => new Sim(SEED, 0, 0, new Uint8Array(MAX_BUNDLE_BYTES + 1)), `${MAX_BUNDLE_BYTES + 1} bytes, more than the ${MAX_BUNDLE_BYTES} allowed`],
+  ];
+  for (const [make, reason] of classes) {
+    const error = refusal(make);
+    expect(error, String(reason)).toBeInstanceOf(Error);
+    expect(error, String(reason)).not.toBeInstanceOf(WebAssembly.RuntimeError);
+    expect(error.message).toMatch(reason);
+  }
+  // A key of 1 MiB: the sentence keeps the loader's bound, its echo of the key cut, and the Worker tells it whole.
+  const long = refusal(() => new Sim(SEED, 0, 0, encode(`{"${"k".repeat(1 << 20)}": 1}`)));
+  expect(long).toBeInstanceOf(Error);
+  expect(long.message).toMatch(/^the content is refused: /);
+  expect(long.message.length).toBeLessThanOrEqual(THROWN_TEXT_UNITS);
+  expect(trapMessage({ buffer: new ArrayBuffer(0) }, 0, long)).toBe(long.message);
+  // Nothing panicked, and the same module makes a match and runs it.
+  expect(readPanicMessage(wasm.memory, panic_buffer())).toBe("");
+  const sim = new Sim(SEED, 0, 0, BUNDLE);
+  sim.step(0);
+  expect(checkLayoutHash(blockOf(sim))).toEqual({ ok: true });
+  expect(tickOf(blockOf(sim))).toBe(1);
+});
+
+test("the Worker's bound on a thrown text is the loader's own bound on its sentences, read from its source", () => {
+  // Every byte of a loader's sentence is ASCII (one code unit each), so its byte bound is the Worker's code units.
+  const source = readFileSync(new URL("../../../crates/content/src/error.rs", import.meta.url), "utf8");
+  const bound = /^pub const MESSAGE_BYTES: usize = (\d+);$/m.exec(source);
+  expect(bound, "MESSAGE_BYTES in crates/content/src/error.rs").not.toBeNull();
+  expect(Number(bound?.[1])).toBe(THROWN_TEXT_UNITS);
+});
+
+test("the Worker's cap on a bundle is the loader's own: one byte more is refused for its size, and the cap itself is not", () => {
+  // The Worker refuses a bigger bundle before the glue copies it (messages.ts); the loader's own number is read here.
+  expect(refusal(() => new Sim(SEED, 0, 0, new Uint8Array(MAX_BUNDLE_BYTES + 1))).message).toContain(
+    `${MAX_BUNDLE_BYTES + 1} bytes, more than the ${MAX_BUNDLE_BYTES} allowed`,
+  );
+  // At the cap the size passes: zero bytes are refused for what they are, not for how many.
+  const atCap = refusal(() => new Sim(SEED, 0, 0, new Uint8Array(MAX_BUNDLE_BYTES)));
+  expect(atCap).toBeInstanceOf(Error);
+  expect(atCap.message).not.toContain("more than the");
 });
 
 test("the panic hook's buffer stands from the module's start: no text, and its room said", () => {
@@ -177,7 +244,7 @@ test("in the glue, each per-tick call reaches exactly one export", () => {
 });
 
 test("the host on the real Wasm: two calls per tick, one transferred block per tick, each passing the check", () => {
-  const sim = new Sim(SEED, 0, 0);
+  const sim = new Sim(SEED, 0, 0, BUNDLE);
   const calls = { input: 0, step: 0, rebase: 0, block_ptr: 0, block_len: 0 };
   const counted = Object.fromEntries(
     ["input", "step", "rebase", "block_ptr", "block_len"].map((name) => [

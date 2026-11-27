@@ -100,6 +100,11 @@ const rulesDir = path.join(root, ".gate/rules-module");
 const rulesTargetDir = path.join(root, ".gate/target-rules");
 /** The content tool's target folder: its own, so building a page never rebuilds what the tests built, or the reverse. */
 const contentTargetDir = path.join(root, ".gate/target-content");
+/**
+ * Where the development server's bundle is written (vite.config.mjs): outside every package and every folder a
+ * server serves, and outside `content/`, as the content tool asks.
+ */
+export const DEV_CONTENT_DIR = path.join(root, ".gate/dev-content");
 /** The tool's absolute path, after its file was compared with the recorded values. */
 function checkedTool() {
   const tool = process.env["SHAMBLE_WASM_BINDGEN"];
@@ -212,11 +217,13 @@ export function buildWasm() {
 }
 
 /**
- * Writes the content bundle into the built page's folder: the content tool asks the game's own loader about every
- * file under `content/` and the whole, and writes `content.json` only when the loader takes them (it refuses a folder
- * inside `content/`). The same refusals of settings from the environment as every cargo call here.
+ * Writes the content bundle into `outDir` (the built page's folder, or the development server's): the content tool
+ * asks the game's own loader about every file under `content/` and the whole, and writes `content.json` only when the
+ * loader takes them (it refuses a folder inside `content/`). The same refusals of settings from the environment as
+ * every cargo call here, and the same call, environment and target folder for both callers, so a page built once
+ * leaves the development server nothing to compile.
  */
-function writeContentBundle(outDir) {
+export function writeContentBundle(outDir) {
   refuseSettings();
   execFileSync(
     "cargo",

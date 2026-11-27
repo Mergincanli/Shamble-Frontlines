@@ -2,14 +2,26 @@
  * The messages between the page and the Worker. They are structured-clone data, checked where they arrive. No
  * message carries the match seed: the Worker draws it and keeps it (ADR 0004 part 8).
  */
+import { ERROR_TEXT_UNITS } from "./panic-message.ts";
 
 /** The local match: the client endpoint and a local server in one Worker (ADR 0002 part 6). The only mode so far. */
 export const MODE_LOCAL = 0;
 
+/**
+ * The most bytes a content bundle may hold: the game's loader's own cap (`MAX_BUNDLE_BYTES`,
+ * crates/content/src/bundle.rs; the boundary test reads it from the players' Wasm). A bigger one is refused here,
+ * before the glue copies it into the Wasm's memory.
+ */
+export const MAX_BUNDLE_BYTES = 8 * 1024 * 1024;
+
 /** From the page to the Worker. */
 export type PageToWorker =
-  /** Start the match. `padBytes` pads the block for the hand-off readings; the game itself sends 0. */
-  | { readonly type: "start"; readonly padBytes: number }
+  /**
+   * Start the match. `padBytes` pads the block for the hand-off readings; the game itself sends 0. `bundle` is the
+   * content bundle's bytes as the page fetched them, transferred: the match is made on it once, and the game's
+   * loader in the Wasm takes it whole or refuses it.
+   */
+  | { readonly type: "start"; readonly padBytes: number; readonly bundle: ArrayBuffer }
   /**
    * The newest input, once per drawn frame, as plain numbers: `post` counts the page's posts (it is never the
    * protocol's command sequence), `held` has one bit per button held (16 buttons), and `p0` to `p3` hold the
@@ -111,6 +123,11 @@ function isCount(value: unknown): value is number {
   return typeof value === "number" && Number.isInteger(value) && value >= 0 && value <= 0xffff_ffff;
 }
 
+/** A bundle the Worker may hand to the Wasm: a plain `ArrayBuffer` (never a shared one) of 1 to `MAX_BUNDLE_BYTES` bytes. */
+function isBundle(value: unknown): value is ArrayBuffer {
+  return value instanceof ArrayBuffer && value.byteLength >= 1 && value.byteLength <= MAX_BUNDLE_BYTES;
+}
+
 /**
  * Whether a message the Worker received is one the page may send. Anything else is answered with an `error`
  * message and never reaches the Wasm.
@@ -119,7 +136,7 @@ export function isPageToWorker(value: unknown): value is PageToWorker {
   if (!isObject(value)) return false;
   switch (value["type"]) {
     case "start":
-      return isCount(value["padBytes"]);
+      return isCount(value["padBytes"]) && isBundle(value["bundle"]);
     case "input":
       return (
         isCount(value["post"]) &&
@@ -164,7 +181,8 @@ export function isWorkerToPage(value: unknown): value is WorkerToPage {
       // One read of each time: `isFinite` refuses everything that is not a number, without converting it.
       return value["buffer"] instanceof ArrayBuffer && Number.isFinite(value["startAt"]) && Number.isFinite(value["doneAt"]);
     case "error":
-      return typeof value["message"] === "string";
+      // No longer than the Worker's longest text (a whole panic buffer after its lead): a longer one is not this build's.
+      return typeof value["message"] === "string" && value["message"].length <= ERROR_TEXT_UNITS;
     case "report":
       return isWorkerStats(value["stats"]);
     default:

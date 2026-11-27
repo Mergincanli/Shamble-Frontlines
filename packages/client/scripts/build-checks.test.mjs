@@ -748,14 +748,15 @@ describe("the built-file check", () => {
     expect(libmProblems([SQRTF_LEGACY, BUILTINS_ROUND, "roundf", ...NOT_MATHS], allowed)).toEqual([]);
     const beside = ["_RNvNtNtCs8f6xQ2mK1pZ_4libm4math6sqrtf26sqrtf2", SQRT_GENERIC, "_RNvNtNtNtCs4WfqS6F5PNm_17compiler_builtins4math9libm_math6roundf6roundf", "round", ACOSF];
     expect(libmProblems(beside, allowed)).toHaveLength(5);
-    // Today's list is empty, and whatever joins it is a whole routine with its reason.
+    // Today's list holds the two routines the content loader brings, and whatever joins it is a whole routine with
+    // its reason.
     for (const entry of MATHS_ALLOWED) {
       expect(entry.routine).toMatch(/^(libm|compiler_builtins|C)(::[A-Za-z_][A-Za-z0-9_]*)+$/);
       expect(entry.why.length).toBeGreaterThan(20);
       expect(fusedMultiplyAddProblems(entry.routine.split("::"))).toEqual([]);
       expect(bannedMathsProblems(entry.routine.split("::"))).toEqual([]);
     }
-    expect(MATHS_ALLOWED).toEqual([]);
+    expect(MATHS_ALLOWED.map(({ routine }) => routine)).toEqual(["C::round", "C::__multi3"]);
   });
 
   test("a function of a crate the players' file is built without is refused: its own, and the standard library's as it used it", () => {

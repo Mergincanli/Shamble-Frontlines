@@ -17,13 +17,14 @@ function tell(message: WorkerToPage, transfer: ArrayBuffer[] = []): void {
   postMessage(message, transfer);
 }
 
-async function start(padBytes: number): Promise<void> {
+async function start(padBytes: number, bundle: ArrayBuffer): Promise<void> {
   const wasm = await init();
   const wasmSide = { memory: wasm.memory, panicBuffer: panic_buffer() };
   loaded = wasmSide;
   // The seed is drawn here and goes nowhere else: no message carries it and nothing logs it (ADR 0004 part 8).
   const seed = crypto.getRandomValues(new Uint8Array(32));
-  const sim = new Sim(seed, MODE_LOCAL, padBytes);
+  // The content crosses once, here: the game's loader takes the bundle whole or the constructor throws its reason.
+  const sim = new Sim(seed, MODE_LOCAL, padBytes, new Uint8Array(bundle));
   seed.fill(0);
   host = new SimHost(
     sim,
@@ -53,7 +54,7 @@ addEventListener("message", (event: MessageEvent<unknown>) => {
     tell({ type: "error", message: "the Worker got a message it does not know" });
   } else if (data.type === "start" && !starting) {
     starting = true;
-    start(data.padBytes).catch((error: unknown) => {
+    start(data.padBytes, data.bundle).catch((error: unknown) => {
       // Before the Wasm is loaded there is no buffer to read: an empty memory reads as no text.
       const { memory, panicBuffer } = loaded ?? { memory: { buffer: new ArrayBuffer(0) }, panicBuffer: 0 };
       tell({ type: "error", message: trapMessage(memory, panicBuffer, error) });

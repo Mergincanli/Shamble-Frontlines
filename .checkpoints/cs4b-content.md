@@ -1174,6 +1174,36 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
     its frozen content, with the proof that no state changed) is built and in its final checks, while step 9's last
     cut, step 10's wiring and the look ahead before steps 11 and 12 remain."
 
+- **Step 9, cut C: the match is made on the content bundle: COMMITTED** (2026-11-27, about 16:28 UTC; its commit is
+  the one that removes `cutC-wip.patch`). **An order change, for the advisor agent's final read:** it was committed
+  and pushed while its full local checks were still running (they were past formatting, clippy, every Rust test,
+  the release tests and both page builds, at the boundary tests): this environment's Stop hook asks that every change
+  be committed and pushed before a turn ends, as his saving rule does; `step9-order.md` says the full checks come
+  before the commit. Their result is written here when they end; a defect they find gets its own commit. What it
+  holds: `Sim::create`/`Sim::new(seed, mode, pad_bytes, bundle)`, the loader between the mode and the padding checks,
+  `CreateError::Content` giving the loader's own sentence whole, the order test; devtools' `Replay::new` passing the
+  frozen content; rust-reviewer's two allow-list entries (`C::round`, `C::__multi3`, `rust-reviewer-cutC.md`) with
+  the test's pin; the Worker's `start` with `bundle` (a plain ArrayBuffer of 1 to 8,388,608 bytes, before the glue
+  copies it; `MAX_BUNDLE_BYTES` exported to the page); the bounds (`THROWN_TEXT_UNITS` 512 code units for a thrown
+  text, `ERROR_TEXT_UNITS` 1,040 for the page's check of an `error`, `cutText`; the Worker's own error event cut by
+  `WorkerLink.workerError`); `content.ts` (one fetch, the copy before the transfer, `readBundle` of own fields after
+  `ready`, kept nowhere: `PageContent`) and `boot.ts` (the content before any Worker; a failed fetch said in fixed
+  words and no Worker made); the dev server's `/content.json` (`vite.config.mjs`, build.mjs's own
+  `writeContentBundle` into `DEV_CONTENT_DIR`); the boundary tests (six refusal classes, each an Error and no trap,
+  the module usable after; the cap read from the loader's own refusal; the 512 tied to `MESSAGE_BYTES`; a 1 MiB key
+  within 512), both replays on the frozen content, the Chromium specs (a new `content.spec.ts`: one fetch, the served
+  bytes the built file's, one changed value refused at its file and line, seven hostile bundles shown only as the
+  loader's sentence with no element and the empty scene kept, a failed fetch with no Worker; the isolation spec's
+  `/content.json` before the page loads). **Evidence before the commit:** the bindings' 16 and the devtools tests;
+  Worker 53, page 139 then the app folder's 32 after the last changes, boundary 37; the type checks of the Worker,
+  the page and the specs; the whole Chromium suite 28 of 29, the 29th a defect of this cut's own, fixed, then the
+  page and content specs 15 of 15; cut C's plants 10 of 10 caught, the control held, every file and the players'
+  file put back; every recording file byte for byte cut B's (`git diff e1e2dd4 -- crates/devtools/recordings`
+  empty: content.json b9901bc9..., hashes 18fbc3a8..., rec 200a793d..., vector b766f0c1..., manifest 1320f8b8...);
+  the players' file 217,692 bytes, sha256 04733d44fe90d57619f81ed1efed6ac5cef0b90228753affc9253e0c9fa96185 (54,514
+  before; recorded, not gated: ADR 0002's G7). **Official count 6,504, raw 6,522.** Not yet: the full local checks'
+  end, the gate, CI on this head, the plants' whole run (at the close).
+
 ## Slips of this chat's own rules, for the report
 - One git command did not start its own shell call: `git add .checkpoints/cs4b-content/review-brief-4b1.md` stood
   on the line after a `cat` that wrote that file, in one call (2026-11-26, about 16:46 Amsterdam). It staged that

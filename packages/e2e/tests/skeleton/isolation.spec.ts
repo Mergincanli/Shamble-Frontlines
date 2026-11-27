@@ -1,6 +1,7 @@
 // The isolation flag (ADR 0002 part 5; PM-0002-20): cross-origin isolation is on when a run asks for it and off
 // otherwise, on the page and in the Worker, under Vite's dev server and its preview server. Chromium's 4 of the 12
 // cases; Firefox and WebKit run in CI later.
+import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { expect, test } from "@playwright/test";
@@ -32,6 +33,14 @@ for (const kind of ["dev server", "preview server"] as const) {
             : await preview({ ...settings, build: { outDir: dist } });
         const address = server.resolvedUrls?.local[0];
         expect(address).toContain("127.0.0.1");
+        if (kind === "dev server") {
+          // First the game's content, which the page fetches before its Worker starts: the bundle the build's own
+          // content tool writes (vite.config.mjs's plugin), byte for byte the built page's. (This server answers an
+          // address it has no file for with the page itself, so the type is asked too.)
+          const bundle = await page.request.get(`${address ?? ""}content.json`);
+          expect([bundle.status(), bundle.headers()["content-type"]]).toEqual([200, "application/json"]);
+          expect(new Uint8Array(await bundle.body())).toEqual(new Uint8Array(readFileSync(path.join(dist, "content.json"))));
+        }
         await page.goto(address ?? "");
         await running(page, 30);
         const data = await report(page);
@@ -48,6 +57,8 @@ for (const kind of ["dev server", "preview server"] as const) {
           // (For a file that is not there this server answers 200 with the page itself, so the file's type is asked too.)
           const players = await page.request.get(at("packages/sim-worker/pkg/sim_wasm_bg.wasm"));
           expect([players.status(), players.headers()["content-type"]]).toEqual([200, "application/wasm"]);
+          // The folder the content plugin writes its bundle into is not served.
+          expect((await page.request.get(at(".gate/dev-content/content.json"))).status()).toBe(403);
           expect((await page.request.get(at(".gate/rules-module/release/devtools_bg.wasm"))).status()).toBe(403);
           expect((await page.request.get(at(".gate/rules-module/dev/devtools.js"))).status()).toBe(403);
           expect((await page.request.get(at("node_modules/@shamble/sim-worker/package.json"))).status()).toBe(403);

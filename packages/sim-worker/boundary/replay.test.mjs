@@ -48,7 +48,8 @@ test.each(names)("%s replays on the players' file to its hashes file, step for s
   const other = Uint8Array.from(content);
   other[other.length - 2] ^= 1;
   await expect(checkContent(recording, other)).rejects.toThrow("the content is not the recording's: its sha256 is not the content hash the header names");
-  const sim = new Sim(recording.seed, 0, 0);
+  // The match is made on that content, as every match is: the bundle crosses once, through the constructor.
+  const sim = new Sim(recording.seed, 0, 0, content);
   const got = replayOn(sim, recording);
   expect(got).toHaveLength(recording.steps.length);
   expect(firstDifference(expected, got)).toBeNull();
@@ -56,7 +57,7 @@ test.each(names)("%s replays on the players' file to its hashes file, step for s
 
   // The check can fail, and it names the step. A replay that leaves out the input call of step 46 differs at step 46
   // (its post brings other held keys than the step before: the script's second stretch starts there)...
-  const skipping = new Sim(recording.seed, 0, 0);
+  const skipping = new Sim(recording.seed, 0, 0, content);
   skipping.rebase(recording.steps[0].hostMs);
   const skipped = recording.steps.map((step, index) => {
     if (index !== 45) return replayStep(skipping, step);
@@ -71,17 +72,17 @@ test.each(names)("%s replays on the players' file to its hashes file, step for s
 });
 
 test("two matches on one module instance, stepped in turn, each give the hashes they give alone", () => {
-  const { recording, expected } = committed("first-loop");
-  // A second match of another seed and another input stream: the first one's steps from step 600 on, on the first
-  // one's own times.
+  const { recording, expected, content } = committed("first-loop");
+  // A second match of another seed and another input stream, on the same content: the first one's steps from step
+  // 600 on, on the first one's own times.
   const turned = recording.steps.map((step, index) => ({ ...recording.steps[(index + 600) % recording.steps.length], hostMs: step.hostMs }));
   const second = { ...recording, seed: Uint8Array.from(recording.seed, (byte, at) => (at < 8 ? byte : byte ^ 0x5a)), steps: turned };
-  const alone = new Sim(second.seed, 0, 0);
+  const alone = new Sim(second.seed, 0, 0, content);
   const secondAlone = replayOn(alone, second);
   alone.free();
   expect(firstDifference(expected, secondAlone)).not.toBeNull();
 
-  const [a, b] = [new Sim(recording.seed, 0, 0), new Sim(second.seed, 0, 0)];
+  const [a, b] = [new Sim(recording.seed, 0, 0, content), new Sim(second.seed, 0, 0, content)];
   a.rebase(recording.steps[0].hostMs);
   b.rebase(second.steps[0].hostMs);
   const together = [[], []];

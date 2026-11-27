@@ -193,7 +193,8 @@ test("a report is sent when asked, and a message that makes no sense gets an err
   host.start();
   host.onMessage({ type: "report-request" });
   expect(posts.at(-1)).toMatchObject({ type: "report", stats: { hardwareConcurrency: 8, crossOriginIsolated: false } });
-  for (const bad of [null, { type: "stop" }, { type: "start", padBytes: 0 }, { type: "input", sequence: -1 }]) {
+  // A second start, well formed, is refused as much as a message of no known shape.
+  for (const bad of [null, { type: "stop" }, { type: "start", padBytes: 0, bundle: new ArrayBuffer(8) }, { type: "input", sequence: -1 }]) {
     host.onMessage(bad);
     expect(posts.at(-1)).toEqual({ type: "error", message: "the Worker got a message it does not know" });
   }

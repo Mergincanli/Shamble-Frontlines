@@ -27,12 +27,14 @@ pub fn tick_hz() -> u32 {
 }
 
 /// Why a `Sim` was not created.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum CreateError {
     /// The seed is not `SEED_BYTES` long; it holds this many bytes.
     SeedLength(usize),
     /// A mode that does not exist yet.
     Mode(u32),
+    /// The content bundle is not one the game's loader takes: its refusal, with the file and the place in it.
+    Content(content::Error),
     /// More padding than the block writer takes.
     PadBytes(u32),
 }
@@ -40,7 +42,7 @@ pub enum CreateError {
 impl CreateError {
     /// The reason in plain words, for the Worker's error message. It never holds the seed.
     #[must_use]
-    pub fn message(self) -> String {
+    pub fn message(&self) -> String {
         match self {
             Self::SeedLength(found) => {
                 format!("the match seed must be {SEED_BYTES} bytes and is {found}")
@@ -48,6 +50,8 @@ impl CreateError {
             Self::Mode(mode) => {
                 format!("mode {mode} does not exist: only local play ({MODE_LOCAL})")
             }
+            // The loader's own sentence, whole: it begins "the content is refused: " and is at most 512 bytes.
+            Self::Content(error) => error.message(),
             Self::PadBytes(pad) => {
                 format!("{pad} bytes of block padding is above the writer's cap")
             }
@@ -64,16 +68,25 @@ pub struct Sim {
 
 impl Sim {
     /// Checks what the host passed and builds the match at tick 0, its join already on its way. The block is whole
-    /// from the start; the host's first `rebase` says when the first tick is due.
+    /// from the start; the host's first `rebase` says when the first tick is due. `bundle` is the match's content
+    /// (`content.json`): it crosses once, here, so no call can swap it mid-match; the game's own loader judges it,
+    /// and nothing of it enters the match's state yet (step 10 brings its map in).
     ///
     /// # Errors
-    /// A seed of the wrong length, a mode that does not exist, or too much padding.
-    pub fn create(seed: &[u8], mode: u32, pad_bytes: u32) -> Result<Self, CreateError> {
+    /// A seed of the wrong length, a mode that does not exist, a bundle the loader refuses, or too much padding,
+    /// checked in that order.
+    pub fn create(
+        seed: &[u8],
+        mode: u32,
+        pad_bytes: u32,
+        bundle: &[u8],
+    ) -> Result<Self, CreateError> {
         let seed =
             <[u8; SEED_BYTES]>::try_from(seed).map_err(|_| CreateError::SeedLength(seed.len()))?;
         if mode != MODE_LOCAL {
             return Err(CreateError::Mode(mode));
         }
+        content::load(bundle).map_err(CreateError::Content)?;
         let setup = MatchSetup {
             seed,
             start_tick: 0,
@@ -95,13 +108,14 @@ impl Sim {
 impl Sim {
     /// Creates the match. `seed` is 32 bytes the Worker drew; `mode` is `MODE_LOCAL` (a `u32`: a whole number below
     /// 2^32 arrives as the host passed it, and JavaScript turns anything else into one first, so the host passes the
-    /// constant); `pad_bytes` pads the block for the hand-off readings (the game passes 0).
+    /// constant); `pad_bytes` pads the block for the hand-off readings (the game passes 0); `bundle` is the content
+    /// the page fetched, which the Worker has already held to its size limit.
     ///
     /// # Errors
     /// As `Sim::create`, as a JavaScript `Error` with the reason in plain words.
     #[wasm_bindgen(constructor)]
-    pub fn new(seed: &[u8], mode: u32, pad_bytes: u32) -> Result<Sim, JsError> {
-        Self::create(seed, mode, pad_bytes).map_err(|error| JsError::new(&error.message()))
+    pub fn new(seed: &[u8], mode: u32, pad_bytes: u32, bundle: &[u8]) -> Result<Sim, JsError> {
+        Self::create(seed, mode, pad_bytes, bundle).map_err(|error| JsError::new(&error.message()))
     }
 
     /// Where the block lies in linear memory. The buffer never moves, so the host asks once.
@@ -155,6 +169,11 @@ mod tests {
 
     const SEED: [u8; SEED_BYTES] = [7; SEED_BYTES];
 
+    /// The test bundle (`content::bundle::test_bundle`): the content every test match here is made on.
+    fn bundle() -> Vec<u8> {
+        content::bundle::test_bundle().into_bytes()
+    }
+
     /// The block's words: the tick, the layout's hash, then the echo and the link's counts.
     fn words(sim: &Sim) -> Vec<u32> {
         let fours = sim.local().block().as_chunks::<4>().0;
@@ -163,7 +182,7 @@ mod tests {
 
     #[test]
     fn a_new_match_holds_a_valid_block_at_tick_zero() {
-        let sim = Sim::create(&SEED, MODE_LOCAL, 0).expect("a good seed and mode");
+        let sim = Sim::create(&SEED, MODE_LOCAL, 0, &bundle()).expect("a good seed and mode");
         assert_eq!(sim.block_len(), 44);
         assert_eq!(words(&sim), [&[0, LAYOUT_HASH][..], &[0; 9]].concat());
         assert_eq!(sim.block_ptr(), sim.local().block().as_ptr());
@@ -172,7 +191,7 @@ mod tests {
 
     #[test]
     fn each_step_is_one_tick_in_the_block_and_gives_the_next_due_time() {
-        let mut sim = Sim::create(&SEED, MODE_LOCAL, 0).expect("a good seed and mode");
+        let mut sim = Sim::create(&SEED, MODE_LOCAL, 0, &bundle()).expect("a good seed and mode");
         let place = sim.block_ptr();
         let period = 1000.0 / f64::from(TICK_HZ);
         assert_eq!(sim.rebase(1000.0), 1000.0 + period);
@@ -191,7 +210,7 @@ mod tests {
     /// own byte, and only the low 16 held bits.
     #[test]
     fn what_the_page_posts_comes_back_in_the_block_s_echo() {
-        let mut sim = Sim::create(&SEED, MODE_LOCAL, 0).expect("a good seed and mode");
+        let mut sim = Sim::create(&SEED, MODE_LOCAL, 0, &bundle()).expect("a good seed and mode");
         sim.step(0.0);
         for button in 0..16u32 {
             // One press of this button, on top of the ones before it, with only its own bit held.
@@ -215,9 +234,11 @@ mod tests {
     /// tick by tick, and one button held differently makes it differ.
     #[test]
     fn the_shared_hash_is_the_local_server_s_and_covers_no_seed() {
-        let mut a = Sim::create(&SEED, MODE_LOCAL, 0).expect("a good seed and mode");
-        let mut b = Sim::create(&[9; SEED_BYTES], MODE_LOCAL, 0).expect("a good seed and mode");
-        let mut held_otherwise = Sim::create(&SEED, MODE_LOCAL, 0).expect("a good seed and mode");
+        let mut a = Sim::create(&SEED, MODE_LOCAL, 0, &bundle()).expect("a good seed and mode");
+        let mut b =
+            Sim::create(&[9; SEED_BYTES], MODE_LOCAL, 0, &bundle()).expect("a good seed and mode");
+        let mut held_otherwise =
+            Sim::create(&SEED, MODE_LOCAL, 0, &bundle()).expect("a good seed and mode");
         for tick in 0..20u32 {
             let hash = a.shared_hash();
             assert_eq!(hash, b.shared_hash());
@@ -240,7 +261,8 @@ mod tests {
 
     #[test]
     fn padding_makes_the_block_longer_and_stays_zero() {
-        let mut sim = Sim::create(&SEED, MODE_LOCAL, 4096).expect("4 KiB of padding is allowed");
+        let mut sim =
+            Sim::create(&SEED, MODE_LOCAL, 4096, &bundle()).expect("4 KiB of padding is allowed");
         assert_eq!(sim.block_len(), 44 + 4096);
         sim.input(1, 0xFFFF, u32::MAX, u32::MAX, u32::MAX, u32::MAX);
         sim.step(0.0);
@@ -250,7 +272,7 @@ mod tests {
 
     #[test]
     fn a_bad_seed_mode_or_padding_is_refused_with_a_plain_reason() {
-        let refused = |seed: &[u8], mode, pad| Sim::create(seed, mode, pad).err();
+        let refused = |seed: &[u8], mode, pad| Sim::create(seed, mode, pad, &bundle()).err();
         assert_eq!(
             refused(&[7; 31], MODE_LOCAL, 0),
             Some(CreateError::SeedLength(31))
@@ -287,5 +309,53 @@ mod tests {
         ] {
             assert!(!error.message().contains("7, 7"));
         }
+    }
+
+    /// The content crosses here once, and the game's own loader judges it: a bundle it refuses makes no match, and
+    /// the reason is the loader's own sentence, with the file and the place in it.
+    #[test]
+    fn a_bundle_the_loader_refuses_makes_no_match_and_says_the_loader_s_words() {
+        let refused = |bundle: &[u8]| Sim::create(&SEED, MODE_LOCAL, 0, bundle).err();
+        for bundle in [&b""[..], b"{}", b"not a bundle", &[0xff, 0xfe]] {
+            let error = refused(bundle).expect("refused");
+            let CreateError::Content(why) = &error else {
+                panic!("{error:?}");
+            };
+            assert_eq!(error.message(), why.message());
+            assert!(error.message().starts_with("the content is refused: "));
+        }
+        // A movement file that is not in canonical form, inside a bundle the writer made: named by its file.
+        let text = content::movement::TEST_TEXT.replace(": 100,", ": 100.0,");
+        let unformed = content::bundle::write(&[("movement/test-soldier.json", &text)]);
+        let message = refused(unformed.as_bytes()).expect("refused").message();
+        assert!(message.contains("movement/test-soldier.json"), "{message}");
+        assert!(refused(&bundle()).is_none());
+    }
+
+    /// The four checks run in a fixed order, seed, mode, content, padding: each case below fails all the ones after
+    /// its own, and only its own is named.
+    #[test]
+    fn the_checks_run_in_the_order_seed_mode_content_padding() {
+        let bad = b"{}";
+        let first = |seed: &[u8], mode, pad, bundle: &[u8]| {
+            Sim::create(seed, mode, pad, bundle)
+                .err()
+                .map(|error| std::mem::discriminant(&error))
+        };
+        let kind = |error: CreateError| Some(std::mem::discriminant(&error));
+        assert_eq!(
+            first(&[7; 31], 1, u32::MAX, bad),
+            kind(CreateError::SeedLength(0))
+        );
+        assert_eq!(first(&SEED, 1, u32::MAX, bad), kind(CreateError::Mode(0)));
+        let loaded = content::load(bad).expect_err("refused");
+        assert_eq!(
+            first(&SEED, MODE_LOCAL, u32::MAX, bad),
+            kind(CreateError::Content(loaded))
+        );
+        assert_eq!(
+            first(&SEED, MODE_LOCAL, u32::MAX, &bundle()),
+            kind(CreateError::PadBytes(0))
+        );
     }
 }

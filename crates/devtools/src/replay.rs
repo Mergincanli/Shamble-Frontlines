@@ -114,7 +114,7 @@ impl<'a> Replay<'a> {
     pub fn new(recording: &'a Recording, bundle: &[u8]) -> Result<Self, ReplayError> {
         check(recording)?;
         check_content(recording, bundle)?;
-        let mut sim = Sim::create(&recording.header.seed, MODE_LOCAL, 0)
+        let mut sim = Sim::create(&recording.header.seed, MODE_LOCAL, 0, bundle)
             .map_err(|error| ReplayError::Create(error.message()))?;
         if let Some(first) = recording.steps.first() {
             sim.rebase(first.host_ms);
