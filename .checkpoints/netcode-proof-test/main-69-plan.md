@@ -48,6 +48,37 @@ steps, forms and stop rules hold except where this file differs.
   to the same ref (gate.yml:15-17, toolchain.yml:23-25), so step 6's save waits until the four CI runs of the follow-up
   F1 (operator-rewordings.md, its last section), if pushed first, read completed; F1's commit is named under H0.
 
+## Step 1, done 14:3x UTC
+- Usage 0.89 (14:32), go. The saver bwfk8pky9 stopped by TaskStop; `pgrep -c -f checkpoint.mjs` printed 0.
+- H0 c7950799bcd5007b1c8c1353bdf89f8957fb141b (the resume line's save; F1's commit c16777e is under it, pushed in
+  9fbc4b4). `git fetch origin` alone; `git rev-parse HEAD origin/main` printed H0 and
+  b8f02b0149cc928964e54e194cd9c4d68f52bd94 (C4 holds).
+- The anchor T: `git merge-tree --write-tree --name-only HEAD origin/main` printed one line,
+  85fcce48e0d7584c15b81dff4482b2c456137daf, and no CONFLICT line.
+- `mkdir -p /home/user/Shamble-Frontlines/.gate/main-69`; the base light run started into
+  /home/user/Shamble-Frontlines/.gate/main-69/light-base.log (run_in_background).
+
+- The base light run (14:36:16-14:36:38 UTC, exit 0): refs 2163 tracked files (N0); marks 81 read and checked (drafts at
+  626df678…), rows unchanged; self 80 of 80; redact 11 of 11 tests, "464 item(s) checked, 0 finding(s)".
+
+## Steps 2-5, done 14:3x UTC
+- Step 2: usage 0.90 (14:36), go (0.95 or less). `git rev-parse origin/main` alone: b8f02b0149cc928964e54e194cd9c4d68f52bd94.
+  `git merge origin/main` (named in the chat first): "Merge made by the 'ort' strategy.", the six paths, "6 files
+  changed, 134 insertions(+), 4 deletions(-)" (auto-merging DECISIONS.md, REPO_MAP.md and STATUS.md); no prompt, no
+  refusal. Steps 3-4 moot.
+- Step 5, each alone: `git rev-parse HEAD^1 HEAD^2` printed H0 and b8f02b0…; `git diff --stat H0 HEAD` the six paths and
+  "6 files changed, 134 insertions(+), 4 deletions(-)"; `git diff --name-only <T> HEAD` printed nothing (its control:
+  the stat line); M69-1: the non-spike, non-notes, non-docs form printed nothing (its control before the merge printed
+  .github/workflows/toolchain.yml), the docs form printed the usual six names, the spikes, design and notes form
+  printed nothing; M69-5's manifest form printed nothing. GATE PASS (--no-smoke, base b8f02b0); "repo map OK: 246
+  entries cover 110 required paths" (245 before: main's new report entry); checkpoint tests 33 of 33, 0 fail.
+- 5d, the light run on the merged state (14:37:16-14:37:21 UTC, exit 0): refs 2164 = N0 + 1; marks 81, rows unchanged;
+  self 80 of 80; redact 11 of 11, 464 items, 0 findings: every count equal to the base run's but refs, as the bar asks.
+- Step 6 waited until F1's four runs on 9fbc4b4 read success: all four success at attempt 1 (push gate 46016904132,
+  toolchain 46016904135 to 14:40:23; pull request gate 46016913053, toolchain 46016913183 to 14:41:00). Main's CI on
+  b8f02b0 unchanged (gate 46011351316 and toolchain 46011355903, completed success). M69-5's manifest line printed
+  nothing (step 5). Then `wc -l` on the card, the card save (the push), the saver's restart, CI on the pushed head.
+
 ## Why
 - His words (MAIN-52, history.md:2055-2057, word for word there): "Take main in when main changes code, CI or rules".
   The main session's reading at :2082-2086 stands beside them. #78 changes .github/workflows/toolchain.yml, a CI file.

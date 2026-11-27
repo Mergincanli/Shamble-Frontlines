@@ -31,6 +31,61 @@ first, after the 15:50 seats finish; this merge after UM-4's push, in the next g
   this merge go right after MAIN-69, before UM-4 (step 4's bars then U8-F1's M5 numbers as re-read on MAIN-69's merged
   state, and UM-4's bars from this merge's run), if that saves a wait? Which order carries less risk?
 
+## As checked: NB2B-1 to NB2B-11 (advisor-nb2b-merge.md, block 3), word for word; they govern the steps below
+- **NB2B-1 (Medium): step 4's redact bar is 1i's items + 0, not + 5.**
+  - The redact step walks spikes/netcode-proof only (check.mjs:2717; redact-check.mjs:277-288).
+  - The five added files are all under .checkpoints/, and the six spike files are modified, none added.
+  - As written, a correct run would stop at step 4. refs stays N0 + 5 (`git ls-files` counts every tracked file).
+  - Met: step 4's bar line.
+- **NB2B-2 (Medium): the usage read (step 1j) is repeated just before step 2's send, after his reply.**
+  - The stretch that must not be cut starts at the merge commit and ends at step 8's push.
+  - His reply can come long after H0, so a reading taken only at H0 can be stale.
+  - The read must cover a cold step 4 (1f is likely under 8,192 MiB: 8,008 at 12:4x, and UM-4's run first), the two
+    -47 calls, the gate and the push.
+  - A no-go after his reply: no command, one line to him, and the command waits for the reset (H0 is pushed: nothing
+    to undo).
+  - Allowed and better: name the command after 1f, then run 1g-1j on his reply, so no save is held while he answers.
+  - Met: 1j, step 2.
+- **NB2B-3 (Low): the tree anchor (NB2-C7 (a)), written in.** After 1h, run `git merge-tree --write-tree --name-only H0
+  T`: one line, tree X. At step 3, `git rev-parse HEAD^{tree}` = X. Met: 1h, 3.
+- **NB2B-4 (Low): step 8's CI bar is advisor-main-65.md §4 (a) whole again.**
+  - Push and pull-request runs on the pushed SHA, all success, and PR #40 mergeable true.
+  - The last merge's push-only reading lapsed with MAIN-68: PR #40 reads mergeable true now.
+  - A pull-request run that is red or never starts is not green.
+  - Met: step 8.
+- **NB2B-5 (Low): step 4 names every bar, and the 136 is read for real.**
+  - web as UM-4's (70 of 70); deps passes; wasm, ops and wrappers as UM-4's.
+  - check.mjs's log keeps no per-crate lines for a passing step. So the judge's 136 comes from one main-run.sh call,
+    `env CARGO_INCREMENTAL=0 cargo test --locked -p npt-judge --no-fail-fast`, into
+    /home/user/Shamble-Frontlines/.gate/nb2b-merge/judge-tests.log: 19 + 4 + 87 + 26 passed, 0 failed.
+  - Met: step 4.
+- **NB2B-6 (Low): step 6's gate output is kept** as /home/user/Shamble-Frontlines/.gate/nb2b-merge/gate.txt (by Write
+  from the call's output). Last time only the claim was kept (ADV-NB2H-1). Met: step 6.
+- **NB2B-7 (Low): the -47 folder stays unpacked until this merge's step 5 is done.** The card's "then -47's pack"
+  (after NB2's report) waits for it too. Met: the card's queue.
+- **NB2B-8 (Low): Q2's reviewer read** (section below), before this merge's report. The report's own line under his
+  2026-11-15 rule names what covered each part:
+  - the netcode-architect read 1a637408 (his "one reviewer's read");
+  - the advisor agent read c56afd07;
+  - this read covers the fix pass;
+  - NB2-C10's M1 (figures.rs:722-724) is not in this tip and stays Builder 2's forward fix.
+  - Met: before the report.
+- **NB2B-9 (Low): NB2's own report goes out before this one, or with it, in separate blocks.** It is still owed (card
+  :9), with advisor-nb2-head.md's C10 and C11 lines. Met: the reports.
+- **NB2B-10 (Low): printing forms.**
+  - 1g: `pgrep -c -f "checkpoint.mjs watch"` printing 0, as the last merge's narrower pattern.
+  - 1e2 may use `git rev-parse 29a901994f5b65c23a17162422770aaacc0ca44e:spikes/netcode-proof/marks/marks.json` printing
+    84e382e7972aba928f6a9587bc74631783627794, in place of the pipe. Step 3's on-disk `sha256sum` against a41ee583…
+    stays.
+  - Met: 1e2, 1g.
+- **NB2B-11 (Low): his NB2-PROMPT (a) terms, carried by "the same steps".**
+  - The prompt must show one `git merge --no-ff` of 29a901994f5b65c23a17162422770aaacc0ca44e and nothing else, in the
+    named -F form.
+  - The tip is re-read just before the send. Moved: no command, two lines to him (his item 3).
+  - Met: step 2.
+- Since NB's check (the main session, 14:4x): MAIN-69's merge (on c795079) comes under this merge's H0 with F1's
+  c16777e, and UM-4 before it (NB's Q4); steps 1d, 1e and 1i are re-read on that H0, as "Since the draft" says.
+
 ## His word (history.md:8133-8151, word for word there)
 - Item 3: "merge that branch at exactly that tip, by the same steps and bars as the last merge (the command named
   first and my reply to it, afterwards the whole check). Take the next gap that fits, before R1's report. If the tip

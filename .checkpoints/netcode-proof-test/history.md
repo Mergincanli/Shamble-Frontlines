@@ -8184,3 +8184,13 @@ FOR THE NETCODE CHAT. From Mustafa, 27 November, 14:45 Amsterdam (written with m
   the evening. (5) The interim rule and FULL-PATHS unchanged.
   Written 14:45 Amsterdam (13:45 UTC) by his header; transcript line 113867 (a queue-operation enqueue at
   13:55:41.836Z), 1429 characters.
+
+## Mustafa, 2026-11-27 14:30 UTC, in this chat: "go" (word for word)
+```text
+go
+```
+- **Read as** (the main session's reading, not his words): his answer to my 14:2x hold (no no-save stretch before the
+  15:50 reset, by his 13:55 item 1's limit): go on now, the usage read before each stretch (F1, then MAIN-69's steps 1-6).
+  It is not his reply to Builder 2's merge command: that command has not been named yet (NB2-PROMPT (a): the command
+  named first, then his reply to it).
+  Transcript line 114521 (a queue-operation enqueue at 14:30:50.960Z), 2 characters.
