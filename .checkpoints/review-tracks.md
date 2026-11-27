@@ -230,14 +230,27 @@ and gh() (7) after the definitions it uses (6); each state in between parses and
     (20:49:39, his question), 376dac3c (20:50:45, his proposal that became (d)), 442b9871 (20:58:55, "d"), 5ab2d0b4
     (2026-11-27 13:55:39); PASS-FORGE pending.
 
-## Current step
-Narrow re-checks of the second fix pass (advisor agent: track hunks, guard SA-RC-5/6, the advisor.md line-end gloss;
-security-auditor: its SA-RC fixes). In parallel, his answers: ADDITIONS-OK, SIZE-LINE (past the stop line); SA-PA-5,
-SA-RC-5 and the binary-file floor as information. Then the applies (about 12 asks), cmp, suites, gate, one commit.
+## Current step (saved at 99% usage, 2026-11-27 ~15:10 UTC)
+39. Docs pass running: docs-keeper in the worktree .gate/rt-sync (DECISIONS five entries by script, STATUS, ROADMAP,
+    REPO_MAP; notes docs-keeper-pass.md). Its docs edits are NOT committed yet. The report draft is written
+    (docs/reports/2026-11-27-review-tracks.md in the worktree, copy: .checkpoints/review-tracks/report-draft.md).
+    Waiting: his PASS-FORGE answer (asked 2026-11-27 ~14:55 UTC; (a) recommended by me and the advisor agent,
+    security-auditor prefers (c)).
 
-## Next steps
-1. Re-checks back; his answers.
-2. Applies, cmp, suites, gate, one commit; build-review round; verifier; docs-keeper; report; PR; head review; his go.
+## Next steps (to resume)
+1. Folder state: the main folder /home/user/Shamble-Frontlines is parked on the local branch claude/rt-park (from
+   origin/main, never pushed). The branch claude/confident-gates-tbnq38 lives in the worktree .gate/rt-sync. If the
+   container was reset: git fetch origin; git worktree add .gate/rt-sync claude/confident-gates-tbnq38 (from the
+   main folder, which may again be on main or a fresh clone; never switch it to the branch).
+2. In the worktree: check docs-keeper's edits (git status; docs/DECISIONS.md new entries; run its wordsCheck script;
+   node .claude/scripts/repo-map-check.mjs). If they are missing, rerun docs-keeper with the same brief (card step 38
+   lists the five messages; saved files at commit 6a630c2529338d7bea8aa2ceb060a87f91d09e29). Commit the docs.
+3. Record his PASS-FORGE answer: save his message by script from the transcript, add its DECISIONS entry, update STATUS
+   and the report (copy in .checkpoints/review-tracks/report-draft.md; fix "his Advisor's merge check" to "your" in
+   For Mustafa). If (b) or (c): plan the one extra kit edit, advisor + security-auditor quick look, his ask.
+4. Fold the card into the report, delete .checkpoints/review-tracks* in the last commit (no [skip ci]), push, open the
+   PR (body must not spell out the merge-check line), the advisor agent's head review (full gate with smoke in a
+   worktree), his Advisor's merge check, his go for that head; merge from a day session with the expected head.
 
 ## Decisions taken
 - ADDITIONS-OK (a) and SIZE-LINE (a) · Mustafa · 2026-11-27 14:45 Amsterdam
