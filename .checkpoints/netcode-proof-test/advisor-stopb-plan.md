@@ -136,3 +136,59 @@ Reading with Read, Grep and Glob; Bash only for single git commands; nothing run
   (X), :207 no longer throws and :208's replace finds no zeros, so both fail at X. That is a second pin the fill breaks.
   config.mjs:101 codeCommit is what lib.mjs:129 reads on the laptop at X. No test pins R1.md:92-93's URL placeholder
   (Grep `termsOfService|production ACME` over ops/).
+- After the advisor tool's check, these reads:
+  - The owed-items Grep (-o) over u8-report.md, u6c-report.md, advisor-u8-head.md and advisor-u8-stopb.md. It adds
+    nothing beyond the items above; u6c-report.md:133 is the page-host item (A2, "with LimitNOFILE in U8's unit"), and
+    :152 is NPT-EDGE-SLIVER, answered (a) by him (card :95).
+  - PR #40's body, re-read by `gh api repos/{owner}/{repo}/pulls/40 --jq .body` at 22:0x. Its "Closing list: security
+    findings left open" still names only SEC-U6B-3, SEC-U6C-R2-1, SEC-U6C-R2-2 and the page-host item: no
+    SEC-U8F1-3, SEC-U8F1-4 or SEC-SB-9's rest.
+  - config.mjs:100-105: codeCommit takes the 40 hex digits after `- path: /etc/npt/commit` and throws "not filled" on
+    zeros.
+  - PROMPT-R1.md:18-23, start checks 2 and 4. On R1's day `<run>` must be X, and `git -C <run> diff --name-only
+    origin/main -- CLAUDE.md .claude` must print nothing, "On a mismatch, stop". So a kit move on main after X is made
+    means a new X before R1.
+  - main-run.sh:17-18 export CARGO_TARGET_DIR and `CARGO_NET_OFFLINE=true`, so rs.yaml's `cargo fetch` and `cargo
+    install` cannot run through it.
+  - The existing probe reading's limits, read:
+    - It ran before H1 moved the start-edge read (u6c-report.md:34-36).
+    - It read P0 and P1 only; "P2, P3, P4 and B1's profiles ... were not read; reading 3's bound holds for any
+      profile with one-way plus half jitter under about 9 s" (u6c-r2-netcode.md:237-238).
+    - No line there names NC-SB-16. My link is an inference from :40-41 ("keep until `outside` reaches `packets`").
+      lab/src/probe.rs:124-131 counts `outside` only for sends not `in_burst`; u6c-build.md:11 says leg_series builds
+      NC-SB-16's count, with tests.
+- The coordinator's ADV-U8H-3 read (adv-u8h-3-read.md, present): the delay clock thread never runs on the tick vCPU
+  (delay_clock.rs:92-99; main.rs:737, :841, :244, :655; npt-ctl:71; tick_loop.rs:1317-1323). Not settled: whether
+  ds-selftest's judged numbers depend on the tick thread's send stamps. Moving ds-selftest out of TIMING_BLOCKS would
+  be a U8 line.
+
+## The main finding first: STOPB-1 (High), the expected dist list must be in Y, not X (DONE)
+- **What fails:**
+  - RS clones Y, never X: rs.yaml:121, :143-148 fetch COMMIT = /etc/npt/commit = Y into /opt/npt/clone.
+  - r1.sh runs from that clone and reads `EXPECTED_DIST=/opt/npt/clone/spikes/netcode-proof/ops/runs/r1-dist.sha256`
+    (r1.sh:30-33).
+  - A list filled only at X (the plan's D2, following R1.md:313) is therefore absent on RS. Bring-up writes
+    "(the expected list is empty: Stop B fills it)" into DIST-DIFFERS (r1.sh:150), `host_active` refuses every page
+    (:130-131), and `dist-accept` refuses an empty list (:878).
+  - On R1's day no browser leg could run: his 80-minute sitting is lost, or a new commit pair and new VMs are needed.
+  - Every bar in the plan would pass first, except one: r1sh.test.mjs:449 (STOPB-4).
+- **Whose defect:** not the plan's. It is merged U8, in R1.md:313, r1.sh:136's comment and r1-dist.sha256:3. It comes
+  from SEC-SB-5's fix text (u8-stopb-security.md:105, "commit the expected list at X ... root-owned in the clone") and
+  from my own term at advisor-u8-stopb.md:192 ("The expected list is committed at X"). **Ignore my "committed at X".**
+  The list must be in the commit the root clone holds: Y.
+- **The fix form, ruled:**
+  1. **Y0** = B2's commit: the two notes plus the two test stand-ins (STOPB-4), all under the gate and the counted
+     run. Pushed, with CI green.
+  2. **Build 1** of U7's dist at Y0, in worktree A with CARGO_HOME A.
+  3. **Y** = Y0 plus ops/runs/r1-dist.sha256's seven lines from build 1, and nothing else. Bar:
+     `git diff --name-only Y0 Y -- spikes/netcode-proof` prints exactly spikes/netcode-proof/ops/runs/r1-dist.sha256.
+     web/build.mjs reads no ops/ path and no git state (Grep), so Y's dist inputs are Y0's.
+  4. **Build 2** of U7's dist at Y itself, in worktree B with CARGO_HOME B. **Bar:** build 2's list equals the list
+     committed at Y, byte for byte. That proves both the paths' independence and that Y's own dist is the expected one.
+     A difference comes to me before X, with both lists.
+  5. **X** = Y plus the two cloud-init `/etc/npt/commit` lines (Y) and R1.md step 7's URL. Bar:
+     `git diff --name-only Y X -- spikes/netcode-proof` prints exactly ops/cloud-init/rs.yaml, ops/cloud-init/lg.yaml
+     and ops/runs/R1.md.
+- **The words "committed at X"** (R1.md:313, r1.sh:136, r1-dist.sha256:3, and the pin at r1plan.test.mjs:150) stay as
+  they are, because X descends from Y and so holds the list too. Stop B's message says in one line that the list sits
+  at Y, which X carries. Fewer U8 lines are touched that way (item 7 of the count below).
