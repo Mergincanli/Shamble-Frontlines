@@ -54,8 +54,15 @@ PAGE_CONTENT = ("node", "../../node_modules/vitest/vitest.mjs", "run", "src/app/
 def boundary(name): return ("node", "node_modules/vitest/vitest.mjs", "run", "--root", f"{ROOT}/packages/sim-worker", "--dir", f"{ROOT}/packages/sim-worker/boundary", name)
 DEV_PLANT = f"{ROOT}/.gate/dist-plant-dev"
 DEV_PAGE = ("node", "--input-type=module", "-e", f'import {{ buildPage }} from "{ROOT}/packages/client/scripts/build.mjs"; await buildPage({{ production: false, outDir: "{DEV_PLANT}" }});')
-def chromium(spec): return ("node", "node_modules/@playwright/test/cli.js", "test", "-c", "packages/e2e/playwright.config.ts", "--project=chromium", "--workers=1", "--retries=0", "--trace", "off", "--reporter=list", spec)
+def chromium(*specs): return ("node", "node_modules/@playwright/test/cli.js", "test", "-c", "packages/e2e/playwright.config.ts", "--project=chromium", "--workers=1", "--retries=0", "--trace", "off", "--reporter=list", *specs)
 BROWSER_ENV = lambda dist: dict(ENV, SHAMBLE_DIST=dist, SHAMBLE_CHROMIUM="/opt/pw-browsers/chromium")
+# The development page the local checks built: the specs that need no page of their own run on it.
+DEV_ENV = BROWSER_ENV(f"{ROOT}/.gate/dist-development")
+# The fix pass of round 1 (Builder V6, 2026-11-27).
+CONTENT_TS_FILE, VITE_FILE, TESTLINES_FILE = "packages/client/src/app/content.ts", "packages/client/vite.config.mjs", "packages/client/scripts/testlines.mjs"
+PAGE_TIES = ("node", "../../node_modules/vitest/vitest.mjs", "run", "src/app/content-ties.test.mjs")
+TYPES_UNIT = ("node", "../../node_modules/vitest/vitest.mjs", "run")
+BOUNDARY_ALL = ("node", "node_modules/vitest/vitest.mjs", "run", "--root", f"{ROOT}/packages/sim-worker", "--dir", f"{ROOT}/packages/sim-worker/boundary")
 def chain(*parts):
     """Commands run in order, each with its environment, until one fails: the plant's output is all of theirs."""
     return ("CHAIN",) + parts
@@ -109,6 +116,11 @@ WALK_LINE, WALK_UP, WALK_TEXT, WALK_NEW = ulp_up(SOLDIER, "walk_speed_m_per_s")
 STAMINA_OLD, STAMINA_NEW, SPRINT_TEXT, REFILL_TEXT = numbers_swapped(SOLDIER, "sprint_time_from_full_s", "stamina_refill_time_s")
 ROWS_OLD, ROWS_NEW = fields_swapped(TABLE_FILE, "sprint_time_from_full_s", "stamina_refill_time_s")
 POST_OLD, POST_NEW = millimetre_up(MAP_FILE, "yard_lane_post_50")
+# The fix pass of round 1 (test-engineer's TE-1): two rows whose Export values are equal trade fields. The content
+# then needs no change, so no route that compares values can see it; only the table's names can.
+EQUAL_ROWS_OLD, EQUAL_ROWS_NEW = fields_swapped(TABLE_FILE, "speed_up_time_to_90pct_s", "stop_time_to_10pct_s")
+# The hand-over's own check on the repository's files, without the table-name test the fix pass added beside it.
+HAND_REAL = HAND + ("-t", "the check holds content/movement/soldier.json to his saved Export")
 
 # name, kind, what the defect is, the edits (file, text there once, its replacement), the command, the words its output must hold
 PLANTS = [
@@ -233,7 +245,9 @@ PLANTS = [
      [f"values.movement.walk_speed_m_per_s is {WALK_TEXT} in his Export, and the loader's walk_speed_m_per_s is {WALK_NEW}"]),
     ("C3", "defect", "two rows of the table send their values to each other's field, and the movement table is written from that table (the second route)", [(TABLE_FILE, ROWS_OLD, ROWS_NEW), (SOLDIER, STAMINA_OLD, STAMINA_NEW)], FILES,
      [f"values.stamina.refill_time_from_empty_s is {REFILL_TEXT} in his Export, and the loader's stamina_refill_time_s is {SPRINT_TEXT}"]),
-    ("C4", "control", "the same mis-mapped pair passes the hand-over's own check, which is what the second route is for", [(TABLE_FILE, ROWS_OLD, ROWS_NEW), (SOLDIER, STAMINA_OLD, STAMINA_NEW)], HAND, []),
+    # Since the fix pass the hand-over's test file also holds the table-name test, which catches this pair (C38's
+    # kind): C4 runs the hand-over's own check alone, as it did before that test was there.
+    ("C4", "control", "the same mis-mapped pair passes the hand-over's own check, which is what the second route is for", [(TABLE_FILE, ROWS_OLD, ROWS_NEW), (SOLDIER, STAMINA_OLD, STAMINA_NEW)], HAND_REAL, []),
     ("C5", "defect", "the test scene's last lane post one millimetre taller: its world is not the committed one", [(MAP_FILE, POST_OLD, POST_NEW)], PROOF,
      ["the test scene's world is not the committed one"]),
     ("C6", "control", "the clean content: the content folder's tests", [], FILES, []),
@@ -268,7 +282,9 @@ PLANTS = [
      ["every recording replays in the browser's WebAssembly", "toBeNull", "Received: 1"]),
     ("C20", "defect", "the Worker's start takes a bundle one byte over the loader's cap", [(MESSAGES_TS, "  return value instanceof ArrayBuffer && value.byteLength >= 1 && value.byteLength <= MAX_BUNDLE_BYTES;", "  return value instanceof ArrayBuffer && value.byteLength >= 1 && value.byteLength <= MAX_BUNDLE_BYTES + 1;")], SW_MESSAGES,
      ["anything else is refused"]),
-    ("C21", "defect", "the Worker's cap is one byte above the loader's own", [(MESSAGES_TS, "export const MAX_BUNDLE_BYTES = 8 * 1024 * 1024;", "export const MAX_BUNDLE_BYTES = 8 * 1024 * 1024 + 1;")], boundary("sim-wasm"),
+    # From here a plant that reads the players' file builds it clean first: C19 leaves its fold in the file
+    # (test-engineer's round of 2026-11-27).
+    ("C21", "defect", "the Worker's cap is one byte above the loader's own", [(MESSAGES_TS, "export const MAX_BUNDLE_BYTES = 8 * 1024 * 1024;", "export const MAX_BUNDLE_BYTES = 8 * 1024 * 1024 + 1;")], chain((ENV, WASM), (ENV, boundary("sim-wasm"))),
      ["the Worker's cap on a bundle is the loader's own"]),
     ("C22", "defect", "the Worker tells a thrown text uncut", [(PANIC_TS, "  return cutText(thrown instanceof Error ? thrown.message : String(thrown));", "  return thrown instanceof Error ? thrown.message : String(thrown);")], SW_PANIC,
      ["a thrown text is cut to its bound with a mark"]),
@@ -280,7 +296,7 @@ PLANTS = [
      ["what the page says of a failed fetch is fixed text"]),
     ("C26", "defect", "the development server has no /content.json of its own: its page-for-any-address stands in",
      [(VITE_CONFIG, "  plugins: [devContent],\n", "  plugins: [],\n")],
-     chromium("tests/skeleton/isolation.spec.ts"),
+     chain((ENV, WASM), (DEV_ENV, chromium("tests/skeleton/isolation.spec.ts"))),
      ["under Vite's dev server", "application/json"]),
     ("C27", "control", "the clean Worker and page: the messages' and the content's tests", [], SW_MESSAGES, []),
     # Step 10's wiring (Builder V6): the match holds the world of its own map, found by its id.
@@ -310,6 +326,43 @@ PLANTS = [
      ], CONTENT_LIB("ts_export"),
      ["generated/content/schema/movement.schema.json is not what the Rust code gives"]),
     ("C37", "control", "the clean schemas: the content crate's export tests", [], CONTENT_LIB("ts_export"), []),
+    # The fix pass of round 1 (Builder V6, 2026-11-27): each fix shown red on the defect it closes.
+    # The words are the failure's own where the runner prints them only for a failure: cargo's "---- <test> stdout"
+    # block, vitest's "<file> > <test>" line, Playwright's frame of the failing line.
+    ("W14", "defect", "a ray beyond the reach is cast (rust-reviewer's overflow)", [(WORLD_RS, "            .all(|value| -RAY_REACH <= *value && *value <= RAY_REACH);", "            .all(|value| value.is_finite());")], COLLISION,
+     ["collision::tests::a_ray_beyond_the_reach_and_a_ramp_beyond_f32_give_no_hit stdout"]),
+    ("W15", "defect", "an endless limit is taken as endless", [(WORLD_RS, "        let limit = if limit > RAY_REACH { RAY_REACH } else { limit };", "        let limit = limit;")], COLLISION,
+     ["collision::tests::a_ray_beyond_the_reach_and_a_ramp_beyond_f32_give_no_hit stdout"]),
+    ("W16", "defect", "a ramp's NaN goes on as if it were a number", [(WORLD_RS, "    if above.is_nan() || rate.is_nan() {", "    if false {")], COLLISION,
+     ["collision::tests::a_ray_beyond_the_reach_and_a_ramp_beyond_f32_give_no_hit stdout"]),
+    ("C38", "defect", "two rows whose Export values are equal trade fields (test-engineer's swap): the content needs no change, the table's names catch it", [(TABLE_FILE, EQUAL_ROWS_OLD, EQUAL_ROWS_NEW)], HAND,
+     ["testlines.test.mjs > his Export and the game's first movement table, the repository's own files > every row of the table sends its Export value to the field of the same name", "expected 'stop_time_to_10pct_s' to be 'speed_up_time_to_90pct_s'"]),
+    ("C39", "control", "the same equal pair passes the second route, which compares values", [(TABLE_FILE, EQUAL_ROWS_OLD, EQUAL_ROWS_NEW)], FILES, []),
+    ("C40", "control", "the same equal pair passes the hand-over's own check, which compares values", [(TABLE_FILE, EQUAL_ROWS_OLD, EQUAL_ROWS_NEW)], HAND_REAL, []),
+    ("C41", "defect", "the page keeps its copy when the Worker refuses", [(CONTENT_TS_FILE, "  const read = content.afterMessage(link);\n  if (problem !== \"\") return problem;", "  if (problem !== \"\") return problem;\n  const read = content.afterMessage(link);")], PAGE_CONTENT,
+     ["content.test.ts > however the match ends before the Worker's ready"]),
+    ("C42", "defect", "the page keeps its copy when the Worker itself fails", [(CONTENT_TS_FILE, "  const problem = link.workerError(message);\n  content.afterMessage(link);", "  const problem = link.workerError(message);")], PAGE_CONTENT,
+     ["content.test.ts > however the match ends before the Worker's ready"]),
+    ("C43", "defect", "another site's ask for /content.json starts the content tool", [(VITE_FILE, '      if (from !== undefined && from !== "same-origin" && from !== "none") {', '      if (from === "never") {')],
+     chain((ENV, WASM), (DEV_ENV, chromium("tests/skeleton/isolation.spec.ts"))),
+     ["under Vite's dev server", "expect([crossSite.status(), await crossSite.text()])"]),
+    ("C44", "defect", "an address that reads as no path makes the plugin's own error page", [(VITE_FILE, '  try {\n    return new URL(url ?? "/", "http://127.0.0.1").pathname;\n  } catch {\n    return undefined;\n  }', '  return new URL(url ?? "/", "http://127.0.0.1").pathname;')],
+     chain((ENV, WASM), (DEV_ENV, chromium("tests/skeleton/isolation.spec.ts"))),
+     ["under Vite's dev server", "status()).not.toBe(500)"]),
+    ("C45", "defect", "the tools check the file's own folder only, not the folders above it", [(TESTLINES_FILE, '  for (const part of ["", ...(relative === "" ? [] : relative.split(path.sep))]) {', '  for (const part of [""]) {')], HAND,
+     ["testlines.test.mjs > the hand-over's files > no file is read or written through a link"]),
+    ("C46", "defect", "the page's bundle version is not the loader's", [(CONTENT_TS_FILE, "export const BUNDLE_VERSION = 1;", "export const BUNDLE_VERSION = 2;")], PAGE_TIES,
+     ["content-ties.test.mjs > the bundle's format and version the page reads are the loader's own"]),
+    ("C47", "defect", "a generated type loses a key the schema names", [("packages/types/src/generated/content/MapDocument.ts", " regions: Array<Region>, };", " };")], TYPES_UNIT,
+     ["content-schema.test.mjs > the generated types and the schemas name the same keys"]),
+    ("C48", "defect", "the schema writes no fewest spawns", [(SCHEMA_RS, '        property("map", "spawns", list(MIN_SPAWNS, MAX_SPAWNS, spawn)),', '        property("map", "spawns", list(0, MAX_SPAWNS, spawn)),')], CONTENT_LIB("schema"),
+     ["schema::tests::the_map_s_numbers_and_words_are_the_reader_s stdout"]),
+    ("C49", "defect", "the loader's sentence for a key that is there twice changes: the page's spec pins it", [("crates/content/src/error.rs", 'write!(f, "the key \\"{key}\\" is there twice")', 'write!(f, "the key \\"{key}\\" is there two times")')],
+     chain((ENV, WASM), (ENV, DEV_PAGE), (BROWSER_ENV(DEV_PLANT), chromium("tests/skeleton/content.spec.ts"))),
+     ["a bundle with a duplicate key is refused by the loader", "is there two times"]),
+    ("C50", "control", "the boundary tests on a clean build of the players' file", [], chain((ENV, WASM), (ENV, BOUNDARY_ALL)), []),
+    ("C51", "control", "the replay, isolation and content specs in Chromium on a clean build", [],
+     chain((ENV, WASM), (ENV, DEV_PAGE), (BROWSER_ENV(DEV_PLANT), chromium("tests/replay/determinism.spec.ts", "tests/skeleton/isolation.spec.ts", "tests/skeleton/content.spec.ts"))), []),
 ]
 
 def note(name, kind, ok, what, detail):
@@ -415,7 +468,7 @@ def main():
     for name, kind, what, edits, command, words in PLANTS:
         if names and name not in names: continue
         # A chain runs from the root; it holds environments, which are no keys.
-        cwd = None if command[0] == "CHAIN" else {UNIT: "packages/client", HAND: "packages/client", PAGE_CONTENT: "packages/client", SW_UNIT: "packages/sim-worker", SW_MESSAGES: "packages/sim-worker", SW_PANIC: "packages/sim-worker"}.get(command)
+        cwd = None if command[0] == "CHAIN" else {UNIT: "packages/client", HAND: "packages/client", HAND_REAL: "packages/client", PAGE_CONTENT: "packages/client", PAGE_TIES: "packages/client", TYPES_UNIT: "packages/types", SW_UNIT: "packages/sim-worker", SW_MESSAGES: "packages/sim-worker", SW_PANIC: "packages/sim-worker"}.get(command)
         planted(name, kind, what, edits, command, words, cwd=cwd)
     stamp_plants(names)
     native_plants(names)

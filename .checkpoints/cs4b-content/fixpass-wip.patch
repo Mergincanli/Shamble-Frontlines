@@ -67,19 +67,18 @@ index 6aa9411..1297f30 100644
  
  #[cfg(test)]
 diff --git a/crates/content/src/schema.rs b/crates/content/src/schema.rs
-index c7cf3da..438c7d2 100644
+index c7cf3da..84a0368 100644
 --- a/crates/content/src/schema.rs
 +++ b/crates/content/src/schema.rs
-@@ -14,7 +14,7 @@
- 
+@@ -15,6 +15,7 @@
  use crate::json::{MAX_NAME_BYTES, Member, Node, Value};
  use crate::map::{
--    self, AIM_HEIGHT_MAX_CM, AIM_REACH_CM, COORDINATE, FACING, MAX_REGIONS, MAX_SHAPES, MAX_SPAWNS,
-+    self, AIM_HEIGHT_MAX_CM, AIM_REACH_CM, COORDINATE, FACING, MAX_REGIONS, MAX_SHAPES, MAX_SPAWNS, MIN_SPAWNS,
+     self, AIM_HEIGHT_MAX_CM, AIM_REACH_CM, COORDINATE, FACING, MAX_REGIONS, MAX_SHAPES, MAX_SPAWNS,
++    MIN_SPAWNS,
  };
  use crate::movement::{self, FIELDS};
  use crate::read::Range;
-@@ -244,12 +244,17 @@ pub fn movement_schema() -> Node {
+@@ -244,12 +245,17 @@ pub fn movement_schema() -> Node {
  /// The map's schema: its bounds within the aim's reach, its three lists with their caps, and the fixed words.
  pub fn map_schema() -> Node {
      let words = |list: &[&str]| array(list.iter().map(|word| text(word)).collect());
@@ -100,7 +99,7 @@ index c7cf3da..438c7d2 100644
      };
      let spawn = closed(vec![
          id("spawn"),
-@@ -301,9 +306,9 @@ pub fn map_schema() -> Node {
+@@ -301,9 +307,9 @@ pub fn map_schema() -> Node {
      properties.extend([
          id("map"),
          property("map", "bounds", bounds),
@@ -112,7 +111,7 @@ index c7cf3da..438c7d2 100644
      ]);
      document(
          "shamble-map",
-@@ -478,6 +483,15 @@ mod tests {
+@@ -478,6 +484,15 @@ mod tests {
              [cap("spawns"), cap("shapes"), cap("regions")],
              [MAX_SPAWNS, MAX_SHAPES, MAX_REGIONS].map(f64::from)
          );
@@ -128,16 +127,23 @@ index c7cf3da..438c7d2 100644
          let spawn = get(get(get(properties, "spawns"), "items"), "properties");
          assert_eq!(range_of(get(spawn, "facing_deg")), FACING.range);
          // The facing is the one range open at its top: the schema says so with its own keyword.
-@@ -602,5 +616,13 @@ mod tests {
+@@ -602,5 +617,20 @@ mod tests {
          );
          let Range { min, max, .. } = range_of(get(spawn, "facing_deg"));
          assert!(facing(min) && !facing(min.next_down()) && !facing(max) && facing(max.next_down()));
 +        // The spawns' fewest, read back from the schema: the test map's one spawn is taken, an empty list refused.
 +        let fewest = value_of(get(get(get(&map, "properties"), "spawns"), "minItems"));
 +        assert_eq!(fewest, 1.0);
-+        let from = map::TEST_TEXT.find("  \"spawns\": [\n").expect("the spawns");
-+        let to = map::TEST_TEXT[from..].find("\n  ],\n").expect("their end") + from + "\n  ],\n".len();
-+        let none = format!("{}  \"spawns\": [],\n{}", &map::TEST_TEXT[..from], &map::TEST_TEXT[to..]);
++        let from = map::TEST_TEXT
++            .find("  \"spawns\": [\n")
++            .expect("the spawns");
++        let to =
++            map::TEST_TEXT[from..].find("\n  ],\n").expect("their end") + from + "\n  ],\n".len();
++        let none = format!(
++            "{}  \"spawns\": [],\n{}",
++            &map::TEST_TEXT[..from],
++            &map::TEST_TEXT[to..]
++        );
 +        assert!(load_file("maps/test-scene.json", map::TEST_TEXT.as_bytes()).is_ok());
 +        assert!(load_file("maps/test-scene.json", none.as_bytes()).is_err());
      }
@@ -191,7 +197,7 @@ index 5d19aa8..9862fda 100644
  
  /// The loopback of a local match: each slot takes the longest message there is, and one step moves at most two
 diff --git a/crates/sim/src/collision.rs b/crates/sim/src/collision.rs
-index d0949d7..4066473 100644
+index d0949d7..c28f644 100644
 --- a/crates/sim/src/collision.rs
 +++ b/crates/sim/src/collision.rs
 @@ -24,6 +24,12 @@ use crate::vec::V3;
@@ -260,7 +266,7 @@ index d0949d7..4066473 100644
          assert_eq!(
              cast(&built, [0.0, 0.5, -3.0], [0.0, 0.0, 1.0]),
              Some((0, 3.0))
-@@ -697,6 +720,42 @@ mod tests {
+@@ -697,6 +720,69 @@ mod tests {
          );
      }
  
@@ -276,33 +282,102 @@ index d0949d7..4066473 100644
 +        // rust-reviewer's probe: from the top of the box of the ramp rising toward +x, over its slope, up and away.
 +        let over = [10.5, 1.0, 1.0];
 +        for scale in [1.0, 1e5] {
-+            assert_eq!(cast(&built, over, [2.0 * scale, 3.0 * scale, 0.0]), None, "{scale}");
++            assert_eq!(
++                cast(&built, over, [2.0 * scale, 3.0 * scale, 0.0]),
++                None,
++                "{scale}"
++            );
 +        }
 +        // Down onto the slope (its height at x = 13 is 0.75): the same shape, the point the same, `t` by the length.
-+        assert_eq!(cast(&built, [13.0, 3.0, 1.0], [0.0, -1.0, 0.0]), Some((ramp_px, 2.25)));
-+        assert_eq!(cast(&built, [13.0, 3.0, 1.0], [0.0, -1e5, 0.0]), Some((ramp_px, 2.25e-5)));
++        assert_eq!(
++            cast(&built, [13.0, 3.0, 1.0], [0.0, -1.0, 0.0]),
++            Some((ramp_px, 2.25))
++        );
++        assert_eq!(
++            cast(&built, [13.0, 3.0, 1.0], [0.0, -1e5, 0.0]),
++            Some((ramp_px, 2.25e-5))
++        );
 +        // Beyond the reach: no hit, where the overflow gave the box's entry as a hit (`inf - inf` is NaN).
 +        assert_eq!(cast(&built, over, [2e38, 3e38, 0.0]), None);
 +        assert_eq!(cast(&built, [13.0, 3.0, 1.0], [0.0, -2e6, 0.0]), None);
 +        let edge = cast(&built, [13.0, 3.0, 1.0], [0.0, -RAY_REACH, 0.0]).expect("at the reach");
 +        assert_eq!(edge.0, ramp_px);
-+        assert_eq!(cast(&built, [13.0, 3.0, 1.0], [0.0, -RAY_REACH.next_up(), 0.0]), None);
-+        assert_eq!(built.cast_ray(v(RAY_REACH.next_up(), 3.0, 1.0), v(0.0, -1.0, 0.0), 10.0), None);
++        assert_eq!(
++            cast(&built, [13.0, 3.0, 1.0], [0.0, -RAY_REACH.next_up(), 0.0]),
++            None
++        );
++        assert_eq!(
++            built.cast_ray(v(RAY_REACH.next_up(), 3.0, 1.0), v(0.0, -1.0, 0.0), 10.0),
++            None
++        );
 +        // A direction so short that no shape is within reach: an endless limit reaches `RAY_REACH`, not infinity, so
 +        // the box ahead is no hit at an endless `t`.
-+        assert_eq!(built.cast_ray(v(-20.0, 0.5, 0.5), v(1e-45, 0.0, 0.0), f32::INFINITY), None);
++        assert_eq!(
++            built.cast_ray(v(-20.0, 0.5, 0.5), v(1e-45, 0.0, 0.0), f32::INFINITY),
++            None
++        );
 +        assert_eq!(
 +            built.cast_ray(v(-20.0, 0.5, 0.5), v(1.0, 0.0, 0.0), f32::INFINITY),
 +            Some(RayHit { shape: 1, t: 19.0 })
 +        );
 +        // A ramp as large as `f32` goes: its length and height overflow, and the ray from its middle gets no hit.
-+        let huge = world(vec![ramp("huge", [-3e38, -3e38, -3e38], [3e38, 3e38, 3e38], Toward::PlusX)]);
-+        assert_eq!(huge.cast_ray(v(0.0, 0.0, 0.0), v(0.0, -1.0, 0.0), 100.0), None);
++        let huge = world(vec![ramp(
++            "huge",
++            [-3e38, -3e38, -3e38],
++            [3e38, 3e38, 3e38],
++            Toward::PlusX,
++        )]);
++        assert_eq!(
++            huge.cast_ray(v(0.0, 0.0, 0.0), v(0.0, -1.0, 0.0), 100.0),
++            None
++        );
 +    }
 +
      #[test]
      fn a_ramp_is_met_on_its_slope_its_faces_and_its_floor_toward_each_of_the_four_sides() {
          let built = world(yard());
+diff --git a/packages/client/scripts/build-checks.test.mjs b/packages/client/scripts/build-checks.test.mjs
+index 032d0ed..83a6158 100644
+--- a/packages/client/scripts/build-checks.test.mjs
++++ b/packages/client/scripts/build-checks.test.mjs
+@@ -55,6 +55,15 @@ import {
+ } from "./build-checks.mjs";
+ import { MATHS_ALLOWED } from "./maths-allowed.mjs";
+ 
++/**
++ * A link test on a system that cannot make a link: skipped on a developer's machine, failed under CI, where a link
++ * test never skips (the links rule, test-list.md; test-engineer's round of 2026-11-27).
++ */
++function linksOrSkip(skip, error) {
++  if (process.env["CI"] !== undefined) throw new Error(`a link test cannot make its link under CI: ${error instanceof Error ? error.message : String(error)}`);
++  skip("this system does not let this user make links");
++}
++
+ const LOCK = `# This file is automatically @generated by Cargo.
+ version = 4
+ 
+@@ -148,8 +157,8 @@ describe("the tool's file before any run", () => {
+     const link = path.join(folder, "link");
+     try {
+       symlinkSync(tool, link);
+-    } catch {
+-      skip("this system does not let this user make links");
++    } catch (error) {
++      linksOrSkip(skip, error);
+     }
+     expect(() => checkCliFile(link, sha256, content.length)).toThrow("not a plain file");
+   });
+@@ -891,8 +900,8 @@ describe("a folder is read file by file, and through no link", () => {
+       const at = path.join(folder, link);
+       try {
+         symlinkSync(path.join(folder, target), at);
+-      } catch {
+-        skip("this system does not let this user make links");
++      } catch (error) {
++        linksOrSkip(skip, error);
+       }
+       expect(() => plainFilesOf(path.join(folder, "page")), link).toThrow(`${at} is no plain file (a link, a pipe or a device): nothing is read through it`);
+       expect(() => sourceTexts(folder, ["page"]), link).toThrow("is no plain file");
 diff --git a/packages/client/scripts/canonical.mjs b/packages/client/scripts/canonical.mjs
 index e9306ff..f3727b7 100644
 --- a/packages/client/scripts/canonical.mjs
@@ -704,6 +779,56 @@ index 0db249b..56a083b 100644
  async function serveContent(response) {
    try {
      const { DEV_CONTENT_DIR, writeContentBundle } = await import(new URL("./scripts/build.mjs", import.meta.url).href);
+diff --git a/packages/e2e/tests/skeleton/content.spec.ts b/packages/e2e/tests/skeleton/content.spec.ts
+index 681ceb8..0cbfe8b 100644
+--- a/packages/e2e/tests/skeleton/content.spec.ts
++++ b/packages/e2e/tests/skeleton/content.spec.ts
+@@ -49,18 +49,20 @@ test("the Worker's loader reads the bytes the page was served: one changed value
+   await expect(page.locator("#notice")).toContainText(`, in maps/test-scene.json, line ${line} column `);
+ });
+ 
+-// Bundles that JSON.parse takes (but for the number) and the loader refuses, each shown only as the loader's sentence.
+-const hostile: [string, (text: string) => string][] = [
+-  ["a duplicate key", (text) => text.replace('"format": "shamble-content-bundle",', '"format": "shamble-content-bundle",\n  "format": "shamble-content-bundle",')],
+-  ["a __proto__ key", (text) => text.replace('{\n  "files": [', '{\n  "__proto__": {\n    "polluted": 1\n  },\n  "files": [')],
+-  ["a number out of every range", (text) => text.replace('"version": 1', '"version": 1e400')],
+-  ["an extra key in a file entry", (text) => text.replace('"path": "maps/test-scene.json",', '"extra": 1,\n      "path": "maps/test-scene.json",')],
+-  ["a source/ path", (text) => text.replace('"path": "maps/test-scene.json"', '"path": "source/test-scene.json"')],
+-  ["an unknown key named like an image tag", (text) => text.replace('{\n  "files": [', '{\n  "<img src=x onerror=alert(1)>": 1,\n  "files": [')],
+-  ["a key of 1 MiB", () => `{"${"k".repeat(1 << 20)}": 1}`],
++// Bundles that JSON.parse takes (but for the number) and the loader refuses, each shown only as the loader's own
++// sentence for its class (read from the players' file under Node by the notes' hostile-sentences.mjs, never typed
++// as a guess; test-engineer's round of 2026-11-27).
++const hostile: [string, (text: string) => string, string][] = [
++  ["a duplicate key", (text) => text.replace('"format": "shamble-content-bundle",', '"format": "shamble-content-bundle",\n  "format": "shamble-content-bundle",'), 'the key "format" is there twice, line 13 column 3'],
++  ["a __proto__ key", (text) => text.replace('{\n  "files": [', '{\n  "__proto__": {\n    "polluted": 1\n  },\n  "files": ['), 'the key "__proto__" is not a lower-case name of 1 to 64 characters, line 2 column 3'],
++  ["a number out of every range", (text) => text.replace('"version": 1', '"version": 1e400'), "the number 1e400 is too large, line 13 column 14, at version"],
++  ["an extra key in a file entry", (text) => text.replace('"path": "maps/test-scene.json",', '"extra": 1,\n      "path": "maps/test-scene.json",'), 'the key "extra" is not known, line 4 column 7, at files[0]'],
++  ["a source/ path", (text) => text.replace('"path": "maps/test-scene.json"', '"path": "source/test-scene.json"'), '"source/test-scene.json" is not a content file\'s path'],
++  ["an unknown key named like an image tag", (text) => text.replace('{\n  "files": [', '{\n  "<img src=x onerror=alert(1)>": 1,\n  "files": ['), 'the key "<img src=x onerror=alert(1)>" is not a lower-case name of 1 to 64 characters, line 2 column 3'],
++  ["a key of 1 MiB", () => `{"${"k".repeat(1 << 20)}": 1}`, `the key "${"k".repeat(64)}..." is not a lower-case name of 1 to 64 characters, line 1 column 2`],
+ ];
+ 
+-for (const [name, make] of hostile) {
++for (const [name, make, said] of hostile) {
+   test(`a bundle with ${name} is refused by the loader, said as text, and the scene stays empty`, async ({ page }) => {
+     const text = make(built());
+     expect(text).not.toBe(built());
+@@ -72,10 +74,10 @@ for (const [name, make] of hostile) {
+     });
+     await page.goto("/");
+     const notice = page.locator("#notice");
+-    await expect(notice).toContainText("The match stopped: the content is refused: ");
+-    // The loader's sentence, whole and within its bound, as plain text: no element came of it.
+-    const said = (await notice.textContent()) ?? "";
+-    expect(said.length - "The match stopped: ".length).toBeLessThanOrEqual(512);
++    // The loader's own sentence for this class, whole, within its bound, and as plain text: no element came of it.
++    await expect(notice).toHaveText(`The match stopped: the content is refused: ${said}`);
++    const shown = (await notice.textContent()) ?? "";
++    expect(shown.length - "The match stopped: ".length).toBeLessThanOrEqual(512);
+     expect(await notice.locator("*").count()).toBe(0);
+     expect(await page.locator("img").count()).toBe(0);
+     expect(dialogs).toEqual([]);
 diff --git a/packages/e2e/tests/skeleton/isolation.spec.ts b/packages/e2e/tests/skeleton/isolation.spec.ts
 index 7dc94ed..1054e98 100644
 --- a/packages/e2e/tests/skeleton/isolation.spec.ts
@@ -720,6 +845,104 @@ index 7dc94ed..1054e98 100644
          }
          await page.goto(address ?? "");
          await running(page, 30);
+diff --git a/packages/sim-worker/boundary/replay.test.mjs b/packages/sim-worker/boundary/replay.test.mjs
+index 7f789dc..97d984a 100644
+--- a/packages/sim-worker/boundary/replay.test.mjs
++++ b/packages/sim-worker/boundary/replay.test.mjs
+@@ -10,7 +10,7 @@ import { expect, test } from "vitest";
+ import * as dev from "../../../.gate/rules-module/dev/devtools.js";
+ import * as release from "../../../.gate/rules-module/release/devtools.js";
+ import { initSync, Sim, tick_hz } from "../pkg/sim_wasm.js";
+-import { checkContent, firstDifference, readHashes, readRecording, replayOn, replayStep } from "../src/recording.ts";
++import { checkContent, checkReplayable, firstDifference, readHashes, readRecording, replayOn, replayStep } from "../src/recording.ts";
+ import { readPlainFile } from "./plain-file.ts";
+ 
+ // The committed recordings, each read only when it is a plain file in a plain folder (plain-file.ts).
+@@ -43,7 +43,9 @@ test("the manifest lists every recording's files with their length and digest, a
+ 
+ test.each(names)("%s replays on the players' file to its hashes file, step for step", async (name) => {
+   const { recording, expected, content } = committed(name);
+-  // The frozen content beside it is the content its header names; any other bundle is refused before a match exists.
++  // What this build cannot replay, and content other than the header names, are refused before a match exists, as
++  // the native runner and the browser's refuse them (netcode-architect's round of 2026-11-27).
++  checkReplayable(recording);
+   await checkContent(recording, content);
+   const other = Uint8Array.from(content);
+   other[other.length - 2] ^= 1;
+diff --git a/packages/types/src/content-schema.test.mjs b/packages/types/src/content-schema.test.mjs
+index 16bc77f..5802e42 100644
+--- a/packages/types/src/content-schema.test.mjs
++++ b/packages/types/src/content-schema.test.mjs
+@@ -54,7 +54,9 @@ test("each schema file is the canonical writer's text: JSON.stringify of the sor
+   }
+ });
+ 
+-test("at every end of every number range of both schemas, a field flags what the loader refuses", () => {
++// The ends a field built from the schema flags; that the loader refuses the same values at the same numbers is the
++// Rust test's (crates/content/src/schema.rs, at_each_end_the_loader_does_what_the_schema_says).
++test("at every end of every number range of both schemas, a field built from the schema flags the value past the end", () => {
+   const ranges = [...numbers(schemas.movement, "movement"), ...numbers(schemas.map, "map")];
+   for (const [path, schema] of ranges) {
+     const { low, high } = limits(schema);
+@@ -117,3 +119,58 @@ test("every object is closed, and a shape is a box or a ramp with all its own ke
+   expect(forms.map((form) => form.properties.type.const)).toEqual(["box", "ramp"]);
+   expect(Object.keys(forms[1].properties).sort()).toEqual(["id", "max", "min", "rises_toward", "type"]);
+ });
++
++/** A generated type's declaration (generated/content/<name>.ts), as its text stands. */
++const declaration = (name) => {
++  const text = readFileSync(new URL(`./generated/content/${name}.ts`, import.meta.url), "utf8");
++  const line = text.split("\n").find((entry) => entry.startsWith(`export type ${name} = `));
++  if (line === undefined) throw new Error(`${name}.ts declares no type ${name}`);
++  return line.slice(`export type ${name} = `.length).replace(/;$/, "");
++};
++/** An object type's keys in order, and each key's type, from a declaration's `{ key: type, ... }`. */
++const members = (body) =>
++  Object.fromEntries(
++    [...body.matchAll(/(?:^|[{,] )"?([a-z][a-z0-9_]*)"?: ((?:\[[^\]]*\])|[^,]+)/g)].map(([, key, type]) => [key, type.trim()]),
++  );
++/** A union of words' members, from a declaration's `"a" | "b"`. */
++const words = (body) => [...body.matchAll(/"([^"]+)"/g)].map(([, word]) => word);
++/** A schema's own keys, but for the header's two, which the types leave out (they say what a file holds beside them). */
++const keys = (schema) => Object.keys(schema.properties).filter((key) => key !== "format" && key !== "version");
++
++// The TypeScript types (written by ts-rs from the Rust structs) and the schemas (written from the reader's tables)
++// come from two sources in the content crate: held here to name the same keys, lengths and words, so the two cannot
++// drift apart (engine-architect's round of 2026-11-27; ADR 0005 CD-3: both "from the same Rust types").
++test("the generated types and the schemas name the same keys, the same corner lengths and the same words", () => {
++  const map = schemas.map.properties;
++  const pairs = [
++    ["Movement", schemas.movement],
++    ["MapDocument", schemas.map],
++    ["Bounds", map.bounds],
++    ["Spawn", map.spawns.items],
++    ["Region", map.regions.items],
++  ];
++  for (const [name, schema] of pairs) {
++    const typed = members(declaration(name));
++    expect(Object.keys(typed).sort(), name).toEqual(keys(schema).sort());
++    // A corner is a tuple of as many numbers as the schema's fixed length.
++    for (const [key, type] of Object.entries(typed)) {
++      if (!type.startsWith("[")) continue;
++      const length = type.split(",").length;
++      const fixed = schema.properties[key];
++      expect([fixed.minItems ?? fixed.prefixItems?.length, fixed.maxItems], `${name}.${key}`).toEqual([length, length]);
++    }
++  }
++  // A shape: its own keys, then each form's (a box's type alone, a ramp's type and its side).
++  const shape = declaration("Shape");
++  const [own, forms] = shape.split(" & ");
++  const variants = forms.replace(/^\(|\)$/g, "").split(" | ").map((form) => members(form));
++  const schemaForms = map.shapes.items.oneOf;
++  expect(variants).toHaveLength(schemaForms.length);
++  variants.forEach((variant, at) => {
++    expect([...Object.keys(members(own)), ...Object.keys(variant)].sort(), `Shape form ${at}`).toEqual(keys(schemaForms[at]).sort());
++    expect(words(variant.type ?? ""), `Shape form ${at}`).toEqual([schemaForms[at].properties.type.const]);
++  });
++  // The words: a ramp's side and a region's ground.
++  expect(words(declaration("Toward"))).toEqual(schemaForms[1].properties.rises_toward.enum);
++  expect(words(declaration("Ground"))).toEqual(map.regions.items.properties.kind.enum);
++});
 diff --git a/packages/types/src/generated/content/schema/map.schema.json b/packages/types/src/generated/content/schema/map.schema.json
 index 90d6982..acba292 100644
 --- a/packages/types/src/generated/content/schema/map.schema.json
