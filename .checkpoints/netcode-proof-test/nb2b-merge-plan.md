@@ -161,6 +161,25 @@ first, after the 15:50 seats finish; this merge after UM-4's push, in the next g
 A merge of another lane's branch, its code commit checked by his main Advisor, nothing edited by hand: 12 files, six
 of them spike files in the judge's code and marks/ (+379/-6). Risk tier 1 (spike code and notes). No Brave check.
 
+## Done lines
+- Step 1 re-reads, 16:30-16:31 UTC on HEAD 787eb984 (UM-4's commit 8fb32bc8 pushed; its gate runs 46034034986 and
+  46034043528 success, the two toolchain runs still running), each its own call, printing forms:
+  - 1a: `git fetch origin claude/practical-ride-igo41n`, `git rev-parse FETCH_HEAD`: 29a901994f5b65c23a17162422770aaacc0ca44e.
+  - 1b: `git merge-base c56afd07 T`: c56afd07002f6c13af418c8f016d6087fe806813; `git rev-list --count c56afd07..T`: 3;
+    `git diff --name-only c56afd07 T`: .checkpoints/netcode-judge.md and .checkpoints/netcode-judge/q-oneway-merge.md.
+  - 1c: `git diff --name-status 591e2cb T`: the 12 paths above, exactly.
+  - 1d: `git merge-base HEAD T`: 591e2cb0ab07d8483290c98d8f6ab8595a2621e3.
+  - 1e: `git merge-tree --write-tree --name-only HEAD T`: one line, tree 17461528611fbb5d2348548bbab81083bd30e6dd, no
+    conflict (12:4x's 147dec96 was on HEAD 7b50a66; the tree anchor X is taken on H0 at 1h, NB2B-3).
+  - 1e2: `git rev-parse T:spikes/netcode-proof/marks/marks.json`: 84e382e7972aba928f6a9587bc74631783627794 (NB2B-10);
+    `git diff -U0 591e2cb T -- …/marks.json`: one hunk, line 2368, PM-0001-3's "notes" gaining the NPT-L2-ONEWAY text
+    and "marks/README.md 2.3".
+  - 1f: 7,946 MiB free (under 8,192); `pgrep -c` cargo, rustc, npt- each 0; the dev part-clean (the card's Tools form,
+    `--locked`): "Removed 5467 files, 7.0GiB total"; `ls -la` lists .lane.lock and CACHEDIR.TAG, no debug; 14,491 MiB
+    free, so step 4 runs cold.
+  - Usage 16:31: utilization 0.21, resetsAt 1795812600 (20:50 UTC). Step 2's naming after the four CI runs on
+    787eb984 read success; 1g-1j and NB2B-2's re-read on his reply.
+
 ## Questions for the checker
 - Q1: each of NB2-C1 to -C12 (advisor-nb2-merge.md): carried here, or moot (and why)?
 - Q2: the reviewer's read of the judge and marks diff: who, and when (before the report, or before the push)?
