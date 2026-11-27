@@ -180,12 +180,18 @@ If the copy is lost: rebuild it from the applied rows plus the plan; never guess
 | 5 | .claude/hooks/routine-guard.mjs | Edit: the mcp() call at :460 passes the hook input | IN: a9120a17 (the old mcp() ignores the extra argument) |
 | 6 | .claude/hooks/routine-guard.mjs | Edit: :1501-:1593, GUARD-MARK, mcp(), merge check, passAllows | IN: 6a 3e701b26 (GUARD-MARK and mcp()), 6b 8398752d (toolchain and the PASS reading; two edits) |
 | 7 | .claude/hooks/routine-guard.mjs | Edit: gh() at :1448-:1458 (needs row 6's definitions) | IN: 9a3a7d0a (the guard equals the copy; suite 1579/1581, the 2 guard.mjs tests wait for row 8) |
-| 8 | .claude/hooks/guard.mjs | Edit: the allow output | not applied |
+| 8 | .claude/hooks/guard.mjs | Edit: the allow output | IN: 3773e463 (equals the copy; guard suite 1581/1581 in the real folder) |
 | 9 | .claude/agents/security-auditor.md | Edit: :54 | not applied |
 | 10 | .claude/agents/advisor.md | Write (whole file) | not applied |
 | 11 | CLAUDE.md | Edit: :62-:133 | not applied |
 Order why: the guard runs live from disk in this session, so its call site (5) goes in before mcp() reads the input (6),
 and gh() (7) after the definitions it uses (6); each state in between parses and fails toward a refusal or a prompt.
+
+33. During the applies, an automated commit review (a plugin, not a project reviewer) flagged: (1) High, the PASS is
+    posted as the same account sessions use: the known, recorded risk of his MERGE-PROMPT (d) (SA-PA-5 and the
+    MERGE-MARK follow-up); (2) Medium, the allow path does not require the repository to be this one or the PR number
+    to be a plain integer: for security-auditor at the build review; under the budget a STATUS follow-up unless rated
+    higher.
 
 ## Current step
 Narrow re-checks of the second fix pass (advisor agent: track hunks, guard SA-RC-5/6, the advisor.md line-end gloss;
