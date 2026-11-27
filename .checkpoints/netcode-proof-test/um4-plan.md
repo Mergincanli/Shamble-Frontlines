@@ -182,6 +182,19 @@ puts them inside check.mjs, so a whole run cannot leave them out.
   proven by step 5's local counted run, not by CI. Left: the review round (test-engineer: the step, its tests and 2b's
   log; security-auditor: the short read) and B's read of 787eb984, in one window of three seats after NB2-ONEWAY's push
   (the advisor tool, 16:3x), or before it if his reply has not come by 17:30 UTC.
+- Review round 1, T (test-engineer, review-um4-nb2b-test.md, COMPLETE 18:10Z): block 1 APPROVE WITH FINDINGS.
+  - T-1 (Medium): the "either part failing" test (check.test.mjs:2021-2030) cannot fail. Mutants dropping
+    check.mjs:2696 or :2700 stay 5 of 5 green: the stand-in `out: "boom\n"` trips the zero-count or last-line guard, and
+    the assert reads only the shared prefix. Fix (T's, shown in scratch): stand-ins past the neighbouring guards, exact
+    message asserts. The same shape in the web step's test (check.test.mjs:1985-1995) is a carry outside UM-4.
+  - CORRECTION (T-1): the commit message's "Five new tests, each red by its own name first" (8fb32bc8) holds for three
+    of the five (zero count, last line, missing folder). The failing-part test and the call-order test arrived green
+    with the step (this file's lines on stage B). The record above was right; the commit message overstated, and the
+    report says so. History is not rewritten.
+  - T-2 to T-5 (Low): no case where the stdout-only last-line read matters; a skipped or todo ops test passes the
+    step; the real `present` proven only by the logs; T-5 (forward, infra-engineer's): no CI net for later heads.
+  - S (security-auditor) still running; then the advisor agent's ruling on the round, then the fix pass (T-1, UM4H-1's
+    clause in dependency-check.md once S confirms it, and what the ruling adds).
 
 ## Size (for U8-FILLS)
 About 20-30 added lines by estimate: the step and its missing-folder line in check.mjs (about 12-18), the list entry
