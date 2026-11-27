@@ -110,10 +110,10 @@ row; the script fails otherwise). Marks: `-n` = PM-0001-n, `0004-67` = PM-0004-6
 | `second.s.interp_delay_ns` | ns | npt-client | one per client tick: the interpolation delay in use | -46 |
 | `second.s.probe_burst_down_lost` | flag | npt-lab (L1 probe), npt-server's probe mode (L2 probe, from npt-net's `ImpairSocket` stamps: M15) | one per probe packet sent down inside the burst: 1 when lost | -3 |
 | `second.s.probe_burst_up_lost` | flag | npt-lab (L1 probe), npt-server's probe mode (L2 probe, from npt-net's `ImpairSocket` stamps: M15) | one per probe packet sent up inside B1's 1 s burst: 1 when lost | -3 |
-| `second.s.probe_down_delay_ns` | ns | npt-lab (L1 probe), npt-server's probe mode (L2 probe, from npt-net's `ImpairSocket` stamps: M15) | one per delivered probe packet, server to client: its one-way delay | -3 |
+| `second.s.probe_down_delay_ns` | ns | npt-lab (L1 probe), npt-server's probe mode (L2 probe, from npt-net's `ImpairSocket` stamps: M15) | one per delivered probe packet, server to client: its one-way delay. On L2 the stamp holds only the delay the model added, so -3's checks of place read their bounds less half `header.params.base_rtt_ns` (README §2.3, NPT-L2-ONEWAY) | -3 |
 | `second.s.probe_down_lost` | flag | npt-lab (L1 probe), npt-server's probe mode (L2 probe, from npt-net's `ImpairSocket` stamps: M15) | one per probe packet sent down, outside the B1 burst: 1 when lost | -3 |
 | `second.s.probe_rtt_ns` | ns | npt-lab (L1 probe), npt-server's probe mode (L2 probe, from npt-net's `ImpairSocket` stamps: M15) | one per probe round trip (echo minus hold time, filed under the echoing down packet's second): its time | -3 |
-| `second.s.probe_up_delay_ns` | ns | npt-lab (L1 probe), npt-server's probe mode (L2 probe, from npt-net's `ImpairSocket` stamps: M15) | one per delivered probe packet, client to server: its one-way delay | -3 |
+| `second.s.probe_up_delay_ns` | ns | npt-lab (L1 probe), npt-server's probe mode (L2 probe, from npt-net's `ImpairSocket` stamps: M15) | one per delivered probe packet, client to server: its one-way delay. On L2 the stamp holds only the delay the model added, so -3's checks of place read their bounds less half `header.params.base_rtt_ns` (README §2.3, NPT-L2-ONEWAY) | -3 |
 | `second.s.probe_up_lost` | flag | npt-lab (L1 probe), npt-server's probe mode (L2 probe, from npt-net's `ImpairSocket` stamps: M15) | one per probe packet sent up, outside the B1 burst: 1 when lost | -3 |
 | `second.s.replay_forced_ns` | ns | web | one per replay forced at P3's or P4's measured maximum depth | -44 |
 | `second.s.replay_ns` | ns | web | one per forced replay: reset and replay time in the Worker | -44 |
@@ -234,7 +234,7 @@ row; the script fails otherwise). Marks: `-n` = PM-0001-n, `0004-67` = PM-0004-6
 | `event.wss_cert.accepted` | flag | web | per wss session: 1 when the certificate was accepted with no warning | 0006-15 |
 | `header.params.aim_bits` | bits | npt-proto | the aim's field widths from the codec | -51 |
 | `header.params.area_count` | count | npt-room | the map's area count | -9 |
-| `header.params.base_rtt_ns` | ns | npt-net, web | the path's base RTT: median of 10 s of pings at session start | -3 |
+| `header.params.base_rtt_ns` | ns | npt-net, web | the path's base RTT: median of 10 s of pings at session start. The judge reads it on L2, from the header of every log that carries a one-way delay series: a whole number of ns at 0 or above, the leg's own measured value (README §2.3, NPT-L2-ONEWAY) | -3 |
 | `header.params.bottleneck_queue_datagrams_count` | count | npt-net | the bottleneck's queue depth in full datagrams | -24 |
 | `header.params.bottleneck_queue_ns` | ns | npt-net | the bottleneck's queue depth as time at the bottleneck rate | -24 |
 | `header.params.buffer_depth_ticks_count` | count | npt-room | -30's input buffer depth set for P0 | -30 |
