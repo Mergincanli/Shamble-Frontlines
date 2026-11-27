@@ -286,3 +286,165 @@ ws_split.txt, through logq's `-`), and s14.test.mjs's pin test.
 - The scratch files stay: .checkpoints/netcode-proof-test/u8-f1/ (drafts.md, list-draft.test.mjs, pin-draft.test.mjs,
   hooks-proof.mjs, missing-log.mjs); the worktree's .gate/u8-f1/ (hooks-proof-1/, s14-fixture/) is not snapshotted.
 DONE
+
+# FIX PASS (security round)
+On the advisor's ruling of 00:59 UTC 27 Nov (advisor-u8-f1-sec.md section 3, read at its main-folder path, read only;
+the security round's notes security-u8-f1.md sections 2 and 6 read the same way). Start checks, each its own call:
+top level .../.claude/worktrees/agent-a7fe1b9f436f36bb1; HEAD 77ffc95101e1...; status: U8-F1's six files and the
+notes only. Edits only in s14.test.mjs, PROMPT-R1.md, R1.md and r1plan.test.mjs; the plants elsewhere are temporary.
+
+## Item 1 DONE (SEC-U8F1-2: one exact list for npt-s14's $OUT lines)
+- Red before the merge: `hostname > $OUT/host.txt` after npt-s14's run loop: the pin test PASSED (the gap: an
+  unquoted `$OUT/` matched neither "npt-s14's lines writing them" nor "npt-s14's other $OUT lines").
+- Merged into one `only("npt-s14's $OUT lines", ...)`: filter `/\$\{?OUT\b|"\$PROBE" (?:server|client|bursts)/` over
+  the trimmed lines; wanted: the eight lines plus `[ ! -e "$OUT" ] ...`, `install -d ... "$OUT"` and the final printf.
+- After the merge, the same red FAILED by name: "npt-s14's $OUT lines: ... goes to Mustafa first", naming
+  `hostname > $OUT/host.txt`. Restored by Edit: npt-s14 sha256 0c62ea52...9e1d before and after. Green after it.
+- Net after item 1: s14.test.mjs 43/1 (+42); total **+92** (one line freed).
+
+## Item 2 DONE (SEC-U8F1-1 (a): r1.sh's writer forms)
+- "r1.sh's writes into the folder"'s filter is now
+  `/^[^#]*(?:>|\btee |\bcp |\bmv |\bln |\binstall |\bpython3 |\bnode |s14_run ")/`. On today's tree: green with the
+  wanted list unchanged; the new filter caught no other line (its only new match, the compare.py summary line, was
+  already listed).
+- Plant: a heredoc writer in s14_run (`python3 -I - "$1" << 'PY'`, a body line opening `$1/extra.txt` for writing,
+  `PY`): failed by name ("r1.sh's writes into the folder: ...", naming the call line). Restored by Edit: r1.sh sha256
+  a6f1dded...3a3a before and after.
+- Net after item 2: unchanged, **+92** (a changed line).
+
+## Item 3 DONE (SEC-U8F1-1 (b), with SEC-U8F1-2's dash-form MAC and stamps text)
+- The address loop's pattern is now the ruling's whole expression (the IPv4 form, the MAC in colon and dash forms,
+  hostname, nodename, gethost\w*, getfqdn, `\buname\b(?! -r\b)`, platform.node, getsockname, getpeername, getifaddrs,
+  if_nameindex, ifconfig, /sys/class/net, /etc/host\w*, `(addr|link|neigh) show`), flags gi; the wanted list stays
+  198.51.100.1 and .2; the label reads "<name>'s addresses, host and interface names".
+- `stamps` (every non-comment line of r1.sh naming stamps.txt: :750, :784, :794 today) sits on the `block` line; the
+  loop's object gains "r1.sh's stamps lines"; "the stamps' writers" reads `stamp()` plus `stamps`, its wanted list
+  gaining r1.sh's `cp -p "$R/browsers/stamps.txt" ...` line.
+- Today's tree: green (npt-s14's `uname_r` and `uname -r` excluded as the seat found). redact.test.mjs over the spike,
+  with the new expression's text in it: pass, clean.
+- Plants, each failed by name, each restored by Edit with sha256 equal:
+  - `"role": f"server {socket.gethostname()}"` in probe.py: "probe.py's addresses, host and interface names" naming
+    `gethostname`; probe.py 65020716...0434.
+  - `PLANT = "aa-bb-cc-dd-ee-ff"` in probe.py: the same check, naming `aa-bb-cc-dd-ee-ff`; probe.py 65020716...0434.
+  - `  date -u >> "$R/browsers/stamps.txt"` in browsers() (a third writer of another shape, no host name in it):
+    "the stamps' writers" naming that line; r1.sh a6f1dded...3a3a.
+- Net after item 3: unchanged, **+92** (changed lines only; three long test lines).
+
+## Item 4 DONE (SEC-U8F1-2's rest)
+- `go(what)` builds the shared message ("<what>: a change that puts anything more into the pushed s14 folder stops
+  and goes to Mustafa first"); `only` uses it, and so do the two asserts: "compare.py summary's one print" and "the
+  listed net.ipv4 settings". The latter's deepEqual now holds `[count of "for s in ", the list]` against `[1, [...]]`.
+- No IPv6 literal by name (the ruling's reason: Python slices; the repo's redact test catches a literal).
+- Plant: a second one-line `for s in ../../kernel/hostname; do printf ... "$(ip netns exec "$NSC" cat
+  "/proc/sys/net/ipv4/$s" ...)"; done` in npt-s14's kernel.txt block: failed by name ("the listed net.ipv4 settings:
+  ... goes to Mustafa first", count 2 against 1). Restored by Edit: npt-s14 0c62ea52...9e1d before and after.
+- Net after item 4: unchanged, **+92**.
+
+## Item 5 DONE (SEC-U8F1-1 (c), S14-VMS: the s14 folder's own check with no VM list)
+- PROMPT-R1.md step 2, the same six lines (:124-129) rewrapped: "Before the push, in PowerShell, the fixed copy
+  `~/npt-operator/redact-check.mjs` runs on `<results>\r1\s14` with no VM list, so a VM's own address there is a
+  finding; its whole output is saved as `<results>\r1\s14-redact.txt` in UTF-8 (UTF-16 reads as binary, a finding),
+  its last line in step 4's summary. A finding, or any exit but 0, means no push: stop and tell him." Net 0.
+- R1.md section 7's bullet: the parenthesis is now "(the redaction check's fixed copy, run on the s14 folder first
+  with no VM list; then the pre-push hook's own over the whole push)". The bullet re-wraps from 10 lines to 11: +1.
+- r1plan.test.mjs:211 on the same line: `[the re-read line present, a --vms before "runs? on `<results>\r1\s14`",
+  "runs? on `<results>\r1\s14` with no VM list" present]` against `[true, false, true]`. The ruling says "run on";
+  the prompt's sentence says "runs on" (the brief's own words for it), so the test reads both.
+- Tests: r1plan + operator (3.6 included) + redact: 22 pass.
+- Plant: `with `--vms ~/npt-operator/vms.txt`` put back after the fixed copy's name: failed by name ("SR-1: ...;
+  S14-VMS: the s14 folder's check names no --vms", [true, true, true]). Restored by Edit: PROMPT-R1.md
+  a3c63b7f...120a before and after.
+- Proof, scratch (.gate/u8-f1/s14-fixture/s14), three outputs:
+  1. no VM list, the fixture as it was: "redact-check: 14 item(s) checked, 0 finding(s)".
+  2. **A difference from the brief's recipe, needed for the proof:** the fixture's vms.txt held 192.0.2.10 and .20,
+     which redact-check's built-in list allows anyway (192.0.2.0/24, redact-check.mjs:113). With them, a VM address in
+     the folder reads 0 findings with or without a VM list. So for this proof the fixture's vms.txt stood in with
+     private 10.20.30.40 and .50 (no real public address written anywhere), and `rs_address 10.20.30.40` was appended
+     to the fixture's kernel.txt. With `--vms`: "redact-check: 14 item(s) checked, 0 finding(s)" (today's gap).
+  3. No VM list: ".gate/u8-f1/s14-fixture/s14/kernel.txt:23:12: IPv4 address: 10.…(11 chars)" and "redact-check: 14
+     item(s) checked, 1 finding(s)", exit 1.
+  Restored by Edit: vms.txt a90fbc8c...4b0c and kernel.txt 02d28270...c402, before and after.
+- Net after item 5: R1.md 13/1 (+12); total **+93** (the stop).
+
+## Item 6 PART BUILT, PART CARRIED (SEC-U8F1-3 and -4, the Lows), at +93 with no line to spare
+Carry order applied as the ruling words it (advisor-u8-f1-sec.md:63-66): first item 6's Stop B record, then its wording
+"SEC-U8F1-3, then SEC-U8F1-4's first part". Each part measured by re-wrapping the step's six lines in memory (node,
+print only), at the file's 120-column wrap, no code span broken.
+- **Built: SEC-U8F1-4's first part, net 0.** The save is named: "its whole output is saved with
+  `| Out-File -Encoding utf8 <results>\r1\s14-redact.txt` (not `>`, which writes UTF-16)". It fits the same six
+  lines. The brief's longer reason ("Windows PowerShell's `>` writes UTF-16, which the hook reads as binary") and
+  "in UTF-8" beside the command each made a seventh line. The UTF-8 is now named by the command's own
+  `-Encoding utf8`.
+- **Carried: SEC-U8F1-3**, "Then, in the same PowerShell, push to `claude/npt-results` after the pre-push hook passes
+  (a prompt)". With it, every wording tried (four forms) takes 7 lines: +1, past 93.
+- **Carried: SEC-U8F1-4's second part**, Stop B's start-check line (R1.md:86-88) ending "its printed path and
+  `git --version` are recorded": :88 is already 120 columns, so the clause is a new line: +1, past 93.
+- Both carried Lows are STATUS follow-ups (a Low triggers no push on its own).
+- Tests: operator.test.mjs 3.6 (every backticked git command in PROMPT-R1.md against every deny): pass. The r1plan
+  assert first failed on the re-wrap ("runs" ends one line, "on" starts the next): its two patterns now take `\s+`
+  (same line). Redone, item 5's plant (`--vms ~/npt-operator/vms.txt` back before "runs on") still fails by name.
+  Restored: PROMPT-R1.md a3e9d53f...fd35 before and after.
+- Net after item 6: unchanged, **+93**.
+
+# FIX PASS (security round) HAND-BACK
+Base 77ffc95, no merge, no commit, no cargo, no fetch. Edited only s14.test.mjs, PROMPT-R1.md, R1.md and
+r1plan.test.mjs; every red and plant in npt-s14, probe.py and r1.sh was restored by Edit with sha256 equal.
+
+**Items, reds, plants and restore hashes**
+| Item | Red or plant | Failed by name | Restored (sha256, before = after) |
+|---|---|---|---|
+| 1 SEC-U8F1-2, one exact $OUT list | `hostname > $OUT/host.txt` after the run loop: PASSED before the merge (the gap), FAILED after | "npt-s14's $OUT lines" | npt-s14 0c62ea52...9e1d |
+| 2 SEC-U8F1-1 (a), writer forms | today: green, wanted list unchanged, no other line caught; plant `python3 -I - "$1" << 'PY'` heredoc in s14_run | "r1.sh's writes into the folder" | r1.sh a6f1dded...3a3a |
+| 3 SEC-U8F1-1 (b), names and dash MAC | today: green; redact.test.mjs clean on the new text; plant `"role": f"server {socket.gethostname()}"` | "probe.py's addresses, host and interface names" (`gethostname`) | probe.py 65020716...0434 |
+| 3 | plant `aa-bb-cc-dd-ee-ff` in probe.py | the same check (`aa-bb-cc-dd-ee-ff`) | probe.py 65020716...0434 |
+| 3 | plant a third stamps.txt writer, `date -u >> "$R/browsers/stamps.txt"` | "the stamps' writers" | r1.sh a6f1dded...3a3a |
+| 4 SEC-U8F1-2's rest | plant a second one-line `for s in ../../kernel/hostname; do ...; done` | "the listed net.ipv4 settings: ... goes to Mustafa first" (count 2, want 1) | npt-s14 0c62ea52...9e1d |
+| 5 S14-VMS, no VM list | plant `--vms ~/npt-operator/vms.txt` back (done twice: after item 5, and on item 6's final wrap) | "SR-1 ...; S14-VMS: the s14 folder's check names no --vms" | PROMPT-R1.md a3c63b7f...120a, then a3e9d53f...fd35 |
+| 6 SEC-U8F1-3, -4 | the Out-File save built (net 0); operator 3.6 green | (no plant asked) | carried: "in the same PowerShell" and the Stop B record (below) |
+
+Item 5's proof (scratch, .gate/u8-f1/s14-fixture/s14): no VM list: 14 items, 0 findings; with
+`rs_address 10.20.30.40` appended and that address in the fixture's vms.txt: with `--vms` 0 findings (the gap), with
+no VM list 1 finding (kernel.txt:23:12, IPv4), exit 1; restored (vms.txt a90fbc8c...4b0c, kernel.txt 02d28270...c402);
+re-run at the end with no VM list: 14 items, 0 findings. The fixture's vms.txt had held documentation addresses,
+which redact-check allows built in, so the stand-in was private addresses (item 5's notes).
+
+**End checks** (the final tree)
+- `node --test` on the 8 browser-free ops test files: **95 pass, 0 fail** (95 before; the pass adds no test).
+- `bash ops/tests/wrappers.test.sh`: "315 ok, 0 failed".
+- `node ops/operator/redact-check.mjs <spike>`: 421 item(s) checked, 0 finding(s).
+- `node check.mjs --only refs,self,redact`: PASS refs (1,994 tracked files), PASS self 78 of 78, PASS redact 11 of 11
+  (421 items, 0 findings): "check: all 3 steps pass".
+- The scratch fixture: as above.
+- No plant left: `git status` shows only U8-F1's six files and the notes; npt-s14, probe.py, compare.py and ops/browser
+  (its package.json and package-lock.json) unchanged against 77ffc95.
+- No end check needed cargo or the lane lock.
+
+**Size** (`git diff --numstat 77ffc95101e186f75c57a1e8770b3ab7a9442820`, all six of U8-F1's files)
+| File | Added | Removed | Net |
+|---|---|---|---|
+| spikes/netcode-proof/ops/operator/PROMPT-R1.md | 8 | 2 | +6 |
+| spikes/netcode-proof/ops/runs/R1.md | 13 | 1 | +12 |
+| spikes/netcode-proof/ops/runs/r1.sh | 17 | 6 | +11 |
+| spikes/netcode-proof/ops/tests/r1plan.test.mjs | 7 | 0 | +7 |
+| spikes/netcode-proof/ops/tests/r1sh.test.mjs | 17 | 2 | +15 |
+| spikes/netcode-proof/ops/tests/s14.test.mjs | 43 | 1 | +42 |
+| **Total** | **105** | **12** | **+93** (at the stop; U8 at 6,282) |
+The pass moved one line from s14.test.mjs (item 1's merge, -1) to R1.md (item 5's longer parenthesis, +1); items 2-4
+and 6's built part are changed lines only (three test lines are now long: the stamps line, the names pattern, the
+net.ipv4 assert).
+
+**Carried, and why**
+- SEC-U8F1-4's second part (Stop B's line ends "its printed path and `git --version` are recorded"): R1.md:88 is at
+  120 columns, so it is a new line, past +93. Carried first, as the ruling orders.
+- SEC-U8F1-3 ("Then, in the same PowerShell, push to ..."): with it, step 2 needs a seventh line in every form tried,
+  past +93. Carried second.
+- Both are Lows: STATUS follow-ups, each one line, at a later unit or a new stop of 6,284.
+- Kept: SEC-U8F1-4's first part (the Out-File save), net 0 with the shorter reason "(not `>`, which writes UTF-16)".
+- Not carried: item 4 (built, net 0); items 1, 2, 3 and 5 (built).
+
+**Open (no lines)**
+- Two wordings for Mustafa's Stop B read of PROMPT-R1.md: "runs on `<results>\r1\s14` with no VM list" departs
+  from C5's "with `--vms`" (the ruling's S14-VMS); the save's reason is shorter than the brief's sentence.
+- The earlier Lows stand: logq's unguarded non-object line; re-runs keep the last attempt's prints only.
+
+Status: COMPLETE 2026-11-27T01:14:16Z
