@@ -1544,6 +1544,17 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   tests in its scratch copy. Fix (about 2 lines): the groups by name in the same test. (Its list names movement, jump,
   stamina and pushing; the table also has `aim_down_sights`, which the fix must name.) Its slip: one `git log` after
   other commands in one call, a read.
+- **Round 2's one fix pass, the plan so far** (made only after the last reviewer ends, since they read the tree; all
+  Lows, about 30 lines against 103 left): (A) the ramp guard `is_finite` for `above` and `rate`, with
+  rust-reviewer's two probes as assertions; (B) `RAY_REACH`'s doc: the cap is in t, metres for a unit direction;
+  (C) `map.rs`'s spawns check against `MIN_SPAWNS` itself; (D) TE-9: the name test also holds each row's Export group
+  (movement, jump, stamina, pushing, aim_down_sights); (E) L2-1: the isolation spec asks with `same-site` too; (F)
+  L2-2: a `canonical.test.mjs` case with `content/` as a link; (G) L2-3: `path.resolve` first in `readPlain` and
+  `writePlain`, with a test of a `lnk/..` path; (H) engine-architect's F1: the tie test's corner check runs on
+  Shape's own members too, and its comment says member types are not compared; (I) its F2: the report says EA-1's
+  two `boot.ts` calls are read and type-checked, not tested. Follow-up, not fixed: L2-4 (`serve.test.mjs`, outside
+  this diff, from 3a). Plants for each that a test can see (W16's anchor moves; new W17, C55 to C59; (C) cannot be seen while
+  `MIN_SPAWNS` is 1, said so), then the local checks, the gate, the count, the code commit, the whole run, CI.
 
 ## Slips of this chat's own rules, for the report
 - One git command did not start its own shell call: `git add .checkpoints/cs4b-content/review-brief-4b1.md` stood

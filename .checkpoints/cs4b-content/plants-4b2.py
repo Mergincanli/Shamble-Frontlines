@@ -127,6 +127,15 @@ ONE_RAN = ["Tests  1 passed | 11 skipped (12)"]
 # their values, so the hand-over's check agrees with it.
 TE_ROWS_OLD, TE_ROWS_NEW = fields_swapped(TABLE_FILE, "sprint_time_from_full_s", "sprint_returns_at_pct")
 TE_OLD, TE_NEW, _, _ = numbers_swapped(SOLDIER, "sprint_returns_at_pct", "sprint_time_from_full_s")
+# Round 2 (test-engineer's TE-9): a row re-pointed to another unit's entry of the same last name, and the movement
+# table given that entry's value, read from his Export by script (never typed).
+def export_value(group, key):
+    import json
+    return repr(json.load(open("content/source/testlines-export.json"))["values"][group][key])
+BODY_LINE, BODY_TEXT = content_line(SOLDIER, "body_radius_m")
+HORNET_BODY = export_value("hornet", "body_radius_m")
+CANON = ("node", "../../node_modules/vitest/vitest.mjs", "run", "scripts/canonical.test.mjs")
+SHAPE_TS = "packages/types/src/generated/content/Shape.ts"
 
 # name, kind, what the defect is, the edits (file, text there once, its replacement), the command, the words its output must hold
 PLANTS = [
@@ -340,7 +349,7 @@ PLANTS = [
      ["collision::tests::a_ray_beyond_the_reach_and_a_ramp_beyond_f32_give_no_hit stdout"]),
     ("W15", "defect", "an endless limit is taken as endless", [(WORLD_RS, "        let limit = if limit > RAY_REACH { RAY_REACH } else { limit };", "        let limit = limit;")], COLLISION,
      ["collision::tests::a_ray_beyond_the_reach_and_a_ramp_beyond_f32_give_no_hit stdout"]),
-    ("W16", "defect", "a ramp's NaN goes on as if it were a number", [(WORLD_RS, "    if above.is_nan() || rate.is_nan() {", "    if false {")], COLLISION,
+    ("W16", "defect", "a ramp's NaN goes on as if it were a number", [(WORLD_RS, "    if !(above.is_finite() && rate.is_finite()) {", "    if false {")], COLLISION,
      ["collision::tests::a_ray_beyond_the_reach_and_a_ramp_beyond_f32_give_no_hit stdout"]),
     ("C38", "defect", "two rows whose Export values are equal trade fields (test-engineer's swap): the content needs no change, the table's names catch it", [(TABLE_FILE, EQUAL_ROWS_OLD, EQUAL_ROWS_NEW)], HAND,
      ["testlines.test.mjs > his Export and the game's first movement table, the repository's own files > every row of the table sends its Export value to the field of the same name", "expected 'stop_time_to_10pct_s' to be 'speed_up_time_to_90pct_s'"]),
@@ -374,6 +383,23 @@ PLANTS = [
      ["testlines.test.mjs > his Export and the game's first movement table, the repository's own files > every row of the table sends its Export value to the field of the same name", "expected 'sprint_returns_at_pct' to be 'sprint_time_from_full_s'"]),
     ("C53", "control", "the same case passes the second route, which reads neither value", [(TABLE_FILE, TE_ROWS_OLD, TE_ROWS_NEW), (SOLDIER, TE_OLD, TE_NEW)], FILES, []),
     ("C54", "control", "the same case passes the hand-over's own check, which compares the swapped table with the swapped content", [(TABLE_FILE, TE_ROWS_OLD, TE_ROWS_NEW), (SOLDIER, TE_OLD, TE_NEW)], HAND_REAL, ONE_RAN),
+    # Round 2's fix pass (Builder V6, 2026-11-27): each fix shown red on the defect it closes. Not planted: the spawns
+    # check against MIN_SPAWNS itself (no test can see it while MIN_SPAWNS is 1) and the reach's doc (words).
+    ("W17", "defect", "the ramp's guard looks for a NaN only, so infinities make a crossing of NaN or of -0.0 (rust-reviewer's round 2)", [(WORLD_RS, "    if !(above.is_finite() && rate.is_finite()) {", "    if above.is_nan() || rate.is_nan() {")], COLLISION,
+     ["collision::tests::a_ray_beyond_the_reach_and_a_ramp_beyond_f32_give_no_hit stdout"]),
+    ("C55", "defect", "the dev server refuses a cross-site ask only, not another server of this machine (security-auditor's round 2)", [(VITE_FILE, '      if (from !== undefined && from !== "same-origin" && from !== "none") {', '      if (from === "cross-site") {')],
+     chain((ENV, WASM), (DEV_ENV, chromium("tests/skeleton/isolation.spec.ts"))),
+     ["under Vite's dev server", "Error: same-site"]),
+    ("C56", "defect", "the canonical tool reads from the file's own folder, so a linked content folder goes unseen (security-auditor's round 2)", [("packages/client/scripts/canonical.mjs", "  const before = readPlain(file, base);", "  const before = readPlain(file);")], CANON,
+     ["canonical.test.mjs > the content folder as a link: nothing is read through it"]),
+    ("C57", "defect", "the tools open a path as given while they check it normalised, so a path that climbs out through a link is read (security-auditor's round 2)", [(TESTLINES_FILE, "export function readPlain(file, base = path.dirname(file)) {\n  file = path.resolve(file);\n", "export function readPlain(file, base = path.dirname(file)) {\n")], HAND,
+     ["a path that climbs out through a link: expected 'OUTSIDE' to be 'INSIDE'"]),
+    ("C58", "defect", "a row re-pointed to another unit's entry of the same name, and the movement table given its value (test-engineer's TE-9): the groups catch it", [(TABLE_FILE, '"export": "movement.body_radius_m"', '"export": "hornet.body_radius_m"'), (SOLDIER, BODY_LINE, BODY_LINE.replace(f": {BODY_TEXT}", f": {HORNET_BODY}", 1))], HAND,
+     ["testlines.test.mjs > his Export and the game's first movement table, the repository's own files > every row of the table sends its Export value to the field of the same name", "to include 'hornet'"]),
+    ("C59", "control", "the same re-pointed row passes the hand-over's own check, which compares values", [(TABLE_FILE, '"export": "movement.body_radius_m"', '"export": "hornet.body_radius_m"'), (SOLDIER, BODY_LINE, BODY_LINE.replace(f": {BODY_TEXT}", f": {HORNET_BODY}", 1))], HAND_REAL, ONE_RAN),
+    ("C60", "defect", "a shape's corner in the generated type loses a number (engine-architect's round 2)", [(SHAPE_TS, " min: [number, number, number],", " min: [number, number],")], TYPES_UNIT,
+     ["content-schema.test.mjs > the generated types and the schemas name the same keys", "Shape form 0.min"]),
+    ("C61", "control", "the clean canonical tool: its tests", [], CANON, []),
 ]
 
 def note(name, kind, ok, what, detail):
@@ -480,7 +506,7 @@ def main():
     for name, kind, what, edits, command, words in PLANTS:
         if names and name not in names: continue
         # A chain runs from the root; it holds environments, which are no keys.
-        cwd = None if command[0] == "CHAIN" else {UNIT: "packages/client", HAND: "packages/client", HAND_REAL: "packages/client", PAGE_CONTENT: "packages/client", PAGE_TIES: "packages/client", TYPES_UNIT: "packages/types", SW_UNIT: "packages/sim-worker", SW_MESSAGES: "packages/sim-worker", SW_PANIC: "packages/sim-worker"}.get(command)
+        cwd = None if command[0] == "CHAIN" else {UNIT: "packages/client", HAND: "packages/client", HAND_REAL: "packages/client", CANON: "packages/client", PAGE_CONTENT: "packages/client", PAGE_TIES: "packages/client", TYPES_UNIT: "packages/types", SW_UNIT: "packages/sim-worker", SW_MESSAGES: "packages/sim-worker", SW_PANIC: "packages/sim-worker"}.get(command)
         planted(name, kind, what, edits, command, words, cwd=cwd)
     stamp_plants(names)
     native_plants(names)

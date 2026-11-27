@@ -109,7 +109,9 @@ netcode-architect (route (i)), engine-architect, test-engineer (the test list).
   a wrong hit; no caller in 4b-2): fixed (the reach, the cap, the NaN guard; W14 to W16 caught). RR-2 (Low: the
   schema said nothing of the fewest spawns): fixed. RR-3 (Low: a stale doc): fixed. Rulings (1), (8), (9): fine.
 - **engine-architect: one Medium, the rest Low or carried to 4c.** EA-1 (Medium: after the loader's refusal the page kept its copy of the
-  bundle, up to 8 MiB, for its life): fixed, with tests of the wiring (C41, C42 caught). Lows: EA-2 (types and
+  bundle, up to 8 MiB, for its life): fixed, the page's handling moved into two tested functions that `boot.ts`
+  calls (C41, C42 caught); those two calls of `boot.ts` are read and type-checked, not tested (engine-architect's
+  round 2). Lows: EA-2 (types and
   schemas from two sources, untied): a tie test (C47); EA-3 (two sentences for this report): written above, under
   "Decisions and deviations"; EA-4 (the page's own copy of the format and version): tied to the loader's (C46); EA-5
   (= NA-2) fixed; EA-6 (test helpers in the shipped crate's docs): hidden; EA-7 and EA-8: 4c's plan. Ruling (3)

@@ -92,7 +92,8 @@ changed or new entries, and the whole run (`.checkpoints/cs4b-content/plants-4b2
 held of 17, every file put back (30 files by sha256), the players' file rebuilt to its digest from before the plants,
 the clean tree green. Since the fix pass a control holds only if it also says the words it names (C4, C40 and C54,
 each run with `-t`, must show their one test passing). The players' file: 257,421 bytes and 95,441 instructions walked, as at c442a80;
-its sha256 changed (2e886646... from 3660132b...): the file carries the path `crates/sim/src/collision.rs` once (the
+its sha256 changed (2e8866474b22... from 3660132b...; first written here as "2e886646...", a typo found by
+netcode-architect): the file carries the path `crates/sim/src/collision.rs` once (the
 world's build has panic places there) and the fix pass moved lines in that file (read so, not proved byte by
 byte; rust-reviewer may judge it). The card
 (`.checkpoints/cs4b-content.md`, "The fix pass, round 1's findings") gives the times and the counts. The official
