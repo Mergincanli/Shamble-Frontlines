@@ -12,7 +12,7 @@
   `git push origin cs/4b-content:claude/cool-pasteur-oiqk1r`, alone in its command; never a plain `git push`. The
   session's start folder is never switched · **Base:** origin/main 2483e9a741c4e552323c36523831a2f35de4002e (the
   merge of 4a, pull request #70)
-- **Last update:** 2026-11-27 01:04 Amsterdam (from the clock)
+- **Last update:** 2026-11-27 01:18 Amsterdam (from the clock)
 
 ## Sizes and stop lines (his answer of 2026-11-26, 14:09:13 UTC: SIZE-4B (b); which number is which)
 - **4b is two pull requests**, in engine-architect's cut; "each stands on its own: lines left over in 4b-1 do not
@@ -905,6 +905,37 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
     (4B-SCAN-CFG-TEST: three bites, one control).
   - **What of step 9 still waits for his DIFF-LIST answer:** the constructor taking the bundle, the page's
     fetch of `content.json`, the build running the bundle tool, the first recording's frozen content.
+- **Step 10, one more piece that needs no content file: the maps the loader takes, through the world's builder
+  (2026-11-27; built, in its local checks at 01:18; NOT YET COMMITTED AS CODE: the patch is
+  `cs4b-content/wip-step10-fuzz-worlds.diff`, made by `git diff -- crates packages` on head 3951680; `git apply`
+  puts it back).** The sheet's row 10 names it ("the fuzz extended to `ContentSet -> StaticWorld::build`",
+  "hand-made hostile documents"); it was listed under the wiring, and needs no content file.
+  - `crates/devtools/src/world_proofs.rs`: `judge_taken(&MapDocument) -> Result<bool, String>` (the builder's
+    one refusal of a map that keeps the map kind's rules is a tree too deep; a built world holds the map's
+    shapes by their ids' order, each by its own corners; built twice it is the same tree; a ray straight down
+    onto the middle of every shape gives what a search of every shape says: to the last bit and the lowest index
+    when only boxes hold the point), `fuzz_worlds(path, bytes)` (every map of an input the loader takes, through
+    the judge), `HOSTILE` and `hostile(at)` (nine maps, each written as a file by the generator's writer, read
+    by the loader, then built: 512 times the same box; 512 boxes inside one another; 512 slabs a centimetre
+    thin and a map long; 512 centimetre cubes in the far corner; two piles a map apart; a stair of 512 ramps; a
+    row of 512 boxes of one height, each over every other's middle, the lowest index in the middle of the row;
+    rust-reviewer's chain of 34 cubes, refused at 34 deep; its first 31, built at depth 31). `made()` holds the
+    judge on the 12 seeded maps too and writes one line per hostile map: `vectors/static-world.txt` has 22 lines
+    (its first: `shamble-static-world 1 12 2000 9`; the 12 seeded lines are unchanged, bit for bit).
+  - `content_proofs.rs`: `hold` and the new `map_file` are `pub(crate)`; `verdicts()` (the cross-target run of
+    the fuzz run's first 2,000 inputs) calls `fuzz_worlds` too, so WebAssembly under Node and the browsers hold
+    the same promises; the committed verdict digests are unchanged.
+  - `tests/content_fuzz.rs`: every taken input's maps go through `fuzz_worlds` inside the same `catch_unwind`;
+    the run prints and holds the worlds built (2,387 in the 50,000 inputs of a debug run: 477 in 10,000; at
+    least 250; none too deep: mutation does not reach one, the chain does).
+  - `tests/static_world.rs`: the hostile lines' form, the chain's refusal by its sentence, a third test (every
+    hostile map through the judge; the list's end; a shape without thickness is named as the builder's own
+    refusal). `static-world.test.mjs` (23 split lines, 9 hostile) and `static-world.spec.ts` (maps 12, hostile 9).
+  - **A finding on the way:** the same box 512 times does NOT show a broken rule for two shapes at one distance
+    (the tree's walk happens to start with the lowest index there): two planted defects passed the judge on it.
+    The row of 512 boxes was added for that; with it both are caught.
+  - Plants W10 to W13 in `plants-4b2.py` (the tie rule through the judge; a node pruned at the best hit's own
+    distance; the builder leaving a shape out; the fuzz run sending no map on): run by hand, all four caught.
 - **CI, read 2026-11-27, 01:04: green on every code head up to c09f459** (gate with smoke, and toolchain): 2f058b2
   (runs 45908649135, 45908649409), e3acb41 (45910750962, 45910750974), 8e5a268 (45912515590, 45912515341: the
   first run with the static world's browser spec; the whole toolchain job took 11 min 29 s, so the browser
@@ -954,10 +985,12 @@ just continue as you were)". So: the chat's work and its agents' work are commit
 
 **Where everything is.** Branch `claude/cool-pasteur-oiqk1r` on origin (this chat's own; a session of another
 account works on its own branch from this head and never pushes here: his Lanes rule). The head: see the last
-"DONE" entries above (the card is saved with every push). Nothing is uncommitted. No agent is running. The board add-on is
-active for this chat (thread state: needs-musti, for DIFF-LIST).
+"DONE" entries above (the card is saved with every push). Code that is not yet committed is saved as a patch in
+the notes and named in the card's newest entry (today: `cs4b-content/wip-step10-fuzz-worlds.diff`, until that
+entry says DONE). No agent is running. The board add-on is active for this chat (thread state: needs-musti, for
+DIFF-LIST).
 
-**State of 4b-2, by step** (3,999 written lines of 8,450; two thirds is 5,633; rungs at 6,750 and 8,000):
+**State of 4b-2, by step** (4,350 written lines of 8,450 at 6290c85; two thirds is 5,633; rungs at 6,750 and 8,000):
 - 6 the library's batch: done (298837a). 7 the built-file check: done (d313162, then 2f058b2 and e3acb41 for the
   advisories' rule). 8, first part, the two tools on test files: done (54e89d2). 10, the core, the static world
   on maps made in tests: done (8e5a268). 9, first piece, the type writer's manifest line and its rule: done
@@ -982,18 +1015,17 @@ active for this chat (thread state: needs-musti, for DIFF-LIST).
    held by a second route (found in the Export's own text by their names, never typed: his rule) against what
    the Rust loader reads; `StaticWorld::build` on the real map (depth, a committed tree digest). The report's
    first lines say that `content/source/` changes (his SOURCE-GO answer).
-2. **Step 9** (the sheet's row 9, `cs4b-content/reread-sheet.md:167`). Its manifest line is approved by
-   security-auditor on two digests (`deps-step9.sha256`; the two files are remade from `deps-step9.diff`, or
-   lie in `.gate/cs4b/batch-step9/` on this machine): commit them only together with the dependency rule's
-   edit (`dependency_rules.rs`: the content crate's tables become package, dev-dependencies, lints; SA-STEP9-1:
-   the refusal test's list and two more plants; SA-STEP9-2: the comment at `build-checks.mjs` about nested
-   generated types), then check the committed files against both digests. When content is first linked into
+2. **Step 9** (the sheet's row 9, `cs4b-content/reread-sheet.md:167`). Done already: its manifest line with
+   the dependency rule (c09f459, as security-auditor approved it on two digests) and the generated content types
+   with their export test (6290c85). Left: the constructor's bundle argument and every caller, the page's
+   `content.ts`, the build running `content_bundle`, the frozen content of `first-loop`. When content is first linked into
    the players' file the built-file check will name `C::round` (content's `f64::round`) and perhaps
    `C::__multi3`: each gets an entry in `maths-allowed.mjs` with its reason, or the code changes; rust-reviewer
    decides. The first recording's frozen content, the constructor's new argument and every caller: the row.
 3. **Step 10's wiring** (the row at `reread-sheet.md:168`): `CreateError::MapMissing` and `::World`, the local
-   match holding the world of the map `test-scene`, the fuzz run through `StaticWorld::build`, and the
-   built-file check's result recorded where the library is first linked into the players' file.
+   match holding the world of the map `test-scene`, and the built-file check's result recorded where the library
+   is first linked into the players' file. (The fuzz run through `StaticWorld::build` and the hostile documents
+   need no content file and are built: the card's entry "Step 10, one more piece".)
 4. **The look ahead before steps 11 and 12** (the count then, plus about 520 and 1,060, plus a fix pass of about
    350; a rung that is reached moves its step: 11 to 4d, 12 to the start of 4c; past 8,450: stop and ask him).
 5. **The close:** `plants-4b2.py <commit>` whole; reviewers on the final diff (rust-reviewer, engine-architect,

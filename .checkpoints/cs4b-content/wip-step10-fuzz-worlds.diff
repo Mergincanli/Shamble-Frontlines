@@ -1,0 +1,697 @@
+diff --git a/crates/devtools/src/content_proofs.rs b/crates/devtools/src/content_proofs.rs
+index 1993fdf..770cdb9 100644
+--- a/crates/devtools/src/content_proofs.rs
++++ b/crates/devtools/src/content_proofs.rs
+@@ -31,7 +31,7 @@ use content::{load, load_file};
+ use sim::state_hash::fnv1a_64;
+ use sim::{ChaCha8, SEED_BYTES};
+ 
+-fn hold(holds: bool, why: impl FnOnce() -> String) -> Result<(), String> {
++pub(crate) fn hold(holds: bool, why: impl FnOnce() -> String) -> Result<(), String> {
+     if holds { Ok(()) } else { Err(why()) }
+ }
+ 
+@@ -449,6 +449,12 @@ impl Map {
+     }
+ }
+ 
++/// A map document as the file the generator writes for it: its path and its text.
++pub(crate) fn map_file(document: &MapDocument) -> (String, Vec<u8>) {
++    let map = Map::of(document.clone());
++    (map.path(), map.text())
++}
++
+ /// Where `token` stands in a text, `past` bytes into it: the line and the column, both from 1.
+ fn find_place(text: &[u8], token: &str, past: usize) -> (usize, usize) {
+     let at = text
+@@ -1126,8 +1132,11 @@ pub fn verdicts(seed: u64, per_class: u32) -> Result<String, String> {
+     let (inputs, mut digest) = (u64::from(per_class) * 4, 0_u64);
+     for index in 0..inputs {
+         let (path, bytes) = fuzz_input(seed, index);
+-        let stage = fuzz_judge(path.as_deref(), &bytes)
+-            .map_err(|why| format!("the fuzz run's input {index} of seed {seed}: {why}"))?;
++        let named = |why| format!("the fuzz run's input {index} of seed {seed}: {why}");
++        let stage = fuzz_judge(path.as_deref(), &bytes).map_err(named)?;
++        // What is taken goes on into the static world's builder, on this target too (the digest holds the loader's
++        // verdict alone; the worlds' own bytes are compared by `world_proofs`).
++        crate::world_proofs::fuzz_worlds(path.as_deref(), &bytes).map_err(named)?;
+         digest = fnv1a_64(&[&digest.to_le_bytes()[..], &bytes, &[stage as u8]].concat());
+     }
+     let _ = writeln!(text, "the fuzz run's first inputs|{inputs}|{digest:016x}");
+diff --git a/crates/devtools/src/world_proofs.rs b/crates/devtools/src/world_proofs.rs
+index 9f7e6e7..46f7ff6 100644
+--- a/crates/devtools/src/world_proofs.rs
++++ b/crates/devtools/src/world_proofs.rs
+@@ -7,15 +7,23 @@
+ //! holds the tree's depth, a digest of the tree's bytes and a digest of every ray's answer (the shape and the
+ //! distance's bits). The lines of the native build are a committed file (`vectors/static-world.txt`); a build whose
+ //! tree or whose one ray differs gives another line.
++//!
++//! Then the maps that lean on the tree's builder where a seeded map does not ([`HOSTILE`]: 512 times the same box,
++//! boxes inside one another, slabs a centimetre thin and a map long, the chain of cubes whose tree is too deep),
++//! each written as a file, read by the loader and built or refused: one line each. And [`judge_taken`] holds every one of these worlds, and every map the content fuzz
++//! run's loader takes ([`fuzz_worlds`]), to what the loader and the builder promise together.
+ 
+ use std::fmt::Write as _;
+ 
+-use content::map::{Bounds, Form, MapDocument, Shape, Toward};
+-use sim::collision::StaticWorld;
++use content::map::{Bounds, Form, MapDocument, Shape, Spawn, Toward};
++use content::{Document, load, load_file};
++use sim::collision::{MAX_TREE_DEPTH, RayHit, Solid, StaticWorld, WorldError};
+ use sim::state_hash::fnv1a_64;
+ use sim::vec::V3;
+ use sim::{ChaCha8, SEED_BYTES};
+ 
++use crate::content_proofs::{hold, map_file};
++
+ /// The committed file's seed, the shapes of each map, and the rays cast into each.
+ pub const SEED: u64 = 20_261_127;
+ pub const SHAPES: [usize; 12] = [0, 1, 2, 3, 17, 64, 200, 512, 512, 300, 100, 31];
+@@ -145,13 +153,301 @@ fn ray(rng: &mut Rng, world: &StaticWorld) -> (V3, V3) {
+     )
+ }
+ 
+-/// The proof's text as this build makes it: a first line that says what follows, then one line per map.
++/// One node of [`StaticWorld::tree_bytes`]: six `f32`, the leaf's mark, the leaf's shape.
++const NODE_BYTES: usize = 29;
++
++/// A map whose shapes keep the map kind's rules, through the world's builder, held to what the loader and the
++/// builder promise together. The builder's one refusal of such a map is a tree deeper than the cap: the map kind's
++/// own rules (512 shapes, corners on the millimetre grid, a centimetre of thickness, all inside bounds of a few
++/// hundred metres) are the builder's other three. A world that is built holds the map's shapes in the order of
++/// their ids, each by its own corners; it is the same world when it is built again; and a ray straight down onto
++/// the middle of every shape meets what a search of every shape says it must. Of the shapes whose floor plan holds
++/// the point it meets one, no higher than the highest top among them and no lower than the first surface that must
++/// stop it (a box's top, a ramp's floor); when all of them are boxes that is one distance to the last bit, and the
++/// shape is the lowest index of those as high.
++///
++/// `true` for a world that was built, `false` for a tree that is too deep.
++///
++/// # Errors
++/// The promise that does not hold, in words.
++pub fn judge_taken(map: &MapDocument) -> Result<bool, String> {
++    let world = match StaticWorld::build(map) {
++        Ok(world) => world,
++        Err(refusal @ WorldError::TooDeep(depth)) if depth > MAX_TREE_DEPTH => {
++            let message = refusal.message();
++            let plain =
++                message.len() <= 200 && message.bytes().all(|byte| (0x20..=0x7e).contains(&byte));
++            hold(plain, || {
++                format!("a refusal that is not short and printable: {message:?}")
++            })?;
++            return Ok(false);
++        }
++        Err(other) => {
++            return Err(format!(
++                "the world refuses it for more than its tree's depth: {}",
++                other.message()
++            ));
++        }
++    };
++    let solids = world.solids();
++    let mut ranked: Vec<&Shape> = map.shapes.iter().collect();
++    ranked.sort_by(|a, b| a.id.as_bytes().cmp(b.id.as_bytes()));
++    let narrowed = |corner: [f64; 3]| corner.map(|value| value as f32);
++    let own = |(solid, shape): (&Solid, &&Shape)| {
++        solid.min == narrowed(shape.min)
++            && solid.max == narrowed(shape.max)
++            && solid.form == shape.form
++    };
++    hold(
++        solids.len() == ranked.len() && solids.iter().zip(&ranked).all(own),
++        || "the world's shapes are not the map's own, in the order of their ids".to_owned(),
++    )?;
++    let (depth, bytes) = (world.tree_depth(), world.tree_bytes());
++    let (nodes, rest) = bytes.as_chunks::<NODE_BYTES>();
++    let leaves = nodes.iter().filter(|node| node[24] == 1).count();
++    hold(
++        depth <= MAX_TREE_DEPTH && rest.is_empty() && leaves == solids.len(),
++        || {
++            format!(
++                "a tree {depth} deep of {leaves} leaves over {} shapes",
++                solids.len()
++            )
++        },
++    )?;
++    let again = StaticWorld::build(map).map(|world| world.tree_bytes());
++    hold(again.as_ref() == Ok(&bytes), || {
++        "built a second time, the tree differs".to_owned()
++    })?;
++    // Above every shape: the loader holds a map's shapes inside its bounds.
++    let top = map.bounds.max[1] as f32 + 1.0;
++    let limit = top - map.bounds.min[1] as f32 + 1.0;
++    for (index, solid) in solids.iter().enumerate() {
++        let middle = |axis: usize| solid.min[axis] + (solid.max[axis] - solid.min[axis]) / 2.0;
++        let (x, z) = (middle(0), middle(2));
++        let holds = |other: &&Solid| {
++            other.min[0] <= x && x <= other.max[0] && other.min[2] <= z && z <= other.max[2]
++        };
++        let hit = world.cast_ray(V3::new(x, top, z), V3::new(0.0, -1.0, 0.0), limit);
++        let named =
++            |why: String| format!("the ray down onto the middle of shape {index}: {why} ({hit:?})");
++        let Some(RayHit { shape, t }) = hit else {
++            return Err(named("it meets nothing".to_owned()));
++        };
++        // The search of every shape: the highest top (the least distance), the first index that has it, and the
++        // first surface that must stop the ray.
++        let (mut highest, mut stop, mut ramps): (Option<(usize, f32)>, f32, bool) =
++            (None, limit, false);
++        for (place, other) in solids.iter().enumerate().filter(|(_, other)| holds(other)) {
++            let to_top = top - other.max[1];
++            if highest.is_none_or(|(_, least)| to_top < least) {
++                highest = Some((place, to_top));
++            }
++            let must_stop = match other.form {
++                Form::Box => to_top,
++                Form::Ramp { .. } => top - other.min[1],
++            };
++            if must_stop < stop {
++                stop = must_stop;
++            }
++            ramps |= other.form != Form::Box;
++        }
++        let Some((first, least)) = highest else {
++            return Err(named("no shape holds its own middle".to_owned()));
++        };
++        let met = solids.get(shape as usize).filter(holds);
++        let own_height = met.is_some_and(|met| top - met.max[1] <= t && t <= top - met.min[1]);
++        hold(own_height && least <= t && t <= stop, || {
++            named(format!(
++                "a search of every shape says between {least} and {stop}, on a shape that holds the point"
++            ))
++        })?;
++        hold(ramps || (shape as usize == first && t == least), || {
++            named(format!(
++                "a search of every shape says shape {first} at {least}"
++            ))
++        })?;
++    }
++    Ok(true)
++}
++
++/// What the fuzz run tallies of the maps it sends on to the world's builder.
++pub const WORLD_VERDICTS: [&str; 2] = ["a world built", "a tree too deep"];
++
++/// Every map of an input the loader takes, through [`judge_taken`]: how many gave each of [`WORLD_VERDICTS`]. An
++/// input the loader refuses, and one that holds no map, give none.
++///
++/// # Errors
++/// The first map that breaks a promise, by its id.
++pub fn fuzz_worlds(path: Option<&str>, bytes: &[u8]) -> Result<[u64; 2], String> {
++    let maps = match path {
++        Some(path) => match load_file(path, bytes) {
++            Ok(Document::Map(map)) => vec![map],
++            _ => Vec::new(),
++        },
++        None => load(bytes)
++            .map(|set| set.maps().to_vec())
++            .unwrap_or_default(),
++    };
++    let mut tally = [0; 2];
++    for map in &maps {
++        let built = judge_taken(map).map_err(|why| format!("its map {}: {why}", map.id))?;
++        tally[usize::from(!built)] += 1;
++    }
++    Ok(tally)
++}
++
++/// Maps the loader takes that lean on the tree's builder, or on a ray's rule for two shapes at one distance, where a
++/// seeded map does not. The first seven hold the most shapes a map may, and their shapes share a middle, a plane,
++/// or all six of their faces. In the row every box is as high as every other and lies over the middle of every
++/// other, and the lowest index is the box in the middle of the row: a ray onto any of them meets all 512 at one
++/// distance, and whichever end the tree's walk starts from, the box it visits first is not the one that must
++/// answer (the same box 512 times does not show that: there the walk happens to start with the lowest index).
++/// The last two are the chain: the one map here that the builder refuses, and the deepest tree a world may have.
++pub const HOSTILE: [&str; 9] = [
++    "512 times the same box",
++    "512 boxes inside one another",
++    "512 slabs a centimetre thin, as high and as long as a map may be",
++    "512 cubes of a centimetre in the map's far corner",
++    "two piles of the same cube a map apart, and one cube between them",
++    "a stair of 512 ramps, each starting where the last one ends",
++    "a row of 512 boxes of one height, each over the middle of every other",
++    "34 cubes, each so much farther out than the ones before it that the tree is a chain",
++    "the first 31 cubes of that chain",
++];
++
++/// The chain's cubes by their low corners, in millimetres: the same 34 as in `sim`'s own collision tests (found by
++/// rust-reviewer's search on the pinned library, 2026-11-27). Each is one centimetre wide.
++#[rustfmt::skip]
++const CHAIN: [[i32; 3]; 34] = [[-5, 327665, -5], [-5, 327666, -5], [-5, 327667, -5], [-5, 327663, -5], [-5, 327671, -5], [-14, 327665, -5], [4, 327665, -5], [-5, 327665, -14], [-5, 327665, 4], [-5, 327648, -5], [-5, 327746, -5], [-5, 327530, -5], [-162, 327665, -5], [-5, 327665, -162], [189, 327665, -5], [-5, 327665, 189], [-5, 328456, -5], [-5, 326420, -5], [-1272, 327665, -5], [-5, 327665, -1272], [1924, 327665, -5], [-5, 327665, 1924], [-5, 335079, -5], [-5, 316071, -5], [-11621, 327665, -5], [-5, 327665, -11621], [18096, 327665, -5], [-5, 327665, 18096], [-5, 396773, -5], [-5, 219673, -5], [-108019, 327665, -5], [-5, 327665, -108019], [168719, 327665, -5], [-5, 327665, 168719]];
++
++/// The hostile map number `at`, or nothing past the list's end. Its bounds are the widest a map may have (the
++/// aim's reach); its corners are whole millimetres; its ids are given so that no shape's rank is its place (in the
++/// row: so that the lowest rank is the box in the middle).
++#[must_use]
++pub fn hostile(at: usize) -> Option<MapDocument> {
++    // The aim's reach on x and z, and its height, in millimetres.
++    const REACH: i32 = 327_670;
++    const HEIGHT: i32 = 655_350;
++    let corners = |place: i32| -> ([i32; 3], [i32; 3]) {
++        match at {
++            0 => ([-1_000, 0, -1_000], [1_000, 2_000, 1_000]),
++            1 => {
++                let half = 10 * (place + 1);
++                ([-half, 0, -half], [half, half, half])
++            }
++            2 => {
++                let from = 10 * place - 2_560;
++                ([from, 0, -REACH], [from + 10, HEIGHT, REACH])
++            }
++            3 => {
++                let high = [
++                    REACH - 10 * (place % 8),
++                    HEIGHT - 10 * (place / 8 % 8),
++                    REACH - 10 * (place / 64),
++                ];
++                (high.map(|corner| corner - 10), high)
++            }
++            4 if place < 255 => ([-REACH, 0, -REACH], [10 - REACH, 10, 10 - REACH]),
++            4 if place < 511 => (
++                [REACH - 10, HEIGHT - 10, REACH - 10],
++                [REACH, HEIGHT, REACH],
++            ),
++            4 => ([-5, 0, -5], [5, 10, 5]),
++            5 => {
++                let from = 100 * place - 25_600;
++                (
++                    [from, 20 * place, -1_000],
++                    [from + 100, 20 * place + 20, 1_000],
++                )
++            }
++            6 => {
++                let middle = 10 * place - 2_555;
++                ([middle - 6_000, 0, -1_000], [middle + 6_000, 2_000, 1_000])
++            }
++            _ => {
++                let low = CHAIN[place as usize % CHAIN.len()];
++                (low, low.map(|corner| corner + 10))
++            }
++        }
++    };
++    let count = match at {
++        7 => 34,
++        8 => 31,
++        _ => 512,
++    };
++    let rank = |place: i32| match at {
++        6 => (place + 256) % 512,
++        _ => (place * 7_919) % 1_000,
++    };
++    let metres = |millimetres: i32| f64::from(millimetres) / 1000.0;
++    let shape = |place: i32| {
++        let (min, max) = corners(place);
++        Shape {
++            id: format!("h{:03}", rank(place)),
++            min: min.map(metres),
++            max: max.map(metres),
++            form: if at == 5 {
++                Form::Ramp {
++                    rises_toward: Toward::PlusX,
++                }
++            } else {
++                Form::Box
++            },
++        }
++    };
++    (at < HOSTILE.len()).then(|| MapDocument {
++        id: "hostile".to_owned(),
++        bounds: Bounds {
++            min: [-REACH, 0, -REACH].map(metres),
++            max: [REACH, HEIGHT, REACH].map(metres),
++        },
++        spawns: vec![Spawn {
++            id: "s".to_owned(),
++            at: [0.0; 3],
++            facing_deg: 0.0,
++        }],
++        shapes: (0..count).map(shape).collect(),
++        regions: Vec::new(),
++    })
++}
++
++/// A hostile map's line: written as a file, read by the loader, built and judged.
++fn hostile_line(at: usize, document: &MapDocument) -> String {
++    let (path, text) = map_file(document);
++    let read = match load_file(&path, &text) {
++        Ok(Document::Map(read)) if read == *document => read,
++        Ok(_) => return format!("hostile {at} read as another document"),
++        Err(error) => return format!("hostile {at} not taken: {}", error.record()),
++    };
++    let shapes = read.shapes.len();
++    match (judge_taken(&read), StaticWorld::build(&read)) {
++        (Err(why), _) => format!("hostile {at} shapes {shapes} broken: {why}"),
++        (Ok(_), Err(why)) => format!("hostile {at} shapes {shapes} refused: {}", why.message()),
++        (Ok(_), Ok(world)) => format!(
++            "hostile {at} shapes {shapes} depth {} tree {:016x}",
++            world.tree_depth(),
++            fnv1a_64(&world.tree_bytes())
++        ),
++    }
++}
++
++/// The proof's text as this build makes it: a first line that says what follows, then one line per seeded map and
++/// one per hostile map.
+ #[must_use]
+ pub fn made() -> String {
+-    let mut text = format!("shamble-static-world 1 {} {RAYS}\n", SHAPES.len());
++    let mut text = format!(
++        "shamble-static-world 1 {} {RAYS} {}\n",
++        SHAPES.len(),
++        HOSTILE.len()
++    );
+     for (number, count) in SHAPES.into_iter().enumerate() {
+         let mut rng = Rng::new(SEED, number as u64);
+-        let world = match StaticWorld::build(&map(&mut rng, count)) {
++        let document = map(&mut rng, count);
++        if let Err(why) = judge_taken(&document) {
++            let _ = writeln!(text, "map {number} shapes {count} broken: {why}");
++            continue;
++        }
++        let world = match StaticWorld::build(&document) {
+             Ok(world) => world,
+             Err(why) => {
+                 let _ = writeln!(
+@@ -178,6 +474,11 @@ pub fn made() -> String {
+             fnv1a_64(&answers)
+         );
+     }
++    for at in 0..HOSTILE.len() {
++        if let Some(document) = hostile(at) {
++            let _ = writeln!(text, "{}", hostile_line(at, &document));
++        }
++    }
+     text
+ }
+ 
+diff --git a/crates/devtools/tests/content_fuzz.rs b/crates/devtools/tests/content_fuzz.rs
+index d70b8ec..5f9700e 100644
+--- a/crates/devtools/tests/content_fuzz.rs
++++ b/crates/devtools/tests/content_fuzz.rs
+@@ -5,7 +5,10 @@
+ //! that checks the files under `content/` will call it). Nine inputs in ten are a valid bundle or file changed the
+ //! way content gets broken (`devtools::content_proofs::fuzz_input`); one in ten is random. Every input must leave no
+ //! panic and keep the loader's promises (`fuzz_judge`); each stage of the loader must settle its share of the
+-//! verdicts, or the run did not reach it; the slowest input is named. A failure prints the seed, the input's number
++//! verdicts, or the run did not reach it; the slowest input is named. Every map of an input the loader takes goes on
++//! into the static world's builder (`devtools::world_proofs::fuzz_worlds`): no panic there either, no refusal but a
++//! tree's depth, and a world that answers a ray onto each of its shapes as a search of every shape does (4b-2's
++//! step 10; the worlds built are counted, so a run that reached none fails). A failure prints the seed, the input's number
+ //! and its bytes, so it can be made again. The full count runs where debug assertions are off (`cargo test
+ //! --release`, which keeps overflow checks on); a debug run takes fewer, and each test's name says which it ran.
+ //! `SHAMBLE_FUZZ_SEED` runs another seed by hand.
+@@ -24,6 +27,7 @@ use std::time::{Duration, Instant};
+ 
+ use content::{load, load_file};
+ use devtools::content_proofs::{LIMIT_CASES, STAGES, fuzz_input, fuzz_judge, limit_case};
++use devtools::world_proofs::{WORLD_VERDICTS, fuzz_worlds};
+ 
+ thread_local! {
+     /// The bytes this thread holds now, and the most it has held since `peak` last started. A constant start
+@@ -165,25 +169,45 @@ fn the_search_for_a_key_that_is_there_twice_does_not_walk_every_pair() {
+ /// run with no map in it passed.
+ const SHARES: [u64; STAGES.len()] = [900, 0, 1_000, 5, 700, 1_600, 150, 300, 80, 10];
+ 
+-type Tally = ([u64; STAGES.len()], (Duration, u64, usize));
++/// The worlds built in 10,000 inputs, at the least: about half of what the run gave when the worlds joined it (its
++/// printed line). No share for a tree too deep: mutation does not reach one (the chain of cubes among the hostile
++/// maps of `tests/static_world.rs` does).
++const WORLDS_BUILT: u64 = 250;
+ 
+-/// One worker's inputs, judged: how many verdicts each stage settled, and the slowest input (its time, its number,
+-/// its length). The first input that leaves a panic or breaks a promise ends the run, named.
++type Tally = (
++    [u64; STAGES.len()],
++    [u64; WORLD_VERDICTS.len()],
++    (Duration, u64, usize),
++);
++
++/// One worker's inputs, judged: how many verdicts each stage settled, what the world's builder made of the maps
++/// that were taken, and the slowest input (its time, its number, its length). The first input that leaves a panic
++/// or breaks a promise ends the run, named.
+ fn judge_all(seed: u64, indices: impl Iterator<Item = u64>) -> Tally {
+-    let (mut stages, mut slowest) = ([0; STAGES.len()], (Duration::ZERO, 0, 0));
++    let (mut stages, mut worlds, mut slowest) = (
++        [0; STAGES.len()],
++        [0; WORLD_VERDICTS.len()],
++        (Duration::ZERO, 0, 0),
++    );
+     for index in indices {
+         let (path, bytes) = fuzz_input(seed, index);
+         let started = Instant::now();
+-        let judged = catch_unwind(|| fuzz_judge(path.as_deref(), &bytes));
++        let judged = catch_unwind(|| {
++            let stage = fuzz_judge(path.as_deref(), &bytes)?;
++            fuzz_worlds(path.as_deref(), &bytes).map(|built| (stage, built))
++        });
+         let took = started.elapsed();
+         let why = match judged {
+-            Ok(Ok(stage)) => {
++            Ok(Ok((stage, built))) => {
+                 stages[stage] += 1;
++                for (sum, more) in worlds.iter_mut().zip(built) {
++                    *sum += more;
++                }
+                 slowest = slowest.max((took, index, bytes.len()));
+                 continue;
+             }
+             Ok(Err(why)) => why,
+-            Err(_) => "the loader panicked".to_owned(),
++            Err(_) => "the loader or the world's builder panicked".to_owned(),
+         };
+         let hex: String = bytes.iter().map(|byte| format!("{byte:02x}")).collect();
+         panic!(
+@@ -191,7 +215,7 @@ fn judge_all(seed: u64, indices: impl Iterator<Item = u64>) -> Tally {
+             bytes.len()
+         );
+     }
+-    (stages, slowest)
++    (stages, worlds, slowest)
+ }
+ 
+ fn run(inputs: u64) {
+@@ -209,7 +233,7 @@ fn run(inputs: u64) {
+     });
+     let (took, index, bytes) = tallies
+         .iter()
+-        .map(|tally| tally.1)
++        .map(|tally| tally.2)
+         .max()
+         .unwrap_or_default();
+     // By the wall clock with the workers side by side: a reading that names an input to look at, not a measure.
+@@ -225,6 +249,20 @@ fn run(inputs: u64) {
+             "{name} settled {had} in 10,000 verdicts, under its {share}"
+         );
+     }
++    let worlds = |verdict: usize| tallies.iter().map(|tally| tally.1[verdict]).sum::<u64>();
++    let built = worlds(0) * 10_000 / inputs;
++    println!(
++        "  maps sent on to the world's builder: {} gave {}, {} gave {} ({built} built in 10,000 inputs; at least \
++         {WORLDS_BUILT})",
++        worlds(0),
++        WORLD_VERDICTS[0],
++        worlds(1),
++        WORLD_VERDICTS[1]
++    );
++    assert!(
++        built >= WORLDS_BUILT,
++        "{built} worlds built in 10,000 inputs, under {WORLDS_BUILT}"
++    );
+ }
+ 
+ #[cfg(not(debug_assertions))]
+diff --git a/crates/devtools/tests/static_world.rs b/crates/devtools/tests/static_world.rs
+index e23c61e..bc8b535 100644
+--- a/crates/devtools/tests/static_world.rs
++++ b/crates/devtools/tests/static_world.rs
+@@ -1,12 +1,13 @@
+ //! The static world's proof, natively (PM-0004-32): the trees this build makes and the rays it casts are the
+-//! committed lines. The same check runs in WebAssembly through the test-only module
+-//! (`packages/sim-worker/boundary/static-world.test.mjs` under Node, `packages/e2e/tests/rules/static-world.spec.ts`
+-//! in the browsers), so a target whose tree or whose one ray differs is named by its map.
++//! committed lines, the hostile maps' among them (each written as a file, read by the loader, built or refused). The
++//! same check runs in WebAssembly through the test-only module (`packages/sim-worker/boundary/static-world.test.mjs`
++//! under Node, `packages/e2e/tests/rules/static-world.spec.ts` in the browsers), so a target whose tree or whose one
++//! ray differs is named by its map.
+ 
+ use std::path::{Path, PathBuf};
+ 
+ use devtools::files::{read_plain, write_plain};
+-use devtools::world_proofs::{RAYS, SHAPES, check, made};
++use devtools::world_proofs::{HOSTILE, RAYS, SHAPES, check, hostile, judge_taken, made};
+ 
+ const FILE: &str = "static-world.txt";
+ 
+@@ -27,10 +28,14 @@ fn this_build_makes_the_committed_trees_and_rays() {
+     assert_eq!(check(&committed), "");
+     // The file is a proof of something: every map built, the full worlds among them, and rays that met shapes.
+     let lines: Vec<&str> = committed.lines().collect();
+-    assert_eq!(lines.len(), 1 + SHAPES.len());
++    assert_eq!(lines.len(), 1 + SHAPES.len() + HOSTILE.len());
+     assert_eq!(
+         lines[0],
+-        format!("shamble-static-world 1 {} {RAYS}", SHAPES.len())
++        format!(
++            "shamble-static-world 1 {} {RAYS} {}",
++            SHAPES.len(),
++            HOSTILE.len()
++        )
+     );
+     let mut met = Vec::new();
+     for (line, count) in lines[1..].iter().zip(SHAPES) {
+@@ -46,6 +51,55 @@ fn this_build_makes_the_committed_trees_and_rays() {
+     // No shape, no hit; a full world is met by more than a third of the rays.
+     assert_eq!(met[0], 0);
+     assert!(met[7] > RAYS / 3 && met[8] > RAYS / 3, "{met:?}");
++    // The hostile maps: the loader takes every one; the builder refuses the chain alone, and by its depth; the
++    // chain's first 31 cubes are the deepest tree a world may have.
++    let hostile_lines = &lines[1 + SHAPES.len()..];
++    let digest = |word: &str| word.len() == 16 && word.bytes().all(|byte| byte.is_ascii_hexdigit());
++    for (at, line) in hostile_lines.iter().enumerate() {
++        let shapes = [512, 512, 512, 512, 512, 512, 512, 34, 31][at];
++        let head = format!("hostile {at} shapes {shapes} ");
++        let rest = line.strip_prefix(&head).unwrap_or_else(|| panic!("{line}"));
++        if at == 7 {
++            assert_eq!(
++                rest,
++                "refused: the tree over the map's shapes is 34 deep, and at most 31 is taken: its shapes are spread \
++                 too unevenly"
++            );
++            continue;
++        }
++        let ["depth", depth, "tree", tree] = rest.split(' ').collect::<Vec<&str>>()[..] else {
++            panic!("{line}");
++        };
++        let depth: u32 = depth.parse().expect("a depth");
++        let fits = if at == 8 {
++            depth == 31
++        } else {
++            (10..=31).contains(&depth)
++        };
++        assert!(fits && digest(tree), "{line}");
++    }
++}
++
++#[test]
++fn every_hostile_map_is_one_the_judge_passes_and_the_list_ends_where_it_says() {
++    for (at, name) in HOSTILE.into_iter().enumerate() {
++        let map = hostile(at).unwrap_or_else(|| panic!("{name}: not made"));
++        // Built, but for the chain (the judge's `false`: a tree too deep, refused by name).
++        assert_eq!(judge_taken(&map), Ok(at != 7), "{name}");
++    }
++    assert!(hostile(HOSTILE.len()).is_none());
++    // The judge has teeth where a map is none the loader takes: a shape without thickness is the builder's own
++    // refusal, and no tree's depth.
++    let mut flat = hostile(0).expect("the first hostile map");
++    flat.shapes[3].max[1] = flat.shapes[3].min[1];
++    assert_eq!(
++        judge_taken(&flat),
++        Err(
++            "the world refuses it for more than its tree's depth: shape 3 of the map has no thickness on one of its \
++             axes"
++            .to_owned()
++        )
++    );
+ }
+ 
+ #[test]
+@@ -61,7 +115,7 @@ fn the_check_names_the_first_map_that_differs() {
+     let short = made.lines().take(5).collect::<Vec<&str>>().join("\n");
+     assert_eq!(
+         check(&short),
+-        "this build gives 13 lines and the file has 5"
++        "this build gives 22 lines and the file has 5"
+     );
+     assert_eq!(check(&made), "");
+ }
+diff --git a/crates/devtools/vectors/static-world.txt b/crates/devtools/vectors/static-world.txt
+index ee87275..58a31a4 100644
+--- a/crates/devtools/vectors/static-world.txt
++++ b/crates/devtools/vectors/static-world.txt
+@@ -1,4 +1,4 @@
+-shamble-static-world 1 12 2000
++shamble-static-world 1 12 2000 9
+ map 0 shapes 0 depth 0 tree cbf29ce484222325 rays 0 946675ff6c9829e5
+ map 1 shapes 1 depth 1 tree 301944f7ffaa10ad rays 403 3d91c50f4ce587f7
+ map 2 shapes 2 depth 2 tree 4db92b1422fa01dd rays 382 1cb12360b1c44fb2
+@@ -11,3 +11,12 @@ map 8 shapes 512 depth 14 tree 3c5e632805dce0a8 rays 1069 e58f34a53e78f13c
+ map 9 shapes 300 depth 11 tree 38373c3230c7ec80 rays 907 549b040f923c4fb1
+ map 10 shapes 100 depth 10 tree 0d1a1ea8a5f5edb1 rays 654 244b12376c440420
+ map 11 shapes 31 depth 7 tree 9cbd34f486b89951 rays 471 518ab427458f796b
++hostile 0 shapes 512 depth 10 tree 5c81cea21747e44d
++hostile 1 shapes 512 depth 13 tree 58c83febdf33d1cc
++hostile 2 shapes 512 depth 10 tree b214a133fb7e0f8f
++hostile 3 shapes 512 depth 10 tree 8476846f885ae687
++hostile 4 shapes 512 depth 11 tree d38d0a3b5a6c11e1
++hostile 5 shapes 512 depth 10 tree 5ca12d59dc26be08
++hostile 6 shapes 512 depth 10 tree 664b5575d54bff95
++hostile 7 shapes 34 refused: the tree over the map's shapes is 34 deep, and at most 31 is taken: its shapes are spread too unevenly
++hostile 8 shapes 31 depth 31 tree 4b64fdd8ae70558a
+diff --git a/packages/e2e/tests/rules/static-world.spec.ts b/packages/e2e/tests/rules/static-world.spec.ts
+index 2c7a5b1..73b9df7 100644
+--- a/packages/e2e/tests/rules/static-world.spec.ts
++++ b/packages/e2e/tests/rules/static-world.spec.ts
+@@ -1,7 +1,7 @@
+ // The static world's proof in the browser's own engine (PM-0004-32): the trees the test-only module builds and the
+-// rays it casts, in its release profile, against the native build's committed lines (its dev profile runs the same
+-// check under Node: packages/sim-worker/boundary/static-world.test.mjs). No server hands the module out: this spec
+-// answers a made-up address from the module's folder.
++// rays it casts, the hostile maps among them, in its release profile, against the native build's committed lines
++// (its dev profile runs the same check under Node: packages/sim-worker/boundary/static-world.test.mjs). No server
++// hands the module out: this spec answers a made-up address from the module's folder.
+ import path from "node:path";
+ import { fileURLToPath } from "node:url";
+ import { expect, test } from "@playwright/test";
+@@ -27,7 +27,7 @@ test("the static world's trees and rays in the browser's WebAssembly are the nat
+     return route.fulfill({ status: 404, body: "" });
+   });
+   await page.goto(`${ORIGIN}/`);
+-  const outcome = await page.evaluate(async (): Promise<{ same: string; changed: string; maps: number; tookMs: number }> => {
++  const outcome = await page.evaluate(async (): Promise<{ same: string; changed: string; maps: number; hostile: number; tookMs: number }> => {
+     const lines = await (await fetch("/static-world.txt")).text();
+     // Not a name the type checker can follow: the module exists only once the build has made it.
+     const address = "/devtools.js";
+@@ -38,10 +38,11 @@ test("the static world's trees and rays in the browser's WebAssembly are the nat
+     // The compare bites: the full world's ray digest with its last digit changed.
+     const line = lines.split("\n")[8] ?? "";
+     const changed: string = glue.static_world(lines.replace(line, `${line.slice(0, -1)}${line.endsWith("0") ? "1" : "0"}`));
+-    return { same, changed, maps: lines.split("\n").length - 2, tookMs: Math.round(performance.now() - started) };
++    const starting = (word: string): number => lines.split("\n").filter((each) => each.startsWith(word)).length;
++    return { same, changed, maps: starting("map "), hostile: starting("hostile "), tookMs: Math.round(performance.now() - started) };
+   });
+   console.log(`the static world's proof: ${JSON.stringify({ ...outcome, changed: outcome.changed.slice(0, 60) })}`);
+-  expect(outcome).toMatchObject({ same: "", maps: 12 });
++  expect(outcome).toMatchObject({ same: "", maps: 12, hostile: 9 });
+   expect(outcome.changed).toMatch(/^this build gives\n {2}map 7 shapes 512 depth \d+ tree [0-9a-f]{16} rays \d+ [0-9a-f]{16}\nand the file has\n {2}map 7 /);
+   expect(outcome.tookMs).toBeLessThan(60_000);
+ });
+diff --git a/packages/sim-worker/boundary/static-world.test.mjs b/packages/sim-worker/boundary/static-world.test.mjs
+index c4d72e3..7e64363 100644
+--- a/packages/sim-worker/boundary/static-world.test.mjs
++++ b/packages/sim-worker/boundary/static-world.test.mjs
+@@ -1,7 +1,9 @@
+ // The static world's proof in WebAssembly, under Node (PM-0004-32): the check of
+ // crates/devtools/tests/static_world.rs, run by the test-only module in its release and its dev profile. The
+ // committed lines are the native build's: a module whose tree for one map, or whose answer to one ray, differs by a
+-// bit gives another line, and the check names the map. A missing module fails this file at its imports.
++// bit gives another line, and the check names the map. The hostile maps' lines are held the same way: each is
++// written as a file, read by the loader and built or refused inside the module. A missing module fails this file at
++// its imports.
+ import { readFileSync } from "node:fs";
+ import { describe, expect, test } from "vitest";
+ import * as dev from "../../../.gate/rules-module/dev/devtools.js";
+@@ -15,10 +17,11 @@ describe.each([["release", release], ["dev", dev]])("the static world's proof, %
+   glue.initSync({ module: readFileSync(new URL(`../../../.gate/rules-module/${profile}/devtools_bg.wasm`, import.meta.url)) });
+ 
+   test("every map's tree and every ray's answer are the native build's", { timeout: 120_000 }, () => {
+-    expect(lines.split("\n")).toHaveLength(14);
++    expect(lines.split("\n")).toHaveLength(23);
++    expect(lines.split("\n").filter((line) => line.startsWith("hostile "))).toHaveLength(9);
+     const started = performance.now();
+     expect(glue.static_world(lines)).toBe("");
+-    console.log(`the static world's proof, ${profile} profile: 12 maps and 24,000 rays in ${Math.round(performance.now() - started)} ms`);
++    console.log(`the static world's proof, ${profile} profile: 12 maps, 24,000 rays and 9 hostile maps in ${Math.round(performance.now() - started)} ms`);
+     // The compare bites: one digit of one ray digest changed is found, with its map.
+     const line = lines.split("\n")[8];
+     const changed = lines.replace(line, `${line.slice(0, -1)}${line.endsWith("0") ? "1" : "0"}`);

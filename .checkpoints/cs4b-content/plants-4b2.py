@@ -37,6 +37,8 @@ FILES = ("cargo", "test", "-p", "devtools", "--locked", "--test", "content_files
 READERS = ("cargo", "test", "-p", "devtools", "--locked", "--test", "recordings", "the_committed_recordings")
 COLLISION = ("cargo", "test", "-p", "sim", "--locked", "--lib", "collision")
 PROOF = ("cargo", "test", "-p", "devtools", "--locked", "--test", "static_world")
+FUZZ = ("cargo", "test", "-p", "devtools", "--locked", "--test", "content_fuzz", "fifty_thousand")
+PROOFS_RS = "crates/devtools/src/world_proofs.rs"
 SCAN = ("cargo", "test", "-p", "sim", "--locked", "--test", "rules_scan", "the_simulation_crate")
 def native(crate): return ("cargo", "test", "-p", crate, "--locked", "--test", "native_target", "--target-dir", ".gate/target-plant")
 
@@ -121,6 +123,15 @@ PLANTS = [
      ["a_ramp_is_met_on_its_slope_its_faces_and_its_floor_toward_each_of_the_four_sides"]),
     ("W9", "defect", "one ray's distance moved by one unit in its last place: the committed lines differ", [(WORLD_RS, "    Some((enter, leave))\n}", "    Some((if enter > 17.0 && enter < 17.01 { f32::from_bits(enter.to_bits() + 1) } else { enter }, leave))\n}")], PROOF,
      ["this build gives", "and the file has"]),
+    # Step 10, the judge of a taken map's world, the hostile maps and the fuzz run's worlds.
+    ("W10", "defect", "of 512 boxes met at one distance the first visited answers a ray, not the lowest index (the hostile row names it; the same box 512 times does not)", [(WORLD_RS, "t < hit.t || (t == hit.t && shape < hit.shape)", "t < hit.t")], PROOF,
+     ["every_hostile_map_is_one_the_judge_passes", "a search of every shape says shape 0"]),
+    ("W11", "defect", "a node entered exactly as far as the best hit is pruned, so a lower index behind it is lost", [(WORLD_RS, "            if enter_box(min, max, origin, direction, reach).is_none() {", "            if enter_box(min, max, origin, direction, reach).is_none_or(|(enter, _)| best.is_some_and(|hit| enter >= hit.t)) {")], PROOF,
+     ["a search of every shape says shape"]),
+    ("W12", "defect", "the builder leaves out one of the map's shapes", [(WORLD_RS, "        for place in order {", "        for place in order.into_iter().skip(1) {")], PROOF,
+     ["the world's shapes are not the map's own"]),
+    ("W13", "defect", "the fuzz run sends no map on to the world's builder", [(PROOFS_RS, "            Ok(Document::Map(map)) => vec![map],", "            Ok(Document::Map(_)) => Vec::new(),"), (PROOFS_RS, "            .map(|set| set.maps().to_vec())", "            .map(|_| Vec::new())")], FUZZ,
+     ["worlds built in 10,000 inputs, under 250"]),
     # Step 8, the tools.
     ("T1", "defect", "the content walk takes a link, a pipe or a folder for a file", [(WALK, "            if !kind.is_file() {", "            if kind.is_dir() && kind.is_file() {")], FILES,
      ["whatever_is_not_a_kinds_folder_with_plain_id_files_is_refused_before_it_is_read"]),
