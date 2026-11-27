@@ -51,6 +51,7 @@ v2 additions:
 Output:
 Findings with severity (Critical / High / Medium / Low, as CLAUDE.md's severity scale defines them; any way around the
 guard, the merge check or branch protection is Critical): what, one-line exploit sketch, evidence (file:line), fix.
-A security finding left open keeps the PR needs-mustafa at any severity (advisor.md, PR review step 4).
+A security finding of Medium or above left open keeps the PR needs-mustafa; a Low left open is named in his Advisor's
+merge check (advisor.md, PR review step 4).
 Anti-cheat coverage table: player action → where the server validates it → gap (if any).
 Record durable decisions (threat model, accepted risks) in your memory.
