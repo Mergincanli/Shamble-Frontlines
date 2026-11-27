@@ -211,6 +211,11 @@ of them spike files in the judge's code and marks/ (+379/-6). Risk tier 1 (spike
 - Step 6: `node tools/gate.mjs --no-smoke` GATE PASS, base b8f02b0 (origin/main); output kept whole as
   /home/user/Shamble-Frontlines/.gate/nb2b-merge/gate.txt (NB2B-6). Step 7: nothing edited by hand (`git status
   --short` lists only this file).
+- Step 8, 17:49-18:00 UTC: the save pushed b81061cf3884cd249ee4d8765814f7643cedd8ae (no skip marker) on the merge; the
+  saver bsiqyfwt6 restarted. CI on b81061cf, all four success (NB2B-4): gate 46044847948 (push) and 46044855530 (pull
+  request), toolchain 46044848099 (push) and 46044855642 (pull request); PR #40 mergeable_state "blocked" (draft and
+  branch protection), not "dirty": no conflict. Builder 2 told the merged SHA through his For Mustafa list (18:0x).
+  Step 9: B a3de649cd25e474df resumed 18:0x for both pushed heads (advisor-um4-nb2b-head.md).
 
 ## Questions for the checker
 - Q1: each of NB2-C1 to -C12 (advisor-nb2-merge.md): carried here, or moot (and why)?

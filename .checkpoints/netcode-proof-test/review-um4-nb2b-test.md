@@ -20,3 +20,20 @@ Brief: launch-1750-msgs.md section T. Read only. Branch claude/netcode-proof-tes
 3. Verdicts, severity counts, first action. Last line "Status: COMPLETE <UTC time>".
 
 No cargo, no check.mjs.
+
+## Notes (one line per finding as it lands)
+- 18:00Z draft of block 1 saved; extra checks (last-line mutant, skip grep, nb2b check.log) still running.
+- Mutation harness: scratchpad mutate-ops.mjs (copies check.mjs, check.test.mjs and crates/hash-wasm/loader.mjs to a
+  scratch folder, one exact once-only replacement per mutant, runs `node --test --test-name-pattern="the ops step"`).
+  No repository file touched. Results: M0 control 5/5; M1 (drop check.mjs:2696, node exit guard) SURVIVES 5/5; M2 (drop
+  :2698, zero count) killed by :2033; M3 (drop :2700, wrappers exit guard) SURVIVES 5/5; M4 (`w.out` for `w.stdout ||
+  w.out`, :2702) SURVIVES; M5 (drop N > 0, :2704) killed by :2043; M6 (drop :2694, present) killed by :2052; M7
+  (STEPS.ops passes `() => true`, :2740) SURVIVES; M8 (OPS_BROWSER_MODULES = ops/browser, :2684) SURVIVES; M9 (last-line
+  regex accepts any failed count, :2703) killed by :2043. W1 (outside the diff: drop webStep's node exit guard) SURVIVES.
+- Node glob (scratch globexp.sh, dummy files, Node 22.23.4): `node --test "ops/**/*.test.mjs"` ran ops/top and ops/a/deep
+  only; it did not enter ops/node_modules, ops/a/node_modules/pkg or ops/.hidden.
+- Counted run tied to the commit: `git diff 65b2f296 8fb32bc8 -- .` from spikes/netcode-proof hashes to 09c26ef2…b858,
+  the value absent.log, ops-pass.log and counted.log print; untracked e3b0c442… = sha256 of empty input.
+- `node --test spikes/netcode-proof/check.test.mjs` at b81061cf: 85 tests, 85 pass, 0 fail, 0 skipped.
+
+## Block 1: UM-4 (in progress)
