@@ -1364,6 +1364,43 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   (ADR 0005 CD-8). Its forward note for 4c: the room gets the static world, and the step that decides movement and
   prediction uses the same world, built from the same bytes.
 - **Round 1, infra-engineer launched** (before 20:31:44 UTC) in netcode-architect's slot, told the findings so far.
+- **Round 1, engine-architect: one Medium, the rest Low or carried to 4c** (`cs4b-content/engine-architect-review-4b2.md`,
+  DONE). **Ruling (3), the departure from its design 4.5: CONFIRMED by name** (the reading moves with its one reader;
+  what stays keeps 4.5's place and order; the camera half could never land here: `bundle.rs`'s `FOLDERS` holds maps
+  and movement only). Boundaries fine (content depends on nothing; sim on content and parry3d; sim-wasm the
+  composition root; parry3d named only in `collision.rs`, behind sim's `V3`); the boundary's shape fine (its run of
+  the boundary sim-wasm test: 14 of 14); the dev route against block 1.9 fine (one producer, the Rust tool, better
+  than its planned JavaScript); the schema writer against 1.10 and CD-3 fine with the departures recorded; the unread
+  generated types acceptable (type-only, held by the drift test). Its runs: content 44, devtools dependency_rules and
+  static_world 7, sim-wasm 20; "test-soldier" and "Walking speed" 0 hits in the players' file. **EA-1 (Medium)**
+  `packages/client/src/app/boot.ts:88-92`, `:99-104` (`content.ts:88-93`): when the loader refuses, `link.receive`
+  returns the problem and the listener returns before `content.afterMessage` runs, and the Worker's error listener
+  never calls it: the page's copy (up to 8 MiB) is held for the page's life, against `content.ts`'s "let go as soon
+  as the match ends"; `content.test.ts` proves the class, not the wiring: fix both call sites, and test the wiring.
+  **EA-2 (Low)** `map.rs:108-149` against `schema.rs:15-19`: the TypeScript types and the schema come from two sources
+  (the structs with their renames; the reader's tables) with no tie, against CD-3's "from the same Rust types": fix,
+  a tie test, and the report says how CD-3 is read. **EA-3 (Low)** the report's draft lacks two sentences (the
+  generated types unread but for the drift test, cut C's Q2 c5; only block 1.9's serving part built, no watch or
+  reload, Q3 c7): fix. **EA-4 (Low)** `content.ts:22-23`: `FORMAT` and `VERSION` copied from `bundle.rs:26-27`, tied
+  only end to end by the Chromium spec: fix, a unit tie. **EA-5 (Low)** = NA-2 (`NO_CONTENT`'s comment). **EA-6
+  (Low)** `bundle.rs:253-263`, `map.rs:397-400`: the test fixtures are public in the shipped crate, and the fixture
+  map's id is the live map's: fix, `#[doc(hidden)]`; 4c's tests that rely on a map's shapes name their map.
+  **EA-7 (Low, to 4c)** `LocalMatch` owns the authority's world; in 4c it moves to `Room`, the endpoint gets its own
+  copy (design 1.8), and no rule yet keeps content out of room's and client-endpoint's manifests: 4c's plan. **EA-8
+  (Low, to 4c)** the schema's limit function lives in the test alone: 4c's panel moves it into product code.
+- **Round 1, infra-engineer: PASS, nothing to fix in 4b-2** (`cs4b-content/infra-engineer-review-4b2.md`, DONE; CI's
+  logs read by `gh api` GET: runs 46033756121, 46035714024 and 46061540930, on c442a80). The toolchain times 9 min 3 s
+  to 13 min 2 s, at most 52 % of the 25-minute limit: fine. Ruling (4) under the network cut fine (`cargo fetch
+  --locked` before the cut; the content tool's target built by build.mjs first, each GET about 0.5 s; the isolation
+  spec checks the answer). Preview links and hosted builds: nothing makes them differ from CI's page (relative
+  addresses; `content.json` 8,375 bytes inside the 25 MiB check; the page sets no CSP of its own, as before). Ruling
+  (9) fine (no cost change: the preview artifact about 1.1 MB a run, kept 7 days). Two Lows, both follow-ups for
+  later work: **IE-1** the Chromium tests now take 3.6 to 3.9 minutes of the 5-minute timeout (`toolchain.yml:205`;
+  4b-2 added about 22 s; `loop.spec` and `presses.spec` set most of it): track the total per head and decide on the
+  limit or a split before 4c adds a long browser spec (a CI file: the CI Builder's). **IE-2** `content.json` keeps a
+  fixed name with no hash beside hashed Wasm and scripts: when hosting is built, serve `index.html` and
+  `content.json` as no-cache, or give the bundle a hashed name (a hosting change-set's). Not checked by it: the
+  preview hand-off steps (skipped on push runs), lane 2's `preview.yml`, any host's caching.
 
 ## Slips of this chat's own rules, for the report
 - One git command did not start its own shell call: `git add .checkpoints/cs4b-content/review-brief-4b1.md` stood
