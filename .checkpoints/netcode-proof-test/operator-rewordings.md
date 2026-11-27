@@ -98,3 +98,13 @@ Proof (B's list), each its own call; node only, no cargo, no main-run.sh, no lan
   saver restarted; CI on the pushed head; B reads that head (no round).
 - For the day message (B's For Mustafa, his to reverse): the push's redaction rule as reworded; he sees it at Stop B.
 - UM-4's plan (um4-plan.md, step 5's proviso) names this commit's file beside d8b57b8's three.
+Done (14:3x UTC, on his "go" of 14:3x; usage 0.87 at 14:21, go for F1 alone):
+- Q0: 21 of 21 pass, 0 fail; "redact-check: 464 item(s) checked, 0 finding(s)".
+- The saver b8f6z5zn5 stopped by TaskStop; `pgrep -c -f checkpoint.mjs` printed 0.
+- F1 by Edit. Q1: 21 of 21 pass, 0 fail; redact 464 items, 0 findings; `git diff --numstat -- spikes/netcode-proof/ops`
+  printed only "3 3 spikes/netcode-proof/ops/operator/PROMPT-R1.md"; `awk` printed 127 at 126 bytes (124 characters:
+  the ellipsis is three bytes), 128 at 134, 129 at 131, the text as F1; `git status --short` only PROMPT-R1.md; GATE PASS
+  (--no-smoke, base b9aad01); "repo map OK: 245 entries cover 110 required paths".
+- Q2: `git add` of PROMPT-R1.md alone (`git diff --cached --name-only` printed only it); commit c16777e by `git commit
+  -F /home/user/Shamble-Frontlines/.gate/f1-commit-msg.txt` (1 file changed, 3 insertions, 3 deletions); pushed by the
+  save after this line; CI on the pushed head next, then B's read (riding its next task).
