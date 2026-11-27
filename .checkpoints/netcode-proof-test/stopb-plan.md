@@ -74,6 +74,20 @@ run going; free disk; usage read.
   - the pieces Builder 2 could build alone (his 19:14 item 2, answer-1914.md);
   - U4k, U6d and U6e at about 3.3x, with options (a)-(c) and my lean on each (card, LEAN-MODE's Stop B line).
 
+## Read before the check (read only, 21:4x)
+- C2's tools here: rustup 1.29.3 (rs.yaml:179's archive version); rustc 1.99.1 from the spike's rust-toolchain.toml
+  (channel 1.99.1, targets wasm32-unknown-unknown); node v22.23.4 and npm 10.9.9 (rs.yaml:184's tarball is v22.23.4);
+  wasm-bindgen 0.2.130 at /home/user/Shamble-Frontlines/.gate/u7-0b/cli-root/bin/wasm-bindgen (build.mjs:24's pin; it
+  takes NPT_WASM_BINDGEN, else PATH's). All match.
+- The dist recipe is web/build.mjs (rs.yaml:198-200 runs `npm ci --ignore-scripts`, then `CARGO_NET_OFFLINE=true node
+  build.mjs`): its own target folder under .gate/, CARGO_HOME, the workspace and the target remapped so RS and here
+  make the same bytes, exactly seven files, each SHA-256 printed; `--out <dir>` writes the dist under
+  .gate/netcode-proof-test/ (a dist under web/ fails the redact step, N-U7D-1). C3 uses `--out`, one folder per build.
+- A1's script is written, not run: /home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/stopb-linkcheck.mjs.
+- B1's points: PROMPT-R1.md:129 ("Then push to `claude/npt-results` after ..."; the inserted ", in the same PowerShell,"
+  carries no backticked git command, so operator.test.mjs 3.6's scan is unchanged); R1.md:88 unchanged, the clause a
+  new sentence on its own line after it.
+
 ## Size
 - The notes: +2 lines in U8's files, so U8 reaches 6,284 (his stop).
 - Outside the stop, as fills: r1-dist.sha256's seven lines; Y, X and the URL in place.
