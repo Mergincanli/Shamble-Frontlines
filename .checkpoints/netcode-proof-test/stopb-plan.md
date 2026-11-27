@@ -1,103 +1,132 @@
-# Stop B's preparation: the owed items, the two notes, Y, the dist hashes, the fill X, the message (DRAFT, 2026-11-27 21:5x UTC)
-Status: DRAFT, for the advisor agent's check. Nothing below is run before that check, except read-only reads.
+# Stop B's preparation: the owed items, the two notes, Y0, Y, the dist hashes, the fill X, the message (rev 0.2, 2026-11-27 22:1x UTC)
+Status: rev 0.2, B6's REVISE applied (advisor-stopb-plan.md, COMPLETE 22:00 UTC; one High, STOPB-1). Lines changed
+since rev 0.1 carry their condition: [C1]-[C7] (B6's), [T] (the advisor tool's points, 22:0x). Started now, as B6
+allowed: A1, A2's seat, A3's reads, A4, B1's dry run, C2's prints, D4's first read, E2's drafting, the closing-list edit
+and TE-5. B2 onward (Y0, the builds, Y, X) waits for B6's re-check of the changed lines.
 
 ## Why now
-- His NO WAITING FOR WINDOWS (history.md:8163-8186) and his word of 21:35 UTC (history.md, its last entry): continue
+- His NO WAITING FOR WINDOWS (history.md:8163-8186) and his 21:34 and 21:35 words (history.md:8241-8257): continue
   after the planning, with no break. Stop B is Tue 1 Dec (R1.md:57; u8-brief.md:409-415); R1 is Thu 3 Dec.
-- R1.md:94-95 (section 2 step 8) and :308-318 (section 8): before his OK at Stop B, the main session fills Y and X, the
-  Subscriber Agreement's URL, the expected dist SHA-256s, and re-reads hetzner.com's two price pages.
-- U8-FILLS (a) (history.md:8137): the fills sit outside U8's stop; the two one-line security notes are built at that
-  fill and count, so the stop becomes 6,284 (U8 at 6,282 now).
+- R1.md section 2 step 8 and section 8: before his OK at Stop B, the main session fills Y and X, the Subscriber
+  Agreement's URL, the expected dist SHA-256s, and re-reads hetzner.com's two price pages.
+- U8-FILLS (a) (history.md:8137): the fills sit outside U8's stop; the two notes are built at the fill and count (6,284).
+- [C6] Risk tier 1 (spikes/ code and tests, notes, one PR body edit; no kit, CI, gate, secret or money). Risks:
+  STOPB-1's commit pair; a move on main before R1; disk for two dist builds; the proxy for fetch and npm; unequal
+  builds; A2 finding a fix past his stop; TE-5 not runnable here.
 
 ## Step 0 (each printed)
-Main still b8f02b0 (MAIN-52: a move with code, CI or rules comes first); branch = origin, clean; no agent, build or
-run going; free disk; usage read.
+Main still b8f02b0 (MAIN-52: a move with code, CI or rules comes first); branch = origin, clean; no build or run
+going; free disk; usage read.
 
-## A. The owed items, before Y (each settled, or recorded why it cannot move Y)
-- **A1, the static link check** (choice 32; advisor-u8-f1-head.md:57-79, its form word for word): one scratch node
-  script under .checkpoints/netcode-proof-test/ (text) calls config.mjs's pure `pageUrl(...)` for every link R1's
-  browser legs build, feeds each to U7's exported `parseLink(search, hash)` from .gate/netcode-proof-test/web-check,
-  asserts `ok` with the intended room, transport and token and no field dropped, and prints one line per link and a
-  count. A mismatch means a config.mjs fix, a U8 line under his stop: it goes to him before Stop B, with the lines.
-- **A2, Stop B's host read** (PR #40's closing list: the page host's missing handshake or read deadline and connection
-  cap, "owned by Stop B's host read before R1"; SEC-SB-9's rest, the host unit's sandbox, u8-stopb-security.md:134;
-  advisor-u8-stopb.md:324): a security-auditor read of U6c's merged page host and its unit. A finding gets a fix plan
-  (its file's owner and stop named) or stays on PR #40's list with his word.
-- **A3, the probe block's hours** (R1.md:319-322, "re-checked against U6c's container reading of one leg at U6c's
-  merge (no reading exists yet)"): no such reading is recorded (u6c-report.md; u6c-build.md:11 builds NC-SB-16's count,
-  with tests). So one probe leg runs here on loopback through main-run.sh, in the form B rules; its time is read
-  against the row's 0.20 h, and NC-SB-16's `probe_packets` against L1's reading (R1.md:342-343). If the reading moves
-  the row, R1.md's row and timeline change (Q6: a fill or a U8 line).
-- **A4, main's tip** re-read at Y; any move by MAIN-52 first.
-- **The re-fill rule:** any later change to a file the servers build or the laptop runs means a new Y, a new X and new
-  dist hashes.
+## A. The owed items, before Y0
+- **A1, the static link check: DONE 22:06** (web step passed, .gate/stopb/a1-web.log): 133 links, 0 mismatches, exit 0
+  (.gate/stopb/a1-links.log); the count equals the slots' sum (smoke 8 + cert 61 + fallback 61 + mds 3); a smoke
+  link carries `smoke=1`, which parseLink takes, returning exactly its seven keys; a planted wrong transport gives 4
+  MISMATCH lines and exit 1 (.gate/stopb/a1-plant.log). No config.mjs fix.
+- **A2, Stop B's host read** [C6]: one security-auditor seat (opus, xhigh), launched 22:0x with section 1's reading
+  list and B's two notes' exact text, into stopb-a2-security.md. Each item: fixed where (file, owner, stop) or carried
+  with his word. A fix past 6,284 or in crates/host goes to him as a decision before X; a fix in a file the servers
+  build comes before Y0.
+- **A3, two reads, no run** [C4]: (1) the existing reading (u6c-r2-netcode.md:90-93, :162) with its limits: P0 and P1
+  only, before H1; P2-P4's and B1's one-way delay plus half jitter, each read from its profile file, against the
+  ~9 s bound (:237-238); probe and load code since 17964a3d: only load.rs's MAX_LEAD (U7). (2) NC-SB-16's pin:
+  server/src/probe_tests.rs:59-78 beside probe.rs:82-92 and lab/src/probe.rs:124-131, quoted. R1.md:321's stale "no
+  reading exists yet" is named in his message, not edited.
+- **A4, main's tip** at Y0, Y and X; a move by MAIN-52 first. Re-fill triggers [Q5]: (1) any commit changing a path
+  under spikes/netcode-proof means a new Y0, Y and X (the dist rebuilt only if its inputs moved, else build 2 redone at
+  the new Y); (2) main's CLAUDE.md or .claude moved and taken in means a new X naming Y. A new X after his OK goes to
+  him with its two raw URLs. On Stop B's day: `git diff --name-only X origin/<branch> -- spikes/netcode-proof` and
+  `git diff --name-only X origin/main -- CLAUDE.md .claude` printed; the price pages re-read.
+- **A5, owed items B6 added** [C5]: ADV-U8H-3 DONE (adv-u8h-3-read.md: the clock thread is never on the tick vCPU; the
+  skip stands for R1; a netcode follow-up after R1, named in his message). TE-5 (u7-report.md:190-191) runs before X
+  in a disposable worktree under .gate/ [T]: t5i.mjs:108's ignoreHTTPSErrors flipped there only, never in the tracked
+  file; one B-ws load; handshake_failed and accepted recorded; time-boxed to 45 minutes, else its reason recorded and
+  R1's first WebSocket leg reads it. NC-3 SATISFIED (B6's read). ADV-U7S-6 SATISFIED, repeated at X (`git diff --stat
+  9c2fcf4 X -- r1.sh load.rs` against today's 17/6).
+- **A6, the commit-pair read** [T] (blocks Y0): grep PROMPT-R1.md, R1.md, r1.sh, npt-userdata and both cloud-init
+  files for any check of what X adds to Y (a `diff --name-only` against a list, a user-data comparison, a file count,
+  a parent or ancestry check), knowing saves put notes-only commits between Y and X. One that fails with the list at Y
+  or with those commits is a U8 line in Y0, to him first. None found: one line for B6.
 
-## B. The two notes (U8-FILLS (a))
-- **B1, dry run in a scratch copy first:** PROMPT-R1.md's push step gains SEC-U8F1-3's sentence, word for word as
-  u8-f1-build.md:378-379 carries it, as the step's seventh line; R1.md's start-check line (:86-88) gains SEC-U8F1-4's
-  clause (u8-f1-build.md:380-381) as a new line. Bar: numstat +1 in each file, nothing removed beyond a re-wrap the
-  numstat shows; U8's ops tests (operator.test.mjs 3.6 and r1plan.test.mjs's pins included) pass with no test line
-  added; wrappers "315 ok, 0 failed"; redact 0 findings. Anything more stops, and the question goes to him.
-- **B2:** applied by Edit, the counted run `--only self,ops,redact,refs` through main-run.sh, one commit naming both
-  notes; PR #40's closing list loses SEC-U8F1-3 and -4, naming that commit. That commit is Y.
+## B. The two notes and the stand-ins: Y0
+- **B1, the full dry run** [C2][T]: in a git worktree under .gate/ (not a copy, so refs and redact read real git state),
+  three shapes, each through `node check.mjs --only self,ops,redact,refs`:
+  Y0 (the notes and stand-ins, unfilled); Y (plus U7's real seven list lines, u7-report.md:134-141, commit zeros);
+  X (plus any 40-hex Y in both cloud-init files and the real URL). The redact item count and wrappers' 315 match the
+  real tree's. Every failure is named; each fix lands in Y0. Red first: the two pins fail by name on the filled
+  shapes before the stand-ins, and pass on all three shapes after.
+- **The texts:** SEC-U8F1-3 (u8-f1-build.md:378-379): PROMPT-R1.md:129's "Then push to `claude/npt-results` ..."
+  becomes "Then, in the same PowerShell, push to `claude/npt-results` after the pre-push hook passes (a prompt).",
+  re-wrapped as one more line. SEC-U8F1-4's second part (:380-381): a new line after R1.md:88, "   Its printed path
+  and `git --version` are recorded." (A2's seat may sharpen either wording at the same count.)
+- **The stand-ins** [C2]: r1sh.test.mjs:448 runs dist_check on the committed file's comment lines alone (an unfilled
+  stand-in); browser.test.mjs:206 builds `rs` from the committed rs.yaml with its commit line set back to zeros. Each
+  rewritten in place (`1 1`), no new assert line; they then test the same rules on Y0, Y and X alike.
+- **Bar:** numstat net +1 in PROMPT-R1.md and net +1 in R1.md (U8 at 6,284); the two stand-ins `1 1` each; nothing
+  else under spikes/; a re-wrap changes a line in place only as B6's section 2 allows. The ops tests, wrappers "315 ok,
+  0 failed" and redact 0 findings in the counted run. A net line more, or a change to redact-check.mjs (with the
+  pre-push hook's pinned hash), stops before the edit and goes to him.
+- **B2, Y0:** applied by Edit; the counted run `--only self,ops,redact,refs` through main-run.sh; the gate; one commit
+  naming both notes and both stand-ins; pushed by the save; CI green.
+- **The closing list** [C3]: DONE 22:10 UTC: PR #40's body read whole, only its list changed (SEC-U8F1-3, SEC-U8F1-4,
+  SEC-SB-9's rest, each with its source, and one line that they were missed since U8-F1's merge), written back and
+  re-read (7 entries; nothing else changed; still a draft). At B2: -3 and -4 off, "closed by Y0 <sha>";
+  SEC-SB-9's rest stays until A2 settles it. The report says the list missed them since U8-F1's merge.
 
 ## C. Y and the expected dist hashes
-- **C1:** Y = B2's commit, pushed, CI green on it.
-- **C2, the tools, printed beside rs.yaml's pins** (rs.yaml:174-197: rustup's 1.29.3 archive, the toolchain file's
-  version by `rustup toolchain install`, wasm-bindgen-cli 0.2.130, node v22.23.4; and the dist step's own tools): a
-  mismatch goes to B before any build.
-- **C3, two builds of U7's dist at Y**, by rs.yaml's recipe (its own commands, :174-221, never reconstructed): two
-  worktrees under .gate/ (`git worktree add`), two CARGO_HOMEs (Q3), `--locked`, the lane lock; disk measured after
-  the first. Each dist listed in rs.yaml:221's form (`find . -type f -print0 | LC_ALL=C sort -z | xargs -0 sha256sum`).
-  Bars: the two lists equal byte for byte, and the file count is U7's dist's seven; anything else goes to B before the
-  fill.
+- **C1, the order** [C1]: Y0 -> build 1 at Y0 (worktree A, CARGO_HOME A) -> Y = Y0 plus r1-dist.sha256's seven lines
+  only, under its 4-line comment -> build 2 at Y (worktree B, CARGO_HOME B) -> X = Y plus the two commit lines and the
+  URL. Bars [T]: `git diff --name-only Y0 Y -- spikes/netcode-proof` is the list's file alone, `--numstat` `7 0`;
+  build 2's list equals Y's committed non-comment lines byte for byte; `git diff --name-only Y X --
+  spikes/netcode-proof` is exactly rs.yaml, lg.yaml and R1.md, `--numstat` `1 1` each, hunks printed. A difference
+  goes to B6 before X with both lists. Y and X each pushed with CI green.
+- **C2, the tools** (read before the check, all matching rs.yaml's pins): rustup 1.29.3, rustc 1.99.1 (the spike's
+  rust-toolchain.toml), wasm-bindgen 0.2.130 (build.mjs refuses otherwise), node v22.23.4, npm 10.9.9. Re-printed in
+  each build's log.
+- **C3, the recipe** [C6]: only rs.yaml's dist lines, :193 (`rustup toolchain install`), :194 (`cargo install
+  wasm-bindgen-cli --version 0.2.130 --locked`, its CARGO_TARGET_DIR prefix and `--root` in that worktree's scratch
+  home), :195 (`cargo fetch --locked`), :198-200 (in web/, `npm ci` and `CARGO_NET_OFFLINE=true node build.mjs`, with
+  npm_config_ignore_scripts=true); not :196-197. Outside main-run.sh (its CARGO_NET_OFFLINE and CARGO_TARGET_DIR
+  exports would refuse :195); each build its own background command under the lane lock (.gate/shared-target/
+  .lane.lock, taken as main-run.sh takes it), nothing else building; the names (never values) of any set variable
+  among RUSTFLAGS, CARGO_ENCODED_RUSTFLAGS, RUSTC_WRAPPER, CARGO_BUILD_*, CARGO_PROFILE_*, CARGO_TARGET_DIR,
+  CARGO_NET_OFFLINE and RUSTUP_TOOLCHAIN printed first, all unset but rs.yaml's prefixes; free disk before and after
+  build 1; literal paths. Q3: `cargo fetch --locked` into CARGO_HOME B through the proxy; a copy only if refused.
+- **The npm deviation** [T]: rs.yaml:198's `npm ci --ignore-scripts` makes npm's built-in audit call, which this lane
+  never runs; here it runs as `npm ci --ignore-scripts --no-audit --no-fund` (the form of every earlier install on the
+  lane, dependency-check.md). The flags change no installed byte, so the dist is the same; named in the report.
+- **The lists:** rs.yaml:221's form (`find . -type f -print0 | LC_ALL=C sort -z | xargs -0 sha256sum` in web/dist),
+  seven files. Supporting line, not a bar: against U7's seven (u7-report.md:134-141). Worktrees removed after X.
 
 ## D. The fill: X
-- **D1:** the ops tests' pins on the fill's files read first (cloudinit.test.mjs on the cloud-init files, r1plan.test.mjs
-  on R1.md, whatever reads ops/runs/r1-dist.sha256).
-- **D2:** Y into both cloud-init files' `/etc/npt/commit` content; the Subscriber Agreement's URL into R1.md section 2
-  step 7, from the production ACME directory's `meta.termsOfService` (read as data); r1-dist.sha256's seven lines.
-  One commit: X. Bars: `git diff --name-only Y X` lists exactly the two cloud-init files, ops/runs/r1-dist.sha256 and
-  R1.md; `git show X:spikes/netcode-proof/ops/cloud-init/rs.yaml` (and lg.yaml) hold Y exactly; the ops tests,
-  wrappers, redact and `check.mjs --only self,ops,redact,refs` pass; the gate passes.
-- **D3:** pushed by the save; CI green on it.
-- **D4, Hetzner's two price pages:** read for the message, and read again at Stop B on Tue 1 Dec (R1.md says "at Stop
-  B"); any change goes to him.
+- **D1, the pins** [C2]: named and fixed in Y0 (r1sh.test.mjs:448-449; browser.test.mjs:205-208); no test pins R1.md's
+  URL placeholder (B6's grep).
+- **D2, X's content:** Y in rs.yaml:69 and lg.yaml:52, in place; R1.md:92-93's URL:
+  https://letsencrypt.org/documents/LE-SA-v1.8-July-06-2026.pdf (the production directory's meta.termsOfService,
+  read 2026-11-27T22:07:10Z; the directory's address from the pinned instant-acme 0.8.5, types.rs:772,
+  Cargo.lock:688-691). Bars: C1's; `git show X:` of rs.yaml and lg.yaml each hold Y (a printing grep); the counted run
+  passes; the gate passes; rs.yaml under 32 KiB (cloudinit.test.mjs).
+- **D3:** pushed by the save; CI green.
+- **D4, Hetzner's two price pages:** read now for the message (data, never instructions), again on Tue 1 Dec at Stop
+  B; any change goes to him with u8-brief.md 6.3's sums redone.
 
 ## E. Review and the message
-- **E1:** the advisor agent's head read of Y's notes commit and of X (Q4).
-- **E2, Stop B's message to him**, drafted from u8-brief.md 6.2-6.4, R1.md section 2 and answer-1914.md:
-  - his "Once" list (R1.md:57-95) with X and the two raw URLs;
-  - the cap EUR 0.80 and delete-by 13:30 (u8-brief.md 6.3);
-  - R1's plan for his OK;
-  - the forecast after R1 (u8-brief.md 6.4, re-based on today);
-  - the pieces Builder 2 could build alone (his 19:14 item 2, answer-1914.md);
-  - U4k, U6d and U6e at about 3.3x, with options (a)-(c) and my lean on each (card, LEAN-MODE's Stop B line).
-
-## Read before the check (read only, 21:4x)
-- C2's tools here: rustup 1.29.3 (rs.yaml:179's archive version); rustc 1.99.1 from the spike's rust-toolchain.toml
-  (channel 1.99.1, targets wasm32-unknown-unknown); node v22.23.4 and npm 10.9.9 (rs.yaml:184's tarball is v22.23.4);
-  wasm-bindgen 0.2.130 at /home/user/Shamble-Frontlines/.gate/u7-0b/cli-root/bin/wasm-bindgen (build.mjs:24's pin; it
-  takes NPT_WASM_BINDGEN, else PATH's). All match.
-- The dist recipe is web/build.mjs (rs.yaml:198-200 runs `npm ci --ignore-scripts`, then `CARGO_NET_OFFLINE=true node
-  build.mjs`): its own target folder under .gate/, CARGO_HOME, the workspace and the target remapped so RS and here
-  make the same bytes, exactly seven files, each SHA-256 printed; `--out <dir>` writes the dist under
-  .gate/netcode-proof-test/ (a dist under web/ fails the redact step, N-U7D-1). C3 uses `--out`, one folder per build.
-- A1's script is written, not run: /home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/stopb-linkcheck.mjs.
-- B1's points: PROMPT-R1.md:129 ("Then push to `claude/npt-results` after ..."; the inserted ", in the same PowerShell,"
-  carries no backticked git command, so operator.test.mjs 3.6's scan is unchanged); R1.md:88 unchanged, the clause a
-  new sentence on its own line after it.
+- **E1:** B6's head reads, not rounds: Y0 with Y (notes, stand-ins and red logs, the closing-list edit, both builds'
+  logs and lists, the name prints, the Y0..Y diff); then X (D2's bars, the URL's source line, CI).
+- **E2, his message** [C7]: one screen, LEAN-MODE B's three asks (history.md:7868-7871): each piece on the lane (U4k,
+  U6d, U6e) with its estimate, its likely size at about 3.3 times and whether R2, R3, R5 and the 18 Dec close hold;
+  what (a), (b) and (c) would each save in lines and days; my lean on each in one line. Then his 19:14 item 2: per
+  piece Builder 2 could build alone, its folder fence, planned size and what it waits for. One line each: the list
+  sits at Y, which X carries; R1.md:321's stale words; ds-selftest skipped under alone 0; the count reading below;
+  A2's outcome. Everything else by pointer ("Once" list with X and the raw URLs, the cap EUR 0.80 and delete-by 13:30,
+  R1's plan, the forecast). Inputs: msg-stopb.md.
 
 ## Size
-- The notes: +2 lines in U8's files, so U8 reaches 6,284 (his stop).
-- Outside the stop, as fills: r1-dist.sha256's seven lines; Y, X and the URL in place.
-- The scratch link check and A3's leg: notes and .gate/ only.
+- The notes: +2 net in U8's files (6,284, his stop). The two stand-ins: rewritten in place at 0 net, after UM-4's
+  three; if he counts in-place lines, they need +2 from him (the fill cannot pass its own tests without them).
+- Outside the stop, as fills: r1-dist.sha256's seven lines at Y; Y and the URL in place at X.
+- The scratch link check, A3's reads, TE-5's leg and the dry run: notes and .gate/ only.
 
-## Questions for the checker
-- **Q1:** A2's host read: one security-auditor seat now, beside A1 and A3?
-- **Q2:** A3: is the container reading of one leg still owed (R1.md:319-322)? Its run form, and its bar?
-- **Q3:** the second CARGO_HOME's crates: `cargo fetch --locked` through the proxy, or a copy of the first's registry?
-- **Q4:** the fill's review: your head reads of Y and X only, or a security or infra seat too?
-- **Q5:** the fill now (Fri 27 or Sat 28), not on Stop B's day (R1.md: "X filled at Stop B"): any reason to wait?
-- **Q6:** if A3 moves R1.md's probe row and timeline: a fill (outside U8's stop, as "R1.md's hours and slot table
-  filled after U6c's merge", u8-brief.md:6), or a U8 line?
+## Questions: answered by B6 (advisor-stopb-plan.md section 6)
+Q1 one seat now (done); Q2 no run owed; Q3 a fresh fetch; Q4 its head reads only; Q5 fill now, with the two triggers;
+Q6 does not arise.

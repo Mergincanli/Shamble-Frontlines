@@ -502,3 +502,91 @@ Reading with Read, Grep and Glob; Bash only for single git commands; nothing run
    cannot pass its own tests without them.
 
 Status: COMPLETE 2026-11-27 22:00 UTC
+
+## Re-check of rev 0.2
+Plan: read stopb-plan.md rev 0.2 whole (132 lines). Check only the lines tagged [C1]-[C7] and [T], plus the coordinator's
+items 1-5 against their evidence. Rule the rs.yaml:199 question. Same rules as above: read only; Bash for single git
+commands only.
+
+### Notes (one line per check)
+- rev 0.2 (Read whole): the tags sit on :13-15 [C6], :26-29 [C6], :30-34 [C4], :35-39 [Q5], :40-45 [C5][T],
+  :46-49 [T], :52-57 [C2][T], :62-64 [C2], :71-73 [C3], :76-81 [C1][T], :85-93 [C6], :94-96 [T], :101-102 [C2],
+  :115-121 [C7].
+- A1's logs (Grep):
+  - a1-links.log:134 "links: 133, mismatches: 0";
+  - a1-plant.log:2-8 four "MISMATCH smoke <browser>-ws" lines and :134 "mismatches: 4";
+  - a1-web.log:7 the web step at exit 0, 22:06:32 UTC.
+  - The claims hold. The plant's exit code is the main session's word; the log prints the count only.
+- A6 (spot-reads):
+  - PROMPT-R1.md:57-60: user-data compared with `<run>`'s rs.yaml (X), then `npt-userdata head` shows Y.
+  - rs.yaml:148 and :191 compare each clone's HEAD with COMMIT (read earlier).
+  - PROMPT-R1.md:22 is scoped to CLAUDE.md and .claude.
+  - No check compares X with Y, so notes-only save commits between them break nothing. The claim holds.
+- The URL's source chain:
+  - issue.rs:162-164: "production" maps to `LetsEncrypt::Production.url()`;
+  - Cargo.lock:688-690: instant-acme 0.8.5 from crates.io.
+  - The URL itself I did not fetch (no web in this seat). B1's X shape scans it with redact-check.
+- redact-check on the URL (reasoned): `LE-SA-v1.8-July-06-2026.pdf` parses as a host name. Its numeric labels (8, 06,
+  2026) never make four in a row, so I expect no finding. B1's X shape is the proof.
+- **R1.md:90-93 (the URL's place):** the placeholder spans :92-93. :92 runs to about 107 columns before it, so the
+  63-character URL cannot join :92 under the 120-column wrap. The fill changes both lines: numstat `2 2`, net 0, not
+  `1 1`. Rev 0.2's C1 bar (:80, "`1 1` each") would fail on R1.md.
+- **B1's worktree:** a fresh `git worktree add` has no ops/browser/node_modules (gitignored). opsStep then fails at
+  once with OPS_MISSING (check.mjs:2694, UM-4 (d)), so the dry run's ops step cannot show 104 of 104. Rev 0.2 :52-57
+  names no install or link for it. U8's merge run used a link to the cleared install (u8-report.md:60).
+- The npm deviation line (:94) names "rs.yaml:198"; the npm line is :199 (Grep: rs.yaml:199 is the only npm line in
+  cloud-init/).
+- **The rs.yaml:199 question:**
+  - cloudinit.test.mjs:142 pins `/npm_config_ignore_scripts=true npm ci --ignore-scripts/`, and browser.test.mjs:128
+    pins `/npm ci --ignore-scripts/`. Both would still match with `--no-audit --no-fund` appended, so option 1 needs no
+    test line.
+  - SEC-U7D-3 (security-u7-deps.md:223-226; item (3), :139-148) is about "C10's two commands" in this container: "the
+    refused `npm audit` by another door", a session permission routed around.
+  - Item (4) (:150-153) read rs.yaml's line for ignore-scripts only.
+  - On RS no session refusal exists to route around. The audit call would send web/'s lock (TypeScript 6.0.3 alone) to
+    the public registry, it changes no installed byte, and an audit failure does not fail `npm ci`.
+- The other tagged lines match my conditions word for word in substance:
+  - C1's order and bars (`7 0` for the list; build 2 against the non-comment lines);
+  - C2's full dry run in three shapes, with red first;
+  - C3's closing-list edit before B2;
+  - C4's two reads;
+  - C5's four items, with TE-5 in a disposable worktree, its tracked file never edited, time-boxed to 45 minutes;
+  - C6's recipe, environment and risks;
+  - C7's frame;
+  - the Q5 triggers with "a new X after his OK goes to him".
+
+### Rulings
+- **The rs.yaml:199 question: option 2.** Keep rs.yaml as merged, and record the deviation as rev 0.2 :94-96 words it.
+  Three reasons:
+  - The audit call on RS is not SEC-U7D-3's case: no refusal is routed around there, and it sends one public package's
+    name.
+  - The flags change no installed byte, so the dist's equality bar does not lean on them.
+  - Option 1 would touch a third U8 line in this pass, on an in-place reading he has not yet confirmed, for no change
+    in evidence.
+  - One exception: if A2's security seat rates RS's audit call as a finding, it rides Y0 in option 1's form (`1 1`, net
+    0, before Y0, as a file the servers build from).
+  - Neither option is his call. Option 2 changes nothing. Option 1 is a technical choice at net 0, by the count he
+    has been told (the day message's line), and would move no stop, money or run day.
+- **A1: DONE**, as claimed. **A6: holds**: nothing on R1's day compares X with Y.
+- **The URL:** its source chain holds. It is filled only at X, after B1's X shape has scanned it.
+
+### Verdict on rev 0.2
+**APPROVE WITH CONDITIONS.** STOPB-1 (High) is resolved by C1's order, and no Critical or High is open. B2 onward may
+start once these three lines are in rev 0.2:
+- **R1 (Medium):** B1's worktree gets ops/browser/node_modules before its first run. Either a link to the main
+  folder's cleared install, as U8's merge run did (u8-report.md:60), or the cleared form (`npm ci --ignore-scripts
+  --no-audit --no-fund --prefix <the worktree's absolute ops/browser>`, with npm_config_ignore_scripts=true). The log
+  says which. Without it the ops step fails on OPS_MISSING in every shape. The worktree is removed after B1.
+- **R2 (Low):** C1's X bar for R1.md reads "net 0, its hunk inside :92-93" (`2 2` expected after the re-wrap), not
+  `1 1`. rs.yaml and lg.yaml stay `1 1`.
+- **R3 (Low):** :94's "rs.yaml:198" becomes ":199", and the line adds "kept as merged (B6's re-check, option 2)".
+
+### Decisions needed
+- None.
+
+### For Mustafa
+- Nothing to act on.
+- The day message's count line stands as this file's first "For Mustafa" and the plan's Size give it: two notes, +2 net (6,284);
+  two test lines rewritten in place at 0 net; the fills. Option 2 adds no third in-place line.
+
+Status: COMPLETE 2026-11-27 22:12 UTC
