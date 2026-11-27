@@ -343,6 +343,10 @@ reason); his 15:05 message goes into DECISIONS by script (uuid, 738 bytes, sha25
   its own; `git rev-parse --show-toplevel` alone before every add, commit and push. Agents' briefs say the same.
 - In the main folder, only `git switch -c <new> origin/main`, `git merge --ff-only origin/main` and
   `git pull --ff-only origin main`; every other merge happens in a worktree under .gate/.
+- His standing rule of 2026-11-27 (message e4b7acdf-2208-4abc-b96d-9fe3ad9cd552, 12:37:31 UTC, 463 bytes, sha256
+  a014e5f8...; mustafa-2026-11-27-full-paths.md; into DECISIONS at the next docs head): in a shell command, every file
+  written, moved, copied or deleted is spelled out by its full path, with no variable, substitution or wildcard in its
+  name; or the Write and Edit tools are used. Writes to kit and gate files still ask him first.
 - GIT-IN-NODE (a): main's tracked kit scripts may run git (the saver, checkpoint.mjs, may run again); a script a chat
   writes itself never runs git and never writes a protected file (resolve70.py, verify70.py, control70.py run no git
   and write only docs/ or the scratchpad). This chat commits checkpoints by hand, each git call alone.
