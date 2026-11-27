@@ -1362,10 +1362,25 @@ again here. SEAT-OUT from him: stop at a whole point and report the last commit'
    `advisor-cutC.md` (the dev-server cases compile nothing; the network cut does not stop `cargo run --locked`).
 3. **Step 10's wiring: DONE** (885d382, with its follow-up for another map's recording; the card's entry "Step
    10's wiring"). Official count at its end 6,635 (6,659 with the follow-up): the first rung (6,750) is not reached.
-4. **Step 11, the schema writer** (the sheet's row 11, revised at row 12 for the map's reading): its four
-   questions are with the advisor agent (`cs4b-content/advisor-step11-brief.md`; its notes `advisor-step11.md`);
-   **no code of it before that ruling**; and his STEP11-ROOM is asked in the chat (build it now, or move it to 4d
-   so the scene fits): without his answer when the ruling is back, it is built, as the ladder says. **The look
+4. **Step 11, the schema writer** (the sheet's row 11, revised for the map's reading and for this ruling): **the
+   advisor agent ruled at 16:58 UTC** (`cs4b-content/advisor-step11.md`, DONE; brief `advisor-step11-brief.md`):
+   Q1 APPROVE, no `default` column (the report says why; the first field with a default goes to it first, with
+   read.rs's "nothing missing" rule); Q2 APPROVE, the descriptions in `schema.rs` under `#![cfg(test)]`, keyed by
+   object and key, every property exactly one, printable ASCII, the field's name, unit, range and use only, and
+   after the build three of them searched for in the players' file (0 hits expected); Q3 REVISE, fold in and build:
+   C1 an open end refused and the next double inside taken (a closed end taken, the next double outside refused),
+   in Rust and in Vitest; C2 the aim's reach on `bounds` by `prefixItems` (x and z at least -327.67 and at most
+   327.67, y at least 0 and at most 655.35, the other ends `COORDINATE`), its values tied to `AIM_REACH_CM` and
+   `AIM_HEIGHT_MAX_CM`; C3 the Vitest limit test walks every range of both schemas, `prefixItems` too; C4 the id
+   rule once in `$defs` (`^[a-z0-9][a-z0-9_-]*$`, `maxLength` 64, a `not` pattern for the reserved names), its
+   plants in Vitest; C5 no new dependency; C6 the export test admits one real folder `schema` (its own type, never
+   followed), write mode deletes only its `.json` files, tests for a link named `schema`, a folder inside it, a
+   `.json` link and a file that is no `.json`; C7 each schema a content `Node` tree (no boolean, no null): lengths
+   by `minItems` = `maxItems`, the shape forms as `oneOf`, each branch closed with all its keys; not step 11's: the
+   bundle's `files` bound and PM-0005-5's scan (4b-1's row 2), no bundle schema. Q4 APPROVE, the schema files count
+   in full. About 800 to 900 counted lines. **His STEP11-ROOM is open in the chat:** without his answer it is built
+   now, as the ladder says (the first rung did not fire); before step 12 the look ahead is told to him again with
+   this ruling in it (about 9,130 with step 11 built, about 8,300 without), and the stop to ask stands. **The look
    ahead before step 12** (the count then, plus about 1,060 and the map's reading moved there, plus a fix pass of
    about 350; past 8,450: stop and ask him; a rung reached moves its step: 12 to the start of 4c).
 5. **The close:** `plants-4b2.py --anchors` (reads only: every plant's text still stands once; 51 edits, 0 wrong
