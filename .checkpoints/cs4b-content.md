@@ -12,7 +12,7 @@
   `git push origin cs/4b-content:claude/cool-pasteur-oiqk1r`, alone in its command; never a plain `git push`. The
   session's start folder is never switched · **Base:** origin/main 2483e9a741c4e552323c36523831a2f35de4002e (the
   merge of 4a, pull request #70)
-- **Last update:** 2026-11-27 01:36 Amsterdam (from the clock)
+- **Last update:** 2026-11-27 01:48 Amsterdam (from the clock)
 
 ## Sizes and stop lines (his answer of 2026-11-26, 14:09:13 UTC: SIZE-4B (b); which number is which)
 - **4b is two pull requests**, in engine-architect's cut; "each stands on its own: lines left over in 4b-1 do not
@@ -940,9 +940,11 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
     distance; the builder leaving a shape out; the fuzz run sending no map on): run by hand, all four caught.
 - **Step 9, third piece that needs no content file: the page folder read through no link, and the scan of the
   sources for `innerHTML` and its kin (the sheet's row 9; security-auditor's points on `filesOf` and the scan;
-  2026-11-27; built, in its local checks at 01:36; NOT YET COMMITTED AS CODE: the patch is
-  `cs4b-content/wip-step9-markup-scan.diff`, made by `git diff -- crates packages` on head 1ae0c3f; `git apply`
-  puts it back).**
+  2026-11-27). DONE (commit 5c6738a, pushed 01:48; the gate passes; the full local checks passed whole: 219 Rust
+  tests twice, 218 in release, client 136, sim-worker 51, types 8, 36 boundary tests, the type checks, 19 browser
+  tests in 3.4 min; the players' file unchanged, sha256 b4a9774f...59ba; **4,956 written lines of 4b-2**, of
+  8,450). A first run of the checks failed, rightly: the edit had dropped an import (`readdirSync`) that the
+  build of the players' file still uses; fixed, and the checks run again whole.**
   - `packages/client/scripts/build-checks.mjs`: `plainFilesOf(folder)` (every file of a folder in a fixed order;
     it throws at a link, a pipe or a device, by its path), `MARKUP_SINKS` (12 words: innerHTML, outerHTML,
     insertAdjacentHTML, createContextualFragment, document.write, DOMParser, setHTML, srcdoc, a javascript:
@@ -964,7 +966,17 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   (runs 45908649135, 45908649409), e3acb41 (45910750962, 45910750974), 8e5a268 (45912515590, 45912515341: the
   first run with the static world's browser spec; the whole toolchain job took 11 min 29 s, so the browser
   tests stay under CI's 5-minute stop), c09f459 (45913683931, 45913683934). Read again at 01:34: 6290c85 green too
-  (gate 45914579327, toolchain 45914579307, 9 min 6 s). ad88341's runs: to be read.
+  (gate 45914579327, toolchain 45914579307, 9 min 6 s). ad88341: gate green (45917465677), toolchain still
+  going at 01:40 (45917465670). 5c6738a's runs: to be read.
+- **Ahead, by the count, at 4,956 (2026-11-27, 01:48):** left by the designs' way of counting about 1,490 (step
+  8's second part 100, step 9's rest about 600, step 10's wiring about 60, step 11 240, step 12 490). At the
+  rate so far (about 2.15) the count at step 10's end is near 6,600: under the first rung (6,750), so step 11 is
+  built (look ahead: 6,600 + 520 + 350 = 7,470). At step 11's end near 7,100: under the second rung (8,000),
+  but the look ahead before step 12 gives 7,100 + 1,060 + 350 = 8,510, past 8,450: **by today's numbers the
+  page's scene (step 12) meets the stop-and-ask before it is built**. Two thirds (5,633) is not reached. Told to
+  him in the update after this piece. Step 11 is not built ahead of its place: it is the first to leave when
+  the size presses, and building it now would take that relief away and put the scene, which he sees, at risk
+  instead.
 - **To do before 4b-2 merges:** the licence texts for the hosted build (a follow-up for lane 2).
 - **GREY-COLOURS: (a), the default greys stand** (his message of 2026-11-26, 21:16:26 UTC, one letter: "a",
   `cs4-walk/mustafa-2026-11-26-grey-colours.md`; read as his answer to the one question the chat's update before
@@ -1013,16 +1025,18 @@ just continue as you were)". So: the chat's work and its agents' work are commit
 **Where everything is.** Branch `claude/cool-pasteur-oiqk1r` on origin (this chat's own; a session of another
 account works on its own branch from this head and never pushes here: his Lanes rule). The head: see the last
 "DONE" entries above (the card is saved with every push). Code that is not yet committed is saved as a patch in
-the notes and named in the card's newest entry (at this save: `cs4b-content/wip-step9-markup-scan.diff`, until
-that entry says DONE). No agent is running. The board add-on is active for this chat (thread state: needs-musti, for
+the notes and named in the card's newest entry (none at this save: nothing is uncommitted). No agent is running. The board add-on is active for this chat (thread state: needs-musti, for
 DIFF-LIST).
 
-**State of 4b-2, by step** (4,769 written lines of 8,450 at ad88341; two thirds is 5,633; rungs at 6,750 and 8,000):
+**State of 4b-2, by step** (4,956 written lines of 8,450 at 5c6738a; two thirds is 5,633; rungs at 6,750 and 8,000):
 - 6 the library's batch: done (298837a). 7 the built-file check: done (d313162, then 2f058b2 and e3acb41 for the
   advisories' rule). 8, first part, the two tools on test files: done (54e89d2). 10, the core, the static world
   on maps made in tests: done (8e5a268). 9, first piece, the type writer's manifest line and its rule: done
   (c09f459); 9, second piece, the generated content types: done (6290c85). 10, the fuzz run and the hostile maps through the world's builder:
-  done (ad88341). CI: green on every code head through 6290c85; ad88341 to be read.
+  done (ad88341). 9, third piece, the page folder read through no link and the scan for `innerHTML` and its
+  kin: done (5c6738a). CI: green on every code head through 6290c85; ad88341 and 5c6738a to be read.
+- **Nothing more of 4b-2 can be built without the content files**: every piece of rows 8, 9 and 10 that needs
+  none is done. Step 11 keeps its place in the order (the card's "Ahead, by the count").
 - **Blocked on his own answer to DIFF-LIST** (asked 2026-11-26, 23:11 Amsterdam;
   `cs4b-content/question-2026-11-26-diff-list.md`): step 8's second part, step 9, step 10's wiring. A bare "a"
   has reached this chat twice as a repeat of his older message (`cs4-walk/redelivered-2026-11-26.md`): it is
@@ -1044,8 +1058,10 @@ DIFF-LIST).
    first lines say that `content/source/` changes (his SOURCE-GO answer).
 2. **Step 9** (the sheet's row 9, `cs4b-content/reread-sheet.md:167`). Done already: its manifest line with
    the dependency rule (c09f459, as security-auditor approved it on two digests) and the generated content types
-   with their export test (6290c85). Left: the constructor's bundle argument and every caller, the page's
-   `content.ts`, the build running `content_bundle`, the frozen content of `first-loop`. When content is first linked into
+   with their export test (6290c85), the page folder's plain files and the markup-sink scan (5c6738a). Left:
+   the constructor's bundle argument and every caller, the page's `content.ts`, the build running
+   `content_bundle` and refusing a page folder without `content.json` or with one over 8 MiB, the frozen
+   content of `first-loop`. When content is first linked into
    the players' file the built-file check will name `C::round` (content's `f64::round`) and perhaps
    `C::__multi3`: each gets an entry in `maths-allowed.mjs` with its reason, or the code changes; rust-reviewer
    decides. The first recording's frozen content, the constructor's new argument and every caller: the row.
