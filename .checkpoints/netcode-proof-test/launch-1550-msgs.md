@@ -136,6 +136,13 @@ B's form (advisor-u8-f1-head.md block 4), each its own call:
 - D DONE (hand-back 14:1x): the three reads matched; `git add` of the 12; `git merge --ff-only` "Updating
   77ffc95..28ea74e Fast-forward", 231 files; `git status --short` printed nothing; no refusal, deny or prompt.
   `git worktree list --porcelain`: the worktree at 28ea74e, detached.
+- D's keep-first DONE 14:15 (B's form): `mkdir -p /home/user/Shamble-Frontlines/.gate/u8-f1`; `cp -a` into
+  /home/user/Shamble-Frontlines/.gate/u8-f1/kept-agent-a7fe1b9f (hooks-proof-1/ and s14-fixture/); `diff -rq` of the two
+  printed nothing; both folders hash to the same 50 files; u8-f1-kept-list.md (50 sha256 lines, by Write); `sha256sum
+  -c` of it printed 50 lines, each "OK"; saved e778dd8 before the remove.
+- D's worktree REMOVED 14:16 by the plain `git worktree remove
+  /home/user/Shamble-Frontlines/.claude/worktrees/agent-a7fe1b9f436f36bb1` (no output, no refusal); `ls -d` of the path:
+  "No such file or directory"; `git worktree list --porcelain` no longer names it; df 8,037 MiB free.
 
 ## C: a2b7636a57dff4206 (resumed; it checked MAIN-68's plans: advisor-main-68b.md): the check of MAIN-69's plan
 Into the seat B and D freed (NB still running: 2 agents at once). Sent 14:14 UTC (resumed: "Resuming agent a2b7636").

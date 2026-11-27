@@ -73,3 +73,28 @@ No cargo, no main-run.sh (it touches every file under crates/), no lane lock: no
   attempt 1 (push gate 45991394499, toolchain 45991394502; pull request gate 45991405364, toolchain 45991405394;
   11:33-11:42, read 11:43);
   B's head read in the 15:50 window (launch-1550-msgs.md, section B, with Q-A and Q-B).
+
+## Follow-up: Q-A and Q-B, both taken (B's ruling, advisor-ops-reword-head.md block 2, COMPLETE 14:11 UTC)
+B's head read (block 1): d8b57b8 stands, nothing owed. Block 2: take Q-A and Q-B in one net-zero follow-up by the main
+session within PROMPT-R1.md:127-129, before Stop B; no round; B reads its pushed head. The sentence, B's words: "Unless
+its saved last line reads `… checked, 0 finding(s)`, no push (an empty file included): stop and tell him."
+F1, by Edit. PROMPT-R1.md:127-129 rewrapped within the same three lines (each at 136 characters or less):
+  `   summary. Unless its saved last line reads \`… checked, 0 finding(s)\`, no push (an empty file included): stop and tell him.`
+  `   Just before the push, in PowerShell, \`git -C <results> rev-parse --git-path hooks\` must print the clone's own hooks folder, the one`
+  `   holding pre-push; anything else: stop and tell him. Then push to \`claude/npt-results\` after the pre-push hook passes (a prompt).`
+  No test pins :127's words (the sweep 14:1x: only redact.test.mjs:20's pattern on the program's own output). The two
+  pins at r1plan.test.mjs:211 still hold: the hooks span stays on one line, and :125's "runs on `<results>\r1\s14` with
+  no VM list" is untouched.
+Proof (B's list), each its own call; node only, no cargo, no main-run.sh, no lane lock:
+- Q0 base, before F1: `node --test` of operator.test.mjs and r1plan.test.mjs by absolute path (21 of 21 expected);
+  `node spikes/netcode-proof/ops/operator/redact-check.mjs spikes/netcode-proof` (464 items, 0 findings expected).
+- The saver stopped by TaskStop, `pgrep -c -f checkpoint.mjs` printing 0, before F1 (a staged spike file must not ride a
+  notes save).
+- Q1 after F1: both test files with Q0's counts; redact-check 0 findings, items as Q0; `git diff --numstat --
+  spikes/netcode-proof/ops`: PROMPT-R1.md 3 3, nothing else; the three lines printed by `awk` with their numbers and
+  lengths, and quoted; `git status --short` only PROMPT-R1.md beside notes; `node tools/gate.mjs --no-smoke` GATE PASS;
+  `node .claude/scripts/repo-map-check.mjs` OK.
+- Q2: one commit of PROMPT-R1.md alone (its message naming B's ruling and choice 31), pushed by a checkpoint save; the
+  saver restarted; CI on the pushed head; B reads that head (no round).
+- For the day message (B's For Mustafa, his to reverse): the push's redaction rule as reworded; he sees it at Stop B.
+- UM-4's plan (um4-plan.md, step 5's proviso) names this commit's file beside d8b57b8's three.
