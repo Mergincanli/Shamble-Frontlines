@@ -234,6 +234,19 @@ the advisor rules."
   (22:38:56-22:46:57); PR #40's check_suite.completed event at 22:48:52 (nothing failed or running). M9's CI bar is
   met. Left in M9: the advisor's read of the pushed head at 00:50 (U7-M-8, with the M3 retry and the form's fix),
   then the cleanups in the forms it names.
+- M9, the head read, DONE 01:01 UTC on 11-27 (advisor-u7-head.md, A a0530735048f1620a): the merge stands, no fix; M3's
+  retry accepted (a Low departure from M6's letter, not its purpose); the form gains M3a (a refresh right before M3,
+  and at the start of M6's undo: its section 3 words, for the next merge of this form); u7-report.md's two Edits done.
+  Cleanups: cli-target CLEANED 01:1x (`env CARGO_NET_OFFLINE=true cargo clean --locked`, no cargo running: 1,496 files,
+  441.1 MiB; df 7,378 -> 7,802 MiB; cli-root kept). .gate/u7-amend REMOVED 01:09 by the first ruling's form (the two
+  Edits undone by Edit, both files then equal to c21582d's blobs f6e0fef and e4d5ff3 and to its sha256 d8af72f7...000e
+  and 55604a5f...9f5d; a plain `git worktree remove`, exit 0), about a minute before the re-rule (01:09, "Item 6,
+  re-ruled") withdrew that step as a discard-to-pass and kept the worktree until PR #40's close: a recorded departure,
+  nothing lost (the Edits' content is committed at 56b3e1b; no evidence in it, the first ruling's section 6 B), for the
+  advisor's next read. U7's builder worktree: by the re-ruled form (the main session copies its two notes onto the lane
+  at the same paths and saves; ffcheck 35 ADDED and 10 differing; the builder, resumed in a window, `git add`s those 45,
+  then `git merge --ff-only`, then `git status --short` empty; the evidence kept first by `cp -a`, `diff -rq` and a
+  sha256 list; then a plain remove; any refusal: it stays until PR #40's close), in a later window.
 
 ## Risks
 - M5's counts move with MAIN-68 and Builder 2: each bar comes from this merge's own base run on its own H0 (MAIN-68's

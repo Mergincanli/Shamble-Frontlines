@@ -172,4 +172,64 @@ Nothing.
 - Not run: no git in any worktree, no cargo, no removal. The `worktree remove` ignored-file behaviour is stated from
   git's rule as I know it, not tried.
 
-Status: COMPLETE 01:01 UTC
+Status: COMPLETE 01:01 UTC (sections 1-7; superseded in part by "Item 6, re-ruled" below)
+
+## Item 6, re-ruled (01:0x UTC, 27 Nov): no delete or move to make a git step pass, in any wording
+My section 6 A.4 ("removes the two files by absolute path (`rm` of each file …)") is withdrawn: it is the delete-to-pass
+form the safety check stopped on 11-25 (launch-0850.md:13-17; the card's choice 7), never retried. Section 6 B's "undo
+the two Edits by Edit, then … remove" is withdrawn too, for the same reason: it discards a local change by another door
+to make `git worktree remove` pass. The rest of section 6 stands as amended here.
+
+**The ruling: (a), made to work by one notes save first. Fallback (b).**
+- **Why (a) as worded is not enough.** The builder's two notes, `.checkpoints/netcode-proof-test/u7-build-rs.md` and
+  `u7-t-build.md`, are not on the lane at those paths: `git ls-files` prints neither. The lane holds them only as
+  wip/u7-build-rs-notes-1055.md and wip/u7-t-build-notes-2050.md. So ffcheck lists neither: both lie outside the
+  fast-forward's range. Staging them would leave two staged additions that the new tree lacks, which git keeps as
+  staged (two-tree case 4/5, "keep index"), and the worktree would still not be clean.
+- **The form (no file deleted, moved or reverted anywhere):**
+  1. **A notes save puts the two notes on the lane at their worktree paths, byte for byte.** The main session runs
+     `cp` of each, its own call, from the worktree's absolute path to the main folder's same path. Before the save,
+     `sha256sum` must read a65282fa…a34c and d073228f…9c93, equal to the worktree's and the wip copies. The wip copies
+     stay, a harmless duplicate in the notes.
+  2. **ffcheck,** from the main folder, against the new lane head:
+     `node .checkpoints/netcode-proof-test/ffcheck.mjs <worktree> 80b6748 <lane head>`. Expected: 35 ADDED present
+     (U7's 33 and the two notes), 10 differing (U7's 10), and nothing else.
+  3. **The builder, resumed in a window.** A short message, one command per call, with the two standing rules word for
+     word:
+     - `git add` of exactly those 45 paths (as ffcheck lists them);
+     - then `git merge --ff-only <lane head>`;
+     - then `git status --short`, which must print nothing;
+     - if git refuses at any step: stop and report its message. Remove, restore or move nothing.
+  4. **The main session:** the keep-first copy (below), then `git worktree remove
+     /home/user/Shamble-Frontlines/.claude/worktrees/agent-a9873cdba07a3219e`, plain, from the main folder. If it
+     refuses, leave the worktree and bring the message here.
+- **Fallback (b):** if step 3 or 4 refuses, the worktree stays as it is until PR #40's close, its evidence copied
+  first. It costs disk (its .gate/ 168 MiB, web/node_modules and the checkout), and the close's checklist takes it up
+  again.
+- **Does git's fast-forward accept a staged path equal to the target?**
+  - Yes, by git's two-tree merge rules: Documentation/git-read-tree.txt, "Two Tree Merge". With I the index, H the old
+    commit and M the new:
+    - cases 6 and 7 (I has the path, H does not, M does, I == M): "keep index";
+    - cases 18 and 19 (H != M, I == M): "keep index", clean or not.
+  - Without the stage, a dirty tracked path is case 21 (I == H, H != M, not clean: "fail"), and an untracked path the
+    new tree adds is refused as "would be overwritten". That is the 11-25 refusal.
+  - That `git merge --ff-only` applies this table (git's builtin/merge.c fast-forward through unpack_trees'
+    two-way merge) is from git's source as I recall it. **Not tried.**
+- **The keep-first step may be a copy, and should be.**
+  - `cp -a` (each its own call, absolute paths) of the worktree's `.gate/u7/`, `.gate/netcode-proof-test/t5-dist/`,
+    `dist-bites/` and `failed-steps/` into `/home/user/Shamble-Frontlines/.gate/u7/kept-agent-a9873/`.
+  - Then `diff -rq <original> <copy>` for each (read only; exit 0 = equal).
+  - Then one `find /home/user/Shamble-Frontlines/.gate/u7/kept-agent-a9873 -type f -exec sha256sum {} +`, its output
+    written by Write into `.checkpoints/netcode-proof-test/u7-kept-list.md`.
+  - Run 3's and run 4's summary.json are copied into the notes by `cp` (sha256 equal; run 4's 100b27d1…).
+  - The originals stay for the plain `git worktree remove`, which takes the ignored files with the worktree (section 6
+    A.4's reading, not tried). Nothing is moved.
+- **B, .gate/u7-amend: it stays.** Its two files are byte-equal to the lane's (blobs da7a5596… and 25759d8d…, the same
+  as HEAD's). But it is detached at c21582d with those two files modified, so a plain remove refuses. Making it clean
+  needs git inside it (stage the two, then fast-forward), and no agent works there: the main session runs no git in
+  another worktree. So it stays (41 MiB) until PR #40's close, when the closing checklist names its form. Nothing in
+  it is evidence: its content is 56b3e1b's.
+- **C, cli-target:** unchanged (section 6 C). `cargo clean --target-dir` removes a build cache by cargo's own command,
+  not to make a git step pass.
+
+Status: COMPLETE 01:09 UTC

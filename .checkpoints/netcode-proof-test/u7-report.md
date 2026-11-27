@@ -59,8 +59,10 @@ The fix pass added about 462 of these against the advisor's estimate of about 30
   Three content checks exit 0 (tree = index and tree = H0 under spikes/, and M2). After the advisor tool's read, `git
   update-index --refresh` (its one line: an unsaved notes file) and one re-run by name: exit 0; then `git apply
   --index` exit 0. `git status --short`: exactly the 43 paths staged (10 M, 33 A); u7-m4-cmp.mjs: 43 byte-equal to the
-  worktree's with mode 644 on both sides; 33 "create mode 100644" lines, no mode change. The retry and the form's fix
-  go to the advisor agent's head read.
+  worktree's with mode 644 on both sides; 33 "create mode 100644" lines, no mode change. The retry: accepted by the
+  advisor's head read (advisor-u7-head.md section 2): a stat-only refusal, retried once by name; a departure from M6's
+  letter, not its purpose. The form's fix: its section 3 (M3a, a refresh right before M3, and the same refresh at the
+  start of M6's undo), for the next merge of this form.
 - C1 (U7-M-5, a form test): run 4's 6-mds `pages[0]` (result.json d2c566aa…f3bf, = run 4's own list) through U8's
   save() as R1 (u7-c1.mjs): log 0d07fa1f…f055, 15 page lines, the printed wasm sha256 901a6492…0e77 = run 4's (UM-3's
   bar). npt-judge with PM-0001-36 (.gate/u7-merge/c1-verdicts.json): NOT-RUN (the six ML parts 0 of 1 valid runs, the
@@ -196,6 +198,11 @@ snapshot read: a hand read is enough).
 - ADV-U7S-6 (no test pins r1.sh's load_settings to LoadSettings; the advisor read the 24 keys and their ranges equal):
   carried. U8's stop, 6,282, is spent by U8-F1 (+93 of 93), and past it unbuilt Lows are carried (history.md:7703-7722),
   so it goes on PR #40's closing list, a test for U8's first change after R1; until then the advisor's read stands.
+  The guard before R1 (advisor-u7-head.md section 5): at Stop B's fill, if `git diff --stat 9c2fcf4 <then> --
+  spikes/netcode-proof/ops/runs/r1.sh spikes/netcode-proof/crates/bots/src/load.rs` is not empty, the advisor reads the
+  pairing again (load_settings' 24 keys and machine's 5 against LoadSettings' fields, types and ranges) before R1.
+  CI on the merge's push 9c2fcf4: push gate 45906116335 (gate and smoke jobs) and toolchain 45906116365, pull request
+  gate 45906121962 and toolchain 45906121987, all success at attempt 1.
 - The `ops` step: the first change after this merge (UM-4: test first, U8's fix 2 install, the dependency record),
   before Stop B's fill.
 - ADV-U7S-2: a real-page control for the three shipped calls, at the next T5 (ii) run if one comes. ADV-U7S-7: `fail`'s
