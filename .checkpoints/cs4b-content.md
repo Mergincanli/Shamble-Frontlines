@@ -1211,7 +1211,9 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   (`routine-guard.mjs:369`), so it stays as it is (no history is rewritten). (2) The card's "from 2026-11-27 15:06
   Amsterdam" for the seat's start was written before the time was read; git's record gives 14:06:28 UTC (15:06:28
   Amsterdam): the same minute, now with its source. (3) The chat told him the baseline checks "started 14:22
-  UTC"; the log's own birth time is 14:18:25 UTC. Corrected to him in the chat.
+  UTC"; the log's own birth time is 14:18:25 UTC. Corrected to him in the chat. (4) At about 15:41 UTC one
+  `git status --short` stood after a `cd` and before an `ls` in one call. A read. Since then each git command
+  stands alone in its call.
 
 ## HAND-OVER: where another session picks this up (written 2026-11-27, 00:44 Amsterdam; kept current)
 His words of 2026-11-27, 00:43 Amsterdam (2026-11-26, 23:43:38 UTC; `cs4-walk/mustafa-2026-11-27-save-every-25-
@@ -1337,13 +1339,20 @@ never a test cut or thinned to fit CI's limit (his CI-TIME); a toolchain run sto
 in two lines.
 
 ## Current step
-4b-2 (2026-11-27, 16:29 Amsterdam, from the clock; Builder V6). DIFF-LIST is answered (a). Done and pushed on this
+4b-2 (2026-11-27, 16:44 Amsterdam, from the clock; Builder V6). DIFF-LIST is answered (a). Done and pushed on this
 seat: 35e96ad (main in), 5cef19f (step 8's second part), ccde0d4 (step 9, cut A: the page carries the bundle; CI
-green), e1e2dd4 (step 9, cut B: the recording's frozen content; CI running). **Official count 5,672 (raw 5,690) of
-8,450: past two thirds, his sentence given.** In hand: cut C of `cs4b-content/step9-order.md` (the constructor,
-its callers, the Worker and the page), from its point a (the constructor, then at once the wasm-only build and
-rust-reviewer on the names it prints: `cs4b-content/rust-reviewer-cutC-brief.md`). CI on e1e2dd4 is read before
-the next code push (a code push cancels a toolchain run in progress).
+green), e1e2dd4 (step 9, cut B: the recording's frozen content; CI green, read 15:44 UTC: gate, smoke, and the
+toolchain run 15:28:54 to 15:38:37 UTC). **Official count with cut C's work so far 5,760 (raw 5,778) of 8,450**
+(`cs4b-content/count-4b2.mjs` on the saved numstat; past two thirds, his sentence given). In hand: cut C of
+`cs4b-content/step9-order.md`. **Done in it, not committed, saved as `cs4b-content/cutC-wip.patch`** (taken with
+`git diff -- crates packages`; put back with `git apply` on e1e2dd4's tree): point a (the constructor takes the
+bundle: `CreateError::Content`, `message(&self)`, the order test) and point b (the one other Rust caller,
+devtools' `Replay::new`, passes the frozen content it already checked; `step_alloc.rs` makes a `LocalMatch`, not a
+`Sim`: step 10's); the bindings' 16 tests and the devtools tests (20 groups) pass. rust-reviewer's decision
+(`cs4b-content/rust-reviewer-cutC.md`, DONE): both names are allow-list entries, no code change, so 4b-1's proofs
+stand; its two entries are in `maths-allowed.mjs`, word for word, with the test's pin. Next: the wasm-only build
+(the production file's rules run with content linked for the first time: a refusal there is security-auditor's
+stop), then points c to g.
 
 ## Next steps (the sheet's revision 3, section G; each step ends with the count of written lines)
 - **4b-1:** 1 the content crate's manifests · 2 the reader, the writer, the bundle, the two kinds, the old tuning's
@@ -1384,4 +1393,5 @@ the next code push (a code push cancels a toolchain run in progress).
   (`cs4-walk/mustafa-2026-11-27-guard-retry.md`).
 
 ## Running work
-- None. CI on 298837a is the first run that downloads the library's packages.
+- None. rust-reviewer's read of cut C's two names ended (DONE). Its own disassembly run filled the disk for a
+  while (its notes' warning: never `llvm-objdump -d` on the twins); it deleted that output, 54 GB free again.

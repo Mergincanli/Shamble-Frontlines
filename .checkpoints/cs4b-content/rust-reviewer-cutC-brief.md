@@ -14,7 +14,20 @@ already links content, `f64::round` arriving as `C::round` and a 128-bit multipl
 `f32::round` arriving as the C name `roundf` alone, with no `compiler_builtins` path beside it.
 
 ## The build's own lines
-(filled in from the wasm-only build's output when it is run: `node packages/client/scripts/build.mjs --wasm-only`)
+`SHAMBLE_WASM_BINDGEN=<the checked tool> node packages/client/scripts/build.mjs --wasm-only`, 2026-11-27 about 15:33
+UTC, on the worktree with only `crates/sim-wasm/src/lib.rs`'s constructor changed (the rest of cut C not yet built;
+its log `.gate/cutC-wasm-only-1.log`), exit 1, the whole refusal:
+
+```
+build: the built-file check refuses the players' WebAssembly:
+  the release twin: round: C::round is a maths routine outside the allow-list (packages/client/scripts/maths-allowed.mjs)
+  the release twin: __multi3: C::__multi3 is a maths routine outside the allow-list (packages/client/scripts/maths-allowed.mjs)
+  the dev-profile twin: round: C::round is a maths routine outside the allow-list (packages/client/scripts/maths-allowed.mjs)
+  the dev-profile twin: __multi3: C::__multi3 is a maths routine outside the allow-list (packages/client/scripts/maths-allowed.mjs)
+```
+
+Nothing else fired: no import outside `PLAYERS_IMPORTS`, no machine path, no vector instruction, no fused
+multiply-add (the production file was not reached: the twins' rule stops the build first).
 
 ## What is asked
 For each name the check refuses: an entry in `maths-allowed.mjs` with its reason (what calls it, why its result is
