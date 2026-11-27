@@ -1428,6 +1428,17 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   the casts' first caller), TE-6 (kept as a backstop). Then: the count (stop line 8,450), the full local checks, the
   gate, the plants' whole run again, CI; round 2 on what changed (security-auditor, rust-reviewer, engine-architect,
   netcode-architect, test-engineer); the verifier; docs-keeper; the report; the advisor agent.
+  **At 20:49 UTC, built and tested, not committed** (saved as `cs4b-content/fixpass-wip.patch`, 18 files, the new
+  `packages/client/src/app/content-ties.test.mjs` marked with `git add -N`; put back with `git apply` on c442a80's
+  tree): RR-1 (`RAY_REACH`, the limit's cap, the ramp's NaN guard, a test of rust-reviewer's probe, the reach's
+  edges, the tiny direction, the ramp as large as `f32`), TE-4's -0.0 rays, RR-3's words, NA-2's comment, EA-6's
+  `#[doc(hidden)]`, RR-2 (`map::MIN_SPAWNS`, the schema's `minItems` 1 written again, its two tests), SA-1 and SA-2
+  (`pathOf`, the cross-site refusal, the isolation spec's two checks), SA-3 (`plainFolders` from the base, `O_NOFOLLOW`
+  and the handle's check, the test of a link higher up), TE-1 (the table's names held by a test on the real table;
+  the second route's doc), EA-1 (`takeWorkerMessage`, `takeWorkerError`, `PageContent.holding`, two wiring tests),
+  EA-4 (`BUNDLE_FORMAT`, `BUNDLE_VERSION`, `content-ties.test.mjs`). Collision 9, content 43, the tools' tests 15,
+  the page's app tests 35 pass. **Official count 8,241, raw 8,259**: 209 under the stop line. Left: NA-1, EA-2,
+  TE-3, TE-5, TE-7, TE-8, then the checks.
 
 ## Slips of this chat's own rules, for the report
 - One git command did not start its own shell call: `git add .checkpoints/cs4b-content/review-brief-4b1.md` stood
@@ -1480,6 +1491,7 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   the second plants run started "20:16 UTC" when the clock then read 20:15:06: typed ahead of it, corrected before
   it was committed. (10) The same for engine-architect's launch: "about 20:31" written when the clock read 20:26:57;
   corrected before it was committed. From here every time in the card is written only after the clock is read.
+  (11) At the fix pass (about 20:50 UTC) one `git diff --stat` stood after a `cargo test` in one call. A read.
 
 ## HAND-OVER: where another session picks this up (written 2026-11-27, 00:44 Amsterdam; kept current)
 His words of 2026-11-27, 00:43 Amsterdam (2026-11-26, 23:43:38 UTC; `cs4-walk/mustafa-2026-11-27-save-every-25-
