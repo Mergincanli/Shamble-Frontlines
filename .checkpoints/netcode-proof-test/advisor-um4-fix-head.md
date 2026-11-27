@@ -48,3 +48,62 @@ call, git and gh first; no test, cargo, gate, mutant or plant run; no git variab
     throwing if its sha256 differs.
   - KILLED means exit not 0, fail > 0 and tests > 0.
   - Every log is a literal full path. No git variable is set; NODE_TEST_CONTEXT is removed from the env.
+- red-first.log (Read whole, 207 lines): tests 3, pass 0, fail 3. Each failed on its own assert:
+  - the missing-folder pin (:2069): strictEqual, relative against absolute prefix;
+  - the env pin (:2093): deepStrictEqual at :2103, `undefined` where the kept set was expected;
+  - the victim test (:2109): "the repository GIT_DIR names is unchanged, byte for byte" at :2136.
+  - The victim's diff shows new objects, a changed HEAD, COMMIT_EDITMSG and index, a new `refs/heads/side` and a moved
+    `master`. So UM4R-1's effect (a `side` branch, commits in the named repository) is now SHOWN on a scratch victim,
+    no longer only reasoned. keep.txt is unchanged (the work tree was the temp folder).
+- base-t1, -web, -t2, -t4, -pin and -victim .log: each "exit 0; tests 1, fail 0: PASS", one `ok 1 - <its title>`,
+  skipped 0, todo 0.
+- Mutants, each "exit 1; tests 1, fail 1: KILLED", on the right assert:
+  - M1: case "0", s.ok true !== false, :2044.
+  - M3: case "1", same assert.
+  - W1: case "node tests", :2000.
+  - M4: T-2's noise case, :2083, "its last line: noise on stderr".
+  - M10: T-2's extra case, :2089.
+  - M8: the path pin, :2020, ops/browser against ops/browser/node_modules.
+  - M-env: the env pin, :2103, all five stand-in GIT_ names in the call's env.
+  - M-wild: the same assert. The diff shows `+ GIT_DIR: '/tmp/npt-sec-um4-1-no-such-repo/.git'` in the call's env for
+    `/opt/node22/bin/node --test ops/**/*.test.mjs`.
+- V1, V2, V3: each KILLED, with the location :2109 and the stack at :2136, which is the byte-for-byte assert. The
+  three-title assert sits after it, so it was not reached. V3's diff shows `refs/heads/side` added in the victim.
+  (Read through Bash grep before the 21:07 note; from here on logs are read with Read and Grep only.)
+- Blobs (`git rev-parse f1b46682:<path>` against `git hash-object` of each .gate/um4-fix/fixed-*.mjs, and of the working
+  files): equal for all four, d6498e4e, 17d27fc0, e78deb4a and 8f604833. The kept copies (20:52) and today's tree ARE the
+  committed bytes. fixed.sha256 (Read) lists the four paths' sha256; I did not recompute its sha256s, since the blob ids
+  tie the copies to the commit more strongly.
+- counted.log (Read):
+  - Run at 20:53:11 on HEAD a7c4b25b. diff 446f383d…; untracked e3b0c442… (empty).
+  - self 88 of 88; ops "104 of 104 tests passed; wrappers.test.sh: 315 ok, 0 failed"; redact "11 of 11 tests passed;
+    redact-check: 464 item(s) checked, 0 finding(s)"; refs "2181 tracked files"; exit 0.
+  - main-run.sh:42 hashes `git diff HEAD -- .` from the spike folder, so the diff line covers spikes/netcode-proof against
+    a7c4b25b.
+  - NOT re-done by me: hashing `git diff a7c4b25b f1b46682 -- spikes/netcode-proof` needs a pipe, and this seat keeps
+    Bash to single git commands. The blob identity above holds the same tie for the four code files.
+  - The other spike files: `git diff --name-only` between a7c4b25b and f1b46682 lists only those four plus notes.
+- light-base.log (Read): 20:46:00 at HEAD a7c4b25b with diff and untracked empty. self 85 of 85; ops, redact and refs the
+  same lines as counted.log. counted.log against base: self +3 (85 to 88, the three new tests: T-2, the env pin, the
+  victim); the other three lines are equal word for word.
+- gate.txt (Read): base b8f02b0 (origin/main); [1]-[4] and [5b]-[5d] PASS, [5a] SKIP (--no-smoke); "GATE PASS".
+- Since the fix: `git diff --name-only f1b46682 HEAD` lists notes only (.checkpoints/...).
+  `git diff --name-only f1b46682 1d4e81a6` lists .checkpoints/netcode-proof-test.md and um4-plan.md, so the pushed save
+  carries the fix unchanged.
+- This repository's state (single git commands):
+  - `git show-ref --verify refs/heads/side`: "fatal: 'refs/heads/side' - not a valid ref" (exit 128): no side branch.
+  - `git symbolic-ref HEAD`: refs/heads/claude/netcode-proof-test-plan-hcky5g.
+  - `git log -6`: only the session's checkpoint saves since 20:59; no "results", "a leak", "base", "side" or "merge side"
+    commit.
+  - `git status --short --branch`: even with origin; only this file modified.
+- Whole-spike search (Grep, .gitignore respected, so node_modules is left out): `["']git["']` gives exactly the main
+  session's list. A second Grep for `git <subcommand>` in every non-.md file adds:
+  - ops/cloud-init/lg.yaml:113-161 and rs.yaml:145-234: WRITERS (`git init -q /opt/npt/clone`, fetch, `checkout
+    --detach`), run by cloud-init on a fresh VM at boot. No inherited caller env there, and the tests read these files
+    only as text.
+  - ops/sbin/npt-userdata:17, :20: reads (`rev-parse HEAD`, GIT_CONFIG_NOSYSTEM=1).
+  - Comments and permission strings only: check.test.mjs:1527, redact-check.mjs:15 and :332, redact-check.test.mjs:217,
+    ops/operator/settings.json (git push rules), operator.test.mjs:17-98 (assert strings), r1plan.test.mjs:211,
+    c-u4f-cap.mjs:18 and :110, c-u4f-runs.mjs:34.
+  - siocoutq-root-check.py:153-179 is the status read at :164.
+  - No Rust `Command::new("git")` anywhere (the quoted grep covers .rs).

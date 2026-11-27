@@ -21,7 +21,7 @@
   - Stop B's message (B): U4k, U6d and U6e at about 3.3x, and options (a)-(c), each with my lean.
 - **FABLE, 2026-11-24 16:14 UTC (history.md:7891-7900):** the advisor tool (Fable 5.2) is on: use it before each step on
   R1's path and before a step is called done; tell him what needs it. An extra: the recorded advisor rulings stay.
-  The board add-on is active (2026-11-24).
+  The board add-on is active (2026-11-24; again 2026-11-27 21:09 UTC, in this chat).
 - **RE-PLAN answers, 2026-11-22 12:54 UTC (history.md:7595-7607):** RE-PLAN-OK yes (replan.md is the plan); MARK-NOTES
   yes as replan.md:106-111 words them (the MOVED unit writes them, with a reviewer's read); LAPTOP (b) (R8 once he names
   ML); PACK-P0 (b); R1 Thursday 3 December; dates for R2, R3, R5 and the close come with R1's run plan (aim: the close
