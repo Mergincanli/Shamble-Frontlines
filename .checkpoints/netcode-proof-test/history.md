@@ -8205,3 +8205,13 @@ Just do some prep work and save in between so you have a jump start once the usa
   step-7 brief, UM-4's drafts), so UM-4's build and Builder 2's merge start at once after the reset; no no-save
   stretch is started now (his 13:55 item 1's limit stands).
   Transcript line 114972 (a queue-operation enqueue at 14:52:40.053Z), 124 characters.
+
+## Mustafa, 2026-11-27 15:09 UTC, in this chat: save before the reset (word for word)
+```text
+You're at 98% usage, make sure to save progress (also for the agents)
+The usage will be reset in ~41 minutes
+```
+- **Read as** (the main session's reading, not his words): everything committed and pushed before the usage ran out,
+  the agents' work included; nothing new started. Done 15:09-15:10: the branch equal to origin and clean at cb9e045, no
+  agent running (all four seats' files COMPLETE and committed), the saver bwjsbqfnx running.
+  Transcript line 115122 (a queue-operation enqueue at 15:09:36.137Z), 108 characters.

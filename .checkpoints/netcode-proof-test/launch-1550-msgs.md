@@ -150,8 +150,8 @@ B's form (advisor-u8-f1-head.md block 4), each its own call:
   13:55 item 1's limit, no no-save stretch (F1, MAIN-69, UM-4, NB2-ONEWAY) starts before the reset.
 
 ## B2 (after the 15:50 reset): a3de649cd25e474df (resumed; MAIN-69's Q4 lets B take step 7): two head reads
-Not sent. Written 14:5x as prep (his 14:52 message). It goes after the reset, once MAIN-69's CI on d9fb0dd is read and
-filled in below; one resume for both heads (the advisor tool, 14:3x).
+Sent 15:5x UTC after the reset (resetsAt 1795794600 passed; utilization 0 at 15:52), one resume for both heads (the
+advisor tool, 14:3x). Written 14:5x as prep (his 14:52 message); MAIN-69's CI filled in at 14:56.
 The head reads of two pushed heads: F1 (commit c16777e, pushed in 9fbc4b4) and MAIN-69 (merge 8ec5dc07, pushed in
 d9fb0dd).
 As the advisor (main's .claude/agents/advisor.md, by `git show origin/main:.claude/agents/advisor.md`; read only, no
@@ -173,7 +173,8 @@ cargo, no git write), read and rule, each in its own block:
 Write .checkpoints/netcode-proof-test/advisor-f1-main69-head.md (plan first, then each block as it is done); end with
 "Decisions needed" and "For Mustafa", then, once both blocks are written, the last line `Status: COMPLETE <date and UTC
 time>`.
-Re-checked at sending: (to fill: main; HEAD = origin, clean; CI on d9fb0dd).
+Re-checked at sending (15:5x UTC): main b8f02b0 (unchanged since MAIN-69's take-in); HEAD = origin, clean; CI on
+d9fb0dd all four success (above).
 Write files with the Write and Edit tools only (no sed, no shell redirect, no python writes; never `cargo fmt` writing
 files: apply rustfmt's diff by Edit); an agent with no Edit tool rewrites its notes file whole with Write. git and gh
 always start their own command, with no other program in front of them. In this tool a command that exits non-zero
