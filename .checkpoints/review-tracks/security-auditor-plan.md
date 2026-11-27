@@ -74,3 +74,27 @@ choice; recorded in risk 1 and section 5). GUARD-MARK still closes SA-RT-1's pro
   route weighs more; the guard should refuse the marker in plainly spelled gh comment, review and edit forms and
   file-sourced bodies for them; disguised forms still meet a prompt while R4-1 is open).
 - SA-RT2-1 (guard-file half) Low: kept for the build review.
+
+## Pre-apply review (build copy .gate/review-tracks/build, 2026-11-27)
+Read: diffs of routine-guard.mjs, routine-guard.test.mjs, guard.mjs, advisor.md, security-auditor.md, CLAUDE.md.new;
+track.mjs, track.test.mjs (new). Probed the copy's decide() and track.mjs on a throwaway repo (scratchpad only).
+Sources: code.claude.com/docs/en/hooks (agent_id: set for a subagent or an in-process teammate; agent_type also for
+--agent; a timed-out PreToolUse hook goes on to the normal permission flow); .github/workflows/toolchain.yml:16-18 (every
+push and pull_request, no path filter); settings.json:5-87 allow list (node .gate/*.mjs|js allow-listed; no Write rule).
+Findings (id, severity, class):
+- SA-PA-1 Medium: MARK-FORMS (SA-RT3-1 partly open: close/reopen comment forms; attached/clustered short body-file flag).
+- SA-PA-2 Medium: MARK-THROW (recursive scan overflows; a throw fails open into the allow list in a day session).
+- SA-PA-3 Medium: PATH-TAB (track.mjs cuts a tab-named path; floors, eyes paths and security slot lost; measured).
+- SA-PA-4 Low: ARG-END (track.mjs check-ignore and rev-parse lack end-of-options; no injection: execFileSync, no shell).
+- SA-PA-5 Medium: RISK-INPUT-RUN (risk text: residual forge routes do not all meet a prompt; INPUT-RUN plus allow-listed
+  runners; no new reach, adds stealth against the after-check; report/STATUS text and a follow-up).
+- SA-PA-6 Low: SERVER-NAME (GUARD-MARK keyed to the server name github).
+- SA-PA-7 Low: CRLF (a PASS with CRLF line ends gives silence; fails closed).
+- SA-PA-8 Low: AFTER-CHECK-WAY2 (way-2 merges and reverts carry no PASS; reported as missing Criticals).
+- SA-PA-9 Low: TEST-PAGES (no check that the comment read is paginated, nor of an unparsable line).
+- SA-RT2-1 guard-file half: settled, not needed now (accepted Low; revisit at the first change to passAllows/GUARD-MARK).
+- Teammates: in-process carry agent_id (docs); out-of-process undocumented; agent teams not enabled: accepted, no change.
+Verified sound: mark/accept invariant; edits can never yield an accepted PASS; read-before-edit fails closed; subagent
+refusal; allow reachable only by a day main session on PreToolUse; new merge-path throws end in deny or silence;
+toolchain has no path filter.
+Verdict: REVISE (SA-PA-1, -2, -3 code; SA-PA-5 text). Status: handed back.

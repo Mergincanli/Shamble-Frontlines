@@ -190,3 +190,36 @@ His words are named by code and DECISIONS line; only the plan and the kit are qu
   - Deny them in settings.json. Sessions comment through the GitHub tool, where GUARD-MARK scans every write.
   - This costs one more ask at build. It closes the plain Bash route; the disguised forms stay open until R4-1's fix.
   - Security-auditor rules on it at its (d) read.
+
+---
+
+# Pre-apply review (build copy .gate/review-tracks/build/, 2026-11-27)
+
+**Verdict: REVISE** (4 Medium, 7 Low; no Critical or High). Fixes are text in the copy; re-check only the changed hunks.
+- Matches the plan: CLAUDE.md :62, :83, :92-94, :103, :107, Review tracks bullet, merge sentence and rest of paragraph;
+  advisor.md :33-34, cat. 5, :63-64, :71-74, classes, "His go keeps", plan-review line, evidence sentence, :167-169,
+  :174, :178-184, step 5 item, :200, After-check, merge check counts, kit tests line, :266-268, :304-305, Never;
+  security-auditor.md:54; guard: GUARD-MARK (MCP + SA-RT3-1 gh forms), subagent merge, toolchain, passAllows (d), allow
+  output day-PreToolUse only. Nothing loosened beyond his words; no misquote.
+- Size: 585 added (39 CLAUDE.md + 546 kit), stop line about 980.
+- Suites in copy: guard 1575 (main 1551), track 61, checkpoint 33; settings S4 fails in copy and in basecopy alike
+  (copy is not a git main folder), 127/127 on the real repo.
+- PA-M1 advisor.md "Mustafa's go": first sentence still unscoped (Q2 half met).
+- PA-M2 advisor.md step 5: no "For the merge check" slot in the comment, though H1's routine merge depends on it.
+- PA-M3 track.mjs plan gaps: changed or removed existing DECISIONS entries not flagged; other added DECISIONS text not
+  listed; sha256 missing from forMergeCheck; XMLHttpRequest missing from the triggers; V2_PHASE0_BRIEF missing from (4).
+- PA-M4 track.mjs case-twin: missed when the changed path sorts after its twin (main() :144).
+- PA-L1 gh -F attached form (-Fnote.md) passes the body-file refusal (falls to a prompt).
+- PA-L2 no test for the paginated comment read (plan evidence lists a second-page PASS).
+- PA-L3 advisor.md Never and step 2 still say gate and smoke; the guard now needs toolchain too.
+- PA-L4 advisor.md "Steps 5 and 6": a subagent's merge is now refused; say so.
+- PA-L5 internal id "(H1)" in advisor.md rule text.
+- PA-L6 GUARD-MARK will refuse this change-set's own MCP PR body or report if it quotes the line (risk 10).
+- PA-L7 SA-RT2-1 guard-file half: not built; stays for security-auditor's build review.
+- PA-M5 passAllows splits the body on \n only: a web-typed multi-line PASS (CRLF) never matches, so the allow would
+  never fire on his paste (fail-safe: prompt). Not observed: PRs #65-#77 carry no web-typed comment (all app `claude`);
+  the real --paginate/@json read parses (u, t, c, m, b) on #66, #67, #70, #77. Fix touches SA-RT2-3 wording: SA rules.
+- Departures (accepted, record in the report): merge_pull_request outside the GUARD-MARK scan; security triggers on every
+  path; "no saved file named" is a go floor; SA-RT3-1 built (Bash plain forms now refused); "Main's" and "as above".
+- No case-only twins on origin/main (378 paths). main()'s git half is covered by exit-code tests only.
+- Groups: restores the plan PA-M1, M3, M4, L1, L2; new rule text to show him as additions PA-M2, M5, L3, L4, L5.

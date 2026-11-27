@@ -87,6 +87,13 @@
     security-auditor.md (+2/-1). Size against main: 585 added (guard 37, its tests 151, guard.mjs 4, advisor 76, sa 2,
     CLAUDE 39, track.mjs 160, its tests 116); stop line about 980. Suites in the copy: 1575, 61, 33, 9.
 
+21. test-engineer's pre-apply review: REVISE: TE-B1 High (new case-only twin missed), TE-B2 High (changed or removed
+    entries pass silently), TE-B3 High (two real entries hash the quote plus a final newline: false floors), Mediums
+    TE-B4..B10 (no-saved-file floor vs the plan; cwd and git config dependence; the git layer untested; triggers vs plan
+    3b; V2_PHASE0_BRIEF missing; --files picks by file count; the guard's comment-read fake not pinned), Lows TE-B11..B18;
+    its two technical choices WORDS-NEWLINE (a) and SAVED-FILE-FLOOR (a) taken (they follow the plan) · notes
+    test-engineer-build.md; security-auditor and the advisor agent: running
+
 ## Current step
 Pre-apply review of the copy (security-auditor, test-engineer, the advisor agent), so fixes cost no extra asks; then
 the applies (about 10 asks), cmp, suites, gate, one commit. Then: fast-forward the lane branch to main, move the notes from
