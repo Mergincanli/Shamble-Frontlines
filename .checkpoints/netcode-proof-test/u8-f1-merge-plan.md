@@ -1,6 +1,6 @@
 # U8-F1's merge into the lane: the plan (M0-M9), written 2026-11-27 01:3x UTC by the main session
-Status: DRAFT for its check by B a3de649cd25e474df in the 05:50 UTC window (launch-0550-msgs.md). Nothing runs before
-it. Form: U7's M0-M9 (u7-merge-plan.md), with the head read's M3a (advisor-u7-head.md section 3) and U8-F1's terms. The
+Status: APPROVED WITH CONDITIONS C1-C3 by B a3de649cd25e474df (advisor-u8-f1-merge.md, 06:00 UTC on 11-27), each
+applied by Edit word for word: C1 at M0 and M5, C2 and C3 at M8, its Q3 addition at M9. Nothing ran before it. Form: U7's M0-M9 (u7-merge-plan.md), with the head read's M3a (advisor-u7-head.md section 3) and U8-F1's terms. The
 merge into the lane needs no go of his; PR #40 keeps its own. Order: this merge first, with the linked install (choice
 15 (i)); the `ops` step change (UM-4) after it, plan first. The advisor tool read the outline (01:2x): its six points
 are folded in; its read of the written plan (01:2x): the base run back to the four light steps (no check.mjs step calls
@@ -70,10 +70,10 @@ the advisor rules."
     after the save that carries M0's done line, named in the chat. The no-save window runs from there to M8's push: a
     Stop hook gets one line, no save.
   - `git diff --quiet 6968215 H0 -- spikes/`, its own call: exit 0 (nothing under spikes/ moved since U7's merge, so
-    M5's bars below are U7's M5 counts).
+    M5's bars below that read only spikes/ are U7's M5 counts; the others are the base run's: C1).
   - The base run at H0: `bash .checkpoints/netcode-proof-test/main-run.sh
     /home/user/Shamble-Frontlines/.gate/u8-f1-merge/light-base.log node check.mjs --only refs,marks,self,redact`
-    (run_in_background, timeout 7200000): N0 (refs; 2,139 expected), the marks line, self, redact items (464). A
+    (run_in_background, timeout 7200000): N0 (refs; the count recorded as N0 (2,139 at U7's M5; notes since may move it)), the marks line, self, redact items (464). A
     failure stops the merge here: nothing is staged; the saver restarted; the log to the advisor.
 - **M1:** the patch's sha256 is 4d6a248425aebb25b317cf2da363e00915e8f2b13eb6f26a6a259a5e0f3f7164.
 - **M2:** `git diff --quiet 77ffc95 H0 --` the 6 paths: exit 0 (each unchanged on the lane since 77ffc95).
@@ -93,12 +93,15 @@ the advisor rules."
   /home/user/Shamble-Frontlines/.gate/u8-f1-merge/m5-check.log node --test 'ops/**/*.test.mjs' :: bash
   ops/tests/wrappers.test.sh :: env CARGO_INCREMENTAL=0 node check.mjs` (run_in_background, timeout 7200000). All
   pass:
-  - ops: 104 tests, 104 pass, 0 fail (U7's M5's 101 + U8-F1's three);
-  - wrappers: "315 ok, 0 failed";
-  - check.mjs: all 12 steps, each count equal to U7's M5 (u7-merge-plan.md's M5 done line): test 931 measured and
-    1,028 bites passed, 0 failed, 0 skipped; web 70 of 70; self 80 of 80; marks 81, rows unchanged; redact 11 of 11,
-    464 items, 0 findings; refs 2,139 (= N0: no new file); wasm 27,000 ticks native-native and native-Wasm, 0
-    mismatching; deps' held rules. A count that differs is named; unless U8-F1's six ops/ files explain it, M6.
+  - ops: 104 tests, 104 pass, 0 fail; wrappers: '315 ok, 0 failed'.
+  - check.mjs: all 12 steps pass.
+    - test, web and wasm: equal to U7's M5 (931 and 1,028 passed, 0 failed, 0 skipped; 70 of 70; 27,000 ticks, 0
+      mismatching).
+    - self, marks and refs: equal to M0's base run (refs = N0).
+    - redact: 11 of 11 tests, 0 findings, and its items equal to the base run's count. A difference is named with the
+      files on disk that explain it; an unexplained drop is M6.
+  - Any other differing count is named; unless U8-F1's six ops/ files explain it, M6.
+  (C1, advisor-u8-f1-merge.md:47-55, word for word; its table at :34-45 gives each figure's bar and reason.)
 - **M6:** a failing test or bar is never retried unnamed. It stops the merge, by advisor-u7-head.md section 3's words:
   "The undo starts with `git update-index --refresh` (the same bar) and `git diff --quiet -- spikes/`, then `git apply
   -R --index` of the patch, then `git diff --quiet H0 -- spikes/`." Then the link removed and the saver restarted; the
@@ -113,19 +116,46 @@ the advisor rules."
     item 6's save wording);
   - the size: +93 net (105 added, 12 removed) of 93; U8 at 6,282 of his 6,282 stop (U8F1-SIZE (a));
   - S14-VMS: the advisor's ruling (inside his "the same redaction check"; his to reverse, choice 25);
-  - the carries: SEC-U8F1-3's "in the same PowerShell" wording and SEC-U8F1-4's Stop B record (their home by the
-    checker's Q2), logq's non-object line (a STATUS follow-up), and the earlier Lows (re-runs keep the last attempt's
+  - the carries: SEC-U8F1-3's "in the same PowerShell" wording and SEC-U8F1-4's Stop B record (C2: on PR #40's
+    closing list now, as security findings left open; no fill and no building of them until he answers U8-FILLS), logq's non-object line (a STATUS follow-up), and the earlier Lows (re-runs keep the last attempt's
     prints only);
   - the proofs by pointer (u8-f1-build.md's FIX PASS HAND-BACK: each item's red, plant and restore hash; item 5's
     scratch proof with private stand-in addresses, since the fixture's documentation addresses are allowed anyway);
   - M5's and M7's lines.
+  - C3 (advisor-u8-f1-merge.md:98-125, word for word): these lines too, each a pointer, no new paper:
+    1. The rounds and rulings: the head read: advisor-u8-head.md, APPROVE WITH FINDINGS; ADV-U8H-1 to -4; SR-1 and
+       SR-2 weighed Low; his RESULTS-PUSH (b) and S14-PUSH (a), at history.md:8068-8106; the brief check:
+       advisor-u8-f1-brief.md, C1-C7; the security round: security-u8-f1.md; its ruling: advisor-u8-f1-sec.md; the
+       stop's moves: 6,230, then 6,282 by U8F1-SIZE (a).
+    2. What leaves the server now, one line for his Stop B read: `collect/`, `probe/presence.txt`,
+       `ds-selftest/ws_split.txt`, `bringup/facts.txt`, `s14/` whole and `s14-redact.txt`. The new prints are integers
+       only, and the policy reads are numbers. The s14 folder's own check runs with no VM list (S14-VMS), and the hook
+       checks the whole push with it.
+    3. The D10 and DEP-HOLD lines: no marks.json or judge change; no manifest or lockfile; ops/browser's package.json
+       and package-lock.json unchanged.
+    4. The first run against the merged trees: the builder's end checks ran at 77ffc95, so M5 is U8-F1's first run
+       against NB2's and U7's merges.
+    5. The security findings left open, for PR #40's closing list: SEC-U8F1-3 and SEC-U8F1-4 (C2); SEC-SB-9's rest, as
+       before. logq's non-object line is a STATUS follow-up, not a security finding.
+    6. ADV-U8H-4, applied in the same edit (my head read asked for it; it is not done): :63-64's "U6c's names (NC-R2-4,
+       read by test 7 on the merged code: M5 above)" becomes "U6c's names: test 7's item 4 reads fixtures; on real
+       output, the head read's run of probe_presence on U6c's 24 Nov log (P0 present, P1 at the drop rule)"; the open
+       list gains U7's alignments (the URL contract in config.mjs, `node build.mjs` in rs.yaml), checked at U7's merge:
+       their state as found; :70-71's "For the advisor's head read" line points to advisor-u8-head.md (read).
+    7. The two wordings for his Stop B read (u8-f1-build.md, "Open"): "runs on `<results>\r1\s14` with no VM list"
+       (S14-VMS, choice 25); the save's shorter reason.
   Pushed by a checkpoint save with the card updated.
 - **M9, after the push:** the saver restarted; CI on the pushed head (gate with its gate and smoke jobs, toolchain; push
   and pull request), all green; B's read of the pushed head in the next window (not a round; advisor-u8-f1-sec.md
   section 1). After that read, U8-F1's builder's worktree comes off by the re-ruled form for U7's builder
   (advisor-u7-head.md, "Item 6, re-ruled"): its notes on the lane at the same paths, then the builder, resumed in a
   window, `git add`s the ADDED and differing paths and runs `git merge --ff-only`, and `git status --short` prints
-  nothing; any refusal: it stays until PR #40's close. Never `--force`, never `rm -rf`.
+  nothing; any refusal: it stays until PR #40's close. Never `--force`, never `rm -rf`. Q3's addition
+  (advisor-u8-f1-merge.md:90-95, Low): the builder's worktree also holds the scratch folder
+  `.checkpoints/netcode-proof-test/u8-f1/` untracked (drafts.md, list-draft.test.mjs, pin-draft.test.mjs,
+  hooks-proof.mjs, missing-log.mjs), beside u8-f1-build.md; step 1's notes save copies each of those files to the main
+  folder's same path, sha256-equal to the worktree's; ffcheck then expects exactly those, the six differing ops paths,
+  and nothing else; otherwise the fast-forward leaves staged additions, and the fallback (b) applies.
 
 ## Risks
 - M5's whole run is cold after the part-clean: about 20-45 minutes (U7's: 21 minutes).
@@ -142,6 +172,8 @@ the advisor rules."
   and SR-2 were)? Does building them at Stop B's fill count against U8's stop?
 - Q3: no C1 and no M2b, and M3a kept for uniformity: agree?
 - Q4: u8-report.md's U8-F1 section (M8's list): anything missing?
+- Answered 06:00 (advisor-u8-f1-merge.md): Q1 figure by figure (C1); Q2 C2, and U8-FILLS is his (before Stop B's
+  fill); Q3 agree, plus M9's scratch-folder addition; Q4 C3.
 
 ## Done lines (one per step, by Edit)
 (none yet: M0 not started)
