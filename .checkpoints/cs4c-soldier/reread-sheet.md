@@ -86,8 +86,11 @@ needs it; if his answers come after step S's code, step 0 still lands before any
   decides. Under SIZE-4C (b) or (c), each pull request gets its own rungs, written here when he has answered.
 - Until he answers SIZE-4C, step S is held to about 1,420 written lines (its planned size times 1.25, the lowest line
   any option gives it), and its reviews wait, since under (a) they run on 4c's final diff.
-- The count is taken at each step's end by 4b-2's method: `git diff --numstat` against the base, `crates/` and
-  `packages/` only, the generated and recorded data files counted as 4b-2 counted them (`count-4b2.mjs` at 59f6cc7).
+- The count is taken at each step's end by 4b-2's method (`count-4c.mjs` in this folder, from `count-4b2.mjs` at
+  59f6cc7): `git diff --numstat dae6d107 -- crates packages`, added lines; the vectors' data and what `make_recordings`
+  writes left out; everything else in, the generated TypeScript included. The advisor agent's count ruling of
+  2026-11-27 held the generated TypeScript counted "to the end of 4b-2": whether it stays counted in 4c is its to rule
+  (section H).
 
 ## G. Evidence, reviewers, his checks, risks
 - **Step S:** a visual change. Before and after renders of the real page (the empty scene on main, the scene on the
