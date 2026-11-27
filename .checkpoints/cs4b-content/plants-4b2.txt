@@ -31,7 +31,7 @@ P15 CAUGHT (defect): the page's entry shows a text as markup: exit 1, found 2 of
 P16 CAUGHT (defect): the Worker makes code from a text: exit 1, found 2 of 2 wanted texts
 P17 CAUGHT (defect): the folder reader takes a link for a file: exit 1, found 1 of 1 wanted texts
 P18 CAUGHT (defect): the scan of the sources no longer knows innerHTML: exit 1, found 1 of 1 wanted texts
-P19 DID NOT HOLD (control): the production page builds from the clean sources: exit 1, found 0 of 0 wanted texts
+P19 HELD (control): the production page builds from the clean sources, after a clean build of the players' file: exit 0, found 0 of 0 wanted texts
 W10 CAUGHT (defect): of 512 boxes met at one distance the first visited answers a ray, not the lowest index (the hostile row names it; the same box 512 times does not): exit 101, found 2 of 2 wanted texts
 W11 CAUGHT (defect): a node entered exactly as far as the best hit is pruned, so a lower index behind it is lost: exit 101, found 1 of 1 wanted texts
 W12 CAUGHT (defect): the builder leaves out one of the map's shapes: exit 101, found 1 of 1 wanted texts
@@ -93,7 +93,7 @@ N3 CAUGHT (defect): the native tests of sim built with -Ctarget-cpu=haswell: exi
 N4 CAUGHT (defect): the native tests of devtools built with -Ctarget-feature=+avx2: exit 101, found 1 of 1 wanted texts
 N6 CAUGHT (defect): a cargo config file committed beside the workspace: exit 101
 N5 HELD (control): the native tests of content built with no flag: exit 0
-DEFECT CHECKS: 83 caught, 0 not caught. CONTROLS: 10 held, 1 did not hold.
+DEFECT CHECKS: 83 caught, 0 not caught. CONTROLS: 11 held, 0 did not hold.
 EVERY FILE PUT BACK (sha256 of 28 files as at the start): yes
 THE PLAYERS' FILE REBUILT TO ITS SHA256 FROM BEFORE THE PLANTS (3660132be46b...): yes
 CLEAN TREE GREEN: the players' build with its built-file check, the build checks' tests, the source scan: exits [0, 0, 0]

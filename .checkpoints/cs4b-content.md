@@ -1300,7 +1300,13 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   the clean tree green (the players' build, the build checks' tests, the source scan: exits 0, 0, 0); its result
   file kept as `cs4b-content/plants-4b2-run1.txt`. P19 fixed, the anchors 85 of 85, the tree clean: **the second
   whole run started before 20:15:06 UTC** (the clock read right after; a first version of this line said "20:16",
-  typed ahead of the clock: slip 9), on the same code (c442a80).
+  typed ahead of the clock: slip 9), on the same code (c442a80). **The second whole run ended at 20:18:20 UTC:
+  83 defect checks caught, 0 not caught; controls 11 held, 0 did not hold** (P19 held, after its clean build of the
+  players' file); every file put back (28 by sha256); the players' file rebuilt to 3660132b...; the clean tree
+  green (exits 0, 0, 0); `cs4b-content/plants-4b2.txt` is this run's. The source tree clean after it.
+- **The close, second point: the reviewers, round 1, on the code head c442a80** (`cs4b-content/review-brief-4b2.md`),
+  three at a time: rust-reviewer, security-auditor, netcode-architect; then engine-architect, test-engineer,
+  infra-engineer. Their notes: `cs4b-content/<name>-review-4b2.md`.
 
 ## Slips of this chat's own rules, for the report
 - One git command did not start its own shell call: `git add .checkpoints/cs4b-content/review-brief-4b1.md` stood
