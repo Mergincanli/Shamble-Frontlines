@@ -22,3 +22,10 @@ not his answer to DIFF-LIST, and nothing was done on it.** DIFF-LIST stays open 
 
 `chat-words.mjs` now leaves such a repeat out and says so; run on "a" it finds the one message and "left out: 2
 repeat(s)".
+
+**One more, 2026-11-27 (written 02:03 Amsterdam).** His message of 2026-11-26, 23:43:38 UTC ("We're at 94% usage,
+make sure to save your and the agents work every 25 minutes ...") was shown to the chat a second time at
+2026-11-27, 01:03:02 UTC, when the turn after the container's restart (about 00:22 UTC) ended. The chat's record
+holds it twice under one id (`aba2bec8-67fc-4ff9-b94e-79588e8a01ef`), with a queue entry of 00:23:19 UTC between:
+a repeat, not a new message. It asks nothing new (the saving every 25 minutes was already kept), and it is no
+answer to DIFF-LIST or to CI-TIME, which the chat had asked two minutes before. Nothing was done on it but this note.

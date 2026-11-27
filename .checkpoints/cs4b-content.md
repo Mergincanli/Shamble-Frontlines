@@ -1050,7 +1050,8 @@ worktree and everything under `.gate/` were kept.
 - **Blocked on his own answer to DIFF-LIST** (asked 2026-11-26, 23:11 Amsterdam;
   `cs4b-content/question-2026-11-26-diff-list.md`): step 8's second part, step 9, step 10's wiring. A bare "a"
   has reached this chat twice as a repeat of his older message (`cs4-walk/redelivered-2026-11-26.md`): it is
-  no answer. `chat-words.mjs` shows whether a message is a repeat (its `source_uuid`).
+  no answer. His "94% usage" message came a second time the same way (2026-11-27, 02:03 Amsterdam, after the
+  container's restart): no new message either. `chat-words.mjs` shows whether a message is a repeat (its `source_uuid`).
 
 **On his yes, in this order:**
 1. **Step 8, second part.** `content/source/testlines-export.json` = `cs4b-content/testlines-export-30.json`
