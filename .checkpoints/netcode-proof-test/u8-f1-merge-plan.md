@@ -234,7 +234,9 @@ the advisor rules."
   head, push and pull request; B's read of the pushed head in the 10:50 window; then U8-F1's builder worktree by the
   re-ruled form with Q3's scratch-folder addition).
 - M9, 06:38:47-: the card save 08e8b0f pushed (carries ddb06ff; neither subject has a skip marker); the branch clean
-  = origin; the saver restarted as bxsgd1l59 (110 minutes, to about 08:29). CI on 08e8b0f: (to fill from PR #40's
-  events: the push and pull request gate and toolchain runs, each one's result). Left in M9: B's read of the pushed
+  = origin; the saver restarted as bxsgd1l59 (110 minutes, to about 08:29). CI on 08e8b0f, all four success at
+  attempt 1: push gate 45953185098 (06:38:49-06:39:57) and toolchain 45953185158 (06:38:49-06:46:58); pull request
+  gate 45953191100 (06:38:52-06:40:14) and toolchain 45953191037 (06:38:52-06:46:48); PR #40's check_suite.completed
+  event at 06:49:10 (nothing failed or running). M9's CI bar is met. Left in M9: B's read of the pushed
   head at 10:50 (it also rules the U7-alignments proposal in u8-report.md), then U8-F1's builder worktree by the
   re-ruled form with Q3's addition.
