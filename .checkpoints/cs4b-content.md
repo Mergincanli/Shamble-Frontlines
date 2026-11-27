@@ -15,7 +15,7 @@
   `claude/cool-pasteur-oiqk1r` ends at 7f5ba3966def8c36e2c3863c6b2fda7b4b9a9169 and is never pushed to again (his
   Lanes rule: one account per branch) · **Base:** 4b-1's origin/main 2483e9a741c4e552323c36523831a2f35de4002e (the
   merge of 4a, pull request #70); 4b-2 counts against b9aad01954be666340a7ec5c6e9fc9353b11abf1 (the merge of 4b-1)
-- **Last update:** 2026-11-27 15:14 Amsterdam (from the clock)
+- **Last update:** 2026-11-27 15:32 Amsterdam (from the clock)
 
 ## Sizes and stop lines (his answer of 2026-11-26, 14:09:13 UTC: SIZE-4B (b); which number is which)
 - **4b is two pull requests**, in engine-architect's cut; "each stands on its own: lines left over in 4b-1 do not
@@ -1021,6 +1021,34 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
     Advisor opens the draft and merges on his tap (his item 11).
   - **`chat-words.mjs`** now names this session and writes only to a full path given on the command line (his
     standing rule of 2026-11-27 on full paths); Builder V4's saved notes keep V4's session id.
+  - **The seat's start, by git's own record** (`git reflog`): the local `cs/4b-content` made at 7f5ba39 at
+    14:06:16 UTC; `claude/ecstatic-wozniak-5cbdzs` created on GitHub by the first push at 14:06:28 UTC (15:06:28
+    Amsterdam); the notes commit 876ac7d pushed 14:15:47; **main taken in: 35e96ad** (git's merge of 876ac7d and
+    main b8f02b0, pushed 14:16:29; no clash; every file under `docs/`, `.claude/`, `.github/`, `tools/`,
+    `legacy/` and `CLAUDE.md` equal to main's), its own commit with CI.
+  - **CI on 35e96ad: green** (gate run 46014436944; toolchain run 46014436936, 14:16:34 to 14:25:23 UTC by the
+    run's own times: under the new 25-minute limit). The count reproduced on it: **4,956** written lines against
+    b9aad01 (55 files; 248 data lines of `crates/devtools/vectors/` left out).
+  - **The baseline on this machine: ALL LOCAL CHECKS PASSED on 35e96ad** (14:18:25 to 14:26:59 UTC by the log's
+    own times; `.gate/local-checks.log`): 219 Rust tests twice, 218 in release, clippy clean, client 136,
+    sim-worker 51, types 8, net 1, 36 boundary tests, the type checks, 19 browser tests in 198 s, the recordings
+    unchanged; **the players' file 54,514 bytes, sha256 b4a9774f9be1a35271cb92ce00daaf7f372b2ebb389c4dac03d10c67a64f59ba,
+    as at 5c6738a**. **The gate: PASS with smoke** (its Playwright 1.56.1 asks for build 1194's
+    `chromium_headless_shell-1194/chrome-linux/headless_shell`: linked to this machine's build-1243 headless
+    shell; renderer SwiftShader). `repo-map-check.mjs`: OK, 237 entries cover 109 required paths (neither the
+    gate nor CI runs it).
+  - **Two choices for step 8's second part, for the report's departures and the advisor agent's final read:**
+    (1) **The manifest beside his Export in `content/source/` is written by script**
+    (`cs4b-content/content-source-manifest.mjs`), not moved byte for byte from the notes as the plan's "moves,
+    byte for byte, to `content/source/` with its manifest" (`cs4-walk/plan.md:407`) could be read: a byte copy's
+    first line would name the notes file it no longer sits beside, and its comparison lines name another notes
+    file, and both leave the head. Each line is worked out from the Export's own bytes (and must equal the notes
+    manifest's line of that name) or, for the message's two lines, copied by script; nothing is typed; the
+    design's list of what the manifest holds (`cs4-walk/testlines-cs4.md:31-32`) is met whole. (2) **The second
+    route takes five values that stand once among the fifteen** (walk speed, sprint multiplier, gravity, the
+    refill time by its other name, push strength): three pairs are equal (the two easing times 0.164, body and
+    push radius 0.4, step-up and the sights multiplier 0.55), so **a row swapped within one of those pairs
+    passes every check**: said in the test and in the report as not verified.
 
 ## Slips of this chat's own rules, for the report
 - One git command did not start its own shell call: `git add .checkpoints/cs4b-content/review-brief-4b1.md` stood
@@ -1054,6 +1082,12 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
 - The chat told him, in its update after round 1's fix pass, that the million-input fuzz run is by hand. It is
   not: CI's release line runs the tools crate's tests (test-engineer's TE-8). Corrected in the chat's update
   after test-engineer's read, and in the report.
+- **Builder V6's, 2026-11-27:** (1) the take-in's merge commit 35e96ad carries git's default message and no
+  attribution lines: the merge was made with no message of its own, and the guard refuses `git commit --amend`
+  (`routine-guard.mjs:369`), so it stays as it is (no history is rewritten). (2) The card's "from 2026-11-27 15:06
+  Amsterdam" for the seat's start was written before the time was read; git's record gives 14:06:28 UTC (15:06:28
+  Amsterdam): the same minute, now with its source. (3) The chat told him the baseline checks "started 14:22
+  UTC"; the log's own birth time is 14:18:25 UTC. Corrected to him in the chat.
 
 ## HAND-OVER: where another session picks this up (written 2026-11-27, 00:44 Amsterdam; kept current)
 His words of 2026-11-27, 00:43 Amsterdam (2026-11-26, 23:43:38 UTC; `cs4-walk/mustafa-2026-11-27-save-every-25-
@@ -1090,10 +1124,10 @@ again here. SEAT-OUT from him: stop at a whole point and report the last commit'
   older message: `cs4-walk/redelivered-2026-11-26.md`; `chat-words.mjs` leaves repeats out.)
 
 **Now, in this order** (his DIFF-LIST yes is in):
-0. **This seat's start** (2026-11-27): main taken in once (b8f02b0, #78: CI-TIME), as its own commit with CI;
-   the machine's tools made again (the list below); the count reproduced (4,956 against b9aad01); the full local
-   checks on that head as the baseline (the players' file 54,514 bytes, sha256 b4a9774f...59ba as at 5c6738a).
-   Step 8's second part starts only once that baseline is green.
+0. **This seat's start** (2026-11-27): DONE. Main taken in once (35e96ad: b8f02b0, #78, CI-TIME), CI green on
+   it; the machine's tools made again (the list below); the count reproduced (4,956 against b9aad01); the full
+   local checks on 35e96ad passed whole, the players' file byte for byte 5c6738a's; the gate passed with smoke
+   (the card's entry "The seat moved to Builder V6").
 1. **Step 8, second part.** `content/source/testlines-export.json` = `cs4b-content/testlines-export-30.json`
    byte for byte (sha256 a9d47785ed8f70d895d10480d180c9bba5a67f7e955e0c460c0c1bef7718c4ab, the pin in
    `packages/client/scripts/testlines.mjs`); its manifest beside it (it must hold the line `sha256: <that
@@ -1174,8 +1208,9 @@ in two lines.
 ## Current step
 4b-2 (2026-11-27, 15:14 Amsterdam, from the clock; Builder V6): every piece of steps 6 to 10 that needs no content
 file is built and pushed (head of the code: 5c6738a; 4,956 written lines of 8,450). DIFF-LIST is answered (a).
-In hand: the HAND-OVER list's item 0 (main taken in, the machine's tools, the count, the baseline checks); then its
-item 1 (step 8's second part).
+The HAND-OVER list's item 0 is done (35e96ad: main in, CI green, the baseline checks and the gate green on this
+machine, 4,956 reproduced). In hand (15:32 Amsterdam): its item 1, step 8's second part (the content files, then
+the four tests on the real files and their plants).
 
 ## Next steps (the sheet's revision 3, section G; each step ends with the count of written lines)
 - **4b-1:** 1 the content crate's manifests · 2 the reader, the writer, the bundle, the two kinds, the old tuning's
