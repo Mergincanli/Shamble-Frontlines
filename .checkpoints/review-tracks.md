@@ -156,6 +156,13 @@
 30. The advisor agent's re-check of the third fix pass: APPROVE; the copy is ready for the applies. RC3-L1 Low (the
     comment-edit check on GitHub-named connectors only; safe side): a STATUS follow-up. security-auditor: running.
 
+31. security-auditor's re-check: SA-RC-7 and SA-RC-8 closed; SA-RC-9 (the SA-RC-5 class, Critical by class, ends at a
+    prompt): one more name shape; its tested fix built in the copy (the merge rules and the comment-edit check read the
+    tool name's last part on every connector; a merge only as the github connector's own tool), which also closes the
+    advisor's RC3-L1. The class's remainder that no name rule can close stays for him, as on main. Suites: guard 1581
+    (one more mutation case), track 85, checkpoint 33, kept-logs 9; its probe: every shape refused. Narrow
+    confirmation by security-auditor running; rows 1-3 do not depend on it.
+
 ## Applies (the source of truth for what is in: a row is "in" only with its commit; every other row is NOT applied)
 Source for every apply: .gate/review-tracks/build/ (gitignored; CLAUDE.md there is CLAUDE.md.new). After each apply:
 node --check (scripts), the file compared with the copy once its last edit is in, one commit of that file only

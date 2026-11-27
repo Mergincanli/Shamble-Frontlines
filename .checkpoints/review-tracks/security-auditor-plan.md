@@ -123,3 +123,16 @@ Probes: session scratchpad only (sa-recheck5..8.mjs).
 - New SA-RC-8 Medium: WORDS-SHAPE (measured on the built function).
 - New SA-RC-7 Low: BASE-LOCAL (measured on the built script).
 Verdict: REVISE on SA-RC-8; the other hunks approved.
+
+## Re-check of the SA-RC-5 remainder, SA-RC-7, SA-RC-8 hunks (build copy, 2026-11-27, not a new round)
+Read: routine-guard.mjs mcp() whole, track.mjs wordsCheck and git(). Suites: guard 1581/1581, track 85/85.
+Probes: session scratchpad only (sa-recheck7..10.mjs).
+- SA-RC-8 (WORDS-SHAPE): closed (tail-only quote floors; 24/24 real saved files with a "---" line match the shape).
+- SA-RC-7 (BASE-LOCAL): closed (graft present: merge base unchanged, full track with the tier-2 floor).
+- New SA-RC-9 Critical by class (MERGE-SCOPE remainder; ends at a prompt; day sessions only): measured on the built mcp().
+Verdict: REVISE on SA-RC-9; SA-RC-7 and SA-RC-8 hunks approved.
+SA-RC-9 measured further: routines (both roles) refuse every three-part name on main and on the copy; day session
+returns no decision on main and on the copy (pre-existing, not widened; the hunk misses that shape). Trial fix (last
+"__" segment, exact mcp__github__<name>) on a scratch copy: all shapes refused, the github merge still reaches the
+merge check; suite 1580/1581 (only the mutation runner's text anchor for the changed line fails, expected).
+Class: standard merge names closable here; other merge-capable tool names stay for Mustafa as on main.
