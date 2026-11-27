@@ -108,7 +108,7 @@
     literal pathspecs made git's ignore check fail on every path: found and fixed; any failure now exits 2), "++" lines,
     XMLHttpRequest, text triggers only under packages/tools/legacy, V2_PHASE0_BRIEF, Cargo.toml anywhere and
     rust-toolchain, a spike's .rs to rust-reviewer, --files picks marked provisional); fixture-repository tests; guard:
-    the marker check on every connector, the subagent rule and comment-edit check on any GitHub-named server, CRLF,
+    the marker check on every connector, the subagent rule and the comment-edit check widened, CRLF,
     the comment read pinned to an exported filter; advisor.md PA-M1, PA-M2, PA-L3, PA-L4, PA-L5, SA-PA-8, TE-B9.
     Suites in the copy: guard 1581, track 82, checkpoint 33, kept-logs 9. Mutants on track.mjs: 49 of 51 caught (2
     cannot change the result); guard mutation run: every new mutant caught. Real history: the 20 newest DECISIONS
@@ -121,9 +121,9 @@
     real entries naming their branch; RC-M1 wrapped headers; RC-M2 folder-only twins; RC-L1 local excludes; RC-L2 diff
     algorithm; RC-S1 = SA-PA-10's class, kept out of files); the rest approved; twins departure accepted; ADDITIONS-OK
     list grown. security-auditor REVISE on track.mjs (SA-RC-1 base by short name, SA-RC-2 repo ignorecase, SA-RC-3 temp
-    leak on stop, SA-RC-4 folder outside temp, SA-RC-6 size message) and SA-RC-5 (pre-existing, Critical by class: a
-    merge through an other-named GitHub connector skips the guard's checks; ends at a prompt).
-26. Second fix pass in the copy: all of them, SA-RC-5 included (refused outside the github connector); the ignore
+    leak on stop, SA-RC-4 folder outside temp, SA-RC-6 size message) and SA-RC-5 (pre-existing on main, Critical by
+    class, ends at a prompt; its detail stays out of files until its fix is merged).
+26. Second fix pass in the copy: all of them, SA-RC-5 included; the ignore
     check in a new hermetic temporary repository; parts() (header up to the quote, the quote's own run); twinPaths()
     (file or folder twins, changed paths only); refs/remotes/origin/main; GIT_NO_REPLACE_OBJECTS; --diff-algorithm=myers;
     every failure exits 2 after cleanup; saved files in the record's three shapes (the quote; plus a final newline; a
