@@ -1276,7 +1276,9 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   UTC"; the log's own birth time is 14:18:25 UTC. Corrected to him in the chat. (4) At about 15:41 UTC one
   `git status --short` stood after a `cd` and before an `ls` in one call. A read. Since then each git command
   stands alone in its call. (5) The correction sent to the advisor agent at cut C says "15:58 UTC"; it was written
-  before the clock read 15:57:53: a time typed ahead of the clock (the brief now says so).
+  before the clock read 15:57:53: a time typed ahead of the clock (the brief now says so). (6) At 16:42 UTC one
+  `gh api` call (a read of CI's checks on 885d382) stood after a `grep` and a `date` in one call. A read. Since
+  then each git and gh command stands alone in its call.
 
 ## HAND-OVER: where another session picks this up (written 2026-11-27, 00:44 Amsterdam; kept current)
 His words of 2026-11-27, 00:43 Amsterdam (2026-11-26, 23:43:38 UTC; `cs4-walk/mustafa-2026-11-27-save-every-25-
