@@ -3,7 +3,8 @@ Status: DRAFT for its check by B a3de649cd25e474df in the 05:50 UTC window (laun
 it. Form: U7's M0-M9 (u7-merge-plan.md), with the head read's M3a (advisor-u7-head.md section 3) and U8-F1's terms. The
 merge into the lane needs no go of his; PR #40 keeps its own. Order: this merge first, with the linked install (choice
 15 (i)); the `ops` step change (UM-4) after it, plan first. The advisor tool read the outline (01:2x): its six points
-are folded in.
+are folded in; its read of the written plan (01:2x): the base run back to the four light steps (no check.mjs step calls
+the CLI) and the CLI checked directly.
 
 ## Facts (read 01:1x-01:3x UTC on 11-27; HEAD 46c964f = origin, clean)
 - wip/u8-f1-build.patch: sha256 4d6a248425aebb25b317cf2da363e00915e8f2b13eb6f26a6a259a5e0f3f7164, 23,152 B, 6 files,
@@ -40,8 +41,10 @@ are folded in.
 - M3a kept for uniformity: the head read scoped it to patches that change tracked files under crates/, and this one
   changes none; here it is a no-cost refresh before `--index`.
 - Disk: 7,802 MiB free (01:1x), under M0's 8,192: the part-clean first.
-- The CLI: cli-target was cleaned 01:1x (cli-root kept: the installed wasm-bindgen that build.mjs uses). This is the
-  first whole run since, so M0's base run adds `web` and `wasm`, before anything is staged.
+- The CLI: cli-target was cleaned 01:1x; cli-root is kept, and its `bin/wasm-bindgen --version` prints "wasm-bindgen
+  0.2.130" (01:3x), the version web/build.mjs pins (:4, :24). No check.mjs step calls it: the web step runs npm ci when
+  needed, tsc and web/test's node tests (check.mjs:2656-2679), and the wasm step builds npt-hash-wasm with cargo
+  (:2242-2250, :2378). Only build.mjs uses it (Stop B's two dist builds), so this merge does not depend on it.
 - The guard: no command below has a program in front of git or gh; main-run.sh's own git calls run inside the script
   (INPUT-RUN). If one asks or is refused, the step stops and the advisor rules.
 - u8f1-m4-cmp.mjs (written 01:3x) is u7-m4-cmp.mjs with its header (:1-4), :9 (the worktree), :10 (the patch) and :32
@@ -69,10 +72,9 @@ the advisor rules."
   - `git diff --quiet 6968215 H0 -- spikes/`, its own call: exit 0 (nothing under spikes/ moved since U7's merge, so
     M5's bars below are U7's M5 counts).
   - The base run at H0: `bash .checkpoints/netcode-proof-test/main-run.sh
-    /home/user/Shamble-Frontlines/.gate/u8-f1-merge/light-base.log node check.mjs --only refs,marks,self,redact,web,wasm`
-    (run_in_background, timeout 7200000): N0 (refs; 2,139 expected), the marks line, self, redact items (464), web's
-    count (70), wasm's ticks; web and wasm finding the installed CLI. A failure stops the merge here: nothing is staged;
-    the saver restarted; the log to the advisor (never install, update, rebuild or copy the CLI).
+    /home/user/Shamble-Frontlines/.gate/u8-f1-merge/light-base.log node check.mjs --only refs,marks,self,redact`
+    (run_in_background, timeout 7200000): N0 (refs; 2,139 expected), the marks line, self, redact items (464). A
+    failure stops the merge here: nothing is staged; the saver restarted; the log to the advisor.
 - **M1:** the patch's sha256 is 4d6a248425aebb25b317cf2da363e00915e8f2b13eb6f26a6a259a5e0f3f7164.
 - **M2:** `git diff --quiet 77ffc95 H0 --` the 6 paths: exit 0 (each unchanged on the lane since 77ffc95).
 - **M3a (its own call, right before M3; advisor-u7-head.md section 3, word for word):** "`git update-index --refresh`.
@@ -127,7 +129,8 @@ the advisor rules."
 
 ## Risks
 - M5's whole run is cold after the part-clean: about 20-45 minutes (U7's: 21 minutes).
-- The base run builds web and wasm at H0: if the CLI is not found, the merge stops before anything is staged.
+- The builder's end checks ran at 77ffc95, so M5 is the first run of U8-F1's tests against U7's and NB2's merged
+  trees: a red there is M6, never a retry.
 - #73's rules: a refusal or an ask stops the step where it is (M6's form if after M4).
 
 ## Questions for the checker
