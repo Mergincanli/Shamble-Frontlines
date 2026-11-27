@@ -1328,7 +1328,9 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   stands alone in its call. (5) The correction sent to the advisor agent at cut C says "15:58 UTC"; it was written
   before the clock read 15:57:53: a time typed ahead of the clock (the brief now says so). (6) At 16:42 UTC one
   `gh api` call (a read of CI's checks on 885d382) stood after a `grep` and a `date` in one call. A read. Since
-  then each git and gh command stands alone in its call.
+  then each git and gh command stands alone in its call. (7) The card's "Current step" was first written "21:09
+  Amsterdam" when the clock then read 20:07:44 UTC (21:07): a time typed ahead of the clock, corrected before it
+  was committed.
 
 ## HAND-OVER: where another session picks this up (written 2026-11-27, 00:44 Amsterdam; kept current)
 His words of 2026-11-27, 00:43 Amsterdam (2026-11-26, 23:43:38 UTC; `cs4-walk/mustafa-2026-11-27-save-every-25-
@@ -1412,27 +1414,35 @@ again here. SEAT-OUT from him: stop at a whole point and report the last commit'
    by `minItems` = `maxItems`, the shape forms as `oneOf`, each branch closed with all its keys; not step 11's: the
    bundle's `files` bound and PM-0005-5's scan (4b-1's row 2), no bundle schema. Q4 APPROVE, the schema files count
    in full. **Built** (the card's entry "Step 11, the schema writer"; his STEP11-ROOM had no answer, so the ladder
-   decided). **The count at its end, 7,978, is under the second rung; the look ahead before step 12 is about 9,630,
-   past 8,450: STOP, his decision before step 12 is built** (STEP12-GO in the chat: the scene to the start of 4c,
-   or a higher stop line). Until he answers: nothing of step 12; the close's parts that do not depend on his answer
-   may be prepared in the notes (the report's draft, the pull request's text), never the reviewers' round, which
-   runs on the final diff. **The look
-   ahead before step 12** (the count then, plus about 1,060 and the map's reading moved there, plus a fix pass of
-   about 350; past 8,450: stop and ask him; a rung reached moves its step: 12 to the start of 4c).
-5. **The close:** `plants-4b2.py --anchors` (reads only: every plant's text still stands once; 51 edits, 0 wrong
-   on 5c6738a), then `plants-4b2.py <commit>` whole; reviewers on the final diff (rust-reviewer, engine-architect,
-   security-auditor, test-engineer; netcode-architect for steps 9 and 10; graphics-engineer, perf-auditor and
-   art-director if step 12 is built), two rounds at most; the verifier until PASS; docs-keeper (his messages
-   into DECISIONS by script: 18:52:56, 21:16:26 and 23:43:38 UTC of 2026-11-26; his two messages of 2026-11-27
-   to Builder V6, 13:57:21 UTC (DIFF-LIST (a) among them) and 14:02:23 UTC (GUARD-RETRY (a)); **the VISION-RULE
-   addition** (his item 9, a to e, which sharpens point 2c of version 2: recorded beside version 2 in DECISIONS,
-   `docs/adr/README.md` and STATUS's line, with his two open points; no code); STATUS follow-ups: heapless 0.9.4
-   when rstar or parry3d move; the licence texts for the hosted build); the report (`/advisor-report`; its first
-   lines: `content/source/` changes); the notes out of the head; **the pull request's title and text in the
-   notes** (this chat cannot open one: his Advisor opens the draft, his item 11); the advisor agent on the final
-   head (it runs the gate itself; it is told of the order change: step 10's core and the pieces of steps 9 and 10
-   that need no content file were built before step 8's second part, while DIFF-LIST was open; and of the seat's
-   move); his go; the merge, by his Advisor on his tap, with the full head as the expected head.
+   decided). The count at its end, 7,978, was under the second rung, and the look ahead before step 12, about
+   9,630, past 8,450: **he chose STEP12-GO (a) at 20:03:18 UTC: step 12, with the map's reading, moves to the
+   start of 4c, and 4b-2 closes with steps 6 to 11** (the card's "Decisions taken").
+5. **The close, now:** the last code commit (a comment of `content.ts` that named step 12); `plants-4b2.py
+   --anchors` (reads only), then `plants-4b2.py <commit>` whole, alone in the worktree (it edits source files one
+   plant at a time); then the reviewers on the final diff (b9aad01 to the head), three at a time, one round, then
+   one fix pass (a second round only on what changed): rust-reviewer, security-auditor (the dev server's route, the
+   caps' departure of `advisor-cutC.md` Q1, the imports and the players' file), netcode-architect (steps 9 and 10),
+   engine-architect (it confirms the departure from its design 4.5, `advisor-cutC.md` Q2), test-engineer (is it
+   proven; the plants' whole run), infra-engineer (CI's time: 13 min 2 s on one run, 2 min under the job's limit;
+   the dev server's cargo run under the network cut); graphics-engineer, perf-auditor and art-director are not
+   called (step 12 moved); the verifier until PASS; docs-keeper (his messages into DECISIONS by script: 18:52:56,
+   21:16:26 and 23:43:38 UTC of 2026-11-26; his three messages of 2026-11-27 to Builder V6, 13:57:21 UTC (DIFF-LIST
+   (a) among them), 14:02:23 UTC (GUARD-RETRY (a)) and 20:03:18 UTC (STEP12-GO (a)); **the VISION-RULE addition**
+   (his item 9, a to e, which sharpens point 2c of version 2: recorded beside version 2 in DECISIONS,
+   `docs/adr/README.md` and STATUS's line, with his two open points; no code); ROADMAP: step 12 with the map's
+   reading at the start of 4c, step 11 built in 4b-2; STATUS follow-ups: heapless 0.9.4 when rstar or parry3d move;
+   the licence texts for the hosted build; the `unit` column ships in the players' file and nothing reads it at run
+   time (`advisor-step11.md`, Low); the first field with a default goes to the advisor agent first, with read.rs's
+   "nothing missing" rule (`advisor-step11.md` Q1); 4c carries the re-read's condition 4 (the first collision query
+   from the match's step is 4c's, so a recording that covers it is 4c's); the generated content types have no reader
+   in 4b-2 but the drift test; CI's time near its limit); the report (`/advisor-report`; its first lines:
+   `content/source/` changes; then that 4b-2 changes nothing a player sees in a match that runs, the scene having
+   moved); **the pull request's title and text in the notes** (this chat cannot open one: his Advisor opens the
+   draft, his item 11); the notes out of the head; the advisor agent on the final head (it runs the gate itself;
+   it is told of the order changes: step 10's core and the pieces of steps 9 and 10 that need no content file were
+   built before step 8's second part, while DIFF-LIST was open; step 9 in three cuts; cut C and step 10 committed
+   before their full local checks ended, as the Stop hook asks, each check then passing on the same files; and of
+   the seat's move); his go; the merge, by his Advisor on his tap, with the full head as the expected head.
 
 **Made again on Builder V6's container (2026-11-27, under `/home/user/Shamble-Frontlines/.gate/cs4b-2/.gate/`):**
 the bindings tool fetched as CI fetches it (`toolchain.yml:77-128`): the archive from the release address over
@@ -1473,15 +1483,12 @@ never a test cut or thinned to fit CI's limit (his CI-TIME); a toolchain run sto
 in two lines.
 
 ## Current step
-4b-2 (2026-11-27, 17:31 Amsterdam, from the clock; Builder V6). DIFF-LIST is answered (a). Done and pushed on this
-seat: 35e96ad (main in), 5cef19f (step 8's second part), and **step 9 whole in three cuts**: ccde0d4 (cut A, CI
-green), e1e2dd4 (cut B, CI green), **fbbd84d (cut C: the match is made on the content bundle; its full local checks
-and the gate passed; CI green, the two Q3 points read on its log)**, and **step 10's wiring** (committed after
-fbbd84d; its checks after the commit). **Official count at step 10's end 6,635, raw 6,653, of 8,450**
-(`cs4b-content/count-4b2.mjs`): the first rung (6,750) is not reached, so step 11 is built in 4b-2; its look ahead
-is 7,505. Next: step 10's full local checks and the gate, CI on its head; then step 11, the schema writer (the
-sheet's row 11), and before step 12 the look ahead (by today's numbers about 7,155 + 1,060 + the map's reading +
-350, past 8,450: the stop to ask him is expected there).
+4b-2 (2026-11-27, 21:07 Amsterdam, from the clock; Builder V6). **Steps 6 to 11 done; step 12 moved to the start
+of 4c by his STEP12-GO (a), received 20:03:18 UTC.** On this seat: 35e96ad (main in), 5cef19f (step 8's second
+part), step 9 in three cuts (ccde0d4, e1e2dd4, fbbd84d), step 10's wiring (885d382, with c68b8d5 and dcb5e6b),
+step 11 (46c192f): each with its full local checks, the gate and CI green (CI on 46c192f: gate and smoke green,
+its toolchain run read at the next step). **Official count 7,978, raw 7,996, of 8,450.** In hand: **the close**
+(HAND-OVER item 5), from its first point.
 
 ## Next steps (the sheet's revision 3, section G; each step ends with the count of written lines)
 - **4b-1:** 1 the content crate's manifests · 2 the reader, the writer, the bundle, the two kinds, the old tuning's
@@ -1491,7 +1498,9 @@ sheet's row 11), and before step 12 the look ahead (by today's numbers about 7,1
 - **4b-2 (held):** 6 the library's manifest batch with the feature compare · 7 the built-file check · 8 the tools
   and the data (**his Export at 30 steps; DIFF-LIST**) · 9 content to the simulation, the generated types, the
   frozen content of `first-loop` · 10 the static collision world · 11 the schema writer (first ladder rung) · 12
-  the page's scene (second rung). About 3,750 by the designs' count; planned 6,750; stop line 8,450.
+  the page's scene (second rung). About 3,750 by the designs' count; planned 6,750; stop line 8,450. **Steps 6 to
+  11 DONE; step 12 moved to the start of 4c by his STEP12-GO (a) (2026-11-27, 20:03:18 UTC), with the map's
+  reading field by field.**
 - Then per pull request: the gate and the local checks at every step; the plants script; reviewers (4b-1:
   rust-reviewer, engine-architect, security-auditor, then test-engineer; 4b-2 adds graphics-engineer and
   perf-auditor); the verifier; the advisor agent on every pushed head; docs-keeper (his messages of 2026-11-26
@@ -1520,6 +1529,16 @@ sheet's row 11), and before step 12 the look ahead (by today's numbers about 7,1
   (`cs4-walk/mustafa-2026-11-27-builder-v6.md`, item 7).
 - GUARD-RETRY (a): the guard check run once more; he denied it · Mustafa · 2026-11-27, received 14:02:23 UTC
   (`cs4-walk/mustafa-2026-11-27-guard-retry.md`).
+- STEP11-ROOM (build the schema writer now, or move it to 4d so the scene fits): no answer of his; asked in the
+  chat at about 16:47 UTC with "if no answer comes: (a), as the approved ladder says"; the advisor agent's ruling
+  came back at 16:58 UTC, and step 11 was built under the ladder (the first rung did not fire: 6,635 < 6,750).
+- **STEP12-GO (a): the page's scene (step 12), with the map's reading field by field that the advisor agent's
+  cut C ruling put there, moves to the start of 4c; 4b-2 closes with steps 6 to 11** · Mustafa · 2026-11-27,
+  received 20:03:18 UTC (`cs4-walk/mustafa-2026-11-27-step12-go.md`, his "A", by script). The plan's second rung,
+  chosen by him (the count at step 11's end, 7,978, was 22 under it; the look ahead, about 9,630, was past his
+  8,450). So 4b-2 changes nothing a player sees in a match that runs (the page still draws the empty scene; what is
+  new on the page is its content's fetch and, when that fails or the loader refuses the content, the notice's
+  plain text), and the reviewers for step 12 (graphics-engineer, perf-auditor, art-director) are not called.
 
 ## Running work
 - None. rust-reviewer's read of cut C's two names ended (DONE). Its own disassembly run filled the disk for a

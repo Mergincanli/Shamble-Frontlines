@@ -88,8 +88,8 @@ export interface ContentLink {
 /**
  * The page's copy of the bundle from the Worker's start to its `ready`: read once, the first time the link is ready,
  * and let go then, or as soon as the match ends without it (a Worker that answered `error`). Until the page's scene
- * draws from the files (step 12), this reading is the page's check that what the loader took is a bundle, and nothing
- * of what it reads is kept.
+ * draws from the files (change-set 4c, which also brings the map's reading field by field), this reading is the
+ * page's check that what the loader took is a bundle, and nothing of what it reads is kept.
  */
 export class PageContent {
   #kept: Uint8Array | null = null;
