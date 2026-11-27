@@ -1,5 +1,10 @@
 # The 15:50 UTC window, 2026-11-27: the messages (written 11:2x UTC; sent only inside the window)
-**Status: WRITTEN, NOT SENT.** Each message below gets a "Sent HH:MM UTC" line when it goes; the window has run only
+**Status: WRITTEN, NOT SENT.** PULLED FORWARD by his message of 13:55 UTC (history.md:8163-8186: LEAN-MODE item 3
+ended, so the 16:20 limit below no longer binds). At step 0 (13:5x) main read b8f02b0 (#78 ci-time, CI and docs), not
+b9aad01: by the advisor tool's ruling (14:0x) D, B and NB go anyway (D's target is pinned, B and NB only read, and
+main's advisor.md is not among #78's paths); this file's "else MAIN-52 first, nothing below" was my own step-0 rule,
+so the departure is a choice for the day message; MAIN-69 is planned meanwhile. Each message below gets a "Sent HH:MM
+UTC" line when it goes; the window has run only
 for the messages that carry one (this file existing does not mean the window ran). An agent's file is done only when
 its last line reads "Status: COMPLETE <date and UTC time>"; a builder that writes no file is done when its hand-back
 pastes all its outputs.
@@ -30,7 +35,7 @@ lane commit (the operator rewordings, choice 31) can make git refuse the fast-fo
 
 ## D: U8-F1's builder a7fe1b9f436f36bb1 (resumed; its worktree .claude/worktrees/agent-a7fe1b9f436f36bb1, detached at 77ffc95)
 Not sent. Only after the three checks above hold, and only before 16:20.
-The 15:50 window, U8-F1's builder D: bring your worktree onto the lane commit 28ea74e by three git commands, after
+Pulled forward from the 15:50 window (Mustafa's message of 13:55 UTC), U8-F1's builder D: bring your worktree onto the lane commit 28ea74e by three git commands, after
 three reads; write no file (the advisor's rulings: advisor-u8-f1-head.md block 4, advisor-u7-ff.md block 1).
 Three commands in your own worktree, each its own call, in this order. Paste each command's full output in your reply.
 Write no file at all in this task, not even a notes line: your notes are among the staged paths, and any write leaves
@@ -54,7 +59,10 @@ only forms whose output carries the answer (`git diff --name-only` or `--stat`, 
 quote that output. His rule: "in a shell command, spell out every file you write with its full path. No variable,
 substitution or wildcard in the name of a file that is written, moved, copied or deleted. Or use the Write and Edit
 tools for it."
-Re-checked at sending: (to fill: main; HEAD = origin, clean; the three checks above).
+Re-checked at sending (14:1x UTC): main b8f02b0 (#78); the target stays pinned at 28ea74e, whose kit and CI files are
+main's as of b9aad01 (toolchain.yml since replaced on main by #78); A1's ground, a git command with no byte of a kit file
+authored (advisor-u7-ff.md:26-30), holds, so D's record says "main's kit files as of b9aad01"; HEAD = origin, clean; the
+three checks above re-run 14:0x, all as at 11:1x.
 
 ## B: a3de649cd25e474df (resumed; it ruled the rewordings in advisor-u8-f1-head.md block 3): their head read
 Not sent. With D, before 16:20.
@@ -73,7 +81,8 @@ d8b57b82d08ffafbec4d1b3c0c556d0fefeda5da, the three net-zero rewordings your blo
 Write .checkpoints/netcode-proof-test/advisor-ops-reword-head.md (plan first, then each block as it is done); end with
 "Decisions needed" and "For Mustafa", then, once both blocks are written, the last line `Status: COMPLETE <date and UTC
 time>`.
-Re-checked at sending: (to fill: main; HEAD = origin, clean; CI on the pushed head).
+Re-checked at sending (14:1x UTC): main b8f02b0 (#78, CI and docs; main's advisor.md not among its paths); HEAD =
+origin, clean; CI on the pushed head 6417fe2 four of four success (read 11:43).
 Write files with the Write and Edit tools only (no sed, no shell redirect, no python writes; never `cargo fmt` writing
 files: apply rustfmt's diff by Edit); an agent with no Edit tool rewrites its notes file whole with Write. git and gh
 always start their own command, with no other program in front of them. In this tool a command that exits non-zero
@@ -89,11 +98,13 @@ As the advisor (main's .claude/agents/advisor.md, by `git show origin/main:.clau
 cargo, no git write), check .checkpoints/netcode-proof-test/nb2b-merge-plan.md: the plan for Mustafa's word of
 2026-11-27 12:25 UTC (history.md:8133-8151, word for word there) to merge Builder 2's one-way delay work at tip
 29a901994f5b65c23a17162422770aaacc0ca44e "by the same steps and bars as the last merge". It is a delta on your
-nb2-merge-plan.md and its conditions. Rule APPROVE, APPROVE WITH CONDITIONS or REVISE, and answer its Q1-Q3.
+nb2-merge-plan.md and its conditions. Rule APPROVE, APPROVE WITH CONDITIONS or REVISE, and answer its Q1-Q4 (its section "Since the draft" and Q4 were added
+at 14:0x UTC: main moved to b8f02b0 with #78, a take-in MAIN-69 comes first, and Mustafa's message of 13:55 UTC).
 Write .checkpoints/netcode-proof-test/advisor-nb2b-merge.md (plan first, then each block as it is done); end with
 "Decisions needed" and "For Mustafa", then, once every block is written, the last line `Status: COMPLETE <date and
 UTC time>`.
-Re-checked at sending: (to fill: main; HEAD = origin, clean; Builder 2's tip still 29a90199).
+Re-checked at sending (14:1x UTC): main b8f02b0 (#78; MAIN-69 owed, in the plan's new section); HEAD = origin, clean;
+Builder 2's tip 29a901994f5b65c23a17162422770aaacc0ca44e (read 14:0x).
 Write files with the Write and Edit tools only (no sed, no shell redirect, no python writes; never `cargo fmt` writing
 files: apply rustfmt's diff by Edit); an agent with no Edit tool rewrites its notes file whole with Write. git and gh
 always start their own command, with no other program in front of them. In this tool a command that exits non-zero

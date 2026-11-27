@@ -4,6 +4,28 @@ Status: DRAFT, for the advisor agent's check in the 15:50 window (a10848a10f73ed
 numbers, stop rules and risks hold except where this file differs. The order (the advisor tool, 12:3x): UM-4's build
 first, after the 15:50 seats finish; this merge after UM-4's push, in the next gap that fits, before R1's report.
 
+## Since the draft (14:0x UTC on 11-27, before NB's check)
+- His message of 13:55 UTC (history.md:8163-8186, word for word there). Item 1, NO WAITING FOR WINDOWS: the next step
+  starts whenever usage allows, with "One limit: do not start a step that must not be cut, such as a merge's no-save
+  stretch, unless the usage left covers it." Item 4: "Builder 2's merge: name the command as soon as you are ready for
+  it. It does not have to wait for the evening." So the 15:50 seats run now (pulled forward), and this merge's command
+  is named as soon as the steps before it allow, not about 18:30.
+- Main moved to b8f02b0149cc928964e54e194cd9c4d68f52bd94 (#78 ci-time: .github/workflows/toolchain.yml
+  timeout-minutes 15 to 25, and docs/DECISIONS.md, REPO_MAP.md, ROADMAP.md, STATUS.md and
+  docs/reports/2026-11-27-ci-time.md; no manifest or lockfile; `git merge-tree --write-tree --name-only HEAD b8f02b0`
+  one tree line, no conflict). MAIN-52 takes it in first: MAIN-69, a full take-in (CI is outside TAKEIN-CODE (b),
+  his 13:55 item 2, and outside light-takein-recipe.md:9-10's limits), plan first with its check. UM-4's step 0 pins
+  main (um4-plan.md:66), so UM-4 follows MAIN-69. This merge's H0 then sits on MAIN-69's merge or UM-4's commit:
+  steps 1d, 1e and 1i are re-read there (1d's merge-base stays 591e2cb while T stays 29a90199, as T holds no main
+  commit after 591e2cb: its whole list above).
+- Builder 2's tip re-read at 14:0x: 29a901994f5b65c23a17162422770aaacc0ca44e (unchanged).
+- New step 1j (his item 1's limit): just before H0, the session's rate-limit event read (utilization and resetsAt);
+  the stretch from H0 to step 7's push starts only if the usage left covers it; the figure and the go or no-go on the
+  card's resume line. A no-go waits for the reset, nothing begun.
+- Q4 (new): the order. Default: MAIN-69, then UM-4, then this merge (step 4's bars on UM-4's counted run, as Q3). May
+  this merge go right after MAIN-69, before UM-4 (step 4's bars then U8-F1's M5 numbers as re-read on MAIN-69's merged
+  state, and UM-4's bars from this merge's run), if that saves a wait? Which order carries less risk?
+
 ## His word (history.md:8133-8151, word for word there)
 - Item 3: "merge that branch at exactly that tip, by the same steps and bars as the last merge (the command named
   first and my reply to it, afterwards the whole check). Take the next gap that fits, before R1's report. If the tip
