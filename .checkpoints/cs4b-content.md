@@ -1020,8 +1020,7 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
     main is taken in once, before 4b-2 changes a shared doc. VISION-RULE, an addition (his item 9, a to e): for
     the docs pass, no code now; open, in his words: "the exact eye height, which reaches the game through my
     Export, and which points of an enemy's body the line is tested against". Saving every 25 minutes, the
-    agents' work too; SEAT-OUT: stop at a whole point and report the last commit's id. The board add-on is active
-    for this chat (his message of 2026-11-27 in the chat, which replaced that line of item 10).
+    agents' work too; SEAT-OUT: stop at a whole point and report the last commit's id. The board add-on is active.
   - **Pull requests:** this chat cannot open or merge one: the guard keeps `gh api` read-only
     (`routine-guard.mjs:1466`, "GitHub writes go through the GitHub MCP tools"), the environment refuses `gh pr`,
     and no GitHub MCP tool is attached. At the close the pull request's title and text go in the notes; his
@@ -1533,7 +1532,8 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   controls" (about 21:00 UTC) and "each fix catching the defect it closes (17 of 17), and the 5 controls held"
   (about 21:06 UTC). The 17 new entries are 13 defects and 4 controls; the run of 20 by name was 15 defects caught
   (those 13, C21 and C26) and 5 controls held (those 4 and C4). Found by the advisor tool's read; corrected to him
-  in the next chat message. The card's own entry had the right numbers.
+  in the next chat message. The card's own entry had the right numbers. (13) For one notes commit (89866fd) the
+  card's note on the board said a little more than that the add-on is active; trimmed in the next.
 
 ## HAND-OVER: where another session picks this up (written 2026-11-27, 00:44 Amsterdam; kept current)
 His words of 2026-11-27, 00:43 Amsterdam (2026-11-26, 23:43:38 UTC; `cs4-walk/mustafa-2026-11-27-save-every-25-
@@ -1728,8 +1728,7 @@ fixes running; then the checks and the code commit), then round 2 on what change
 ## Decisions taken
 - His go for the merge of #70 and his answers to the six decisions · Mustafa · 2026-11-26, 12:21:17 UTC.
 - His rules for this chat: no CI, kit or gate file is written here; never a push to another chat's branch; git and
-  gh always start their own command, one git per shell call. The board add-on was active for Builder V4's chat,
-  and is active for Builder V6's (his message of 2026-11-27 in the chat).
+  gh always start their own command, one git per shell call. The board add-on is active.
 - DIFF-LIST (a): his Export's list at 30 steps is his; its movement values become the game's starting movement
   table; a later Export replaces them the same way · Mustafa · 2026-11-27, received 13:57:21 UTC
   (`cs4-walk/mustafa-2026-11-27-builder-v6.md`, item 7).
