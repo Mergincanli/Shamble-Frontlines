@@ -39,6 +39,10 @@ COLLISION = ("cargo", "test", "-p", "sim", "--locked", "--lib", "collision")
 PROOF = ("cargo", "test", "-p", "devtools", "--locked", "--test", "static_world")
 FUZZ = ("cargo", "test", "-p", "devtools", "--locked", "--test", "content_fuzz", "fifty_thousand")
 PROOFS_RS = "crates/devtools/src/world_proofs.rs"
+REPLAY_RS, SCRIPTS_RS, RECORDING_TS = "crates/devtools/src/replay.rs", "crates/devtools/src/scripts.rs", "packages/sim-worker/src/recording.ts"
+REPLAY_UNIT = ("cargo", "test", "-p", "devtools", "--locked", "--lib", "replay")
+RECS = ("cargo", "test", "-p", "devtools", "--locked", "--test", "recordings")
+SW_UNIT = ("node", "../../node_modules/vitest/vitest.mjs", "run", "--dir", "src", "recording")
 SCAN = ("cargo", "test", "-p", "sim", "--locked", "--test", "rules_scan", "the_simulation_crate")
 def native(crate): return ("cargo", "test", "-p", crate, "--locked", "--test", "native_target", "--target-dir", ".gate/target-plant")
 
@@ -220,6 +224,16 @@ PLANTS = [
      ["the bundle's cap is the game's loader's own, read from its source"]),
     ("C11", "defect", "the check takes a content.json anywhere in the page's folder", [(CHECKS, "  const bundle = files.find(({ name }) => name === CONTENT_FILE);", "  const bundle = files.find(({ name }) => name.endsWith(CONTENT_FILE));")], UNIT,
      ["a page folder without content.json beside index.html, or with one larger than the loader takes, is refused"]),
+    # Step 9, cut B (Builder V6): a recording names its frozen content, and a replay runs on that content alone.
+    ("C12", "defect", "a replay takes any bundle: its sha256 is not held to the header", [(REPLAY_RS, "    if sha256(bundle) != header.content_hash {", "    if bundle.is_empty() && sha256(bundle) != header.content_hash {")], REPLAY_UNIT,
+     ["content_other_than_the_header_names_is_refused_by_name_before_the_match_is_made"]),
+    ("C13", "defect", "a header that names no content is replayed", [(REPLAY_RS, "            header.content_hash == [0; 32] || header.map_id.is_empty(),", "            header.content_hash == [0; 32] && header.map_id.is_empty(),")], REPLAY_UNIT,
+     ["what_this_build_cannot_replay_is_refused_by_name_before_any_call"]),
+    ("C14", "defect", "the scripts leave the content out of the header", [(SCRIPTS_RS, "            content_hash: content.sha256,", "            content_hash: [0; 32],")], RECS,
+     ["content: its header names none"]),
+    ("C15", "defect", "the TypeScript check takes any bundle", [(RECORDING_TS, "  if (digest.length !== recording.contentHash.length || digest.some((byte, at) => byte !== recording.contentHash[at])) {", "  if (digest.length !== recording.contentHash.length) {")], SW_UNIT,
+     ["the content a replay is given is the one its recording's header names"]),
+    ("C16", "control", "the clean recordings: the recordings' tests", [], RECS, []),
 ]
 
 def note(name, kind, ok, what, detail):
@@ -313,7 +327,7 @@ def main():
     before = {path: digest(path) for path in touched}
     for name, kind, what, edits, command, words in PLANTS:
         if names and name not in names: continue
-        planted(name, kind, what, edits, command, words, cwd="packages/client" if command in (UNIT, HAND) else None)
+        planted(name, kind, what, edits, command, words, cwd={UNIT: "packages/client", HAND: "packages/client", SW_UNIT: "packages/sim-worker"}.get(command))
     stamp_plants(names)
     native_plants(names)
     back = {path: digest(path) for path in touched} == before

@@ -15,7 +15,7 @@
   `claude/cool-pasteur-oiqk1r` ends at 7f5ba3966def8c36e2c3863c6b2fda7b4b9a9169 and is never pushed to again (his
   Lanes rule: one account per branch) · **Base:** 4b-1's origin/main 2483e9a741c4e552323c36523831a2f35de4002e (the
   merge of 4a, pull request #70); 4b-2 counts against b9aad01954be666340a7ec5c6e9fc9353b11abf1 (the merge of 4b-1)
-- **Last update:** 2026-11-27 16:04 Amsterdam (from the clock)
+- **Last update:** 2026-11-27 16:29 Amsterdam (from the clock)
 
 ## Sizes and stop lines (his answer of 2026-11-26, 14:09:13 UTC: SIZE-4B (b); which number is which)
 - **4b is two pull requests**, in engine-architect's cut; "each stands on its own: lines left over in 4b-1 do not
@@ -27,7 +27,13 @@
 - **4b-2** (steps 6 to 12): about 3,750 by the designs' count; planned about 6,750; **stop line 8,450**; about
   9,000 at 4a's rate. Its own "what leaves first" list is written before its step 6.
 - Counted after every step with git against 4b-1's base (main 2483e9a), `crates/` and `packages/` only, data files
-  left out (the committed extracts and corpus texts are data).
+  left out (the committed extracts and corpus texts are data). **4b-2's official count (the advisor agent's ruling
+  of 2026-11-27, `cs4b-content/advisor-count-rule.md`):** `git diff --numstat b9aad01954be666340a7ec5c6e9fc9353b11abf1
+  -- crates packages`, added lines; left out: `crates/devtools/vectors/` but for `.py` files, and what
+  `make_recordings` writes into `crates/devtools/recordings/` (`.rec`, `.hashes`, `manifest.txt`, `*.content.json`);
+  everything else counts, `packages/types/src/generated/` included (as Builder V4 counted it). New files are staged
+  or marked (`git add -N`) first, since numstat does not see untracked files. One count decides; every count line
+  also gives the raw total with the recordings in.
 
 ## What leaves 4b-1 first if the count runs high, in order (his point 2; fixed before step 1)
 The build order puts what can leave last, so that a part that leaves is code not yet written. Order of building:
@@ -558,7 +564,8 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
      steps 9 and 10.
   7. 4b-1's conditions still apply (PM-0005-3; his Export's values; the first commit fixes 4B-MEMORY-UNIT).
 - **How a rung fires (its ruling):** the count is taken as in 4b-1 (against b9aad01, `crates/` and `packages/`,
-  data files left out) at every step's end AND at every commit. A rung fires when the count at the end of the
+  data files left out: from cut B of step 9 on, the official count of the card's first section, the advisor agent's
+  ruling `cs4b-content/advisor-count-rule.md`) at every step's end AND at every commit. A rung fires when the count at the end of the
   step before the rung's step has reached its number; he is told before a step moves; built code never moves.
   **Look ahead before steps 11 and 12:** the count plus the step's projected size (about 520 and 1,060) plus
   one fix pass (about 350): if that reaches 8,450, stop and ask him before the step. Past 8,450 at any commit:
@@ -1130,6 +1137,42 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   file's lines 2 to 1,801 and the vector file the same; by design the header's content hash and map id (`""` to
   `"test-scene"`, 10 bytes), line 1 and three manifest lines. Left in cut B: the TypeScript side (`recording.ts`,
   its test, the Node replay test, the browser replay spec), then the checks.
+  - (15:18 UTC) The TypeScript side is built (`checkContent` by WebCrypto; a header of zeros refused; the tests),
+    rustfmt run on the eleven Rust files by name, clippy clean, the tools crate's tests and the recording unit
+    tests green; plants C12 to C16 by hand: 4 caught, the control held, every file put back (20 files). The full
+    local checks run on the tree (`.gate/local-checks-cutB.log`). **That first run failed, rightly**, at "the tools
+    crate for wasm32 on its own line": `files.rs` imported the native-only `content_files` (`lib.rs:7-8`, gated to
+    no wasm32) for `freeze`; the import and `freeze` are now gated the same way (the test-only module replays and
+    never freezes); the wasm32 build is clean; the checks run again from 15:21 UTC (`.gate/local-checks-cutB2.log`).
+  - **The count: past two thirds (5,633).** First read 5,668 with the recordings left out (5,672 by Builder V4's
+    rule as written). **After the wasm32 fix: 5,690 by Builder V4's rule as written** (it counts the frozen
+    content's 14 lines, the hashes file's 1 and the manifest's 3, the first time a recording changes in 4b-2) **and
+    5,672 with `crates/devtools/recordings/` left out** as data, as the designs leave the recordings and the frozen
+    content out (`cs4-walk/netcode-architect-cs4.md:569`). **That rule change is not this seat's to make alone**
+    (the card: "A new threshold or order goes back to the advisor agent first"): it is asked of the advisor agent
+    (`cs4b-content/advisor-count-rule.md`), and **until it rules both counts are reported and the higher decides
+    every threshold.** **Its ruling (2026-11-27, about 15:29 UTC):** (1) APPROVE: what `make_recordings` writes into
+    `crates/devtools/recordings/` is data and left out (the code that makes and reads it, and any hand-written file
+    there, still count); (2) the generated TypeScript stays counted to the end of 4b-2 (left out, the count would
+    be 5,624 and under two thirds: the method does not change part-way); (3) the higher-decides rule was right as a
+    stopgap only: from now on **one official count decides** (the card's first section), the raw total beside it.
+    **Cut B's official count: 5,672 (raw 5,690): past two thirds.** Its conditions: the sentence to him says what
+    the count leaves out and that the generated TypeScript stays in (sent again so); the rule written into the
+    card's count lines (done: the first section, the rung ruling, the HAND-OVER recipe, which now names b9aad01, its
+    L1); new files marked before counting (its L2). Its look ahead before step 11: 5,672 + 520 + 350 = 6,542, under
+    8,450.
+- **Step 9, cut B: DONE** (commit **e1e2dd462e9f4d7c18228498a95394a153c20449**, 2026-11-27 15:28:48 UTC, pushed;
+  the gate passes with smoke; the full local checks passed whole on the second run, 15:21:06 to 15:27:45 UTC: 225
+  Rust tests twice, 224 in release, clippy clean, client 139, sim-worker 52, types 8, net 1, 36 boundary tests, the
+  type checks, 19 browser tests in 197 s (the replay spec on the new recording: 1,800 steps, every shared hash as in
+  the file), the recordings what their scripts make, the players' file unchanged (54,514 bytes, b4a9774f...59ba);
+  **official count 5,672, raw 5,690**). The patch `cutB-wip.patch` is removed in this notes commit (it predated
+  rustfmt, the TypeScript side and the wasm32 fix).
+    **His one sentence was given in the chat at once** (before 15:18:47 UTC, the clock read right after it): "4b-2 is at 5,668 of its 8,450 written lines
+    (past two thirds): step 8 is done and green (your Export's movement table and the test scene, 5cef19f), step 9's
+    cut A is done and green (every page carries the content bundle, ccde0d4), and cut B (the first recording names
+    its frozen content, with the proof that no state changed) is built and in its final checks, while step 9's last
+    cut, step 10's wiring and the look ahead before steps 11 and 12 remain."
 
 ## Slips of this chat's own rules, for the report
 - One git command did not start its own shell call: `git add .checkpoints/cs4b-content/review-brief-4b1.md` stood
@@ -1278,8 +1321,12 @@ taken out into an empty folder, 8,170,784 bytes and its sha256 checked, then mov
 - `.gate/cs4b/batch-step9/` (step 9's two files) and `.gate/rust-reviewer-step10-scratch/` (its probe; what
   the tests need of it, the chain of cubes, is in `collision.rs`).
 - The local checks: `bash .checkpoints/cs4b-content/local-checks.sh > .gate/local-checks.log 2>&1` (about 13
-  minutes; the last line must be ALL LOCAL CHECKS PASSED). The count: `git diff --numstat origin/main --
-  crates packages`, added lines, `crates/devtools/vectors/` left out but for `.py` files, before every commit.
+  minutes; the last line must be ALL LOCAL CHECKS PASSED). The count, before every commit (the official count of
+  the card's first section, the advisor agent's ruling of 2026-11-27): `git diff --numstat
+  b9aad01954be666340a7ec5c6e9fc9353b11abf1 -- crates packages`, added lines, new files marked with `git add -N`
+  first; `crates/devtools/vectors/` left out but for `.py` files, and what `make_recordings` writes into
+  `crates/devtools/recordings/`; the generated TypeScript counted; the raw total with the recordings in given
+  beside it.
 
 **Rules that bind whoever continues** (his words are in the card's first sections and in `docs/DECISIONS.md`):
 every git and gh command alone in its own shell call; every file a shell command writes, moves, copies or deletes
@@ -1290,12 +1337,13 @@ never a test cut or thinned to fit CI's limit (his CI-TIME); a toolchain run sto
 in two lines.
 
 ## Current step
-4b-2 (2026-11-27, 15:14 Amsterdam, from the clock; Builder V6): every piece of steps 6 to 10 that needs no content
-file is built and pushed (head of the code: 5c6738a; 4,956 written lines of 8,450). DIFF-LIST is answered (a).
-The HAND-OVER list's items 0 and 1 are done (35e96ad: main in; 5cef19f: step 8's second part; 5,129 written lines).
-Step 9's cut A is done (ccde0d4). In hand (16:04 Amsterdam, from the clock): cut B of `cs4b-content/step9-order.md` (the
-recording's frozen content, with the constructor untouched). CI on ccde0d4 is read before the next code push (a
-code push cancels a toolchain run in progress).
+4b-2 (2026-11-27, 16:29 Amsterdam, from the clock; Builder V6). DIFF-LIST is answered (a). Done and pushed on this
+seat: 35e96ad (main in), 5cef19f (step 8's second part), ccde0d4 (step 9, cut A: the page carries the bundle; CI
+green), e1e2dd4 (step 9, cut B: the recording's frozen content; CI running). **Official count 5,672 (raw 5,690) of
+8,450: past two thirds, his sentence given.** In hand: cut C of `cs4b-content/step9-order.md` (the constructor,
+its callers, the Worker and the page), from its point a (the constructor, then at once the wasm-only build and
+rust-reviewer on the names it prints: `cs4b-content/rust-reviewer-cutC-brief.md`). CI on e1e2dd4 is read before
+the next code push (a code push cancels a toolchain run in progress).
 
 ## Next steps (the sheet's revision 3, section G; each step ends with the count of written lines)
 - **4b-1:** 1 the content crate's manifests · 2 the reader, the writer, the bundle, the two kinds, the old tuning's

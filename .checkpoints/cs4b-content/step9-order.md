@@ -21,6 +21,13 @@ sources** (`isolation.spec.ts:31`): no `content.json` there, so cut C must make 
 block 1.9 plans a serve-only plugin for that, CD-7) or the spec must say what the page shows without it; (4) the
 page opened as a file (`file-url.spec.ts:12`): it "either runs or says how to serve it", and a fetch from a file
 address must end in that notice, never a broken page. Each is settled in cut C before its commit.
+**Read at cut B (2026-11-27, 15:20 UTC):** the isolation spec under the development server asks the match to run
+with no error (`isolation.spec.ts:36-41`), and that server answers a file that is not there with the page itself, 200
+(`:48`): a fetch of `./content.json` there would hand the page's HTML to the loader. So cut C brings the
+development-only server plugin engine-architect's block 1.9 plans (`cs4-walk/engine-architect-cs4.md:249-251`,
+`apply: "serve"`, so in no build's output), its serving part only (the watch and the reload, CD-7 and PM-0005-10,
+stay with their change-set): `/content.json` made by the same content tool the build runs, so the dev server's
+verdict is the build's. Before it is built, its form goes to the advisor agent if it is more than block 1.9 says.
 
 **Cut B, the recording's content, with the constructor untouched.** First the `git show` copies of main 2483e9a's
 recording files, taken before any tool writes (`.gate/cs4b/main-recordings/`). Then
@@ -58,5 +65,30 @@ the very next chat message).
 5. **Proof that loading content changed no state, sharper than lines:** after this cut every recording file is byte
    for byte as cut B left it. Plant: one content byte folded into the shared state at construction fails at tick 1
    natively, in Node and in Chromium (never with `make_recordings` run under the plant).
+
+**Cut C in detail, in the order it is built (written at cut B, 2026-11-27):**
+- a. `Sim::create(seed, mode, pad_bytes, bundle)`: the loader's `load(bundle)` between the mode and the padding
+  checks; `CreateError::Content(content::Error)`, `message(&self)`. The set is validated and not yet held: a field
+  nobody reads would be dead code, and step 10's wiring is what takes the map from it into the local match. Then at
+  once the wasm-only build: the built-file check's names go to rust-reviewer (its decision, then its entries or the
+  code change), before anything else of the cut is built on it.
+- b. Every Rust caller; the non-replay callers pass `content::bundle::test_bundle()` (cut B's one test bundle, whose
+  map is `test-scene`); the replays pass the frozen content (`Replay::new` already holds it).
+- c. The Worker: `messages.ts` (`start` with `bundle: ArrayBuffer`, refused unless 1 to `MAX_BUNDLE_BYTES` bytes;
+  that number tied by a test to `crates/content/src/bundle.rs`'s line), `worker.ts` (the bundle to `new Sim`).
+- d. The page: `content.ts` (one fetch of `./content.json`, its bytes kept as a copy before the transfer, the copy
+  parsed only after the Worker's `ready`), `worker-link.ts` (`start(padBytes, bundle)` transfers it), `boot.ts`
+  (the content fetched before the Worker starts; a failure said on the page in plain text). The file-address spec
+  stays as it is: in Chromium the page's module script does not run from a file, so the notice keeps
+  `index.html`'s own "run \"node serve.mjs\"" line; in a browser that did run the script from a file, the
+  content's fetch fails as the Worker's start already does today, and is said on the page in plain text the same
+  way.
+- e. The development server's `/content.json` (block 1.9's serving part, `apply: "serve"`), made by the content
+  tool the build runs.
+- f. The boundary tests (`sim-wasm.test.mjs`: the constructor with the test bundle, a malformed bundle refused as
+  an `Error` naming the file and the place, never a trap; `replay.test.mjs`: the players' `Sim` made on the frozen
+  content), the replay spec's Worker made on the frozen content, the page's own tests.
+- g. The proof: after this cut every recording file is byte for byte as cut B left it; the plant (one content byte
+  folded into the shared state at construction) fails at tick 1 natively, in Node and in Chromium.
 
 Reviewers at the close for this step: netcode-architect (steps 9 and 10) with the round's others.
