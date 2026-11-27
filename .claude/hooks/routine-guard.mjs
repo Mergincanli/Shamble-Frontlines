@@ -457,7 +457,7 @@ export async function decide(input, io) {
   const ti = input.tool_input || {};
   const cwd = input.cwd || io.projectDir;
   if (tool === 'Bash') return bash(String(ti.command ?? ''), cwd, role, io, input);
-  if (tool.startsWith('mcp__')) return mcp(tool, ti, role, io);
+  if (tool.startsWith('mcp__')) return mcp(tool, ti, role, io, input);
   if (!role) return dayEdit(tool, ti, cwd, io, input);
   // ---- routines only from here ----
   if (['AskUserQuestion', 'EnterPlanMode', 'ExitPlanMode'].includes(tool)) {
