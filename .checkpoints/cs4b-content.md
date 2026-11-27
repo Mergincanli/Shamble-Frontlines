@@ -1000,7 +1000,8 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
 - The chat's update of 2026-11-27 was headed "00:06 Amsterdam" and was written before 00:05:10 by the machine's
   clock (the next event's own time stamp): a minute or two ahead of the clock. Told to him.
 - The card's entry for commit ad88341 was first written with a push time of 01:35 when the clock read 01:34: a
-  time ahead of the clock, typed and not read. Corrected before it was committed.
+  time ahead of the clock, typed and not read. Corrected before it was committed. The same again a quarter of
+  an hour later: "Current step" written as 01:50 when the clock read 01:49:47; corrected before it was committed.
 - Commit 2f058b2's message gives the written lines as 2,626; the count, taken after the commit instead of
   before it, is 2,627. The message stays as it is (no history is rewritten); the card and the chat have 2,627.
 - The chat told him "Your second 'a' (23:00 Amsterdam)" as if he had sent a second message. He had not: it was
@@ -1025,8 +1026,9 @@ just continue as you were)". So: the chat's work and its agents' work are commit
 **Where everything is.** Branch `claude/cool-pasteur-oiqk1r` on origin (this chat's own; a session of another
 account works on its own branch from this head and never pushes here: his Lanes rule). The head: see the last
 "DONE" entries above (the card is saved with every push). Code that is not yet committed is saved as a patch in
-the notes and named in the card's newest entry (none at this save: nothing is uncommitted). No agent is running. The board add-on is active for this chat (thread state: needs-musti, for
-DIFF-LIST).
+the notes and named in the card's newest entry (none at this save: nothing is uncommitted). No agent is running. The board add-on is active for this chat
+(thread state: needs-musti, for DIFF-LIST). The container was restarted once (2026-11-27, about 01:22): the
+worktree and everything under `.gate/` were kept.
 
 **State of 4b-2, by step** (4,956 written lines of 8,450 at 5c6738a; two thirds is 5,633; rungs at 6,750 and 8,000):
 - 6 the library's batch: done (298837a). 7 the built-file check: done (d313162, then 2f058b2 and e3acb41 for the
@@ -1034,7 +1036,8 @@ DIFF-LIST).
   on maps made in tests: done (8e5a268). 9, first piece, the type writer's manifest line and its rule: done
   (c09f459); 9, second piece, the generated content types: done (6290c85). 10, the fuzz run and the hostile maps through the world's builder:
   done (ad88341). 9, third piece, the page folder read through no link and the scan for `innerHTML` and its
-  kin: done (5c6738a). CI: green on every code head through 6290c85; ad88341 and 5c6738a to be read.
+  kin: done (5c6738a). CI: green on every code head through ad88341 (gate 45917465677, toolchain 45917465670,
+  9 min 29 s); 5c6738a to be read.
 - **Nothing more of 4b-2 can be built without the content files**: every piece of rows 8, 9 and 10 that needs
   none is done. Step 11 keeps its place in the order (the card's "Ahead, by the count").
 - **Blocked on his own answer to DIFF-LIST** (asked 2026-11-26, 23:11 Amsterdam;
@@ -1071,14 +1074,16 @@ DIFF-LIST).
    need no content file and are built: the card's entry "Step 10, one more piece".)
 4. **The look ahead before steps 11 and 12** (the count then, plus about 520 and 1,060, plus a fix pass of about
    350; a rung that is reached moves its step: 11 to 4d, 12 to the start of 4c; past 8,450: stop and ask him).
-5. **The close:** `plants-4b2.py <commit>` whole; reviewers on the final diff (rust-reviewer, engine-architect,
+5. **The close:** `plants-4b2.py --anchors` (reads only: every plant's text still stands once; 51 edits, 0 wrong
+   on 5c6738a), then `plants-4b2.py <commit>` whole; reviewers on the final diff (rust-reviewer, engine-architect,
    security-auditor, test-engineer; netcode-architect for steps 9 and 10; graphics-engineer, perf-auditor and
    art-director if step 12 is built), two rounds at most; the verifier until PASS; docs-keeper (his messages
    into DECISIONS by script: 18:52:56, 21:16:26 and 23:43:38 UTC of 2026-11-26, and his DIFF-LIST answer;
    STATUS follow-ups: heapless 0.9.4 when rstar or parry3d move; the licence texts for the hosted build); the
    report (`/advisor-report`; its first lines: `content/source/` changes); the notes out of the head; a draft
    pull request; the advisor agent on the final head (it runs the gate itself; it is told of the order change:
-   step 10's core before step 9); his go; the merge with the full head as the expected head.
+   step 10's core and the pieces of steps 9 and 10 that need no content file were built before step 8's second
+   part, while DIFF-LIST was open); his go; the merge with the full head as the expected head.
 
 **What is on this machine only (under `.gate/`, not in git) and how to make it again:**
 - `.gate/wb-tool/wasm-bindgen`: the bindings tool, the file `packages/client/scripts/wasm-bindgen-tool.mjs`
@@ -1103,16 +1108,11 @@ manifest change held for security-auditor's answer; times from the clock; no fil
 DIFF-LIST answer; no merge without his go on the head the advisor agent approved.
 
 ## Current step
-4b-2: steps 6 and 7, step 8's first part and step 10's core are done and pushed (3,999 written lines). DIFF-LIST
-is asked of him and open. With his yes: step 8's second part, then step 9 (its held manifest line is approved by
-security-auditor on two digests), then step 10's wiring, then the look ahead before steps 11 and 12.
-(Earlier text of this section:) 4b-2: steps 6 and 7 are done and green in CI. DIFF-LIST is asked of him
-(`cs4b-content/question-2026-11-26-diff-list.md`; the board thread is on needs-musti). Step 8's first part (the
-tools, on test files) is built and in its local checks; then its commit, the count, the push, CI. After his yes:
-step 8's second part (his Export, its manifest and the table under `content/source/`, the movement table by the
-script, the test scene from the draft, the real-files checks). Without his answer, the next work that does not
-rest on it: step 10's static collision world on a map built in code is not possible without step 9's seat; so
-step 9's parts that need no content file (the constructor's bundle argument on the test texts) come next.
+4b-2 (2026-11-27, 01:49 Amsterdam, from the clock): every piece of steps 6 to 10 that needs no content file is built and pushed
+(head of the code: 5c6738a; 4,956 written lines of 8,450). DIFF-LIST is asked of him and open
+(`cs4b-content/question-2026-11-26-diff-list.md`; the board thread is on needs-musti). With his own yes in the
+chat: the HAND-OVER section's list, from its item 1 (step 8's second part). Without it nothing more of 4b-2 is
+built: step 11 keeps its place in the order, and no file under `content/` is written.
 
 ## Next steps (the sheet's revision 3, section G; each step ends with the count of written lines)
 - **4b-1:** 1 the content crate's manifests · 2 the reader, the writer, the bundle, the two kinds, the old tuning's

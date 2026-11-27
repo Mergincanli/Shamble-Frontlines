@@ -242,7 +242,14 @@ def native_plants(names):
         code, _ = run(*native("content"), env=ENV)
         note("N5", "control", code == 0, "the native tests of content built with no flag", f"exit {code}")
 
+def anchors():
+    """Reads only: every plant's text to replace stands exactly once in its file (a plant whose anchor moved is no plant)."""
+    wrong = [(name, path, open(path).read().count(old)) for name, _, _, edits, _, _ in PLANTS for path, old, _ in edits if open(path).read().count(old) != 1]
+    for name, path, count in wrong: print(f"{name}: its text stands {count} times in {path}")
+    print(f"ANCHORS: {sum(len(plant[3]) for plant in PLANTS)} edits of {len(PLANTS)} plants read, {len(wrong)} wrong")
+
 def main():
+    if sys.argv[1] == "--anchors": return anchors()
     commit, names = sys.argv[1], set(sys.argv[2:])
     print(f"plants on {commit}", flush=True)
     touched = sorted({path for plant in PLANTS for path, _, _ in plant[3]})
