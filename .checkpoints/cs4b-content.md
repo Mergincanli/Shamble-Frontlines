@@ -1232,8 +1232,9 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   failed test, the recordings tests (5) and the boundary tests (39) then pass; the full checks run again).
   **CI on 885d382: green** (gate and smoke; toolchain run 46035714024, 16:41:26 to 16:54:28 UTC, **13 min 2 s**,
   against 9 min 50 s on fbbd84d: every phase was about a third slower, the Rust tests +1:20, the page builds +38 s,
-  the boundary tests +25 s, the browser tests +14 s, Firefox +20 s, so a slower runner, not one test; two minutes
-  under the job's 15-minute limit, told to him in the step's update).
+  the boundary tests +25 s, the browser tests +14 s, Firefox +20 s, so a slower runner, not one test; **11 min 58
+  s under the job's limit, which is 25 minutes since #78 (his CI-TIME, `toolchain.yml:38`), taken in at 35e96ad**;
+  the chat told him "two minutes under the 15-minute limit", which was wrong: corrected to him, a slip below).
   `sim_wasm::LOCAL_MAP` ("test-scene", the one map the content holds; the first recording's header names the same
   id); `CreateError::MapMissing` and `CreateError::World(WorldError)`, in the order seed, mode, content, map,
   world, padding (the order test covers the map; no map made in tests reaches the world's check, whose sentence is
@@ -1286,6 +1287,15 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   recordings what their scripts make, the players' file 257,421 bytes in both pages); the gate passes with smoke; CI:
   gate and smoke green, the toolchain run started 17:10:41 UTC.
 
+- **The close, first point: the plants' whole run on c442a80** (started about 20:08:30 UTC, alone in the worktree).
+  **A defect of the plants script found by it:** the control P19 ("the production page builds from the clean
+  sources", the page's step alone) DID NOT HOLD, with "the built-file check left no stamp: the players' WebAssembly
+  was not walked" (`.gate/plants-4b2.log`): in a whole run it follows P14, whose refused build leaves no stamp, as the
+  stamp's design says; run by name after a clean build (as Builder V4 ran it) it held. P15 to P18 stand before it
+  and are caught on the markup scan's own words, which run before the stamp's check. The fix, after this run ends
+  (the running script holds a planted source file at any moment): P19 builds the players' file first, then the page
+  (a chain, as C18 and C19), and the whole run is made again; both runs are told in the report.
+
 ## Slips of this chat's own rules, for the report
 - One git command did not start its own shell call: `git add .checkpoints/cs4b-content/review-brief-4b1.md` stood
   on the line after a `cat` that wrote that file, in one call (2026-11-26, about 16:46 Amsterdam). It staged that
@@ -1330,7 +1340,10 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   `gh api` call (a read of CI's checks on 885d382) stood after a `grep` and a `date` in one call. A read. Since
   then each git and gh command stands alone in its call. (7) The card's "Current step" was first written "21:09
   Amsterdam" when the clock then read 20:07:44 UTC (21:07): a time typed ahead of the clock, corrected before it
-  was committed.
+  was committed. (8) **The chat told him twice, at step 10's end, that CI's 13 min 2 s run left "two minutes
+  under the 15-minute limit".** Wrong: the toolchain job's limit is 25 minutes since #78 (his CI-TIME,
+  `toolchain.yml:38`), which this branch took in at 35e96ad; the run was 11 min 58 s under it. Found at the close
+  (20:10 UTC) while writing the reviewers' brief; corrected to him in the next chat message.
 
 ## HAND-OVER: where another session picks this up (written 2026-11-27, 00:44 Amsterdam; kept current)
 His words of 2026-11-27, 00:43 Amsterdam (2026-11-26, 23:43:38 UTC; `cs4-walk/mustafa-2026-11-27-save-every-25-
@@ -1423,7 +1436,8 @@ again here. SEAT-OUT from him: stop at a whole point and report the last commit'
    one fix pass (a second round only on what changed): rust-reviewer, security-auditor (the dev server's route, the
    caps' departure of `advisor-cutC.md` Q1, the imports and the players' file), netcode-architect (steps 9 and 10),
    engine-architect (it confirms the departure from its design 4.5, `advisor-cutC.md` Q2), test-engineer (is it
-   proven; the plants' whole run), infra-engineer (CI's time: 13 min 2 s on one run, 2 min under the job's limit;
+   proven; the plants' whole run), infra-engineer (CI's time: 9 min 43 s to 13 min 2 s on this seat's heads,
+   under the job's 25-minute limit (#78) and the browser tests' 5-minute one;
    the dev server's cargo run under the network cut); graphics-engineer, perf-auditor and art-director are not
    called (step 12 moved); the verifier until PASS; docs-keeper (his messages into DECISIONS by script: 18:52:56,
    21:16:26 and 23:43:38 UTC of 2026-11-26; his three messages of 2026-11-27 to Builder V6, 13:57:21 UTC (DIFF-LIST
@@ -1435,7 +1449,7 @@ again here. SEAT-OUT from him: stop at a whole point and report the last commit'
    time (`advisor-step11.md`, Low); the first field with a default goes to the advisor agent first, with read.rs's
    "nothing missing" rule (`advisor-step11.md` Q1); 4c carries the re-read's condition 4 (the first collision query
    from the match's step is 4c's, so a recording that covers it is 4c's); the generated content types have no reader
-   in 4b-2 but the drift test; CI's time near its limit); the report (`/advisor-report`; its first lines:
+   in 4b-2 but the drift test); the report (`/advisor-report`; its first lines:
    `content/source/` changes; then that 4b-2 changes nothing a player sees in a match that runs, the scene having
    moved); **the pull request's title and text in the notes** (this chat cannot open one: his Advisor opens the
    draft, his item 11); the notes out of the head; the advisor agent on the final head (it runs the gate itself;
