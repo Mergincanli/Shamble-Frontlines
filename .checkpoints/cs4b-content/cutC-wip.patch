@@ -12,7 +12,7 @@ index 5c8bb2c..9f81dfd 100644
          if let Some(first) = recording.steps.first() {
              sim.rebase(first.host_ms);
 diff --git a/crates/sim-wasm/src/lib.rs b/crates/sim-wasm/src/lib.rs
-index d4e267f..95a2196 100644
+index d4e267f..765e2e7 100644
 --- a/crates/sim-wasm/src/lib.rs
 +++ b/crates/sim-wasm/src/lib.rs
 @@ -27,12 +27,14 @@ pub fn tick_hz() -> u32 {
@@ -135,7 +135,7 @@ index d4e267f..95a2196 100644
          sim.step(0.0);
          for button in 0..16u32 {
              // One press of this button, on top of the ones before it, with only its own bit held.
-@@ -215,9 +234,9 @@ mod tests {
+@@ -215,9 +234,11 @@ mod tests {
      /// tick by tick, and one button held differently makes it differ.
      #[test]
      fn the_shared_hash_is_the_local_server_s_and_covers_no_seed() {
@@ -143,21 +143,24 @@ index d4e267f..95a2196 100644
 -        let mut b = Sim::create(&[9; SEED_BYTES], MODE_LOCAL, 0).expect("a good seed and mode");
 -        let mut held_otherwise = Sim::create(&SEED, MODE_LOCAL, 0).expect("a good seed and mode");
 +        let mut a = Sim::create(&SEED, MODE_LOCAL, 0, &bundle()).expect("a good seed and mode");
-+        let mut b = Sim::create(&[9; SEED_BYTES], MODE_LOCAL, 0, &bundle()).expect("a good seed and mode");
-+        let mut held_otherwise = Sim::create(&SEED, MODE_LOCAL, 0, &bundle()).expect("a good seed and mode");
++        let mut b =
++            Sim::create(&[9; SEED_BYTES], MODE_LOCAL, 0, &bundle()).expect("a good seed and mode");
++        let mut held_otherwise =
++            Sim::create(&SEED, MODE_LOCAL, 0, &bundle()).expect("a good seed and mode");
          for tick in 0..20u32 {
              let hash = a.shared_hash();
              assert_eq!(hash, b.shared_hash());
-@@ -240,7 +259,7 @@ mod tests {
+@@ -240,7 +261,8 @@ mod tests {
  
      #[test]
      fn padding_makes_the_block_longer_and_stays_zero() {
 -        let mut sim = Sim::create(&SEED, MODE_LOCAL, 4096).expect("4 KiB of padding is allowed");
-+        let mut sim = Sim::create(&SEED, MODE_LOCAL, 4096, &bundle()).expect("4 KiB of padding is allowed");
++        let mut sim =
++            Sim::create(&SEED, MODE_LOCAL, 4096, &bundle()).expect("4 KiB of padding is allowed");
          assert_eq!(sim.block_len(), 44 + 4096);
          sim.input(1, 0xFFFF, u32::MAX, u32::MAX, u32::MAX, u32::MAX);
          sim.step(0.0);
-@@ -250,7 +269,7 @@ mod tests {
+@@ -250,7 +272,7 @@ mod tests {
  
      #[test]
      fn a_bad_seed_mode_or_padding_is_refused_with_a_plain_reason() {
@@ -166,7 +169,7 @@ index d4e267f..95a2196 100644
          assert_eq!(
              refused(&[7; 31], MODE_LOCAL, 0),
              Some(CreateError::SeedLength(31))
-@@ -288,4 +307,55 @@ mod tests {
+@@ -288,4 +310,52 @@ mod tests {
              assert!(!error.message().contains("7, 7"));
          }
      }
@@ -188,10 +191,7 @@ index d4e267f..95a2196 100644
 +        let text = content::movement::TEST_TEXT.replace(": 100,", ": 100.0,");
 +        let unformed = content::bundle::write(&[("movement/test-soldier.json", &text)]);
 +        let message = refused(unformed.as_bytes()).expect("refused").message();
-+        assert!(
-+            message.contains("movement/test-soldier.json"),
-+            "{message}"
-+        );
++        assert!(message.contains("movement/test-soldier.json"), "{message}");
 +        assert!(refused(&bundle()).is_none());
 +    }
 +
