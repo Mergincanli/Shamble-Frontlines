@@ -180,6 +180,48 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     his words stand in `docs/EDITOR_V2.md` §3, "Decided 2026-11-05".
 
 ## Decisions, newest first
+- **Taken by Mustafa, 2026-11-27, 12:37:33 UTC: a standing rule against needless guard prompts: in a shell command
+  every file that is written, moved, copied or deleted is spelled out with its full path, with no variable,
+  substitution or wildcard in its name, or the Write and Edit tools are used, so the guard can see it is not a kit or
+  gate file; writes to kit and gate files still ask him first** (the chat he calls CI Builder,
+  session_019YNMUUemXge56777MiUWFz, a Claude Code chat on Opus 5.5 for CI work; his label: "From Mustafa, 27 November
+  (written with my Advisor). A standing rule against needless guard prompts: in a shell command, spell out every file
+  you write with its full path. No variable, substitution or wildcard in the name of a file that is written, moved,
+  copied or deleted. Or use the Write and Edit tools for it. Then the guard can see it is not a kit or gate file and
+  does not ask me. This changes nothing else: writes to kit and gate files still ask me first."; message
+  98a843a1-3f77-4e1e-8e00-ea4ae6c0273c, whole; copied by script from the chat's saved file
+  `.checkpoints/ci-time/mustafa-2026-11-27-full-paths.md` (readable at commit 2afe425 of the chat's branch
+  `claude/keen-tesla-v807cf`), which the chat copied by script from its transcript). What it answers, in the chat's
+  words (not his): nothing the chat asked: a standing rule; in a shell command every file written, moved, copied or
+  deleted is spelled out with its full path, no variable, substitution or wildcard, or the Write and Edit tools are
+  used. Records, not his words: the CI chat follows it from this message on (its CI-TIME notes and commits). Copied by
+  script (463 bytes, sha256 a014e5f89155b99e4fd4c985f567115f6eb4aa28298a85aaa45ce22ca9c5a48d):
+> From Mustafa, 27 November (written with my Advisor). A standing rule against needless guard prompts: in a shell command, spell out every file you write with its full path. No variable, substitution or wildcard in the name of a file that is written, moved, copied or deleted. Or use the Write and Edit tools for it. Then the guard can see it is not a kit or gate file and does not ask me. This changes nothing else: writes to kit and gate files still ask me first.
+- **Taken by Mustafa, 2026-11-27, 12:25:12 UTC: CI-TIME (a): `.github/workflows/toolchain.yml` line 38
+  `timeout-minutes: 15` becomes `timeout-minutes: 25`, this exact text approved in advance, nothing else in the file,
+  the 5-minute Firefox stop stays; the main folder first fast-forwarded to main b9aad01; a plan for the advisor agent,
+  the change and security-auditor's read; the chat opens the draft pull request if it can; on his go for the approved
+  head's full id it marks it ready and merges with that id as the expected head, and a refused merge is told to him**
+  (the chat he calls CI Builder, session_019YNMUUemXge56777MiUWFz, a Claude Code chat on Opus 5.5 for CI work; his
+  label: "FOR THE CI BUILDER. From Mustafa, 27 November, 12:50 Amsterdam (written with my Advisor)."; message
+  892aacd7-4da9-405e-84d3-3090f2316f54, whole; copied by script from the chat's saved file
+  `.checkpoints/ci-time/mustafa-2026-11-27T1250-ci-time.md` (readable at commit 2afe425 of the chat's branch
+  `claude/keen-tesla-v807cf`), which the chat copied by script from its transcript). What it answers, in the chat's
+  words (not his): nothing the chat asked: one small job, the job's time limit raised from 15 to 25 minutes, the exact
+  text approved in advance. Records, not his words: the main folder fast-forwarded to b9aad01; the line written at
+  12:43:24 UTC with the mode read right before as `acceptEdits`, the file then sha256
+  d1dd16d7eb850a8b27118eab51008b2e8ad97fcded27c468fa1d310f080ff11c (commit af127c2); draft pull request #78 opened by
+  the chat through the GitHub tools; the advisor agent, security-auditor and infra-engineer approved (the report
+  `docs/reports/2026-11-27-ci-time.md`). Copied by script (1280 bytes, sha256
+  cbff88724bcb157fd0d69efbc92fa5837f01f0e8dd9c9bc9aab47d3e0f37ee06):
+> FOR THE CI BUILDER. From Mustafa, 27 November, 12:50 Amsterdam (written with my Advisor).
+>
+> 1. One small job, CI-TIME. `.github/workflows/toolchain.yml` line 38 on main says `timeout-minutes: 15`. Builder V4's newest head (5c6738a) took 13 minutes, and the rest of Walk adds tests. A run that passes the limit fails with no defect.
+> 2. CI-TIME: (a). That one line becomes `timeout-minutes: 25`. This exact text has my yes, so do not ask me again for the text. Nothing else in the file changes, and the 5-minute stop for Firefox stays.
+> 3. First fast-forward your main folder to main (b9aad01954be666340a7ec5c6e9fc9353b11abf1) so the newest guard loads. Then a plan of a few lines for the advisor agent, the change, and the security-auditor's read (risk tier 2).
+> 4. Open the draft pull request yourself if this chat can. If it cannot, put the title and text in your notes and my Advisor opens it.
+> 5. When the advisor agent and the security-auditor approved the head and gate, smoke and toolchain are green on it, tell me its full id. On my go for that id you mark it ready and merge it with that id as the expected head. If GitHub refuses the merge, tell me and work around nothing.
+> 6. Rule unchanged: git and gh always start their own command, with no other program in front of them.
 - **Taken by Mustafa, 2026-11-26, 18:16:35 UTC: main moved under pull request #75 (to
   2671595fc823750a83c58f5b5b122128eb500387, the Guard fix chat's #76), so it cannot merge at 2e282176: the chat takes
   main in once, with no rebase and no force push; in the four clashing docs files both sides are kept, main's text
@@ -299,6 +341,18 @@ queued item leaves "Queued" when the change-set that carries it out merges._
 > 8. Rule unchanged: git and gh always start their own command, with no other program in front of them.
 - **Taken by Mustafa, 2026-11-26, 15:28:51 UTC: THROWAWAY-PUBLIC (a): the throwaway repository is public, with neutral names, and deleted as soon as the results are reviewed** (the chat he calls the Guard fix chat, session_019YNMUUc6oiiNVygR9H56Q7, a Claude Code chat on Opus 5.5 on the branch `claude/confident-gates-tbnq38`; message 6fe0dfd1-e3ff-478f-9d3b-adbfd5cd9d51, whole; copied by script from the chat's saved file `.checkpoints/main-wall/mustafa-2026-11-26T1628-throwaway-public.md` (readable at commit 68b690f130c6a7c5cd770d5fabd088091f9110e6), which the chat saved by script from its transcript). What it answers, in the chat's words (not his): the question THROWAWAY-PUBLIC from the advisor agent's REVISE of the plan (the chat's checkpoint, steps 4 and 6). Copied by script (1 bytes, sha256 ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb):
 > a
+- **Taken by Mustafa, 2026-11-26, 15:27:12 UTC: #74 is merged, main 3b949c1a9f9c99d6d54570a0f2805c3d65661d8b; nothing
+  more for the CI chat then; its board thread set to done** (the chat he calls CI Builder,
+  session_019YNMUUemXge56777MiUWFz, a Claude Code chat on Opus 5.5 for CI work; his label: "From Mustafa, 26 November:
+  #74 is merged, main is 3b949c1a9f9c99d6d54570a0f2805c3d65661d8b. Nothing more for you now. Set your board thread to
+  done."; message 809f16a9-a961-48d5-b841-73e216fa5223, whole; copied by script from the chat's saved file
+  `.checkpoints/ci-time/mustafa-2026-11-26-74-merged.md` (readable at commit 2afe425 of the chat's branch
+  `claude/keen-tesla-v807cf`), which the chat copied by script from its transcript). What it answers, in the chat's
+  words (not his): nothing the chat asked: #74 merged (main 3b949c1a); the board thread to done. Records, not his
+  words: main 3b949c1a's second parent is the chat's head e8340eb (read with git); the trial Firefox folder and the
+  read-only copy of the upload action's code deleted at that merge. Copied by script (148 bytes, sha256
+  fcc6d017e6f629442b816c003cd8739fdd963d455e4d7f817cf09b7ad01369ef):
+> From Mustafa, 26 November: #74 is merged, main is 3b949c1a9f9c99d6d54570a0f2805c3d65661d8b. Nothing more for you now. Set your board thread to done.
 - **Taken by Mustafa, 2026-11-26, 15:07:24 UTC: his Testlines Export at 30 steps, handed over for the data step of
   4b-2** (the builder chat he calls Builder V4, lane 1 of the build, session_019YNMUVZR6ociHFWjByxkrq, a Claude Code
   chat; his label: "I have played on testlines.html on steps set to 30, and have exported data you needed:"; message
