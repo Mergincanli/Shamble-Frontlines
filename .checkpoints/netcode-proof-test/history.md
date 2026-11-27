@@ -8129,3 +8129,23 @@ go
   0e621dae6e5b009a4cf00b6401b46d771b2215a3`, with his item 4 (history.md:7909). Sent at 18:02 UTC after the tip
   re-read 0e621dae: the merge 48efc9c59b06347c79d0e9ecbdcc78c6992eebde (parents H0 22cd65d and T).
   Transcript line 105054 (record a72ae2b3-1d7e-4d89-af60-d5d7507f387d, 18:01:32.990Z), 2 characters.
+
+## Mustafa, 2026-11-27 12:25 UTC, in this chat: U8-FILLS (a), Builder 2's one-way merge, a readings follow-up (word for word)
+```text
+FOR THE NETCODE CHAT. From Mustafa, 27 November, 12:50 Amsterdam (written with my Advisor).
+
+1. U8-FILLS: (a). The values filled in at Stop B and the `ops` step in the check script sit outside U8's stop. The two one-line security notes are built at that fill and count, so the stop becomes 6,284.
+2. Netcode Builder 2's one-way delay work (my NPT-L2-ONEWAY (a)) is ready and my main Advisor checked it. Code commit c56afd07002f6c13af418c8f016d6087fe806813 on claude/practical-ride-igo41n, tip 29a901994f5b65c23a17162422770aaacc0ca44e. The commits after the code commit touch only its notes. Six files changed, all in the judge's code and marks/. marks.json has one changed field (the notes of PM-0001-3) and the sha256 a41ee58398274840c20eac3f09ab144fe8bc84dda5f7c7233fd5fd7589ea24f2. Gate, smoke and toolchain are green on the code commit, and a trial merge into your tip 7e1813c7 shows no conflict. Not run by my Advisor: its 136 judge tests.
+3. My word: merge that branch at exactly that tip, by the same steps and bars as the last merge (the command named first and my reply to it, afterwards the whole check). Take the next gap that fits, before R1's report. If the tip has moved, send no command and two lines to me.
+4. One follow-up from Builder 2 for your readings change before R5: the part named "L2 P0 (the real path, recorded)" in PM-0001-3 misleads, because on that leg the probe's one-way stamps hold only the socket's own hold time.
+5. Rule unchanged: git and gh always start their own command, with no other program in front of them.
+```
+- **Read as** (the main session's reading, not his words): (1) U8-FILLS (a): U8's stop is 6,284 lines (was 6,282);
+  Stop B's fills and UM-4's `ops` step sit outside it; SEC-U8F1-3's "in the same PowerShell" and SEC-U8F1-4's Stop B
+  record line are built at Stop B's fill and count; UM-4's build no longer waits. (2)-(3) NB2-ONEWAY: merge
+  claude/practical-ride-igo41n at tip 29a90199… exactly (code commit c56afd07…), by nb2-merge-plan.md's steps and bars
+  (NB2-PROMPT (a): the command named first and his reply awaited; then the whole check), in the next gap that fits,
+  before R1's report, plan first with the advisor's check; a moved tip: no command, two lines to him (the tip read
+  29a90199 at 12:2x). (4) For the readings PR before R5 (the card's Open findings). (5) The interim rule unchanged.
+  Written 12:50 Amsterdam (11:50 UTC) by his header; transcript line 113258 (a queue-operation enqueue at
+  12:25:15.618Z), 1549 characters.
