@@ -114,3 +114,12 @@ Closed: SA-PA-4 (its defect fix sound apart from SA-RC-2/3/4; info/exclude and g
 negations); dir-only pattern without the folder covered by the fixture. SA-PA-7 closed (line-end handling, not
 trimming; SA-RT2-3 holds). SA-PA-9 closed (filter text pinned by the mutants' exactly-once rule). SA-PA-6 closed.
 Verdict: REVISE on SA-RC-1 and SA-RC-2 (both contradict track.mjs lines 9-10); fixes tested on the scratch copy.
+
+## Narrow re-check of the built SA-RC fixes (build copy, 2026-11-27, not a new round)
+Read: built track.mjs whole, routine-guard.mjs diff vs main (guard.mjs not re-read). Suites: guard 1581/1581, track 85/85.
+Probes: session scratchpad only (sa-recheck5..8.mjs).
+- Closed: SA-RC-1 (BASE-REF), SA-RC-2 (IGNORE-CASE), SA-RC-3 (TEMP-LEAK), SA-RC-4 (CRAFTED-TREE), SA-RC-6 (BUDGET-MSG).
+- SA-RC-5 (MERGE-SCOPE): closed for the measured reach; same class remains as on main for Mustafa.
+- New SA-RC-8 Medium: WORDS-SHAPE (measured on the built function).
+- New SA-RC-7 Low: BASE-LOCAL (measured on the built script).
+Verdict: REVISE on SA-RC-8; the other hunks approved.

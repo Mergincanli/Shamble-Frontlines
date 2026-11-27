@@ -256,3 +256,20 @@ budget: after it, only a Critical or High reopens.
 - Size 931 vs about 980: fine. The fixes must stay under it, or it is his call (His go keeps, 6).
 - ADDITIONS-OK stays the one decision. Its list grows by SA-PA-8, TE-B9 and the guard widenings (stricter), plus
   WORDS-NEWLINE: a second accepted quote form, not in plan 3f's letter, named as a tolerance (it proves the same words).
+
+---
+
+# Re-check of the second fix pass (changed hunks only, 2026-11-27). Not a new review round.
+
+**Verdict: REVISE, one guard hunk** (plus one Medium riding the same pass); the rest approved.
+- Run myself in the copy: track 85/85, routine-guard 1581/1581, checkpoint 33/33, kept-logs 9 pass (10 tests, 0 fail);
+  fix-words20 999: 44 ok / 65 / 52 / 1 (as stated); fix-hist: 11/11 same, #65 stops, floors as stated; guard probe.
+- Met: RC-H1, RC-M2, RC-L1, RC-L2 (pinned; mutant survives: Low), SA-RC-1..4, SA-RC-6, advisor.md gloss (matches the
+  guard's first-line match). RC-M1: met for headers; see RC2-M1.
+- RC2-C1 (Critical by class, same class as SA-RC-5, ends at a prompt): SA-RC-5 only partly met. Detail to the caller.
+- RC2-M1 (Medium): existing-entry floor misses a removed quote line after a left-out note (2 entries on main). Rides
+  the pass.
+- RC2-L1 (Low): diff-algorithm pin untested. Follow-up.
+- Third saved-file shape: accepted as a named tolerance in ADDITIONS-OK (24 saved files hold a "---" line).
+- Size: 1003 plus the last fix, past about 980: SIZE-LINE to him, recommend (a) go as is.
+- Not run: settings S4 (copy), security-auditor's probes (its own re-check).

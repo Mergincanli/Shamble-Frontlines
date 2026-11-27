@@ -132,6 +132,19 @@
     file and a sha256 passes (44); 65 older with no stated sha, 52 with no saved file, 1 partial copy with a part left
     out (floor). Replay: tracks 11/11, no false words floors left. The auditor's probes pass on the copy (base by tag,
     ignorecase, excludes, temp leak, a crafted tree). Size: 1003 added, past the stop line of about 980: his call.
+27. Narrow re-checks: the advisor agent REVISE on one guard hunk (RC2-C1, the SA-RC-5 class, Critical by class, ends at
+    a prompt) and RC2-M1 Medium (an existing entry's quote lines after a note); RC2-L1 Low (diff algorithm untested: a
+    STATUS follow-up); third saved-file shape accepted as a named tolerance; final ADDITIONS-OK list in its notes;
+    SIZE-LINE recommended (a). security-auditor: SA-RC-1..4 and 6 closed; SA-RC-5 remainder (same class); SA-RC-8
+    Medium (the third shape needs its header); SA-RC-7 Low (local git state can move the base).
+28. Third fix pass: the merge rules keyed on the tool name on every connector; kept() (header plus every quote line)
+    for existing entries; the third shape only with the record's header (# title, blank, one _Copied by script..._
+    line, blank: all 24 real files); GIT_GRAFT_FILE=/dev/null and a usage line naming the local origin/main ref. Suites:
+    guard 1581, track 85, checkpoint 33, kept-logs 9. Mutants 58/62 (left: diff algorithm and graft file, both covered
+    by security-auditor's probes, and two equivalents). Whole record and replay unchanged. Probes: the tail-only quote
+    floors; a graft no longer moves the base. Size: 1019 added (kit 980, CLAUDE.md 39). Asked of him at 13:33 UTC:
+    ADDITIONS-OK and SIZE-LINE, recommended (a) both, with SA-PA-5, the connector fix and the binary floor as
+    information, and my slip (a gap of a class still open on main named in checkpoint c6f530a; reworded in cdf1624).
 
 ## Current step
 Narrow re-checks of the second fix pass (advisor agent: track hunks, guard SA-RC-5/6, the advisor.md line-end gloss;
