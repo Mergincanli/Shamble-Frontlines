@@ -125,3 +125,38 @@ B's form (advisor-u8-f1-head.md block 4), each its own call:
    /home/user/Shamble-Frontlines/.claude/worktrees/agent-a7fe1b9f436f36bb1` from the main folder, then `git worktree
    list --porcelain` and `ls -d` of the path, quoted. A refusal: fallback (b), the worktree stays until PR #40's close.
    Never `--force`, never `rm -rf`. D is detached, so no branch ref stays behind.
+   The keep-first's destination is B's own (advisor-u8-f1-head.md:167-168): `mkdir -p
+   /home/user/Shamble-Frontlines/.gate/u8-f1`, then `cp -a` into /home/user/Shamble-Frontlines/.gate/u8-f1/kept-agent-a7fe1b9f
+   (the ruling governs over the shorter path above); the list holds only sha256sum lines, as u7-kept-list.md.
+
+## Done 14:11-14:1x
+- B DONE 14:11 (advisor-ops-reword-head.md, last line "Status: COMPLETE 2026-11-27T14:11Z"): d8b57b8 stands, nothing
+  owed; Q-A and Q-B both taken, in one net-zero follow-up by the main session within PROMPT-R1.md:127-129, before Stop B,
+  B reading its pushed head (no round).
+- D DONE (hand-back 14:1x): the three reads matched; `git add` of the 12; `git merge --ff-only` "Updating
+  77ffc95..28ea74e Fast-forward", 231 files; `git status --short` printed nothing; no refusal, deny or prompt.
+  `git worktree list --porcelain`: the worktree at 28ea74e, detached.
+
+## C: a2b7636a57dff4206 (resumed; it checked MAIN-68's plans: advisor-main-68b.md): the check of MAIN-69's plan
+Into the seat B and D freed (NB still running: 2 agents at once). Sent 14:14 UTC (resumed: "Resuming agent a2b7636").
+The check of MAIN-69's plan (main-69-plan.md): taking main b8f02b0 (#78 ci-time) into the lane.
+As the advisor (main's .claude/agents/advisor.md, by `git show origin/main:.claude/agents/advisor.md`; read only, no
+cargo, no git write), check .checkpoints/netcode-proof-test/main-69-plan.md, a delta on main-68-plan.md rev 4 as you
+checked it (advisor-main-68b.md: C68B-1 to -6, P-2). Main moved from b9aad01 to b8f02b0 by one merge, #78: CI
+(.github/workflows/toolchain.yml, timeout-minutes 15 to 25) and five docs paths; the trial merge is clean. Mustafa's
+message of 13:55 UTC (history.md:8163-8186, word for word there) ended LEAN-MODE's window rule, with one limit (a step
+that must not be cut starts only if the usage left covers it), and answered TAKEIN-CODE (b), whose conditions leave CI
+out. Rule APPROVE, APPROVE WITH CONDITIONS or REVISE, and answer the plan's Q1-Q5.
+Write .checkpoints/netcode-proof-test/advisor-main-69.md (plan first, then each block as it is done); end with
+"Decisions needed" and "For Mustafa", then, once every block is written, the last line `Status: COMPLETE <date and
+UTC time>`.
+Re-checked at sending (14:1x UTC): main b8f02b0 (its push runs gate 46011351316 and toolchain 46011355903, both
+success); HEAD = origin (d6c8862, the saver's save), clean.
+Write files with the Write and Edit tools only (no sed, no shell redirect, no python writes; never `cargo fmt` writing
+files: apply rustfmt's diff by Edit); an agent with no Edit tool rewrites its notes file whole with Write. git and gh
+always start their own command, with no other program in front of them. In this tool a command that exits non-zero
+without printing can show nothing at all, the same as a pass (seen with `test`, `git diff --quiet` and `grep -q`): use
+only forms whose output carries the answer (`git diff --name-only` or `--stat`, `ls -d`, `cmp -s`, sha256 lists), and
+quote that output. His rule: "in a shell command, spell out every file you write with its full path. No variable,
+substitution or wildcard in the name of a file that is written, moved, copied or deleted. Or use the Write and Edit
+tools for it."
