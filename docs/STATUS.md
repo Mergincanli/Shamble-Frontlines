@@ -2,7 +2,7 @@
 _Mustafa and the Advisor read this first. At most 120 lines (Mustafa's STATUS-DIET, 2026-11-10): the phase, in flight,
 next, waiting on Mustafa, the routines' state, pointers. His decisions, word for word, newest first:
 `docs/DECISIONS.md`. The rest: `docs/STATUS_ARCHIVE.md`. Kept current by docs-keeper after every change-set._
-_Last updated: 2026-11-27 (ci-time: the #78 row added, the CI Builder's old 2026-11-26 line dropped as #74 is merged). 2026-11-26 (MAIN-WALL's docs pass, on the lane branch with main 3b949c1a merged in: the wall on main; #73 and #74 merged, their rows, "Waiting on" lines and follow-ups bullets moved to the archive by script; his SPEED-ORDER (b) sets the queue)._
+_Last updated: 2026-11-27 (review-tracks' docs pass, on the lane branch with main b8f02b01 merged in: the change-set applied, its pull request next; #75, #76 and #78 merged, their rows and the old line moved to the archive by script; T10 done)._
 
 ## Phase
 - **v2 phase 0** (`docs/V2_PHASE0_BRIEF.md`; the rebuild: `docs/VISION_V2.md`): the process upgrades (kit-v3-0 to
@@ -10,7 +10,7 @@ _Last updated: 2026-11-27 (ci-time: the #78 row added, the CI Builder's old 2026
   `docs/ENGINE_OVERVIEW.md` and `docs/SPIKE_PLAN.md`) are the basis for the spikes and stay Proposed (the stop's
   answers, 2026-11-03: `docs/DECISIONS.md`), but for his SCOPE (a) of 2026-11-10: "I accept ADR 0002's part 1 alone
   (the repository layout, with the legacy constraints applying to legacy/ only)", recorded in ADR 0002 by 2.1b (#51).
-- **Last merged** (read with git, 2026-11-26): #74, ci-preview-handover (3b949c1a); #73, guard-wrappers (4a62873e); #70, 4a (2483e9a, 2026-11-26); #71, ci-after-3a (07d673b); #67 (c1da1bd); #69 (311c048); #68, 3b (3ab9eae).
+- **Last merged** (read with git, 2026-11-27): #78, ci-time (b8f02b01, 2026-11-27); #75, 4b-1 (b9aad019); #77, MAIN-WALL's T10 half (47bb79e9); #76, MAIN-WALL (2671595f); #74 (3b949c1a); #73, guard-wrappers (4a62873e); #70, 4a (2483e9a).
 - **The kit:** KIT-FREEZE-2, FREEZE-FDN, his exceptions and additions, and his words of 2026-11-13 for step 2.3 (on kit,
   gate and CI edits): `docs/DECISIONS.md`; the bullet that quoted them whole: the archive's "Phase", at its end.
 - **The day guard, after guard-wrappers** (merged as #73, 4a62873e, by his R4-END (1) and his go of 14:56 UTC): every
@@ -22,7 +22,7 @@ _Last updated: 2026-11-27 (ci-time: the #78 row added, the CI Builder's old 2026
   then, his interim rule: "git and gh always start their own command, with no other program in front of them."
 - **The legacy game is frozen** (critical fixes only). Legacy phase 0 stays PARTIAL until his Windows run.
 - **Main's wall is on** (2026-11-26, about 17:15 UTC, his click; TECHNICAL, "Main's wall"): only his account updates main, and gate and smoke stay required for every merge, his too; rollback: the wall's Enforcement status, Disabled.
-  Open (T10): one day-session and one PR Advisor merge under it, then the other lane's token sitting (his TOKEN-RELEASE (c)); not measured: his own web merge, and the first merge from his second personal Claude account.
+  T10 passed, both halves: the day-session merge (#76, 2026-11-26 18:00:25 UTC) and the PR Advisor merge (#77, 18:52:17 UTC by the merge commit's date; by the PR Advisor [assumed: the chat's card]); so his TOKEN-RELEASE (c) condition is met. Not measured: his own web merge, the first merge from his second personal Claude account.
 - **main** needs a pull request with the `gate` and `smoke` checks green; `toolchain` runs on every push and
   pull request but is not a required check (REQUIRED-CHECK, a finding for step 2.3); gate, smoke and toolchain green on
   2483e9a (runs 45818982040 and 45818982052, read with gh's REST route 2026-11-26; read 2026-11-26, 14:24 UTC). Approved unattended work: [Night queue, issue #16](https://github.com/Mergincanli/Shamble-Frontlines/issues/16).
@@ -31,22 +31,21 @@ _Last updated: 2026-11-27 (ci-time: the #78 row added, the CI Builder's old 2026
 | PR | Work | Branch | State | Waiting on |
 |---|---|---|---|---|
 | #40 | the netcode proof test (SPIKE_PLAN item 1; a throwaway spike, `spikes/netcode-proof/`) | `claude/netcode-proof-test-plan-hcky5g` | draft; U1-U3 done; U4: U4d2 merged, U4r's build on its fourth builder copy; main 4d21c1a merged in (7685b2b) (its checkpoint at d0d1cfd, read 2026-11-14 01:05 UTC) | its units, runs and report; his OK of each run's plan and cost cap |
-| none yet | MAIN-WALL (his words of 2026-11-25 19:36:42 UTC: only his account updates main), by the Guard fix chat: the wall is on by his click ("Phase"); this docs pull request records it | `claude/confident-gates-tbnq38` (stands in for `cs/main-wall`) | risk tier 2; GitHub settings by his clicks, no code or workflow changed; measured on a public throwaway repository, deleted by his click after 17:27 UTC [assumed: his "done" of 17:31:41 UTC]; the plan: the advisor agent APPROVE, security-auditor REVISE (text only, all applied); the results: both APPROVE; report `docs/reports/2026-11-26-main-wall.md` | the advisor agent's review of the pushed head; the merge |
-| #75 (draft) | change-set 4b-1, "Content" (the first of 4b's two pull requests, his SIZE-4B (b)), by lane 1 (the chat he calls Builder V4): the content crate, the time unit, the reader's proofs and fuzz run, the links check (the list: REPO_MAP, ROADMAP) | `claude/cool-pasteur-oiqk1r` (stands in for `cs/4b-content`) | risk tier 1, no browser check; reviewed (two rounds, no Critical or High); the verifier and the advisor agent's verdict on the final head are in its report | his go for the head the advisor agent approves |
-| #78 (draft) | CI-TIME (his CI-TIME (a) of 2026-11-27, 12:50 Amsterdam), by the chat he calls CI Builder: the `toolchain` job's time limit 15 to 25 minutes (`.github/workflows/toolchain.yml:38`), nothing else in the file; report `docs/reports/2026-11-27-ci-time.md` | `claude/keen-tesla-v807cf` | risk tier 2; the advisor agent, security-auditor and infra-engineer approved the change | his go for the head the advisor agent approves, gate, smoke and toolchain green; then the chat marks it ready and merges with that id |
+| none yet | the review tracks with SOURCE-GO (a) (his brief of 2026-11-25; his answers of 2026-11-26 and 2026-11-27: `docs/DECISIONS.md`), by the Guard fix chat: main's `.claude/scripts/track.mjs` gives the light or full track and the reviewers from the files touched; two merge ways (the building chat on his Advisor's PASS; his go in a chat); the guard skips the merge prompt only on his MERGE-PROMPT (d)'s conditions | `claude/confident-gates-tbnq38` (stands in for `cs/review-tracks`) | risk tier 2; applied on the branch (eight kit files, 1029 added lines, past the stop line by his SIZE-LINE (a)); build review: the advisor agent and security-auditor APPROVE; the verifier PASS WITH NOTES; main b8f02b01 merged in (583c85a0); the pull request still to open | his PASS-FORGE answer ("Waiting on Mustafa"); the advisor agent's review of the pushed head; his go |
 
 ## Next
 1. In his order (ORDER (b), 2026-11-10): his unit walk of 2026-11-09 (a docs change-set: UNITS.md §0 and LOOP_V2),
    then the Slice 1 note of 2026-11-10, each in a fresh chat. His words: `docs/DECISIONS.md`, "Queued".
 2. v2: the netcode proof test (#40); step 2.3's chat stays stopped; the first builder chat paused. Walk (his WALK-CUT
-   (a)): 4a merged; **4b-1 reviewed (#75)**; then 4b-2, 4c, 4d, the link simulator, change-set 7 (ROADMAP, "Next / open").
+   (a)): 4a and 4b-1 merged (#70, #75); then 4b-2, 4c, 4d, the link simulator, change-set 7 (ROADMAP, "Next / open").
 3. Lane 2 (Builder V2), his order of 2026-11-25: #66 and #67 (ADR 0006's revision) merged (09faefa, c1da1bd);
    step 2.6's plan (its first edit after his go on the revised row); the carry of his look decisions when
    his block comes; one plan for the look test page and the model-check tool (EARLY-LOOK (a)), built after his go.
-4. The Guard fix chat (`docs/DECISIONS.md`, "Queued"): MAIN-WALL done but T10 ("Phase"); then, by his SPEED-ORDER (b) of 2026-11-26, 17:37:10 UTC, the review tracks with SOURCE-GO (a), then one guard change-set with R4-1's fix and GUARD-KIT; each plan first.
+4. The Guard fix chat (`docs/DECISIONS.md`, "Queued"): MAIN-WALL done, T10 included; by his SPEED-ORDER (b) the review tracks (in flight), then one guard change-set, plan first: R4-1's fix, GUARD-KIT, FEWER-ASKS (his 2026-11-27 item 5), SA-PA-10 and RC-S1, SA-PA-5 ("Follow-ups").
 
 ## Waiting on Mustafa
-- 4b-1 (#75), reviewed (its report): his go. Answered (`docs/DECISIONS.md`, 2026-11-26, 18:16:35 UTC): SIGHT-FLAG (a), DUR-1 (C), STATUS-LEN (a).
+- Review tracks (in flight): **PASS-FORGE: pending his answer** (a PASS could be faked through a route that runs without a prompt, the script-run route): (a) accept until the guard change-set, its fix first there (the chat and the advisor agent recommend it); (b) that route off the no-prompt list now; (c) the no-prompt merge off until then (security-auditor recommends it). Then his go on the head the advisor agent approves. Later, his click: `toolchain` as a required check in "Shamble Ruleset 1". Still his words to give: ACCT-LINES (below).
+- For his information: once the review tracks merge, a binary file is a go floor, so a pull request that adds binary test files (like #68's test vectors and #70's recording) needs his go.
 - Later, from 4a's report: MOVE-RULES, NO-SOURCE, RESUME-FLASH, TUNE-HOME, SPRINT-DELAY-4; `docs/UNITS.md` §0's two lines (his unit walk); DIFF-LIST at 4b-2's data step.
 - His accounts, his words (2026-11-26, 17:11:23 UTC, `docs/DECISIONS.md`): "My first personal account (I have two) and 1 enterprise (university), so I have 3 accounts working on the project" (ACCT-3, below).
 - His to give: ACCT-3's roles and CLAUDE.md line (his third account, counted like the other two); his go before anything
@@ -89,7 +88,7 @@ _Last updated: 2026-11-27 (ci-time: the #78 row added, the CI Builder's old 2026
   Advisor's documents); routine proofs to record; local smoke's Chromium build; the stale citations left unedited.
 - **From change-sets 0 and 1 (PRs #56, #58) and Part 15:** O1 (PM-0005-54) and O2, his calls with change-set M's plan;
   the first real export; the coat's motion; the machine lines; ADR 0002's package list; #58's other follow-ups and Lows.
-- **From MAIN-WALL** (`docs/reports/2026-11-26-main-wall.md`; the archive's block "From MAIN-WALL"): SA-MW-R1 to -R8 (R5 and R6 done); T1e not run; his own web merge under the wall not measured; for the rule-file change-set, ACCT-LINES: CLAUDE.md's lanes lines say two accounts, he has three ("Waiting on Mustafa").; the advisor agent's results condition 5 (click 0's Actions > General screenshot) not received [assumed: open], a Low, no new ask
+- **From MAIN-WALL** (`docs/reports/2026-11-26-main-wall.md`; the archive's block "From MAIN-WALL"): SA-MW-R1 to -R8 (R5 and R6 done); T1e not run; his own web merge under the wall not measured; ACCT-LINES: CLAUDE.md's lanes lines say two accounts, he has three; they wait on his words (the review tracks left them unchanged); the advisor agent's results condition 5 (click 0's Actions > General screenshot) not received [assumed: open], a Low, no new ask
 - **Merged pull requests' bullets** (moved by script): #49, #50, #51, #48 (gate step 2.3): the archive's "Moved from
   STATUS (2026-11-24)"; #60, #61, #64 to #71, #73, #74: its "Moved from STATUS (2026-11-25...)" and "(2026-11-26...)".
 - **VISION-RULE** (his point 4c, `docs/DECISIONS.md`, 2026-11-26, 15:51:38 UTC; no ADR text rewritten now), his words:
@@ -101,13 +100,14 @@ _Last updated: 2026-11-27 (ci-time: the #78 row added, the CI Builder's old 2026
   leaves that square (none in Slice 1; Slice 2's plan says whether its maps do), at the latest in Slice 3's change-set that sets
   the command codec for online play (PM-0001-51), beside 3B-ACKS and 3B-OUTAGE-256. No numbered change-set holds it yet. And 16
   more ids there, among them 4B-SIGHT-MARK (Slice 2's plan adds the mark), 4B-FIRE-RATE, 4B-CI-CONTENT (the CI Builder).
+- **From review-tracks** (in flight; the archive's block "From review-tracks"; class words only): REPO-PIN (Medium: the no-prompt merge path to pin this repository and a plain pull request number); UNSCANNED-VERBS (Low); RC2-L1 (Low: the diff-algorithm pin has no test); SA-RT2-1's guard-file half (Low); T-MARK, the measurement of an app mark on comments (not run [assumed]); for the guard change-set: SA-PA-5 (an entry to drop from the no-prompt list), FEWER-ASKS and GUARD-KIT.
 
 ## Open risks (their text: `docs/STATUS_ARCHIVE.md`, "Open bugs and risks", a live section)
 - **Kit:** kit-v3-5's merge-check limits (Windows names, gitignored names, case-only twins, symlinks, more than 100
   files) and W1-W3; kit-v3-3's stated limits (L1-L18, R-PLAIN, D-ASK); kit-v3-2's items 1-5; kit-v3-1's items 1-2;
   kit-v2-2's finding 4 (Medium, open) and its Lows; kit-v2-1's night-rules note (issue #16's comments are trusted);
   guard-wrappers' R4-1 (Critical, open: "Phase") and INPUT-RUN (a named limit, a security finding left open);
-  MAIN-WALL's: the wall cannot tell a session from him, does not guard itself, and Disabled reopens it (SA-MW-11).
+  MAIN-WALL's: the wall cannot tell a session from him, does not guard itself, and Disabled reopens it (SA-MW-11). Review tracks' (class words only): SA-PA-10 and RC-S1 (Critical by class, older, open on main, each ends at a prompt; the guard change-set); PASS-FORGE (pending his answer: "Waiting on Mustafa").
 - **CI:** the smoke job's Chromium step stalled once (PR #42); on #50 (3f29cb8, 8d8c422) its library install failed in 5
   attempts and was cancelled in 1 (a runner DNS outage). #64's browser tests use a Chrome that moves with the image. ci-preview-handover's upload runs after the cut on what the cut wrote (CUT-ESCAPE, accepted; PH-SA-2), and its artifact is readable by signed-in users for 7 days.
 - **v2:** the decision drafts' risks (the asset pipeline and several LOOK_V2 techniques not researched); R1-R6's (R3-R6

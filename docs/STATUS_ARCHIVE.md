@@ -348,6 +348,22 @@ _Last updated: 2026-11-26 (change-set 4b-1's docs pass, second part, by lane 1's
   online play; releases worked out, not counted); 4a's (the recording tests still follow a link, 4A-S3-READ; two planted
   divergences only in a stand-in or native form). **Legacy (frozen):** 3a's ranked list (PR #15); bot navigation; the
 
+_Moved from STATUS (2026-11-27, review-tracks' docs pass, under his OLD-LINES of 2026-11-18): STATUS's rows for three merged pull requests, moved by script, byte for byte, so their cells read as they stood when they left STATUS: MAIN-WALL's docs pull request (PR #76, merge commit 2671595f, 2026-11-26 18:00:25 UTC), change-set 4b-1 (PR #75, merge commit b9aad019, 2026-11-26 18:53:13 UTC) and CI-TIME (PR #78, merge commit b8f02b01, 2026-11-27 13:55:47 UTC), each by its merge commit's date read with git:_
+
+| PR | Work | Branch | State | Waiting on |
+|---|---|---|---|---|
+| none yet | MAIN-WALL (his words of 2026-11-25 19:36:42 UTC: only his account updates main), by the Guard fix chat: the wall is on by his click ("Phase"); this docs pull request records it | `claude/confident-gates-tbnq38` (stands in for `cs/main-wall`) | risk tier 2; GitHub settings by his clicks, no code or workflow changed; measured on a public throwaway repository, deleted by his click after 17:27 UTC [assumed: his "done" of 17:31:41 UTC]; the plan: the advisor agent APPROVE, security-auditor REVISE (text only, all applied); the results: both APPROVE; report `docs/reports/2026-11-26-main-wall.md` | the advisor agent's review of the pushed head; the merge |
+| #75 (draft) | change-set 4b-1, "Content" (the first of 4b's two pull requests, his SIZE-4B (b)), by lane 1 (the chat he calls Builder V4): the content crate, the time unit, the reader's proofs and fuzz run, the links check (the list: REPO_MAP, ROADMAP) | `claude/cool-pasteur-oiqk1r` (stands in for `cs/4b-content`) | risk tier 1, no browser check; reviewed (two rounds, no Critical or High); the verifier and the advisor agent's verdict on the final head are in its report | his go for the head the advisor agent approves |
+| #78 (draft) | CI-TIME (his CI-TIME (a) of 2026-11-27, 12:50 Amsterdam), by the chat he calls CI Builder: the `toolchain` job's time limit 15 to 25 minutes (`.github/workflows/toolchain.yml:38`), nothing else in the file; report `docs/reports/2026-11-27-ci-time.md` | `claude/keen-tesla-v807cf` | risk tier 2; the advisor agent, security-auditor and infra-engineer approved the change | his go for the head the advisor agent approves, gate, smoke and toolchain green; then the chat marks it ready and merges with that id |
+
+_STATUS's "Waiting on Mustafa" bullet for #75, moved the same way (merged since, as the header above says):_
+
+- 4b-1 (#75), reviewed (its report): his go. Answered (`docs/DECISIONS.md`, 2026-11-26, 18:16:35 UTC): SIGHT-FLAG (a), DUR-1 (C), STATUS-LEN (a).
+
+_STATUS's "Last updated" line as it stood before review-tracks' docs pass, moved the same way:_
+
+_Last updated: 2026-11-27 (ci-time: the #78 row added, the CI Builder's old 2026-11-26 line dropped as #74 is merged). 2026-11-26 (MAIN-WALL's docs pass, on the lane branch with main 3b949c1a merged in: the wall on main; #73 and #74 merged, their rows, "Waiting on" lines and follow-ups bullets moved to the archive by script; his SPEED-ORDER (b) sets the queue)._
+
 ## Targets
 - **v2 (VISION_V2 §3, read with MODES-3 (a): the starting sizes are totals; Mustafa, 2026-10-31):** start with two teams
   with 2–8 players in total (1v1 to 4v4) and three teams with 6–18 in total (2v2v2 to 6v6v6); the goal 12v12v12 or
@@ -2038,7 +2054,10 @@ _Last updated: 2026-11-26 (change-set 4b-1's docs pass, second part, by lane 1's
   - T1e not run (his T1E-BEFORE-DELETE (b)): a residual, inferred from the other results, not measured.
   - Not measured until first use: his own web merge under the wall (T3a, not run; see the report's deviations); the first merge from
     his second personal Claude account; T10, one day-session merge and one PR Advisor merge under the wall (STATUS,
-    "Phase"). The other lane's token sitting waits for both halves of T10 (his TOKEN-RELEASE (c)).
+    "Phase"). The other lane's token sitting waits for both halves of T10 (his TOKEN-RELEASE (c)). (_corrected
+    2026-11-27 (review-tracks' docs pass): T10 passed, both halves: #76's merge at 2026-11-26 18:00:25 UTC (2671595f)
+    and the PR Advisor's merge of #77 at 18:52:17 UTC (47bb79e9, the merge commit's date read with git; who merged it:
+    the chat's card, step 17 [assumed]); so his TOKEN-RELEASE (c) condition is met_)
   - For the rule-file change-set: CLAUDE.md's "Lanes and accounts" quotes his LANE-RULES and ACCOUNTS lines, which say
     two accounts; his answer of 2026-11-26, 17:11:23 UTC says three (`docs/DECISIONS.md`); the lines need his new words.
   - The advisor agent's results condition 5: click 0's missing Settings > Actions > General screenshot was to ride with
@@ -2226,6 +2245,29 @@ _Last updated: 2026-11-26 (change-set 4b-1's docs pass, second part, by lane 1's
     before."): for change-set 8 (the guns): a gun's interval is its table value, with the timer's leftover carried
     (ADR 0004 part 4); no value is rewritten to match the old game's rate at 60 frames a second.
   - Closed by 4b-1, at its merge: 4A-S3-READ's read side (the block "From change-set 4a" above, its dated pointer).
+- **From review-tracks** (the chat he calls the Guard fix chat, session_019YNMUUc6oiiNVygR9H56Q7; branch
+  `claude/confident-gates-tbnq38` standing in for `cs/review-tracks`; risk tier 2; applied on the branch, no pull request
+  yet; the notes in `.checkpoints/review-tracks.md` and `.checkpoints/review-tracks/`, readable at commit
+  6a630c2529338d7bea8aa2ceb060a87f91d09e29. Written by its docs pass, 2026-11-27. Class words only for every guard gap
+  still open on main (his words of 2026-11-25, 19:36:42 UTC, item 3). The ids are the reviewers' and the chat's):
+  - REPO-PIN (Medium; the integer part Low; an automated commit review's finding as security-auditor rated it at the
+    build review, the card's step 35): the no-prompt merge path is to pin this repository and a plain pull request
+    number.
+  - UNSCANNED-VERBS (Low; the same review's fourth finding, rated the same way): a follow-up; its text stays in the chat's
+    notes.
+  - RC2-L1 (Low; the advisor agent's narrow re-check, step 27): the diff-algorithm pin in `track.mjs` has no test (the
+    mutation run's survivor; security-auditor's probes cover it, step 28).
+  - SA-RT2-1's guard-file half (Low; security-auditor's plan re-review): an allow only when the guard's own file equals
+    main's; not built; accepted as a Low, to revisit at the first change to the no-prompt merge path or to the marker
+    check.
+  - T-MARK (the plan's measurement of an app mark on comments, the basis of a later MERGE-MARK (b)): not run [assumed:
+    the card records no run].
+  - For the guard change-set (his SPEED-ORDER (b); with R4-1's fix): SA-PA-5 (an entry to drop from the no-prompt list;
+    the route of PASS-FORGE's class), SA-PA-10 and RC-S1 ("Open bugs and risks", "review-tracks"), GUARD-KIT, and
+    FEWER-ASKS (his item 5 of 2026-11-27, `docs/DECISIONS.md`, 13:55:39 UTC: in that plan, with the security-auditor).
+  - Rule files, his words first: ACCT-LINES (the block "From MAIN-WALL" above; CLAUDE.md's lanes lines unchanged by
+    this change-set [verified: its CLAUDE.md diff]).
+  - Later, his click: `toolchain` as a required check in "Shamble Ruleset 1" (the chat's ask of 2026-11-26).
 
 ## Decisions pending: the rest
 _The advisor agent's rulings (not Mustafa's), the five carry-forwards, and the old ADR and design lines, moved from
@@ -2394,6 +2436,22 @@ _From STATUS's "Routines", moved here on 2026-11-23 by docs-keeper's script, byt
     other lane's wall-test placeholder).
   - Unmeasured until first use: T10 (a day-session merge and a PR Advisor merge), his own web merge, his second
     personal Claude account's first merge. R4-1 in the guard stays bounded by the wall and today's ruleset.
+    (_corrected 2026-11-27 (review-tracks' docs pass): T10 measured since, both halves passed (#76, #77); his own web
+    merge and his second personal account's first merge stay unmeasured_)
+- **review-tracks** (applied on the branch `claude/confident-gates-tbnq38`, no pull request yet, 2026-11-27; class words
+  only, by his words of 2026-11-25, 19:36:42 UTC, item 3, in `docs/DECISIONS.md`):
+  - PASS-FORGE (security-auditor's FORGED-PASS at the build review, Critical by class; the same risk the advisor agent
+    named PASS-FORGE): until the guard change-set, a PASS could be faked through a route that runs without a prompt
+    (class: the script-run route; INPUT-RUN's and SA-PA-5's class). **Pending his answer** at the time of writing: (a)
+    accept until the guard change-set, its fix first there (the chat and the advisor agent); (b) that route off the
+    no-prompt list now; (c) the no-prompt merge off until then (security-auditor). His Advisor's comparison of every
+    merge on main with its own list is the one check that catches a forged PASS (the plan, "What catches a problem
+    afterwards").
+  - SA-PA-10 and RC-S1 (Critical by class; older, open on main, R4-1's class; each ends at a prompt): their fix is the
+    guard change-set's.
+  - The automated commit review's first finding (the PASS is posted as the same account sessions use): the known risk
+    of his MERGE-PROMPT (d) (SA-PA-5, MERGE-MARK); its third: the shell-route forms (R4-1's class); both folded into
+    PASS-FORGE by security-auditor (the card, steps 33 and 35).
 - **guard-wrappers** (the day guard, `.claude/hooks/routine-guard.mjs`; waiting for his go (_corrected 2026-11-26 (MAIN-WALL's docs pass): merged since as PR #73, 4a62873e, 2026-11-26 14:56:33 UTC by the merge commit's date_); by his R4-END (1) what is
   approved merges with these open, on his go; class words only, every form out of the repository by his words of
   2026-11-25, 16:34:18 UTC, item 3e, and 2026-11-26, 14:09:28 UTC, item 1):
@@ -2691,6 +2749,7 @@ _From STATUS's "Routines", moved here on 2026-11-23 by docs-keeper's script, byt
 | Gate | on main 8675367: full gate PASS in 26 s (Advisor's independent run), all 8 checks (1-4, 5a-5d); core 134 / game 691 / editor 349, 44 editor refs guarded (re-measured on main + kit-v1-2), smoke 8/8 + 5/5 steps | 2026-10-14 | gate.mjs |
 | v2, the first page (change-set 2, PR #61, merged 2026-11-19; his Brave and Firefox readings: `docs/reports/2026-11-19-cs2-browser-check.md`): the Wasm's size, the Worker's tick pacing, the hand-off's cost per block size, the page's allocation per frame and per block, the backend | in its report, from the container's headless Chromium on the WebGL 2 fallback with software rendering (no WebGPU adapter, no real GPU here): readings, not judged; the final numbers are the ready head's | 2026-11-19 | docs/reports/2026-11-19-cs2-first-page.md |
 | MAIN-WALL: main's rulesets | two Active: "Shamble Ruleset 1" (pull request; `gate` and `smoke` required; no deletion; no force push; no bypass; not opened at the click) and "main-wall (only the owner updates main)" (default branch; only Restrict updates; bypass the Repository admin role, mode Exempt); no repository secrets, one environment secret in "preview" (SA-MW-9 by names) | 2026-11-26 | his screenshots at click 12, as the chat's checkpoint (step 17) and the plan record them; not read by docs-keeper [assumed] |
+| review-tracks (applied on the branch `claude/confident-gates-tbnq38`, no pull request yet): the kit's suites, the gate, the size | `track.test.mjs` 85/85 and `routine-guard.test.mjs` 1581/1581 [verified 2026-11-27 by docs-keeper, at 6a630c25 in the worktree]; `settings` 127/127, `checkpoint.test.mjs` 33/33, kept-logs 9 pass (10 tests), gate PASS with `--no-smoke` (smoke could not run in the container: a Chromium build mismatch; CI runs it), mutants on `track.mjs` 58 of 62 caught (the rest: the diff algorithm and graft file, covered by security-auditor's probes, and two equivalents); 1029 added lines against main (kit 990, CLAUDE.md 39), past the stop line of about 980 by his SIZE-LINE (a) | 2026-11-27 | the chat's card, steps 28, 34 and 37 (the verifier's re-run) [assumed: those not re-run by docs-keeper] |
 | CI on main, latest (the rows below are older) | `gate`, `smoke` and `toolchain` success on 2483e9a, PR #70's merge commit (push; gate run 45818982040 with its gate and smoke jobs, completed 12:23 UTC; toolchain run 45818982052, 12:28 UTC) | 2026-11-26 | GitHub's REST API, the commit's workflow runs and the gate run's jobs (read by ci-preview-handover's docs-keeper) |
 | CI on main, latest (the rows below are older) | `gate`, `smoke` and `toolchain` success on 2483e9a, PR #70's merge commit (gate 12:22:25, smoke 12:23:01, toolchain 12:28:06 UTC by `completed_at`) | 2026-11-26 | GitHub's REST API, the commit's check runs (read 14:24 UTC by docs-keeper) [verified] |
 | guard-wrappers (no pull request yet (_corrected 2026-11-26 (MAIN-WALL's docs pass): merged since as PR #73, 4a62873e, 2026-11-26 14:56:33 UTC by the merge commit's date_)): the kit's three test files | `routine-guard.test.mjs` 1551/1551 (1247 on main c1da1bd by the chat's count; `.claude/` unchanged from c1da1bd to 2483e9a, read with git diff), `settings.test.mjs` 127/127, `checkpoint.test.mjs` 33/33, on the docs pass's worktree at 54bbf38c (main 2483e9a merged in) | 2026-11-26 | `node --test`, run by docs-keeper [verified] |
