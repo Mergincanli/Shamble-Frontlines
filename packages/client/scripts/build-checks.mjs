@@ -2,7 +2,7 @@
 // each is tested without a build (build-checks.test.mjs). The build itself (scripts/build.mjs) calls them.
 
 import { createHash } from "node:crypto";
-import { lstatSync, readFileSync } from "node:fs";
+import { lstatSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { brotliCompressSync, constants, gzipSync } from "node:zlib";
 
@@ -127,6 +127,75 @@ export function cspProblems(files) {
     }
   }
   return problems;
+}
+
+/**
+ * Every file of a folder, as paths from it with forward slashes, in a fixed order. It throws when the folder holds
+ * anything but plain files and plain folders: a link would be read through to whatever it names (so a link put into
+ * the built page's folder would hand a file of this machine to the checks, and to a server, under another name), and
+ * a pipe or a device is no file at all. The build lists the built page with it, and the sources the scan below reads.
+ * @param {string} folder
+ * @returns {string[]}
+ */
+export function plainFilesOf(folder, prefix = "") {
+  return readdirSync(folder, { withFileTypes: true })
+    .sort((a, b) => (a.name < b.name ? -1 : 1))
+    .flatMap((entry) => {
+      const name = `${prefix}${entry.name}`;
+      if (entry.isDirectory()) return plainFilesOf(path.join(folder, entry.name), `${name}/`);
+      if (!entry.isFile()) throw new Error(`${path.join(folder, entry.name)} is no plain file (a link, a pipe or a device): nothing is read through it`);
+      return [name];
+    });
+}
+
+/**
+ * What the page's and the Worker's sources may not hold: each of these turns a text into markup or into code. The
+ * page shows text that is not ours (a refused content file's sentence echoes the file's own bytes) and shows it as
+ * text, through `textContent`; CLAUDE.md's rule ("dynamic or player-provided text: `textContent`, never
+ * `innerHTML`") is held here by a scan, comments and strings included, so a slip stops the build. It is a tripwire
+ * and no proof: a name put together from pieces passes it, and the review holds that. The built scripts are read
+ * for `eval` and `new Function` once more by `cspProblems`. A dynamic import is taken only with its address written
+ * out as a plain text in quotes: an address that is data could load anything.
+ */
+export const MARKUP_SINKS = [
+  ["innerHTML", /innerHTML/i],
+  ["outerHTML", /outerHTML/i],
+  ["insertAdjacentHTML", /insertAdjacentHTML/i],
+  ["createContextualFragment", /createContextualFragment/i],
+  ["document.write", /\bdocument\s*\.\s*write(ln)?\b/],
+  ["DOMParser", /\bDOMParser\b|\bparseFromString\b/],
+  ["setHTML", /\b(setHTML|setHTMLUnsafe|parseHTML|parseHTMLUnsafe)\b/],
+  ["srcdoc", /srcdoc/i],
+  ["a javascript: address", /javascript:/i],
+  ["eval", /\beval\s*\(/],
+  ["new Function", /\bnew\s+Function\b/],
+  ["a dynamic import whose address is not a plain text in quotes", /\bimport\s*\(\s*(?!["'][^"'`$]*["']\s*\))/],
+];
+
+/**
+ * One line for every source that holds one of `MARKUP_SINKS`, and one line when no source was given (a scan of
+ * nothing would pass anything).
+ * @param {{ name: string, text: string }[]} sources
+ */
+export function markupSinkProblems(sources) {
+  if (sources.length === 0) return ["no source was given to the scan for markup sinks"];
+  return sources.flatMap(({ name, text }) =>
+    MARKUP_SINKS.filter(([, pattern]) => pattern.test(text)).map(([what]) => `${name}: ${what} (text is shown as text: MARKUP_SINKS in build-checks.mjs)`),
+  );
+}
+
+/** The folders whose every file the scan for markup sinks reads: the page's sources and the Worker's. */
+export const SCANNED_SOURCES = ["packages/client/src", "packages/sim-worker/src"];
+
+/**
+ * The sources the scan reads: every file under each folder, by `plainFilesOf` (so through no link), as text.
+ * @param {string} root the folder the names are told from
+ * @param {string[]} folders paths from `root`
+ */
+export function sourceTexts(root, folders) {
+  return folders.flatMap((folder) =>
+    plainFilesOf(path.join(root, folder)).map((name) => ({ name: `${folder}/${name}`, text: readFileSync(path.join(root, folder, name), "utf8") })),
+  );
 }
 
 /** Text that only the development readout, its report and the tests' hook hold. */

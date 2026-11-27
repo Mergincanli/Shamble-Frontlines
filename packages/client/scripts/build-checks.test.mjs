@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
@@ -16,19 +16,24 @@ import {
   fusedMultiplyAddProblems,
   libmProblems,
   lockedWasmBindgenVersion,
+  MARKUP_SINKS,
+  markupSinkProblems,
   MAX_SERVED_BYTES,
   missingOverflowOverrides,
   nameSteps,
   NATIVE_TESTS,
   overriddenCrates,
+  plainFilesOf,
   PLAYERS_IMPORTS,
   productionProblems,
   refusedBuildSettings,
   registryRemapFlag,
   runtimeCrates,
+  SCANNED_SOURCES,
   simFeatureDifferences,
   simFeatureList,
   sizeTable,
+  sourceTexts,
   stampProblems,
   TARGET_FEATURES_ALLOWED,
   TARGET_ONLY_ENTRIES,
@@ -847,5 +852,109 @@ describe("the built-file check", () => {
     for (const none of [undefined, "", "not json", "null", "[]", '{"production":5}', '{"twin":"x"}']) {
       expect(stampProblems(none, production)).toEqual(["the built-file check left no stamp: the players' WebAssembly was not walked"]);
     }
+  });
+});
+
+describe("a folder is read file by file, and through no link", () => {
+  let folder;
+
+  beforeAll(() => {
+    folder = mkdtempSync(path.join(tmpdir(), "shamble-plain-files-"));
+    mkdirSync(path.join(folder, "page/assets"), { recursive: true });
+    writeFileSync(path.join(folder, "page/index.html"), "<!doctype html>");
+    writeFileSync(path.join(folder, "page/assets/b.js"), "b");
+    writeFileSync(path.join(folder, "page/assets/a.js"), "a");
+    writeFileSync(path.join(folder, "outside.txt"), "a file of this machine");
+  });
+  afterAll(() => rmSync(folder, { recursive: true, force: true }));
+
+  test("plain files in plain folders are listed in a fixed order, as paths with forward slashes", () => {
+    expect(plainFilesOf(path.join(folder, "page"))).toEqual(["assets/a.js", "assets/b.js", "index.html"]);
+    expect(sourceTexts(folder, ["page"])).toEqual([
+      { name: "page/assets/a.js", text: "a" },
+      { name: "page/assets/b.js", text: "b" },
+      { name: "page/index.html", text: "<!doctype html>" },
+    ]);
+  });
+
+  test("a link to a file and a link to a folder are refused by name, wherever they lie", ({ skip }) => {
+    const planted = [
+      ["page/link.js", "outside.txt"],
+      ["page/assets/deep.js", "outside.txt"],
+      ["page/more", "page/assets"],
+    ];
+    for (const [link, target] of planted) {
+      const at = path.join(folder, link);
+      try {
+        symlinkSync(path.join(folder, target), at);
+      } catch {
+        skip("this system does not let this user make links");
+      }
+      expect(() => plainFilesOf(path.join(folder, "page")), link).toThrow(`${at} is no plain file (a link, a pipe or a device): nothing is read through it`);
+      expect(() => sourceTexts(folder, ["page"]), link).toThrow("is no plain file");
+      rmSync(at);
+    }
+    // With the links gone the folder is read again.
+    expect(plainFilesOf(path.join(folder, "page"))).toHaveLength(3);
+  });
+
+  test("a folder that is not there is an error, never an empty list", () => {
+    expect(() => plainFilesOf(path.join(folder, "missing"))).toThrow();
+  });
+});
+
+describe("no source turns a text into markup or into code", () => {
+  const line = (name, what) => `${name}: ${what} (text is shown as text: MARKUP_SINKS in build-checks.mjs)`;
+
+  test("the page's and the Worker's own sources hold none of the words", () => {
+    const root = path.resolve(import.meta.dirname, "../../..");
+    const sources = sourceTexts(root, SCANNED_SOURCES);
+    // The scan reads something: the page's entry and the Worker's are among its sources.
+    expect(sources.map(({ name }) => name)).toEqual(expect.arrayContaining(["packages/client/src/main.ts", "packages/sim-worker/src/worker.ts"]));
+    expect(markupSinkProblems(sources)).toEqual([]);
+  });
+
+  test("text shown as text, and an import whose address is written out, pass", () => {
+    const fine = [
+      'element.textContent = message;',
+      'const [overlay] = await Promise.all([import("../overlay/overlay.ts"), import(\'./keys.ts\')]);',
+      'type Glue = typeof import("../pkg/sim_wasm.js");',
+      "document.title = name; const evaluation = 1; const functions = new Map(); // the important (first) part",
+    ];
+    expect(markupSinkProblems(fine.map((text, at) => ({ name: `fine-${at}.ts`, text })))).toEqual([]);
+  });
+
+  test("each word is refused by its own name, in code, in a text and in a comment alike", () => {
+    const planted = [
+      ["innerHTML", "element.innerHTML = message;"],
+      ["innerHTML", "<div dangerouslySetInnerHTML={{ __html: message }} />"],
+      ["outerHTML", "element.outerHTML = message;"],
+      ["insertAdjacentHTML", 'element.insertAdjacentHTML("beforeend", message);'],
+      ["createContextualFragment", "document.createRange().createContextualFragment(message);"],
+      ["document.write", "document.write(message);"],
+      ["document.write", "document . writeln(message);"],
+      ["DOMParser", 'new DOMParser().parseFromString(message, "text/html");'],
+      ["setHTML", "element.setHTMLUnsafe(message);"],
+      ["setHTML", "Document.parseHTMLUnsafe(message);"],
+      ["srcdoc", "frame.srcdoc = message;"],
+      ["a javascript: address", 'link.href = "javascript:void(0)";'],
+      ["eval", "eval (message);"],
+      ["new Function", "const made = new Function(message);"],
+      ["a dynamic import whose address is not a plain text in quotes", "await import(address);"],
+      ["a dynamic import whose address is not a plain text in quotes", "await import(`./${name}.ts`);"],
+      ["a dynamic import whose address is not a plain text in quotes", 'await import("./" + name);'],
+      ["innerHTML", "// never innerHTML"],
+      ["innerHTML", 'const word = "innerHTML";'],
+    ];
+    for (const [what, text] of planted) {
+      expect(markupSinkProblems([{ name: "fine.ts", text: "element.textContent = message;" }, { name: "planted.ts", text }]), text).toEqual([line("planted.ts", what)]);
+    }
+    // Every word of the list has its planted source above.
+    expect([...new Set(planted.map(([what]) => what))].sort()).toEqual(MARKUP_SINKS.map(([what]) => what).sort());
+  });
+
+  test("two words in one source give two lines, and a scan of nothing is refused", () => {
+    expect(markupSinkProblems([{ name: "two.ts", text: "a.innerHTML = b; eval(c);" }])).toEqual([line("two.ts", "innerHTML"), line("two.ts", "eval")]);
+    expect(markupSinkProblems([])).toEqual(["no source was given to the scan for markup sinks"]);
   });
 });

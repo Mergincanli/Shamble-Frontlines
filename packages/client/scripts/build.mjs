@@ -40,14 +40,18 @@ import {
   cspProblems,
   formatSizeTable,
   lockedWasmBindgenVersion,
+  markupSinkProblems,
   missingOverflowOverrides,
   NATIVE_TESTS,
+  plainFilesOf,
   productionProblems,
   refusedBuildSettings,
   registryRemapFlag,
+  SCANNED_SOURCES,
   simFeatureDifferences,
   simFeatureList,
   sizeTable,
+  sourceTexts,
   stampProblems,
   tooLarge,
   twinProblems,
@@ -206,15 +210,6 @@ function commitName() {
   return git("rev-parse", "--short=9", "HEAD") + (changed === "" ? "" : "+changes");
 }
 
-/** Every file of a folder, as paths from it with forward slashes. */
-function filesOf(folder, prefix = "") {
-  return readdirSync(folder, { withFileTypes: true })
-    .sort((a, b) => (a.name < b.name ? -1 : 1))
-    .flatMap((entry) =>
-      entry.isDirectory() ? filesOf(path.join(folder, entry.name), `${prefix}${entry.name}/`) : [`${prefix}${entry.name}`],
-    );
-}
-
 /** The stamp file's text, or nothing when the built-file check left none. */
 function stampText() {
   try {
@@ -226,6 +221,9 @@ function stampText() {
 
 /** Builds the page into `outDir` and checks every served file. Returns their size table. */
 export async function buildPage({ production, outDir }) {
+  // Before anything is built: no source of the page or the Worker turns a text into markup or code.
+  const sinks = markupSinkProblems(sourceTexts(root, SCANNED_SOURCES));
+  if (sinks.length > 0) throw new Error(`the page's sources are refused:\n  ${sinks.join("\n  ")}`);
   process.env["VITE_SHAMBLE_COMMIT"] = commitName();
   if (production) delete process.env["VITE_SHAMBLE_DEVTOOLS"];
   else process.env["VITE_SHAMBLE_DEVTOOLS"] = "1";
@@ -251,7 +249,8 @@ export async function buildPage({ production, outDir }) {
   const workerEntry = workerEntryChunk(workerChunks, workerSource);
   // The zip's small server is a development tool: it is not part of a production build.
   if (!production) copyFileSync(path.join(clientDir, "serve.mjs"), path.join(outDir, "serve.mjs"));
-  const files = filesOf(outDir)
+  // The built page, file by file: a folder that holds a link or anything else that is no plain file stops here.
+  const files = plainFilesOf(outDir)
     .filter((name) => name !== "serve.mjs")
     .map((name) => ({ name, bytes: readFileSync(path.join(outDir, name)) }));
   const rows = sizeTable(files);
