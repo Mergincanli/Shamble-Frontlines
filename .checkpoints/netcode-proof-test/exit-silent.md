@@ -41,14 +41,39 @@ check.mjs, ffcheck.mjs, checkpoint.mjs) are not affected: only what a session or
      there again because M5 rebuilt it after M0's part-clean (06:36);
    - the main folder's ops/browser has no node_modules link (M7's unlink).
 
-## One difference, explained
+## One difference, explained and verified
 U7's M5 header (.gate/u7-merge/m5-check.log:3) reads "diff 0a4a6eed…", not the patch's 6535c181… The value is
 recorded nowhere in the notes, and U7's plan never claimed equality (only U8-F1's done line did). The cause is the
 form: worktree_patch.py writes the tracked diff first (`git diff HEAD --binary`, :18), then appends each untracked file
-by `git diff --no-index --binary /dev/null <f>` (:19-22), while main-run.sh hashes `git diff HEAD -- .` (:42), which
-sorts all paths together. U7's patch had 33 new files, so the bytes differ in order; U8-F1's had none, so they matched.
-U7's tree at M5 rests on M4's `git status --short` (exactly the 43), the empty untracked hash, and M8's `git diff
---cached --numstat` equal to the patch's line for line.
+by `git diff --no-index --binary /dev/null <f>` (:19-22), while main-run.sh hashes `git diff HEAD -- .` from
+spikes/netcode-proof (:26 `cd "$S"`, :42; the log's line 2 prints that folder), which sorts all paths together. U7's
+patch had 33 new files, so the bytes differ in order; U8-F1's had none, so they matched.
+- **Verified 08:5x** (a pipe with git first, read only, no file; `git diff --output` was refused by the guard, "not
+  allowed here", and not retried): `git diff dc51f0e 6968215 -- spikes/netcode-proof | sha256sum` gives
+  0a4a6eedb6a541fc77f1a3d3efd24cb5a73851f60579d7c7f08f98f3a088c7c7, U7's M5 header exactly. So U7's tree at M5 was the
+  merged commit's spike content byte for byte. The control, `git diff 833c3f0 ddb06ff -- spikes/netcode-proof |
+  sha256sum`, gives 4d6a248425aebb25b317cf2da363e00915e8f2b13eb6f26a6a259a5e0f3f7164, U8-F1's header and patch.
+
+## MAIN-68's silent checks, re-run from commits (08:5x; each by `git diff --name-only`, nothing printed)
+- C68B-3, the root manifests equal main's (main-68-plan.md:76, :247, :321): b9aad01..6b4a0d3 and b9aad01..HEAD (with
+  `.claude/` too), over Cargo.lock, Cargo.toml, crates, packages, package.json, package-lock.json.
+- Step 5's `.claude/` equal to main's (main-68-plan.md:319): b9aad01..6b4a0d3 -- .claude/.
+- The anchor (advisor-main-68-head.md:64-66): T 83d650e..6b4a0d3, outside .checkpoints/, docs/STATUS.md and
+  docs/STATUS_ARCHIVE.md.
+- The whole tree equal to main outside spikes/, .checkpoints/ and docs/ (:67-68): b9aad01..6b4a0d3.
+- spikes/, docs/design/ and .checkpoints/ equal H0's (:70): 6b4a0d3^1..6b4a0d3.
+- Block 6's precondition (:125-126): 6b4a0d3..4e3d1fb, outside spikes/, .checkpoints/ and docs/design/.
+- The positive control: `git diff --name-only 076233a f67cd9a` prints ".checkpoints/netcode-proof-test.md", so an
+  empty result is a real "equal".
+
+## R1's own package: one step a session reads (for B; nothing edited: U8's 6,282 stop)
+- spikes/netcode-proof/ops/operator/rules.md:14-15: before reading the run or results worktree, the laptop session
+  "checks it: the run worktree's `CLAUDE.md` and `.claude/` equal main's (`git diff --quiet origin/main -- CLAUDE.md
+  .claude`) … on a mismatch it stops." If that session's tool hides the exit code as this one does, a mismatch reads
+  as a pass. A printing form (`git diff --name-only origin/main -- CLAUDE.md .claude`, nothing printed = equal) is a
+  one-line, net-zero rewording; Mustafa approves rules.md at Stop B.
+- The other 54 matches under ops/ are inside scripts and tests (r1.sh's nine `grep -q` sit in `&&`, `if !` and `||`;
+  wrappers.test.sh 41), where the program reads the exit code itself: not affected.
 
 ## The forms from now on (the main session's commands and every agent brief)
 - Equal trees or paths: `git diff --name-only` or `--stat`; nothing printed means equal.
@@ -56,7 +81,15 @@ U7's tree at M5 rests on M4's `git status --short` (exactly the 43), the empty u
 - Equal bytes: `cmp -s` (its exit 1 shows) or a sha256 list.
 - Never `test`, `git diff --quiet` or `grep -q` alone as evidence.
 
-## Not re-checked
-The older uses: 293 matches of these forms in 137 notes files, most in agents' files, from U1 on. Most sit beside
-evidence that prints (status listings, hashes, counted runs, CI). Whether any older one needs a re-check is for the
-advisor (B's head read at 10:50).
+## Not re-checked, and the rule proposed for them
+The older uses: 293 matches of these forms in 137 notes files, most in agents' files, from U1 on. Proposed rule, for
+B's yes or no: an older silent check stands where later printing evidence re-proved the same state (a status listing,
+hashes, a counted run, CI); MAIN-68's (recent, on R1's path) are re-run above; any other a later step still relies on
+is re-run in a printing form before that step.
+
+## Owed rewordings (before each form's next use, by the seat whose words they are)
+- The merge form's M3a and M6 undo (advisor-u7-head.md section 3's words, word for word in u8-f1-merge-plan.md:83-87
+  and :108-110): A's.
+- The merge form's M2 and M7 (the main session's plan wording, checked by A and B): mine, in the next plan of the form.
+- light-takein-recipe.md:89 (the anchor) and :107 (step 5 f.): C's words (advisor-light-takein.md:75, and L-9 at
+  :97), C's to reword before the recipe's next use; :106 (step 5 e., `.claude/ .github/ tools/`): mine, the same.
