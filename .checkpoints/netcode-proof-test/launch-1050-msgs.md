@@ -1,5 +1,5 @@
 # The 10:50 UTC window, 2026-11-27: the messages (written 08:5x UTC, rev 3 09:1x after two advisor-tool reads; sent only inside the window)
-**Status: B and A1 SENT 10:58 UTC (both resumed); A2 and C not sent yet.** Each message below gets a "Sent HH:MM UTC" line when it goes; the window has run only
+**Status: B and A1 SENT 10:58 UTC (both resumed); B DONE 11:02, A1 DONE 11:05 ("go", no conditions); A2 and C SENT 11:08 UTC (both resumed).** Each message below gets a "Sent HH:MM UTC" line when it goes; the window has run only
 for the messages that carry one (this file existing does not mean the window ran). An agent's file is done only when
 its last line reads "Status: COMPLETE <date and UTC time>"; without it the file is half-written and that agent is
 resumed from it.
@@ -89,7 +89,7 @@ only forms whose output carries the answer (`git diff --name-only` or `--stat`, 
 quote that output.
 
 ## A2: a0530735048f1620a (the same seat, after A1's hand-back): UM-4's plan, and the form's printing wording
-Not sent. Sent on A1's hand-back, with C if A1 says "go"; before 11:20.
+Sent 11:08 UTC (resumed, with C, on A1's "go"; unwrapped, with a first line naming the seat and its file).
 As the advisor (as before; read only, no cargo, no git write), two rulings, each its own block:
 1. **UM-4's plan.** Check .checkpoints/netcode-proof-test/um4-plan.md (rev 0.2: your UM-4, advisor-u7-merge.md:39-54,
    as a plan): APPROVE, APPROVE WITH CONDITIONS or REVISE, and answer its Q1-Q4. Its build also waits on his U8-FILLS
@@ -100,7 +100,7 @@ As the advisor (as before; read only, no cargo, no git write), two rulings, each
 Write .checkpoints/netcode-proof-test/advisor-um4-plan.md (plan first, then each block as it is done); end with
 "Decisions needed" and "For Mustafa", then, once both blocks are written, the last line `Status: COMPLETE <date and UTC
 time, as 2026-11-27T11:15Z>`.
-Re-checked at sending: (to fill).
+Re-checked at sending (11:0x UTC): main b9aad01; HEAD 5814256 = origin, the only change A1's advisor-u7-ff.md (complete, 78 lines).
 Write files with the Write and Edit tools only (no sed, no shell redirect, no python writes; never `cargo fmt` writing
 files: apply rustfmt's diff by Edit); an agent with no Edit tool rewrites its notes file whole with Write. git and gh
 always start their own command, with no other program in front of them. In this tool a command that exits non-zero
@@ -109,7 +109,7 @@ only forms whose output carries the answer (`git diff --name-only` or `--stat`, 
 quote that output.
 
 ## C: U7's builder a9873cdba07a3219e (resumed; its worktree .claude/worktrees/agent-a9873cdba07a3219e at 80b6748)
-Not sent. Only when A1's block 1 opens with "go" (or a "go" whose conditions are literal text changes to this message; a condition that adds a command or changes the target makes a new message, for the next window), and only before 11:20. A refused resume of C is not replaced by a fresh agent (a fresh agent is not in that worktree): it means fallback (b) for this window.
+Sent 11:08 UTC (resumed; A1's block 1 opened "go", conditions none; the text below unwrapped, with a first line naming the task and A1's ruling). Only when A1's block 1 opens with "go" (or a "go" whose conditions are literal text changes to this message; a condition that adds a command or changes the target makes a new message, for the next window), and only before 11:20. A refused resume of C is not replaced by a fresh agent (a fresh agent is not in that worktree): it means fallback (b) for this window.
 Three commands in your own worktree, each its own call, in this order. Paste each command's full output in your reply.
 Write no file at all in this task, not even a notes line: your two notes are among the staged paths, and any write
 leaves the worktree unclean. If anything refuses or denies a step (git, a hook or a permission prompt), stop there, quote its message word for word, and try no other form. If step 3
