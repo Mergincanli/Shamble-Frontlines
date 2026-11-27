@@ -193,8 +193,23 @@ puts them inside check.mjs, so a whole run cannot leave them out.
     report says so. History is not rewritten.
   - T-2 to T-5 (Low): no case where the stdout-only last-line read matters; a skipped or todo ops test passes the
     step; the real `present` proven only by the logs; T-5 (forward, infra-engineer's): no CI net for later heads.
-  - S (security-auditor) still running; then the advisor agent's ruling on the round, then the fix pass (T-1, UM4H-1's
-    clause in dependency-check.md once S confirms it, and what the ruling adds).
+- Review round 1, S (security-auditor, review-um4-security.md, COMPLETE 20:07Z; it waited on a Bash prompt 18:55-about
+  20:0x): APPROVE WITH FINDINGS.
+  - SEC-UM4-1 (Medium): with an absolute GIT_DIR in check.mjs's environment, ops/tests/operator.test.mjs:151-188's
+    "temporary" repository commits land in the repository GIT_DIR names, the first with a tree of verdict.txt alone (S's
+    probe on stand-in folders). My own read agrees: the git helper (:157) passes no env, run's env defaults to
+    process.env (check.mjs:1951-1952), and opsStep passes none (:2695). No caller today: this shell has no GIT_DIR,
+    GIT_WORK_TREE or GIT_INDEX_FILE (names only; GIT_CONFIG_COUNT, _KEY_n, _VALUE_n, GIT_ASKPASS, GIT_EDITOR,
+    GIT_SSL_CAINFO and GIT_TERMINAL_PROMPT are set), and main-run.sh sets none (grep exit 1). S's fix: opsStep passes
+    an env without git's location variables, pinned by a check.test.mjs case; operator.test.mjs's helper clears them
+    too (U8's file, so its size stop is the ruling's question).
+  - SEC-UM4-2 (Low): the install record lacks the registry, npm and node lines its cited form asks for (npm 10.9.9,
+    node v22.23.4 read today, after the install).
+  - SEC-UM4-3 (Low): OPS_MISSING's `--prefix ops/browser` is relative to the operator's shell; it fails closed from the
+    repository root.
+  - UM4H-1 CONFIRMED, with a corrected clause (review-um4-security.md:136-138).
+  - Next: the advisor agent's ruling on the round (T-1 to T-5, SEC-UM4-1 to -3, UM4H-1), then the fix pass, its commit,
+    CI and the head read.
 
 ## Size (for U8-FILLS)
 About 20-30 added lines by estimate: the step and its missing-folder line in check.mjs (about 12-18), the list entry
