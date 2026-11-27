@@ -1137,6 +1137,15 @@ again here. SEAT-OUT from him: stop at a whole point and report the last commit'
    that need no content file were built before step 8's second part, while DIFF-LIST was open; and of the seat's
    move); his go; the merge, by his Advisor on his tap, with the full head as the expected head.
 
+**Made again on Builder V6's container (2026-11-27, under `/home/user/Shamble-Frontlines/.gate/cs4b-2/.gate/`):**
+the bindings tool fetched as CI fetches it (`toolchain.yml:77-128`): the archive from the release address over
+https, 11,860,397 bytes and its sha256 checked against his values, its member list checked, the one program
+taken out into an empty folder, 8,170,784 bytes and its sha256 checked, then moved to `wb-tool/wasm-bindgen`
+(GitHub's own `gh release verify-asset` is not run here: this environment refuses `gh` porcelain; CI runs it);
+`strict-line.txt` copied by script from `toolchain.yml:173`; `npm ci --ignore-scripts --no-audit --no-fund` and
+`cargo fetch --locked` at the root (49 crates). This machine's browsers are `/opt/pw-browsers` build 1243
+(`chromium`, `chromium_headless_shell`): the gate's `pw-1194` link is made when the gate first runs here.
+
 **What is on this machine only (under `.gate/`, not in git) and how to make it again:**
 - `.gate/wb-tool/wasm-bindgen`: the bindings tool, the file `packages/client/scripts/wasm-bindgen-tool.mjs`
   records (CI's toolchain workflow shows the download and the checks). `local-checks.sh` points
