@@ -58,7 +58,9 @@ Read the pushed rewordings as the advisor (main's .claude/agents/advisor.md, by 
 origin/main:.claude/agents/advisor.md`; read only, no cargo, no git write): commit
 d8b57b82d08ffafbec4d1b3c0c556d0fefeda5da, the three net-zero rewordings your block 3 (c) ruled
 (advisor-u8-f1-head.md:104-137), built by the main session by .checkpoints/netcode-proof-test/operator-rewordings.md
-(its plan, then its done lines); CI on the pushed head: (to fill). Rule, each in its own block:
+(its plan, then its done lines); CI on the pushed head 6417fe2: all four success at attempt 1 (push gate
+45991394499 and toolchain 45991394502, pull request gate 45991405364 and toolchain 45991405394; 11:33-11:42, read
+11:43). Rule, each in its own block:
 1. The commit: it stands, or what is owed. A third file joined your two: operator.test.mjs:98 pinned start check 4's
    old wording word for word, so the pin follows the new one (red first, then green: the done lines P1 and P2).
 2. Q-A and Q-B (operator-rewordings.md, "Two wording questions"; your words were kept in this commit): take, leave or

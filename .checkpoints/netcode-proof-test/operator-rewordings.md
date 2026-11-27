@@ -69,5 +69,7 @@ No cargo, no main-run.sh (it touches every file under crates/), no lane lock: no
   1 1, operator.test.mjs 1 1; the seven changed lines printed by `awk` with their numbers read as E1-E4 give them;
   `git status --short` only the three files; `node tools/gate.mjs --no-smoke` GATE PASS (base b9aad01); repo map OK
   (245 entries, 110 required paths).
-- P4: commit d8b57b8 (3 files changed, 7 insertions, 7 deletions), pushed by the next save; CI on the pushed head;
+- P4: commit d8b57b8 (3 files changed, 7 insertions, 7 deletions), pushed in 6417fe2; CI on it all four success at
+  attempt 1 (push gate 45991394499, toolchain 45991394502; pull request gate 45991405364, toolchain 45991405394;
+  11:33-11:42, read 11:43);
   B's head read in the 15:50 window (launch-1550-msgs.md, section B, with Q-A and Q-B).
