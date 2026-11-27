@@ -73,8 +73,12 @@
     half, so both halves of T10 are done and his TOKEN-RELEASE (c) condition is met. Lane branch fast-forwarded to main
     b9aad019 (#75 merged since); notes moved from .gate/review-tracks/ into .checkpoints/review-tracks/.
 
+18. Build copy .gate/review-tracks/build/ (plain copy of .claude/ and CLAUDE.md.new): track.mjs (160 lines) and
+    track.test.mjs written; 61/61 pass in the copy
+
 ## Current step
-Build (was: wait for #77's merge). Then: fast-forward the lane branch to main, move the notes from
+Build: the guard (GUARD-MARK in mcp() and gh(), subagent merges refused, toolchain in the merge check, the prompt
+skip of MERGE-PROMPT (d)) and guard.mjs's allow output, with tests; then CLAUDE.md, advisor.md, security-auditor.md. Then: fast-forward the lane branch to main, move the notes from
 .gate/review-tracks/ into .checkpoints/review-tracks/ (plan, reviews, inputs, saved messages; no exploit forms), push the
 checkpoint, and build in a plain copy (not a worktree), one Edit per kit file asked of him (about 10).
 Inputs in parallel: (A) his timings of #65, #68, #69 measured from commit and event times, and every needs-mustafa
