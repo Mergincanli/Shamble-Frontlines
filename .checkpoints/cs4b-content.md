@@ -12,7 +12,7 @@
   `git push origin cs/4b-content:claude/cool-pasteur-oiqk1r`, alone in its command; never a plain `git push`. The
   session's start folder is never switched · **Base:** origin/main 2483e9a741c4e552323c36523831a2f35de4002e (the
   merge of 4a, pull request #70)
-- **Last update:** 2026-11-27 01:48 Amsterdam (from the clock)
+- **Last update:** 2026-11-27 02:02 Amsterdam (from the clock)
 
 ## Sizes and stop lines (his answer of 2026-11-26, 14:09:13 UTC: SIZE-4B (b); which number is which)
 - **4b is two pull requests**, in engine-architect's cut; "each stands on its own: lines left over in 4b-1 do not
@@ -967,7 +967,14 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   first run with the static world's browser spec; the whole toolchain job took 11 min 29 s, so the browser
   tests stay under CI's 5-minute stop), c09f459 (45913683931, 45913683934). Read again at 01:34: 6290c85 green too
   (gate 45914579327, toolchain 45914579307, 9 min 6 s). ad88341: gate green (45917465677), toolchain still
-  going at 01:40 (45917465670). 5c6738a's runs: to be read.
+  going at 01:40 (45917465670); green when read again (9 min 29 s). 5c6738a, read at 02:02: gate green
+  (45918878271), toolchain green (45918878273).
+- **CI's toolchain job is nearing its time limit (a finding for him and the CI Builder; no file of mine):** the
+  job may run 15 minutes (`.github/workflows/toolchain.yml:38`, `timeout-minutes: 15`). On 5c6738a it took 13
+  min 1 s (its build-and-test step 12 min 20 s); on the four heads before it 9 min 6 s to 11 min 29 s. The
+  piece of 5c6738a adds seven small tests and a scan of 43 files, so most of the difference is the runner, but
+  step 9's rest adds a tool run, a bundle and more tests. A run that passes 15 minutes fails for no defect. The
+  limit is a CI file: the CI Builder's. Asked of him as CI-TIME in the chat's update of 02:02.
 - **Ahead, by the count, at 4,956 (2026-11-27, 01:48):** left by the designs' way of counting about 1,490 (step
   8's second part 100, step 9's rest about 600, step 10's wiring about 60, step 11 240, step 12 490). At the
   rate so far (about 2.15) the count at step 10's end is near 6,600: under the first rung (6,750), so step 11 is
@@ -1036,8 +1043,8 @@ worktree and everything under `.gate/` were kept.
   on maps made in tests: done (8e5a268). 9, first piece, the type writer's manifest line and its rule: done
   (c09f459); 9, second piece, the generated content types: done (6290c85). 10, the fuzz run and the hostile maps through the world's builder:
   done (ad88341). 9, third piece, the page folder read through no link and the scan for `innerHTML` and its
-  kin: done (5c6738a). CI: green on every code head through ad88341 (gate 45917465677, toolchain 45917465670,
-  9 min 29 s); 5c6738a to be read.
+  kin: done (5c6738a). CI: green on every code head through 5c6738a (gate 45918878271, toolchain 45918878273,
+  13 min 1 s of the 15 the job may take: the card's entry "CI's toolchain job is nearing its time limit").
 - **Nothing more of 4b-2 can be built without the content files**: every piece of rows 8, 9 and 10 that needs
   none is done. Step 11 keeps its place in the order (the card's "Ahead, by the count").
 - **Blocked on his own answer to DIFF-LIST** (asked 2026-11-26, 23:11 Amsterdam;
