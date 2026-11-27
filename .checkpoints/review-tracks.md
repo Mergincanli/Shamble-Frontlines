@@ -92,7 +92,12 @@
     TE-B4..B10 (no-saved-file floor vs the plan; cwd and git config dependence; the git layer untested; triggers vs plan
     3b; V2_PHASE0_BRIEF missing; --files picks by file count; the guard's comment-read fake not pinned), Lows TE-B11..B18;
     its two technical choices WORDS-NEWLINE (a) and SAVED-FILE-FLOOR (a) taken (they follow the plan) · notes
-    test-engineer-build.md; security-auditor and the advisor agent: running
+    test-engineer-build.md
+22. The advisor agent's pre-apply review: REVISE, no Critical or High: group A restores the plan (PA-M1 Q2's first
+    sentence; PA-M3 XMLHttpRequest, V2_PHASE0_BRIEF, changed or removed entries, sha256 in the list, other added text;
+    PA-M4 twins in either order; PA-L1 attached -F; PA-L2 --paginate pinned); group B is new text (PA-M5 CRLF in a pasted
+    PASS, PA-M2 a "For the merge check" slot in step 5, PA-L3 toolchain named in advisor.md, PA-L4 subagent merge wording,
+    PA-L5 drop an id) for his ADDITIONS-OK (recommended (a)) · notes advisor-plan.md; security-auditor: running
 
 ## Current step
 Pre-apply review of the copy (security-auditor, test-engineer, the advisor agent), so fixes cost no extra asks; then
