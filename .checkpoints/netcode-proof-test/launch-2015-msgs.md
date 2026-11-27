@@ -4,7 +4,8 @@ runs. Usage 0.58 at 20:09:41 (reset 20:50). The advisor tool read this plan firs
 split by owner, the variable list from a printed source, the proof bars, the rest by name.
 
 ## B4: the message, as sent
-Sent: (not yet)
+Sent: 20:15 UTC by SendMessage ("Resuming agent a3de649"); done when advisor-um4-r1.md's last line reads "Status:
+COMPLETE".
 
 ```text
 UM-4's round-1 ruling, from the main session (2026-11-27 20:1x UTC). Your rules as before: main's .claude/agents/advisor.md (unchanged since c9bd268; main is still b8f02b0149cc928964e54e194cd9c4d68f52bd94). Read only, effort xhigh. Your one output file: /home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/advisor-um4-r1.md. Write your plan first, a notes line after each check, and each finished block at once, so a usage cut loses nothing; the last line "Status: COMPLETE <UTC time>". Write files with the Write and Edit tools only. No `git -C`, no cd into a worktree; one simple command per Bash call, with git first in its own command; run no cargo, test, gate, light run or plant; never export GIT_DIR, GIT_WORK_TREE or any other git variable in a command (the hazard below); read nothing from the web. Name only variable NAMES from this environment, never their values (some may hold credentials).
