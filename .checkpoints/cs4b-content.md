@@ -12,7 +12,7 @@
   `git push origin cs/4b-content:claude/cool-pasteur-oiqk1r`, alone in its command; never a plain `git push`. The
   session's start folder is never switched · **Base:** origin/main 2483e9a741c4e552323c36523831a2f35de4002e (the
   merge of 4a, pull request #70)
-- **Last update:** 2026-11-27 01:34 Amsterdam (from the clock)
+- **Last update:** 2026-11-27 01:36 Amsterdam (from the clock)
 
 ## Sizes and stop lines (his answer of 2026-11-26, 14:09:13 UTC: SIZE-4B (b); which number is which)
 - **4b is two pull requests**, in engine-architect's cut; "each stands on its own: lines left over in 4b-1 do not
@@ -938,6 +938,28 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
     The row of 512 boxes was added for that; with it both are caught.
   - Plants W10 to W13 in `plants-4b2.py` (the tie rule through the judge; a node pruned at the best hit's own
     distance; the builder leaving a shape out; the fuzz run sending no map on): run by hand, all four caught.
+- **Step 9, third piece that needs no content file: the page folder read through no link, and the scan of the
+  sources for `innerHTML` and its kin (the sheet's row 9; security-auditor's points on `filesOf` and the scan;
+  2026-11-27; built, in its local checks at 01:36; NOT YET COMMITTED AS CODE: the patch is
+  `cs4b-content/wip-step9-markup-scan.diff`, made by `git diff -- crates packages` on head 1ae0c3f; `git apply`
+  puts it back).**
+  - `packages/client/scripts/build-checks.mjs`: `plainFilesOf(folder)` (every file of a folder in a fixed order;
+    it throws at a link, a pipe or a device, by its path), `MARKUP_SINKS` (12 words: innerHTML, outerHTML,
+    insertAdjacentHTML, createContextualFragment, document.write, DOMParser, setHTML, srcdoc, a javascript:
+    address, eval, new Function, a dynamic import whose address is not a plain text in quotes),
+    `markupSinkProblems(sources)`, `SCANNED_SOURCES` (`packages/client/src`, `packages/sim-worker/src`),
+    `sourceTexts(root, folders)`.
+  - `build.mjs`: `buildPage` refuses the sources before anything is built ("the page's sources are refused"),
+    and lists the built page with `plainFilesOf` (its own `filesOf` is gone).
+  - `build-checks.test.mjs`: 7 more tests (57 in the file): the folder reader (order, a link to a file, a deep
+    link, a link to a folder, a missing folder), the scan (the 43 real sources are clean; text as text and a
+    written-out import pass; 19 planted lines, every word of the list among them; two words give two lines;
+    a scan of nothing is refused).
+  - Plants P15 to P18 and the control P19 in `plants-4b2.py`, run by hand: the page's entry setting innerHTML and
+    the Worker using `new Function` stop the production build by the rule's own words; the reader taking a link
+    and the list losing innerHTML fail their tests by name; the clean production page builds.
+  - What waits for the content files: a page folder without `content.json` refused, and a `content.json` over
+    8 MiB refused (the same row).
 - **CI, read 2026-11-27, 01:04: green on every code head up to c09f459** (gate with smoke, and toolchain): 2f058b2
   (runs 45908649135, 45908649409), e3acb41 (45910750962, 45910750974), 8e5a268 (45912515590, 45912515341: the
   first run with the static world's browser spec; the whole toolchain job took 11 min 29 s, so the browser
@@ -991,7 +1013,8 @@ just continue as you were)". So: the chat's work and its agents' work are commit
 **Where everything is.** Branch `claude/cool-pasteur-oiqk1r` on origin (this chat's own; a session of another
 account works on its own branch from this head and never pushes here: his Lanes rule). The head: see the last
 "DONE" entries above (the card is saved with every push). Code that is not yet committed is saved as a patch in
-the notes and named in the card's newest entry (none at this save: nothing is uncommitted). No agent is running. The board add-on is active for this chat (thread state: needs-musti, for
+the notes and named in the card's newest entry (at this save: `cs4b-content/wip-step9-markup-scan.diff`, until
+that entry says DONE). No agent is running. The board add-on is active for this chat (thread state: needs-musti, for
 DIFF-LIST).
 
 **State of 4b-2, by step** (4,769 written lines of 8,450 at ad88341; two thirds is 5,633; rungs at 6,750 and 8,000):

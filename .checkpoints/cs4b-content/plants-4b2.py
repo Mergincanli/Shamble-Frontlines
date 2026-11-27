@@ -123,6 +123,16 @@ PLANTS = [
      ["a_ramp_is_met_on_its_slope_its_faces_and_its_floor_toward_each_of_the_four_sides"]),
     ("W9", "defect", "one ray's distance moved by one unit in its last place: the committed lines differ", [(WORLD_RS, "    Some((enter, leave))\n}", "    Some((if enter > 17.0 && enter < 17.01 { f32::from_bits(enter.to_bits() + 1) } else { enter }, leave))\n}")], PROOF,
      ["this build gives", "and the file has"]),
+    # Step 9, the page folder's plain files and the scan of the sources for markup sinks.
+    ("P15", "defect", "the page's entry shows a text as markup", [("packages/client/src/main.ts", "void boot();", "void boot();\ndocument.body.innerHTML = location.hash;")], PAGE,
+     ["the page's sources are refused", "packages/client/src/main.ts: innerHTML (text is shown as text: MARKUP_SINKS in build-checks.mjs)"]),
+    ("P16", "defect", "the Worker makes code from a text", [("packages/sim-worker/src/worker.ts", "let starting = false;", "let starting = new Function(\"return false\")() as boolean;")], PAGE,
+     ["the page's sources are refused", "packages/sim-worker/src/worker.ts: new Function (text is shown as text: MARKUP_SINKS in build-checks.mjs)"]),
+    ("P17", "defect", "the folder reader takes a link for a file", [(CHECKS, "      if (!entry.isFile()) throw", "      if (entry.isFIFO()) throw")], UNIT,
+     ["a link to a file and a link to a folder are refused by name, wherever they lie"]),
+    ("P18", "defect", "the scan of the sources no longer knows innerHTML", [(CHECKS, '  ["innerHTML", /innerHTML/i],\n', "")], UNIT,
+     ["each word is refused by its own name, in code, in a text and in a comment alike"]),
+    ("P19", "control", "the production page builds from the clean sources", [], PAGE, []),
     # Step 10, the judge of a taken map's world, the hostile maps and the fuzz run's worlds.
     ("W10", "defect", "of 512 boxes met at one distance the first visited answers a ray, not the lowest index (the hostile row names it; the same box 512 times does not)", [(WORLD_RS, "t < hit.t || (t == hit.t && shape < hit.shape)", "t < hit.t")], PROOF,
      ["every_hostile_map_is_one_the_judge_passes", "a search of every shape says shape 0"]),
