@@ -174,7 +174,7 @@ If the copy is lost: rebuild it from the applied rows plus the plan; never guess
 | N | File | How | State |
 |---|---|---|---|
 | 1 | .claude/scripts/track.mjs | Write (new file) | IN: 8d15e7bf (equals the copy; the copy's one comment re-wrapped first, no code change) |
-| 2 | .claude/scripts/track.test.mjs | Write (new file) | not applied |
+| 2 | .claude/scripts/track.test.mjs | Write (new file) | IN: d1bd54c6 (equals the copy; 85/85 in the real folder) |
 | 3 | .claude/hooks/routine-guard.test.mjs | Edit: import line and the fake (:18-:97) | not applied |
 | 4 | .claude/hooks/routine-guard.test.mjs | Edit: the new block appended after :3875 | not applied |
 | 5 | .claude/hooks/routine-guard.mjs | Edit: the mcp() call at :460 passes the hook input | not applied |
