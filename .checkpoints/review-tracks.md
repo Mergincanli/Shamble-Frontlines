@@ -195,6 +195,11 @@ and gh() (7) after the definitions it uses (6); each state in between parses and
     shell-route forms, R4-1's and FEWER-ASKS' change-set; only issue comments count as a PASS): for security-auditor at
     the build review; detail kept out of files.
 
+34. Applies done, all 11 rows in (commits 8d15e7bf..dcd8f563, one file each; rows 3 and 6 took two edits each). Checks
+    in the real folder: the eight files equal the reviewed copy (cmp); suites: guard 1581/1581, settings 127/127,
+    checkpoint 33/33, kept-logs 9 pass (10 tests), track 85/85; gate PASS (--no-smoke; CI runs smoke). The repository
+    map lacks the two new script files (docs-keeper).
+
 ## Current step
 Narrow re-checks of the second fix pass (advisor agent: track hunks, guard SA-RC-5/6, the advisor.md line-end gloss;
 security-auditor: its SA-RC fixes). In parallel, his answers: ADDITIONS-OK, SIZE-LINE (past the stop line); SA-PA-5,
