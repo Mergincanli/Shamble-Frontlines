@@ -149,6 +149,37 @@ B's form (advisor-u8-f1-head.md block 4), each its own call:
 - Usage after the four resumes: 0.83 at 14:16, 0.86 at 14:19 (0.52 at 13:56; resetsAt 1795794600, 15:50 UTC). By his
   13:55 item 1's limit, no no-save stretch (F1, MAIN-69, UM-4, NB2-ONEWAY) starts before the reset.
 
+## B2 (after the 15:50 reset): a3de649cd25e474df (resumed; MAIN-69's Q4 lets B take step 7): two head reads
+Not sent. Written 14:5x as prep (his 14:52 message). It goes after the reset, once MAIN-69's CI on d9fb0dd is read and
+filled in below; one resume for both heads (the advisor tool, 14:3x).
+The head reads of two pushed heads: F1 (commit c16777e, pushed in 9fbc4b4) and MAIN-69 (merge 8ec5dc07, pushed in
+d9fb0dd).
+As the advisor (main's .claude/agents/advisor.md, by `git show origin/main:.claude/agents/advisor.md`; read only, no
+cargo, no git write), read and rule, each in its own block:
+1. F1, commit c16777e (PROMPT-R1.md:127-129, net zero): the follow-up your block 2 of advisor-ops-reword-head.md
+   ruled, built by operator-rewordings.md's last section (its plan, then its done lines). CI on its pushed head 9fbc4b4:
+   all four success at attempt 1 (push gate 46016904132 and toolchain 46016904135, pull request gate 46016913053 and
+   toolchain 46016913183; 14:32-14:41 UTC). Rule: it stands, or what is owed.
+2. MAIN-69, merge 8ec5dc07 (main b8f02b0, #78 ci-time) on H0 c7950799, pushed in d9fb0dd: step 7 of main-69-plan.md
+   rev 0.2 (C's conditions M69-1 to M69-6, advisor-main-69.md, applied word for word; its done lines). MAIN-65 step 7's
+   form, with M69-1's three whole-tree bars and M69-2's baseline: main's toolchain run 46011355903, job 140547396571,
+   compared line for line as M67-3 gives it (the `test result:` lines, the vitest `Test Files` and `Tests` lines, every
+   Playwright "passed" line); its lines should also equal job 140114848934's; #74's two pull-request steps by rev 4's
+   step-6 bar; the toolchain job's run time beside the 25-minute limit. CI on d9fb0dd: (to fill). Rule: APPROVE, or
+   what is owed.
+Write .checkpoints/netcode-proof-test/advisor-f1-main69-head.md (plan first, then each block as it is done); end with
+"Decisions needed" and "For Mustafa", then, once both blocks are written, the last line `Status: COMPLETE <date and UTC
+time>`.
+Re-checked at sending: (to fill: main; HEAD = origin, clean; CI on d9fb0dd).
+Write files with the Write and Edit tools only (no sed, no shell redirect, no python writes; never `cargo fmt` writing
+files: apply rustfmt's diff by Edit); an agent with no Edit tool rewrites its notes file whole with Write. git and gh
+always start their own command, with no other program in front of them. In this tool a command that exits non-zero
+without printing can show nothing at all, the same as a pass (seen with `test`, `git diff --quiet` and `grep -q`): use
+only forms whose output carries the answer (`git diff --name-only` or `--stat`, `ls -d`, `cmp -s`, sha256 lists), and
+quote that output. His rule: "in a shell command, spell out every file you write with its full path. No variable,
+substitution or wildcard in the name of a file that is written, moved, copied or deleted. Or use the Write and Edit
+tools for it."
+
 ## C: a2b7636a57dff4206 (resumed; it checked MAIN-68's plans: advisor-main-68b.md): the check of MAIN-69's plan
 Into the seat B and D freed (NB still running: 2 agents at once). Sent 14:14 UTC (resumed: "Resuming agent a2b7636").
 DONE 14:19 (advisor-main-69.md, last line "Status: COMPLETE 2026-11-27T14:19Z"): APPROVE WITH CONDITIONS M69-1 to
