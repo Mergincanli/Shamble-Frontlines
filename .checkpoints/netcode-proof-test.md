@@ -130,7 +130,7 @@
   Note; C-U7-1; the U1 carries (C4, C6, A3, the results ledger, Q13, Q23); C6 widened (U6, before R3); JITTER-ORDER
   (parked: to him before R3 only if C6 shows the model's reordering moves a WebTransport result).
 - **For PR #40's ready head** (MAIN-60 check): its own CI run; STATUS.md's #40 row ("main 53272a1 merged in") fixed in
-  PR #40's closing docs pass (ADV-M60-7), which also takes U4f2's follow-ups by id (u4f2-report.md, "Follow-ups").
+  PR #40's closing docs pass (ADV-M60-7), which also takes U4f2's follow-ups by id (u4f2-report.md, "Follow-ups"), and UM-4's carried items (advisor-um4-r1.md section 4), into STATUS: T-3 (a skipped or todo ops or web test passes its step: "# pass below # tests fails", for both steps at once); UM4R-2 (the redact step's test run passes the whole env: leave GIT_ out there, pinned, when that step is next touched; a safe-direction FAIL only) with the refs step's `git ls-files` (check.mjs:2730, a read; for B5 to rule beside it); T-5 (infra-engineer, after UM-4's close: a CI job for check.test.mjs is a .github/ change, tier 2, his ask first; 88 tests, self step 4.9 s, no install); the security seat's memory line ("a test that runs git in a temporary folder with the inherited environment acts on the repository an absolute GIT_DIR names; check every temporary-repository test for a GIT_-free env"; met twice: u3c review C2b F2, check.test.mjs:1497-1525, and SEC-UM4-1 with UM4R-1), for security-auditor's memory when the follow-ups are done.
 
 ## After the close (TEST-FIRST rule 1's list: found on the way, outside the plan)
 - Whole and word for word on this card at e67ef59 ("After the close"): ADV-U4F20-2 with NC-F1-1 (his, marks.json); U5-Q1
