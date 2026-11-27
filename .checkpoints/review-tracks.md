@@ -76,9 +76,14 @@
 18. Build copy .gate/review-tracks/build/ (plain copy of .claude/ and CLAUDE.md.new): track.mjs (160 lines) and
     track.test.mjs written; 61/61 pass in the copy
 
+19. Guard built in the copy: GUARD-MARK (mcp() for every GitHub write, comment edits, gh() plain forms and body files),
+    subagent merges refused, toolchain in the merge check, the MERGE-PROMPT (d) allow (passAllows), guard.mjs's allow
+    output; tests: fixture (toolchain rides every list unless named, opted out or counted) and the new cases plus a
+    mutation run of the 14 new rules and guard.mjs's day-only allow: routine-guard 1575/1575, track 61/61, checkpoint
+    33/33, kept-logs 9/9; settings 126/127 in the copy, the same failure in an untouched copy (the copy's location)
+
 ## Current step
-Build: the guard (GUARD-MARK in mcp() and gh(), subagent merges refused, toolchain in the merge check, the prompt
-skip of MERGE-PROMPT (d)) and guard.mjs's allow output, with tests; then CLAUDE.md, advisor.md, security-auditor.md. Then: fast-forward the lane branch to main, move the notes from
+Build: CLAUDE.md, advisor.md, security-auditor.md text in the copy; then the applies (about 10 asks). Then: fast-forward the lane branch to main, move the notes from
 .gate/review-tracks/ into .checkpoints/review-tracks/ (plan, reviews, inputs, saved messages; no exploit forms), push the
 checkpoint, and build in a plain copy (not a worktree), one Edit per kit file asked of him (about 10).
 Inputs in parallel: (A) his timings of #65, #68, #69 measured from commit and event times, and every needs-mustafa
