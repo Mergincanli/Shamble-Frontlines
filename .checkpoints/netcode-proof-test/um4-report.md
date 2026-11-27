@@ -1,4 +1,4 @@
-# UM-4, the check script's `ops` step: the report (DRAFT until B5's head read of the fix commit)
+# UM-4, the check script's `ops` step: the report (UM-4 CLOSED on f1b46682, 2026-11-27 21:2x UTC)
 Built on 2026-11-27 by the main session. Plan um4-plan.md rev 0.3, approved by the advisor agent (A2, UM4-1 to UM4-8),
 built after his U8-FILLS (a) (history.md:8137). Two commits:
 - 8fb32bc8, pushed in 787eb984: the step, its tests and the install record.
@@ -6,7 +6,8 @@ built after his U8-FILLS (a) (history.md:8137). Two commits:
 
 Reviews: the test-engineer and the security auditor read 8fb32bc8 (review-um4-nb2b-test.md block 1;
 review-um4-security.md); the advisor agent read 787eb984's head (advisor-um4-nb2b-head.md block 1), ruled on the round
-(advisor-um4-r1.md) and reads f1b46682's head (advisor-um4-fix-head.md: to fill).
+(advisor-um4-r1.md) and read f1b46682's head (advisor-um4-fix-head.md, "Status: COMPLETE 2026-11-27 21:16 UTC"):
+APPROVE WITH FINDINGS, two Lows, none above. UM-4 closes on that head.
 
 ## What it is
 check.mjs's 13th step, `ops`:
@@ -57,9 +58,16 @@ check.mjs's 13th step, `ops`:
   After them, the four fixed files' sha256 all matched, so no mutant reached the commit.
 - **The counted run** through main-run.sh (`--only self,ops,redact,refs`): self 88 of 88, ops 104 of 104 and "315 ok, 0
   failed", redact 464 items and 0 findings, refs 2181, all equal to H0's base.
-  - Its diff hash 446f383d… equals the hash of `git diff` from H0 to f1b46682, so the tested tree is the committed tree.
-- **Gate and CI:** GATE PASS (--no-smoke), repo map OK. CI 4/4 green on 1d4e81a: gate 46066802730 and 46066808752,
-  toolchain 46066803492 and 46066808757.
+  - The tie, as printed at 21:2x: `git diff a7c4b25bbe46a443493162dc311cfea9954880e6
+    f1b466825e8caf9b86aa8a626ac0786d4fba230d -- spikes/netcode-proof | sha256sum` gave
+    446f383d41f9f761c6d83db1e9acd327ee72101dc6958f3b50082fd6fc0549a0. counted.log's third line reads "diff
+    446f383d41f9f761c6d83db1e9acd327ee72101dc6958f3b50082fd6fc0549a0". So the tested tree is the committed tree.
+- **Gate and CI:**
+  - GATE PASS (--no-smoke; gate.txt kept).
+  - The repo map read "repo map OK: 246 entries cover 110 required paths". That output was printed, not kept
+    (UM4H2-1, Low). Every changed file is a modification, none added or moved.
+  - CI 4/4 green on 1d4e81a, attempt 1, smoke jobs included: gate 46066802730 and 46066808752, toolchain 46066803492
+    and 46066808757.
 - **This repository:** untouched by the deliberately vulnerable runs. No `side` branch exists, and HEAD is still the
   lane's branch.
 
@@ -81,8 +89,13 @@ check.mjs's 13th step, `ops`:
 
 ## Carried (the card's Open findings, for PR #40's closing docs pass)
 - **T-3:** a skipped or todo test passes the ops and web steps.
-- **UM4R-2:** the redact step's test run passes the whole environment. The refs step's `git ls-files` is for B5 to rule
-  beside it.
+- **UM4R-2, widened by UM4H2-2 (Low, robustness, not security):** the redact step's test run and the refs step's `git
+  ls-files` (check.mjs:2730) pass the whole environment. Under an exported GIT_DIR they would read the wrong
+  repository, mostly ending in a loud failure; nothing is written. Both steps get `withoutGitVars`, pinned, when next
+  touched.
+- **Git's other sites in the spike folder**, the main session's grep and the advisor's wider one: every temporary-repository
+  builder now leaves GIT_ out. The rest only read, apart from the cloud-init writers (ops/cloud-init/lg.yaml:113-161,
+  rs.yaml:145-234). Those run once on a fresh server, under `runuser … env -i`, and no test runs them.
 - **T-5:** a CI job for check.test.mjs, infra-engineer's, after the close. It is a .github/ change: tier 2, his ask
   first.
 - **The security auditor's memory line:** met twice, u3c C2b F2 and SEC-UM4-1.
@@ -91,7 +104,11 @@ check.mjs's 13th step, `ops`:
 - The hazard under a real git hook. That is by design: no git variable is ever exported here; the victim test sets one
   only inside its child's environment, naming its own scratch repository.
 - Whether `git rebase -x` or `git bisect run` export GIT_DIR.
-- B5's head read: to fill.
+- The repo map's output (printed, not kept: UM4H2-1).
+
+## PR #40's closing list
+- SEC-UM4-1 does not go on it: both halves are fixed in the PR, and proven (the advisor's head read).
+- SEC-UM4-2 and SEC-UM4-3 are fixed too. The list stays as it is.
 
 ## Decisions needed
 None. OPS-GIT-ENV-B was not raised, since all three of U8's lines stayed 0 net.

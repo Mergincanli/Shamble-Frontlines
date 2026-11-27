@@ -259,6 +259,11 @@ puts them inside check.mjs, so a whole run cannot leave them out.
   - Commit f1b466825e8caf9b86aa8a626ac0786d4fba230d (parent H0 a7c4b25b; `git commit -F` .gate/um4-fix/commit-msg.txt;
     7 files staged, numstat as above): `git diff a7c4b25b f1b46682 -- spikes/netcode-proof | sha256sum` printed
     446f383d41f9f761…, the counted run's diff line, so the tested tree is the committed tree.
+  - Pushed by the save 1d4e81a; CI 4/4 green at attempt 1 (gate 46066802730 and 46066808752, toolchain 46066803492 and
+    46066808757). B5's head read (advisor-um4-fix-head.md, COMPLETE 21:16 UTC): APPROVE WITH FINDINGS, UM4H2-1 and
+    UM4H2-2 (Low); all seven departures approved, (ii) on the diff hash, which the main session printed at 21:2x with
+    both SHAs explicit: 446f383d41f9f761c6d83db1e9acd327ee72101dc6958f3b50082fd6fc0549a0, equal. UM-4 CLOSED;
+    um4-report.md is its report.
 
 ## Size (for U8-FILLS)
 About 20-30 added lines by estimate: the step and its missing-folder line in check.mjs (about 12-18), the list entry

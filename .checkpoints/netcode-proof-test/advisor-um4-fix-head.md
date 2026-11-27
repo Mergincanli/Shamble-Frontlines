@@ -125,6 +125,19 @@ call, git and gh first; no test, cargo, gate, mutant or plant run; no git variab
   session's later [skip ci] notes saves), mergeable true, mergeable_state "blocked" (not "dirty"). The body's "Closing
   list: security findings left open" names SEC-U6B-3, SEC-U6C-R2-1, SEC-U6C-R2-2 and U6c's page-host item. No UM-4 entry.
 
+- After the advisor tool's check (21:1x), three more reads:
+  - An open Grep for `git\s+[a-z"$-]` over every non-.md file except settings.json, which catches `clean`, `restore`,
+    `pull`, `ls-tree`, `remote` and `git "$@"` too. It adds no site: every hit is already listed above or is a comment
+    or assert string (deny.toml:18, check.mjs:1294 and :2696, the c-u4*.mjs header comments, the
+    siocoutq-root-check.py and test_siocoutq_root_check.py docstrings).
+  - lg.yaml:111-161 (Read): the clone at /opt/npt/clone belongs to root in the cloud-init script. Line 142's `clone`
+    lives in npt-build's HOME, run through `runuser -u npt-build -- env -i HOME=… PATH=…` (:133), and `env -i` empties
+    the environment, so no `GIT_*` can reach it.
+  - cloudinit.test.mjs (Grep `spawn|exec|"git"|clone`): its one child is `bash -c '. npt-lib.sh; printf …'` (:104-108),
+    which prints rule strings. No test runs the YAML's git lines; it is read as text.
+  - CI jobs (`gh run view <id> --json jobs`): gate push 46066802730 and gate pull_request 46066808752 each have jobs
+    `gate` success and `smoke` success.
+
 ## 1. My ruling's items against the commit: every item HOLDS (DONE)
 | Ruling item (advisor-um4-r1.md) | In f1b46682 | Holds |
 |---|---|---|
@@ -163,10 +176,13 @@ call, git and gh first; no test, cargo, gate, mutant or plant run; no git variab
     2181.
   - The real ops step ran with every `GIT_*` left out, the container's GIT_CONFIG_* included, and passed. So 2(a)'s stop
     rule was never needed.
-- gate.txt: GATE PASS (5a skipped by --no-smoke; CI's smoke job ran on the push, below).
-- Not reproduced in my seat: counted.log's diff hash 446f383d… against the commit's spike diff, which needs a pipe. The
-  tie holds another way: all four code files are byte-identical by blob id, and the commit changes no other spike file
-  (name-status).
+- gate.txt: GATE PASS, with 5a skipped by --no-smoke. CI's `smoke` job passed in both gate runs (jobs read, Notes).
+- NOT reproduced in my seat: counted.log's diff hash 446f383d… against
+  `git diff a7c4b25b f1b46682 -- spikes/netcode-proof | sha256sum`, which needs a pipe. That hash is the tie between the
+  20:53 run and the commit.
+  - What I have is supporting, not the tie: the 20:52 copies and today's tree are the committed bytes by blob id, and the
+    commit changes no other spike file (name-status). That does not show which tree the 20:53 run used.
+  - The main session prints that one command and quotes it in the report.
 
 ## 3. (a) and (b) against S's probe, then the whole spike folder (DONE)
 - The victim test exercises S's hazard itself, not an analogue.
@@ -187,9 +203,12 @@ call, git and gh first; no test, cargo, gate, mutant or plant run; no git variab
     All leave `GIT_*` out now.
   - Other writers: ops/cloud-init/lg.yaml:113-161 and rs.yaml:145-234 (`git init`, fetch, checkout, under `-C`).
     - These extend the main session's list.
-    - They run once, by cloud-init on a freshly booted VM, as root, from the cloud-init file: no caller's environment
-      reaches them.
-    - The tests only read the YAML. Outside this hazard: no finding.
+    - They run once, from the cloud-init file on a freshly booted VM.
+    - Root's clone is /opt/npt/clone. npt-build's `clone` (lg.yaml:142) runs under `runuser … env -i`, which empties the
+      env (read for lg.yaml; rs.yaml:188 has the same form, reasoned from the same layout, not read line by line).
+    - No caller's environment reaches them, and no test runs them: cloudinit.test.mjs's one child is a bash that prints
+      npt-lib.sh's rule strings.
+    - Outside this hazard: no finding.
   - Reads by design: redact-check.mjs:291, which must honour the GIT_DIR a pre-push hook gets.
   - Reads inside opsStep's filtered env: browser.test.mjs:109.
   - Reads in run scripts, not tests: ops/runs/c-u2-pm-0001-3.mjs, c-u4f-cap.mjs, c-u4f-r2.mjs, c-u4r-r2.mjs,
@@ -210,9 +229,9 @@ call, git and gh first; no test, cargo, gate, mutant or plant run; no git variab
   - Its refs count (2181) already holds the notes added since 8fb32bc8, so the compare is like for like. The old base
     would differ for reasons that are not the fix.
 - (ii) The counted run before the commit, on the uncommitted tree, tied by the diff hash: APPROVE.
-  - This was UM-4's own accepted form.
-  - The tie holds by blob identity of the four code files and by name-status (no other spike file changed), even
-    though my seat did not recompute the hash.
+  - This was UM-4's own accepted form, on one condition: the hash must match.
+  - My seat did not recompute it. Blob identity and name-status support it but are not the tie (section 2).
+  - The main session prints the hash command before the report. A mismatch reopens this item.
 - (iii) The web test's npm ci and tsc parts also assert exact messages: APPROVE. Stricter, in the same test, with no
   new behaviour.
 - (iv) T-2 as one test with two cases: APPROVE. T asked for two cases. M4 and M10 fail at two distinct lines (:2083,
@@ -272,7 +291,8 @@ Findings:
   - Folded into UM4R-2's STATUS follow-up, which now reads: the redact and refs steps get `withoutGitVars`, pinned, when
     next touched.
 
-- **UM-4 closes:** yes, on this head.
+- **UM-4 closes:** yes, on this head, once the main session has printed the diff-hash command (section 2) and it equals
+  counted.log's 446f383d…. A mismatch means the counted run is re-done at the commit.
   - Left: the report (um4-report.md) with UM4H2-1's wording, "+88 against an estimate of +45 to 60", and the carries:
     T-3, UM4R-2 widened by UM4H2-2, T-5 to infra-engineer after the close, and the security seat's memory line.
 - **SEC-UM4-1 and PR #40's closing list:** it does NOT go on the list.
@@ -288,7 +308,9 @@ Findings:
   its 6,284 stop.
 
 ## For Mustafa
-- Nothing. (Already told in round 1, for his reading: a line rewritten in place at 0 net does not pass his stop. That
-  reading is what kept OPS-GIT-ENV-B from arising.)
+- Nothing to act on.
+- One line should reach him in the day message, since my round-1 ruling said it only to the main session: "a line
+  rewritten in place at 0 net does not pass your 6,284 stop; that reading kept OPS-GIT-ENV-B from arising; say if you
+  read it otherwise."
 
-Status: COMPLETE 2026-11-27 21:13 UTC
+Status: COMPLETE 2026-11-27 21:16 UTC
