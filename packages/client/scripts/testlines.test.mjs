@@ -275,6 +275,15 @@ describe("the hand-over's files", () => {
     writeFileSync(large, "x".repeat(MAX_READ_BYTES + 1));
     expect(() => readPlain(large)).toThrow(`is larger than the ${MAX_READ_BYTES} bytes a read takes`);
     expect(statSync(large).size).toBe(MAX_READ_BYTES + 1);
+    // A path that climbs out through a link (`lnk/..`) is read as it reads: the folders checked are the file's.
+    mkdirSync(path.join(folder, "outside/deep"));
+    mkdirSync(path.join(folder, "outside/movement"));
+    writeFileSync(path.join(folder, "outside/movement/inside.json"), "OUTSIDE");
+    writeFileSync(path.join(folder, "content/movement/inside.json"), "INSIDE");
+    symlinkSync(path.join(folder, "outside/deep"), path.join(folder, "content/lnk"));
+    expect(readPlain(`${folder}/content/lnk/../movement/inside.json`, folder), "a path that climbs out through a link").toBe("INSIDE");
+    writePlain(`${folder}/content/lnk/../movement/inside.json`, "WRITTEN", folder);
+    expect(readFileSync(path.join(folder, "outside/movement/inside.json"), "utf8"), "a write that climbs out through a link").toBe("OUTSIDE");
   });
 });
 
@@ -285,14 +294,18 @@ describe("his Export and the game's first movement table, the repository's own f
 
   // The check above reads the values through the table, so a row sent to the wrong field would pass it, whatever
   // the values (test-engineer's round of 2026-11-27). The table's own names hold the rows in place: each row's field
-  // is the last step of its Export name, but for the one rename named here, so no two rows can trade fields.
+  // is the last step of its Export name, but for the one rename named here, so no two rows can trade fields. And
+  // its group is one of the soldier's, so no row reads another unit's entry of the same name (his Export also holds
+  // the hornet's body radius and step: test-engineer's round 2).
   test("every row of the table sends its Export value to the field of the same name, but for one named rename", () => {
     const RENAMED = { "stamina.refill_time_from_empty_s": "stamina_refill_time_s" };
+    const GROUPS = ["movement", "jump", "stamina", "pushing", "aim_down_sights"];
     const { rows } = JSON.parse(readFileSync(path.join(import.meta.dirname, "../../..", PATHS.table), "utf8"));
     const filled = rows.filter((row) => row.field !== undefined);
     expect(filled).toHaveLength(15);
     for (const { export: name, field } of filled) {
       expect(field, name).toBe(RENAMED[name] ?? name.split(".").at(-1));
+      expect(GROUPS, name).toContain(name.split(".")[0]);
     }
     // The rename stands in the table once, and every field once: the rule above leaves no row out.
     expect(filled.filter(({ export: name }) => name in RENAMED)).toHaveLength(1);

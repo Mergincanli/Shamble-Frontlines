@@ -24,10 +24,11 @@ use crate::vec::V3;
 /// The most shapes a static world holds: the map kind's own cap (`content::map::MAX_SHAPES`; a test ties the two).
 pub const MAX_SHAPES: usize = 512;
 
-/// The largest a ray's numbers may be, in metres: every part of its origin and of its direction, and its limit
-/// (2^20). Far beyond any map (the loader keeps every coordinate within 10,000 m), and small enough that no product
-/// a ray's test makes of such a number and a shape's size leaves `f32`'s finite range: a ray beyond it gives no hit,
-/// and a longer limit, an endless one included, reaches this far (rust-reviewer's round of 2026-11-27).
+/// The largest a ray's numbers may be (2^20): every part of its origin and of its direction, in metres, and its
+/// limit, in t (the ray reaches `origin + direction * t`, so t is metres only for a unit direction). Far beyond any
+/// map (the loader keeps every coordinate within 10,000 m), and small enough that no product a ray's test makes of
+/// such a number and a shape's size leaves `f32`'s finite range: a ray beyond it gives no hit, and a longer limit,
+/// an endless one included, reaches this far in t (rust-reviewer's rounds of 2026-11-27).
 pub const RAY_REACH: f32 = 1_048_576.0;
 
 /// The deepest tree a static world may have. The library's walks keep the nodes they still owe on a stack of 32
@@ -174,9 +175,10 @@ fn enter_ramp(
     // Above the slope when positive, on it when zero; `rate` is how that changes along the ray.
     let above = (origin[1] - solid.min[1]) * length - along * height;
     let rate = direction[1] * length - along_rate * height;
-    // A ramp whose numbers leave `f32`'s finite range gives no hit, never one made of a NaN (which passes every
-    // comparison below). Only a document no loader takes can hold such a ramp: its corners stay within 10,000 m.
-    if above.is_nan() || rate.is_nan() {
+    // A ramp whose numbers leave `f32`'s finite range gives no hit, never one made of an infinity or a NaN (an
+    // infinity over an infinity is a NaN, which passes every comparison below, and a number over an infinity a zero
+    // of either sign). Only a document no loader takes can hold such a ramp: its corners stay within 10,000 m.
+    if !(above.is_finite() && rate.is_finite()) {
         return None;
     }
     if rate == 0.0 {
@@ -293,7 +295,7 @@ impl StaticWorld {
     /// The walk visits a node only while its box is entered no later than the best hit so far (a later node
     /// cannot hold a better hit: a node's box holds its children's, and a shape is met no earlier than its own
     /// box). A ray whose origin or direction holds a number beyond [`RAY_REACH`] (one that is not finite included)
-    /// gives no hit; a limit beyond it reaches [`RAY_REACH`].
+    /// gives no hit; a limit beyond it reaches [`RAY_REACH`] in t.
     #[must_use]
     pub fn cast_ray(&self, origin: V3, direction: V3, limit: f32) -> Option<RayHit> {
         let (origin, direction) = (origin.to_array(), direction.to_array());
@@ -778,6 +780,28 @@ mod tests {
         )]);
         assert_eq!(
             huge.cast_ray(v(0.0, 0.0, 0.0), v(0.0, -1.0, 0.0), 100.0),
+            None
+        );
+        // Finite terms whose sums overflow (rust-reviewer's round 2): above and rate both infinite give a NaN
+        // crossing, rate alone a -0.0 one; each gave the box's entry as a hit, and the truth is none.
+        let tall = world(vec![ramp(
+            "tall",
+            [0.0, -1e33, -1.0],
+            [1e33, 1e33, 1.0],
+            Toward::PlusX,
+        )]);
+        assert_eq!(
+            tall.cast_ray(v(0.0, 0.0, 0.0), v(0.0, -RAY_REACH, 0.0), 100.0),
+            None
+        );
+        let long = world(vec![ramp(
+            "long",
+            [0.0, 0.0, -1.0],
+            [1e33, 1.0, 1.0],
+            Toward::PlusX,
+        )]);
+        assert_eq!(
+            long.cast_ray(v(0.0, 0.5, 0.0), v(0.0, RAY_REACH, 0.0), 100.0),
             None
         );
     }

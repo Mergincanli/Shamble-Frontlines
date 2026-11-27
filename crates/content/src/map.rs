@@ -337,12 +337,13 @@ pub fn check(map: &MapDocument) -> Result<(), Error> {
             );
         }
     }
-    // MIN_SPAWNS is one: a map holds at least one spawn.
-    if map.spawns.is_empty() {
+    // Held to MIN_SPAWNS itself, so that the schema's fewest and the loader's are one number.
+    let spawns = u32::try_from(map.spawns.len()).unwrap_or(u32::MAX);
+    if spawns < MIN_SPAWNS {
         return refuse(
             "spawns".to_owned(),
             Kind::TooFew {
-                len: 0,
+                len: spawns,
                 min: MIN_SPAWNS,
             },
         );

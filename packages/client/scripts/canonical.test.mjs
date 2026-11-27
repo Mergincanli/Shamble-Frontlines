@@ -73,3 +73,14 @@ test("only a content path is taken: no file path, no source folder, no link", ()
   expect(() => run("maps/linked.json", base)).toThrow("is a link or not a plain file: it is not read");
   expect(readFileSync(outside, "utf8")).toBe(HAND);
 });
+
+test("the content folder as a link: nothing is read through it", () => {
+  // Every folder from the base down is held to be no link (security-auditor's round 2): content/ itself as a link is
+  // refused before the read, though the folder and the canonical file behind it are plain.
+  const linked = mkdtempSync(path.join(tmpdir(), "shamble-canonical-linked-"));
+  mkdirSync(path.join(linked, "real/maps"), { recursive: true });
+  writeFileSync(path.join(linked, "real/maps/yard.json"), CANONICAL);
+  symlinkSync(path.join(linked, "real"), path.join(linked, "content"));
+  expect(() => run("maps/yard.json", linked)).toThrow(`${path.join(linked, "content")} is a link or not a plain folder: it is not read`);
+  rmSync(linked, { recursive: true, force: true });
+});

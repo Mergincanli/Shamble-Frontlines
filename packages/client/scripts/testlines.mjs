@@ -66,9 +66,11 @@ function plainFolders(file, base, refused) {
 /**
  * A plain file's text: every folder from `base` down to it and the file itself are no links, and the file is at
  * most `MAX_READ_BYTES`. The file is opened without following a link (a link put in its place after the check is
- * refused there) and judged again by what was opened.
+ * refused there) and judged again by what was opened. Its path is first resolved as it reads, so the folders checked
+ * and the file opened are one (a `link/..` in it is never followed: security-auditor's round 2).
  */
 export function readPlain(file, base = path.dirname(file)) {
+  file = path.resolve(file);
   plainFolders(file, base, "it is not read");
   if (!lstatSync(file).isFile()) throw new Error(`${file} is a link or not a plain file: it is not read`);
   const handle = openSync(file, constants.O_RDONLY | (constants.O_NOFOLLOW ?? 0));
@@ -90,6 +92,7 @@ export function readPlain(file, base = path.dirname(file)) {
  * plain folder, and whatever stands in the target's place must be a plain file.
  */
 export function writePlain(file, text, base = path.dirname(file)) {
+  file = path.resolve(file);
   plainFolders(file, base, "nothing is written");
   const there = lstatSync(file, { throwIfNoEntry: false });
   if (there !== undefined && !there.isFile()) throw new Error(`${file} is a link or not a plain file: nothing is written`);

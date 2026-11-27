@@ -149,16 +149,20 @@ test("the generated types and the schemas name the same keys, the same corner le
     ["Spawn", map.spawns.items],
     ["Region", map.regions.items],
   ];
-  for (const [name, schema] of pairs) {
-    const typed = members(declaration(name));
-    expect(Object.keys(typed).sort(), name).toEqual(keys(schema).sort());
-    // A corner is a tuple of as many numbers as the schema's fixed length.
+  // A corner is a tuple of as many numbers as the schema's fixed length. (A member's kind, number or string or
+  // which word list it names, is not compared here: 4c's reader of the types reads it.)
+  const corners = (typed, schema, name) => {
     for (const [key, type] of Object.entries(typed)) {
       if (!type.startsWith("[")) continue;
       const length = type.split(",").length;
       const fixed = schema.properties[key];
       expect([fixed.minItems ?? fixed.prefixItems?.length, fixed.maxItems], `${name}.${key}`).toEqual([length, length]);
     }
+  };
+  for (const [name, schema] of pairs) {
+    const typed = members(declaration(name));
+    expect(Object.keys(typed).sort(), name).toEqual(keys(schema).sort());
+    corners(typed, schema, name);
   }
   // A shape: its own keys, then each form's (a box's type alone, a ramp's type and its side).
   const shape = declaration("Shape");
@@ -169,6 +173,7 @@ test("the generated types and the schemas name the same keys, the same corner le
   variants.forEach((variant, at) => {
     expect([...Object.keys(members(own)), ...Object.keys(variant)].sort(), `Shape form ${at}`).toEqual(keys(schemaForms[at]).sort());
     expect(words(variant.type ?? ""), `Shape form ${at}`).toEqual([schemaForms[at].properties.type.const]);
+    corners(members(own), schemaForms[at], `Shape form ${at}`);
   });
   // The words: a ramp's side and a region's ground.
   expect(words(declaration("Toward"))).toEqual(schemaForms[1].properties.rises_toward.enum);

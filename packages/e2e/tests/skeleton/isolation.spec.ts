@@ -40,9 +40,12 @@ for (const kind of ["dev server", "preview server"] as const) {
           const bundle = await page.request.get(`${address ?? ""}content.json`);
           expect([bundle.status(), bundle.headers()["content-type"]]).toEqual([200, "application/json"]);
           expect(new Uint8Array(await bundle.body())).toEqual(new Uint8Array(readFileSync(path.join(dist, "content.json"))));
-          // Another site's ask, as a browser marks it, starts no content tool: refused in the server's own words.
-          const crossSite = await page.request.get(`${address ?? ""}content.json`, { headers: { "Sec-Fetch-Site": "cross-site" } });
-          expect([crossSite.status(), await crossSite.text()]).toEqual([403, "the content is served to this page alone\n"]);
+          // Another site's ask, as a browser marks it, starts no content tool: refused in the server's own words, from
+          // another site and from another server of this machine (`same-site`) alike.
+          for (const from of ["cross-site", "same-site"]) {
+            const asked = await page.request.get(`${address ?? ""}content.json`, { headers: { "Sec-Fetch-Site": from } });
+            expect([asked.status(), await asked.text()], from).toEqual([403, "the content is served to this page alone\n"]);
+          }
           // An address that reads as no path goes on to Vite's own handlers, never to an error page of the plugin's.
           expect((await page.request.get(`${address ?? ""}/`)).status()).not.toBe(500);
         }
