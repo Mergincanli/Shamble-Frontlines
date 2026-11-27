@@ -1,0 +1,4 @@
+# Advisor review of head 19034b71 (PR #72), scope since 851f004a
+Plan: (1) merge f5c39e3 file lists both ways, kit/gate, five sha256, verify75; judgement CI-WASM move; (2) 19034b7 DECISIONS six entries vs transcript by uuid, STATUS/ROADMAP/REPO_MAP lane-2 only, secrets grep; (3) c37a40c runbook hand-over vs toolchain.yml + preview.mjs:239-248, report claims; (4) token-sitting message vs (a)-(e), plan clicks 6-8, runbook; (5) CI on 19034b7; (6) budget.
+## Findings
+- 1 ok: file lists both ways equal (157f888c->f5c39e3 = 3b949c1->b9aad01, 58; b9aad01->f5c39e3 = 3b949c1->157f888c, 84); one-sided files equal their side (diff --stat empty both ways, shared docs excluded); main changed nothing under .claude/CLAUDE.md/.github/tools 3b949c1..b9aad01; raw diff vs main all 100644; five sha256 match at 19034b7; 851f004..19034b7 outside .checkpoints = main content + 4 shared docs + report + runbook (no .github/hosting change).
