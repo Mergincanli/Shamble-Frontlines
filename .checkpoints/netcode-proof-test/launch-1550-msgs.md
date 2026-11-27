@@ -9,7 +9,8 @@ Step 0 at the window, each its own call, in printing forms (EXIT-SILENT, exit-si
 it); `git ls-remote origin refs/heads/main` still b9aad01 (else MAIN-52 first, nothing below); `git status --short
 --branch` shows HEAD = origin and nothing else; ListAgents; `df -m /home/user`; the saver running (bk0rhq5v6 ends
 about 12:10: if it ended, restart it in the card's form). Then the advisor tool once on this file.
-The order: D alone (one worktree's git steps at a time, B's form). Everything new starts before 16:20 (LEAN-MODE); what
+The order: D and B at once (B only reads, so D's are the only git steps in a worktree, as B's form asks); at most 3
+agents. Everything new starts before 16:20 (LEAN-MODE); what
 misses 16:20 waits for the next window. A refused resume of D is not replaced by a fresh agent (a fresh agent is not in
 that worktree): it means fallback (b), the worktree stays until PR #40's close.
 Every message carries the two standing sentences word for word, and the EXIT-SILENT sentence after them.
@@ -50,6 +51,29 @@ without printing can show nothing at all, the same as a pass (seen with `test`, 
 only forms whose output carries the answer (`git diff --name-only` or `--stat`, `ls -d`, `cmp -s`, sha256 lists), and
 quote that output.
 Re-checked at sending: (to fill: main; HEAD = origin, clean; the three checks above).
+
+## B: a3de649cd25e474df (resumed; it ruled the rewordings in advisor-u8-f1-head.md block 3): their head read
+Not sent. With D, before 16:20.
+Read the pushed rewordings as the advisor (main's .claude/agents/advisor.md, by `git show
+origin/main:.claude/agents/advisor.md`; read only, no cargo, no git write): commit
+d8b57b82d08ffafbec4d1b3c0c556d0fefeda5da, the three net-zero rewordings your block 3 (c) ruled
+(advisor-u8-f1-head.md:104-137), built by the main session by .checkpoints/netcode-proof-test/operator-rewordings.md
+(its plan, then its done lines); CI on the pushed head: (to fill). Rule, each in its own block:
+1. The commit: it stands, or what is owed. A third file joined your two: operator.test.mjs:98 pinned start check 4's
+   old wording word for word, so the pin follows the new one (red first, then green: the done lines P1 and P2).
+2. Q-A and Q-B (operator-rewordings.md, "Two wording questions"; your words were kept in this commit): take, leave or
+   reword each. If one is taken, the follow-up is the main session's, net zero, within PROMPT-R1.md:127-129. The
+   source check behind Q-B is the done lines' first item (redact-check.mjs:385).
+Write .checkpoints/netcode-proof-test/advisor-ops-reword-head.md (plan first, then each block as it is done); end with
+"Decisions needed" and "For Mustafa", then, once both blocks are written, the last line `Status: COMPLETE <date and UTC
+time>`.
+Re-checked at sending: (to fill: main; HEAD = origin, clean; CI on the pushed head).
+Write files with the Write and Edit tools only (no sed, no shell redirect, no python writes; never `cargo fmt` writing
+files: apply rustfmt's diff by Edit); an agent with no Edit tool rewrites its notes file whole with Write. git and gh
+always start their own command, with no other program in front of them. In this tool a command that exits non-zero
+without printing can show nothing at all, the same as a pass (seen with `test`, `git diff --quiet` and `grep -q`): use
+only forms whose output carries the answer (`git diff --name-only` or `--stat`, `ls -d`, `cmp -s`, sha256 lists), and
+quote that output.
 
 ## After D (the main session; not bound to the window, as it starts no agent; only when D's step 3 printed nothing)
 B's form (advisor-u8-f1-head.md block 4), each its own call:

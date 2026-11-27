@@ -1,5 +1,6 @@
 # The operator rewordings to printed output (choice 31), the main session's plan (written 11:3x UTC on 11-27)
-Status: PLAN, for the advisor tool before any edit. Its plan check is B's block 3 (c) (advisor-u8-f1-head.md:104-137,
+Status: DONE 11:3x UTC, commit d8b57b82d08ffafbec4d1b3c0c556d0fefeda5da (the done lines at the end). The advisor tool
+read this plan first: E1, E2 and E4 as written, E3 after a source check; B's words kept, Q-A and Q-B to B at 15:50. Its plan check is B's block 3 (c) (advisor-u8-f1-head.md:104-137,
 "three net-zero rewordings in one small change by the main session ... no security round"). Net zero, so U8-FILLS
 does not touch it; any part that cannot be made net zero waits for his answer and is named in the day's message.
 
@@ -52,3 +53,21 @@ P3 after E3 and E4: both test files pass with P0's counts; redact-check 0 findin
 P4: one commit of the three files (its message naming choice 31 and B's block 3 (c)), pushed by a checkpoint save;
   CI on the pushed head.
 No cargo, no main-run.sh (it touches every file under crates/), no lane lock: node only.
+
+## Done (11:2x-11:3x UTC, in one turn; the saver bk0rhq5v6 stopped first by TaskStop, `pgrep -c -f checkpoint.mjs` printed 0)
+- E3's source check (redact-check.mjs:295-306 and :384-394): findings and the summary both print through
+  `print = console.log` (stdout), the findings first and the summary last (:385, unless `--quiet`); its text is
+  `redact-check: <n> item(s) checked, <m> finding(s)`, nothing after; an error goes to stderr (:393) with no summary,
+  so the saved file then has no such last line, and B's rule reads that as no push.
+- The sweep widened (the advisor tool's point): the first pattern set over every .md under ops/: the same three lines.
+- P0 (before E1): operator.test.mjs and r1plan.test.mjs 21 of 21 pass, 0 fail; redact-check "464 item(s) checked, 0
+  finding(s)".
+- P1 (after E1): operator.test.mjs 9 pass, 1 fail, "the prompt: start checks, ...", naming "git -C <run> diff
+  --name-only origin/main -- CLAUDE.md .claude" (red).
+- P2 (after E2): operator.test.mjs 10 of 10 (green).
+- P3 (after E3 and E4): 21 of 21; redact-check 464 items, 0 findings; `git diff --numstat`: PROMPT-R1.md 5 5, rules.md
+  1 1, operator.test.mjs 1 1; the seven changed lines printed by `awk` with their numbers read as E1-E4 give them;
+  `git status --short` only the three files; `node tools/gate.mjs --no-smoke` GATE PASS (base b9aad01); repo map OK
+  (245 entries, 110 required paths).
+- P4: commit d8b57b8 (3 files changed, 7 insertions, 7 deletions), pushed by the next save; CI on the pushed head;
+  B's head read in the 15:50 window (launch-1550-msgs.md, section B, with Q-A and Q-B).
