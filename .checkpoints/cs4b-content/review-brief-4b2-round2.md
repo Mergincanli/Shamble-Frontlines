@@ -12,7 +12,12 @@ pass is code head **70f11e130ee9dc0aabbb61a01bb9d3a6c013418e** (commits after it
 (1c4906e: his six messages of the change-set, copied by script and checked back by
 `.checkpoints/cs4b-content/decisions-4b2.mjs check`): not yours to review unless your section names it.
 
-**What the fix pass did, finding by finding** (round 1's six notes files hold each finding in full):
+**What the fix pass did, finding by finding** (round 1's six notes files hold each finding in full; your notes may
+name them otherwise: security-auditor's L-a, L-b and L-c are SA-1, SA-2 and SA-3; engine-architect's M1 is EA-1 and
+its L1 to L7 are EA-2, EA-4, EA-5, EA-6, EA-7, EA-8 and EA-3 in that order; netcode-architect's L1 is NA-2 and its L2
+is NA-1; rust-reviewer's ramp finding, re-rated Medium, is RR-1, the spawns' `minItems` RR-2 and the stale doc RR-3;
+test-engineer's findings are TE-1 to TE-8 as its final answer numbered them, kept in the card's entry "Round 1,
+test-engineer" in `.checkpoints/cs4b-content.md`):
 - **TE-1 (High)** a swap between two rows the second route does not read passed every check. Fixed: a test on the
   real table (`packages/client/scripts/testlines.test.mjs`, "every row of the table sends its Export value to the
   field of the same name, but for one named rename"): every row's field is the last step of its Export name, but for
