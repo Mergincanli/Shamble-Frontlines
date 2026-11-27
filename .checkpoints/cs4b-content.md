@@ -1346,6 +1346,24 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   checked by it: the WebAssembly half of "the same bits" (this environment's classifier refused its vitest run; it
   cites the card and CI), cargo audit and deny (offline), aarch64, Firefox.
 - **Round 1, test-engineer launched** (before 20:29:21 UTC) in rust-reviewer's slot, told the findings so far.
+- **Round 1, netcode-architect: PASS, two Lows** (`cs4b-content/netcode-architect-review-4b2.md`, DONE). Route (i)
+  as built (the header names the frozen bundle's sha256 and the map; the frozen file an input the scripts never
+  make; every runner checks it; two_instances and two_processes replay on it too); loading content changed no state,
+  checked on its own against `git show b8f02b0` (the 1,800 steps' 122,400 bytes and header bytes 0 to 50 equal; the
+  header's hash is the bundle's sha256; the hashes file differs at line 1 only; the vector unchanged; nothing in the
+  folder changed since e1e2dd4; plants C17 to C19 at step 1 in three runners); one content set per match (CD-7: only
+  the constructor takes the bundle, the host refuses a second start); another map's recording refused natively and
+  in TypeScript with `LOCAL_MAP` tied; the world held and queried by no step; condition 4 carried to 4c. Rulings (7)
+  and (10) fine. Its runs (own target, `--locked --offline`): devtools recordings 5, static_world 4, two_instances 1,
+  two_processes 1, library 17; sim-wasm 18 + 1 + 1; Node boundary replay, sim-wasm and static-world 22. **NA-1
+  (Low)** `packages/sim-worker/boundary/replay.test.mjs:47-53`: the Node runner makes the match (`:52`) before
+  `checkReplayable` runs (inside `replayOn`, `recording.ts:167`), where Rust (`replay.rs:120-122`) and Chromium
+  (`determinism.spec.ts:75-78`) refuse first; the card's "refused before any call in each runner" overstates it: fix,
+  `checkReplayable` before `new Sim`. **NA-2 (Low)** `crates/sim-wasm/src/local_match.rs:20`: `NO_CONTENT`'s comment
+  is stale ("while there is no content data"): fix, the join names zeros until change-set 8 brings the bundle's sha256
+  (ADR 0005 CD-8). Its forward note for 4c: the room gets the static world, and the step that decides movement and
+  prediction uses the same world, built from the same bytes.
+- **Round 1, infra-engineer launched** (before 20:31:44 UTC) in netcode-architect's slot, told the findings so far.
 
 ## Slips of this chat's own rules, for the report
 - One git command did not start its own shell call: `git add .checkpoints/cs4b-content/review-brief-4b1.md` stood
