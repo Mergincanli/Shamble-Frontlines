@@ -12,7 +12,7 @@
   `git push origin cs/4b-content:claude/cool-pasteur-oiqk1r`, alone in its command; never a plain `git push`. The
   session's start folder is never switched · **Base:** origin/main 2483e9a741c4e552323c36523831a2f35de4002e (the
   merge of 4a, pull request #70)
-- **Last update:** 2026-11-27 00:56 Amsterdam (from the clock)
+- **Last update:** 2026-11-27 01:04 Amsterdam (from the clock)
 
 ## Sizes and stop lines (his answer of 2026-11-26, 14:09:13 UTC: SIZE-4B (b); which number is which)
 - **4b is two pull requests**, in engine-architect's cut; "each stands on its own: lines left over in 4b-1 do not
@@ -892,7 +892,10 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
     security-auditor approved it (both committed files equal the two digests, checked after the copy and before
     the commit); `dependency_rules.rs` holds the three tables and the one line, with four planted manifests
     (SA-STEP9-1); the comment on the "known clash" in `build-checks.mjs` (SA-STEP9-2).
-  - **Second piece: built, in its local checks at 00:56:** `crates/content/src/ts_export.rs` (the protocol
+  - **Second piece DONE** (commit 6290c85, pushed 2026-11-27, 01:03; the gate passes; the full local checks
+    passed whole: 218 Rust tests twice with the generated types written again and unchanged, 217 in release,
+    client 129, sim-worker 51, types 8, 36 boundary tests, the type checks, 19 browser tests; **4,350 written
+    lines of 4b-2**, of 8,450): `crates/content/src/ts_export.rs` (the protocol
     crate's export test, copied, with the content crate's folder: the two crates share no code); the derives
     under `cfg(test)` on `Movement`, `MapDocument`, `Bounds`, `Spawn`, `Shape`, `Form`, `Toward`, `Region`,
     `Ground`; eight generated files under `packages/types/src/generated/content/` (a shape is its corners and
@@ -902,6 +905,10 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
     (4B-SCAN-CFG-TEST: three bites, one control).
   - **What of step 9 still waits for his DIFF-LIST answer:** the constructor taking the bundle, the page's
     fetch of `content.json`, the build running the bundle tool, the first recording's frozen content.
+- **CI, read 2026-11-27, 01:04: green on every code head up to c09f459** (gate with smoke, and toolchain): 2f058b2
+  (runs 45908649135, 45908649409), e3acb41 (45910750962, 45910750974), 8e5a268 (45912515590, 45912515341: the
+  first run with the static world's browser spec; the whole toolchain job took 11 min 29 s, so the browser
+  tests stay under CI's 5-minute stop), c09f459 (45913683931, 45913683934). 6290c85's runs were still going.
 - **To do before 4b-2 merges:** the licence texts for the hosted build (a follow-up for lane 2).
 - **GREY-COLOURS: (a), the default greys stand** (his message of 2026-11-26, 21:16:26 UTC, one letter: "a",
   `cs4-walk/mustafa-2026-11-26-grey-colours.md`; read as his answer to the one question the chat's update before
@@ -954,8 +961,8 @@ active for this chat (thread state: needs-musti, for DIFF-LIST).
 - 6 the library's batch: done (298837a). 7 the built-file check: done (d313162, then 2f058b2 and e3acb41 for the
   advisories' rule). 8, first part, the two tools on test files: done (54e89d2). 10, the core, the static world
   on maps made in tests: done (8e5a268). 9, first piece, the type writer's manifest line and its rule: done
-  (c09f459); 9, second piece, the generated content types: see the entry "Step 9, the pieces that need no
-  content file" above. CI: green through 54e89d2; the later heads to be read.
+  (c09f459); 9, second piece, the generated content types: done (6290c85). 4,350 written lines of 8,450. CI:
+  green on every code head through c09f459; 6290c85 to be read.
 - **Blocked on his own answer to DIFF-LIST** (asked 2026-11-26, 23:11 Amsterdam;
   `cs4b-content/question-2026-11-26-diff-list.md`): step 8's second part, step 9, step 10's wiring. A bare "a"
   has reached this chat twice as a repeat of his older message (`cs4-walk/redelivered-2026-11-26.md`): it is
