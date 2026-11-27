@@ -265,6 +265,27 @@ export function wasmProblems(files, playersWasm) {
   ];
 }
 
+/** The content bundle's name in a built page: the page fetches it from beside its own `index.html`. */
+export const CONTENT_FILE = "content.json";
+/**
+ * The most bytes the content bundle may hold: the game's loader's own cap (`MAX_BUNDLE_BYTES` in
+ * `crates/content/src/bundle.rs`; `build-checks.test.mjs` reads that line and holds the two equal).
+ */
+export const MAX_CONTENT_BYTES = 8 * 1024 * 1024;
+
+/**
+ * The content a built page carries (the sheet's row 9): the build writes `content.json` beside `index.html` with the
+ * content tool, which writes nothing the game's own loader did not take, file by file and as a whole. A page folder
+ * without it is refused, and so is one whose bundle the loader would refuse for its size alone. One line per problem.
+ * @param {{ name: string, bytes: Uint8Array }[]} files
+ */
+export function contentProblems(files) {
+  const bundle = files.find(({ name }) => name === CONTENT_FILE);
+  if (bundle === undefined) return [`${CONTENT_FILE}: the page holds no content bundle`];
+  if (bundle.bytes.length > MAX_CONTENT_BYTES) return [`${CONTENT_FILE}: ${bundle.bytes.length} bytes, more than the ${MAX_CONTENT_BYTES} the loader takes`];
+  return [];
+}
+
 /**
  * Refuses an output folder the build must not empty. Vite clears the folder it builds into, so the folder is either
  * the page's own `dist` or one whose name starts with `dist-`: a mistyped `--out-dir` cannot wipe sources or notes.

@@ -25,6 +25,11 @@
 // multiply-add, no maths routine outside the allow-list, no vector instruction), and then the file players get (the
 // instructions again, its imports, no path of this machine). A clean walk leaves a stamp beside that file, and no
 // page is built from a file the stamp does not name. Nothing skips it.
+//
+// Every page carries the game's content as one bundle, `content.json` beside `index.html` (the sheet's row 9): the
+// content tool (`crates/devtools`, `content_bundle`) reads `content/`, asks the game's own loader about each file and
+// the whole, and writes the bundle only when the loader takes it. It runs in a cargo call and a target folder of its
+// own, after Vite has built (and emptied) the page's folder; a page folder without the bundle is refused.
 
 import { execFileSync } from "node:child_process";
 import { copyFileSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
@@ -37,6 +42,7 @@ import {
   checkCli,
   checkCliFile,
   checkOutDir,
+  contentProblems,
   cspProblems,
   formatSizeTable,
   lockedWasmBindgenVersion,
@@ -92,6 +98,8 @@ const cargoEnv = () => ({ ...process.env, CARGO_ENCODED_RUSTFLAGS: registryRemap
  */
 const rulesDir = path.join(root, ".gate/rules-module");
 const rulesTargetDir = path.join(root, ".gate/target-rules");
+/** The content tool's target folder: its own, so building a page never rebuilds what the tests built, or the reverse. */
+const contentTargetDir = path.join(root, ".gate/target-content");
 /** The tool's absolute path, after its file was compared with the recorded values. */
 function checkedTool() {
   const tool = process.env["SHAMBLE_WASM_BINDGEN"];
@@ -203,6 +211,20 @@ export function buildWasm() {
   return rows;
 }
 
+/**
+ * Writes the content bundle into the built page's folder: the content tool asks the game's own loader about every
+ * file under `content/` and the whole, and writes `content.json` only when the loader takes them (it refuses a folder
+ * inside `content/`). The same refusals of settings from the environment as every cargo call here.
+ */
+function writeContentBundle(outDir) {
+  refuseSettings();
+  execFileSync(
+    "cargo",
+    ["run", "--quiet", "--locked", "-p", "devtools", "--bin", "content_bundle", "--target-dir", contentTargetDir, "--", outDir],
+    { cwd: root, stdio: "inherit", env: cargoEnv() },
+  );
+}
+
 /** The commit the page is built from, marked when the tree holds changes that are not committed. */
 function commitName() {
   const git = (...args) => execFileSync("git", args, { cwd: root, encoding: "utf8" }).trim();
@@ -249,6 +271,8 @@ export async function buildPage({ production, outDir }) {
   const workerEntry = workerEntryChunk(workerChunks, workerSource);
   // The zip's small server is a development tool: it is not part of a production build.
   if (!production) copyFileSync(path.join(clientDir, "serve.mjs"), path.join(outDir, "serve.mjs"));
+  // The game's content, judged by its own loader, beside index.html.
+  writeContentBundle(outDir);
   // The built page, file by file: a folder that holds a link or anything else that is no plain file stops here.
   const files = plainFilesOf(outDir)
     .filter((name) => name !== "serve.mjs")
@@ -262,6 +286,7 @@ export async function buildPage({ production, outDir }) {
     // The page's WebAssembly is the Worker's file, and the Worker's file is the one the built-file check walked.
     ...stampProblems(stampText(), playersWasm),
     ...wasmProblems(files, playersWasm),
+    ...contentProblems(files),
   ];
   if (problems.length > 0) throw new Error(`the built page is refused:\n  ${problems.join("\n  ")}`);
   return rows;

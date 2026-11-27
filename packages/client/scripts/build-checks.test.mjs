@@ -10,6 +10,8 @@ import {
   checkCli,
   checkCliFile,
   checkOutDir,
+  CONTENT_FILE,
+  contentProblems,
   cspProblems,
   formatSizeTable,
   FUSED_STEPS,
@@ -18,6 +20,7 @@ import {
   lockedWasmBindgenVersion,
   MARKUP_SINKS,
   markupSinkProblems,
+  MAX_CONTENT_BYTES,
   MAX_SERVED_BYTES,
   missingOverflowOverrides,
   nameSteps,
@@ -956,5 +959,27 @@ describe("no source turns a text into markup or into code", () => {
   test("two words in one source give two lines, and a scan of nothing is refused", () => {
     expect(markupSinkProblems([{ name: "two.ts", text: "a.innerHTML = b; eval(c);" }])).toEqual([line("two.ts", "innerHTML"), line("two.ts", "eval")]);
     expect(markupSinkProblems([])).toEqual(["no source was given to the scan for markup sinks"]);
+  });
+});
+
+describe("a built page carries the game's content", () => {
+  const file = (name, length) => ({ name, bytes: new Uint8Array(length) });
+
+  test("a page folder without content.json beside index.html, or with one larger than the loader takes, is refused", () => {
+    const missing = [`${CONTENT_FILE}: the page holds no content bundle`];
+    expect(contentProblems([file("index.html", 10)])).toEqual(missing);
+    expect(contentProblems([file("index.html", 10), file(`assets/${CONTENT_FILE}`, 10)])).toEqual(missing);
+    expect(contentProblems([file("index.html", 10), file(CONTENT_FILE, 1)])).toEqual([]);
+    expect(contentProblems([file(CONTENT_FILE, MAX_CONTENT_BYTES)])).toEqual([]);
+    expect(contentProblems([file(CONTENT_FILE, MAX_CONTENT_BYTES + 1)])).toEqual([`${CONTENT_FILE}: ${MAX_CONTENT_BYTES + 1} bytes, more than the ${MAX_CONTENT_BYTES} the loader takes`]);
+  });
+
+  test("the bundle's cap is the game's loader's own, read from its source", () => {
+    const root = path.resolve(import.meta.dirname, "../../..");
+    const source = readFileSync(path.join(root, "crates/content/src/bundle.rs"), "utf8");
+    const factors = /^pub const MAX_BUNDLE_BYTES: usize = (\d+) \* (\d+) \* (\d+);$/m.exec(source);
+    expect(factors, "MAX_BUNDLE_BYTES in crates/content/src/bundle.rs, written as three factors").not.toBeNull();
+    const [, a, b, c] = factors ?? [];
+    expect(Number(a) * Number(b) * Number(c)).toBe(MAX_CONTENT_BYTES);
   });
 });
