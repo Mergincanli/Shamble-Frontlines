@@ -154,7 +154,63 @@ street". Default: (b) two neutral greys, one per ground kind, both darker than e
 (c) the regions as outlines in the grid's grey. Asked of him with the next update; the build takes (b) until he says
 otherwise, and test S3's assertion on the two kinds follows his letter.
 
-## E. Steps 1 to 7 against today's code — pending the three reads
+## E. Steps 1 to 7 against today's code
+### E1. Step 1, the simulation's movement: rust-reviewer's read (`rust-reviewer-read.md`, blocks 1 to 4, DONE)
+The read's block 1 holds every symbol with today's file:line (ids.rs, soldiers.rs, rules.rs, vec.rs and fmath.rs,
+collision.rs's sweeps, movement.rs, world.rs and every caller, the allocation test, exp and its vectors); block 2 the
+ray counts, 4B-RAY-WASM and the simulation side of 4B-QUERY-RECORDING; block 3 what MOVE-RULES and NO-SOURCE change,
+by option; block 4 its risks. What the sheet takes from it:
+- **BODY-SHAPE (High; a finding against plan 6.1), for game-designer's read and then for him:** the plan's capsule
+  fails PM-0004-30 (the 0.55 m step gained, the 0.56 m step stopped) under every step rule its prototype tried (9 runs
+  per step height each: landing on an edge allowed, the 0.56 m step gained; landing on a face only, the 0.55 m step
+  missed 6 of 9; stepping from the last face stood on, the 0.56 m step ended perched on its edge 9 of 9). A
+  flat-footed vertical cylinder gains 0.55 m and stops at 0.56 m, 9 of 9 each, but stands 0.4 m past an edge and
+  floats 0.10 to 0.20 m over the yard's ramps unless the foot has a smaller radius of its own: that changes what
+  MOVE-RULES row 2 told him. Untried for every body: ramps, all vertical motion (the in-air step-up with 3.05 m gained
+  and 3.10 m refused, landing, the snap, ceilings) and the push. **The movement step waits for BODY-SHAPE.**
+  game-designer reads the sandbox's own step rule now (`game-designer-read.md`).
+- **SWEEP-ROUTE (a departure from the build plan's Walk card, "our own movement on parry3d's queries"):** recommended
+  our own sweeps on today's corners, as the ray already is, with the library keeping its tree and serving as the
+  tests' oracle: ties by index, no allocation by construction (the library's cast runs a contact query when a sweep
+  starts within 1e-4 of contact, which allocates when the shapes truly overlap), no tolerance-decided ties, no `sqrtf`
+  linked. It rewords PM-0004-20 (the tree only) and PM-0004-35 (0 unsupported pairs by construction, with every form
+  pair still run once through the library's dispatcher in a test). Measured on boxes only so far. **For the advisor
+  agent to rule (section H): accept it as a departure recorded for his acceptance, or keep the library's queries.**
+- **The pins move in step 1, not step 6:** world.rs's known answers and the committed first recording change the
+  moment the state holds a soldier, so the step that changes the state re-makes them as its own named sub-step (the
+  advisor agent's ruling, plan 6.2; netcode-architect agrees), or CI is red from step 1 to step 6. The plan's step 6
+  line is corrected by this.
+- **libm joins as a direct dependency of `sim`** (exp, once per match, for the two easing shares): `libm = "=0.2.16"`
+  in the root's workspace dependencies and `crates/sim/Cargo.toml`, a lockfile edge, the scan's one-file exception,
+  one entry in `maths-allowed.mjs` with its vectors (PM-0004-22). **This reopens the dependency hold:** the batch goes
+  to security-auditor by its digests before it is committed, pushed or built (his DEP-HOLD). The other way, our own
+  exp, departs from ADR 0004 part 7: not recommended.
+- **`Rules::take` refuses what the content's ranges let through:** a jump reach below the step height (the take-off
+  speed would be the root of a negative); a sprint or refill time that rounds to 0 units. The plan's "3.0700 m" is
+  out of date: with his reach of 3.071 m the tick-sampled top is 3.0702 m and the true top 3.0710 m; every jump test
+  compares the true top to `jump_reach_m` as read, never to a literal.
+- **Open points with an owner (engine-architect, the map kind):** FACING-SPAWN (a spawn faces any degree, which
+  needs a sine and a cosine once per spawn: (a) libm `sin` and `cos`, two more reviewed entries; (b) quarter turns
+  only; (c) the endpoint draws the spawn's degrees until the first aim); GROUND (no document says the bounds' floor is
+  solid ground, and the test scene has no ground shape). The slope's unit: a grade in percent needs no maths routine;
+  degrees would need one more (recommended: the grade).
+- **NO-SOURCE (b)'s fields** (block 3's table): `body_height_m`, `steepest_slope_pct`, `foot_radius_m` (only under
+  BODY-SHAPE's cylinder; not on his question's list), and the push's four: `push_sideways_pct`,
+  `push_undo_at_most_pct`, `push_most_m_per_s`, `push_height_gap_m`; their starting values are the sandbox's code
+  constants, which game-designer reads with file:line. The Testlines table gains rows with a `field` and no `export`,
+  which `testlines.mjs --check` must take, with a planted row that claims an export it does not have.
+- **Buildable before his answers, without building anything twice** (block 3): the soldier table and ids with
+  PM-0004-15; the vector, the helpers and the scan; `Rules::take` on today's fifteen fields; the jump with its exact
+  arc, true top and PM-0004-59, and landing on the bounds' floor; stamina and sprint, wish, speed, easing, facing; the
+  sweeps' common part (the grown-box ray, the touching rule, ties, the bounds, the walk, the counts, the ray kinds);
+  the world's command and state, its callers, the known answers and the first recording re-made; exp once the
+  dependency hold is answered. Waits for MOVE-RULES rows 2 to 5 and BODY-SHAPE: the edge and ramp pieces, the slide's
+  speed rule, the step-up and its in-air form, the snap, the walkable test. Waits for NO-SOURCE: the slope, the
+  height, the foot, the push's four guards.
+- **Its size:** 1,300 / 1,260 by the designs' count on the route of our own sweeps (the plan: 1,240 / 1,090); with the
+  ray counts, the sweep proof and NO-SOURCE's fields about 1,430 / 1,370.
+
+### E2 to E7: pending netcode-architect's read and engine-architect's last block
 
 ## F. Sizes, the ladder and the stop lines
 - By the designs' count: steps 1 to 7, 7,315; step S about 740 (engine-architect's recount; 630 before); together

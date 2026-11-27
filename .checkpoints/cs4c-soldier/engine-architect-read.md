@@ -38,10 +38,11 @@ agent's conditions on the map's reading: `advisor-cutC.md` B3 Q2 (59f6cc7), line
   (`MapDocument` from `@shamble/types`, type import only). Called once per match, from the content's hand-off on the
   Worker's `ready` (1.3); the picture builds the map's floor from it, swaps it for what it drew before and keeps no
   reference to the document afterwards (the spawns are read, not drawn: 1.2).
-- **How the camera joins without a second change of the method:** `PictureContent` is a record, so step 5 adds one
-  field, `readonly camera: <the camera kind's generated type>`, with its reader (the follow camera) in the same step.
+- **How the camera joins without a second change of the method:** `PictureContent` is a record, so step 4 adds one
+  field, `readonly camera: <the camera kind's generated type>`, with its reader (the follow camera) in the same step
+  (the camera kind moves from step 5 to step 4: block 3, C6, a departure from the approved step rows).
   The method, its one caller and the hand-off stay as they are; only `readContent` reads one more file. That is the
-  cheap route. Not taken: an optional `camera?` now (no type exists before step 5's camera kind, and a field with no
+  cheap route. Not taken: an optional `camera?` now (no type exists before the camera kind, and a field with no
   reader is what B3 Q2 condition 2 refuses), or `setContent(files)` with the picture reading the bundle itself (the
   reading would sit in `render/`, which passes to lane 2 in change-set 5, Part 15.2 :112-115, and couple the
   picture to the bundle's format).
@@ -113,8 +114,10 @@ agent's conditions on the map's reading: `advisor-cutC.md` B3 Q2 (59f6cc7), line
   installs `window.__shambleScene = () => picture.inventory()` beside `__shambleReport` (boot.ts:315). The app
   imports nothing new from `render/`.
 - **No development path in the production file, proven:** `DEV_MARKERS` (build-checks.mjs:202) gains
-  `"__shambleScene"` (boot's block) and `"scene-inventory"` (a string that only inventory.ts holds, its result's tag),
-  so the production scan (build-checks.mjs:242-245) refuses a production build holding either and a development
+  `"__shambleScene"` (boot's block) and the fixed sentence `readInventory` throws when the floor holds an object
+  it does not know (`INVENTORY_UNKNOWN`, "the scene inventory met an object it does not know": a live string of
+  inventory.ts's own code, so the development build keeps it, where an unreferenced tag constant would be dropped
+  there too and the marker check would fail; advisor-tool point 5, taken), so the production scan (build-checks.mjs:242-245) refuses a production build holding either and a development
   build missing either; build-checks.test.mjs:243's fixture string gains both. The production file keeps only
   `inventory(){return null}`. (Seen while reading: `FrameTimes` has no marker today, so its cut is not proven; a Low
   for the sheet, not this step's.)
@@ -200,16 +203,17 @@ agent's conditions on the map's reading: `advisor-cutC.md` B3 Q2 (59f6cc7), line
   are made per build (a small cache by grey inside one build), never module-level, so no disposal can reach another
   floor's ("never dispose pooled/shared materials"). `stop()` is unchanged: it has no caller (N12).
 - **No allocation per frame:** `draw` (three-picture.ts:128-131) is unchanged; the floor is built once; the inventory
-  runs only when a test or the readout asks (four times a second at most, development only: the readout's counts come
-  from one call per rewrite, boot.ts:321-324). Evidence: allocation.spec.ts on base and head, its per-frame bytes
+  runs only when a test asks, and once at delivery for the scene row (1.5): `data()` and the readout's rewrite
+  (boot.ts:318-325) never call it. Evidence: allocation.spec.ts on base and head, its per-frame bytes
   unchanged within its stated noise (allocation.spec.ts:18-26).
 
 ### 1.9 The follow-ups placed
 - **4B-TYPES-READER** (STATUS_ARCHIVE.md:2280-2281): met here. `readMap` is the first reader of `MapDocument`,
   `Bounds`, `Spawn`, `Shape`, `Toward`, `Region` and `Ground` (packages/types/src/index.ts:16-23), typed as returning
-  `MapDocument` with no cast, so tsc holds the reader's output to the generated type. `Movement` keeps no page reader
-  (only its file's header is read, for the readout): said in the report, and its first reader is the change-set
-  whose page needs a movement number (gap 10, design 3.8).
+  `MapDocument` with no cast, so tsc holds the reader's output to the generated type. In the scene step `Movement` keeps no page
+  reader (only its file's header is read, for the readout); its first page reader is step 4's `readMovement`, for
+  the stand-in's height, if NO-SOURCE puts the height in the movement kind (block 3.6: raised, not ruled). Step 4's
+  row in the plan (800 / 540) does not count it: about 20 / 30 more.
 - **4B-MEMBER-KINDS** (STATUS_ARCHIVE.md:2292-2293): met here, twice. (1) The chain: types to reader by tsc, reader
   to loader by `readMap` on the committed `content/maps/test-scene.json` (and the built bundle in Chromium), loader
   to schema by the Rust test (schema.rs). (2) Directly: content-schema.test.mjs's compare (types:144-179) gains each
@@ -229,7 +233,7 @@ agent's conditions on the map's reading: `advisor-cutC.md` B3 Q2 (59f6cc7), line
 ### 1.10 The exact symbols
 | | Symbols |
 |---|---|
-| **Add** | picture.ts: `PictureContent`, `Picture.setContent`, `SceneObject`, `Picture.inventory`. render/scene.ts (new): `buildEmptyScene` (moved; now returns `{ scene, camera, floor }`), `buildMapFloor(map)`, `solidPoints(shape)` (the 8 or 6 corners), `greyOf(top, lowest, tallest)`, `groundGrey(kind)`, `disposeFloor(floor)`, `overview(bounds, aspect)`. render/inventory.ts (new): `readInventory(floor)`, `INVENTORY_TAG = "scene-inventory"`. app/content.ts: `MAP_FORMAT`, `MAP_VERSION`, `MOVEMENT_FORMAT`, `MOVEMENT_VERSION`, `CONTENT_KINDS`, `NOT_THE_MAP`, `ContentFile`, `ReadContent`, `readMap`, `readContent`, private `closed`, `corner`, `word`, `text`. sim-worker/src/index.ts: `LOCAL_MAP` re-exported. overlay/report.ts: `ContentRows`, `ReportData.content`, `ReportData.scene`. boot.ts: `window.__shambleScene` (development block). build-checks.mjs: two `DEV_MARKERS`. render/scene.test.ts (new). |
+| **Add** | picture.ts: `PictureContent`, `Picture.setContent`, `SceneObject`, `Picture.inventory`. render/scene.ts (new): `buildEmptyScene` (moved; now returns `{ scene, camera, floor }`), `buildMapFloor(map)`, `solidPoints(shape)` (the 8 or 6 corners), `greyOf(top, lowest, tallest)`, `groundGrey(kind)`, `disposeFloor(floor)`, `overview(bounds, aspect)`. render/inventory.ts (new): `readInventory(floor)`, `INVENTORY_UNKNOWN` (its thrown sentence, the marker). app/content.ts: `MAP_FORMAT`, `MAP_VERSION`, `MOVEMENT_FORMAT`, `MOVEMENT_VERSION`, `CONTENT_KINDS`, `NOT_THE_MAP`, `ContentFile`, `ReadContent`, `readMap`, `readContent`, private `closed`, `corner`, `word`, `text`. sim-worker/src/index.ts: `LOCAL_MAP` re-exported. overlay/report.ts: `ContentRows`, `ReportData.content`, `ReportData.scene`. boot.ts: `window.__shambleScene` (development block). build-checks.mjs: two `DEV_MARKERS`. render/scene.test.ts (new). |
 | **Change** | three-picture.ts: `createThreePicture` (the floor, `setContent`, `inventory`, the overview in `setContent` and `resize`; `declare const __SHAMBLE_DEVTOOLS__`). content.ts: `PageContent` constructor `(deliver, read = readContent)`, `afterMessage` delivers once, its comment (content.ts:117-122) rewritten. boot.ts:217 (the hand-off), :276-312 (`data()`), :315 (the second hook). report.ts: `readoutLines`, `formatReport`. e2e: skeleton.spec.ts:6, :45 and the broken-Worker tests; content.spec.ts:121, :198-200; report.ts's `Report` type; render-counts.json's shape. content.test.ts, content-ties.test.mjs, content-schema.test.mjs, report.test.ts, build-checks.test.mjs:243. docs/REPO_MAP.md:128 (docs-keeper). |
 | **Remove** | render/empty-scene.ts (its content moves into scene.ts unchanged). `readBundle` as `PageContent`'s default reader (it stays, called by `readContent`). |
 
@@ -257,7 +261,7 @@ agent's conditions on the map's reading: `advisor-cutC.md` B3 Q2 (59f6cc7), line
 | E1 | both backends (skeleton.spec.ts's first test): `__shambleScene()` equals the built bundle's test-scene map (ids, kinds, `Math.fround` corners, greys in height order), and the counters equal `["test-scene"]` | skeleton.spec.ts | boot calling `link.receive` alone (no scene: 4B-BOOT-CALLS); the swap without `disposeFloor` (geometries 2 high) |
 | E2 | the seven hostile bundles: the inventory is the empty floor alone, the counters equal `["empty"]` | content.spec.ts | `setContent` called before `ready` |
 | E3 | a Worker that cannot load or throws: the readout's content is `none` | skeleton.spec.ts | boot's error listener calling `link.workerError` alone (4B-BOOT-CALLS) |
-| E4 | the production build holds neither new marker, the development build both | build-checks (every build) | `readInventory` called outside the define |
+| E4 | the production build holds neither new marker (`__shambleScene`, `INVENTORY_UNKNOWN`'s sentence), the development build both | build-checks (every build) | `readInventory` called outside the define |
 | E5 | allocation.spec.ts on base and head: per-frame bytes unchanged within its noise | allocation.spec.ts | (a reading on both heads, as risk 5 of the plan says) |
 
 ### 1.12 The designs' count, recounted (written new lines; plus or minus 30 %)
@@ -288,7 +292,7 @@ then name paths alone and the formats from the folder table).
 ### 1.13 His open questions, by option, for the scene step
 - **MOVE-RULES, NO-SOURCE, RESUME-FLASH, TUNE-HOME:** none changes the scene step under any option. (Row 5 of
   MOVE-RULES changes what can be stood on, not what is drawn: the drawn heights are the map's real ones either way.
-  TUNE-HOME acts on the camera's content, which joins at step 5.)
+  TUNE-HOME acts on the camera's content, which joins at step 4: block 3, C6.)
 - **SIZE-4C:** (a) the scene's code merges with the soldier's, reviewed on 4c's final diff; the overview camera can be
   left out (the follow camera frames the scene before 4c merges) and he sees the scene first in the early look.
   (b) and (c): the scene step is 4c-1 on its own, with its own reviewers (engine-architect for picture.ts,
@@ -310,7 +314,7 @@ re-estimated; where no design counts a file group apart it is said.
 ### 2.1 The seam
 | Half | Steps, split by file | What it holds |
 |---|---|---|
-| **4c-2, "the soldier's simulation"** | step 1 whole; step 2 but for RESUME-FLASH's page guards and test (N18); **step 3's snapshot part** (`crates/protocol/src/`: the own soldier record and its codec; the room's encoder; the endpoint's decoder and the parity test); step 6 whole; step 6c whole | the soldier table, the rules taken from content, our own movement on the collision world, the post carrying the move and the ray, the 13-number input call, the endpoint's cast and the room's checks, the jump rule, the snapshot's own soldier, the movement and lane recordings with every mark that rides them, the first recording re-made, the hostile commands, the far-corner map |
+| **4c-2, "the soldier's simulation"** | step 1 whole; step 2 but for RESUME-FLASH's page guards and test (N18); **step 3's snapshot part** (`crates/protocol/src/`: the own soldier record and its codec; the room's encoder; the endpoint's decoder and the parity test); step 6 whole; step 6c whole | the soldier table, the rules taken from content, our own movement on the collision world, the post carrying the move and the ray, the 13-number input call, the endpoint's cast and the room's checks, the jump rule, the snapshot's own soldier, the movement and lane recordings with every mark that rides them, the first recording re-made, the hostile commands, the far-corner map; **and every new field of the simulation's state and its wire that steps 3 to 5 need**: the sprint-lock bit, the stamina's fields in the snapshot's own soldier, and the body-height field if NO-SOURCE puts it in the movement kind (block 3.2 and 3.6), so 4c-3 changes no hashed state |
 | **4c-3, "he plays"** | step 3's block part (`client-endpoint/src/layout.rs`, `block.rs`, `layout_ts.rs`, the generated layout) and its page part (`app/blend.ts`, the Worker's `dueAt` in host.ts and pacing.ts, the pool, the three newest blocks); RESUME-FLASH's guards and test; steps 4, 5, 6b, 7 whole | the block's soldier rows and owner's section, the blend, the stand-in, the follow camera, the keys and the mouse, the aim line, the stamina bar, the readout's rows, the camera panel and its content file, the early-look zip, the paced replay, the page's browser tests, his main check |
 
 ### 2.2 The three conditions (each checked against today's code)
@@ -362,9 +366,13 @@ re-estimated; where no design counts a file group apart it is said.
 - **Nothing in 4c-3 changes the simulation** (the block and the snapshot's bytes are not hashed: the shared state is,
   netcode-architect-cs4.md:396-399), so 4c-2's recordings stand through 4c-3. If 4c-3's review changed the input's
   meaning, the recordings would be made anew there, as its own named step (plan 6.2's ruling).
-- **The never-moved list holds** (plan.md:249-251): the movement recording's four runs, the stale-id run, the hostile
-  commands and the parity marks in 4c-2; the paced replay and the camera panel in 4c-3; steps 4 and 5 in one half,
-  so the panel is in the first build he plays.
+- **The never-moved list** (plan.md:249-251): the movement recording's four runs, the stale-id run, the hostile
+  commands and the parity marks in 4c-2; the camera panel in 4c-3, with steps 4 and 5 in one half, so the panel is in
+  the first build he plays. **PM-0004-28 is a reading for the advisor agent to confirm, not mine to rule:** section 9
+  lists it "on the movement recording, before 4c merges", and the paced replay is on the never-moved list from the
+  advisor agent's High condition 1 (plan.md:824). Under the seam it stays inside 4c and is met before 4c's last part
+  merges, with the page's code it proves; whether "before 4c merges" may mean "before 4c-3 merges" is the advisor
+  agent's (and, if it says the words are his, Mustafa's) call. If not, the seam is not clean.
 
 ### 2.5 What he sees or plays after each
 - **After 4c-1 (the scene):** the grey street corner and training yard in an overview, the content and scene rows; a
@@ -404,7 +412,7 @@ repeated. "Today" is main dae6d107 with 4c-1's scene in.
 | C3 | DEPART-4: the page keeps the **three** newest blocks (netcode-architect-cs4.md:437-447), so the pair drawn is not always (previous, newest) | `PictureFrame`'s two fields are renamed for the pair the app picks (3.3) |
 | C4 | N13: a view made per frame over two blocks fails allocation.spec.ts's per-frame limit | the blocks reach the picture as the `DataView` the link already makes once per block (3.3) |
 | C5 | N14 and game-designer's stamina bar (plan section 2, step 4): no field carries the stamina | the owner's section gains two bytes in its reserved space (3.2); the lock is a state bit for rust-reviewer and netcode-architect |
-| C6 | The camera's content file is placed in step 5, but its first reader, the follow camera, is step 4's | the camera kind moves to step 4 (3.5); the panel stays step 5. Both are in 4c-3, so the seam is untouched |
+| C6 | The camera's content file is placed in step 5, but its first reader, the follow camera, is step 4's | the camera kind moves to step 4 (3.5); the panel stays step 5. Both are in 4c-3, so the seam is untouched. **A departure from the approved step rows (plan.md:239-240), for the advisor agent's re-read**; the lines move between the two rows, the sum does not change |
 | C7 | 4c-1 already puts `__SHAMBLE_DEVTOOLS__` inside render/ (block 1.4) | design 4.1 item 6's `devtools` start option is dropped; `panelHost` stays |
 | C8 | His Export's framing replaces legacy's (DEPART-4; DIFF-LIST: height 24.5, boom 34.7, field of view 13, turn 64 degrees, and 16 framing values) | design 4.4's "legacy's framing, height 40, boom 56.6, fov 15, yaw 45" is replaced by the camera file's values |
 | C9 | The input call takes 13 numbers with the move packed in one word (plan 6.2 (2); netcode-architect-cs4.md:299-316, which had 15 with the view time) | `input/move.ts` returns the packed word, not two floats (design 3.6 said floats quantised by the endpoint) |
@@ -477,9 +485,11 @@ repeated. "Today" is main dae6d107 with 4c-1's scene in.
   from the generated camera schema through **one product function** (4B-LIMIT-IMPORT): `content-schema.test.mjs`'s
   `limits` (:21-25) moves to `@shamble/types` as `numberLimits(schema)`, and the test imports it from there; the
   schema reaches the panel as a JSON import in its development chunk (`DEV_MARKERS` + `"camera-panel"`).
-- **The five presets:** legacy CAM_STYLES sets 6 of the 21 values per preset (N21). Recommended: a `presets` list in
-  the camera kind (data, held to the same ranges by the loader), its five rows written by script from
-  docs/legacy-tuning.json, never typed; a preset sets those values and leaves the others. Not taken: five whole
+- **The five presets:** legacy CAM_STYLES sets 6 of the 21 values per preset (N21); a preset sets those values and
+  leaves the others; its five rows are written by script from docs/legacy-tuning.json, never typed. Where they live
+  follows TUNE-HOME: under (b) and (c), a `presets` list in the camera kind (data, held to the same ranges by the
+  loader); under (a) the camera file must equal his Export, which has no presets, so they are the panel's own
+  development-only table (`camera/presets.ts`, written by the same script). Not taken in any option: five whole
   camera files (each would have to invent 15 values a preset never set).
 - **"Copy values":** the camera file's canonical bytes, by the content's own rule (N22): a browser-safe
   `canonicalText` in product code (development chunk), which canonical.mjs then imports, so the rule has one copy.
@@ -506,9 +516,10 @@ repeated. "Today" is main dae6d107 with 4c-1's scene in.
 - **NO-SOURCE** (step 1's, with one page consequence): the stand-in's height and the capsule's are one number (N23).
   Under (a) and (b) it is a field of the movement kind (from his new Export, or a row "not from your Export"), and
   the page reads it (`readMovement`, the first reader of the generated `Movement`, the rest of 4B-TYPES-READER), so
-  `PictureContent` gains it in step 4; under (c) the height is not among the dropped rules, so as (b). Until the
-  field exists, the stand-in cannot take its height from content, and a 1.80 m constant in the page would be a
-  second home.
+  `PictureContent` gains it in step 4; under (c) the height seems not to be among the dropped rules, so as (b) (an
+  inference from the question's text, not ruled). Until the field exists, the stand-in cannot take its height from
+  content, and a 1.80 m constant in the page would be a second home. **Raised for rust-reviewer** (whose read holds
+  the movement kind's fields), not ruled here: the page reading the height crosses its read.
 - **MOVE-RULES:** no symbol of steps 3 to 5 changes by its rows (rows 6 and 7 are 4d's; the others act inside the
   simulation).
 - B3 DONE. Next: B4, 4B-WORLD-ROOM.
@@ -540,7 +551,10 @@ repeated. "Today" is main dae6d107 with 4c-1's scene in.
   the `[dependencies]` tables of crates/room/Cargo.toml and crates/client-endpoint/Cargo.toml name no `content`, and
   no file under their `src/` names `content` (rules_scan.rs's tokenizer, :127-252, reused, not copied: moved to a
   shared place if needed); planted: a `content = { path = "../content" }` line in a copy of the manifest text, and a
-  `use content::map::MapDocument;` in a copy of a room source, each must fail. About 25 / 25 lines. It keeps one
+  `use content::map::MapDocument;` in a copy of a room source, each must fail. It also holds what `sim` hands on of
+  `content`: today one constant, `pub use content::time::UNITS_PER_SECOND` (sim/src/time.rs:8), and no document
+  type or reader (grep of `pub use` in crates/sim/src), so a room cannot read a map through `sim` either; a `pub use
+  content::map::MapDocument` added to sim must fail it. About 25 / 25 lines. It keeps one
   reader of content in the authority's path: the constructor, through sim's `Rules::take` and `StaticWorld::build`.
 - **What changes:** `Room` (a field, `new`, the step's call); `World::authority_step` (an argument); `LocalMatch`
   loses `world` and `static_world()` (local_match.rs:48-50, :63, :73, :96-100), and `new` hands the world on;
@@ -549,5 +563,17 @@ repeated. "Today" is main dae6d107 with 4c-1's scene in.
 - **When:** with the first step that queries it, step 1's movement inside the room's step: 4c-2 under the seam of
   block 2.
 - B4 DONE.
+
+## Not verified
+- Nothing was built or run for this read but one import of three/webgpu in plain Node (N7). Every count is the
+  designs' estimate (plus or minus 30 %).
+- The scene's render counts in block 1.6 are arithmetic on the design; the measurement goes into the file.
+- That the define and tree-shaking cut `inventory.ts` from the production build (the `FrameTimes` precedent) is
+  unproven until a build runs the marker scan.
+- The `DataView` hand-off's claim of no allocation per frame and none extra per block (block 3.3) is unmeasured until
+  allocation.spec.ts runs on the walking page.
+- netcode-architect's and rust-reviewer's parallel reads were not seen; the zero-ray meaning, step 3's Rust split,
+  the sprint-lock bit, the stamina's wire and share, and the body-height field are theirs.
+- three's dispose bookkeeping (N11) was read in the built file, not run.
 
 DONE
