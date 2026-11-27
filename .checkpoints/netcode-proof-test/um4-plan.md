@@ -251,6 +251,14 @@ puts them inside check.mjs, so a whole run cannot leave them out.
     1: s.ok true), W1 (the web test's node case: s.ok true), M4 (T-2's stderr-noise case), M10 (T-2's extra-line case),
     M8 (T-4's path pin), M-env and M-wild (the env pin: a GIT_ key in a call's env); V1, V2 and V3 (each helper site
     restored alone: the victim test's byte-for-byte assert). Then `sha256sum -c fixed.sha256`: all four OK.
+  - Counted run (counted.log; lock 20:53:10; exit 0; HEAD a7c4b25b; diff 446f383d41f9f761…; untracked e3b0c442…):
+    "check: all 4 steps pass"; self 88 of 88 (85 + 3 new); ops 104 of 104 and "315 ok, 0 failed" (the real step,
+    every GIT_ name left out: no git config, ownership, signing or hook error); redact 11 of 11, 464 items, 0 findings;
+    refs 2181 (both equal to the base). `node tools/gate.mjs --no-smoke`: GATE PASS (gate.txt); repo map OK, 246
+    entries over 110 required paths.
+  - Commit f1b466825e8caf9b86aa8a626ac0786d4fba230d (parent H0 a7c4b25b; `git commit -F` .gate/um4-fix/commit-msg.txt;
+    7 files staged, numstat as above): `git diff a7c4b25b f1b46682 -- spikes/netcode-proof | sha256sum` printed
+    446f383d41f9f761…, the counted run's diff line, so the tested tree is the committed tree.
 
 ## Size (for U8-FILLS)
 About 20-30 added lines by estimate: the step and its missing-folder line in check.mjs (about 12-18), the list entry
