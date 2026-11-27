@@ -60,15 +60,70 @@ stop set for U8 (history.md:7703-7722); nothing carried.
   tests run beside check.mjs in the merge's counted run, with ops/browser/node_modules linked, not installed.
 
 ## Open at the merge (with their takers)
-- From advisor-u8-stopb.md: F28 (U6b's flush, proven live at R1); ds-selftest's place in R1's run list; U6c's names
-  (NC-R2-4, read by test 7 on the merged code: M5 above); SEC-SB-9's rest (the page host's sandbox options, from U6c's
+- From advisor-u8-stopb.md: F28 (U6b's flush, proven live at R1); ds-selftest's place in R1's run list; U6c's names:
+  test 7's item 4 reads fixtures; on real output, the head read's run of probe_presence on U6c's 24 Nov log (P0
+  present, P1 at the drop rule); SEC-SB-9's rest (the page host's sandbox options, from U6c's
   host needs, else carried to R2 with R1's `systemd-analyze security` reading); SEC-SB-5's two-path dist build (at U7's
   merge, before Stop B's fill). U6b's null certificate pair: CLOSED by the fix above.
 - Stop B's fills and reads: the laptop's reads (driver listen, passphrase, fsn1 stock, Claude Code >= 2.1.257),
   `sudo -l` over ssh on RS (only the container's read so far), SEC-U6C-5's URL, rs.yaml's commit line (Y).
 - NC-R3-1 (Low): r1.sh:438-452, save_log unguarded under set -e: a follow-up.
-- For the advisor's head read: the policy-name INVALID (an unasked addition beyond the four reads, plan.md:1256), and
-  the fix's two files (r1.sh, ops/tests/r1sh.test.mjs) with plants P8-P10, which no review seat has read.
+- For the advisor's head read (read: advisor-u8-head.md): the policy-name INVALID (an unasked addition beyond the four
+  reads, plan.md:1256), and the fix's two files (r1.sh, ops/tests/r1sh.test.mjs) with plants P8-P10.
+- U7's alignments (ADV-U8H-4), checked at U7's merge, as found: the URL contract in ops/browser/config.mjs (C1 at U7's
+  merge tested save() and config.mjs against the judge: a verdict, no read error; ADV-U7S-5's stale comment at
+  config.mjs:60 stays open, U8-F1 does not touch config.mjs); `node build.mjs` in cloud-init/rs.yaml (:198-200 build in
+  the spike's web/ with `npm ci --ignore-scripts`, then `node build.mjs`, U7's web/build.mjs, after :194's
+  wasm-bindgen-cli 0.2.130, the version build.mjs pins).
 - The `ops` step and how later trees get webdriverio (an install by U8's one form, or the step reporting its absence):
   at that commit's head read.
 - Not run on a VM yet; `node --test ops/` fails on Node 22.23: use the glob form.
+
+## U8-F1, merged 2026-11-27 (the head read's fix list and its security round)
+Merged into the lane by the main session, plan u8-f1-merge-plan.md (U7's M0-M9 form with M3a), checked by the advisor
+(a3de649cd25e474df: APPROVE WITH CONDITIONS C1-C3, advisor-u8-f1-merge.md, applied word for word). Brief u8-f1-brief.md
+(C1-C7 applied); the builder's notes u8-f1-build.md (a7fe1b9f436f36bb1, on 77ffc95); snapshot wip/u8-f1-build.patch
+4d6a2484…7164 (6 files; removed by this merge, WIP-CLEAN). The commit: (fill at M8).
+- What it built, on six files under spikes/netcode-proof/ops/ (operator/PROMPT-R1.md, runs/R1.md, runs/r1.sh,
+  tests/r1plan.test.mjs, tests/r1sh.test.mjs, tests/s14.test.mjs):
+  - item 1 (ADV-U8H-1 under his RESULTS-PUSH (b)): probe_presence prints P1's l2_summary fields and the four P1 reads,
+    integers only, into probe/presence.txt (the policies as number and priority); ds_selftest writes ws_split's fields
+    into ds-selftest/ws_split.txt; the pushed list, the same in PROMPT-R1.md and R1.md, with a test that the two are
+    equal; his S14-PUSH (a): the s14 folder's own redaction run before the push, its output saved as s14-redact.txt in
+    the pushed set, R1.md's sentence naming every writer into the folder, and the pin test (s14.test.mjs) refusing any
+    other writer, key or address by name;
+  - item 2 (SR-1 with SR-2): PROMPT-R1.md's PowerShell check that `git -C <results> rev-parse --git-path hooks` prints
+    the clone's own hooks folder before the push, and R1.md's Stop B start-check line; its four-way proof was a scratch
+    run (u8-f1-build.md), not committed;
+  - item 3 (ADV-U8H-2): R1.md's clause that the advisor applies plan.md:1256's slack-value rule at R1's report.
+- The fix pass after the security round (security-u8-f1.md; the ruling advisor-u8-f1-sec.md): SEC-U8F1-1's fixes (a)
+  one exact list for npt-s14's `$OUT` lines and a wider writer filter for r1.sh's s14 block, (b) host names, interface
+  names and dash-form hardware addresses in the address loop, stamps.txt's writers read, (c) S14-VMS: the s14 folder's
+  own check runs with no VM list; SEC-U8F1-2's parts (the shared "goes to Mustafa first" message, the one-loop count);
+  item 6's save wording (`| Out-File -Encoding utf8 <results>\r1\s14-redact.txt`, "not `>`, which writes UTF-16").
+- The size: +93 net (105 added, 12 removed) of 93; U8 at 6,282 of his 6,282 stop (U8F1-SIZE (a)).
+- S14-VMS: the advisor's ruling: inside his "the same redaction check" (the same program, only stricter); his to
+  reverse (choice 25).
+- The carries: SEC-U8F1-3's "in the same PowerShell" wording and SEC-U8F1-4's Stop B record of the printed hooks path
+  and `git --version` (C2: on PR #40's closing list now, as security findings left open; no fill and no building of
+  them until he answers U8-FILLS); logq's non-object line (a STATUS follow-up); the earlier Lows (re-runs keep the last
+  attempt's prints only).
+- The proofs, by pointer: u8-f1-build.md's "# FIX PASS (security round) HAND-BACK" (each item's red run, its plant and
+  the restore hash); item 5's scratch proof with private stand-in addresses (the fixture's documentation addresses are
+  allowed anyway, so they cannot show the gap).
+- The rounds and rulings: the head read: advisor-u8-head.md, APPROVE WITH FINDINGS; ADV-U8H-1 to -4; SR-1 and SR-2
+  weighed Low; his RESULTS-PUSH (b) and S14-PUSH (a), at history.md:8068-8106; the brief check:
+  advisor-u8-f1-brief.md, C1-C7; the security round: security-u8-f1.md; its ruling: advisor-u8-f1-sec.md; the stop's
+  moves: 6,230, then 6,282 by U8F1-SIZE (a).
+- What leaves the server now, for his Stop B read: `collect/`, `probe/presence.txt`, `ds-selftest/ws_split.txt`,
+  `bringup/facts.txt`, `s14/` whole and `s14-redact.txt`. The new prints are integers only, and the policy reads are
+  numbers. The s14 folder's own check runs with no VM list (S14-VMS), and the hook checks the whole push with it.
+- D10 and DEP-HOLD: no marks.json or judge change; no manifest or lockfile; ops/browser's package.json and
+  package-lock.json unchanged.
+- The first run against the merged trees: the builder's end checks ran at 77ffc95, so M5 is U8-F1's first run against
+  NB2's and U7's merges.
+- The security findings left open, for PR #40's closing list: SEC-U8F1-3 and SEC-U8F1-4 (C2); SEC-SB-9's rest, as
+  before. logq's non-object line is a STATUS follow-up, not a security finding.
+- The two wordings for his Stop B read (u8-f1-build.md, "Open"): "runs on `<results>\r1\s14` with no VM list"
+  (S14-VMS, choice 25); the save's shorter reason.
+- M5: (fill). M7: (fill).

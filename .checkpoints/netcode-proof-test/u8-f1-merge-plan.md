@@ -176,4 +176,11 @@ the advisor rules."
   fill); Q3 agree, plus M9's scratch-folder addition; Q4 C3.
 
 ## Done lines (one per step, by Edit)
-(none yet: M0 not started)
+- DONE 06:0x-06:1x: M0's prep: B's conditions C1-C3 and its Q3 addition applied by Edit word for word (ca46870);
+  u8-report.md's U8-F1 section drafted (M8's items with C3's seven; ADV-U8H-4's three corrections applied; the commit,
+  M5 and M7 lines to fill); `git diff --no-index` of u7-m4-cmp.mjs and u8f1-m4-cmp.mjs: only the header (:1-4), :9,
+  :10 and :32; no cargo, rustc or npt process (`pgrep -l`, exit 1 each); the lane lock free (`flock -n`, exit 0); the
+  part-clean in the card's form (no ask): "Removed 5765 files, 7.1GiB total", the lock and CACHEDIR.TAG there, no
+  debug folder, free 7,796 to 14,370 MiB. The saver b507lg9fc ran out 06:01:14 ("watch stopped: time is up"; its last
+  autosave bea1d82), not restarted. PR #40 re-subscribed 05:58, its rules event read 05:59 (0 review threads; no check
+  runs on the notes-only head; main b9aad01 in the branch). Next: this line saved, the advisor tool, then M0.
