@@ -220,6 +220,16 @@ and gh() (7) after the definitions it uses (6); each state in between parses and
     SA-RC-9 fix came after step 28); the repository map lacks the two new files; one notes line named a flag next to a
     class label still open on main: reworded to class words (history keeps the earlier line).
 
+38. Main taken in by the advisor's method: the main folder parked on a local branch claude/rt-park from origin/main
+    (never pushed); a worktree of this branch at .gate/rt-sync; merge-tree clean; merged origin/main (b8f02b01) there
+    as 583c85a0 and pushed; the eight kit files still equal the copy and are the only non-notes difference from main
+    (1029 added). From here the work runs in .gate/rt-sync. His two 2026-11-27 saved messages re-saved by script from
+    the transcript (my typed copies had one extra final newline): full-paths 463 bytes (attachment 9a69726a; already
+    recorded in DECISIONS from another chat at 12:37:33 UTC), additions-size-usage 1736 bytes (message 5ab2d0b4).
+    Not yet in DECISIONS: 2d747465 (2026-11-26 20:43:30, PLAN-GO (a), MERGE-PROMPT (A), WAKE-END (a)), 17f11dda
+    (20:49:39, his question), 376dac3c (20:50:45, his proposal that became (d)), 442b9871 (20:58:55, "d"), 5ab2d0b4
+    (2026-11-27 13:55:39); PASS-FORGE pending.
+
 ## Current step
 Narrow re-checks of the second fix pass (advisor agent: track hunks, guard SA-RC-5/6, the advisor.md line-end gloss;
 security-auditor: its SA-RC fixes). In parallel, his answers: ADDITIONS-OK, SIZE-LINE (past the stop line); SA-PA-5,
