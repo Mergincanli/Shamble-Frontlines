@@ -30,9 +30,9 @@ Builder 2's branch claude/practical-ride-igo41n, both parts in one merge (Builde
   - gate and smoke: success.
   - toolchain: success on its one re-run. Attempt 1 failed while downloading a tool ("curl: (22)" with a 504 from
     GitHub's server), before any size or hash check.
-  - Pull-request runs could not start then: PR #40 conflicted with main in docs/STATUS.md until MAIN-68. They ran on
-    MAIN-68's pushed head 7971da0, which contains this merge, all green (advisor-main-68-head.md:100-104; `git
-    merge-base --is-ancestor 48efc9c 7971da0` exit 0).
+  - Pull-request runs could not start then: PR #40 conflicted with main in docs/STATUS.md and docs/STATUS_ARCHIVE.md
+    until MAIN-68 (advisor-nb2-head.md:112-113). They ran on MAIN-68's pushed head 7971da0, which contains this merge,
+    all green (advisor-main-68-head.md:100-104; `git merge-base --is-ancestor 48efc9c 7971da0` exit 0).
 - **Four departures, each accepted by the head read** (advisor-nb2-head.md section 2):
   - step 4's bars re-based on U8's merge run;
   - step 8's two bars re-read ("mergeable" was out of NB2's reach; push runs only);
@@ -56,14 +56,20 @@ Builder 2's branch claude/practical-ride-igo41n, both parts in one merge (Builde
   - Builder 2's lane: a forward fix, plan first, with a test for that path. It was handed to Mustafa to paste into
     Builder 2's chat (msg-2026-11-27.md, For Mustafa item 3).
   - Builder 2's later tip 29a90199 does not fix it (NB2B-8).
-- **L1 to L4 (Low):** a lookup only half pinned by a test, the stop's phase unpinned, a typo and an unwrapped line.
-  Builder 2's lane, as forward fixes.
+- **L1 to L4 (Low), all still open at the merged head.** Builder 2's lane, as forward fixes:
+  - L1: crates/judge/tests/engine.rs:1790-1812: the session lookup is only half pinned by a test;
+  - L2: engine.rs:1322 and crates/judge/src/figures.rs:640-641: the stop record's phase is unpinned;
+  - L3: engine.rs:1820: a typo ("ticks 11 was in flight", still there by `git grep` at HEAD);
+  - L4: marks/README.md:88: a line of 184 characters, not re-wrapped (still so by `awk`).
+  - The one-way work changed engine.rs only from line 5051 and README.md only from line 186, and figures.rs not at all
+    (`git diff -U0 48efc9c T`), so these line numbers hold.
+  - They were never handed over (only M1 was); the paste line is in For Mustafa below.
 - **ADV-NB2H-1 to -5 (Low, records):**
   - the gate output was not kept (CI's gate and smoke stand for it);
   - old plan lines stand under the As-approved header (this report uses the corrected words);
   - the pull-request CI gap is closed above;
   - NB2-C10 and NB2-C11 are closed by this report;
-  - the -47 folder's pack waits until after NB2-ONEWAY's step 5 (NB2B-7).
+  - the -47 folder's pack: allowed since NB2-ONEWAY's step 5 ended (17:46 UTC on 11-27; NB2B-7), still to do.
 
 ## Not verified
 - **PM-0001-57 was not re-judged (NB2-C11).** Its re-plan line ("-57's folder still PASS") is not runnable as worded.
@@ -74,10 +80,17 @@ Builder 2's branch claude/practical-ride-igo41n, both parts in one merge (Builde
     (advisor-nb2-merge.md:178-187).
 - **The reviewer's "fails without it" claims were traced by hand.** review-nb2-c10.md ran no cargo and no plant. The
   plants named in 72651a3c's commit message are Builder 2's record.
+- **Whether any recorded run would change its verdict under the new guard.** The reviewer re-judged nothing and looked
+  for no recorded sets (review-nb2-c10.md, "Not verified"). The -47 re-judge does not cover it: it reads MOVED before
+  any check.
 - **Step 6's gate output was not kept** (ADV-NB2H-1).
 
 ## Decisions needed
 None.
 
 ## For Mustafa
-Nothing new. M1's paste block for Builder 2's chat went out in msg-2026-11-27.md, For Mustafa item 3.
+1. Paste into Builder 2's chat (M1 went out in msg-2026-11-27.md, For Mustafa item 3; L1 to L4 never did):
+
+```text
+Four Lows for your lane as forward fixes, from the netcode branch's test-engineer read of 67892d39..72651a3c (review-nb2-c10.md on claude/netcode-proof-test-plan-hcky5g), all still open at 29a90199. L1, spikes/netcode-proof/crates/judge/tests/engine.rs:1790-1812: no c_u6_11 test has a hole inside an earlier session while a later one exists, so a lookup that takes the slot's last session passes every test. L2, engine.rs:1322 and src/figures.rs:640-641: every test tick is Measured, so the stop record's phase is unpinned (fix: one case with After-phase room records after the end). L3, engine.rs:1820: "ticks 11 was in flight" should read "tick 11 was in flight". L4, marks/README.md:88: one line of 184 characters in a file wrapped near 120.
+```

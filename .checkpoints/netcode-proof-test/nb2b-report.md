@@ -47,11 +47,14 @@ history.md:8219-8228 (17:03:02 UTC). NB2's own report goes with this one, in its
     It did not start at 17:07, as first written. Nothing ran on the tree in between.
 
 ## Reviews: what covered each part (his rule of 2026-11-15, history.md:2125-2127)
-- **1a637408, the one-way change (591e2cb..1a637408):** the netcode-architect's read, his "one reviewer's read".
-  - Its file is on the branch: .checkpoints/netcode-judge/netcode-architect-oneway.md, whose line 1 names that range.
-    Builder 2's card: netcode-judge.md:230-232.
+- **1a637408, the one-way change (591e2cb..1a637408), marks.json's one field included:** the netcode-architect's read,
+  the one review the plan named (plan-oneway.md:56).
+  - Its file is on the branch: .checkpoints/netcode-judge/netcode-architect-oneway.md. Line 1 names that range; line 22
+    reads marks.json ("only -3's notes changed, prefix kept, quotes verbatim"); line 42 gives the verdict.
   - APPROVE WITH FINDINGS, five Lows. Lows 1 to 4 were taken in the fix pass; Low 5 is a follow-up (his item 4,
     history.md:8140).
+  - marks.json changed only in 1a637408: the fix pass's diff lists eval.rs, engine.rs and README.md. The test-engineer
+    also read PM-0001-3's notes text against the code (review-um4-nb2b-test.md:203-208): all three claims match.
 - **c56afd07, the fix pass (1a637408..c56afd07):**
   - the test-engineer's read in this lane (review-um4-nb2b-test.md, block 2; NB2B-8): APPROVE WITH FINDINGS, four
     Lows (T-6 to T-9);
