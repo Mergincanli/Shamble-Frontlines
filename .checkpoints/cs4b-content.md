@@ -1328,6 +1328,24 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   pass after the round, with round 2 for security-auditor on what changed.
 - **Round 1, engine-architect launched** (before 20:26:57 UTC, the clock read right after; a first version of this
   line said "about 20:31", typed ahead of the clock: slip 10) in security-auditor's slot.
+- **Round 1, rust-reviewer: PASS with one Medium and two Lows** (`cs4b-content/rust-reviewer-review-4b2.md`, DONE;
+  its scratch probe `rust-reviewer-4b2-ramp.rs`). Its four step-10 conditions hold in `collision.rs`; nothing panics
+  on content or network input; no `unsafe` added; ruling (1) fine (both entries its text word for word; its twins give
+  0 lines under the build's rules), (5) fine but for its Low, (8) `fma4` fine, (9) recorded (the growth by name:
+  about 85 KB the loader, 36 KB core's float text and parsing, about 30 KB the tree: parry3d about 20, our
+  `StaticWorld` 9.8), (10) fine. Its runs: fmt and clippy clean; 235 tests in debug, 163 in release for sim,
+  sim-wasm, content and devtools; every registry crate of sim-wasm's wasm32 tree has its overflow override. **RR-1
+  (Medium)** `collision.rs:169-176` (guard `:292`): `enter_ramp`'s `f32` products overflow on finite but huge
+  numbers, `inf - inf` is NaN, a NaN passes every comparison, so a ray over the slope hits the ramp's box (its probe:
+  direction (2, 3, 0) misses, (2e38, 3e38, 0) hits at 0.0); and `enter_box` gives `Some((inf, inf))` for a direction
+  of 1e-45 with an endless limit; `cast_ray`'s guard refuses only what is not finite. No caller in 4b-2. **Fix now**
+  (the cast is built in 4b-2): `cast_ray` refuses a ray whose components or limit pass a stated bound, and the ramp
+  test answers no hit on a NaN, with tests. **RR-2 (Low)** `schema.rs:247-251`, `:304`: the spawns list has
+  `maxItems` only, while the loader refuses an empty one (`map.rs:338-339`): fix, `minItems` 1 with its test. **RR-3
+  (Low)** `crates/sim-wasm/src/lib.rs:363`: the order test's doc counts four checks of six: fix the words. Not
+  checked by it: the WebAssembly half of "the same bits" (this environment's classifier refused its vitest run; it
+  cites the card and CI), cargo audit and deny (offline), aarch64, Firefox.
+- **Round 1, test-engineer launched** (before 20:29:21 UTC) in rust-reviewer's slot, told the findings so far.
 
 ## Slips of this chat's own rules, for the report
 - One git command did not start its own shell call: `git add .checkpoints/cs4b-content/review-brief-4b1.md` stood
