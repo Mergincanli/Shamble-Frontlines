@@ -1226,7 +1226,14 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   `LOCAL_MAP`; and since no state reads the world yet, its hashes would even have matched). Now refused before any
   call in each runner, "map: a local match is played on test-scene alone" (`replay.rs`'s `check`; `recording.ts`'s
   `checkReplayable`, with `LOCAL_MAP` tied to the Rust constant by the boundary test), with tests and plants C30 and
-  C31 (both caught); official count with it 6,659, raw 6,677.
+  C31 (both caught); official count with it 6,659, raw 6,677. Committed as c68b8d5 and dcb5e6b (the first one's
+  full local checks failed on the recordings test's plain-read scan, his LINKS-CHECK: the tie read `lib.rs` with
+  `readFileSync` inside `replay.test.mjs`, a recording reader; dcb5e6b moves the tie into `sim-wasm.test.mjs`; the
+  failed test, the recordings tests (5) and the boundary tests (39) then pass; the full checks run again).
+  **CI on 885d382: green** (gate and smoke; toolchain run 46035714024, 16:41:26 to 16:54:28 UTC, **13 min 2 s**,
+  against 9 min 50 s on fbbd84d: every phase was about a third slower, the Rust tests +1:20, the page builds +38 s,
+  the boundary tests +25 s, the browser tests +14 s, Firefox +20 s, so a slower runner, not one test; two minutes
+  under the job's 15-minute limit, told to him in the step's update).
   `sim_wasm::LOCAL_MAP` ("test-scene", the one map the content holds; the first recording's header names the same
   id); `CreateError::MapMissing` and `CreateError::World(WorldError)`, in the order seed, mode, content, map,
   world, padding (the order test covers the map; no map made in tests reaches the world's check, whose sentence is
