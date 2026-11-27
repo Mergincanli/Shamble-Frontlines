@@ -59,6 +59,50 @@ fn new_scratch_folder() -> PathBuf {
     );
 }
 
+/// Files by name, to their bytes.
+type Files = BTreeMap<String, Vec<u8>>;
+
+/// The one folder the generated folder may hold: the schema files' (`schema.rs`).
+const SCHEMA_FOLDER: &str = "schema";
+
+/// The generated folder as committed: its own plain files, and the plain `.json` files of its one folder `schema`.
+/// Every entry is judged by its own type, never through a link: a link (named `schema` or not), any other folder, a
+/// folder inside `schema`, and a file there that is no `.json` file are each refused, by name.
+fn committed_in(folder: &Path) -> Result<(Files, Files), String> {
+    let shown = folder.display();
+    let read =
+        |entry: &fs::DirEntry| fs::read(entry.path()).map_err(|error| format!("{shown}: {error}"));
+    let mut types = Files::new();
+    let mut schemas = Files::new();
+    for entry in fs::read_dir(folder).map_err(|error| format!("{shown} cannot be read: {error}"))? {
+        let entry = entry.map_err(|error| format!("{shown}: {error}"))?;
+        let name = entry.file_name().to_string_lossy().into_owned();
+        let kind = entry
+            .file_type()
+            .map_err(|error| format!("{name}: {error}"))?;
+        if kind.is_dir() && name == SCHEMA_FOLDER {
+            for inner in fs::read_dir(entry.path()).map_err(|error| format!("{name}: {error}"))? {
+                let inner = inner.map_err(|error| format!("{name}: {error}"))?;
+                let file = inner.file_name().to_string_lossy().into_owned();
+                let plain = inner.file_type().is_ok_and(|kind| kind.is_file());
+                if !plain || !file.ends_with(".json") {
+                    return Err(format!(
+                        "{file} in {shown}/{SCHEMA_FOLDER} is no plain .json file"
+                    ));
+                }
+                schemas.insert(file, read(&inner)?);
+            }
+        } else if kind.is_file() {
+            types.insert(name, read(&entry)?);
+        } else {
+            return Err(format!(
+                "{name} in {shown} is no plain file, nor the one folder {SCHEMA_FOLDER}"
+            ));
+        }
+    }
+    Ok((types, schemas))
+}
+
 /// The files directly in a folder, name to bytes. Anything else in it (a folder, a link) fails the test.
 fn files_in(folder: &Path, how: &str) -> BTreeMap<String, Vec<u8>> {
     let shown = folder.display();
@@ -78,10 +122,11 @@ fn files_in(folder: &Path, how: &str) -> BTreeMap<String, Vec<u8>> {
         .collect()
 }
 
-/// Write mode: deletes the generated folder's `.ts` entries (only those directly in it; a link is deleted, never
-/// followed) and writes the new files. It makes that one folder if it is missing, and nothing above it; it refuses
-/// a path with a link in it, so it never writes outside the repository.
-fn write_generated(root: &Path, files: &BTreeMap<String, Vec<u8>>) {
+/// Write mode: deletes the generated folder's `.ts` entries and its `schema` folder's `.json` entries (only those
+/// directly in each; a link is deleted, never followed) and writes the new files. It makes those two folders if
+/// they are missing, and nothing above them; it refuses a path with a link in it, so it never writes outside the
+/// repository.
+fn write_generated(root: &Path, files: &Files, schemas: &Files) {
     let root = fs::canonicalize(root).expect("the repository's root can be resolved");
     let folder = root.join(GENERATED_FOLDER);
     let parent = folder.parent().expect("the generated folder has a parent");
@@ -108,6 +153,89 @@ fn write_generated(root: &Path, files: &BTreeMap<String, Vec<u8>>) {
     for (name, bytes) in files {
         fs::write(folder.join(name), bytes).expect("a generated file can be written");
     }
+    let schema_folder = folder.join(SCHEMA_FOLDER);
+    if fs::symlink_metadata(&schema_folder).is_err() {
+        fs::create_dir(&schema_folder).expect("the schema folder can be made");
+    }
+    assert!(
+        unlinked(&schema_folder),
+        "write mode refuses {GENERATED_FOLDER}/{SCHEMA_FOLDER}: it is a link"
+    );
+    for entry in fs::read_dir(&schema_folder).expect("the schema folder can be read") {
+        let entry = entry.expect("its entries can be read");
+        let is_folder = entry.file_type().is_ok_and(|kind| kind.is_dir());
+        if !is_folder && entry.path().extension().is_some_and(|ext| ext == "json") {
+            fs::remove_file(entry.path()).expect("an old schema file can be deleted");
+        }
+    }
+    for (name, bytes) in schemas {
+        fs::write(schema_folder.join(name), bytes).expect("a schema file can be written");
+    }
+}
+
+/// The generated folder's one folder is a real folder named `schema`, of plain `.json` files: a link named `schema`,
+/// any other folder, a folder inside `schema`, a `.json` link and a file there that is no `.json` file are each
+/// refused, by name (the advisor agent's ruling of 2026-11-27, Q3 C6; S-should 18).
+#[cfg(unix)]
+#[test]
+fn the_generated_folder_admits_one_schema_folder_of_plain_json_files() {
+    use std::os::unix::fs::symlink;
+    let elsewhere = new_scratch_folder();
+    fs::write(elsewhere.join("outside.json"), "{}\n").expect("a file elsewhere");
+    let verdict = |make: &dyn Fn(&Path)| {
+        let folder = new_scratch_folder();
+        fs::write(folder.join("Movement.ts"), "type").expect("a type file");
+        make(&folder);
+        let verdict = committed_in(&folder);
+        fs::remove_dir_all(&folder).expect("the case's folder goes");
+        verdict
+    };
+    let schema = |folder: &Path| {
+        let inner = folder.join(SCHEMA_FOLDER);
+        fs::create_dir(&inner).expect("the schema folder");
+        inner
+    };
+    let good = verdict(&|folder| {
+        fs::write(schema(folder).join("map.schema.json"), "{}\n").expect("a schema file");
+    })
+    .expect("a schema folder of plain .json files is taken");
+    let names = |files: &Files| {
+        files
+            .keys()
+            .map(String::as_str)
+            .collect::<Vec<_>>()
+            .join(" ")
+    };
+    assert_eq!(
+        (names(&good.0), names(&good.1)),
+        ("Movement.ts".to_owned(), "map.schema.json".to_owned())
+    );
+    let refused = |make: &dyn Fn(&Path)| verdict(make).expect_err("refused");
+    assert!(
+        refused(&|folder| symlink(&elsewhere, folder.join(SCHEMA_FOLDER)).expect("a link"))
+            .starts_with("schema in ")
+    );
+    assert!(
+        refused(&|folder| fs::create_dir(folder.join("other")).expect("a folder"))
+            .starts_with("other in ")
+    );
+    assert!(
+        refused(&|folder| fs::create_dir(schema(folder).join("inner")).expect("a folder"))
+            .starts_with("inner in ")
+    );
+    assert!(
+        refused(&|folder| symlink(
+            elsewhere.join("outside.json"),
+            schema(folder).join("map.schema.json")
+        )
+        .expect("a link"))
+        .starts_with("map.schema.json in ")
+    );
+    assert!(
+        refused(&|folder| fs::write(schema(folder).join("notes.txt"), "x").expect("a file"))
+            .starts_with("notes.txt in ")
+    );
+    fs::remove_dir_all(&elsewhere).expect("the folder elsewhere goes");
 }
 
 #[test]
@@ -135,29 +263,45 @@ fn generated_types_are_current() {
         );
     }
 
+    // The schema files (`schema.rs`): the canonical writer's text of each kind's schema.
+    let schemas: Files = crate::schema::schema_files()
+        .into_iter()
+        .map(|(name, text)| (name.to_owned(), text.into_bytes()))
+        .collect();
+
     if std::env::var_os("SHAMBLE_WRITE_TYPES").is_some_and(|value| value == "1") {
-        write_generated(&root, &generated);
+        write_generated(&root, &generated, &schemas);
     }
     let how = "delete by hand what does not belong there, then write the folder again with \
                SHAMBLE_WRITE_TYPES=1 cargo test -p content";
-    let committed = files_in(&root.join(GENERATED_FOLDER), how);
-    for (name, bytes) in &generated {
-        let found = committed
-            .get(name)
-            .unwrap_or_else(|| panic!("{GENERATED_FOLDER}/{name} is missing; {how}"));
-        assert!(
-            found == bytes,
-            "{GENERATED_FOLDER}/{name} is not what the Rust types give; {how}\n\
-             --- the committed file\n{}\n--- from the Rust types\n{}",
-            String::from_utf8_lossy(found),
-            String::from_utf8_lossy(bytes)
-        );
-    }
-    for name in committed.keys() {
-        assert!(
-            generated.contains_key(name),
-            "{GENERATED_FOLDER}/{name} is not a generated file; {how}"
-        );
+    let (committed, committed_schemas) =
+        committed_in(&root.join(GENERATED_FOLDER)).unwrap_or_else(|why| panic!("{why}; {how}"));
+    for (folder, made, found_files) in [
+        (GENERATED_FOLDER.to_owned(), &generated, &committed),
+        (
+            format!("{GENERATED_FOLDER}/{SCHEMA_FOLDER}"),
+            &schemas,
+            &committed_schemas,
+        ),
+    ] {
+        for (name, bytes) in made {
+            let found = found_files
+                .get(name)
+                .unwrap_or_else(|| panic!("{folder}/{name} is missing; {how}"));
+            assert!(
+                found == bytes,
+                "{folder}/{name} is not what the Rust code gives; {how}\n\
+                 --- the committed file\n{}\n--- from the Rust code\n{}",
+                String::from_utf8_lossy(found),
+                String::from_utf8_lossy(bytes)
+            );
+        }
+        for name in found_files.keys() {
+            assert!(
+                made.contains_key(name),
+                "{folder}/{name} is not a generated file; {how}"
+            );
+        }
     }
 
     // Passed: the scratch folder goes. After a failure it stays, to be looked at.

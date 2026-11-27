@@ -30,6 +30,8 @@ pub mod map;
 pub mod movement;
 pub mod number;
 pub mod read;
+#[cfg(test)]
+mod schema;
 pub mod time;
 #[cfg(test)]
 mod ts_export;

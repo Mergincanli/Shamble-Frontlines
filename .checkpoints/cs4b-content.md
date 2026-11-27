@@ -1253,6 +1253,35 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   the look ahead before step 11: 6,635 + 520 + 350 = 7,505, under 8,450.** Condition 4 of the advisor agent's
   re-read: no collision query is called from the match's step in 4b-2 (4c's), so the report says so.
 
+- **Step 11, the schema writer: BUILT** (2026-11-27; his STEP11-ROOM had no answer when the advisor agent's ruling
+  came back at 16:58 UTC, so it was built as the ladder says, as the chat had told him it would be). Under the
+  ruling (`cs4b-content/advisor-step11.md`): `crates/content/src/schema.rs` (`#![cfg(test)]`): each kind's JSON
+  Schema 2020-12 built as a content tree from the reader's own constants and written by the canonical writer
+  (`movement.schema.json` from `FIELDS`; `map.schema.json` from map.rs's caps, `COORDINATE`, `FACING`, the aim's
+  reach on the bounds by `prefixItems`, the fixed words as `enum`); the id rule once in `$defs` (pattern,
+  `maxLength` 64, the reserved names by a `not` pattern); closed objects as `{"not": {}}`, fixed lengths by
+  `minItems` = `maxItems`, a shape's two forms as `oneOf`, no `default` (Q1); the descriptions in its test-only
+  table keyed by object and key (Q2: the movement fields' words from his hand-over table's "what" column, the map's
+  from map.rs), every property exactly one, printable ASCII; map.rs's fixed words `pub(crate)`. The export test
+  (`ts_export.rs`) admits one real folder `schema` of plain `.json` files (`committed_in`), writes and compares the
+  schema files beside the types (`SHAMBLE_WRITE_TYPES=1 cargo test -p content`), and refuses a link named `schema`,
+  any other folder, a folder inside `schema`, a `.json` link and a file that is no `.json` file, each by name (C6).
+  The files: `packages/types/src/generated/content/schema/map.schema.json` (299 lines) and `movement.schema.json`
+  (143). The Vitest test `packages/types/src/content-schema.test.mjs` (its own limits reader): each file is
+  `JSON.stringify` of its sorted value; at every end of every number range of both schemas a closed end is taken and
+  the next double outside flagged, an open end flagged and the next double inside taken (C1, C3: the facing's top is
+  the one `exclusiveMaximum`); the bounds' reach axis by axis (C2); the id rule's plants (C4); every object closed.
+  The Rust tests hold the schemas to the reader (the ranges in both forms, the caps, the reach from
+  `AIM_REACH_CM` and `AIM_HEIGHT_MAX_CM`, the words, the id rule's length) and to the loader at each end, the numbers
+  read back from the schema (C1). **Evidence:** content 43 tests, types 12; plants C32 to C36 caught (a low end
+  always closed, any folder taken for `schema`, a property without its description, a schema file edited by hand,
+  a field renamed without the files written again), C37 held; **the players' file unchanged by step 11** (sha256
+  3660132b...0644, 257,421 bytes) and none of three descriptions, the id pattern or the dialect address in its bytes
+  (0 hits each: Q2's condition 4). **Official count at step 11's end 7,978, raw 7,996: under the second rung
+  (8,000), and the look ahead before step 12 (7,978 + about 1,300 with the map's reading + 350) is about 9,630, past
+  8,450: the work stops before step 12 and asks him** (the card's rule). Its full local checks and the gate: running
+  at the time of writing.
+
 ## Slips of this chat's own rules, for the report
 - One git command did not start its own shell call: `git add .checkpoints/cs4b-content/review-brief-4b1.md` stood
   on the line after a `cat` that wrote that file, in one call (2026-11-26, about 16:46 Amsterdam). It staged that
@@ -1378,9 +1407,12 @@ again here. SEAT-OUT from him: stop at a whole point and report the last commit'
    `.json` link and a file that is no `.json`; C7 each schema a content `Node` tree (no boolean, no null): lengths
    by `minItems` = `maxItems`, the shape forms as `oneOf`, each branch closed with all its keys; not step 11's: the
    bundle's `files` bound and PM-0005-5's scan (4b-1's row 2), no bundle schema. Q4 APPROVE, the schema files count
-   in full. About 800 to 900 counted lines. **His STEP11-ROOM is open in the chat:** without his answer it is built
-   now, as the ladder says (the first rung did not fire); before step 12 the look ahead is told to him again with
-   this ruling in it (about 9,130 with step 11 built, about 8,300 without), and the stop to ask stands. **The look
+   in full. **Built** (the card's entry "Step 11, the schema writer"; his STEP11-ROOM had no answer, so the ladder
+   decided). **The count at its end, 7,978, is under the second rung; the look ahead before step 12 is about 9,630,
+   past 8,450: STOP, his decision before step 12 is built** (STEP12-GO in the chat: the scene to the start of 4c,
+   or a higher stop line). Until he answers: nothing of step 12; the close's parts that do not depend on his answer
+   may be prepared in the notes (the report's draft, the pull request's text), never the reviewers' round, which
+   runs on the final diff. **The look
    ahead before step 12** (the count then, plus about 1,060 and the map's reading moved there, plus a fix pass of
    about 350; past 8,450: stop and ask him; a rung reached moves its step: 12 to the start of 4c).
 5. **The close:** `plants-4b2.py --anchors` (reads only: every plant's text still stands once; 51 edits, 0 wrong

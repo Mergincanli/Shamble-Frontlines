@@ -1,0 +1,299 @@
+{
+  "$defs": {
+    "id": {
+      "maxLength": 64,
+      "not": {
+        "pattern": "^(con|prn|aux|nul|com[0-9]|lpt[0-9])$"
+      },
+      "pattern": "^[a-z0-9][a-z0-9_-]*$",
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": {
+    "not": {}
+  },
+  "description": "One map (content/maps/<id>.json): its bounds, where soldiers start, its solid shapes and its drawn ground.",
+  "properties": {
+    "bounds": {
+      "additionalProperties": {
+        "not": {}
+      },
+      "description": "The box every spawn, shape and region lies in.",
+      "properties": {
+        "max": {
+          "description": "The highest corner, x, y and z, in metres: on whole centimetres, above the lowest on every axis, inside the aim's reach.",
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "maximum": 327.67,
+              "minimum": -10000,
+              "type": "number"
+            },
+            {
+              "maximum": 655.35,
+              "minimum": -10000,
+              "type": "number"
+            },
+            {
+              "maximum": 327.67,
+              "minimum": -10000,
+              "type": "number"
+            }
+          ],
+          "type": "array"
+        },
+        "min": {
+          "description": "The lowest corner, x, y and z, in metres: on whole centimetres, inside the aim's reach on each axis.",
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "maximum": 10000,
+              "minimum": -327.67,
+              "type": "number"
+            },
+            {
+              "maximum": 10000,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "maximum": 10000,
+              "minimum": -327.67,
+              "type": "number"
+            }
+          ],
+          "type": "array"
+        }
+      },
+      "required": [
+        "max",
+        "min"
+      ],
+      "type": "object"
+    },
+    "format": {
+      "const": "shamble-map",
+      "description": "The file's kind: shamble-map."
+    },
+    "id": {
+      "$ref": "#/$defs/id",
+      "description": "The map's id, which is its file's name."
+    },
+    "regions": {
+      "description": "Patches of ground that are only drawn.",
+      "items": {
+        "additionalProperties": {
+          "not": {}
+        },
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/id",
+            "description": "The region's id, once in the map."
+          },
+          "kind": {
+            "description": "The ground drawn there.",
+            "enum": [
+              "street",
+              "grass"
+            ]
+          },
+          "max": {
+            "description": "The highest corner, x and z, in metres: on whole millimetres, above the lowest, inside the bounds.",
+            "items": {
+              "maximum": 10000,
+              "minimum": -10000,
+              "type": "number"
+            },
+            "maxItems": 2,
+            "minItems": 2,
+            "type": "array"
+          },
+          "min": {
+            "description": "The lowest corner, x and z, in metres: on whole millimetres, inside the bounds.",
+            "items": {
+              "maximum": 10000,
+              "minimum": -10000,
+              "type": "number"
+            },
+            "maxItems": 2,
+            "minItems": 2,
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "max",
+          "min"
+        ],
+        "type": "object"
+      },
+      "maxItems": 64,
+      "type": "array"
+    },
+    "shapes": {
+      "description": "The solid pieces of the world.",
+      "items": {
+        "oneOf": [
+          {
+            "additionalProperties": {
+              "not": {}
+            },
+            "properties": {
+              "id": {
+                "$ref": "#/$defs/id",
+                "description": "The shape's id, once in the map."
+              },
+              "max": {
+                "description": "The box's highest corner, x, y and z, in metres: on whole millimetres, at least 1 cm above the lowest on every axis, inside the bounds.",
+                "items": {
+                  "maximum": 10000,
+                  "minimum": -10000,
+                  "type": "number"
+                },
+                "maxItems": 3,
+                "minItems": 3,
+                "type": "array"
+              },
+              "min": {
+                "description": "The box's lowest corner, x, y and z, in metres: on whole millimetres, inside the bounds.",
+                "items": {
+                  "maximum": 10000,
+                  "minimum": -10000,
+                  "type": "number"
+                },
+                "maxItems": 3,
+                "minItems": 3,
+                "type": "array"
+              },
+              "type": {
+                "const": "box",
+                "description": "What fills the box: all of it (box), or a wedge (ramp)."
+              }
+            },
+            "required": [
+              "id",
+              "max",
+              "min",
+              "type"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": {
+              "not": {}
+            },
+            "properties": {
+              "id": {
+                "$ref": "#/$defs/id",
+                "description": "The shape's id, once in the map."
+              },
+              "max": {
+                "description": "The box's highest corner, x, y and z, in metres: on whole millimetres, at least 1 cm above the lowest on every axis, inside the bounds.",
+                "items": {
+                  "maximum": 10000,
+                  "minimum": -10000,
+                  "type": "number"
+                },
+                "maxItems": 3,
+                "minItems": 3,
+                "type": "array"
+              },
+              "min": {
+                "description": "The box's lowest corner, x, y and z, in metres: on whole millimetres, inside the bounds.",
+                "items": {
+                  "maximum": 10000,
+                  "minimum": -10000,
+                  "type": "number"
+                },
+                "maxItems": 3,
+                "minItems": 3,
+                "type": "array"
+              },
+              "rises_toward": {
+                "description": "The side on which a ramp is as high as its box; it meets the floor of the box on the other.",
+                "enum": [
+                  "+x",
+                  "-x",
+                  "+z",
+                  "-z"
+                ]
+              },
+              "type": {
+                "const": "ramp",
+                "description": "What fills the box: all of it (box), or a wedge (ramp)."
+              }
+            },
+            "required": [
+              "id",
+              "max",
+              "min",
+              "rises_toward",
+              "type"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "maxItems": 512,
+      "type": "array"
+    },
+    "spawns": {
+      "description": "Where soldiers start: at least one.",
+      "items": {
+        "additionalProperties": {
+          "not": {}
+        },
+        "properties": {
+          "at": {
+            "description": "The point on the ground between the feet, x, y and z, in metres: on whole millimetres, inside the bounds.",
+            "items": {
+              "maximum": 10000,
+              "minimum": -10000,
+              "type": "number"
+            },
+            "maxItems": 3,
+            "minItems": 3,
+            "type": "array"
+          },
+          "facing_deg": {
+            "description": "The way the soldier faces, in degrees: 0 faces +z, and the degrees grow toward +x.",
+            "exclusiveMaximum": 360,
+            "minimum": 0,
+            "type": "number"
+          },
+          "id": {
+            "$ref": "#/$defs/id",
+            "description": "The spawn's id, once in the map."
+          }
+        },
+        "required": [
+          "at",
+          "facing_deg",
+          "id"
+        ],
+        "type": "object"
+      },
+      "maxItems": 16,
+      "type": "array"
+    },
+    "version": {
+      "const": 1,
+      "description": "The version of the map format the file is written in."
+    }
+  },
+  "required": [
+    "bounds",
+    "format",
+    "id",
+    "regions",
+    "shapes",
+    "spawns",
+    "version"
+  ],
+  "title": "shamble-map",
+  "type": "object"
+}

@@ -61,6 +61,10 @@ def chain(*parts):
     return ("CHAIN",) + parts
 FOLD = [(LIB_RS, "            start_tick: 0,\n", "            start_tick: u32::from(bundle.first().copied().unwrap_or(0)),\n")]
 ANY_MAP = [(LIB_RS, "    let map = set.map(LOCAL_MAP).ok_or(CreateError::MapMissing)?;", "    let map = set.maps().first().ok_or(CreateError::MapMissing)?;")]
+# Step 11: the schema writer and the export test's schema folder.
+SCHEMA_RS, TS_EXPORT_RS, MOVEMENT_RS = "crates/content/src/schema.rs", "crates/content/src/ts_export.rs", "crates/content/src/movement.rs"
+MOVEMENT_SCHEMA = "packages/types/src/generated/content/schema/movement.schema.json"
+def CONTENT_LIB(name): return ("cargo", "test", "-p", "content", "--locked", "--lib", name)
 
 USE = "use wasm_bindgen::prelude::*;\n"
 MODS = "pub mod rng;\n"
@@ -289,6 +293,21 @@ PLANTS = [
      ["what_this_build_cannot_replay_is_refused_by_name_before_any_call", "map: a local match is played on test-scene alone"]),
     ("C31", "defect", "a replay of another map's recording runs on the local map: in TypeScript", [(RECORDING_TS, "  if (recording.mapId !== LOCAL_MAP) throw cannot(", "  if (recording.mapId !== LOCAL_MAP && recording.mapId === \"\") throw cannot(")], SW_UNIT,
      ["refuses what the input call cannot take", "map: a local match is played on test-scene alone"]),
+    # Step 11 (Builder V6): the schema writer (the advisor agent's ruling of 2026-11-27, advisor-step11.md).
+    ("C32", "defect", "a schema writes every low end as closed", [(SCHEMA_RS, '    let low = if range.min_inclusive {\n        "minimum"\n    } else {\n        "exclusiveMinimum"\n    };', '    let low = "minimum";')], CONTENT_LIB("schema"),
+     ["the_movement_ranges_are_the_reader_s_in_both_forms", "at_each_end_the_loader_does_what_the_schema_says"]),
+    ("C33", "defect", "the export test takes any folder in the generated folder for the schema folder", [(TS_EXPORT_RS, "        if kind.is_dir() && name == SCHEMA_FOLDER {", "        if kind.is_dir() {")], CONTENT_LIB("ts_export"),
+     ["the_generated_folder_admits_one_schema_folder_of_plain_json_files"]),
+    ("C34", "defect", "a property without its description", [(SCHEMA_RS, '    ("movement", "push_radius_m", "Body size for pushing: its radius, in metres."),\n', "")], CONTENT_LIB("schema"),
+     ["movement.push_radius_m has no description"]),
+    ("C35", "defect", "a schema file edited by hand", [(MOVEMENT_SCHEMA, '"maximum": 20,', '"maximum": 21,')], CONTENT_LIB("ts_export"),
+     ["generated/content/schema/movement.schema.json is not what the Rust code gives"]),
+    ("C36", "defect", "a field renamed without the files written again", [
+        (MOVEMENT_RS, '    Field { name: "walk_speed_m_per_s", unit: "m/s", range: Range::above(0.0, 20.0) },', '    Field { name: "walk_speed", unit: "m/s", range: Range::above(0.0, 20.0) },'),
+        (SCHEMA_RS, '    ("movement", "walk_speed_m_per_s", "Walking speed, in metres per second."),', '    ("movement", "walk_speed", "Walking speed, in metres per second."),'),
+     ], CONTENT_LIB("ts_export"),
+     ["generated/content/schema/movement.schema.json is not what the Rust code gives"]),
+    ("C37", "control", "the clean schemas: the content crate's export tests", [], CONTENT_LIB("ts_export"), []),
 ]
 
 def note(name, kind, ok, what, detail):

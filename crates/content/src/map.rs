@@ -63,10 +63,10 @@ pub const COORDINATE: Range = Range::closed(-10_000.0, 10_000.0);
 #[rustfmt::skip]
 pub const FACING: Field = Field { name: "facing_deg", unit: "deg", range: Range { min: 0.0, max: 360.0, min_inclusive: true, max_inclusive: false } };
 
-/// The fixed words of a map, in the order of the types below.
-const FORMS: [&str; 2] = ["box", "ramp"];
-const TOWARDS: [&str; 4] = ["+x", "-x", "+z", "-z"];
-const GROUNDS: [&str; 2] = ["street", "grass"];
+/// The fixed words of a map, in the order of the types below (the schema writer lists the same words).
+pub(crate) const FORMS: [&str; 2] = ["box", "ramp"];
+pub(crate) const TOWARDS: [&str; 4] = ["+x", "-x", "+z", "-z"];
+pub(crate) const GROUNDS: [&str; 2] = ["street", "grass"];
 
 /// One map, read and checked.
 #[derive(Debug, Clone, PartialEq)]
