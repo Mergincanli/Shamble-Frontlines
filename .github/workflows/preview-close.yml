@@ -1,0 +1,18 @@
+# Step 2.6 (lane 2): when a pull request closes, the end of this run starts the preview workflow's reconcile on main,
+# which looks every pull request up itself. No secret, no checkout; nothing of the pull request is read.
+name: preview-close
+
+on:
+  pull_request:
+    types: [closed]
+
+permissions: {}
+
+jobs:
+  closed:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    cache-mode: none
+    steps:
+      - name: Mark the close (the reconcile runs on main after this run)
+        run: echo "A pull request closed."

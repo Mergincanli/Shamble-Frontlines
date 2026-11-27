@@ -1,0 +1,10 @@
+{
+  "name": "shamble-frontlines-hosting",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The preview workflow's upload tool (step 2.6, lane 2): Wrangler alone, installed with npm ci --ignore-scripts into a fresh folder. Not part of the game's npm workspace.",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "wrangler": "4.164.0"
+  }
+}

@@ -251,6 +251,17 @@ check in Brave and Firefox: errors 0, WebGPU started in both (`docs/reports/2026
 PR #61, f5030a3, 2026-11-19 15:10:54 UTC, by merge commit, on his go of 14:28:25 UTC for head 4cf30ce; CI green on
 main (gate run 934 with smoke, toolchain run 232).
 
+**CI builds the WebAssembly and runs the tests that need it [2026-11-19 to 11-24, MERGED]** — ci-wasm
+(risk tier 2; planned by the first builder chat, carried by a thread of his project, built by the chat he calls
+Builder V3): before the network cut the `toolchain` job fetches the wasm-bindgen tool's archive by his TOOL-SOURCE
+values, runs GitHub's own check on it and installs its one program root-owned; inside the cut it builds the page
+twice, then runs the boundary tests, five type checks and the 12 browser tests in the runner image's Chrome (CI does
+not pin the test counts). Two CI writes on his yes (the first stopped at its install check on `/opt`), three planted
+faults each red at its own step; with it his browser check of #61 and his words of 2026-11-19 and 2026-11-23. Two
+review rounds, no Critical or High; report `docs/reports/2026-11-19-ci-wasm.md`. Merged: PR #64, 1ec6f6c, 2026-11-24
+10:15:31 UTC, by merge commit, by his main Advisor on his tap after his go for head 8aadfb0; CI green on main (gate
+run 45373057216 with smoke, toolchain run 45373056953). #63 and #62 closed with it.
+
 - **Kit: KEPT-LOGS (2026-11-15):** kept-logs-rule (PR #53, 53272a1, on his KL-MERGE (a)): `.claude/CHECKPOINTS.md` §11 and `.claude/scripts/kept-logs.mjs`: a day session may pack and remove a closed run set's raw logs and the one old build cache, nothing else; SA-KL-1 to -4 and KLT-1 to -8 left open by his word.
 - **UI theme step 1 (2026-10-02):** menu = dossier, pause = clipboard, Field manual; `wr-*` CSS in both pages; awaiting Brave. (Audit phase 2, 2026-09-26, is the "Bug & optimization run" above.)
 - **Performance / hygiene:** pooled FX, GPU resources disposed on map rebuild, player-following shadow frustum; kill vignette captured on the GPU (`vigShot` corner render + `drawImage`); hot paths use `hyp2`/`hyp3` and change-only DOM writes (`_sd`/`_so`/`_st`); ~4.9 MB/s residual GC churn (AUDIT_BUGS_PERF CS11; measured — `AUDIT_BUGS_PERF.md`); an early kill-vignette attempt (readbacks queued via `_vigQueue`/`vigStep()`) did not remove the hitch and was superseded by the GPU capture.
@@ -359,6 +370,17 @@ _Pointer (2026-11-26, ci-preview-handover's docs pass): merged as PR #70, 2483e9
 (`merged_at`), by merge commit, with the head 420b16b; gate, smoke and toolchain green on main (runs 45818982040 and
 45818982052)._
 
+**Step 2.6, the preview links per pull request [2026-11-25 to 11-27, built, at its token sitting, not merged]** — step-2-6-previews
+(foundation step 2.6), by lane 2, Builder V2 and from 2026-11-26 the chat he calls Builder V5 (only this repository, by
+his GUARD-OFF (a)), on his go of 2026-11-25 for plan revision 2 (risk tier 2: CI workflows, hosting, a deploy token):
+every pull request from this repository is to get a public, unlisted preview link of its tested build on Cloudflare
+Pages, in a previews-only account, with one comment holding the link and no click per preview. Built:
+`.github/workflows/preview.yml` and `preview-close.yml` (his texts, by sha256), `hosting/` (one script, 175 tests), the
+runbook `docs/runbooks/previews.md`; gate, smoke, toolchain and `preview / tests` green on code head 84a3ea44. Two review
+rounds closed. Main taken in four times (the last b9aad01), the CI Builder's hand-over step (#74) on main and run here;
+MAIN-WALL on and both check merges done; the token sitting comes before the merge (his ORDER-WALL (a)). Draft PR #72.
+Report `docs/reports/2026-11-26-step-2-6-previews.md`.
+
 **The small CI pull request after change-set 3a [2026-11-24 to 11-25, MERGED]** — ci-after-3a, by the
 chat he calls CI Builder (risk tier 2; CI and the test configuration only): the `toolchain` job runs every crate's
 release tests (E1), checks the committed vector files against their two generators (3A-GEN-CHECK), builds `devtools`
@@ -386,6 +408,8 @@ PR #67. His answers of 2026-11-25 (14:55 Amsterdam): PASS-WORDS (a), with PM-000
 "recorded, the question is not answered"; step 4 achieved (recorded, the question is not answered); WORKERS-NEXT
 (a), keep Pages. Main's #68 taken in by one
 merge commit. Merged: PR #67, c1da1bd, 2026-11-25 17:13:00 UTC by `merged_at`.
+_Pointer (2026-11-26): merged as PR #67, c1da1bd, on 2026-11-25, a normal merge on his go, with the expected head
+35adfbe, checks green, after the advisor agent's APPROVE._
 
 **Change-set 3b of the build plan, The loop closes [2026-11-24 to 11-25, MERGED]** — cs3b-loop-closes (the second
 half of change-set 3, his SIZE-3 (b)), by lane 1, built by the chat he calls Builder V3: the page's keys go to the
@@ -433,14 +457,3 @@ browser check: errors 0 in Brave and Firefox (`docs/reports/2026-11-24-cs3a-brow
 commit, by his main Advisor on his tap of 22:40:00 UTC (his go: `docs/DECISIONS.md`, 22:44:50 UTC), with the expected
 head 1624f084 (the last commit, after the advisor agent's read); gate, smoke and toolchain green on main (read 22:45
 UTC).
-
-**CI builds the WebAssembly and runs the tests that need it [2026-11-19 to 11-24, MERGED]** — ci-wasm
-(risk tier 2; planned by the first builder chat, carried by a thread of his project, built by the chat he calls
-Builder V3): before the network cut the `toolchain` job fetches the wasm-bindgen tool's archive by his TOOL-SOURCE
-values, runs GitHub's own check on it and installs its one program root-owned; inside the cut it builds the page
-twice, then runs the boundary tests, five type checks and the 12 browser tests in the runner image's Chrome (CI does
-not pin the test counts). Two CI writes on his yes (the first stopped at its install check on `/opt`), three planted
-faults each red at its own step; with it his browser check of #61 and his words of 2026-11-19 and 2026-11-23. Two
-review rounds, no Critical or High; report `docs/reports/2026-11-19-ci-wasm.md`. Merged: PR #64, 1ec6f6c, 2026-11-24
-10:15:31 UTC, by merge commit, by his main Advisor on his tap after his go for head 8aadfb0; CI green on main (gate
-run 45373057216 with smoke, toolchain run 45373056953). #63 and #62 closed with it.
