@@ -120,3 +120,73 @@ advisor.md (read whole earlier in this run). The form: advisor-main-66.md Q1 (d)
   Only the times differ (Chromium 3.8 m on main, then 3.5 m and 3.3 m).
 - **Durations.** Build-and-test took 8 min 37 s (push) and 7 min 5 s (pull request), against main's 9 min 20 s, of the
   job's 15-minute limit.
+
+## Block 6. Re-runs in the main folder (00:5x-01:0x UTC, 2026-11-27)
+- **The precondition.** `git diff --quiet 6b4a0d3 HEAD -- . ':(exclude)spikes/' ':(exclude).checkpoints/'
+  ':(exclude)docs/design/'` exits 0 on HEAD 4e3d1fb. `git status --short` shows only three notes files (this file,
+  advisor-u7-head.md, advisor-u8-f1-sec.md).
+- `node tools/gate.mjs --no-smoke`: GATE PASS. Base merge-base = b9aad01; checks 1-4 and 5b-5d PASS; symbols +0 -0;
+  5a skipped.
+- `node .claude/scripts/repo-map-check.mjs`: "repo map OK: 245 entries cover 110 required paths".
+- `node --test .claude/scripts/checkpoint.test.mjs`: tests 33, pass 33, fail 0. The 33rd is the DEP-HOLD case this
+  take-in used: "a manifest or lockfile whose content in the push equals its content on main is not held".
+- `node --test .claude/hooks/routine-guard.test.mjs` (main's file): tests 1551, pass 1551, fail 0 (32.6 s).
+- Each equals step5-outputs.txt.
+
+## Verdict: APPROVE. The merge is as recorded, and the lane may go on from this head.
+- **The conflicts.** STATUS.md and STATUS_ARCHIVE.md were resolved exactly as C68B-4 says. STATUS.md is main's file
+  with H0's #40 row. STATUS_ARCHIVE.md is main's file with H0's own five hunks, the netcode bullet after main's two
+  new bullets.
+- **Nothing else changed.** Against main, the tree differs only in spikes/, .checkpoints/ and the usual six docs names.
+  Against H0, it differs only by main's 87 paths with main's own counts. The anchor holds.
+- **Every bar is met:**
+  - C68B-2's values;
+  - C68B-3: DEP-HOLD's diff exit 0 and the save not held;
+  - C68B-4: 120 and 2,733 lines, "1 1", 18 5, the content lines and the order;
+  - 5a-5e;
+  - no save in the window.
+
+  My own re-runs and reads agree with the record.
+- **CI.** All six jobs on the pushed head are green. Toolchain's summary lines equal the baseline's. #74's two steps met
+  their bar on the pull-request run.
+- **Severity.** Nothing new: nothing Critical, High, Medium or Low. Risk tier 1 for PR #40: after the take-in, its diff
+  against main holds no kit or CI file.
+
+## Findings (CLAUDE.md's scale)
+| Id | Severity | What | Where it stands |
+|---|---|---|---|
+| ADV-M68B-4 | Low (on record) | #75's merge message and main's STATUS row record no go of his. | Owed to him as #75-GO in msg-2026-11-27.md (:79-82), with TAKEIN-CODE (:71-77) |
+| ADV-M68B-5 | Low (on record) | Toolchain time: 7-9 of the job's 15 minutes. | Read before each step; nothing now |
+| ADV-M68B-6 | Low (on record) | Main's stale STATUS rows (MAIN-WALL "none yet", #75 "(draft)") came in as main's text. | Main's next docs pass |
+| ADV-M68-5 | On record (main's) | R4-1 Critical, open on main by his R4-END (1); ADV-R4-2. | Main's next guard change-set |
+| ADV-M60-7, ADV-M54-8 | Low (open) | As before. | As ruled |
+
+## What I did not check
+- The merge and Edit commands' own outputs, which were in the chat only. I checked the committed results instead.
+- The preview-site artifact's contents (not to be read). Its listing and digest match the record.
+- The later commits under spikes/ (U7's 6968215 and its saves): that is A's read.
+
+## What is owed to him
+- His one line naming the six pull requests: C68B-5's record line is in msg-2026-11-27.md:55-57.
+- His two questions: TAKEIN-CODE and #75-GO, msg-2026-11-27.md:71-87.
+
+Both are drafted in the day's message. Nothing is owed beyond them.
+
+## Decisions needed
+- **TAKEIN-CODE** (as advisor-main-68b.md put it): may a reviewed code pull request merged on main come into this
+  branch at step 1 by re-derived numbers, without a new advisor check?
+  - Options: (a) no, a short advisor check of the new merges, then step 1 at once; (b) yes, within the named limits.
+  - My recommendation: (a). Nothing waits on it.
+- **#75-GO:** did #75 (cs4b-1 Content, merged on main at 18:53 UTC) merge with his go?
+  - Why it matters: neither its merge message nor main's STATUS row records one, and MAIN-68 took it in with main's
+    tip.
+  - Options: (a) yes, nothing more; (b) no, the take-in's record gets one line, and what happens on main is his.
+  - No recommendation: it is a fact only he holds.
+
+## For Mustafa
+1. Answer TAKEIN-CODE, (a) or (b), whenever it suits you.
+2. Answer #75-GO, (a) or (b).
+
+Nothing to check in a browser.
+
+Status: COMPLETE 2026-11-27T01:02Z

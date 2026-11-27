@@ -1,5 +1,5 @@
 # The 00:50 UTC window, 2026-11-27: the messages (written 23:1x UTC on 11-26, sent only inside the window)
-**Status: B, A and C SENT 00:55 UTC (all three resumed); D NOT SENT.** Each message below gets a "Sent HH:MM UTC" line when it goes; the window has run only for the
+**Status: B, A and C SENT 00:55 UTC (all three resumed; COMPLETE: B 00:59, A 01:01, C 01:02); D SENT about 01:04 UTC (resumed).** Each message below gets a "Sent HH:MM UTC" line when it goes; the window has run only for the
 messages that carry one. (This file existing does not mean the window ran.) An agent's file is done only when its last line reads "Status:
 COMPLETE <UTC>" (the advisor tool, 00:5x); without it the file is half-written and that agent is resumed from it.
 Step 0 at the window, each its own call: the reset seen (resetsAt 1795740600, 00:50 UTC); `git ls-remote origin
@@ -74,21 +74,27 @@ and anything owed to him. Since then the lane took U7 (6968215); that is A's rea
 Write. git and gh always start their own command, with no other program in front of them.
 
 ## D: a7fe1b9f436f36bb1 (resumed; U8-F1's builder): the fix pass, only after B's completion notice and its last line
-NOT SENT. Staged 00:5x (the advisor tool): at sending, re-run `git diff --stat 77ffc95 HEAD -- spikes/netcode-proof/ops/`
-(must print nothing, else stop: the advisor first), fill <time>, <HH:MM> and <HEAD>, and paste B's fix-pass items word
-for word at <ITEMS>; the rest goes as written. New work only before 01:20; later, the 05:51 wake-up sends it.
-U8-F1's fix pass, on the advisor's ruling of <time> UTC (advisor-u8-f1-sec.md; its items below, word for word). Base:
-stay on 77ffc95101e186f75c57a1e8770b3ab7a9442820, no merge. Checked <HH:MM>: `git diff --stat 77ffc95 HEAD --
-spikes/netcode-proof/ops/` is empty (your six files unchanged on the lane through <HEAD>); ffcheck shows six of your
+Sent about 01:04 UTC (resumed), after the advisor tool's second read (01:02), with two changes against the text below:
+one sentence after the two main-folder paths making B's file govern over the paste ("Section 3 of that ruling (its
+lines 72-175) is your brief: read it there before item 1; the file wins wherever the paste below differs"), the wrapped
+paths joined; and two clauses (the +93 counts over all six of U8-F1's files; an end check that turns out to need cargo
+or the lane lock is reported, not run). Filled 01:0x from B's completed file (its last line "Status: COMPLETE 2026-11-27
+00:59 UTC"; its completion notice 01:00); `git diff --stat 77ffc95 HEAD -- spikes/netcode-proof/ops/` printed nothing at
+01:00 (HEAD 4e3d1fb). Three staged phrases changed to agree with B's brief: "No cargo" (it says no cargo), its own
+notes and hand-back headings, and the main session takes the snapshot. The message:
+U8-F1's fix pass, on the advisor's ruling of 00:59 UTC (advisor-u8-f1-sec.md; its items below, word for word). Base:
+stay on 77ffc95101e186f75c57a1e8770b3ab7a9442820, no merge. Checked 01:00: `git diff --stat 77ffc95 HEAD --
+spikes/netcode-proof/ops/` is empty (your six files unchanged on the lane through 4e3d1fb); ffcheck shows six of your
 own notes files ADDED on the lane (the main session's copies), so a fast-forward would be refused, and none is needed.
 Do not delete or move any file to make a git step pass. Your worktree holds neither the security round nor the ruling:
 read them, if you need them, only at their main-folder paths, read only:
 /home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/security-u8-f1.md and
-/home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/advisor-u8-f1-sec.md. Your brief, word for word: <ITEMS>.
-The stop: 6,282 (U8 is there now); past it you stop and report what grew, why and the cheaper option. First calls in
-your own worktree: show-toplevel, HEAD (77ffc95), status. Every cargo call `--locked`; no shell loops; one command per
-call; waits in the background. Notes: append to u8-f1-build.md under a new "Fix pass" heading, a line after each
-finding, and end that section with the line `Status: COMPLETE <UTC time>`. Hand-back: the snapshot by
-worktree_patch.py, added, removed and net per file, the end checks' counts. Write files with the Write and Edit tools only (no sed, no shell redirect, no python
+/home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/advisor-u8-f1-sec.md. The stop: 6,282 (U8 is there now);
+past it you stop and report what grew, why and the cheaper option. First calls in your own worktree: show-toplevel,
+HEAD (77ffc95), status. No cargo (as the brief says); no shell loops; one command per call; waits in the background.
+The reds and plants in files outside the four you edit are temporary: each is restored by Edit with sha256 equal, as
+its item says. Notes and hand-back as the brief's "Notes" and "Hand-back" say, a line after each finding; end the
+hand-back with the line `Status: COMPLETE <UTC time>`. Your brief, word for word, follows: advisor-u8-f1-sec.md:72-175
+(section 3), pasted whole without its quote marks; it carries these two sentences word for word: Write files with the Write and Edit tools only (no sed, no shell redirect, no python
 writes; never `cargo fmt` writing files: apply rustfmt's diff by Edit); an agent with no Edit tool rewrites its notes
 file whole with Write. git and gh always start their own command, with no other program in front of them.
