@@ -179,6 +179,38 @@ of them spike files in the judge's code and marks/ (+379/-6). Risk tier 1 (spike
     free, so step 4 runs cold.
   - Usage 16:31: utilization 0.21, resetsAt 1795812600 (20:50 UTC). Step 2's naming after the four CI runs on
     787eb984 read success; 1g-1j and NB2B-2's re-read on his reply.
+- Step 2 named 16:4x UTC (T re-read just before: 29a90199; board tags needs-musti, due 17:30 UTC). His reply "yes"
+  17:03:02 UTC (history.md, transcript line 116029, msgcheck3 "history.md holds it exactly: true"; event ee06aedb).
+- On his reply, 17:03-17:06 UTC: NB2B-2's usage read: 0.23 at 16:39:14 (the newest), resetsAt 20:50, so GO (0.77 left
+  against about 0.2); the go line on the card. 1g: TaskStop b3rvvohgw; `pgrep -c -f "checkpoint.mjs watch"` printed
+  0. 1h: the saver's own last save on termination, d24340b7 "autosave (terminated)", carried the card's resume line and
+  history.md's entry, so the explicit save printed "nothing to save"; H0 = d24340b74ce6f5b211c670cf0f705b155b78f93c =
+  `git ls-remote` = `git rev-parse HEAD`. 1i: light-base.log at H0, exit 0: refs 2166 (N0), marks 81, self 85 of 85,
+  redact 11 of 11 and 464 items, 0 findings; free 14,487 MiB. NB2B-3: `git merge-tree --write-tree --name-only H0 T`
+  one line, X = dd5973f4841187a124aa2d6b09d09c3ab207e97e. T re-read: 29a90199.
+- The merge, 17:06 UTC: `git merge --no-ff -F /home/user/Shamble-Frontlines/.gate/nb2b-merge/merge-msg.txt
+  29a901994f5b65c23a17162422770aaacc0ca44e`: "Merge made by the 'ort' strategy.", 12 files, +665/-17.
+- Step 3, all hold: `git rev-parse HEAD^1 HEAD^2` = H0 and T; `git rev-parse HEAD^{tree}` = X; `git diff --stat H0
+  HEAD` = `git diff --stat 591e2cb T` (the same 12 paths and counts, +665/-17); `git diff --name-only T HEAD -- …judge
+  …marks .checkpoints/netcode-judge.md .checkpoints/netcode-judge` printed nothing, the control over marks/ listing
+  README.md, SERIES.md and marks.json; `sha256sum …/marks/marks.json` = a41ee583….
+- Step 4, 17:20:52-17:45:01 UTC (the log's lock line: lock taken 17:20:52, idle after 0 s; launched after the worker
+  restart, not 17:07 as first written here), /home/user/Shamble-Frontlines/.gate/nb2b-merge/check.log (background
+  bzbs6nbmq; no part-clean: 14,487 MiB free), HEAD cb600edee64b74a7e3bf82bd85791b61058d28bd (the merge), exit 0, "check:
+  all 13 steps pass". Bars, all met: test 935 and 1,032 (UM-4's 931 and 1,028 + 4 each), 0 failed, 0 skips; refs 2,171
+  = N0 2,166 + 5; redact 11 of 11, 464 items = 1i's 464 + 0 (NB2B-1), 0 findings; marks 81, rows unchanged; self 85;
+  web 70 of 70; ops 104 of 104 and "315 ok, 0 failed"; wasm 27,000 ticks, 0 mismatching, the bite caught as before;
+  fmt, clippy, clippy-wasm32, doc, deps PASS. The tree after it: only this file modified.
+- NB2B-5, 17:45:42-17:45:51 UTC: `env CARGO_INCREMENTAL=0 cargo test --locked -p npt-judge --no-fail-fast` through
+  main-run.sh into /home/user/Shamble-Frontlines/.gate/nb2b-merge/judge-tests.log, exit 0: lib 19, cli 4, engine 87,
+  fixtures 26 passed (136), 0 failed, as Builder 2's card.
+- Step 5, 17:46:10-17:46:31 UTC: the -47 folders listed by `ls -d` (still unpacked, NB2B-7); 7,807 MiB free (above
+  main-run.sh's 4 GiB). Both calls (env CARGO_INCREMENTAL=0, the first merge's C6) into rejudge-47-measured.log and
+  rejudge-47-bites.log, each exit 0, each headline "PM-0001-47 MOVED moved to Slice 1 change-set 7 (Lag) …" (3 runs
+  and 2 runs listed: counted, not judged); both out files `"verdict": "MOVED"`. The -47 pack may now go (NB2B-7).
+- Step 6: `node tools/gate.mjs --no-smoke` GATE PASS, base b8f02b0 (origin/main); output kept whole as
+  /home/user/Shamble-Frontlines/.gate/nb2b-merge/gate.txt (NB2B-6). Step 7: nothing edited by hand (`git status
+  --short` lists only this file).
 
 ## Questions for the checker
 - Q1: each of NB2-C1 to -C12 (advisor-nb2-merge.md): carried here, or moot (and why)?
