@@ -97,22 +97,36 @@
     sentence; PA-M3 XMLHttpRequest, V2_PHASE0_BRIEF, changed or removed entries, sha256 in the list, other added text;
     PA-M4 twins in either order; PA-L1 attached -F; PA-L2 --paginate pinned); group B is new text (PA-M5 CRLF in a pasted
     PASS, PA-M2 a "For the merge check" slot in step 5, PA-L3 toolchain named in advisor.md, PA-L4 subagent merge wording,
-    PA-L5 drop an id) for his ADDITIONS-OK (recommended (a)) · notes advisor-plan.md; security-auditor: running
+    PA-L5 drop an id) for his ADDITIONS-OK (recommended (a)) · notes advisor-plan.md
+23. security-auditor's pre-apply review: REVISE (ids and classes only, in security-auditor-plan.md): SA-PA-1, -3, -4 and
+    SA-PA-2 patched by it in scratch copies (tested); SA-PA-5 High is text only (a risk sentence; information for him
+    before the applies; follow-up for R4-1's change-set); Lows SA-PA-6..9; SA-PA-10 pre-existing (R4-1's class): left
+    to R4-1's change-set; SA-RT2-1's guard-file half: a STATUS follow-up
+24. Fix pass in the copy (all three reviews): its patches copied in; track.mjs rewritten (twins either order, changed or
+    removed or doubled entries floored, both hash forms, no saved file listed not floored, sha256 and other added text
+    listed, top folder, GIT_* dropped, diff flags, ignore rules read from the base in a temporary tree (its patch's
+    literal pathspecs made git's ignore check fail on every path: found and fixed; any failure now exits 2), "++" lines,
+    XMLHttpRequest, text triggers only under packages/tools/legacy, V2_PHASE0_BRIEF, Cargo.toml anywhere and
+    rust-toolchain, a spike's .rs to rust-reviewer, --files picks marked provisional); fixture-repository tests; guard:
+    the marker check on every connector, the subagent rule and comment-edit check on any GitHub-named server, CRLF,
+    the comment read pinned to an exported filter; advisor.md PA-M1, PA-M2, PA-L3, PA-L4, PA-L5, SA-PA-8, TE-B9.
+    Suites in the copy: guard 1581, track 82, checkpoint 33, kept-logs 9. Mutants on track.mjs: 49 of 51 caught (2
+    cannot change the result); guard mutation run: every new mutant caught. Real history: the 20 newest DECISIONS
+    entries 14 ok, 5 no saved file (listed), 1 old entry with no stated sha (floor); head mode replayed in a shared
+    clone (.gate/rt-hist) on 11 merged PRs: tracks equal --files 11/11, #68 picks netcode-architect (= inputs-B),
+    #65 stops (history not in the clone); #68 and #70 now show a binary-file floor (a test recording, test vectors).
+    Size: 931 added against the stop line of about 980. Evidence scripts: fix-mutate.mjs, fix-words20.mjs, fix-hist.mjs.
+    His standing rule of 2026-11-27 (full literal paths for files written in shell) saved: mustafa-2026-11-27-full-paths.md
 
 ## Current step
-Pre-apply review of the copy (security-auditor, test-engineer, the advisor agent), so fixes cost no extra asks; then
-the applies (about 10 asks), cmp, suites, gate, one commit. Then: fast-forward the lane branch to main, move the notes from
-.gate/review-tracks/ into .checkpoints/review-tracks/ (plan, reviews, inputs, saved messages; no exploit forms), push the
-checkpoint, and build in a plain copy (not a worktree), one Edit per kit file asked of him (about 10).
-Inputs in parallel: (A) his timings of #65, #68, #69 measured from commit and event times, and every needs-mustafa
-reason in the rule files with file:line; (B) CORE-REVIEWERS: the Highs of stops 3a (#65) and 3b (#68), who found each,
-and a rule for the at-most-two extra reviewers. Notes: .checkpoints/review-tracks/.
+The advisor agent re-checks the changed hunks (and security-auditor rules on the guard hunks and the ignore fix): not a
+new round. Then bring him ADDITIONS-OK and the SA-PA-5 information, then the applies (about 10 asks, each with its
+exact text), cmp against the copy, suites (settings 127 in the real folder), gate, one commit.
 
 ## Next steps
-1. Plan (.checkpoints/review-tracks/plan.md): the track script (files touched -> light or full; in doubt full), LIGHT-DEF,
-   the five full-track exceptions, CORE-REVIEWERS, who merges, EYES-KEEP, the needs-mustafa table, SOURCE-GO, answers 4a-d,
-   old beside new, size. Also listed as candidates: the CLAUDE.md accounts lines (his three accounts; needs his words).
-2. security-auditor and the advisor agent on the plan; then his go.
+1. Re-check of the changed hunks (advisor agent; security-auditor on the guard and git-layer hunks).
+2. His ADDITIONS-OK; SA-PA-5 as information; the binary-file floor seen on #68 and #70 as information.
+3. Applies, cmp, suites, gate, one commit; build-review round; verifier; docs-keeper; report; PR; head review; his go.
 
 ## Decisions taken
 - SPEED-ORDER (b): review tracks before the guard change-set · Mustafa · 2026-11-26
