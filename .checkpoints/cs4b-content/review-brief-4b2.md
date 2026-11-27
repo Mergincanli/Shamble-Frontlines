@@ -4,7 +4,8 @@ Written by Builder V6 (the main session), 2026-11-27. Your own focus is in your 
 
 **Where.** The git worktree `/home/user/Shamble-Frontlines/.gate/cs4b-2`, local branch `cs/4b-content` (pushed as
 `claude/ecstatic-wozniak-5cbdzs`), code head **c442a806d83dceac6a272b22ad67b7f01de476fa** (commits after it touch
-only `.checkpoints/`). Main b8f02b0 is merged in (35e96ad), and main has not moved since. The change-set is
+only `.checkpoints/`, and `docs/DECISIONS.md` at 1c4906e: his six messages of the change-set, copied by script and
+checked back by `.checkpoints/cs4b-content/decisions-4b2.mjs check`; added after this brief was first written). Main b8f02b0 is merged in (35e96ad), and main has not moved since. The change-set is
 `git diff b8f02b0149cc928964e54e194cd9c4d68f52bd94 c442a806d83dceac6a272b22ad67b7f01de476fa -- . ":(exclude).checkpoints"`:
 100 files, about 9,850 lines added, of which data are `content/` (about 1,200), `Cargo.lock` (300),
 `crates/devtools/vectors/` and the recordings; the written-line count by the official rule is 7,978

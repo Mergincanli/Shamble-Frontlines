@@ -1309,6 +1309,25 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   infra-engineer. Their notes: `cs4b-content/<name>-review-4b2.md`. The first three launched at about 20:20 UTC.
 - **CI on the code head c442a80: green** (gate and smoke 20:08:23 to 20:09:07 UTC; toolchain 20:08:23 to 20:17:26,
   9 min 3 s).
+- **Round 1, security-auditor: PASS with three Lows** (`cs4b-content/security-auditor-review-4b2.md`). It
+  **confirms** ruling (2), the caps' departure (its P10), and ruling (4), the dev server's `/content.json`; ruling
+  (1), the two maths entries, fine from its side (no new host import); dependencies: no drift (the six manifest
+  digests match its two approvals). Its Lows, each to fix or accept in writing (an open security finding keeps the
+  pull request needs-mustafa): **SA-1** `vite.config.mjs:27`, `new URL(request.url, base)` throws on the path `//`
+  (connect catches it: a 500 page instead of Vite's own answer; its scratch run shows 200 without the plugin, 500 with
+  it): fix, a failed parse passes to `next()`. **SA-2** `vite.config.mjs:26-31`, a page of another site open in the
+  developer's browser can send a plain GET to `/content.json`, which starts the content tool and blocks the server
+  while it runs (fixed arguments, nothing of the request reaches it, the answer unreadable to that site, the content
+  public): the main session's choice is **fix**: refuse when the browser's `Sec-Fetch-Site` header is present and is
+  neither `same-origin` nor `none` (a request with no such header, as Playwright's own requests and the command
+  line, still served). **SA-3** `packages/client/scripts/testlines.mjs:54-57`, `:75-79` (used by `canonical.mjs:35`):
+  `readPlain` checks with lstat, then opens without `O_NOFOLLOW` (a swap between them is followed; a link higher up,
+  `content/` itself, too): fix, open with `O_NOFOLLOW` and check the handle by fstat, and lstat every part of the
+  path under the repository. Its note: the brief's "later commits touch only `.checkpoints/`" missed
+  `docs/DECISIONS.md` at 1c4906e (the brief now says so; the advisor agent is told). The fixes come in the one fix
+  pass after the round, with round 2 for security-auditor on what changed.
+- **Round 1, engine-architect launched** (before 20:26:57 UTC, the clock read right after; a first version of this
+  line said "about 20:31", typed ahead of the clock: slip 10) in security-auditor's slot.
 
 ## Slips of this chat's own rules, for the report
 - One git command did not start its own shell call: `git add .checkpoints/cs4b-content/review-brief-4b1.md` stood
@@ -1359,7 +1378,8 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   `toolchain.yml:38`), which this branch took in at 35e96ad; the run was 11 min 58 s under it. Found at the close
   (20:10 UTC) while writing the reviewers' brief; corrected to him in the next chat message. (9) A card line said
   the second plants run started "20:16 UTC" when the clock then read 20:15:06: typed ahead of it, corrected before
-  it was committed.
+  it was committed. (10) The same for engine-architect's launch: "about 20:31" written when the clock read 20:26:57;
+  corrected before it was committed. From here every time in the card is written only after the clock is read.
 
 ## HAND-OVER: where another session picks this up (written 2026-11-27, 00:44 Amsterdam; kept current)
 His words of 2026-11-27, 00:43 Amsterdam (2026-11-26, 23:43:38 UTC; `cs4-walk/mustafa-2026-11-27-save-every-25-
