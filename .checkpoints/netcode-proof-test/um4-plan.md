@@ -51,6 +51,10 @@ puts them inside check.mjs, so a whole run cannot leave them out.
   builder fast-forwards to. UM-4's commit still waits until C's result is read (C was sent 11:0x on 11-27), so one
   thing moves at a time (UM4-6).
 
+- Since rev 0.3: commit d8b57b8 (11:3x on 11-27, the operator rewordings, choice 31) changed three spike files after
+  ddb06ff: `git diff --name-only ddb06ff HEAD -- spikes/` printed ops/operator/PROMPT-R1.md, ops/operator/rules.md and
+  ops/tests/operator.test.mjs (11:3x). Step 5's proviso names them first, as its "else named first" asks.
+
 ## Steps (each its own call; on the lane, after U8-F1's merge and B's head read; the commit after U7's builder worktree)
 0. **The preconditions, then the light base run, at UM-4's H0.** Step 0 opens with U8-F1's M0 preconditions
    (u8-f1-merge-plan.md:61-71), each in a printing form (exit-silent.md) (UM4-4):
@@ -96,7 +100,8 @@ puts them inside check.mjs, so a whole run cannot leave them out.
    wasm (they read only spikes/ content) equal U8-F1's M5 strictly, provided `git diff --name-only ddb06ff HEAD -- spikes/` prints nothing (control:
    `git diff --name-only 6968215 ddb06ff -- spikes/` lists U8-F1's six) and
    `git status --short --untracked-files=all -- spikes/` lists only check.mjs and check.test.mjs, as modified (else
-   named first) (UM4-5); marks, refs and redact (items and findings) equal step 0's
+   named first) (UM4-5; named first in Facts: d8b57b8's three, so test and web are read against U8-F1's M5 with those
+   three named, and the ops count must still be 104); marks, refs and redact (items and findings) equal step 0's
    base run; self equals step 0's plus the new tests, each named. Any other difference is named; unexplained, it stops.
    Then `node tools/gate.mjs --no-smoke` PASS and the repo-map check OK.
 6. **(e) Until it lands,** whole runs keep choice 15 (i) (ops tests and wrappers beside `node check.mjs`). After it,

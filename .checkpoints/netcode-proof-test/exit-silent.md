@@ -104,6 +104,7 @@ is re-run in a printing form before that step.
 - The merge form's M0 check `git diff --quiet 6968215 H0 -- spikes/` (u8-f1-merge-plan.md:72): mine, the same (named
   by A2, advisor-um4-plan.md:149-151: `git diff --name-only`, nothing printed).
 - R1's operator files, PROMPT-R1.md:22 and :127 and rules.md:14-15: ruled by B (advisor-u8-f1-head.md, block 3 (c)):
-  net-zero rewordings to printed output, by the main session, before Stop B (choice 31).
+  net-zero rewordings to printed output, by the main session, before Stop B (choice 31). DONE: commit d8b57b8, 11:3x
+  on 11-27 (operator-rewordings.md's done lines).
 - light-takein-recipe.md:89 (the anchor) and :107 (step 5 f.): C's words (advisor-light-takein.md:75, and L-9 at
   :97), C's to reword before the recipe's next use; :106 (step 5 e., `.claude/ .github/ tools/`): mine, the same.
