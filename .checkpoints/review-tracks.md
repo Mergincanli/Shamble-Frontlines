@@ -82,8 +82,14 @@
     mutation run of the 14 new rules and guard.mjs's day-only allow: routine-guard 1575/1575, track 61/61, checkpoint
     33/33, kept-logs 9/9; settings 126/127 in the copy, the same failure in an untouched copy (the copy's location)
 
+20. Rule text built in the copy: CLAUDE.md.new (+39/-13), advisor.md (+76/-34: category 5, the classes, "His go keeps",
+    plan-review line, evidence rule, step 2/4/5/6 changes, after-check, how the check counts, Q2, kit tests),
+    security-auditor.md (+2/-1). Size against main: 585 added (guard 37, its tests 151, guard.mjs 4, advisor 76, sa 2,
+    CLAUDE 39, track.mjs 160, its tests 116); stop line about 980. Suites in the copy: 1575, 61, 33, 9.
+
 ## Current step
-Build: CLAUDE.md, advisor.md, security-auditor.md text in the copy; then the applies (about 10 asks). Then: fast-forward the lane branch to main, move the notes from
+Pre-apply review of the copy (security-auditor, test-engineer, the advisor agent), so fixes cost no extra asks; then
+the applies (about 10 asks), cmp, suites, gate, one commit. Then: fast-forward the lane branch to main, move the notes from
 .gate/review-tracks/ into .checkpoints/review-tracks/ (plan, reviews, inputs, saved messages; no exploit forms), push the
 checkpoint, and build in a plain copy (not a worktree), one Edit per kit file asked of him (about 10).
 Inputs in parallel: (A) his timings of #65, #68, #69 measured from commit and event times, and every needs-mustafa
