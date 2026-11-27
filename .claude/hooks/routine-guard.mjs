@@ -1498,13 +1498,40 @@ function actionsRead(name, ti, role) {
   return deny(`routine (pr-advisor): ${name} runs only the methods ${ok.join(', ')} (got ${got})`);
 }
 
-async function mcp(tool, ti, role, io) {
+// The review tracks (Mustafa's MERGE-PROMPT (d), 2026-11-26): his Advisor's merge-check line, in any case and spacing.
+// GUARD-MARK: no session or routine writes or edits it through the GitHub tools; only his Advisor or he writes it.
+const MARK = 'advisormergecheck:pass';
+const hasMark = (v) => {
+  const todo = [v];
+  for (let n = 0; todo.length; n++) {
+    if (n > 10000) return 'big'; // too large to read whole: treated as carrying the line (fails closed)
+    const x = todo.pop();
+    if (typeof x === 'string') { if (x.toLowerCase().replace(/\s+/g, '').includes(MARK)) return true; }
+    else if (x && typeof x === 'object') for (const y of Object.values(x)) todo.push(y);
+  }
+  return false;
+};
+const MARK_DENY = "his Advisor's merge-check line is written only by his Advisor or by him, never by a session (review tracks, GUARD-MARK)";
+const MARK_BIG = 'too large for the guard to read whole for the merge-check line (review tracks, GUARD-MARK); split it';
+
+async function mcp(tool, ti, role, io, input = {}) {
   const m = /^mcp__(.+?)__(.+)$/.exec(tool);
   const server = m?.[1] ?? '', name = m?.[2] ?? '';
+  // GUARD-MARK on every connector, since a GitHub server can sit under another name; a merge carries no body
+  if (!GITHUB_READ.test(name) && name !== 'merge_pull_request' && hasMark(ti)) return deny(hasMark(ti) === 'big' ? MARK_BIG : MARK_DENY);
+  // a merge or a comment edit, by the tool name's last "__" part on any connector, whatever the server or a prefix: a
+  // merge is never a subagent's and goes only through mcp__github__ itself; a comment edit is checked for the line
+  const last = tool.split('__').pop();
+  if (last === 'merge_pull_request' && input.agent_id) return deny('a subagent never merges; the chat that built the PR merges it (review tracks)');
+  if (/^(merge_pull_request|enable_pr_auto_merge)$/.test(last) && tool !== `mcp__github__${last}`) return deny('a merge goes only through the github connector, where the guard checks it (review tracks)');
+  if (last === 'update_issue_comment') {
+    try { if (hasMark(ghJson(io, `repos/${ti.owner}/${ti.repo}/issues/comments/${ti.comment_id}`).body)) return deny(MARK_DENY); }
+    catch { return deny('a comment edit is checked against the merge-check line first; the comment could not be read, so the edit is refused'); }
+  }
   if (server === 'github') {
     if (name === 'enable_pr_auto_merge') return deny('auto-merge skips the expected-head check; merge with the MCP merge tool instead');
     // merge fails closed for every session (K1): if the check can't complete, refuse rather than let it through
-    if (name === 'merge_pull_request') { try { return await mergeCheck(ti, role, io); } catch (e) { return deny(`merge: the check could not complete (${String(e?.message ?? e).slice(0, 80)}); refused`); } }
+    if (name === 'merge_pull_request') { try { return await mergeCheck(ti, role, io, input); } catch (e) { return deny(`merge: the check could not complete (${String(e?.message ?? e).slice(0, 80)}); refused`); } }
     if (role && Object.hasOwn(ACTIONS_READ, name)) return actionsRead(name, ti, role);
     if (!role || GITHUB_READ.test(name)) return null;
     if (`${ti.owner}/${ti.repo}`.toLowerCase() !== REPO.toLowerCase()) return deny(`routine (${role}): GitHub writes only on ${REPO}`);
