@@ -1209,6 +1209,33 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   before; recorded, not gated: ADR 0002's G7). **Official count 6,504, raw 6,522.** Not yet: the full local checks'
   end, the gate, CI on this head, the plants' whole run (at the close).
 
+- **CI on cut C's head fbbd84d: green** (gate and smoke 16:27:24 to 16:28:01 UTC; toolchain run 46033756121,
+  16:27:26 to 16:37:16 UTC, 9 min 50 s: 29 Chromium tests in 3.7 min, 5 Firefox tests). **The advisor agent's two
+  Q3 points, read on its log** (`.gate/ci-fbbd84d-toolchain.log`, not committed): the network was cut before the
+  builds ("the network is cut: no TCP connection to ...:443 (curl exit 7)"), and under the cut the two
+  development-server cases passed in 2.7 s and 2.2 s with no "Compiling" line anywhere in the browser tests' window
+  (16:33:10 to 16:36:55): the content tool ran `--locked` and compiled nothing.
+- **Step 10's wiring: the match holds the world of its map: COMMITTED** (2026-11-27, about 16:42 UTC; its full
+  local checks and the gate run after the commit, as for cut C, and are written here when they end).
+  `sim_wasm::LOCAL_MAP` ("test-scene", the one map the content holds; the first recording's header names the same
+  id); `CreateError::MapMissing` and `CreateError::World(WorldError)`, in the order seed, mode, content, map,
+  world, padding (the order test covers the map; no map made in tests reaches the world's check, whose sentence is
+  tested on its own); `local_world(&set)` builds the map's `StaticWorld` once; `LocalMatch::new(..., world)` keeps
+  it with `static_world()`; no step queries it (4c), and nothing of it is hashed. Every caller: the local match's
+  tests, `tests/step_alloc.rs` (the world built before the counting starts). Tests: the match's world equals the
+  map's own (`solids`, `tree_depth`, `tree_bytes`); a bundle whose map has another id makes no match, natively and
+  on the players' file (a seventh refusal class in the boundary test). **The built-file check where the collision
+  library is first linked into the players' file:** 95,441 instructions walked (79,690 before), both twins' names
+  read, nothing refused (no maths routine beyond cut C's two entries, no vector instruction, no fused multiply-add,
+  the imports unchanged): rust-reviewer's step 10 read ("the maths allow-list stays empty at step 10") holds. The
+  players' file: 257,421 bytes (100,215 gzip, 82,101 brotli), sha256 3660132be46b33a4fbf59404b47a85a2436cfea47251adf386a42e529b800644
+  (217,692 at cut C). Evidence before the commit: the bindings' 18 and the allocation test, the devtools tests (20
+  groups: the recordings replay unchanged), boundary 38, clippy and format clean, plants C28 and C29 caught (the
+  match made on whatever map comes first: natively and on the players' file), every file and the players' file put
+  back. **Official count at step 10's end 6,635, raw 6,653: under the first rung (6,750), so step 11 stays in 4b-2;
+  the look ahead before step 11: 6,635 + 520 + 350 = 7,505, under 8,450.** Condition 4 of the advisor agent's
+  re-read: no collision query is called from the match's step in 4b-2 (4c's), so the report says so.
+
 ## Slips of this chat's own rules, for the report
 - One git command did not start its own shell call: `git add .checkpoints/cs4b-content/review-brief-4b1.md` stood
   on the line after a `cat` that wrote that file, in one call (2026-11-26, about 16:46 Amsterdam). It staged that
@@ -1377,10 +1404,12 @@ in two lines.
 4b-2 (2026-11-27, 17:31 Amsterdam, from the clock; Builder V6). DIFF-LIST is answered (a). Done and pushed on this
 seat: 35e96ad (main in), 5cef19f (step 8's second part), and **step 9 whole in three cuts**: ccde0d4 (cut A, CI
 green), e1e2dd4 (cut B, CI green), **fbbd84d (cut C: the match is made on the content bundle; its full local checks
-and the gate passed; CI: gate and smoke green, the toolchain run under way from 16:27:26 UTC)** (the card's entries
-"Step 9, cut A", "cut B" and "cut C"). **Official count 6,504, raw 6,522, of 8,450** (`cs4b-content/count-4b2.mjs`).
-Next: CI on fbbd84d read green, with the two Q3 points of `advisor-cutC.md` on its log; then step 10's wiring
-(HAND-OVER item 3) and its count; then the look ahead before steps 11 and 12.
+and the gate passed; CI green, the two Q3 points read on its log)**, and **step 10's wiring** (committed after
+fbbd84d; its checks after the commit). **Official count at step 10's end 6,635, raw 6,653, of 8,450**
+(`cs4b-content/count-4b2.mjs`): the first rung (6,750) is not reached, so step 11 is built in 4b-2; its look ahead
+is 7,505. Next: step 10's full local checks and the gate, CI on its head; then step 11, the schema writer (the
+sheet's row 11), and before step 12 the look ahead (by today's numbers about 7,155 + 1,060 + the map's reading +
+350, past 8,450: the stop to ask him is expected there).
 
 ## Next steps (the sheet's revision 3, section G; each step ends with the count of written lines)
 - **4b-1:** 1 the content crate's manifests · 2 the reader, the writer, the bundle, the two kinds, the old tuning's

@@ -60,6 +60,7 @@ def chain(*parts):
     """Commands run in order, each with its environment, until one fails: the plant's output is all of theirs."""
     return ("CHAIN",) + parts
 FOLD = [(LIB_RS, "            start_tick: 0,\n", "            start_tick: u32::from(bundle.first().copied().unwrap_or(0)),\n")]
+ANY_MAP = [(LIB_RS, "    let map = set.map(LOCAL_MAP).ok_or(CreateError::MapMissing)?;", "    let map = set.maps().first().ok_or(CreateError::MapMissing)?;")]
 
 USE = "use wasm_bindgen::prelude::*;\n"
 MODS = "pub mod rng;\n"
@@ -276,6 +277,13 @@ PLANTS = [
      chromium("tests/skeleton/isolation.spec.ts"),
      ["under Vite's dev server", "application/json"]),
     ("C27", "control", "the clean Worker and page: the messages' and the content's tests", [], SW_MESSAGES, []),
+    # Step 10's wiring (Builder V6): the match holds the world of its own map, found by its id.
+    ("C28", "defect", "the match is made on whatever map comes first, not on the local map: natively", ANY_MAP,
+     ("cargo", "test", "-p", "sim-wasm", "--locked", "--lib", "a_bundle_without_the_local_map"),
+     ["a_bundle_without_the_local_map_makes_no_match", "left: None"]),
+    ("C29", "defect", "the match is made on whatever map comes first, not on the local map: on the players' file", ANY_MAP,
+     chain((ENV, WASM), (ENV, boundary("sim-wasm"))),
+     ["each class of refusal is an Error with a plain reason", "expected undefined to be an instance of Error"]),
 ]
 
 def note(name, kind, ok, what, detail):

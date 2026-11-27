@@ -140,6 +140,10 @@ test("each class of refusal is an Error with a plain reason, never a trap, and t
   const frozen = new TextDecoder("utf-8", { fatal: true }).decode(BUNDLE);
   const renamed = frozen.replace('\\"id\\": \\"test-scene\\"', '\\"id\\": \\"Test-scene\\"');
   expect(renamed).not.toBe(frozen);
+  // The frozen bundle with its map moved to another id, file and all: the loader takes it, and the match finds no
+  // map of its own.
+  const elsewhere = frozen.replace('"path": "maps/test-scene.json"', '"path": "maps/other.json"').replace('\\"id\\": \\"test-scene\\"', '\\"id\\": \\"other\\"');
+  expect(elsewhere).not.toBe(frozen);
   const classes = [
     [() => new Sim(new Uint8Array(31), 0, 0, BUNDLE), "the match seed must be 32 bytes and is 31"],
     [() => new Sim(SEED, 1, 0, BUNDLE), "only local play (0)"],
@@ -152,6 +156,8 @@ test("each class of refusal is an Error with a plain reason, never a trap, and t
     [() => new Sim(SEED, 0, 0, encode("{}")), /^the content is refused: /],
     [() => new Sim(SEED, 0, 0, encode(renamed)), /^the content is refused: .+, in maps\/test-scene\.json, line \d+ column \d+, at id$/],
     [() => new Sim(SEED, 0, 0, new Uint8Array(MAX_BUNDLE_BYTES + 1)), `${MAX_BUNDLE_BYTES + 1} bytes, more than the ${MAX_BUNDLE_BYTES} allowed`],
+    // Content the loader takes, without the map a local match is played on.
+    [() => new Sim(SEED, 0, 0, encode(elsewhere)), 'the content holds no map "test-scene", the map a local match is played on'],
   ];
   for (const [make, reason] of classes) {
     const error = refusal(make);

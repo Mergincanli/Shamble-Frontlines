@@ -13,11 +13,16 @@ pub mod panic;
 
 use client_endpoint::post::Post;
 use local_match::{LocalMatch, loopback};
+use sim::collision::{StaticWorld, WorldError};
 use sim::{MatchSetup, SEED_BYTES, TICK_HZ};
 use wasm_bindgen::prelude::*;
 
 /// Local play: the client endpoint and a local server in one Worker (ADR 0002 part 6). The only mode so far.
 pub const MODE_LOCAL: u32 = 0;
+
+/// The map a local match is played on, by its id in the content: the one map the game's content holds so far (the
+/// first recording's header names the same id). A mode that names its map comes with a later change-set.
+pub const LOCAL_MAP: &str = "test-scene";
 
 /// Ticks per second, for the host's readout: the simulation's own build-time constant, asked once.
 #[wasm_bindgen]
@@ -35,6 +40,10 @@ pub enum CreateError {
     Mode(u32),
     /// The content bundle is not one the game's loader takes: its refusal, with the file and the place in it.
     Content(content::Error),
+    /// The content holds no map with the id `LOCAL_MAP`.
+    MapMissing,
+    /// The map makes no static collision world: why.
+    World(WorldError),
     /// More padding than the block writer takes.
     PadBytes(u32),
 }
@@ -52,11 +61,28 @@ impl CreateError {
             }
             // The loader's own sentence, whole: it begins "the content is refused: " and is at most 512 bytes.
             Self::Content(error) => error.message(),
+            Self::MapMissing => {
+                format!(
+                    "the content holds no map \"{LOCAL_MAP}\", the map a local match is played on"
+                )
+            }
+            Self::World(error) => {
+                format!(
+                    "the map \"{LOCAL_MAP}\" makes no collision world: {}",
+                    error.message()
+                )
+            }
             Self::PadBytes(pad) => {
                 format!("{pad} bytes of block padding is above the writer's cap")
             }
         }
     }
+}
+
+/// The static collision world of the local match's map, built once from the content the loader took.
+fn local_world(set: &content::ContentSet) -> Result<StaticWorld, CreateError> {
+    let map = set.map(LOCAL_MAP).ok_or(CreateError::MapMissing)?;
+    StaticWorld::build(map).map_err(CreateError::World)
 }
 
 /// One local match in the Worker. Its state is the local match's (`local_match`): the client endpoint, the local
@@ -69,12 +95,13 @@ pub struct Sim {
 impl Sim {
     /// Checks what the host passed and builds the match at tick 0, its join already on its way. The block is whole
     /// from the start; the host's first `rebase` says when the first tick is due. `bundle` is the match's content
-    /// (`content.json`): it crosses once, here, so no call can swap it mid-match; the game's own loader judges it,
-    /// and nothing of it enters the match's state yet (step 10 brings its map in).
+    /// (`content.json`): it crosses once, here, so no call can swap it mid-match; the game's own loader judges it.
+    /// The match holds the static collision world of the content's map `LOCAL_MAP`; nothing of the content enters
+    /// the match's state, and no step queries the world yet (change-set 4c).
     ///
     /// # Errors
-    /// A seed of the wrong length, a mode that does not exist, a bundle the loader refuses, or too much padding,
-    /// checked in that order.
+    /// A seed of the wrong length, a mode that does not exist, a bundle the loader refuses, a bundle without the map,
+    /// a map that makes no world, or too much padding, checked in that order.
     pub fn create(
         seed: &[u8],
         mode: u32,
@@ -86,12 +113,13 @@ impl Sim {
         if mode != MODE_LOCAL {
             return Err(CreateError::Mode(mode));
         }
-        content::load(bundle).map_err(CreateError::Content)?;
+        let set = content::load(bundle).map_err(CreateError::Content)?;
+        let world = local_world(&set)?;
         let setup = MatchSetup {
             seed,
             start_tick: 0,
         };
-        let local = LocalMatch::new(&setup, 0, pad_bytes, loopback());
+        let local = LocalMatch::new(&setup, 0, pad_bytes, loopback(), world);
         local
             .map(|local| Self { local })
             .ok_or(CreateError::PadBytes(pad_bytes))
@@ -335,7 +363,7 @@ mod tests {
     /// The four checks run in a fixed order, seed, mode, content, padding: each case below fails all the ones after
     /// its own, and only its own is named.
     #[test]
-    fn the_checks_run_in_the_order_seed_mode_content_padding() {
+    fn the_checks_run_in_the_order_seed_mode_content_map_padding() {
         let bad = b"{}";
         let first = |seed: &[u8], mode, pad, bundle: &[u8]| {
             Sim::create(seed, mode, pad, bundle)
@@ -353,9 +381,60 @@ mod tests {
             first(&SEED, MODE_LOCAL, u32::MAX, bad),
             kind(CreateError::Content(loaded))
         );
+        // A bundle the loader takes, with no map: the map's check comes before the padding's. (The world's check
+        // stands between the two; no map made here reaches it: the world's own tests make its refusals.)
+        let mapless =
+            content::bundle::write(&[("movement/test-soldier.json", content::movement::TEST_TEXT)]);
+        assert_eq!(
+            first(&SEED, MODE_LOCAL, u32::MAX, mapless.as_bytes()),
+            kind(CreateError::MapMissing)
+        );
         assert_eq!(
             first(&SEED, MODE_LOCAL, u32::MAX, &bundle()),
             kind(CreateError::PadBytes(0))
+        );
+    }
+
+    /// The match holds the static world of the content's map `LOCAL_MAP`: the same world the map builds on its own.
+    #[test]
+    fn the_match_holds_the_static_world_of_the_local_map() {
+        let sim = Sim::create(&SEED, MODE_LOCAL, 0, &bundle()).expect("a good seed and mode");
+        let set = content::load(&bundle()).expect("the test bundle loads");
+        let built =
+            StaticWorld::build(set.map(LOCAL_MAP).expect("the test map")).expect("it builds");
+        let held = sim.local().static_world();
+        assert_eq!(held.solids().len(), built.solids().len());
+        assert_eq!(held.tree_depth(), built.tree_depth());
+        assert_eq!(held.tree_bytes(), built.tree_bytes());
+        assert!(!held.solids().is_empty());
+    }
+
+    /// A bundle whose maps have other ids makes no match, and says which map it looked for; a map that makes no
+    /// world says the world's own reason.
+    #[test]
+    fn a_bundle_without_the_local_map_makes_no_match() {
+        let other = content::map::TEST_TEXT.replace("\"id\": \"test-scene\"", "\"id\": \"other\"");
+        assert_ne!(other, content::map::TEST_TEXT);
+        let bundle = content::bundle::write(&[
+            ("maps/other.json", &other),
+            ("movement/test-soldier.json", content::movement::TEST_TEXT),
+        ]);
+        assert!(content::load(bundle.as_bytes()).is_ok());
+        assert_eq!(
+            Sim::create(&SEED, MODE_LOCAL, 0, bundle.as_bytes()).err(),
+            Some(CreateError::MapMissing)
+        );
+        assert_eq!(
+            CreateError::MapMissing.message(),
+            "the content holds no map \"test-scene\", the map a local match is played on"
+        );
+        let deep = WorldError::TooDeep(32);
+        assert_eq!(
+            CreateError::World(deep).message(),
+            format!(
+                "the map \"test-scene\" makes no collision world: {}",
+                deep.message()
+            )
         );
     }
 }

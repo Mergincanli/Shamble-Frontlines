@@ -14,6 +14,7 @@ use protocol::codec::MAX_JOIN_BYTES;
 use protocol::loopback::Loopback;
 use protocol::transport::{Channel, Delivery, SendError, Side, Transport, TransportPair};
 use room::Room;
+use sim::collision::StaticWorld;
 use sim::{MatchSetup, TICK_HZ};
 
 /// The content hash both sides hold while there is no content data; the content crate brings the real one.
@@ -30,8 +31,9 @@ pub fn loopback() -> Loopback {
     Loopback::new(SLOT_BYTES, 8)
 }
 
-/// One local match: the local server, the client endpoint and the link between them. It owns no state of the
-/// exchange itself: the endpoint holds the page's post and writes the block, the room holds the world.
+/// One local match: the local server, the client endpoint and the link between them, and the static collision
+/// world of the match's map. It owns no state of the exchange itself: the endpoint holds the page's post and writes
+/// the block, the room holds the world's state.
 pub struct LocalMatch<P: TransportPair = Loopback> {
     room: Room,
     endpoint: Endpoint,
@@ -42,14 +44,23 @@ pub struct LocalMatch<P: TransportPair = Loopback> {
     outgoing: Vec<u8>,
     /// Messages the link did not take; wraps.
     unsent: u32,
+    /// The map's solid shapes and their tree, built once from the match's content. No step queries it yet: the
+    /// movement and the aim's cast that do come with change-set 4c. It is no state: nothing of it is hashed.
+    world: StaticWorld,
 }
 
 impl<P: TransportPair> LocalMatch<P> {
-    /// A match over `link`, with the join already on its way; the endpoint's first command has `first_sequence`
-    /// (0 in play). The block is whole from the start, and no tick is due before the first `rebase`. `None` when
-    /// `pad_bytes` is more padding than the block writer takes.
+    /// A match over `link` on the static world `world`, with the join already on its way; the endpoint's first
+    /// command has `first_sequence` (0 in play). The block is whole from the start, and no tick is due before the
+    /// first `rebase`. `None` when `pad_bytes` is more padding than the block writer takes.
     #[must_use]
-    pub fn new(setup: &MatchSetup, first_sequence: u16, pad_bytes: u32, link: P) -> Option<Self> {
+    pub fn new(
+        setup: &MatchSetup,
+        first_sequence: u16,
+        pad_bytes: u32,
+        link: P,
+        world: StaticWorld,
+    ) -> Option<Self> {
         let mut local = Self {
             room: Room::new(setup, NO_CONTENT),
             endpoint: Endpoint::new(NO_CONTENT, first_sequence, pad_bytes)?,
@@ -58,6 +69,7 @@ impl<P: TransportPair> LocalMatch<P> {
             incoming: Vec::with_capacity(MAX_JOIN_BYTES),
             outgoing: Vec::with_capacity(MAX_JOIN_BYTES),
             unsent: 0,
+            world,
         };
         let joined = local.endpoint.join(&mut local.outgoing);
         let mut client = local.link.end(Side::Client);
@@ -78,6 +90,12 @@ impl<P: TransportPair> LocalMatch<P> {
     #[must_use]
     pub const fn endpoint(&self) -> &Endpoint {
         &self.endpoint
+    }
+
+    /// The static collision world of the match's map.
+    #[must_use]
+    pub const fn static_world(&self) -> &StaticWorld {
+        &self.world
     }
 
     /// Messages the link did not take; wraps. They are in the block's count of refused messages.
@@ -180,10 +198,19 @@ mod tests {
     use protocol::wrap::press_edges;
     use sim::BUTTONS;
 
+    /// The static world of the content crate's test map (`map::TEST_TEXT`), which every match here is made on.
+    fn world() -> StaticWorld {
+        let bundle = content::bundle::test_bundle();
+        let set = content::load(bundle.as_bytes()).expect("the test bundle loads");
+        StaticWorld::build(set.map("test-scene").expect("the test map"))
+            .expect("the test map builds")
+    }
+
     fn local(start_tick: u32, first_sequence: u16) -> LocalMatch {
         let seed = [7; sim::SEED_BYTES];
         let setup = MatchSetup { seed, start_tick };
-        LocalMatch::new(&setup, first_sequence, 0, loopback()).expect("no padding is allowed")
+        LocalMatch::new(&setup, first_sequence, 0, loopback(), world())
+            .expect("no padding is allowed")
     }
 
     /// A post with these buttons held and button 0 pressed this many times.
@@ -368,7 +395,7 @@ mod tests {
             start_tick: 0,
         };
         let pad = client_endpoint::block::MAX_PAD_BYTES + 1;
-        assert!(LocalMatch::new(&setup, 0, pad, loopback()).is_none());
+        assert!(LocalMatch::new(&setup, 0, pad, loopback(), world()).is_none());
     }
 
     /// A link that takes nothing: nothing panics, the join never arrives, so the room has no player to send to,
@@ -381,7 +408,8 @@ mod tests {
             start_tick: 0,
         };
         // Slots of one byte: no message fits.
-        let mut local = LocalMatch::new(&setup, 0, 0, Loopback::new(1, 8)).expect("no padding");
+        let mut local =
+            LocalMatch::new(&setup, 0, 0, Loopback::new(1, 8), world()).expect("no padding");
         assert_eq!(local.unsent(), 1);
         for step in 0..10 {
             local.step(f64::from(step));
