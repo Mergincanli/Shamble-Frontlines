@@ -179,7 +179,7 @@ If the copy is lost: rebuild it from the applied rows plus the plan; never guess
 | 4 | .claude/hooks/routine-guard.test.mjs | Edit: the new block appended after :3875 | IN: d21ff347 (the whole file equals the copy; its new tests fail until rows 5-8 are in) |
 | 5 | .claude/hooks/routine-guard.mjs | Edit: the mcp() call at :460 passes the hook input | IN: a9120a17 (the old mcp() ignores the extra argument) |
 | 6 | .claude/hooks/routine-guard.mjs | Edit: :1501-:1593, GUARD-MARK, mcp(), merge check, passAllows | IN: 6a 3e701b26 (GUARD-MARK and mcp()), 6b 8398752d (toolchain and the PASS reading; two edits) |
-| 7 | .claude/hooks/routine-guard.mjs | Edit: gh() at :1448-:1458 (needs row 6's definitions) | not applied |
+| 7 | .claude/hooks/routine-guard.mjs | Edit: gh() at :1448-:1458 (needs row 6's definitions) | IN: 9a3a7d0a (the guard equals the copy; suite 1579/1581, the 2 guard.mjs tests wait for row 8) |
 | 8 | .claude/hooks/guard.mjs | Edit: the allow output | not applied |
 | 9 | .claude/agents/security-auditor.md | Edit: :54 | not applied |
 | 10 | .claude/agents/advisor.md | Write (whole file) | not applied |
