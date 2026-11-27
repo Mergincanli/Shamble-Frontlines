@@ -165,8 +165,11 @@ cargo, no git write), read and rule, each in its own block:
    form, with M69-1's three whole-tree bars and M69-2's baseline: main's toolchain run 46011355903, job 140547396571,
    compared line for line as M67-3 gives it (the `test result:` lines, the vitest `Test Files` and `Tests` lines, every
    Playwright "passed" line); its lines should also equal job 140114848934's; #74's two pull-request steps by rev 4's
-   step-6 bar; the toolchain job's run time beside the 25-minute limit. CI on d9fb0dd: (to fill). Rule: APPROVE, or
-   what is owed.
+   step-6 bar; the toolchain job's run time beside the 25-minute limit. CI on d9fb0dd: all four success at attempt 1
+   (push gate 46018443843, 14:43:17-14:44:47, and toolchain 46018443909, 14:43:17-14:51:54; pull request gate
+   46018453424, 14:43:21-14:44:36, and toolchain 46018454213, 14:43:21-14:51:10: about 8.5 and 8 minutes against the
+   25-minute limit); #74's two pull-request steps' printed line and the `preview-site` artifact are yours to read from
+   run 46018454213. Rule: APPROVE, or what is owed.
 Write .checkpoints/netcode-proof-test/advisor-f1-main69-head.md (plan first, then each block as it is done); end with
 "Decisions needed" and "For Mustafa", then, once both blocks are written, the last line `Status: COMPLETE <date and UTC
 time>`.
