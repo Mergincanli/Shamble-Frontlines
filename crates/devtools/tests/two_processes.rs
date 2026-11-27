@@ -8,9 +8,11 @@
 //! as not valid, never as passed.
 
 use std::hash::{BuildHasher, RandomState};
+use std::path::Path;
 use std::process::Command;
 
 use devtools::compare::{Column, first_difference};
+use devtools::files::read_plain;
 use devtools::recording::{Recording, TickHashes, parse_hashes};
 use devtools::replay::replay;
 use devtools::scripts::{RECORDINGS, looped};
@@ -108,11 +110,11 @@ fn two_more_processes_give_the_same_hashes_as_each_other_and_as_the_files() {
             continue;
         }
         // What the children got is what the committed files hold.
-        let path =
-            |suffix: &str| format!("{}/recordings/{name}.{suffix}", env!("CARGO_MANIFEST_DIR"));
-        let bytes = std::fs::read(path("rec")).expect("the committed recording");
+        let folder = Path::new(env!("CARGO_MANIFEST_DIR")).join("recordings");
+        let bytes = read_plain(&folder, &format!("{name}.rec")).expect("the committed recording");
         assert!(Recording::decode(&bytes).is_ok());
-        let hashes = std::fs::read_to_string(path("hashes")).expect("its hashes file");
+        let hashes = read_plain(&folder, &format!("{name}.hashes")).expect("its hashes file");
+        let hashes = String::from_utf8(hashes).expect("its hashes file is text");
         let file = parse_hashes(&bytes, &hashes).expect("its hashes file reads");
         assert_eq!(
             first_difference(&file, &a, Column::Whole),

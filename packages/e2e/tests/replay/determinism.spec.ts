@@ -6,6 +6,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { expect, test } from "@playwright/test";
+import { readPlainFile } from "../../../sim-worker/boundary/plain-file.ts";
 import { checkReplayable, firstDifference, readHashes, readRecording } from "../../../sim-worker/src/recording.ts";
 
 const root = fileURLToPath(new URL("../../../..", import.meta.url));
@@ -65,11 +66,13 @@ test("every recording replays in the browser's WebAssembly, on the file players 
   const names = readdirSync(recordings).filter((name) => name.endsWith(".rec"));
   expect(names).toContain("first-loop.rec");
   for (const name of names) {
-    const recording = readRecording(readFileSync(path.join(recordings, name)), 30);
+    // Each file is read once, only when it is a plain file in a plain folder; the digest is of the bytes replayed.
+    const bytes = readPlainFile(recordings, name);
+    const recording = readRecording(bytes, 30);
     checkReplayable(recording);
-    const hashes = readHashes(readFileSync(path.join(recordings, name.replace(/\.rec$/, ".hashes")), "utf8"));
+    const hashes = readHashes(new TextDecoder().decode(readPlainFile(recordings, name.replace(/\.rec$/, ".hashes"))));
     // The hashes file names its recording by digest: it is this recording's.
-    const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", Uint8Array.from(readFileSync(path.join(recordings, name)))));
+    const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", Uint8Array.from(bytes)));
     expect(hashes.recordingSha256).toBe(Array.from(digest, (byte) => byte.toString(16).padStart(2, "0")).join(""));
     const expected = hashes.lines;
     const steps = recording.steps.map((step): Step => [step.hostMs, step.post, step.held, ...step.presses]);

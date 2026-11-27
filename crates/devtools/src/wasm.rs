@@ -9,6 +9,7 @@ use wasm_bindgen::prelude::*;
 // Linked whole, so that its start function installs the real hook and `panic_buffer` is an export of this module.
 use sim_wasm as _;
 
+use crate::content_proofs;
 use crate::files::vector_text;
 use crate::recording::{Recording, hashes_text};
 use crate::replay::replay;
@@ -58,6 +59,38 @@ pub fn replay_state_at(recording: &[u8], tick: u32) -> String {
     let text = read_recording(recording)
         .and_then(|read| vector_text(&read, tick).map_err(|error| format!("error: {error}")));
     text.unwrap_or_else(|why| why)
+}
+
+/// The content reader's proofs (content items 1 and 2), each as the native tests run it, each an empty text when it
+/// holds or what differs when it does not. The number corpus: the reader's bits and the writer's text against a
+/// browser engine's own, number by number.
+#[wasm_bindgen]
+#[must_use]
+pub fn content_corpus(corpus: &str) -> String {
+    content_proofs::corpus_check(corpus)
+}
+
+/// The tree corpus: the canonical writer's text against the engine's `JSON.stringify` with sorted keys.
+#[wasm_bindgen]
+#[must_use]
+pub fn content_trees(trees: &str) -> String {
+    content_proofs::trees_check(trees)
+}
+
+/// The classes of broken files and the fuzz run's first inputs, judged here and compared with the committed
+/// digests of the native verdicts: record for record, messages included.
+#[wasm_bindgen]
+#[must_use]
+pub fn content_verdicts(expected: &str) -> String {
+    content_proofs::verdicts_check(expected)
+}
+
+/// The inputs that lean on the loader's caps, each against its verdict; whoever calls it reads the clock and the
+/// module's memory.
+#[wasm_bindgen]
+#[must_use]
+pub fn content_limits() -> String {
+    content_proofs::limits_check()
 }
 
 /// The state hash's function over `length` bytes, `rounds` times over: for the reading of its cost in WebAssembly

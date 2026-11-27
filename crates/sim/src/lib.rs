@@ -5,6 +5,7 @@
 
 pub mod rng;
 pub mod state_hash;
+pub mod time;
 pub mod world;
 
 pub use rng::ChaCha8;

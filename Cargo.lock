@@ -23,12 +23,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "content"
+version = "0.0.0"
+
+[[package]]
 name = "devtools"
 version = "0.0.0"
 dependencies = [
- "client-endpoint",
+ "content",
  "protocol",
- "room",
  "sim",
  "sim-wasm",
  "wasm-bindgen",
