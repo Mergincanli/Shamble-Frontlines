@@ -52,7 +52,10 @@ for (const row of table.rows.filter((r) => Object.hasOwn(r, 'field'))) {
     if (wrong.length > 0) bad += 1;
     said = hits.map((h) => `${h.where} prints ${h.printed}${Number(h.printed) === c ? '' : ' (NOT the content value)'}`).join('; ');
   } else {
-    const names = equal.filter((line) => oldName !== '' && line.startsWith(`- ${oldName} = `));
+    // The old game's term as the table writes it ("T.accel (speed-up)" is a name of the comparison's own), else
+    // without the table's note in brackets ("STAM.regen (as 1 over it)" is STAM.regen).
+    const asWritten = equal.filter((line) => row.old_game && line.startsWith(`- ${row.old_game} = `));
+    const names = asWritten.length > 0 ? asWritten : equal.filter((line) => oldName !== '' && line.startsWith(`- ${oldName} = `));
     if (names.length !== 1) bad += 1;
     said = names.length === 1 ? `not in the list: the old game has the same (the comparison's EQUAL list: "${names[0].slice(2)}")` : 'NOT in the list, and no EQUAL line names its old-game term';
   }

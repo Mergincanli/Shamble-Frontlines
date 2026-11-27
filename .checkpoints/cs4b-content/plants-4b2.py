@@ -48,6 +48,44 @@ def export(body, more=""): return [(BINDINGS, USE, USE + more + "\n#[wasm_bindge
 VECTOR = "parry3d::math::Vector::new"
 def through_sim(body): return [(SIM, MODS, "pub fn planted(a: f32, b: f32, c: f32) -> f32 { " + body + " }\n" + MODS)] + export("sim::planted(a, b, c)")
 
+# Step 8's second part (Builder V6, 2026-11-27): plants on the repository's own content. Every planted number is
+# read from its file and changed by script, never typed (his rule: no value of his is typed by hand).
+SOLDIER, TABLE_FILE, MAP_FILE = "content/movement/soldier.json", "content/source/testlines-table.json", "content/maps/test-scene.json"
+def content_line(path, key):
+    """The one line of a content file that holds `key`, and its number's text, both as they stand."""
+    found = [line for line in open(path).read().split("\n") if line.startswith(f'  "{key}": ')]
+    if len(found) != 1: raise SystemExit(f"{path}: {len(found)} lines hold {key}")
+    return found[0], found[0].split(": ", 1)[1].rstrip(",")
+def ulp_up(path, key):
+    """`key`'s line, the same line with its number one step of a double up, and the two numbers' texts."""
+    import math
+    line, text = content_line(path, key)
+    up = repr(math.nextafter(float(text), math.inf))
+    return line, line.replace(f": {text}", f": {up}", 1), text, up
+def numbers_swapped(path, first, second):
+    """Two adjacent lines of a content file, the same two with their numbers exchanged, and the two numbers' texts."""
+    (a, x), (b, y) = content_line(path, first), content_line(path, second)
+    if f"{a}\n{b}\n" not in open(path).read(): raise SystemExit(f"{path}: {first} and {second} are not adjacent lines")
+    return f"{a}\n{b}\n", f"{a.replace(f': {x}', f': {y}', 1)}\n{b.replace(f': {y}', f': {x}', 1)}\n", x, y
+def fields_swapped(path, first, second):
+    """The table's text from `first`'s field line through `second`'s, and the same with the two field names exchanged."""
+    text = open(path).read()
+    start, end = text.index(f'"field": "{first}"'), text.index(f'"field": "{second}"') + len(f'"field": "{second}"')
+    old = text[start:end]
+    return old, old.replace(f'"{first}"', "\0").replace(f'"{second}"', f'"{first}"').replace("\0", f'"{second}"')
+def millimetre_up(path, shape_id):
+    """`shape_id`'s top (its max's second number) and the same one millimetre higher, in decimal text."""
+    from decimal import Decimal
+    text = open(path).read()
+    head = f'"id": "{shape_id}",\n      "max": [\n'
+    lines = text[text.index(head) + len(head):].split("\n")
+    top = lines[1].strip().rstrip(",")
+    return head + lines[0] + "\n" + lines[1] + "\n", head + lines[0] + "\n" + lines[1].replace(top, str(Decimal(top) + Decimal("0.001")), 1) + "\n"
+WALK_LINE, WALK_UP, WALK_TEXT, WALK_NEW = ulp_up(SOLDIER, "walk_speed_m_per_s")
+STAMINA_OLD, STAMINA_NEW, SPRINT_TEXT, REFILL_TEXT = numbers_swapped(SOLDIER, "sprint_time_from_full_s", "stamina_refill_time_s")
+ROWS_OLD, ROWS_NEW = fields_swapped(TABLE_FILE, "sprint_time_from_full_s", "stamina_refill_time_s")
+POST_OLD, POST_NEW = millimetre_up(MAP_FILE, "yard_lane_post_50")
+
 # name, kind, what the defect is, the edits (file, text there once, its replacement), the command, the words its output must hold
 PLANTS = [
     ("P1", "defect", "a fused multiply-add exported from our own bindings", export("a.mul_add(b, c)"), WASM,
@@ -163,6 +201,18 @@ PLANTS = [
      ["the Export is the pinned one"]),
     ("T10", "defect", "an Export made at 60 steps a second is handed over", [(HANDOVER, "  if (rate !== 30) throw", "  if (rate === undefined) throw")], HAND,
      ["the Export is the pinned one"]),
+    ("C1", "defect", "his movement table holds a value one step of a double from his Export's (the hand-over's check on the real files)", [(SOLDIER, WALK_LINE, WALK_UP)], HAND,
+     [f"walk_speed_m_per_s is {WALK_NEW}, and his Export has {WALK_TEXT}"]),
+    ("C2", "defect", "the same value, caught by the second route", [(SOLDIER, WALK_LINE, WALK_UP)], FILES,
+     [f"values.movement.walk_speed_m_per_s is {WALK_TEXT} in his Export, and the loader's walk_speed_m_per_s is {WALK_NEW}"]),
+    ("C3", "defect", "two rows of the table send their values to each other's field, and the movement table is written from that table (the second route)", [(TABLE_FILE, ROWS_OLD, ROWS_NEW), (SOLDIER, STAMINA_OLD, STAMINA_NEW)], FILES,
+     [f"values.stamina.refill_time_from_empty_s is {REFILL_TEXT} in his Export, and the loader's stamina_refill_time_s is {SPRINT_TEXT}"]),
+    ("C4", "control", "the same mis-mapped pair passes the hand-over's own check, which is what the second route is for", [(TABLE_FILE, ROWS_OLD, ROWS_NEW), (SOLDIER, STAMINA_OLD, STAMINA_NEW)], HAND, []),
+    ("C5", "defect", "the test scene's last lane post one millimetre taller: its world is not the committed one", [(MAP_FILE, POST_OLD, POST_NEW)], PROOF,
+     ["the test scene's world is not the committed one"]),
+    ("C6", "control", "the clean content: the content folder's tests", [], FILES, []),
+    ("C7", "control", "the clean content: the static world's tests", [], PROOF, []),
+    ("C8", "control", "the clean content: the hand-over's tests", [], HAND, []),
 ]
 
 def note(name, kind, ok, what, detail):

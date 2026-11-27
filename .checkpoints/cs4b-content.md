@@ -15,7 +15,7 @@
   `claude/cool-pasteur-oiqk1r` ends at 7f5ba3966def8c36e2c3863c6b2fda7b4b9a9169 and is never pushed to again (his
   Lanes rule: one account per branch) · **Base:** 4b-1's origin/main 2483e9a741c4e552323c36523831a2f35de4002e (the
   merge of 4a, pull request #70); 4b-2 counts against b9aad01954be666340a7ec5c6e9fc9353b11abf1 (the merge of 4b-1)
-- **Last update:** 2026-11-27 15:32 Amsterdam (from the clock)
+- **Last update:** 2026-11-27 15:51 Amsterdam (from the clock)
 
 ## Sizes and stop lines (his answer of 2026-11-26, 14:09:13 UTC: SIZE-4B (b); which number is which)
 - **4b is two pull requests**, in engine-architect's cut; "each stands on its own: lines left over in 4b-1 do not
@@ -1049,6 +1049,49 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
     refill time by its other name, push strength): three pairs are equal (the two easing times 0.164, body and
     push radius 0.4, step-up and the sights multiplier 0.55), so **a row swapped within one of those pairs
     passes every check**: said in the test and in the report as not verified.
+- **Step 8, second part: the content files from his Export, and the tests on the real files: DONE** (commit
+  **5cef19f8648860160c0e95f2bf5e4ed3a06590af**, 2026-11-27 14:50:27 UTC, pushed; on his DIFF-LIST (a); the gate
+  passes with smoke; the full local checks passed whole, 14:40:27 to 14:46:45 UTC: 222 Rust tests twice, 221 in
+  release, clippy clean, client 137, sim-worker 51, types 8, net 1, 36 boundary tests, the type checks, 19 browser
+  tests in 196 s, the recordings unchanged, the players' file unchanged (54,514 bytes, b4a9774f...59ba); the
+  committed Export's bytes read back from the commit: sha256 a9d47785...c4ab; **5,129 written lines of 4b-2**, of
+  8,450: the part took 173, the sheet's count for it 100; two thirds, 5,633, not reached). **The report's first
+  lines say that `content/source/` changes (his SOURCE-GO).**
+  - `content/source/testlines-export.json`: `cs4b-content/testlines-export-30.json` byte for byte (`cp`, then
+    sha256 a9d47785ed8f70d895d10480d180c9bba5a67f7e955e0c460c0c1bef7718c4ab: the pin in `testlines.mjs:39`;
+    15,508 bytes). `content/source/testlines-export.manifest.txt` by `content-source-manifest.mjs` (the choice
+    above; first commit of the Export's notes copy c2beffe3af82b1eea92f8cacc06e7e0dae455508, read from `git log
+    --full-history`). `content/source/testlines-table.json`: the draft byte for byte (16 rows).
+  - `content/movement/soldier.json` by `testlines.mjs write` ("15 values from his Export ... written"), then
+    `--check` ("15 values, each his Export's"). **No range of the movement kind refused a value of his** (the
+    loader took the file as it stands: the advisor agent's condition). **Held against the list he said yes to,
+    by script** (`cs4b-content/diff-list-agree.mjs`, its output `diff-list-agree.txt`): every value agrees; 5 of
+    the 15 are the rows his printed list shows (sprint multiplier 1.52 in parts A and B; air control 100, body
+    radius 0.4, push strength 8, push radius 0.4 in part C), the other 10 equal the old game by the comparison's
+    EQUAL list. For the report: the game takes his jump reach 3.071 (his Export's `values.jump.jump_reach_m`);
+    the list's "equal" sentence names the old game's 3.0708, equal at the Export's three decimals.
+  - `content/maps/test-scene.json`: the draft, then `canonical.mjs maps/test-scene.json` (6,654 bytes before
+    and after: the keys sorted, no value changed, checked by script). `cargo run -p devtools --bin
+    content_bundle -- --check`: "2 content files, a bundle of 8375 bytes, sha256
+    b9901bc9e0244aee8888fc965284c2fe952abc8b38a49c6621d575df8ecd7fd3: every file is what the loader takes;
+    nothing written".
+  - Tests on the real files: `tests/content_files.rs` +2 (the repository's `content/` is the two files and the
+    loader takes both; **five of his values by a second route**, found by name in his Export's text, read with
+    the standard library's reader, held bit for bit against the loader's fields, no value typed);
+    `tests/static_world.rs` +1 (the test scene through the loader and the builder: judged, depth 7 of at most
+    31, and its tree the committed line `vectors/content-worlds.txt`: `test-scene shapes 23 depth 7 tree
+    ffc96a10bc10cc1f`, written once with `SHAMBLE_WRITE_WORLD=1` on that test alone; **natively only**: no
+    WebAssembly or browser run holds the real map yet, for the report); `testlines.test.mjs` +1 (`--check` on
+    the real files: "15 values, each his Export's").
+  - `docs/REPO_MAP.md`: one row for `content/` (the repo-map check said "missing from the map: content/";
+    after the row: OK, 238 entries cover 110 required paths). The row quotes his SOURCE-GO from the register.
+  - **Plants C1 to C8 in `plants-4b2.py`, run by hand, all as they should be** (4 defects caught by their checks'
+    own words, 4 controls held, every file put back: sha256 of 17 files): a value one step of a double off
+    (caught by the hand-over's check, C1, and by the second route, C2); two rows sent to each other's field
+    with the table written from them (caught by the second route, C3; **the hand-over's own check passes it,
+    C4**: what the second route is for); the last lane post a millimetre taller (the committed tree, C5); the
+    three clean runs (C6 to C8). Every planted number is read from its file and changed by script. The names
+    were first S1 to S8, which the stamp plants already use; renamed before any record of them was kept.
 
 ## Slips of this chat's own rules, for the report
 - One git command did not start its own shell call: `git add .checkpoints/cs4b-content/review-brief-4b1.md` stood
@@ -1128,7 +1171,8 @@ again here. SEAT-OUT from him: stop at a whole point and report the last commit'
    it; the machine's tools made again (the list below); the count reproduced (4,956 against b9aad01); the full
    local checks on 35e96ad passed whole, the players' file byte for byte 5c6738a's; the gate passed with smoke
    (the card's entry "The seat moved to Builder V6").
-1. **Step 8, second part.** `content/source/testlines-export.json` = `cs4b-content/testlines-export-30.json`
+1. **Step 8, second part: DONE (5cef19f; the card's entry "Step 8, second part").** As planned:
+   `content/source/testlines-export.json` = `cs4b-content/testlines-export-30.json`
    byte for byte (sha256 a9d47785ed8f70d895d10480d180c9bba5a67f7e955e0c460c0c1bef7718c4ab, the pin in
    `packages/client/scripts/testlines.mjs`); its manifest beside it (it must hold the line `sha256: <that
    digest>`); `content/source/testlines-table.json` = `cs4b-content/testlines-table-draft.json` (16 rows).
@@ -1141,7 +1185,9 @@ again here. SEAT-OUT from him: stop at a whole point and report the last commit'
    held by a second route (found in the Export's own text by their names, never typed: his rule) against what
    the Rust loader reads; `StaticWorld::build` on the real map (depth, a committed tree digest). The report's
    first lines say that `content/source/` changes (his SOURCE-GO answer).
-2. **Step 9** (the sheet's row 9, `cs4b-content/reread-sheet.md:167`). Done already: its manifest line with
+2. **Step 9** (the sheet's row 9, `cs4b-content/reread-sheet.md:167`), **built in the three cuts of
+   `cs4b-content/step9-order.md`** (each ends green; the advisor agent is told of the cuts at its final read).
+   Done already: its manifest line with
    the dependency rule (c09f459, as security-auditor approved it on two digests) and the generated content types
    with their export test (6290c85), the page folder's plain files and the markup-sink scan (5c6738a). Left:
    the constructor's bundle argument and every caller, the page's `content.ts`, the build running
@@ -1208,9 +1254,10 @@ in two lines.
 ## Current step
 4b-2 (2026-11-27, 15:14 Amsterdam, from the clock; Builder V6): every piece of steps 6 to 10 that needs no content
 file is built and pushed (head of the code: 5c6738a; 4,956 written lines of 8,450). DIFF-LIST is answered (a).
-The HAND-OVER list's item 0 is done (35e96ad: main in, CI green, the baseline checks and the gate green on this
-machine, 4,956 reproduced). In hand (15:32 Amsterdam): its item 1, step 8's second part (the content files, then
-the four tests on the real files and their plants).
+The HAND-OVER list's items 0 and 1 are done (35e96ad: main in; 5cef19f: step 8's second part; 5,129 written lines).
+In hand (15:51 Amsterdam): its item 2, step 9, in the three cuts of `cs4b-content/step9-order.md`, from cut A (the
+build writes `content.json`). CI on 5cef19f is read before the next code push (a code push cancels a toolchain
+run in progress).
 
 ## Next steps (the sheet's revision 3, section G; each step ends with the count of written lines)
 - **4b-1:** 1 the content crate's manifests · 2 the reader, the writer, the bundle, the two kinds, the old tuning's
