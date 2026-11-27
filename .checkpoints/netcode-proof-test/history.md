@@ -8194,3 +8194,14 @@ go
   It is not his reply to Builder 2's merge command: that command has not been named yet (NB2-PROMPT (a): the command
   named first, then his reply to it).
   Transcript line 114521 (a queue-operation enqueue at 14:30:50.960Z), 2 characters.
+
+## Mustafa, 2026-11-27 14:52 UTC, in this chat: prep work with the 5% left (word for word)
+```text
+Go on start, there is still 5%. 
+Just do some prep work and save in between so you have a jump start once the usage is reset
+```
+- **Read as** (the main session's reading, not his words): use the usage left before the 15:50 reset for preparation
+  only, each piece cut-safe and saved as it lands (the part-clean, Builder 2's merge folder and message file, B's
+  step-7 brief, UM-4's drafts), so UM-4's build and Builder 2's merge start at once after the reset; no no-save
+  stretch is started now (his 13:55 item 1's limit stands).
+  Transcript line 114972 (a queue-operation enqueue at 14:52:40.053Z), 124 characters.
