@@ -183,7 +183,7 @@ If the copy is lost: rebuild it from the applied rows plus the plan; never guess
 | 8 | .claude/hooks/guard.mjs | Edit: the allow output | IN: 3773e463 (equals the copy; guard suite 1581/1581 in the real folder) |
 | 9 | .claude/agents/security-auditor.md | Edit: :54 | IN: e11c52d5 (equals the copy) |
 | 10 | .claude/agents/advisor.md | Write (whole file) | IN: 60bc9e36 (equals the copy) |
-| 11 | CLAUDE.md | Edit: :62-:133 | not applied |
+| 11 | CLAUDE.md | Edit: :62-:133 | IN: dcd8f563 (equals CLAUDE.md.new) |
 Order why: the guard runs live from disk in this session, so its call site (5) goes in before mcp() reads the input (6),
 and gh() (7) after the definitions it uses (6); each state in between parses and fails toward a refusal or a prompt.
 
