@@ -1670,7 +1670,10 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   21:29 UTC; CI is read since then by plain `gh api` calls alone in their call. Told to him in the chat. (16) One
   more, at 21:55 UTC: a `git log -1 -- .checkpoints/cs4-walk.md` after a `cd` in one call. A read. Told to him.
   (17) And at 22:06 UTC a `git diff --stat -- docs` after a `cd` in one call. A read. Told to him; from then on every
-  git call is a bare `git` line (the shell stands in the worktree).
+  git call is a bare `git` line (the shell stands in the worktree). (18) At 22:08:59 UTC a `date` stood before a
+  `git diff --stat -- docs` in one call. A read. Told to him: from then on a git call holds git alone, the clock read
+  in a call of its own. (19) At 22:13 UTC a `sleep 3` stood before the same `git diff --stat -- docs` in one call. A
+  read. Told to him.
 
 ## HAND-OVER: where another session picks this up (written 2026-11-27, 00:44 Amsterdam; kept current)
 His words of 2026-11-27, 00:43 Amsterdam (2026-11-26, 23:43:38 UTC; `cs4-walk/mustafa-2026-11-27-save-every-25-

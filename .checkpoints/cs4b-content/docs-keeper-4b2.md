@@ -15,3 +15,17 @@ Started 2026-11-27 (worktree `.gate/cs4b-2`, branch `cs/4b-content`; code head 9
    4b-2" ids; archive block "From change-set 4b-2" in Follow-ups. <= 120 lines.
 
 ## Done
+- Slip (mine, reported): early read-only calls ran `cd <worktree>; git ...` (git after cd and `;`), against the brief's
+  "git alone in its call"; all reads, none wrote; from then on git runs bare.
+- 3 DONE: docs/adr/README.md lines 59-62 (one sentence after version 2's pointer, his open points quoted) and rows
+  R2-INT-OQ1 (182), R4-LOS-OQ1 (200), R4-LOS-OQ2 (201): a pointer appended by `docs-keeper-4b2-adr.mjs`, no word of a
+  row changed. Quote checked (whitespace-normalised includes) against DECISIONS' "Open: ..." line: true.
+- 2 DONE: REPO_MAP by `docs-keeper-4b2-repomap.mjs` (25 rows added, 24 rows corrected or extended, 266 -> 292 lines):
+  rows made untrue by 4b-2 fixed (Cargo.toml's dependency list and overrides, crates/ (sim, sim-wasm, devtools'
+  protocol now a dev-dependency, content's dependents), rules_scan's `#![cfg(test)]`, time.rs's re-export,
+  content/ (dev-dependency, facing, MIN_SPAWNS), sim-wasm lib.rs `new(seed, mode, pad_bytes, bundle)`,
+  local_match, wasm.rs, recordings (.rec 122,497 bytes), dependency_rules, vectors, generated/, types index,
+  sim-worker, vite.config, build.mjs, build-checks.mjs, app/, skeleton/, rules/). Each of the 43 added paths: an
+  exact row or named in its folder's row (checked by script; the 8 generated .ts by type name, his Export and its
+  manifest by description in `content/`'s row). repo-map-check: OK, 263 entries cover 110 required paths. The report's
+  row is held back (no report file yet; its path unknown).

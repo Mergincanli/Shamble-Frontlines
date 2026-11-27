@@ -5,7 +5,7 @@ DRAFT until the verifier's PASS and docs-keeper's pass: the marks [after] are fi
 Asked by Builder V6 (the main session), 2026-11-27. The worktree is `/home/user/Shamble-Frontlines/.gate/cs4b-2`
 (local branch `cs/4b-content`, pushed as `claude/ecstatic-wozniak-5cbdzs`). **The final head: [after]** (the notes
 out of it; the commit before it holds the notes, the report's sources, the pull request's text and the go-question
-file). Main is b8f02b0, merged in at 35e96ad; main has not moved since (fetched [after]). Your agent file on main
+file). Main is b8f02b0, merged in at 35e96ad; main has not moved since (fetched at 21:50 UTC; fetch again). Your agent file on main
 last changed 2026-11-13 (8523d50), before this session started, and this branch does not change it.
 
 **What it is.** Steps 6 to 11 of the re-read sheet's revision 3, section G (`reread-sheet.md`, which you approved on
@@ -24,7 +24,9 @@ asking every change committed, each check then passing on the same files); every
 **Reviews.** Round 1 on c442a80 (six reviewers) and its fix pass (70f11e1); round 2 on what changed (five
 reviewers, every one PASS, Lows only) and its fix pass ([after: the code commit]). **No reviewer read round 2's fix
 pass itself:** please read it (`git diff 70f11e130ee9dc0aabbb61a01bb9d3a6c013418e [after] -- . ":(exclude).checkpoints"`);
-its one change to shipped code is `crates/content/src/map.rs`'s spawns check (now held to `MIN_SPAWNS` itself).
+its one change to the players' file is `crates/content/src/map.rs`'s spawns check (now held to `MIN_SPAWNS` itself);
+its change to the ramp's guard in `crates/sim/src/collision.rs` is product code that no step calls yet, so not in
+that file (the verifier's wording).
 
 **Named questions for your ruling (APPROVE, REVISE with what, or ESCALATE to Mustafa with why):**
 - **Q1.** Security-auditor left two risks for acceptance, both on the developer's own computer: (a) a browser that

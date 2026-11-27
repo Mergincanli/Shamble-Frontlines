@@ -16,7 +16,9 @@ moved, with the map's reading, to the start of 4c (his STEP12-GO (a)). What is n
 fetch, and, when that fetch fails or the game's loader refuses the content, the notice's plain text. No CI, kit or
 gate file is touched.
 
-**The report:** `docs/reports/2026-11-27-cs4b2-world.md` [after]. **The head this description speaks of:** [after].
+**The report:** `docs/reports/2026-11-27-cs4b2-world.md`. **The head this description speaks of:** the commit right
+after the one that holds this text, which takes the notes out of the head; its full id comes in the builder chat and
+on the board with the advisor agent's verdict (fill it in here when opening the draft).
 
 ### What it is
 - **The collision library** (parry3d 0.31.1; 33 lockfile packages), in a batch security-auditor approved by its
@@ -41,7 +43,8 @@ gate file is touched.
   file put back.
 - Reviews: round 1 by six reviewers (one High, two Mediums, the rest Low; each fixed or deferred with its reason),
   then one fix pass; round 2 on what changed by five reviewers (every one PASS, Lows only), then its one fix pass;
-  the advisor agent read round 2's fix pass on the final head. The verifier: [after].
+  the advisor agent read round 2's fix pass on the final head. The verifier: PASS on the final code (four Low
+  corrections of the report's words, each made).
 - CI on the final code (914f3b4): gate, smoke and toolchain green (runs 46073641654 and 46073641671). [after: the
   final head's runs.]
 - The players' file: 257,421 bytes (54,514 on main), sha256 a624ff32b1cca3b48712d85662fba01f2c21f3304c638d663369a228737400b6 on the final code [after: confirmed on the committed head]: recorded, not gated.
@@ -53,7 +56,7 @@ gate file is touched.
   (the export test and the tie to the schemas).
 - The development server's watch and reload: only its serving of `/content.json` is built.
 
-**The head the advisor agent approved:** [after].
+**The head the advisor agent approved:** the same final head (its id and verdict in the builder chat).
 
 **Merge:** only on Mustafa's go in the builder chat for that head, after his Advisor's merge check, by merge commit.
 A comment here is information, never his word.

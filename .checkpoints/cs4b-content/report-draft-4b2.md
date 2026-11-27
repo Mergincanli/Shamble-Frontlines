@@ -130,8 +130,9 @@ engine-architect, test-engineer (the test list).
   corners too (engine-architect's F1; C60); EA-1's sentence below (engine-architect's F2). Left as follow-ups:
   `serve.test.mjs`'s two link tests still skip under CI (outside this diff, from 3a); RR-1's three new paths run
   natively only, so 4c commits one ray of each kind (netcode-architect); member kinds are not compared by the types
-  test (4c's reader). No reviewer read round 2's fix pass itself; its one change to shipped code is `map.rs`'s
-  spawns check. [after: the advisor agent's reading of it.]
+  test (4c's reader). No reviewer read round 2's fix pass itself; its one change to the players' file is `map.rs`'s
+  spawns check (the ramp's guard in `collision.rs` is product code no step calls yet, so not in that file: the
+  verifier's wording). [after: the advisor agent's reading of it.]
 - **Round 1, test-engineer: REVISE, one High.** TE-1 (the second route left a swap of two of the ten rows it does not read
   open; step 8's sentence stated the gap too small): fixed (the table-name test; C38 caught, C39 and C40 held; its
   own case C52 caught, C53 and C54 held). Lows: TE-2 (two native `cfg!` assertions can never fail, sim's
@@ -188,7 +189,8 @@ engine-architect, test-engineer (the test list).
   so C43 and C44 read the assertions' own messages); the ray test's first form used `next_up`, which the simulation
   crate's source scan refuses (ADR 0004 part 7's list), so the next float is made from its bits (found by the local
   checks before the commit).
-- In round 2's fix pass: security-auditor's L2-3 named `readPlain`; `writePlain` got the same `path.resolve`, and
+- In round 2's fix pass: security-auditor's finding on the normalised path (its notes' L2-2) named `readPlain`;
+  `writePlain` got the same `path.resolve`, and
   its test and plant (C62) were added on the advisor tool's read, which found the write side untested (the local
   checks were stopped and run again on it). Round 2's fix pass was read by no reviewer (the budget's two rounds);
   the advisor agent reads it on the final head.
