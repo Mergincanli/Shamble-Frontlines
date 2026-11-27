@@ -142,3 +142,5 @@ the plan's M8 done line and on the card).
 - M7: the node_modules link removed (the install in agent-abf71d95fc07b3522 kept); `node tools/gate.mjs --no-smoke`
   GATE PASS (base b9aad01); `node .claude/scripts/repo-map-check.mjs` "repo map OK: 245 entries cover 110 required
   paths"; `git status --short`: the 6 paths staged and notes only.
+- The done lines' silent checks are re-proved in printing forms by exit-silent.md items 1, 3-5 and 8, and by the head
+  read (advisor-u8-f1-head.md, block 1). The done lines themselves stay as written, the record of what ran.

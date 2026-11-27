@@ -1,8 +1,10 @@
 # UM-4: the `ops` step's own change, the plan (written 2026-11-27 06:2x UTC by the main session)
-Status: DRAFT rev 0.2 for the advisor's check in the 10:50 UTC window (rev 0.2, 08:5x UTC: the advisor tool's points
-folded in: a light base run first, npm's cleared form with no audit, the order after U7's builder worktree, the
-node_modules facts, Q4). Nothing is built before that check, and the build also
-waits on his U8-FILLS answer (msg-2026-11-28.md: whether UM-4's lines count against U8's 6,282 stop). The parts are
+Status: rev 0.3, APPROVED WITH CONDITIONS UM4-1 to UM4-8 (advisor-um4-plan.md, A2 a0530735048f1620a, 11:15 UTC),
+all applied word for word by Edit 11:2x UTC; Q1-Q4 answered there (Q4: the web step's form; npm ci's built-in audit
+falls under "npm audit, never retried in any wording"). C ran 11:09 (its result read) and U7's builder worktree was
+removed 11:1x. (Rev 0.2, 08:5x UTC: the advisor tool's points folded in: a light base run first, npm's cleared form
+with no audit, the order after U7's builder worktree, the node_modules facts, Q4.) Nothing is built before his
+U8-FILLS answer (msg-2026-11-28.md: whether UM-4's lines count against U8's 6,282 stop). The parts are
 A's UM-4 (advisor-u7-merge.md:39-54), word for word in their order; the file and line numbers are today's (U7's merge
 moved check.test.mjs's pin from :2785 to :2847).
 
@@ -10,6 +12,17 @@ moved check.test.mjs's pin from :2785 to :2847).
 u8-brief.md:524 closes U8 with "merge, then the `ops` step in check.mjs". Until it lands, every whole run keeps
 choice 15 (i): U8's ops tests and wrappers.test.sh run beside `node check.mjs` in the same main-run.sh call. The step
 puts them inside check.mjs, so a whole run cannot leave them out.
+
+## Protocol lines (UM4-8, word for word)
+- Change type: logic in the spike's check script. Evidence: red-then-green Node tests on the real code, the real
+  missing-folder run (2b), the counted run.
+- Risk tier 1.
+- Mustafa's Brave check: none (nothing a player sees, hears or feels).
+- Reviewers, one round on the final diff, in the window of the head read (LEAN-MODE's new-agent rule), each at its
+  agent file's model and effort:
+  - test-engineer: the step, its tests and 2b's log;
+  - security-auditor, a short read: the step's two commands, and step 3's install record against its own clearances
+    (security-u7-deps.md items (3)-(4) and SEC-U7D-3; security-u8-deps.md C2 and C3).
 
 ## Facts (read 06:2x UTC on 11-27, H0 833c3f0 plus U8-F1's staged six files)
 - check.test.mjs:2847 pins the step list: `assert.deepEqual(Object.keys(STEPS), ["fmt", "clippy", "clippy-wasm32",
@@ -34,36 +47,56 @@ puts them inside check.mjs, so a whole run cannot leave them out.
   <dir>`, with `npm_config_ignore_scripts=true` in its environment (check.mjs:2656-2667; security-u7-deps.md items
   (3)-(4)). With `--no-audit`, npm sends no audit request at all.
 - Order: check.mjs and check.test.mjs are two of the 43 paths U7's builder stages for its fast-forward to 0efbbef
-  (A's re-ruled form; ffcheck 08:4x). A UM-4 commit to them before that fast-forward makes the staged copies differ
-  from the target, and git refuses it. So UM-4's commit waits until that worktree is fast-forwarded, or until A rules
-  it stays (the form's fallback (b)).
+  (A's re-ruled form; ffcheck 08:4x). C's target is the fixed commit 0efbbef9…, so no later lane commit changes what the
+  builder fast-forwards to. UM-4's commit still waits until C's result is read (C was sent 11:0x on 11-27), so one
+  thing moves at a time (UM4-6).
 
 ## Steps (each its own call; on the lane, after U8-F1's merge and B's head read; the commit after U7's builder worktree)
-0. **The light base run, at UM-4's H0** (its own save first): one main-run.sh call of check.mjs's self, marks, refs
+0. **The preconditions, then the light base run, at UM-4's H0.** Step 0 opens with U8-F1's M0 preconditions
+   (u8-f1-merge-plan.md:61-71), each in a printing form (exit-silent.md) (UM4-4):
+   - no agent or workflow on the lane, the lane lock free, no cargo, rustc or npt process;
+   - HEAD = origin, and the tree clean;
+   - `git fetch origin main`, then `git rev-parse origin/main` = b9aad01… (a code, CI or rules move stops: MAIN-52);
+   - free disk at least 8,192 MiB;
+   - the saver stopped by TaskStop with its proof, and the no-save window running from H0 to step 7's push.
+   Step 0 runs at the build, after his U8-FILLS answer, the same day as step 5 (choice 28).
+   Then the light base run (its own save first): one main-run.sh call of check.mjs's self, marks, refs
    and redact steps only, as U8-F1's M0 (.gate/u8-f1-merge/light-base.log's form), into .gate/um4/light-base.log. Its
    counts are step 5's bars by B's C1 rule (advisor-u8-f1-merge.md:47-55).
 1. **(a) Test first.** check.test.mjs:2847's list gains "ops" after "web". `node --test check.test.mjs` fails on that
    assert (red, recorded). Then check.mjs's STEPS gains `ops` after `web`:
    `node --test 'ops/**/*.test.mjs'`, then `bash ops/tests/wrappers.test.sh`, both in HERE, failing if either fails,
-   summarised with nodeCounts and the wrappers' last line. The self tests pass (green, the count recorded).
+   and failing when node's `# tests` count is 0, or when the wrappers' last line is not
+   `wrappers.test.sh: N ok, 0 failed` with N above 0 (the web step's U7R-TE-4 rule, check.mjs:2677-2678); each case
+   has its own test, red first (UM4-1). Both are summarised with nodeCounts and the wrappers' last line. The self
+   tests pass (green, the count recorded). The step is
+   `export function opsStep(runner = run, present = <the real folder check>)`, with
+   `ops: (runner = run) => opsStep(runner)` in STEPS after `web`, as webStep (check.mjs:2663, :2713). Its tests pass
+   a recording runner and a stand-in `present`, and pin both commands' program, arguments and folder (HERE), as
+   check.test.mjs:1980-1981 pin npm's. check.mjs's header step list gains `ops` (UM4-2).
 2. **(d) A missing folder**, in the same edit: when ops/browser/node_modules is absent, the step fails with one line
    naming that install (UM-4's form, below). Its test passes a stand-in for the folder check (absent: fails with that
    line; present: runs the two commands), so no test touches the real folder. Red first, then green.
+2b. One main-run.sh call, `node check.mjs --only ops` (no cargo), into .gate/um4/absent.log: FAIL with step 2's one
+   line naming the install. The main folder has no ops/browser/node_modules before step 3 (UM4-3).
 3. **(b) U8's fix 2, the real install.** First `sha256sum` of package.json and package-lock.json (the two above). Then
    `env npm_config_ignore_scripts=true npm ci --ignore-scripts --no-audit --no-fund --prefix
-   spikes/netcode-proof/ops/browser`, its own call (the web step's cleared form, Facts). Then both sha256s unchanged and
+   /home/user/Shamble-Frontlines/spikes/netcode-proof/ops/browser` (UM4-7), its own call (the web step's cleared form, Facts). Then both sha256s unchanged and
    `git status --short` unchanged (the folder is a real one, so the root .gitignore's `node_modules/` covers it).
    npm's "added N packages" line is recorded; with `--no-audit` there is no audit line (U8's "4 moderate" stays
    security's reading of the same lock, security-u8-deps.md C3 (c)). It replaces the link form of choice 15 (i) for
    later runs; the kept install in agent-abf71d95fc07b3522 stays until PR #40's close.
 4. **(c) The dependency record.** One note section in dependency-check.md (the install's form as run, both sha256s
-   before and after, npm's "added N packages" line, and the audit line only if Q4's answer is U8's form), with no bare
+   before and after, npm's "added N packages" line; Q4's answer is the web step's form, so the note says: "npm audit not run
+   (`--no-audit`, SEC-U7D-3); security's U8 reading of this lock stands (security-u8-deps.md C2, C3 (c))"), with no bare
    sha256 line: no manifest or lockfile changes, so DEP-HOLD holds nothing. The lock was cleared at U8; the command's
-   flags are Q4's (U8's form, or the web step's flags on it), so whether a new security read is needed is Q4's too.
+   flags are Q4's (U8's form, or the web step's flags on it), and Q4 rules no new security read before the install (security's read of the final diff is UM4-8's).
 5. **The counted run:** one main-run.sh call, `env CARGO_INCREMENTAL=0 node check.mjs` alone: all 13 steps pass. The
    bars, by B's C1 rule: the `ops` step's counts equal U8-F1's M5 (104 of 104; "315 ok, 0 failed"); test, web and
-   wasm (they read only spikes/ content) equal U8-F1's M5 strictly, provided `git diff --name-only ddb06ff HEAD --
-   spikes/` lists only UM-4's two files (else named first); marks, refs and redact (items and findings) equal step 0's
+   wasm (they read only spikes/ content) equal U8-F1's M5 strictly, provided `git diff --name-only ddb06ff HEAD -- spikes/` prints nothing (control:
+   `git diff --name-only 6968215 ddb06ff -- spikes/` lists U8-F1's six) and
+   `git status --short --untracked-files=all -- spikes/` lists only check.mjs and check.test.mjs, as modified (else
+   named first) (UM4-5); marks, refs and redact (items and findings) equal step 0's
    base run; self equals step 0's plus the new tests, each named. Any other difference is named; unexplained, it stops.
    Then `node tools/gate.mjs --no-smoke` PASS and the repo-map check OK.
 6. **(e) Until it lands,** whole runs keep choice 15 (i) (ops tests and wrappers beside `node check.mjs`). After it,
@@ -96,4 +129,4 @@ and two tests in check.test.mjs (about 10-14); dependency-check.md is notes. Cou
   line.
 
 ## Done lines (one per step, by Edit)
-(none yet: the plan's check first, at 10:50)
+(none yet: the plan is approved, UM4-1 to UM4-8 applied; the build waits on his U8-FILLS answer)
