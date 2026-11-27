@@ -4,6 +4,33 @@ Branch `claude/optimistic-albattani-mdoonz` (stands in for `cs/step-2-6-previews
 restarted at main c1da1bd24faae21794195e2384895460753a41eb (#67's merge, 2026-11-25). Risk tier 2 for the build (a CI
 workflow, a deploy token, hosting): the advisor agent and the security-auditor review; his go in a day session.
 
+## PAUSED (2026-11-27): read this first
+His message "FOR BUILDER V5. From Mustafa, 27 November, 14:45 Amsterdam (written with my Advisor)." (message
+212c63fa-a1ce-4945-91b6-77670246a39e, 13:56:04 UTC, 926 bytes, sha256
+5369c162531a6831aadd25f0b064470f6c9452ffde71c36e3f5c3647105565c5; saved whole in mustafa-2026-11-27T1445-pause.md;
+into DECISIONS at the next docs head), in short:
+1. No token sitting today: this account's Opus is nearly used up until Tuesday 1 December, 20:00 (Amsterdam), and what
+   is left goes to the Guard fix chat. He will not store a key while this chat might be cut off before step (d), the
+   check of the wall with the real key.
+2. He does none of the clicks of (a) to (c) now, and nothing is stored: no CLOUDFLARE_ secret, no token. The sitting
+   message (token-sitting-message.md, at 1412d1f) stays as written; its dates are filled in again on the day (a start
+   date of that day and an end date 90 days on; the STATUS reminder 14 days before the end).
+3. This checkpoint saved and pushed; no scheduled task (list_triggers: none); nothing new started; #72's activity
+   subscription stopped so that its wakes spend no more of this account's Opus (re-subscribe on return).
+4. On return, in order: (a) fetch main; it will have moved (the CI Builder's #78 at least); one take-in of main by the
+   scripted method (resolve/verify/control), with the end-date-free docs fixes below, and the advisor agent's review of
+   that head; (b) then the sitting: send token-sitting-message.md with that day's dates; (c) then steps d and e of the
+   sitting, the verifier, the checkpoint folded into the report, ready, the advisor agent's review, his go.
+5. Rules unchanged: git and gh always start their own command, with no other program in front of them; in a shell
+   command, every file written is spelled out with its full path.
+Docs fixes waiting for the next docs commit (the advisor agent's Lows on 19034b7): L-A (DECISIONS: the start block's
+header should say items 8 and 9 and the "Branch head" line came from Builder V2's hand-over message, read only from
+the transcript); L-B (main taken in five times, not four: e3b3642b, main 07d673b0 #71, by Builder V2; in the report,
+STATUS #72's row, ROADMAP's entry); L-F (two DECISIONS "Records" lines say "below" for entries above). Plus his
+messages of 2026-11-27 12:37:31 UTC (the full-paths rule) and 13:56:04 UTC (this pause) into DECISIONS by script.
+State at the pause: branch head 1412d1f (notes only); last code-and-docs head 19034b7, approved by the advisor agent,
+CI green on it; main b9aad01 taken in (f5c39e3); #72 draft, mergeable; the main folder's branch pushed (HOOK-PUSH (b)).
+
 ## Goal (his words of 2026-11-25, 18:15 Amsterdam, item 3; transcript 17:11:56 UTC, uuid 42aa43e4...)
 "Then step 2.6's plan, the preview links, as my order of 25 November has it. Plan first, your advisor agent's review,
 then back to me for my go; nothing built before it." The plan holds:
