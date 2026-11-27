@@ -1,10 +1,13 @@
-// Builder V4's chat (session_019YNMUVZR6ociHFWjByxkrq): copies one of Mustafa's messages from the chat's transcript
-// into the notes, byte for byte, with the question it answers. A message typed while the chat was working is stored
-// as a queued command, so both kinds are read. Builder V3's script (its branch, .checkpoints/handover-builder-v3/),
-// with the session and the folder changed. From the worktree's root:
+// Builder V6's chat (session_01WLuqnt1v3UNwSqbJsJre7u, from 2026-11-27): copies one of Mustafa's messages from the
+// chat's transcript into the notes, byte for byte, with the question it answers. A message typed while the chat was
+// working is stored as a queued command, so both kinds are read. Builder V4's script (session_019YNMUVZR6ociHFWjByxkrq;
+// the notes it saved keep that id), with the session changed, and <out file> a full path (his standing rule of
+// 2026-11-27: every file a command writes is spelled out with its full path). Builder V3's script before that (its
+// branch, .checkpoints/handover-builder-v3/). From the worktree's root:
 //   node .checkpoints/cs4-walk/chat-words.mjs words <transcript.jsonl> <marker> <out file> <title> <what it answers>
 //   node .checkpoints/cs4-walk/chat-words.mjs exact <transcript.jsonl> <the whole text> <out file> <title> <what it answers> [after]
 //   node .checkpoints/cs4-walk/chat-words.mjs part  <saved file> <from line> <before line> <out file> <title>
+// <saved file> is a name in the notes folder; <out file> is always a full path, and the script refuses any other.
 // [after]: only messages sent after this time (as the transcript writes it), for a text he sent more than once.
 // A queued command whose `source_uuid` is the id of a message already in the record is that message handed to the
 // chat again (seen twice on 2026-11-26, each time right after the session's worker was restarted): it is no new
@@ -13,14 +16,19 @@
 import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
 const NOTES = '.checkpoints/cs4-walk/';
-const SESSION = 'session_019YNMUVZR6ociHFWjByxkrq';
+const SESSION = 'session_01WLuqnt1v3UNwSqbJsJre7u';
 const sha = (s) => createHash('sha256').update(s).digest('hex');
 const size = (s) => `${Buffer.byteLength(s)} bytes, sha256 ${sha(s)}`;
 const [mode, ...a] = process.argv.slice(2);
+const full = (p) => {
+  if (typeof p !== 'string' || !p.startsWith('/') || p.split('/').includes('..')) { console.error(`<out file> must be a full path: ${p}`); process.exit(2); }
+  return p;
+};
 if (mode === 'words' || mode === 'exact') {
   // `exact`: the message whose whole text is the marker (a one-letter answer cannot be found as a part of a text).
   const exact = mode === 'exact';
-  const [transcript, marker, out, title, answers, after = ''] = a;
+  const [transcript, marker, outArg, title, answers, after = ''] = a;
+  const out = full(outArg);
   let hits = [];
   const seen = new Set();
   let repeats = 0;
@@ -43,16 +51,17 @@ if (mode === 'words' || mode === 'exact') {
   if (repeats > 0) console.error(`left out: ${repeats} repeat(s) of a message already in the record (handed to the chat again, not sent again)`);
   if (hits.length !== 1) { console.error(`expected one message with the marker, found ${hits.length}`); process.exit(1); }
   const { t, at, id, how } = hits[0];
-  writeFileSync(NOTES + out, `# ${title}\n\n_Copied by script from the chat's transcript (${SESSION}), never retyped: ${how} of ${at} (uuid ${id}), whole (${size(t)}). What it answers: ${answers}_\n\n---\n${t}\n`);
+  writeFileSync(out, `# ${title}\n\n_Copied by script from the chat's transcript (${SESSION}), never retyped: ${how} of ${at} (uuid ${id}), whole (${size(t)}). What it answers: ${answers}_\n\n---\n${t}\n`);
   console.log(`${out}: ${size(t)}, sent ${at}, uuid ${id}`);
 } else if (mode === 'part') {
-  const [file, from, before, out, title] = a;
+  const [file, from, before, outArg, title] = a;
+  const out = full(outArg);
   const note = readFileSync(NOTES + file, 'utf8');
   const lines = note.slice(note.indexOf('\n---\n') + 5).replace(/\n$/, '').split('\n');
   const i = lines.indexOf(from);
   const j = lines.indexOf(before);
   if (i < 0 || j <= i || lines.lastIndexOf(from) !== i || lines.lastIndexOf(before) !== j) { console.error('each of the two lines must stand once, in that order'); process.exit(1); }
   const t = lines.slice(i, j).join('\n').replace(/\n+$/, '');
-  writeFileSync(NOTES + out, `# ${title}\n\n_Copied by script from \`${file}\`, never retyped: its lines ${i + 1} to ${j} of ${lines.length} (${size(t)})._\n\n---\n${t}\n`);
+  writeFileSync(out, `# ${title}\n\n_Copied by script from \`${file}\`, never retyped: its lines ${i + 1} to ${j} of ${lines.length} (${size(t)})._\n\n---\n${t}\n`);
   console.log(`${out}: lines ${i + 1} to ${j} of ${lines.length}, ${size(t)}`);
 } else { console.error('words or part'); process.exit(2); }

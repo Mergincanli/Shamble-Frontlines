@@ -7,12 +7,15 @@
   designs: `.checkpoints/cs4-walk/engine-architect-cs4.md` (blocks 1, 3.6, 3.7), `rust-reviewer-cs4.md` (blocks 1,
   2, 4), `testlines-cs4.md` · his words for it: `.checkpoints/cs4-walk/mustafa-2026-11-26-go-merge-70.md`
   (2026-11-26, 12:21:17 UTC), points 3, 4, 5, 7 and 9
-- **Branch:** `claude/cool-pasteur-oiqk1r` on GitHub (the cloud session's stand-in for `cs/4b-content`). Local:
-  `cs/4b-content` in the worktree `.gate/lane1-takeover`, made from main with `git switch -c`; pushed with
-  `git push origin cs/4b-content:claude/cool-pasteur-oiqk1r`, alone in its command; never a plain `git push`. The
-  session's start folder is never switched · **Base:** origin/main 2483e9a741c4e552323c36523831a2f35de4002e (the
-  merge of 4a, pull request #70)
-- **Last update:** 2026-11-27 02:02 Amsterdam (from the clock)
+- **Branch:** `claude/ecstatic-wozniak-5cbdzs` on GitHub (Builder V6's seat, from 2026-11-27 15:06 Amsterdam: the
+  cloud session's stand-in for `cs/4b-content`). Local: `cs/4b-content` in the worktree `.gate/cs4b-2` of the start
+  folder `/home/user/Shamble-Frontlines`, made at exactly 7f5ba39 with `git worktree add --detach` and
+  `git switch -c`; pushed with `git push origin cs/4b-content:claude/ecstatic-wozniak-5cbdzs`, alone in its command;
+  never a plain `git push`. The start folder is never switched (it stays on b9aad01). Builder V4's branch
+  `claude/cool-pasteur-oiqk1r` ends at 7f5ba3966def8c36e2c3863c6b2fda7b4b9a9169 and is never pushed to again (his
+  Lanes rule: one account per branch) · **Base:** 4b-1's origin/main 2483e9a741c4e552323c36523831a2f35de4002e (the
+  merge of 4a, pull request #70); 4b-2 counts against b9aad01954be666340a7ec5c6e9fc9353b11abf1 (the merge of 4b-1)
+- **Last update:** 2026-11-27 15:14 Amsterdam (from the clock)
 
 ## Sizes and stop lines (his answer of 2026-11-26, 14:09:13 UTC: SIZE-4B (b); which number is which)
 - **4b is two pull requests**, in engine-architect's cut; "each stands on its own: lines left over in 4b-1 do not
@@ -989,6 +992,35 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   `cs4-walk/mustafa-2026-11-26-grey-colours.md`; read as his answer to the one question the chat's update before
   it asked, whose options were (a) the default greys stand and (b) he gives other colours before step 12). No
   veto: step 12 draws the scene in LOOP_V2 section 9's default greys. For DECISIONS at the docs pass.
+- **The seat moved to Builder V6** (his second personal account; session_01WLuqnt1v3UNwSqbJsJre7u; Opus 5.5 at
+  effort max, the advisor tool on Fable 5.2, by the session's record), on his message of 2026-11-27, 14:45
+  Amsterdam (received 13:57:21 UTC; `cs4-walk/mustafa-2026-11-27-builder-v6.md`, saved by script). Builder V4's
+  chat is out of usage until Tuesday and pushes nothing more.
+  - **The guard check** (his item 3: `git merge --ff-only HEAD~1` in the start folder): the first run, 13:57:52
+    UTC, went through: the guard loaded and asked (the record's hook entry: `permissionDecision` "ask" with the
+    main-folder reason), and 1.8 s later the record shows the ask accepted as a one-time yes from the user's side
+    (`"source":"user_temporary","grantScope":"once"`; the other calls read "classifier" or "rule"); git said
+    "Already up to date.", nothing moved. The chat stopped and asked (GUARD-RETRY). **His answer: (a)**
+    (`cs4-walk/mustafa-2026-11-27-guard-retry.md`); the second run asked at 14:02:31 UTC and he denied it at
+    14:02:44 UTC (`"source":"user_reject"`). His item 1 came with its three choices unfilled: who allowed the
+    first run is not recorded.
+  - **The branch:** see the card's Branch line. The tip of `claude/cool-pasteur-oiqk1r` was 7f5ba39 (nothing
+    newer). The new container's `.gate/` was empty: the tools that lived there are made again (HAND-OVER).
+  - **His answers in that message:** DIFF-LIST **(a)** ("The list as printed from my Export at 30 steps
+    (`.checkpoints/cs4b-content/question-2026-11-26-diff-list.md`) is mine, and its movement values become the
+    game's starting movement table. A later Export replaces them the same way."): the hand-over's list is
+    unblocked from its item 1. CI-TIME: #78 (the toolchain job's limit 15 to 25 minutes) is on main as b8f02b0:
+    main is taken in once, before 4b-2 changes a shared doc. VISION-RULE, an addition (his item 9, a to e): for
+    the docs pass, no code now; open, in his words: "the exact eye height, which reaches the game through my
+    Export, and which points of an enemy's body the line is tested against". Saving every 25 minutes, the
+    agents' work too; SEAT-OUT: stop at a whole point and report the last commit's id. The board: not set up for
+    this chat; nothing is posted there.
+  - **Pull requests:** this chat cannot open or merge one: the guard keeps `gh api` read-only
+    (`routine-guard.mjs:1466`, "GitHub writes go through the GitHub MCP tools"), the environment refuses `gh pr`,
+    and no GitHub MCP tool is attached. At the close the pull request's title and text go in the notes; his
+    Advisor opens the draft and merges on his tap (his item 11).
+  - **`chat-words.mjs`** now names this session and writes only to a full path given on the command line (his
+    standing rule of 2026-11-27 on full paths); Builder V4's saved notes keep V4's session id.
 
 ## Slips of this chat's own rules, for the report
 - One git command did not start its own shell call: `git add .checkpoints/cs4b-content/review-brief-4b1.md` stood
@@ -1030,12 +1062,15 @@ account can continue with what you were making. (Do not see this as a reason to 
 just continue as you were)". So: the chat's work and its agents' work are committed and pushed at least every
 25 minutes, and the work itself is not cut.
 
-**Where everything is.** Branch `claude/cool-pasteur-oiqk1r` on origin (this chat's own; a session of another
-account works on its own branch from this head and never pushes here: his Lanes rule). The head: see the last
-"DONE" entries above (the card is saved with every push). Code that is not yet committed is saved as a patch in
-the notes and named in the card's newest entry (none at this save: nothing is uncommitted). No agent is running. The board add-on is active for this chat
-(thread state: needs-musti, for DIFF-LIST). The container was restarted once (2026-11-27, about 01:22): the
-worktree and everything under `.gate/` were kept.
+**Where everything is (Builder V6's seat, from 2026-11-27 15:06 Amsterdam).** Branch
+`claude/ecstatic-wozniak-5cbdzs` on origin; local `cs/4b-content` in `/home/user/Shamble-Frontlines/.gate/cs4b-2`
+(the card's Branch line). Builder V4's `claude/cool-pasteur-oiqk1r` ends at 7f5ba39 and nobody pushes there again.
+A session of another account that takes this over works on its own branch from this branch's head and never pushes
+here (his Lanes rule). The head: see the newest entries above (the card is saved with every push, at least every
+25 minutes: his item 10). Code that is not yet committed is saved as a patch in the notes and named in the card's
+newest entry (none at this save). No agent is running. No board for this chat: post nothing there (his item 10).
+This seat's container is new: its `.gate/` held nothing of Builder V4's, so the machine-only list below is made
+again here. SEAT-OUT from him: stop at a whole point and report the last commit's id.
 
 **State of 4b-2, by step** (4,956 written lines of 8,450 at 5c6738a; two thirds is 5,633; rungs at 6,750 and 8,000):
 - 6 the library's batch: done (298837a). 7 the built-file check: done (d313162, then 2f058b2 and e3acb41 for the
@@ -1047,13 +1082,18 @@ worktree and everything under `.gate/` were kept.
   13 min 1 s of the 15 the job may take: the card's entry "CI's toolchain job is nearing its time limit").
 - **Nothing more of 4b-2 can be built without the content files**: every piece of rows 8, 9 and 10 that needs
   none is done. Step 11 keeps its place in the order (the card's "Ahead, by the count").
-- **Blocked on his own answer to DIFF-LIST** (asked 2026-11-26, 23:11 Amsterdam;
-  `cs4b-content/question-2026-11-26-diff-list.md`): step 8's second part, step 9, step 10's wiring. A bare "a"
-  has reached this chat twice as a repeat of his older message (`cs4-walk/redelivered-2026-11-26.md`): it is
-  no answer. His "94% usage" message came a second time the same way (2026-11-27, 02:03 Amsterdam, after the
-  container's restart): no new message either. `chat-words.mjs` shows whether a message is a repeat (its `source_uuid`).
+- **DIFF-LIST is answered: (a)** (his message to Builder V6 of 2026-11-27, 14:45 Amsterdam, item 7;
+  `cs4-walk/mustafa-2026-11-27-builder-v6.md`, saved by script): "The list as printed from my Export at 30
+  steps (`.checkpoints/cs4b-content/question-2026-11-26-diff-list.md`) is mine, and its movement values become
+  the game's starting movement table. A later Export replaces them the same way." Step 8's second part, step 9
+  and step 10's wiring are unblocked. (Before it, a bare "a" reached Builder V4's chat twice as a repeat of an
+  older message: `cs4-walk/redelivered-2026-11-26.md`; `chat-words.mjs` leaves repeats out.)
 
-**On his yes, in this order:**
+**Now, in this order** (his DIFF-LIST yes is in):
+0. **This seat's start** (2026-11-27): main taken in once (b8f02b0, #78: CI-TIME), as its own commit with CI;
+   the machine's tools made again (the list below); the count reproduced (4,956 against b9aad01); the full local
+   checks on that head as the baseline (the players' file 54,514 bytes, sha256 b4a9774f...59ba as at 5c6738a).
+   Step 8's second part starts only once that baseline is green.
 1. **Step 8, second part.** `content/source/testlines-export.json` = `cs4b-content/testlines-export-30.json`
    byte for byte (sha256 a9d47785ed8f70d895d10480d180c9bba5a67f7e955e0c460c0c1bef7718c4ab, the pin in
    `packages/client/scripts/testlines.mjs`); its manifest beside it (it must hold the line `sha256: <that
@@ -1086,12 +1126,16 @@ worktree and everything under `.gate/` were kept.
    on 5c6738a), then `plants-4b2.py <commit>` whole; reviewers on the final diff (rust-reviewer, engine-architect,
    security-auditor, test-engineer; netcode-architect for steps 9 and 10; graphics-engineer, perf-auditor and
    art-director if step 12 is built), two rounds at most; the verifier until PASS; docs-keeper (his messages
-   into DECISIONS by script: 18:52:56, 21:16:26 and 23:43:38 UTC of 2026-11-26, and his DIFF-LIST answer;
-   STATUS follow-ups: heapless 0.9.4 when rstar or parry3d move; the licence texts for the hosted build); the
-   report (`/advisor-report`; its first lines: `content/source/` changes); the notes out of the head; a draft
-   pull request; the advisor agent on the final head (it runs the gate itself; it is told of the order change:
-   step 10's core and the pieces of steps 9 and 10 that need no content file were built before step 8's second
-   part, while DIFF-LIST was open); his go; the merge with the full head as the expected head.
+   into DECISIONS by script: 18:52:56, 21:16:26 and 23:43:38 UTC of 2026-11-26; his two messages of 2026-11-27
+   to Builder V6, 13:57:21 UTC (DIFF-LIST (a) among them) and 14:02:23 UTC (GUARD-RETRY (a)); **the VISION-RULE
+   addition** (his item 9, a to e, which sharpens point 2c of version 2: recorded beside version 2 in DECISIONS,
+   `docs/adr/README.md` and STATUS's line, with his two open points; no code); STATUS follow-ups: heapless 0.9.4
+   when rstar or parry3d move; the licence texts for the hosted build); the report (`/advisor-report`; its first
+   lines: `content/source/` changes); the notes out of the head; **the pull request's title and text in the
+   notes** (this chat cannot open one: his Advisor opens the draft, his item 11); the advisor agent on the final
+   head (it runs the gate itself; it is told of the order change: step 10's core and the pieces of steps 9 and 10
+   that need no content file were built before step 8's second part, while DIFF-LIST was open; and of the seat's
+   move); his go; the merge, by his Advisor on his tap, with the full head as the expected head.
 
 **What is on this machine only (under `.gate/`, not in git) and how to make it again:**
 - `.gate/wb-tool/wasm-bindgen`: the bindings tool, the file `packages/client/scripts/wasm-bindgen-tool.mjs`
@@ -1111,16 +1155,18 @@ worktree and everything under `.gate/` were kept.
   crates packages`, added lines, `crates/devtools/vectors/` left out but for `.py` files, before every commit.
 
 **Rules that bind whoever continues** (his words are in the card's first sections and in `docs/DECISIONS.md`):
-every git and gh command alone in its own shell call; no CI, kit or gate file; no value typed by hand; a
-manifest change held for security-auditor's answer; times from the clock; no file under `content/` before his
-DIFF-LIST answer; no merge without his go on the head the advisor agent approved.
+every git and gh command alone in its own shell call; every file a shell command writes, moves, copies or deletes
+spelled out with its full path, no variable, substitution or wildcard in its name, or the Write and Edit tools
+(his standing rule of 2026-11-27); no CI, kit or gate file; no value typed by hand; a manifest change held for
+security-auditor's answer; times from the clock; no merge without his go on the head the advisor agent approved;
+never a test cut or thinned to fit CI's limit (his CI-TIME); a toolchain run stopped at its limit is told to him
+in two lines.
 
 ## Current step
-4b-2 (2026-11-27, 01:49 Amsterdam, from the clock): every piece of steps 6 to 10 that needs no content file is built and pushed
-(head of the code: 5c6738a; 4,956 written lines of 8,450). DIFF-LIST is asked of him and open
-(`cs4b-content/question-2026-11-26-diff-list.md`; the board thread is on needs-musti). With his own yes in the
-chat: the HAND-OVER section's list, from its item 1 (step 8's second part). Without it nothing more of 4b-2 is
-built: step 11 keeps its place in the order, and no file under `content/` is written.
+4b-2 (2026-11-27, 15:14 Amsterdam, from the clock; Builder V6): every piece of steps 6 to 10 that needs no content
+file is built and pushed (head of the code: 5c6738a; 4,956 written lines of 8,450). DIFF-LIST is answered (a).
+In hand: the HAND-OVER list's item 0 (main taken in, the machine's tools, the count, the baseline checks); then its
+item 1 (step 8's second part).
 
 ## Next steps (the sheet's revision 3, section G; each step ends with the count of written lines)
 - **4b-1:** 1 the content crate's manifests · 2 the reader, the writer, the bundle, the two kinds, the old tuning's
@@ -1152,7 +1198,13 @@ built: step 11 keeps its place in the order, and no file under `content/` is wri
 ## Decisions taken
 - His go for the merge of #70 and his answers to the six decisions · Mustafa · 2026-11-26, 12:21:17 UTC.
 - His rules for this chat: no CI, kit or gate file is written here; never a push to another chat's branch; git and
-  gh always start their own command, one git per shell call. The board add-on is active.
+  gh always start their own command, one git per shell call. The board add-on was active for Builder V4's chat; it
+  is not set up for Builder V6's (nothing is posted there).
+- DIFF-LIST (a): his Export's list at 30 steps is his; its movement values become the game's starting movement
+  table; a later Export replaces them the same way · Mustafa · 2026-11-27, received 13:57:21 UTC
+  (`cs4-walk/mustafa-2026-11-27-builder-v6.md`, item 7).
+- GUARD-RETRY (a): the guard check run once more; he denied it · Mustafa · 2026-11-27, received 14:02:23 UTC
+  (`cs4-walk/mustafa-2026-11-27-guard-retry.md`).
 
 ## Running work
 - None. CI on 298837a is the first run that downloads the library's packages.
