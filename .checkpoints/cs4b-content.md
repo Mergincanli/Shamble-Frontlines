@@ -1363,8 +1363,19 @@ no trap, the module usable after; the cap read from the loader's own refusal; a 
 replays on the frozen content) and the Chromium replay spec on the frozen content: Worker 52, page 139 (before the
 link's test), boundary 37 tests pass. **Waiting for the advisor agent** (`cs4b-content/advisor-cutC-brief.md`, its
 notes `advisor-cutC.md`): Q1 the message caps (the page's bound above "about 512"), Q2 the page's parse (the map's
-field-by-field reading moved to step 12), Q3 the dev server's `/content.json` form. Not built until it rules:
-`content.ts`, `boot.ts`, the caps, the plugin. Then: the plant, the full checks, the gate, the commit.
+field-by-field reading moved to step 12), Q3 the dev server's `/content.json` form. **The advisor agent ruled at
+about 16:00 UTC: APPROVE on all three, with conditions** (`cs4b-content/advisor-cutC.md`, DONE; the conditions are
+listed in its answer and are being built: code units, the bounds tied by tests, the Worker's own error event cut too,
+fixed page sentences, own-field reading with no cast, the parse in the real page on `ready` and not kept, the sheet
+revised in writing, the plugin's folder made by it, its middleware before Vite's, GET `/content.json` only).
+**At 16:10 UTC (count 6,495, raw 6,513; the patch holds 23 files, three new ones marked with `git add -N`):** built
+and unit-tested: the bounds (`panic-message.ts`: `THROWN_TEXT_UNITS` 512, `ERROR_TEXT_UNITS` 1,040, `cutText`), the
+page's check of an `error`'s length, `WorkerLink.workerError`, `content.ts` (fetch, copy, `readBundle`,
+`PageContent`) with `content.test.ts`, `boot.ts`, the dev server's plugin in `vite.config.mjs` (build.mjs exports
+`writeContentBundle` and `DEV_CONTENT_DIR`), the isolation spec's `/content.json` lines, a new Chromium spec
+`packages/e2e/tests/skeleton/content.spec.ts`; the Worker, page and spec type checks pass. Not yet run: the
+development page's build, the Chromium specs, the plant, the full checks, the gate. Not yet written: the sheet's
+revision (Q2.4), the test list's departure note (Q1.5).
 
 ## Next steps (the sheet's revision 3, section G; each step ends with the count of written lines)
 - **4b-1:** 1 the content crate's manifests · 2 the reader, the writer, the bundle, the two kinds, the old tuning's

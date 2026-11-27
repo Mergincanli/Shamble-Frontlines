@@ -244,6 +244,40 @@ index 816820c..032d0ed 100644
    });
  
    test("a function of a crate the players' file is built without is refused: its own, and the standard library's as it used it", () => {
+diff --git a/packages/client/scripts/build.mjs b/packages/client/scripts/build.mjs
+index 3b3a401..233190b 100644
+--- a/packages/client/scripts/build.mjs
++++ b/packages/client/scripts/build.mjs
+@@ -100,6 +100,11 @@ const rulesDir = path.join(root, ".gate/rules-module");
+ const rulesTargetDir = path.join(root, ".gate/target-rules");
+ /** The content tool's target folder: its own, so building a page never rebuilds what the tests built, or the reverse. */
+ const contentTargetDir = path.join(root, ".gate/target-content");
++/**
++ * Where the development server's bundle is written (vite.config.mjs): outside every package and every folder a
++ * server serves, and outside `content/`, as the content tool asks.
++ */
++export const DEV_CONTENT_DIR = path.join(root, ".gate/dev-content");
+ /** The tool's absolute path, after its file was compared with the recorded values. */
+ function checkedTool() {
+   const tool = process.env["SHAMBLE_WASM_BINDGEN"];
+@@ -212,11 +217,13 @@ export function buildWasm() {
+ }
+ 
+ /**
+- * Writes the content bundle into the built page's folder: the content tool asks the game's own loader about every
+- * file under `content/` and the whole, and writes `content.json` only when the loader takes them (it refuses a folder
+- * inside `content/`). The same refusals of settings from the environment as every cargo call here.
++ * Writes the content bundle into `outDir` (the built page's folder, or the development server's): the content tool
++ * asks the game's own loader about every file under `content/` and the whole, and writes `content.json` only when the
++ * loader takes them (it refuses a folder inside `content/`). The same refusals of settings from the environment as
++ * every cargo call here, and the same call, environment and target folder for both callers, so a page built once
++ * leaves the development server nothing to compile.
+  */
+-function writeContentBundle(outDir) {
++export function writeContentBundle(outDir) {
+   refuseSettings();
+   execFileSync(
+     "cargo",
 diff --git a/packages/client/scripts/maths-allowed.mjs b/packages/client/scripts/maths-allowed.mjs
 index 0c196b5..cebd5cc 100644
 --- a/packages/client/scripts/maths-allowed.mjs
@@ -274,8 +308,363 @@ index 0c196b5..cebd5cc 100644
 +    why: "The toolchain's 128-bit integer multiply (the low 128 bits of a product), which WebAssembly has no instruction for. Called by the loader's number reading and writing, when a bundle loads, never per tick: core's f64 from text (dec2flt, Eisel-Lemire's 64 x 64-bit products), core's shortest and exact texts of an f64 (flt2dec, Grisu: crates/content/src/number.rs, number_text, and the refusal sentences of crates/content/src/error.rs), core's text of a u128, and the tie rule for number texts (number.rs, even_of_a_tie: 5 to the decimals times the odd mantissa, checked). Integer arithmetic: the product modulo 2^128 is one number on every target, and Rust defines checked_mul's overflow, so the bits are the same natively, in every browser and on a server. The routine here is 64-bit integer multiplies, additions, shifts and compares only, no float. rust-reviewer, 2026-11-27: the twin's own body in Node 22 (V8) matched BigInt's product on 900,144 operand pairs.",
 +  },
 +];
+diff --git a/packages/client/src/app/boot.ts b/packages/client/src/app/boot.ts
+index 1d062b1..4ffbe15 100644
+--- a/packages/client/src/app/boot.ts
++++ b/packages/client/src/app/boot.ts
+@@ -4,6 +4,7 @@ import { BUTTON_NAMES, KeyboardInput } from "../input/keyboard.ts";
+ import { runHeader } from "../harness/run-header.ts";
+ import type { ReportData } from "../overlay/report.ts";
+ import { createPicture } from "../render/index.ts";
++import { fetchContent, PageContent } from "./content.ts";
+ import { installErrorHook } from "./error-hook.ts";
+ import { readFlags } from "./flags.ts";
+ import { lostAndDoubled } from "./press-tally.ts";
+@@ -20,9 +21,11 @@ const COMMIT = __SHAMBLE_COMMIT__;
+ const READOUT_EVERY_MS = 250;
+ 
+ /**
+- * The app shell's boot order: the picture first (`await renderer.init()` before the first frame), then the Worker,
+- * then the frame loop. Each drawn frame posts the newest input once (the keys held and the running press counts)
+- * and draws from the two newest blocks. The page never loads or calls the Wasm: the Worker does.
++ * The app shell's boot order: the picture first (`await renderer.init()` before the first frame), then the content
++ * (one fetch; no Worker is made when it fails), then the Worker started on it, then the frame loop. The page reads its
++ * copy of the content only after the Worker's `ready` (content.ts). Each drawn frame posts the newest input once (the
++ * keys held and the running press counts) and draws from the two newest blocks. The page never loads or calls the
++ * Wasm: the Worker does.
+  */
+ export async function boot(): Promise<void> {
+   const notice = document.getElementById("notice");
+@@ -48,6 +51,15 @@ export async function boot(): Promise<void> {
+   document.documentElement.dataset["backend"] = info.backend;
+   document.documentElement.dataset["commit"] = COMMIT;
+ 
++  // The content, fetched once before any Worker exists: a failure is said on the page in fixed words, and nothing starts.
++  const fetched = await fetchContent((url) => fetch(url));
++  if (!fetched.ok) {
++    errors.note(fetched.problem);
++    fail(`The match did not start: ${fetched.problem}`);
++    return;
++  }
++  const content = new PageContent();
++
+   // The clock both sides share.
+   const clock = (): number => performance.timeOrigin + performance.now();
+   const worker = new SimWorker();
+@@ -74,17 +86,23 @@ export async function boot(): Promise<void> {
+   const listener = {
+     blockArrived(event: MessageEvent<unknown>): void {
+       const problem = link.receive(event);
+-      if (problem !== "") stopped(problem);
++      if (problem !== "") {
++        stopped(problem);
++        return;
++      }
++      // Once, on the Worker's `ready`: the page reads its copy of the bundle the loader took.
++      const read = content.afterMessage(link);
++      if (read !== "" && link.end(read)) stopped(read);
+     },
+   };
+   worker.addEventListener("message", listener.blockArrived);
+   worker.addEventListener("error", (event) => {
+     // A script that does not load gives an event with no message. Cancelled, so the window does not count it again.
+     event.preventDefault();
+-    const problem = event.message || "the Worker failed";
+-    if (link.end(problem)) stopped(problem);
++    const problem = link.workerError(event.message);
++    if (problem !== "") stopped(problem);
+   });
+-  link.start(flags.padBytes);
++  content.start(fetched.value, link, flags.padBytes);
+ 
+   const frames = __SHAMBLE_DEVTOOLS__ ? new FrameTimes() : null;
+   const resize = (): void => picture.resize(window.innerWidth, window.innerHeight, window.devicePixelRatio);
+diff --git a/packages/client/src/app/content.test.ts b/packages/client/src/app/content.test.ts
+new file mode 100644
+index 0000000..8480db8
+--- /dev/null
++++ b/packages/client/src/app/content.test.ts
+@@ -0,0 +1,150 @@
++import { expect, test } from "vitest";
++import { CONTENT_URL, type ContentLink, fetchContent, NOT_A_BUNDLE, PageContent, readBundle } from "./content.ts";
++import { WorkerLink } from "./worker-link.ts";
++
++/** A bundle's text as the loader writes one: its files in path order, each file's own text inside as a string. */
++const BUNDLE_TEXT = `${JSON.stringify(
++  {
++    files: [
++      { path: "maps/test-scene.json", text: '{\n  "format": "shamble-map",\n  "id": "test-scene"\n}\n' },
++      { path: "movement/soldier.json", text: '{\n  "format": "shamble-movement",\n  "id": "soldier"\n}\n' },
++    ],
++    format: "shamble-content-bundle",
++    version: 1,
++  },
++  null,
++  2,
++)}\n`;
++const encode = (text: string): Uint8Array<ArrayBuffer> => new TextEncoder().encode(text);
++
++/** A fetch that answers every call with `answer` and counts the addresses it was asked for. */
++function fetcher(answer: () => Promise<Response>) {
++  const asked: string[] = [];
++  return { asked, fetchOnce: (url: string): Promise<Response> => (asked.push(url), answer()) };
++}
++
++test("one fetch of the bundle beside the page; the copy kept is the bytes fetched, still whole after the transfer", async () => {
++  const { asked, fetchOnce } = fetcher(() => Promise.resolve(new Response(encode(BUNDLE_TEXT))));
++  const fetched = await fetchContent(fetchOnce);
++  expect(asked).toEqual([CONTENT_URL]);
++  expect(CONTENT_URL).toBe("./content.json");
++  if (!fetched.ok) throw new Error(fetched.problem);
++  const sent = new Uint8Array(fetched.value.bundle.slice(0));
++  expect(sent).toEqual(encode(BUNDLE_TEXT));
++  // The transfer to the Worker empties the page's buffer; the kept copy is its own.
++  structuredClone(fetched.value.bundle, { transfer: [fetched.value.bundle] });
++  expect(fetched.value.bundle.byteLength).toBe(0);
++  expect(fetched.value.kept).toEqual(sent);
++});
++
++test("what the page says of a failed fetch is fixed text, with at most the status number: never what the server or an error said", async () => {
++  const marked = '<img src=x onerror="alert(1)">';
++  const cases: [() => Promise<Response>, string][] = [
++    [() => Promise.resolve(new Response(marked, { status: 404, statusText: marked })), "the content could not be fetched: the server answered 404"],
++    [() => Promise.resolve(new Response(marked, { status: 500 })), "the content could not be fetched: the server answered 500"],
++    [() => Promise.reject(new TypeError(marked)), "the content could not be fetched"],
++    [() => Promise.resolve(new Response(new Uint8Array(0))), "the content is empty or more than the 8388608 bytes the game's loader takes"],
++    [() => Promise.resolve(new Response(new Uint8Array(8 * 1024 * 1024 + 1))), "the content is empty or more than the 8388608 bytes the game's loader takes"],
++  ];
++  for (const [answer, said] of cases) {
++    const { asked, fetchOnce } = fetcher(answer);
++    const fetched = await fetchContent(fetchOnce);
++    expect(fetched).toEqual({ ok: false, problem: said });
++    expect(asked).toHaveLength(1);
++  }
++  // A bundle at the loader's cap is fetched (what it holds is the loader's to judge).
++  expect((await fetchContent(fetcher(() => Promise.resolve(new Response(new Uint8Array(8 * 1024 * 1024)))).fetchOnce)).ok).toBe(true);
++});
++
++test("the page reads a bundle the loader took as its files by path, from own fields only", () => {
++  const read = readBundle(encode(BUNDLE_TEXT));
++  if (!read.ok) throw new Error(read.problem);
++  expect([...read.value]).toEqual([
++    ["maps/test-scene.json", '{\n  "format": "shamble-map",\n  "id": "test-scene"\n}\n'],
++    ["movement/soldier.json", '{\n  "format": "shamble-movement",\n  "id": "soldier"\n}\n'],
++  ]);
++  // A key named `__proto__` is an own field like any other after JSON.parse: it reaches no prototype and is not read.
++  const withProto = BUNDLE_TEXT.replace('"files": [', '"__proto__": { "files": 7 },\n  "files": [');
++  expect(readBundle(encode(withProto)).ok).toBe(true);
++  expect(({} as Record<string, unknown>)["files"]).toBeUndefined();
++});
++
++test("what the page cannot read as a bundle is said in fixed words, and nothing of it is kept", () => {
++  const faults = [
++    "not json at all: <img src=x>",
++    '"a bundle"',
++    "[]",
++    BUNDLE_TEXT.replace('"shamble-content-bundle"', '"shamble-map"'),
++    BUNDLE_TEXT.replace('"version": 1', '"version": 2'),
++    BUNDLE_TEXT.replace('"version": 1', '"version": "1"'),
++    '{"files": {}, "format": "shamble-content-bundle", "version": 1}',
++    '{"files": ["maps/test-scene.json"], "format": "shamble-content-bundle", "version": 1}',
++    BUNDLE_TEXT.replace('"path": "movement/soldier.json"', '"path": "maps/test-scene.json"'),
++    BUNDLE_TEXT.replace('"text": "{\\n  \\"format\\": \\"shamble-map\\"', '"text": 7, "x": "{\\n  \\"format\\": \\"shamble-map\\"'),
++  ];
++  for (const text of faults) expect(readBundle(encode(text)), text).toEqual({ ok: false, problem: NOT_A_BUNDLE });
++  // Bytes that are no UTF-8 at all.
++  expect(readBundle(new Uint8Array([0xff, 0xfe]))).toEqual({ ok: false, problem: NOT_A_BUNDLE });
++  // The fixed sentence quotes nothing it read.
++  expect(NOT_A_BUNDLE).not.toMatch(/[<>"{}]/);
++});
++
++/** The link with a stand-in Worker, and a count of the page's readings of its copy. */
++function started(answer: () => Promise<Response> = () => Promise.resolve(new Response(encode(BUNDLE_TEXT)))) {
++  const sent: unknown[] = [];
++  const link = new WorkerLink({ postMessage: (message) => sent.push(message), terminate: () => undefined }, () => 0);
++  const readings: ReturnType<typeof readBundle>[] = [];
++  const content = new PageContent((kept) => {
++    const read = readBundle(kept);
++    readings.push(read);
++    return read;
++  });
++  const { asked, fetchOnce } = fetcher(answer);
++  return { link, sent, readings, content, asked, fetchOnce };
++}
++
++test("a Worker that answers error: the copy is never read, and the bundle was fetched once", async () => {
++  const { link, sent, readings, content, asked, fetchOnce } = started();
++  const fetched = await fetchContent(fetchOnce);
++  if (!fetched.ok) throw new Error(fetched.problem);
++  content.start(fetched.value, link, 0);
++  expect(sent).toHaveLength(1);
++  expect(link.onMessage({ type: "error", message: "the content is refused: a key that is not a field of this kind" })).not.toBe("");
++  expect(content.afterMessage(link)).toBe("");
++  // A ready that comes after the end is ignored by the link, and the copy is gone.
++  link.onMessage({ type: "ready", blockBytes: 44, tickHz: 30 });
++  expect(content.afterMessage(link)).toBe("");
++  expect([readings, asked]).toEqual([[], [CONTENT_URL]]);
++});
++
++test("a Worker that answers ready: the copy is read once, and its files are the bundle's by path", async () => {
++  const { link, readings, content, fetchOnce } = started();
++  const fetched = await fetchContent(fetchOnce);
++  if (!fetched.ok) throw new Error(fetched.problem);
++  content.start(fetched.value, link, 0);
++  // Before the answer, nothing is read.
++  expect(content.afterMessage(link)).toBe("");
++  expect(readings).toHaveLength(0);
++  expect(link.onMessage({ type: "ready", blockBytes: 44, tickHz: 30 })).toBe("");
++  expect(content.afterMessage(link)).toBe("");
++  expect(content.afterMessage(link)).toBe("");
++  expect(readings).toHaveLength(1);
++  const [read] = readings;
++  if (read === undefined || !read.ok) throw new Error("the copy was not read as a bundle");
++  expect([...read.value.keys()]).toEqual(["maps/test-scene.json", "movement/soldier.json"]);
++});
++
++test("a bundle the page cannot read after the loader took it ends the match in fixed words", async () => {
++  const { link, content, fetchOnce } = started(() => Promise.resolve(new Response(encode('{"files": [], "format": "x", "version": 1}'))));
++  const fetched = await fetchContent(fetchOnce);
++  if (!fetched.ok) throw new Error(fetched.problem);
++  content.start(fetched.value, link, 0);
++  link.onMessage({ type: "ready", blockBytes: 44, tickHz: 30 });
++  expect(content.afterMessage(link)).toBe(NOT_A_BUNDLE);
++});
++
++test("the link the content starts is the page's own link type", () => {
++  // `WorkerLink` gives what `PageContent` needs of a link: this does not compile if the two drift apart.
++  const link: ContentLink = new WorkerLink({ postMessage: () => undefined, terminate: () => undefined }, () => 0);
++  expect([link.ready, link.failure]).toEqual([false, ""]);
++});
+diff --git a/packages/client/src/app/content.ts b/packages/client/src/app/content.ts
+new file mode 100644
+index 0000000..f2b2bbb
+--- /dev/null
++++ b/packages/client/src/app/content.ts
+@@ -0,0 +1,122 @@
++import { MAX_BUNDLE_BYTES } from "@shamble/sim-worker";
++
++// The page's content (change-set 4b-2, step 9): one fetch of the bundle the build put beside the page, a copy kept
++// before its bytes go to the Worker, and the page's own reading of that copy only after the Worker said `ready`, which
++// means the game's loader in the Wasm took the bundle whole: so `JSON.parse` never sees a bundle the loader refused.
++// Every sentence said here is fixed text, with at most a status number: never what the server sent, a content key or
++// value, or a caught error's text (a parse error can quote its input).
++
++/** Where the bundle lies: beside the page, on its own origin. Never taken from the address, a flag, storage or a message. */
++export const CONTENT_URL = "./content.json";
++
++/** The bundle as fetched: `bundle` goes to the Worker, transferred; `kept` is the page's own copy of its bytes. */
++export interface FetchedContent {
++  readonly bundle: ArrayBuffer;
++  readonly kept: Uint8Array;
++}
++
++/** A value, or a problem in fixed words. */
++export type Outcome<T> = { readonly ok: true; readonly value: T } | { readonly ok: false; readonly problem: string };
++
++/** A bundle's `format` and newest `version`, as the loader writes and reads them (crates/content/src/bundle.rs). */
++const FORMAT = "shamble-content-bundle";
++const VERSION = 1;
++
++/** What the page says when the bundle the loader took does not read as one on the page: the two are not one build. */
++export const NOT_A_BUNDLE = "the content the game's loader took does not read as a bundle on the page: the page and the Wasm are from different builds";
++
++/** One fetch of the bundle. A failure is a fixed sentence, and the page then starts no Worker. */
++export async function fetchContent(fetchOnce: (url: string) => Promise<Response>): Promise<Outcome<FetchedContent>> {
++  let bundle: ArrayBuffer;
++  try {
++    const response = await fetchOnce(CONTENT_URL);
++    if (!response.ok) return { ok: false, problem: `the content could not be fetched: the server answered ${response.status}` };
++    bundle = await response.arrayBuffer();
++  } catch {
++    return { ok: false, problem: "the content could not be fetched" };
++  }
++  if (bundle.byteLength === 0 || bundle.byteLength > MAX_BUNDLE_BYTES) {
++    return { ok: false, problem: `the content is empty or more than the ${MAX_BUNDLE_BYTES} bytes the game's loader takes` };
++  }
++  // The copy first: the transfer to the Worker leaves the page's buffer empty.
++  return { ok: true, value: { bundle, kept: new Uint8Array(bundle.slice(0)) } };
++}
++
++function isObject(value: unknown): value is object {
++  return typeof value === "object" && value !== null && !Array.isArray(value);
++}
++
++/** An own property's value, or undefined: nothing a prototype holds is ever read. */
++function own(object: object, key: string): unknown {
++  return Object.hasOwn(object, key) ? (object as Readonly<Record<string, unknown>>)[key] : undefined;
++}
++
++/**
++ * The page's reading of its copy, once the Worker said `ready`: the bundle's files, path to text, read field by field
++ * from own properties and put into nothing else. A bundle the loader took always reads; one that does not is a fault
++ * of the build, said in fixed words, and nothing of it is kept.
++ */
++export function readBundle(kept: Uint8Array): Outcome<ReadonlyMap<string, string>> {
++  const fault = { ok: false, problem: NOT_A_BUNDLE } as const;
++  let tree: unknown;
++  try {
++    tree = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(kept));
++  } catch {
++    return fault;
++  }
++  if (!isObject(tree) || own(tree, "format") !== FORMAT || own(tree, "version") !== VERSION) return fault;
++  const files = own(tree, "files");
++  if (!Array.isArray(files)) return fault;
++  const byPath = new Map<string, string>();
++  for (const entry of files) {
++    if (!isObject(entry)) return fault;
++    const path = own(entry, "path");
++    const text = own(entry, "text");
++    if (typeof path !== "string" || typeof text !== "string" || byPath.has(path)) return fault;
++    byPath.set(path, text);
++  }
++  return { ok: true, value: byPath };
++}
++
++/** What the content needs of the link: `WorkerLink`, or a stand-in in tests. */
++export interface ContentLink {
++  start(padBytes: number, bundle: ArrayBuffer): void;
++  readonly ready: boolean;
++  readonly failure: string;
++}
++
++/**
++ * The page's copy of the bundle from the Worker's start to its `ready`: read once, the first time the link is ready,
++ * and let go then, or as soon as the match ends without it (a Worker that answered `error`). Until the page's scene
++ * draws from the files (step 12), this reading is the page's check that what the loader took is a bundle, and nothing
++ * of what it reads is kept.
++ */
++export class PageContent {
++  #kept: Uint8Array | null = null;
++  readonly #read: (kept: Uint8Array) => Outcome<ReadonlyMap<string, string>>;
++
++  /** `read` is the page's reading (`readBundle`); a test passes one that counts. */
++  constructor(read: (kept: Uint8Array) => Outcome<ReadonlyMap<string, string>> = readBundle) {
++    this.#read = read;
++  }
++
++  /** Starts the Worker on the fetched bundle: its bytes are transferred, and the page's copy stays here. */
++  start(fetched: FetchedContent, link: ContentLink, padBytes: number): void {
++    this.#kept = fetched.kept;
++    link.start(padBytes, fetched.bundle);
++  }
++
++  /** After each message of the Worker: the problem the reading found (the page then ends the match), or "". */
++  afterMessage(link: ContentLink): string {
++    if (this.#kept === null) return "";
++    if (link.failure !== "") {
++      this.#kept = null;
++      return "";
++    }
++    if (!link.ready) return "";
++    const kept = this.#kept;
++    this.#kept = null;
++    const read = this.#read(kept);
++    return read.ok ? "" : read.problem;
++  }
++}
 diff --git a/packages/client/src/app/worker-link.test.ts b/packages/client/src/app/worker-link.test.ts
-index 4c3c9f3..100cba1 100644
+index 4c3c9f3..3a28246 100644
 --- a/packages/client/src/app/worker-link.test.ts
 +++ b/packages/client/src/app/worker-link.test.ts
 @@ -49,11 +49,17 @@ function setUp() {
@@ -299,10 +688,48 @@ index 4c3c9f3..100cba1 100644
    expect(ready()).toBe("");
    expect(link).toMatchObject({ ready: true, blockBytes: 44, tickHz: 30 });
  });
+@@ -152,6 +158,9 @@ test("a block of the wrong length, an error from the Worker and an unknown messa
+   for (const [message, said] of [
+     [{ type: "block", buffer: block(1, LAYOUT_HASH, 48), startAt: 0, doneAt: 0 }, "a block of 48 bytes, not 44"],
+     [{ type: "error", message: "unreachable executed" }, "unreachable executed"],
++    // An error longer than any text this build's Worker tells (a whole panic buffer after its lead, 1,040 code
++    // units): the page says its own fixed sentence, never the long text.
++    [{ type: "error", message: "e".repeat(1041) }, "the Worker sent a message the page does not know"],
+     [{ type: "surprise" }, "the Worker sent a message the page does not know"],
+     [{ type: "report", stats: { ticks: 5 } }, "the Worker sent a message the page does not know"],
+     [null, "the Worker sent a message the page does not know"],
+@@ -191,6 +200,21 @@ test("the match ends once, whoever ends it first, and nothing is posted to the W
+   expect(other.link.end("again")).toBe(false);
+ });
+ 
++test("the Worker's own error event ends the match with the browser's text cut to the Worker's bound for a thrown text", () => {
++  const long = setUp();
++  long.ready();
++  // 1 MiB of the browser's text: its start and the mark, 512 code units in all.
++  const said = long.link.workerError("w".repeat(1 << 20));
++  expect([said.length, said.endsWith("..."), long.link.failure === said, long.port.terminated]).toEqual([512, true, true, 1]);
++  // A second cause after the end is no second error.
++  expect(long.link.workerError("again")).toBe("");
++  // A short text whole; an event with no text says so.
++  const short = setUp();
++  expect(short.link.workerError("Failed to load the Worker's script")).toBe("Failed to load the Worker's script");
++  const none = setUp();
++  expect(none.link.workerError("")).toBe("the Worker failed");
++});
++
+ test("what the link knows can be read and not written from outside", () => {
+   const { link, ready, deliver } = setUp();
+   ready();
 diff --git a/packages/client/src/app/worker-link.ts b/packages/client/src/app/worker-link.ts
-index a502596..9ad9057 100644
+index a502596..46d8482 100644
 --- a/packages/client/src/app/worker-link.ts
 +++ b/packages/client/src/app/worker-link.ts
+@@ -1,4 +1,4 @@
+-import { isWorkerToPage, Ring, type PageToWorker, type WorkerStats } from "@shamble/sim-worker";
++import { cutText, isWorkerToPage, Ring, type PageToWorker, type WorkerStats } from "@shamble/sim-worker";
+ import { BLOCK_BYTES, BLOCK_LAYOUT, checkLayoutHash } from "@shamble/types";
+ import { EchoTally } from "./press-tally.ts";
+ 
 @@ -208,8 +208,12 @@ export class WorkerLink {
      return this.#pauses;
    }
@@ -318,6 +745,96 @@ index a502596..9ad9057 100644
    }
  
    /**
+@@ -223,6 +227,15 @@ export class WorkerLink {
+     return true;
+   }
+ 
++  /**
++   * The Worker's own error event (a script that did not load, a throw outside the Wasm) ends the match. Its text is
++   * the browser's and has no bound of its own: it is cut to the bound the Worker keeps for a thrown text. Returns the
++   * reason, or an empty string when the match had already ended.
++   */
++  workerError(message: string): string {
++    return this.end(cutText(message === "" ? "the Worker failed" : message)) ? this.#failure : "";
++  }
++
+   /** The Worker's message event. Unpacking it is part of the hand-off's cost, so it happens in here, by name. */
+   receive(event: { readonly data: unknown }): string {
+     return this.onMessage(event.data);
+diff --git a/packages/client/vite.config.mjs b/packages/client/vite.config.mjs
+index e428614..0db249b 100644
+--- a/packages/client/vite.config.mjs
++++ b/packages/client/vite.config.mjs
+@@ -1,9 +1,61 @@
+ // The build and dev-server settings of the player's page (ADR 0002 parts 2 and 5).
++import { closeSync, constants, fstatSync, mkdirSync, openSync, readFileSync } from "node:fs";
++import path from "node:path";
+ import { fileURLToPath } from "node:url";
+ import { defineConfig } from "vite";
+ 
+ const folder = (relative) => fileURLToPath(new URL(relative, import.meta.url));
+ 
++/** What the development server answers for `/content.json` when the content tool refused or anything failed. */
++const CONTENT_REFUSED = "the content tool refused the content: its words are in the dev server's output\n";
++
++/**
++ * The development server's `/content.json` (engine-architect's block 1.9, its serving part only: no watch, no
++ * reload). A built page carries the bundle beside it; the development server serves the sources, and would answer
++ * the address with the page itself. So on each request the build's own function writes the bundle (scripts/build.mjs,
++ * `writeContentBundle`: the same content tool, cargo call, environment and target folder as a build, so after a build
++ * it compiles nothing) into the build's fixed folder for it, outside every folder a server serves, and the file is
++ * handed out whole. `apply: "serve"` keeps it out of every build, and Vite calls `configureServer` for the development
++ * server alone: the preview server serves a built folder and its own bundle.
++ */
++const devContent = {
++  name: "shamble-dev-content",
++  apply: "serve",
++  configureServer(server) {
++    // Added here, not in a returned function, so it runs before Vite's own handlers and their page-for-any-address.
++    server.middlewares.use((request, response, next) => {
++      if (request.method !== "GET" || new URL(request.url ?? "/", "http://127.0.0.1").pathname !== "/content.json") {
++        next();
++        return;
++      }
++      serveContent(response).catch(() => undefined);
++    });
++  },
++};
++
++async function serveContent(response) {
++  try {
++    const { DEV_CONTENT_DIR, writeContentBundle } = await import(new URL("./scripts/build.mjs", import.meta.url).href);
++    mkdirSync(DEV_CONTENT_DIR, { recursive: true });
++    writeContentBundle(DEV_CONTENT_DIR);
++    // The one plain file the tool wrote, never through a link.
++    const handle = openSync(path.join(DEV_CONTENT_DIR, "content.json"), constants.O_RDONLY | constants.O_NOFOLLOW);
++    try {
++      if (!fstatSync(handle).isFile()) throw new Error("content.json is not a plain file");
++      const bytes = readFileSync(handle);
++      response.writeHead(200, { "Content-Type": "application/json", "X-Content-Type-Options": "nosniff" });
++      response.end(bytes);
++    } finally {
++      closeSync(handle);
++    }
++  } catch (error) {
++    // The tool's own words went to this server's output already; the page gets the fixed sentence.
++    console.error(`the dev server's /content.json: ${error instanceof Error ? error.message : String(error)}`);
++    response.writeHead(500, { "Content-Type": "text/plain; charset=utf-8", "X-Content-Type-Options": "nosniff" });
++    response.end(CONTENT_REFUSED);
++  }
++}
++
+ // The isolation flag (ADR 0002 part 5): cross-origin isolation only when a profiling run asks for it, and only on
+ // the dev and preview servers. Both headers, or neither.
+ const isolation =
+@@ -26,6 +78,7 @@ export default defineConfig({
+   },
+   // A module Worker (Vite's default would be a classic script).
+   worker: { format: "es" },
++  plugins: [devContent],
+   // Both servers answer on this computer only, never on the network (the dependency answer's condition), and the
+   // dev server serves only the folders the page loads from, not the whole repository: its own, of the Worker's
+   // package the sources and the players' Wasm, the shared types, and the one library. Not node_modules as a whole:
 diff --git a/packages/e2e/tests/replay/determinism.spec.ts b/packages/e2e/tests/replay/determinism.spec.ts
 index 5fb0b5d..abca3e1 100644
 --- a/packages/e2e/tests/replay/determinism.spec.ts
@@ -384,6 +901,136 @@ index 5fb0b5d..abca3e1 100644
      expect(firstDifference(expected, other.hashes.map((hash) => BigInt(`0x${hash}`)))).toBe(46);
      console.log(`${name}: ${got.hashes.length} steps, every shared hash as in the file, in ${await page.evaluate(() => navigator.userAgent)}`);
    }
+diff --git a/packages/e2e/tests/skeleton/content.spec.ts b/packages/e2e/tests/skeleton/content.spec.ts
+new file mode 100644
+index 0000000..681ceb8
+--- /dev/null
++++ b/packages/e2e/tests/skeleton/content.spec.ts
+@@ -0,0 +1,99 @@
++// The page's content in a real browser, on the built development page (change-set 4b-2, step 9): one fetch of the
++// bundle beside the page, its bytes handed to the Worker, whose loader judges them, and the page's own reading only
++// after the Worker's `ready`. A bundle the loader refuses shows the loader's sentence as text and nothing else; a
++// failed fetch shows the page's fixed sentence and starts no Worker.
++import { readFileSync } from "node:fs";
++import path from "node:path";
++import { expect, type Page, test } from "@playwright/test";
++import { needsBuild, report, running } from "./report.ts";
++
++const baseline = JSON.parse(readFileSync(new URL("./render-counts.json", import.meta.url), "utf8")) as Record<string, unknown>;
++/** The built page's bundle: the content tool's output, as the build wrote it beside index.html. */
++const built = (): string => readFileSync(path.join(needsBuild(), "content.json"), "utf8");
++
++test.beforeAll(() => void needsBuild());
++
++/** Serves `body` (with `status`) for the page's content address, and counts the page's requests for it. */
++async function serveContent(page: Page, body: string | null, status = 200): Promise<{ readonly asked: number }> {
++  const count = { asked: 0 };
++  page.on("request", (request) => {
++    if (new URL(request.url()).pathname === "/content.json") count.asked += 1;
++  });
++  if (body !== null) await page.route("**/content.json", (route) => route.fulfill({ status, contentType: "application/json", body }));
++  return count;
++}
++
++test("the page fetches the bundle beside it once, and the served bytes are the built file's", async ({ page }) => {
++  const count = await serveContent(page, null);
++  const answered = page.waitForResponse((response) => new URL(response.url()).pathname === "/content.json");
++  await page.goto("/");
++  const response = await answered;
++  expect(new Uint8Array(await response.body())).toEqual(new Uint8Array(readFileSync(path.join(needsBuild(), "content.json"))));
++  await running(page, 30);
++  expect((await report(page)).errors).toBe(0);
++  expect(count.asked).toBe(1);
++});
++
++test("the Worker's loader reads the bytes the page was served: one changed value is refused at its own file and line", async ({ page }) => {
++  // The map's id written with a capital letter: the id grammar refuses it, at the id's line of the map's own text.
++  const bundle = JSON.parse(built()) as { files: { path: string; text: string }[] };
++  const map = bundle.files.find((file) => file.path === "maps/test-scene.json");
++  if (map === undefined) throw new Error("the built bundle holds no test scene");
++  const line = map.text.split("\n").findIndex((text) => text === '  "id": "test-scene",') + 1;
++  expect(line).toBeGreaterThan(0);
++  const changed = built().replace('\\"id\\": \\"test-scene\\"', '\\"id\\": \\"Test-scene\\"');
++  expect(changed).not.toBe(built());
++  await serveContent(page, changed);
++  await page.goto("/");
++  await expect(page.locator("#notice")).toContainText(`The match stopped: the content is refused: `);
++  await expect(page.locator("#notice")).toContainText(`, in maps/test-scene.json, line ${line} column `);
++});
++
++// Bundles that JSON.parse takes (but for the number) and the loader refuses, each shown only as the loader's sentence.
++const hostile: [string, (text: string) => string][] = [
++  ["a duplicate key", (text) => text.replace('"format": "shamble-content-bundle",', '"format": "shamble-content-bundle",\n  "format": "shamble-content-bundle",')],
++  ["a __proto__ key", (text) => text.replace('{\n  "files": [', '{\n  "__proto__": {\n    "polluted": 1\n  },\n  "files": [')],
++  ["a number out of every range", (text) => text.replace('"version": 1', '"version": 1e400')],
++  ["an extra key in a file entry", (text) => text.replace('"path": "maps/test-scene.json",', '"extra": 1,\n      "path": "maps/test-scene.json",')],
++  ["a source/ path", (text) => text.replace('"path": "maps/test-scene.json"', '"path": "source/test-scene.json"')],
++  ["an unknown key named like an image tag", (text) => text.replace('{\n  "files": [', '{\n  "<img src=x onerror=alert(1)>": 1,\n  "files": [')],
++  ["a key of 1 MiB", () => `{"${"k".repeat(1 << 20)}": 1}`],
++];
++
++for (const [name, make] of hostile) {
++  test(`a bundle with ${name} is refused by the loader, said as text, and the scene stays empty`, async ({ page }) => {
++    const text = make(built());
++    expect(text).not.toBe(built());
++    await serveContent(page, text);
++    const dialogs: string[] = [];
++    page.on("dialog", (dialog) => {
++      dialogs.push(dialog.message());
++      void dialog.dismiss();
++    });
++    await page.goto("/");
++    const notice = page.locator("#notice");
++    await expect(notice).toContainText("The match stopped: the content is refused: ");
++    // The loader's sentence, whole and within its bound, as plain text: no element came of it.
++    const said = (await notice.textContent()) ?? "";
++    expect(said.length - "The match stopped: ".length).toBeLessThanOrEqual(512);
++    expect(await notice.locator("*").count()).toBe(0);
++    expect(await page.locator("img").count()).toBe(0);
++    expect(dialogs).toEqual([]);
++    // The page itself carries on with its empty scene; only the match stopped.
++    const data = await report(page);
++    expect(data.errors).toBe(1);
++    if (baseline[data.picture.backend] !== null && baseline[data.picture.backend] !== undefined) {
++      await expect.poll(async () => (await report(page)).counters).toEqual(baseline[data.picture.backend]);
++    }
++  });
++}
++
++test("a failed fetch of the bundle is said in the page's fixed words, and no Worker is started", async ({ page }) => {
++  const count = await serveContent(page, '<img src=x onerror="alert(1)">', 404);
++  await page.goto("/");
++  const notice = page.locator("#notice");
++  await expect(notice).toHaveText("The match did not start: the content could not be fetched: the server answered 404");
++  expect(await page.locator("img").count()).toBe(0);
++  expect(page.workers()).toHaveLength(0);
++  expect(count.asked).toBe(1);
++});
+diff --git a/packages/e2e/tests/skeleton/isolation.spec.ts b/packages/e2e/tests/skeleton/isolation.spec.ts
+index 0ba96fd..8f319d1 100644
+--- a/packages/e2e/tests/skeleton/isolation.spec.ts
++++ b/packages/e2e/tests/skeleton/isolation.spec.ts
+@@ -1,6 +1,7 @@
+ // The isolation flag (ADR 0002 part 5; PM-0002-20): cross-origin isolation is on when a run asks for it and off
+ // otherwise, on the page and in the Worker, under Vite's dev server and its preview server. Chromium's 4 of the 12
+ // cases; Firefox and WebKit run in CI later.
++import { readFileSync } from "node:fs";
+ import path from "node:path";
+ import { fileURLToPath } from "node:url";
+ import { expect, test } from "@playwright/test";
+@@ -48,6 +49,12 @@ for (const kind of ["dev server", "preview server"] as const) {
+           // (For a file that is not there this server answers 200 with the page itself, so the file's type is asked too.)
+           const players = await page.request.get(at("packages/sim-worker/pkg/sim_wasm_bg.wasm"));
+           expect([players.status(), players.headers()["content-type"]]).toEqual([200, "application/wasm"]);
++          // The game's content: the bundle the build's own content tool writes (vite.config.mjs's plugin), byte for
++          // byte the built page's. The folder the plugin writes it into is not served.
++          const bundle = await page.request.get(`${address ?? ""}content.json`);
++          expect([bundle.status(), bundle.headers()["content-type"]]).toEqual([200, "application/json"]);
++          expect(new Uint8Array(await bundle.body())).toEqual(new Uint8Array(readFileSync(path.join(dist, "content.json"))));
++          expect((await page.request.get(at(".gate/dev-content/content.json"))).status()).toBe(403);
+           expect((await page.request.get(at(".gate/rules-module/release/devtools_bg.wasm"))).status()).toBe(403);
+           expect((await page.request.get(at(".gate/rules-module/dev/devtools.js"))).status()).toBe(403);
+           expect((await page.request.get(at("node_modules/@shamble/sim-worker/package.json"))).status()).toBe(403);
 diff --git a/packages/sim-worker/boundary/replay.test.mjs b/packages/sim-worker/boundary/replay.test.mjs
 index ec9d591..7f789dc 100644
 --- a/packages/sim-worker/boundary/replay.test.mjs
@@ -431,7 +1078,7 @@ index ec9d591..7f789dc 100644
    b.rebase(second.steps[0].hostMs);
    const together = [[], []];
 diff --git a/packages/sim-worker/boundary/sim-wasm.test.mjs b/packages/sim-worker/boundary/sim-wasm.test.mjs
-index cc2a70c..e36623c 100644
+index cc2a70c..3290f0d 100644
 --- a/packages/sim-worker/boundary/sim-wasm.test.mjs
 +++ b/packages/sim-worker/boundary/sim-wasm.test.mjs
 @@ -11,11 +11,18 @@ import { beforeAll, expect, test } from "vitest";
@@ -440,7 +1087,8 @@ index cc2a70c..e36623c 100644
  import { SimHost } from "../src/host.ts";
 +import { MAX_BUNDLE_BYTES } from "../src/messages.ts";
  import { MAX_TICKS_PER_WAKE } from "../src/pacing.ts";
- import { PANIC_TEXT_ROOM, readPanicMessage } from "../src/panic-message.ts";
+-import { PANIC_TEXT_ROOM, readPanicMessage } from "../src/panic-message.ts";
++import { PANIC_TEXT_ROOM, readPanicMessage, THROWN_TEXT_UNITS, trapMessage } from "../src/panic-message.ts";
  import { copyBlock } from "../src/read-block.ts";
 +import { readPlainFile } from "./plain-file.ts";
  
@@ -491,7 +1139,7 @@ index cc2a70c..e36623c 100644
    grown.step(0);
    plain.step(0);
    // One copy before the growth, so a host that keeps its first view is caught here whatever ran before.
-@@ -111,18 +118,69 @@ test("after the memory grows between two steps, the next block is the block of a
+@@ -111,18 +118,78 @@ test("after the memory grows between two steps, the next block is the block of a
  });
  
  test("padding makes the block longer and it still passes the check", () => {
@@ -543,17 +1191,26 @@ index cc2a70c..e36623c 100644
 +    expect(error, String(reason)).not.toBeInstanceOf(WebAssembly.RuntimeError);
 +    expect(error.message).toMatch(reason);
 +  }
-+  // A key of 1 MiB: the sentence keeps the loader's bound (512 bytes), its echo of the key cut.
++  // A key of 1 MiB: the sentence keeps the loader's bound, its echo of the key cut, and the Worker tells it whole.
 +  const long = refusal(() => new Sim(SEED, 0, 0, encode(`{"${"k".repeat(1 << 20)}": 1}`)));
 +  expect(long).toBeInstanceOf(Error);
 +  expect(long.message).toMatch(/^the content is refused: /);
-+  expect(long.message.length).toBeLessThanOrEqual(512);
++  expect(long.message.length).toBeLessThanOrEqual(THROWN_TEXT_UNITS);
++  expect(trapMessage({ buffer: new ArrayBuffer(0) }, 0, long)).toBe(long.message);
 +  // Nothing panicked, and the same module makes a match and runs it.
 +  expect(readPanicMessage(wasm.memory, panic_buffer())).toBe("");
 +  const sim = new Sim(SEED, 0, 0, BUNDLE);
 +  sim.step(0);
 +  expect(checkLayoutHash(blockOf(sim))).toEqual({ ok: true });
 +  expect(tickOf(blockOf(sim))).toBe(1);
++});
++
++test("the Worker's bound on a thrown text is the loader's own bound on its sentences, read from its source", () => {
++  // Every byte of a loader's sentence is ASCII (one code unit each), so its byte bound is the Worker's code units.
++  const source = readFileSync(new URL("../../../crates/content/src/error.rs", import.meta.url), "utf8");
++  const bound = /^pub const MESSAGE_BYTES: usize = (\d+);$/m.exec(source);
++  expect(bound, "MESSAGE_BYTES in crates/content/src/error.rs").not.toBeNull();
++  expect(Number(bound?.[1])).toBe(THROWN_TEXT_UNITS);
 +});
 +
 +test("the Worker's cap on a bundle is the loader's own: one byte more is refused for its size, and the cap itself is not", () => {
@@ -568,7 +1225,7 @@ index cc2a70c..e36623c 100644
  });
  
  test("the panic hook's buffer stands from the module's start: no text, and its room said", () => {
-@@ -177,7 +235,7 @@ test("in the glue, each per-tick call reaches exactly one export", () => {
+@@ -177,7 +244,7 @@ test("in the glue, each per-tick call reaches exactly one export", () => {
  });
  
  test("the host on the real Wasm: two calls per tick, one transferred block per tick, each passing the check", () => {
@@ -591,18 +1248,35 @@ index c400f00..450a000 100644
      host.onMessage(bad);
      expect(posts.at(-1)).toEqual({ type: "error", message: "the Worker got a message it does not know" });
    }
+diff --git a/packages/sim-worker/src/index.ts b/packages/sim-worker/src/index.ts
+index 4866606..44f588b 100644
+--- a/packages/sim-worker/src/index.ts
++++ b/packages/sim-worker/src/index.ts
+@@ -1,6 +1,7 @@
+-// What the page may import from this package: the messages' types, the check of what the Worker sends, and the ring
+-// of samples. The Worker is started from its own entry (`@shamble/sim-worker/worker`); nothing here loads the Wasm
+-// or its glue.
++// What the page may import from this package: the messages' types, the check of what the Worker sends, the cap on a
++// content bundle, the cut of a text to the bound the Worker keeps, and the ring of samples. The Worker is started from
++// its own entry (`@shamble/sim-worker/worker`); nothing here loads the Wasm or its glue.
+ export type { PageToWorker, WorkerStats, WorkerToPage } from "./messages.ts";
+-export { isWorkerToPage } from "./messages.ts";
++export { isWorkerToPage, MAX_BUNDLE_BYTES } from "./messages.ts";
++export { cutText } from "./panic-message.ts";
+ export { Ring } from "./stats.ts";
 diff --git a/packages/sim-worker/src/messages.test.ts b/packages/sim-worker/src/messages.test.ts
-index b12d179..a96ef02 100644
+index b12d179..9801b58 100644
 --- a/packages/sim-worker/src/messages.test.ts
 +++ b/packages/sim-worker/src/messages.test.ts
-@@ -1,5 +1,5 @@
+@@ -1,5 +1,6 @@
  import { expect, test } from "vitest";
 -import { isPageToWorker, isWorkerStats, isWorkerToPage, MODE_LOCAL, type PageToWorker, type WorkerStats, type WorkerToPage } from "./messages.ts";
 +import { isPageToWorker, isWorkerStats, isWorkerToPage, MAX_BUNDLE_BYTES, MODE_LOCAL, type PageToWorker, type WorkerStats, type WorkerToPage } from "./messages.ts";
++import { ERROR_TEXT_UNITS } from "./panic-message.ts";
  
  test("local play is mode 0", () => {
    expect(MODE_LOCAL).toBe(0);
-@@ -7,12 +7,14 @@ test("local play is mode 0", () => {
+@@ -7,12 +8,14 @@ test("local play is mode 0", () => {
  
  /** An input post with nothing held and no press; a test changes what it is about. */
  const INPUT: PageToWorker = { type: "input", post: 1, held: 0, p0: 0, p1: 0, p2: 0, p3: 0, returned: [] };
@@ -619,7 +1293,7 @@ index b12d179..a96ef02 100644
      { ...INPUT, post: 0 },
      { type: "input", post: full, held: 0xffff, p0: full, p1: full, p2: full, p3: full, returned: [new ArrayBuffer(8), new ArrayBuffer(8)] },
      { type: "visibility", hidden: true },
-@@ -23,7 +25,11 @@ test("every message the page may send is accepted", () => {
+@@ -23,7 +26,11 @@ test("every message the page may send is accepted", () => {
  });
  
  test("anything else is refused", () => {
@@ -631,7 +1305,7 @@ index b12d179..a96ef02 100644
      null,
      undefined,
      "start",
-@@ -32,10 +38,17 @@ test("anything else is refused", () => {
+@@ -32,10 +39,17 @@ test("anything else is refused", () => {
      {},
      { type: "stop" },
      { type: "start" },
@@ -653,11 +1327,34 @@ index b12d179..a96ef02 100644
      // The old shape, a post without one of its numbers, and each number outside its range.
      { type: "input", sequence: 1, returned: [] },
      { ...INPUT, returned: undefined },
+@@ -83,6 +97,8 @@ test("every message the Worker may send is accepted", () => {
+     { type: "block", buffer: new ArrayBuffer(8), startAt: 5_000_000, doneAt: 5_000_000.25 },
+     { type: "error", message: "" },
+     { type: "error", message: "panicked at crates/sim/src/world.rs:42:14:\nattempt to add with overflow" },
++    // The longest text the Worker tells: a whole panic buffer after its lead.
++    { type: "error", message: "e".repeat(ERROR_TEXT_UNITS) },
+     { type: "report", stats: STATS },
+   ];
+   for (const message of good) expect(isWorkerToPage(message), message.type).toBe(true);
+@@ -112,6 +128,8 @@ test("anything else from the Worker is refused", () => {
+     { type: "block", buffer: new ArrayBuffer(8), startAt: "0", doneAt: 0 },
+     { type: "error" },
+     { type: "error", message: 42 },
++    // One code unit longer than any text this build's Worker tells.
++    { type: "error", message: "e".repeat(ERROR_TEXT_UNITS + 1) },
+     { type: "report" },
+     { type: "report", stats: null },
+     { type: "report", stats: { ticks: 5 } },
 diff --git a/packages/sim-worker/src/messages.ts b/packages/sim-worker/src/messages.ts
-index b8203fc..669402b 100644
+index b8203fc..d899e9a 100644
 --- a/packages/sim-worker/src/messages.ts
 +++ b/packages/sim-worker/src/messages.ts
-@@ -6,10 +6,21 @@
+@@ -2,14 +2,26 @@
+  * The messages between the page and the Worker. They are structured-clone data, checked where they arrive. No
+  * message carries the match seed: the Worker draws it and keeps it (ADR 0004 part 8).
+  */
++import { ERROR_TEXT_UNITS } from "./panic-message.ts";
+ 
  /** The local match: the client endpoint and a local server in one Worker (ADR 0002 part 6). The only mode so far. */
  export const MODE_LOCAL = 0;
  
@@ -681,7 +1378,7 @@ index b8203fc..669402b 100644
    /**
     * The newest input, once per drawn frame, as plain numbers: `post` counts the page's posts (it is never the
     * protocol's command sequence), `held` has one bit per button held (16 buttons), and `p0` to `p3` hold the
-@@ -111,6 +122,11 @@ function isCount(value: unknown): value is number {
+@@ -111,6 +123,11 @@ function isCount(value: unknown): value is number {
    return typeof value === "number" && Number.isInteger(value) && value >= 0 && value <= 0xffff_ffff;
  }
  
@@ -693,7 +1390,7 @@ index b8203fc..669402b 100644
  /**
   * Whether a message the Worker received is one the page may send. Anything else is answered with an `error`
   * message and never reaches the Wasm.
-@@ -119,7 +135,7 @@ export function isPageToWorker(value: unknown): value is PageToWorker {
+@@ -119,7 +136,7 @@ export function isPageToWorker(value: unknown): value is PageToWorker {
    if (!isObject(value)) return false;
    switch (value["type"]) {
      case "start":
@@ -702,6 +1399,114 @@ index b8203fc..669402b 100644
      case "input":
        return (
          isCount(value["post"]) &&
+@@ -164,7 +181,8 @@ export function isWorkerToPage(value: unknown): value is WorkerToPage {
+       // One read of each time: `isFinite` refuses everything that is not a number, without converting it.
+       return value["buffer"] instanceof ArrayBuffer && Number.isFinite(value["startAt"]) && Number.isFinite(value["doneAt"]);
+     case "error":
+-      return typeof value["message"] === "string";
++      // No longer than the Worker's longest text (a whole panic buffer after its lead): a longer one is not this build's.
++      return typeof value["message"] === "string" && value["message"].length <= ERROR_TEXT_UNITS;
+     case "report":
+       return isWorkerStats(value["stats"]);
+     default:
+diff --git a/packages/sim-worker/src/panic-message.test.ts b/packages/sim-worker/src/panic-message.test.ts
+index 1b7b4a4..5842f0d 100644
+--- a/packages/sim-worker/src/panic-message.test.ts
++++ b/packages/sim-worker/src/panic-message.test.ts
+@@ -1,5 +1,5 @@
+ import { expect, test } from "vitest";
+-import { PANIC_TEXT_ROOM, readPanicMessage, trapMessage } from "./panic-message.ts";
++import { cutText, ERROR_TEXT_UNITS, PANIC_TEXT_ROOM, readPanicMessage, THROWN_TEXT_UNITS, trapMessage } from "./panic-message.ts";
+ 
+ /** A memory with a panic buffer at `ptr`: the length word, the room word, then the text's bytes. */
+ function memoryWith(ptr: number, text: Uint8Array, options: { length?: number; room?: number; bytes?: number } = {}) {
+@@ -62,3 +62,26 @@ test("the Worker's sentence after a throw: the panic's own text, or else what wa
+     "the block is 8 bytes and the buffer for it is 16",
+   );
+ });
++
++test("a thrown text is cut to its bound with a mark, in code units and never inside a character; a panic's text is not", () => {
++  const quiet = { buffer: new ArrayBuffer(4096) };
++  expect(THROWN_TEXT_UNITS).toBe(512);
++  // 1 MiB of text: its start and the mark, 512 code units in all.
++  const cut = trapMessage(quiet, 64, new Error("k".repeat(1 << 20)));
++  expect([cut.length, cut.endsWith("..."), cut.startsWith("kkk")]).toEqual([512, true, true]);
++  // A text at the bound passes whole (a loader's longest sentence); one unit more is cut.
++  expect(trapMessage(quiet, 64, new Error("a".repeat(512)))).toBe("a".repeat(512));
++  expect(trapMessage(quiet, 64, new Error("a".repeat(513)))).toBe(`${"a".repeat(509)}...`);
++  // A character of two code units across the cut goes whole: no lone half is left.
++  const pair = cutText(`${"a".repeat(508)}😀${"b".repeat(10)}`);
++  expect(pair).toBe(`${"a".repeat(508)}...`);
++  expect(cutText(`${"a".repeat(507)}😀${"b".repeat(10)}`)).toBe(`${"a".repeat(507)}😀...`);
++  // The panic's text is bounded by its buffer and told whole, the longest a whole room's text.
++  const full = memoryWith(64, utf8("p".repeat(PANIC_TEXT_ROOM)));
++  const told = trapMessage(full, 64, new Error("unreachable executed"));
++  expect(told).toBe(`the simulation stopped: ${"p".repeat(PANIC_TEXT_ROOM)}`);
++  expect([told.length, ERROR_TEXT_UNITS]).toEqual([1040, 1040]);
++  // A room of characters that take two bytes each decodes to fewer code units than bytes: the bound holds for every text.
++  const wide = trapMessage(memoryWith(64, utf8("é".repeat(PANIC_TEXT_ROOM / 2))), 64, null);
++  expect(wide.length).toBeLessThanOrEqual(ERROR_TEXT_UNITS);
++});
+diff --git a/packages/sim-worker/src/panic-message.ts b/packages/sim-worker/src/panic-message.ts
+index 1d9767a..5736b57 100644
+--- a/packages/sim-worker/src/panic-message.ts
++++ b/packages/sim-worker/src/panic-message.ts
+@@ -7,6 +7,38 @@ import type { LinearMemory } from "./read-block.ts";
+  */
+ export const PANIC_TEXT_ROOM = 1016;
+ 
++/** What the Worker says before a panic's text. */
++export const PANIC_LEAD = "the simulation stopped: ";
++
++/**
++ * The most UTF-16 code units of a thrown value's text that the Worker tells the page (anything but a panic's text,
++ * whose buffer has a room of its own): the game's loader cuts its sentences to the same number of bytes, all ASCII
++ * (content's `MESSAGE_BYTES`, which the boundary test reads from the Rust source), so a loader's refusal passes whole.
++ * The page cuts the Worker's own error event to it too.
++ */
++export const THROWN_TEXT_UNITS = 512;
++
++/**
++ * The longest `error` text the page takes, in UTF-16 code units: a whole panic buffer after the lead (decoding the
++ * room's 1,016 bytes gives at most 1,016 code units). Any longer text is not from this build's Worker.
++ */
++export const ERROR_TEXT_UNITS = PANIC_TEXT_ROOM + PANIC_LEAD.length;
++
++/** Marks where a text was cut, inside the bound. */
++const CUT_MARK = "...";
++
++/**
++ * A text of at most `THROWN_TEXT_UNITS` UTF-16 code units: the text itself when it fits, otherwise its start and the
++ * mark, never half of a character (a high surrogate whose low half would be cut off goes too).
++ */
++export function cutText(text: string): string {
++  if (text.length <= THROWN_TEXT_UNITS) return text;
++  let keep = THROWN_TEXT_UNITS - CUT_MARK.length;
++  const last = text.charCodeAt(keep - 1);
++  if (last >= 0xd800 && last <= 0xdbff) keep -= 1;
++  return `${text.slice(0, keep)}${CUT_MARK}`;
++}
++
+ /**
+  * The text the Wasm's panic hook left in its buffer, or an empty string when nothing has panicked (sim-wasm's
+  * panic.rs gives the layout: the text's length and the room for it as two little-endian `u32`, then the text).
+@@ -25,11 +57,12 @@ export function readPanicMessage(memory: LinearMemory, ptr: number): string {
+ }
+ 
+ /**
+- * What the Worker tells the page after a call into the Wasm threw: the panic's own text when the hook kept one,
+- * otherwise what was thrown (a trap without a panic, a failed allocation, or an error that is not the Wasm's).
++ * What the Worker tells the page after a call into the Wasm threw: the panic's own text when the hook kept one, whole
++ * (its buffer bounds it), otherwise what was thrown, cut to `THROWN_TEXT_UNITS` (a refusal of the constructor, a trap
++ * without a panic, a failed allocation, or an error that is not the Wasm's).
+  */
+ export function trapMessage(memory: LinearMemory, ptr: number, thrown: unknown): string {
+   const panic = readPanicMessage(memory, ptr);
+-  if (panic !== "") return `the simulation stopped: ${panic}`;
+-  return thrown instanceof Error ? thrown.message : String(thrown);
++  if (panic !== "") return `${PANIC_LEAD}${panic}`;
++  return cutText(thrown instanceof Error ? thrown.message : String(thrown));
+ }
 diff --git a/packages/sim-worker/src/worker.ts b/packages/sim-worker/src/worker.ts
 index cf79087..d183d9b 100644
 --- a/packages/sim-worker/src/worker.ts
