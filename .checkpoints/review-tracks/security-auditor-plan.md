@@ -94,3 +94,23 @@ Findings (id, severity, class):
   not measured); Agent-tool subagent measured live (this run's own calls took the agent branch).
 Patched scratch copies: guard suite 1575/1575 (5 new mutants caught), track suite 61/61, plus a new git-backed tab case (passes patched, fails on the build copy).
 Verdict: REVISE.
+
+## Re-check of the changed hunks (build copy, 2026-11-27, not a new round)
+Read: routine-guard.mjs diff vs main and vs my patched copy (only items 3-5 changed), track.mjs whole, the new tests.
+Probes and a patched track.mjs: session scratchpad only (sa-recheck*.mjs, rc-patch.mjs, rc-patched/).
+Suites re-run: guard 1581/1581, track 82/82; patched track copy 82/82 and every probe below fixed.
+Findings (id, severity, class):
+- SA-RC-1 Medium: BASE-REF (track.mjs base by short ref name; measured: floors lost; delivered by a plain fetch,
+  measured; routines already refuse it before a script runs; day sessions not).
+- SA-RC-2 Medium: IGNORE-CASE (repo-level git config drops the gitignored floor; measured with main's real .gitignore;
+  the fixture pins the config, the code does not; global config alone does not, measured).
+- SA-RC-3 Low: TEMP-LEAK (stop path skips the cleanup; measured, one folder per suite run).
+- SA-RC-4 Low: CRAFTED-TREE (a folder made outside the temp folder before git refuses the path; measured; no file
+  written; exit 1 not 2; reach: main's own tree only).
+- SA-RC-5 Critical (by class; pre-existing on main; meets a prompt; reach unmeasured): MERGE-SCOPE. Not widened by
+  this change-set; for Mustafa like SA-PA-10.
+- SA-RC-6 Low: BUDGET-MSG.
+Closed: SA-PA-4 (its defect fix sound apart from SA-RC-2/3/4; info/exclude and global excludes add only, measured with
+negations); dir-only pattern without the folder covered by the fixture. SA-PA-7 closed (line-end handling, not
+trimming; SA-RT2-3 holds). SA-PA-9 closed (filter text pinned by the mutants' exactly-once rule). SA-PA-6 closed.
+Verdict: REVISE on SA-RC-1 and SA-RC-2 (both contradict track.mjs lines 9-10); fixes tested on the scratch copy.

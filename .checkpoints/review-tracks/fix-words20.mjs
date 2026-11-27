@@ -8,9 +8,10 @@ const text = git(['show', 'origin/main:docs/DECISIONS.md']);
 const entries = text.split(/\n(?=- \*\*)/).filter((e) => e.startsWith('- **Taken by Mustafa'));
 const read = (c, p) => { try { return git(['show', `${c}:${p}`]); } catch { return null; } };
 const tally = {};
-for (const e of entries.slice(0, 20)) {
+const N = Number(process.argv[2]) || 20; // a count, or 999 for the whole record
+for (const e of entries.slice(0, N)) {
   const [w] = wordsCheck(e, '', read);
   tally[w.result] = (tally[w.result] || 0) + 1;
   console.log(`${w.entry.padEnd(36)} ${w.floor ? 'FLOOR' : 'ok   '} ${w.result}`);
 }
-console.log(`\n${entries.length} entries in the record; the first 20 (newest first) checked:`, JSON.stringify(tally));
+console.log(`\n${entries.length} entries in the record; the first ${Math.min(N, entries.length)} (newest first) checked:`, JSON.stringify(tally));

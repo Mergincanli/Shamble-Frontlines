@@ -223,3 +223,36 @@ His words are named by code and DECISIONS line; only the plan and the kit are qu
   path; "no saved file named" is a go floor; SA-RT3-1 built (Bash plain forms now refused); "Main's" and "as above".
 - No case-only twins on origin/main (378 paths). main()'s git half is covered by exit-code tests only.
 - Groups: restores the plan PA-M1, M3, M4, L1, L2; new rule text to show him as additions PA-M2, M5, L3, L4, L5.
+
+---
+
+# Re-check of the fix pass (changed hunks only, 2026-11-27). Not a new review round.
+
+**Verdict: REVISE, track.mjs only** (1 High, 2 Medium, 2 Low, 1 for security-auditor to rate). The rest of the fix
+pass is approved: advisor.md, guard.mjs, routine-guard.mjs and both test files. This is the last fix pass under the
+budget: after it, only a Critical or High reopens.
+- Run myself, in the copy: track 82/82, routine-guard 1581/1581, checkpoint 33/33, kept-logs 9 pass (10 tests, 0 fail).
+  Skimmed the guard test diff: paginate+filter fake, CRLF allow, lone CR, Bot, two gate runs, plugin_ server, Miro,
+  mutants. Not run: fix-mutate, fix-hist, settings S4 (copy).
+- Met: PA-M1, PA-M2, PA-M4 (TE-B1 form), PA-M5, PA-L1..L5; SA-PA-1..9 as described; TE-B9 and SA-PA-8 text present;
+  no internal ids in rule text. PA-M3: not met in full (RC-H1, RC-M1).
+- RC-H1 (High) the saved-file pattern needs ")" right after the commit; real entries write "(readable at commit <sha>
+  of the chat's branch `...`)". All 5 "no saved file named" results of the 20-entry run do name a saved file
+  (90efc3d2, 809fbcd0, d736715d, 83ce083b, 7d208dc5; 247437b9 too). The compare is skipped and the result is wrong.
+  Both commits are reachable from origin/main. Fix the pattern, test it with those real entries, re-run the 20.
+- RC-M1 (Medium) core() keeps only an entry's first line, but headers wrap. Changing an old entry's stated sha256 or
+  saved-file commit gives no floor (reproduced on main's DECISIONS). otherAdded() is true for every newly added wrapped
+  entry (2542b1a0, 89075745), so that merge-check line is always on. core() came from my own pre-apply review. Fix:
+  header = lines up to the first quote line, bounded at a blank line or heading; same core for otherAdded(); replay on
+  the fix-hist PRs and the 20 entries, with no new false floors.
+- RC-M2 (Medium) twins(): a folder-only twin (docs/x/a.md beside docs/X/b.md) is not caught. Fix: floor only the changed
+  path whose folder prefix has a lower-case twin in the head's tree; never pull a sibling folder into the files.
+- RC-L1 (Low) ignoredByBase() also reads the local info/exclude and core.excludesFile (scratch repo: two extra floors).
+  It only adds floors, but the "same under any config" claim is off.
+- RC-L2 (Low) numstat varies with diff.algorithm (2 of the last 15 main merges, by 2-4 lines): pin it.
+- RC-S1 (security-auditor rates; outside the changed hunks) a consistency gap in gh(); detail to the caller only.
+- Twins ruling: TE-B1's form is accepted. The floor concerns the change's own files; my PA-M4 version was overbroad.
+- Binary floors (#68, #70): information for him in the report, not a decision.
+- Size 931 vs about 980: fine. The fixes must stay under it, or it is his call (His go keeps, 6).
+- ADDITIONS-OK stays the one decision. Its list grows by SA-PA-8, TE-B9 and the guard widenings (stricter), plus
+  WORDS-NEWLINE: a second accepted quote form, not in plan 3f's letter, named as a tolerance (it proves the same words).

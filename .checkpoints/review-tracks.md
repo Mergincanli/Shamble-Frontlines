@@ -117,16 +117,30 @@
     #65 stops (history not in the clone); #68 and #70 now show a binary-file floor (a test recording, test vectors).
     Size: 931 added against the stop line of about 980. Evidence scripts: fix-mutate.mjs, fix-words20.mjs, fix-hist.mjs.
     His standing rule of 2026-11-27 (full literal paths for files written in shell) saved: mustafa-2026-11-27-full-paths.md
+25. Re-checks of the fix pass: the advisor agent REVISE on track.mjs only (RC-H1 High: the saved-file pattern skipped
+    real entries naming their branch; RC-M1 wrapped headers; RC-M2 folder-only twins; RC-L1 local excludes; RC-L2 diff
+    algorithm; RC-S1 = SA-PA-10's class, kept out of files); the rest approved; twins departure accepted; ADDITIONS-OK
+    list grown. security-auditor REVISE on track.mjs (SA-RC-1 base by short name, SA-RC-2 repo ignorecase, SA-RC-3 temp
+    leak on stop, SA-RC-4 folder outside temp, SA-RC-6 size message) and SA-RC-5 (pre-existing, Critical by class: a
+    merge through an other-named GitHub connector skips the guard's checks; ends at a prompt).
+26. Second fix pass in the copy: all of them, SA-RC-5 included (refused outside the github connector); the ignore
+    check in a new hermetic temporary repository; parts() (header up to the quote, the quote's own run); twinPaths()
+    (file or folder twins, changed paths only); refs/remotes/origin/main; GIT_NO_REPLACE_OBJECTS; --diff-algorithm=myers;
+    every failure exits 2 after cleanup; saved files in the record's three shapes (the quote; plus a final newline; a
+    header, a line ---, then the quote: 23 real entries). Suites: guard 1581, track 85, checkpoint 33, kept-logs 9.
+    Mutants 56/59 (left: diff algorithm, untestable cheaply; two equivalents). Whole record: every entry naming a saved
+    file and a sha256 passes (44); 65 older with no stated sha, 52 with no saved file, 1 partial copy with a part left
+    out (floor). Replay: tracks 11/11, no false words floors left. The auditor's probes pass on the copy (base by tag,
+    ignorecase, excludes, temp leak, a crafted tree). Size: 1003 added, past the stop line of about 980: his call.
 
 ## Current step
-The advisor agent re-checks the changed hunks (and security-auditor rules on the guard hunks and the ignore fix): not a
-new round. Then bring him ADDITIONS-OK and the SA-PA-5 information, then the applies (about 10 asks, each with its
-exact text), cmp against the copy, suites (settings 127 in the real folder), gate, one commit.
+Narrow re-checks of the second fix pass (advisor agent: track hunks, guard SA-RC-5/6, the advisor.md line-end gloss;
+security-auditor: its SA-RC fixes). In parallel, his answers: ADDITIONS-OK, SIZE-LINE (past the stop line); SA-PA-5,
+SA-RC-5 and the binary-file floor as information. Then the applies (about 12 asks), cmp, suites, gate, one commit.
 
 ## Next steps
-1. Re-check of the changed hunks (advisor agent; security-auditor on the guard and git-layer hunks).
-2. His ADDITIONS-OK; SA-PA-5 as information; the binary-file floor seen on #68 and #70 as information.
-3. Applies, cmp, suites, gate, one commit; build-review round; verifier; docs-keeper; report; PR; head review; his go.
+1. Re-checks back; his answers.
+2. Applies, cmp, suites, gate, one commit; build-review round; verifier; docs-keeper; report; PR; head review; his go.
 
 ## Decisions taken
 - SPEED-ORDER (b): review tracks before the guard change-set · Mustafa · 2026-11-26
