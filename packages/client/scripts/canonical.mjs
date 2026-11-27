@@ -33,10 +33,11 @@ export const canonicalText = (text) => `${JSON.stringify(sorted(JSON.parse(text)
 export function run(contentPath, base = root) {
   if (typeof contentPath !== "string" || !CONTENT_PATH.test(contentPath)) throw new Error("usage: canonical.mjs <maps|movement>/<id>.json");
   const file = path.join(base, "content", contentPath);
-  const before = readPlain(file);
+  // Every folder from `base` down is held to be no link, the content folder included.
+  const before = readPlain(file, base);
   const after = canonicalText(before);
   if (after === before) return `content/${contentPath}: already in canonical form`;
-  writePlain(file, after);
+  writePlain(file, after, base);
   return `content/${contentPath}: rewritten in canonical form (${Buffer.byteLength(before)} bytes before, ${Buffer.byteLength(after)} after)`;
 }
 

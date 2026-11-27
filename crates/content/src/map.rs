@@ -25,6 +25,8 @@ pub const FORMAT: &str = "shamble-map";
 pub const VERSION: u32 = 1;
 /// The most entries each list of a map may hold.
 pub const MAX_SPAWNS: u32 = 16;
+/// The fewest spawns a map may hold (the shapes and the regions may be none).
+pub const MIN_SPAWNS: u32 = 1;
 pub const MAX_SHAPES: u32 = 512;
 pub const MAX_REGIONS: u32 = 64;
 
@@ -335,8 +337,15 @@ pub fn check(map: &MapDocument) -> Result<(), Error> {
             );
         }
     }
+    // MIN_SPAWNS is one: a map holds at least one spawn.
     if map.spawns.is_empty() {
-        return refuse("spawns".to_owned(), Kind::TooFew { len: 0, min: 1 });
+        return refuse(
+            "spawns".to_owned(),
+            Kind::TooFew {
+                len: 0,
+                min: MIN_SPAWNS,
+            },
+        );
     }
     for (at, spawn) in map.spawns.iter().enumerate() {
         let field = |axis: usize| format!("spawns[{at}].at[{axis}]");
@@ -396,7 +405,9 @@ pub fn check(map: &MapDocument) -> Result<(), Error> {
 
 /// A valid map file's text in canonical form with made-up sizes, for this crate's tests and the tools' (never a
 /// content file: no value of the game rests on it). Its id is the one local play asks for, `test-scene`, so a bundle
-/// made of it (`bundle::test_bundle`) serves every caller that replays no committed recording.
+/// made of it (`bundle::test_bundle`) serves every caller that replays no committed recording. Its shapes are no
+/// map's of the game: a test that rests on a map's shapes names the map it uses.
+#[doc(hidden)]
 pub const TEST_TEXT: &str = "{\n  \"bounds\": {\n    \"max\": [\n      50,\n      20,\n      50\n    ],\n    \"min\": [\n      -50,\n      0,\n      -50\n    ]\n  },\n  \"format\": \"shamble-map\",\n  \"id\": \"test-scene\",\n  \"regions\": [],\n  \"shapes\": [\n    {\n      \"id\": \"step\",\n      \"max\": [\n        1,\n        0.55,\n        1\n      ],\n      \"min\": [\n        0,\n        0,\n        0\n      ],\n      \"type\": \"box\"\n    }\n  ],\n  \"spawns\": [\n    {\n      \"at\": [\n        0,\n        0,\n        -5\n      ],\n      \"facing_deg\": 90,\n      \"id\": \"a\"\n    }\n  ],\n  \"version\": 1\n}\n";
 
 #[cfg(test)]

@@ -2,7 +2,7 @@
 // and every file it refuses to read or write. Then the repository's own files (from 4b's step 8): his saved Export,
 // the manifest beside it, the table, and the movement table they give.
 import { createHash } from "node:crypto";
-import { existsSync, lstatSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, symlinkSync, writeFileSync } from "node:fs";
+import { existsSync, lstatSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, renameSync, rmSync, statSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
@@ -256,6 +256,18 @@ describe("the hand-over's files", () => {
     symlinkSync(secret, path.join(folder, "content/movement/.soldier.json.new"));
     expect(() => writePlain(target, "x")).toThrow("EEXIST");
     expect(readFileSync(secret, "utf8")).toBe(exportText);
+    // A link higher up, the content folder itself (security-auditor's round of 2026-11-27): nothing is read through
+    // it and nothing written, though every folder and file below it is plain.
+    const real = path.join(folder, "outside/content");
+    renameSync(path.join(folder, "content"), real);
+    symlinkSync(real, path.join(folder, "content"));
+    expect(() => run("--check", folder, PATHS, pinned)).toThrow(`${path.join(folder, "content")} is a link or not a plain folder: it is not read`);
+    expect(() => writePlain(target, "x", folder)).toThrow(`${path.join(folder, "content")} is a link or not a plain folder: nothing is written`);
+    // And a file that lies outside the folder the reads start from is not read at all.
+    expect(() => readPlain(secret, path.join(folder, "content/movement"))).toThrow("is not under");
+    rmSync(path.join(folder, "content"));
+    renameSync(real, path.join(folder, "content"));
+    expect(readFileSync(secret, "utf8")).toBe(exportText);
     // The cap: a file of exactly the cap is read; one byte more is refused.
     const large = path.join(folder, "outside/large.txt");
     writeFileSync(large, "x".repeat(MAX_READ_BYTES));
@@ -269,5 +281,21 @@ describe("the hand-over's files", () => {
 describe("his Export and the game's first movement table, the repository's own files", () => {
   test("the check holds content/movement/soldier.json to his saved Export through the table: every value, bit for bit, in the writer's form", () => {
     expect(run("--check")).toBe(`${PATHS.target}: 15 values, each his Export's (sha256 ${EXPORT_SHA256.slice(0, 8)}...)`);
+  });
+
+  // The check above reads the values through the table, so a row sent to the wrong field would pass it, whatever
+  // the values (test-engineer's round of 2026-11-27). The table's own names hold the rows in place: each row's field
+  // is the last step of its Export name, but for the one rename named here, so no two rows can trade fields.
+  test("every row of the table sends its Export value to the field of the same name, but for one named rename", () => {
+    const RENAMED = { "stamina.refill_time_from_empty_s": "stamina_refill_time_s" };
+    const { rows } = JSON.parse(readFileSync(path.join(import.meta.dirname, "../../..", PATHS.table), "utf8"));
+    const filled = rows.filter((row) => row.field !== undefined);
+    expect(filled).toHaveLength(15);
+    for (const { export: name, field } of filled) {
+      expect(field, name).toBe(RENAMED[name] ?? name.split(".").at(-1));
+    }
+    // The rename stands in the table once, and every field once: the rule above leaves no row out.
+    expect(filled.filter(({ export: name }) => name in RENAMED)).toHaveLength(1);
+    expect(new Set(filled.map(({ field }) => field)).size).toBe(15);
   });
 });

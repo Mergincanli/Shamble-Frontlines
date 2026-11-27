@@ -10,7 +10,7 @@ import { expect, test } from "vitest";
 import * as dev from "../../../.gate/rules-module/dev/devtools.js";
 import * as release from "../../../.gate/rules-module/release/devtools.js";
 import { initSync, Sim, tick_hz } from "../pkg/sim_wasm.js";
-import { checkContent, firstDifference, readHashes, readRecording, replayOn, replayStep } from "../src/recording.ts";
+import { checkContent, checkReplayable, firstDifference, readHashes, readRecording, replayOn, replayStep } from "../src/recording.ts";
 import { readPlainFile } from "./plain-file.ts";
 
 // The committed recordings, each read only when it is a plain file in a plain folder (plain-file.ts).
@@ -43,7 +43,9 @@ test("the manifest lists every recording's files with their length and digest, a
 
 test.each(names)("%s replays on the players' file to its hashes file, step for step", async (name) => {
   const { recording, expected, content } = committed(name);
-  // The frozen content beside it is the content its header names; any other bundle is refused before a match exists.
+  // What this build cannot replay, and content other than the header names, are refused before a match exists, as
+  // the native runner and the browser's refuse them (netcode-architect's round of 2026-11-27).
+  checkReplayable(recording);
   await checkContent(recording, content);
   const other = Uint8Array.from(content);
   other[other.length - 2] ^= 1;

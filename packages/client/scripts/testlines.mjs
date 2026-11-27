@@ -17,7 +17,7 @@
 // content/movement/soldier.json. The table names fields, never files: a row cannot send a write anywhere.
 
 import { createHash } from "node:crypto";
-import { closeSync, lstatSync, openSync, readSync, renameSync, rmSync, writeSync } from "node:fs";
+import { closeSync, constants, fstatSync, lstatSync, openSync, readSync, renameSync, rmSync, writeSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -49,13 +49,31 @@ const own = (object, key) => (isObject(object) && Object.hasOwn(object, key) ? o
 /** A value as a line shows it: JSON's text, but a minus zero with its sign (JSON's own text for it is "0"). */
 const shown = (value) => (Object.is(value, -0) ? "-0" : JSON.stringify(value));
 
-/** A plain file's text: the file and its folder are no links, and the file is at most `MAX_READ_BYTES`. */
-export function readPlain(file) {
-  for (const [what, entry, wanted] of [["folder", path.dirname(file), "isDirectory"], ["file", file, "isFile"]]) {
-    if (!lstatSync(entry)[wanted]()) throw new Error(`${entry} is a link or not a plain ${what}: it is not read`);
+/**
+ * Every folder from `base` down to `file`'s own is a plain folder, never a link (`file` must lie under `base`):
+ * so no link anywhere on the way, the content folder itself included, leads a read or a write elsewhere.
+ */
+function plainFolders(file, base, refused) {
+  const relative = path.relative(base, path.dirname(file));
+  if (relative === ".." || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative)) throw new Error(`${file} is not under ${base}: ${refused}`);
+  let at = base;
+  for (const part of ["", ...(relative === "" ? [] : relative.split(path.sep))]) {
+    at = path.join(at, part);
+    if (!lstatSync(at).isDirectory()) throw new Error(`${at} is a link or not a plain folder: ${refused}`);
   }
-  const handle = openSync(file, "r");
+}
+
+/**
+ * A plain file's text: every folder from `base` down to it and the file itself are no links, and the file is at
+ * most `MAX_READ_BYTES`. The file is opened without following a link (a link put in its place after the check is
+ * refused there) and judged again by what was opened.
+ */
+export function readPlain(file, base = path.dirname(file)) {
+  plainFolders(file, base, "it is not read");
+  if (!lstatSync(file).isFile()) throw new Error(`${file} is a link or not a plain file: it is not read`);
+  const handle = openSync(file, constants.O_RDONLY | (constants.O_NOFOLLOW ?? 0));
   try {
+    if (!fstatSync(handle).isFile()) throw new Error(`${file} is not a plain file: it is not read`);
     const bytes = Buffer.alloc(MAX_READ_BYTES + 1);
     let length = 0;
     for (let read; length < bytes.length && (read = readSync(handle, bytes, length, bytes.length - length, null)) > 0; ) length += read;
@@ -68,11 +86,11 @@ export function readPlain(file) {
 
 /**
  * Puts `text` in the target's place: written whole into a new file beside it (made only if no such file is there,
- * never through a link), then renamed over it. The folder must be there as a plain folder, and whatever stands in
- * the target's place must be a plain file.
+ * never through a link), then renamed over it. Every folder from `base` down to the target's must be there as a
+ * plain folder, and whatever stands in the target's place must be a plain file.
  */
-export function writePlain(file, text) {
-  if (!lstatSync(path.dirname(file)).isDirectory()) throw new Error(`${path.dirname(file)} is a link or not a plain folder: nothing is written`);
+export function writePlain(file, text, base = path.dirname(file)) {
+  plainFolders(file, base, "nothing is written");
   const there = lstatSync(file, { throwIfNoEntry: false });
   if (there !== undefined && !there.isFile()) throw new Error(`${file} is a link or not a plain file: nothing is written`);
   const fresh = path.join(path.dirname(file), `.${path.basename(file)}.new`);
@@ -223,7 +241,8 @@ export function tableMarkdown(exp, table) {
 
 /** One mode of the script on the files of `paths` under `base`. Returns what to print; throws what stops it. */
 export function run(mode, base = root, paths = PATHS, pinned = EXPORT_SHA256) {
-  const read = (name) => readPlain(path.join(base, paths[name]));
+  // Every folder from `base` down is held to be no link, the content folder included.
+  const read = (name) => readPlain(path.join(base, paths[name]), base);
   const { exp, table } = readSource({ exportText: read("export"), manifestText: read("manifest"), tableText: read("table") }, pinned);
   if (mode === "compare-old") {
     const { equal, different, noCounterpart } = compareOld(exp, JSON.parse(read("legacy")));
@@ -233,7 +252,7 @@ export function run(mode, base = root, paths = PATHS, pinned = EXPORT_SHA256) {
   const { fills, problems } = readRows(exp, table);
   if (mode === "write") {
     if (problems.length > 0) throw new Error(`the table is refused, nothing is written:\n  ${problems.join("\n  ")}`);
-    writePlain(path.join(base, paths.target), contentText(fills));
+    writePlain(path.join(base, paths.target), contentText(fills), base);
     return `${paths.target}: ${fills.length} values from his Export (sha256 ${pinned.slice(0, 8)}...), written`;
   }
   if (mode !== "--check") throw new Error("usage: testlines.mjs --check | write | compare-old | table");

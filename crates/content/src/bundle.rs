@@ -253,7 +253,9 @@ pub fn write(files: &[(&str, &str)]) -> String {
 /// The test bundle: the two kinds' test files (`map::TEST_TEXT`, whose map is `test-scene`, and
 /// `movement::TEST_TEXT`), for the crates' tests and the tools' (never content: no value of the game rests on it).
 /// It is the one bundle every caller passes that replays no committed recording; a committed recording replays on
-/// the frozen bundle its header names.
+/// the frozen bundle its header names. (Public for the other crates' tests, and hidden from the crate's documents:
+/// no build ships a call to it.)
+#[doc(hidden)]
 #[must_use]
 pub fn test_bundle() -> String {
     write(&[

@@ -24,14 +24,35 @@ const devContent = {
   configureServer(server) {
     // Added here, not in a returned function, so it runs before Vite's own handlers and their page-for-any-address.
     server.middlewares.use((request, response, next) => {
-      if (request.method !== "GET" || new URL(request.url ?? "/", "http://127.0.0.1").pathname !== "/content.json") {
+      if (request.method !== "GET" || pathOf(request.url) !== "/content.json") {
         next();
+        return;
+      }
+      // A page of another site open in the developer's browser could ask for this address, and each ask starts
+      // the content tool: a browser says where an ask comes from, so only the page's own asks, and one typed into
+      // the address bar, are served (a tool with no such header, as the browser tests' own requests, still is).
+      const from = request.headers["sec-fetch-site"];
+      if (from !== undefined && from !== "same-origin" && from !== "none") {
+        response.writeHead(403, { "Content-Type": "text/plain; charset=utf-8", "X-Content-Type-Options": "nosniff" });
+        response.end(CROSS_SITE);
         return;
       }
       serveContent(response).catch(() => undefined);
     });
   },
 };
+
+/** What the development server answers another site's ask for `/content.json`. */
+const CROSS_SITE = "the content is served to this page alone\n";
+
+/** A request's path, or nothing for an address that does not read as one (`//`): Vite's own handlers take those. */
+function pathOf(url) {
+  try {
+    return new URL(url ?? "/", "http://127.0.0.1").pathname;
+  } catch {
+    return undefined;
+  }
+}
 
 async function serveContent(response) {
   try {

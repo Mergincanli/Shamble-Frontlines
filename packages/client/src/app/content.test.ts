@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { CONTENT_URL, type ContentLink, fetchContent, NOT_A_BUNDLE, PageContent, readBundle } from "./content.ts";
+import { CONTENT_URL, type ContentLink, fetchContent, type MessageLink, NOT_A_BUNDLE, PageContent, readBundle, takeWorkerError, takeWorkerMessage } from "./content.ts";
 import { WorkerLink } from "./worker-link.ts";
 
 /** A bundle's text as the loader writes one: its files in path order, each file's own text inside as a string. */
@@ -143,8 +143,51 @@ test("a bundle the page cannot read after the loader took it ends the match in f
   expect(content.afterMessage(link)).toBe(NOT_A_BUNDLE);
 });
 
+/** The page's own handling of the Worker (boot.ts calls the same two functions), on a link and its copy. */
+async function wired() {
+  const { link, readings, content, fetchOnce } = started();
+  const fetched = await fetchContent(fetchOnce);
+  if (!fetched.ok) throw new Error(fetched.problem);
+  content.start(fetched.value, link, 0);
+  return { link, readings, content };
+}
+
+test("however the match ends before the Worker's ready, the page lets its copy of the bundle go (engine-architect's round of 2026-11-27)", async () => {
+  // The loader refused: the Worker's error message ends the match, and the copy goes with it, never read.
+  const refused = await wired();
+  expect(refused.content.holding).toBe(true);
+  const said = "the content is refused: a key that is not a field of this kind";
+  expect(takeWorkerMessage(refused.link, refused.content, { data: { type: "error", message: said } })).toBe(said);
+  expect([refused.content.holding, refused.readings.length]).toEqual([false, 0]);
+  // The Worker's own error event (a script that did not load): the same.
+  const failed = await wired();
+  expect(takeWorkerError(failed.link, failed.content, undefined)).toBe("the Worker failed");
+  expect([failed.content.holding, failed.readings.length]).toEqual([false, 0]);
+  // A message the page does not know.
+  const unknown = await wired();
+  expect(takeWorkerMessage(unknown.link, unknown.content, { data: { type: "surprise" } })).toBe("the Worker sent a message the page does not know");
+  expect(unknown.content.holding).toBe(false);
+});
+
+test("on the Worker's ready the page reads its copy once and lets it go; a copy that reads as no bundle ends the match", async () => {
+  const ready = await wired();
+  expect(takeWorkerMessage(ready.link, ready.content, { data: { type: "ready", blockBytes: 44, tickHz: 30 } })).toBe("");
+  expect([ready.content.holding, ready.readings.length, ready.link.failure]).toEqual([false, 1, ""]);
+  // Later messages read nothing again.
+  takeWorkerMessage(ready.link, ready.content, { data: { type: "ready", blockBytes: 44, tickHz: 30 } });
+  expect(ready.readings).toHaveLength(1);
+  // The loader took it, the page cannot read it as a bundle: the page says so, and the match ends.
+  const { link, content, fetchOnce } = started(() => Promise.resolve(new Response(encode('{"files": [], "format": "x", "version": 1}'))));
+  const fetched = await fetchContent(fetchOnce);
+  if (!fetched.ok) throw new Error(fetched.problem);
+  content.start(fetched.value, link, 0);
+  expect(takeWorkerMessage(link, content, { data: { type: "ready", blockBytes: 44, tickHz: 30 } })).toBe(NOT_A_BUNDLE);
+  expect([content.holding, link.failure]).toEqual([false, NOT_A_BUNDLE]);
+});
+
 test("the link the content starts is the page's own link type", () => {
-  // `WorkerLink` gives what `PageContent` needs of a link: this does not compile if the two drift apart.
+  // `WorkerLink` gives what `PageContent` and the page's handling need of a link: this does not compile if they drift.
   const link: ContentLink = new WorkerLink({ postMessage: () => undefined, terminate: () => undefined }, () => 0);
-  expect([link.ready, link.failure]).toEqual([false, ""]);
+  const handled: MessageLink = new WorkerLink({ postMessage: () => undefined, terminate: () => undefined }, () => 0);
+  expect([link.ready, link.failure, handled.failure]).toEqual([false, "", ""]);
 });

@@ -49,18 +49,20 @@ test("the Worker's loader reads the bytes the page was served: one changed value
   await expect(page.locator("#notice")).toContainText(`, in maps/test-scene.json, line ${line} column `);
 });
 
-// Bundles that JSON.parse takes (but for the number) and the loader refuses, each shown only as the loader's sentence.
-const hostile: [string, (text: string) => string][] = [
-  ["a duplicate key", (text) => text.replace('"format": "shamble-content-bundle",', '"format": "shamble-content-bundle",\n  "format": "shamble-content-bundle",')],
-  ["a __proto__ key", (text) => text.replace('{\n  "files": [', '{\n  "__proto__": {\n    "polluted": 1\n  },\n  "files": [')],
-  ["a number out of every range", (text) => text.replace('"version": 1', '"version": 1e400')],
-  ["an extra key in a file entry", (text) => text.replace('"path": "maps/test-scene.json",', '"extra": 1,\n      "path": "maps/test-scene.json",')],
-  ["a source/ path", (text) => text.replace('"path": "maps/test-scene.json"', '"path": "source/test-scene.json"')],
-  ["an unknown key named like an image tag", (text) => text.replace('{\n  "files": [', '{\n  "<img src=x onerror=alert(1)>": 1,\n  "files": [')],
-  ["a key of 1 MiB", () => `{"${"k".repeat(1 << 20)}": 1}`],
+// Bundles that JSON.parse takes (but for the number) and the loader refuses, each shown only as the loader's own
+// sentence for its class (read from the players' file under Node by the notes' hostile-sentences.mjs, never typed
+// as a guess; test-engineer's round of 2026-11-27).
+const hostile: [string, (text: string) => string, string][] = [
+  ["a duplicate key", (text) => text.replace('"format": "shamble-content-bundle",', '"format": "shamble-content-bundle",\n  "format": "shamble-content-bundle",'), 'the key "format" is there twice, line 13 column 3'],
+  ["a __proto__ key", (text) => text.replace('{\n  "files": [', '{\n  "__proto__": {\n    "polluted": 1\n  },\n  "files": ['), 'the key "__proto__" is not a lower-case name of 1 to 64 characters, line 2 column 3'],
+  ["a number out of every range", (text) => text.replace('"version": 1', '"version": 1e400'), "the number 1e400 is too large, line 13 column 14, at version"],
+  ["an extra key in a file entry", (text) => text.replace('"path": "maps/test-scene.json",', '"extra": 1,\n      "path": "maps/test-scene.json",'), 'the key "extra" is not known, line 4 column 7, at files[0]'],
+  ["a source/ path", (text) => text.replace('"path": "maps/test-scene.json"', '"path": "source/test-scene.json"'), '"source/test-scene.json" is not a content file\'s path'],
+  ["an unknown key named like an image tag", (text) => text.replace('{\n  "files": [', '{\n  "<img src=x onerror=alert(1)>": 1,\n  "files": ['), 'the key "<img src=x onerror=alert(1)>" is not a lower-case name of 1 to 64 characters, line 2 column 3'],
+  ["a key of 1 MiB", () => `{"${"k".repeat(1 << 20)}": 1}`, `the key "${"k".repeat(64)}..." is not a lower-case name of 1 to 64 characters, line 1 column 2`],
 ];
 
-for (const [name, make] of hostile) {
+for (const [name, make, said] of hostile) {
   test(`a bundle with ${name} is refused by the loader, said as text, and the scene stays empty`, async ({ page }) => {
     const text = make(built());
     expect(text).not.toBe(built());
@@ -72,10 +74,10 @@ for (const [name, make] of hostile) {
     });
     await page.goto("/");
     const notice = page.locator("#notice");
-    await expect(notice).toContainText("The match stopped: the content is refused: ");
-    // The loader's sentence, whole and within its bound, as plain text: no element came of it.
-    const said = (await notice.textContent()) ?? "";
-    expect(said.length - "The match stopped: ".length).toBeLessThanOrEqual(512);
+    // The loader's own sentence for this class, whole, within its bound, and as plain text: no element came of it.
+    await expect(notice).toHaveText(`The match stopped: the content is refused: ${said}`);
+    const shown = (await notice.textContent()) ?? "";
+    expect(shown.length - "The match stopped: ".length).toBeLessThanOrEqual(512);
     expect(await notice.locator("*").count()).toBe(0);
     expect(await page.locator("img").count()).toBe(0);
     expect(dialogs).toEqual([]);

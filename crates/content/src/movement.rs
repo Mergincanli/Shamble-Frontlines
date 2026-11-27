@@ -103,6 +103,7 @@ pub fn read(top: &Node) -> Result<Movement, Error> {
 
 /// A valid movement file's text with made-up values, for this crate's tests and the tools' (never a content file:
 /// no value of the game rests on it).
+#[doc(hidden)]
 pub const TEST_TEXT: &str = "{\n  \"ads_speed_multiplier\": 0.5,\n  \"air_control_pct\": 100,\n  \"body_radius_m\": 0.5,\n  \"format\": \"shamble-movement\",\n  \"gravity_m_per_s2\": 20,\n  \"id\": \"test-soldier\",\n  \"jump_reach_m\": 3,\n  \"push_radius_m\": 0.5,\n  \"push_strength_per_s\": 10,\n  \"speed_up_time_to_90pct_s\": 0.25,\n  \"sprint_multiplier\": 1.5,\n  \"sprint_returns_at_pct\": 25,\n  \"sprint_time_from_full_s\": 8,\n  \"stamina_refill_time_s\": 4,\n  \"step_up_m\": 0.5,\n  \"stop_time_to_10pct_s\": 0.25,\n  \"version\": 1,\n  \"walk_speed_m_per_s\": 6\n}\n";
 
 #[cfg(test)]

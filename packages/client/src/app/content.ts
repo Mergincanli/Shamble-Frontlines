@@ -18,9 +18,12 @@ export interface FetchedContent {
 /** A value, or a problem in fixed words. */
 export type Outcome<T> = { readonly ok: true; readonly value: T } | { readonly ok: false; readonly problem: string };
 
-/** A bundle's `format` and newest `version`, as the loader writes and reads them (crates/content/src/bundle.rs). */
-const FORMAT = "shamble-content-bundle";
-const VERSION = 1;
+/**
+ * A bundle's `format` and newest `version`, as the loader writes and reads them (crates/content/src/bundle.rs, tied
+ * by `content-ties.test.mjs`).
+ */
+export const BUNDLE_FORMAT = "shamble-content-bundle";
+export const BUNDLE_VERSION = 1;
 
 /** What the page says when the bundle the loader took does not read as one on the page: the two are not one build. */
 export const NOT_A_BUNDLE = "the content the game's loader took does not read as a bundle on the page: the page and the Wasm are from different builds";
@@ -64,7 +67,7 @@ export function readBundle(kept: Uint8Array): Outcome<ReadonlyMap<string, string
   } catch {
     return fault;
   }
-  if (!isObject(tree) || own(tree, "format") !== FORMAT || own(tree, "version") !== VERSION) return fault;
+  if (!isObject(tree) || own(tree, "format") !== BUNDLE_FORMAT || own(tree, "version") !== BUNDLE_VERSION) return fault;
   const files = own(tree, "files");
   if (!Array.isArray(files)) return fault;
   const byPath = new Map<string, string>();
@@ -85,6 +88,32 @@ export interface ContentLink {
   readonly failure: string;
 }
 
+/** What the page's handling of the Worker needs of the link: `WorkerLink`, or a stand-in in tests. */
+export interface MessageLink extends ContentLink {
+  receive(event: { readonly data: unknown }): string;
+  workerError(message: string | undefined): string;
+  end(reason: string): boolean;
+}
+
+/**
+ * One message of the Worker, as the page takes it: the link first, then the content, which reads its copy on the
+ * Worker's `ready` and lets it go as soon as the match has ended, however it ended. Returns the problem that ended
+ * the match (the page says it), or "".
+ */
+export function takeWorkerMessage(link: MessageLink, content: PageContent, event: { readonly data: unknown }): string {
+  const problem = link.receive(event);
+  const read = content.afterMessage(link);
+  if (problem !== "") return problem;
+  return read !== "" && link.end(read) ? read : "";
+}
+
+/** The Worker's own error event, as the page takes it: the link ends the match, and the content lets its copy go. */
+export function takeWorkerError(link: MessageLink, content: PageContent, message: string | undefined): string {
+  const problem = link.workerError(message);
+  content.afterMessage(link);
+  return problem;
+}
+
 /**
  * The page's copy of the bundle from the Worker's start to its `ready`: read once, the first time the link is ready,
  * and let go then, or as soon as the match ends without it (a Worker that answered `error`). Until the page's scene
@@ -98,6 +127,11 @@ export class PageContent {
   /** `read` is the page's reading (`readBundle`); a test passes one that counts. */
   constructor(read: (kept: Uint8Array) => Outcome<ReadonlyMap<string, string>> = readBundle) {
     this.#read = read;
+  }
+
+  /** Whether the page still holds its copy of the bundle: from the start to the Worker's first answer. */
+  get holding(): boolean {
+    return this.#kept !== null;
   }
 
   /** Starts the Worker on the fetched bundle: its bytes are transferred, and the page's copy stays here. */

@@ -17,7 +17,8 @@ use room::Room;
 use sim::collision::StaticWorld;
 use sim::{MatchSetup, TICK_HZ};
 
-/// The content hash both sides hold while there is no content data; the content crate brings the real one.
+/// The content hash the join names on both sides: zeros, until change-set 8 brings the bundle's sha256 into the join
+/// (ADR 0005, CD-8). The match itself is made on a bundle from change-set 4b on; this hash does not name it yet.
 pub const NO_CONTENT: [u8; 32] = [0; 32];
 
 /// The loopback of a local match: each slot takes the longest message there is, and one step moves at most two

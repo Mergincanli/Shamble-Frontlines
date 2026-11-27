@@ -4,7 +4,7 @@ import { BUTTON_NAMES, KeyboardInput } from "../input/keyboard.ts";
 import { runHeader } from "../harness/run-header.ts";
 import type { ReportData } from "../overlay/report.ts";
 import { createPicture } from "../render/index.ts";
-import { fetchContent, PageContent } from "./content.ts";
+import { fetchContent, PageContent, takeWorkerError, takeWorkerMessage } from "./content.ts";
 import { installErrorHook } from "./error-hook.ts";
 import { readFlags } from "./flags.ts";
 import { lostAndDoubled } from "./press-tally.ts";
@@ -82,24 +82,19 @@ export async function boot(): Promise<void> {
     errors.note(problem);
     fail(`The match stopped: ${problem}`);
   };
-  // A method with a name of its own, so that a heap profile can charge the listener's whole body to it.
+  // A method with a name of its own, so that a heap profile can charge the listener's whole body to it. The page's
+  // copy of the bundle is read on the Worker's `ready` and let go as soon as the match ends (content.ts).
   const listener = {
     blockArrived(event: MessageEvent<unknown>): void {
-      const problem = link.receive(event);
-      if (problem !== "") {
-        stopped(problem);
-        return;
-      }
-      // Once, on the Worker's `ready`: the page reads its copy of the bundle the loader took.
-      const read = content.afterMessage(link);
-      if (read !== "" && link.end(read)) stopped(read);
+      const problem = takeWorkerMessage(link, content, event);
+      if (problem !== "") stopped(problem);
     },
   };
   worker.addEventListener("message", listener.blockArrived);
   worker.addEventListener("error", (event) => {
     // A script that does not load gives an event with no message. Cancelled, so the window does not count it again.
     event.preventDefault();
-    const problem = link.workerError(event.message);
+    const problem = takeWorkerError(link, content, event.message);
     if (problem !== "") stopped(problem);
   });
   content.start(fetched.value, link, flags.padBytes);

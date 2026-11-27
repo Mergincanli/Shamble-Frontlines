@@ -376,9 +376,10 @@ fn the_repositorys_content_is_his_movement_table_and_the_test_scene_and_the_load
 /// each value is found by its own name in his Export's text, apart from that table; read with the standard
 /// library's number reader, not the loader's; and held bit for bit against the field the loader reads. No value is
 /// typed (his rule: the values come from his Export and from nothing else), only names, each pair from the movement
-/// kind's own fields. The five stand once among the table's fifteen values. Three pairs of the others are equal
-/// (the two easing times, body and push radius, step-up and the sights' multiplier): a row swapped within such a
-/// pair would pass this test as well as `--check`.
+/// kind's own fields. The five stand once among the table's fifteen values. What holds the other ten in place is the
+/// table's names: `packages/client/scripts/testlines.test.mjs` holds every row's field to the last step of its Export
+/// name, but for one named rename, so no two rows can trade fields, equal values or not (test-engineer's round of
+/// 2026-11-27).
 #[test]
 fn five_of_his_values_reach_the_loader_by_a_second_route() {
     let root = repository();

@@ -15,6 +15,7 @@
 use crate::json::{MAX_NAME_BYTES, Member, Node, Value};
 use crate::map::{
     self, AIM_HEIGHT_MAX_CM, AIM_REACH_CM, COORDINATE, FACING, MAX_REGIONS, MAX_SHAPES, MAX_SPAWNS,
+    MIN_SPAWNS,
 };
 use crate::movement::{self, FIELDS};
 use crate::read::Range;
@@ -244,12 +245,17 @@ pub fn movement_schema() -> Node {
 /// The map's schema: its bounds within the aim's reach, its three lists with their caps, and the fixed words.
 pub fn map_schema() -> Node {
     let words = |list: &[&str]| array(list.iter().map(|word| text(word)).collect());
-    let list = |max: u32, item: Vec<(&'static str, Node)>| {
-        vec![
+    // A list's fewest entries are written only when there is a fewest (JSON Schema's own default is none).
+    let list = |min: u32, max: u32, item: Vec<(&'static str, Node)>| {
+        let mut members = vec![
             ("type", text("array")),
             ("items", object(item)),
             ("maxItems", number(f64::from(max))),
-        ]
+        ];
+        if min > 0 {
+            members.push(("minItems", number(f64::from(min))));
+        }
+        members
     };
     let spawn = closed(vec![
         id("spawn"),
@@ -301,9 +307,9 @@ pub fn map_schema() -> Node {
     properties.extend([
         id("map"),
         property("map", "bounds", bounds),
-        property("map", "spawns", list(MAX_SPAWNS, spawn)),
+        property("map", "spawns", list(MIN_SPAWNS, MAX_SPAWNS, spawn)),
         property("map", "shapes", shapes),
-        property("map", "regions", list(MAX_REGIONS, region)),
+        property("map", "regions", list(0, MAX_REGIONS, region)),
     ]);
     document(
         "shamble-map",
@@ -478,6 +484,15 @@ mod tests {
             [cap("spawns"), cap("shapes"), cap("regions")],
             [MAX_SPAWNS, MAX_SHAPES, MAX_REGIONS].map(f64::from)
         );
+        // The fewest: one spawn (rust-reviewer's round of 2026-11-27); the other lists may be empty and say no fewest.
+        assert_eq!(
+            value_of(get(get(properties, "spawns"), "minItems")),
+            f64::from(MIN_SPAWNS)
+        );
+        let Value::Object(regions) = &get(properties, "regions").value else {
+            panic!("the regions' schema is an object")
+        };
+        assert!(regions.iter().all(|member| member.key != "minItems"));
         let spawn = get(get(get(properties, "spawns"), "items"), "properties");
         assert_eq!(range_of(get(spawn, "facing_deg")), FACING.range);
         // The facing is the one range open at its top: the schema says so with its own keyword.
@@ -602,5 +617,20 @@ mod tests {
         );
         let Range { min, max, .. } = range_of(get(spawn, "facing_deg"));
         assert!(facing(min) && !facing(min.next_down()) && !facing(max) && facing(max.next_down()));
+        // The spawns' fewest, read back from the schema: the test map's one spawn is taken, an empty list refused.
+        let fewest = value_of(get(get(get(&map, "properties"), "spawns"), "minItems"));
+        assert_eq!(fewest, 1.0);
+        let from = map::TEST_TEXT
+            .find("  \"spawns\": [\n")
+            .expect("the spawns");
+        let to =
+            map::TEST_TEXT[from..].find("\n  ],\n").expect("their end") + from + "\n  ],\n".len();
+        let none = format!(
+            "{}  \"spawns\": [],\n{}",
+            &map::TEST_TEXT[..from],
+            &map::TEST_TEXT[to..]
+        );
+        assert!(load_file("maps/test-scene.json", map::TEST_TEXT.as_bytes()).is_ok());
+        assert!(load_file("maps/test-scene.json", none.as_bytes()).is_err());
     }
 }

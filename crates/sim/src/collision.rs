@@ -24,6 +24,12 @@ use crate::vec::V3;
 /// The most shapes a static world holds: the map kind's own cap (`content::map::MAX_SHAPES`; a test ties the two).
 pub const MAX_SHAPES: usize = 512;
 
+/// The largest a ray's numbers may be, in metres: every part of its origin and of its direction, and its limit
+/// (2^20). Far beyond any map (the loader keeps every coordinate within 10,000 m), and small enough that no product
+/// a ray's test makes of such a number and a shape's size leaves `f32`'s finite range: a ray beyond it gives no hit,
+/// and a longer limit, an endless one included, reaches this far (rust-reviewer's round of 2026-11-27).
+pub const RAY_REACH: f32 = 1_048_576.0;
+
 /// The deepest tree a static world may have. The library's walks keep the nodes they still owe on a stack of 32
 /// places that needs no allocation; a deeper tree would make a query allocate inside the step. A map the loader
 /// takes can be deeper (a chain of 34 one-centimetre cubes, each twice as far as the last, is 34 deep), so this
@@ -168,6 +174,11 @@ fn enter_ramp(
     // Above the slope when positive, on it when zero; `rate` is how that changes along the ray.
     let above = (origin[1] - solid.min[1]) * length - along * height;
     let rate = direction[1] * length - along_rate * height;
+    // A ramp whose numbers leave `f32`'s finite range gives no hit, never one made of a NaN (which passes every
+    // comparison below). Only a document no loader takes can hold such a ramp: its corners stay within 10,000 m.
+    if above.is_nan() || rate.is_nan() {
+        return None;
+    }
     if rate == 0.0 {
         if above > 0.0 {
             return None;
@@ -281,17 +292,20 @@ impl StaticWorld {
     ///
     /// The walk visits a node only while its box is entered no later than the best hit so far (a later node
     /// cannot hold a better hit: a node's box holds its children's, and a shape is met no earlier than its own
-    /// box). The numbers of a ray that are not finite give no hit.
+    /// box). A ray whose origin or direction holds a number beyond [`RAY_REACH`] (one that is not finite included)
+    /// gives no hit; a limit beyond it reaches [`RAY_REACH`].
     #[must_use]
     pub fn cast_ray(&self, origin: V3, direction: V3, limit: f32) -> Option<RayHit> {
         let (origin, direction) = (origin.to_array(), direction.to_array());
-        let finite = origin
+        // Written out, so that a NaN fails it as well.
+        let within = origin
             .iter()
             .chain(&direction)
-            .all(|value| value.is_finite());
-        if !finite || limit.is_nan() || limit < 0.0 || direction == [0.0; 3] {
+            .all(|value| -RAY_REACH <= *value && *value <= RAY_REACH);
+        if !within || limit.is_nan() || limit < 0.0 || direction == [0.0; 3] {
             return None;
         }
+        let limit = if limit > RAY_REACH { RAY_REACH } else { limit };
         let mut best: Option<RayHit> = None;
         self.tree.traverse(|node| {
             let reach = best.map_or(limit, |hit| hit.t);
@@ -614,6 +628,15 @@ mod tests {
             cast(&built, [0.0, 10.0, 0.5], [0.0, -1.0, 0.0]),
             Some((0, 9.0))
         );
+        // The same with a minus zero on x, in the direction and in the origin: a zero is a zero, whatever its sign.
+        assert_eq!(
+            cast(&built, [0.0, 10.0, 0.5], [-0.0, -1.0, 0.0]),
+            Some((0, 9.0))
+        );
+        assert_eq!(
+            cast(&built, [-0.0, 10.0, 0.5], [-0.0, -1.0, -0.0]),
+            Some((0, 9.0))
+        );
         assert_eq!(
             cast(&built, [0.0, 0.5, -3.0], [0.0, 0.0, 1.0]),
             Some((0, 3.0))
@@ -693,6 +716,68 @@ mod tests {
         );
         assert_eq!(
             built.cast_ray(v(0.5, 0.5, 0.5), v(0.0, -0.0, 0.0), 100.0),
+            None
+        );
+    }
+
+    /// A ray's numbers stay within [`RAY_REACH`] (rust-reviewer's round of 2026-11-27): within it the verdict does
+    /// not depend on the direction's length; beyond it there is no hit, never one made of an overflow; and a ramp
+    /// whose own numbers overflow gives no hit either.
+    #[test]
+    fn a_ray_beyond_the_reach_and_a_ramp_beyond_f32_give_no_hit() {
+        let built = world(yard());
+        let v = |x: f32, y: f32, z: f32| V3::new(x, y, z);
+        // The yard's shapes by id: a_right, b_left, post, ramp_mx, ramp_mz, ramp_px, ramp_pz, step.
+        let ramp_px = 5;
+        // rust-reviewer's probe: from the top of the box of the ramp rising toward +x, over its slope, up and away.
+        let over = [10.5, 1.0, 1.0];
+        for scale in [1.0, 1e5] {
+            assert_eq!(
+                cast(&built, over, [2.0 * scale, 3.0 * scale, 0.0]),
+                None,
+                "{scale}"
+            );
+        }
+        // Down onto the slope (its height at x = 13 is 0.75): the same shape, the point the same, `t` by the length.
+        assert_eq!(
+            cast(&built, [13.0, 3.0, 1.0], [0.0, -1.0, 0.0]),
+            Some((ramp_px, 2.25))
+        );
+        assert_eq!(
+            cast(&built, [13.0, 3.0, 1.0], [0.0, -1e5, 0.0]),
+            Some((ramp_px, 2.25e-5))
+        );
+        // Beyond the reach: no hit, where the overflow gave the box's entry as a hit (`inf - inf` is NaN).
+        assert_eq!(cast(&built, over, [2e38, 3e38, 0.0]), None);
+        assert_eq!(cast(&built, [13.0, 3.0, 1.0], [0.0, -2e6, 0.0]), None);
+        let edge = cast(&built, [13.0, 3.0, 1.0], [0.0, -RAY_REACH, 0.0]).expect("at the reach");
+        assert_eq!(edge.0, ramp_px);
+        // The next float above the reach, by its bits (ADR 0004 part 7's list holds `to_bits`, not `next_up`).
+        let beyond = f32::from_bits(RAY_REACH.to_bits() + 1);
+        assert_eq!(cast(&built, [13.0, 3.0, 1.0], [0.0, -beyond, 0.0]), None);
+        assert_eq!(
+            built.cast_ray(v(beyond, 3.0, 1.0), v(0.0, -1.0, 0.0), 10.0),
+            None
+        );
+        // A direction so short that no shape is within reach: an endless limit reaches `RAY_REACH`, not infinity, so
+        // the box ahead is no hit at an endless `t`.
+        assert_eq!(
+            built.cast_ray(v(-20.0, 0.5, 0.5), v(1e-45, 0.0, 0.0), f32::INFINITY),
+            None
+        );
+        assert_eq!(
+            built.cast_ray(v(-20.0, 0.5, 0.5), v(1.0, 0.0, 0.0), f32::INFINITY),
+            Some(RayHit { shape: 1, t: 19.0 })
+        );
+        // A ramp as large as `f32` goes: its length and height overflow, and the ray from its middle gets no hit.
+        let huge = world(vec![ramp(
+            "huge",
+            [-3e38, -3e38, -3e38],
+            [3e38, 3e38, 3e38],
+            Toward::PlusX,
+        )]);
+        assert_eq!(
+            huge.cast_ray(v(0.0, 0.0, 0.0), v(0.0, -1.0, 0.0), 100.0),
             None
         );
     }

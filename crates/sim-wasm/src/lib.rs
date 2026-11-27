@@ -360,8 +360,9 @@ mod tests {
         assert!(refused(&bundle()).is_none());
     }
 
-    /// The four checks run in a fixed order, seed, mode, content, padding: each case below fails all the ones after
-    /// its own, and only its own is named.
+    /// The six checks run in a fixed order, seed, mode, content, map, world, padding: each case below fails all the
+    /// ones after its own, and only its own is named. (No map a test makes here reaches the world's check: the
+    /// world's own tests make its refusals, and its sentence is held below.)
     #[test]
     fn the_checks_run_in_the_order_seed_mode_content_map_padding() {
         let bad = b"{}";

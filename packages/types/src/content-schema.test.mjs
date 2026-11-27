@@ -54,7 +54,9 @@ test("each schema file is the canonical writer's text: JSON.stringify of the sor
   }
 });
 
-test("at every end of every number range of both schemas, a field flags what the loader refuses", () => {
+// The ends a field built from the schema flags; that the loader refuses the same values at the same numbers is the
+// Rust test's (crates/content/src/schema.rs, at_each_end_the_loader_does_what_the_schema_says).
+test("at every end of every number range of both schemas, a field built from the schema flags the value past the end", () => {
   const ranges = [...numbers(schemas.movement, "movement"), ...numbers(schemas.map, "map")];
   for (const [path, schema] of ranges) {
     const { low, high } = limits(schema);
@@ -116,4 +118,59 @@ test("every object is closed, and a shape is a box or a ramp with all its own ke
   const forms = schemas.map.properties.shapes.items.oneOf;
   expect(forms.map((form) => form.properties.type.const)).toEqual(["box", "ramp"]);
   expect(Object.keys(forms[1].properties).sort()).toEqual(["id", "max", "min", "rises_toward", "type"]);
+});
+
+/** A generated type's declaration (generated/content/<name>.ts), as its text stands. */
+const declaration = (name) => {
+  const text = readFileSync(new URL(`./generated/content/${name}.ts`, import.meta.url), "utf8");
+  const line = text.split("\n").find((entry) => entry.startsWith(`export type ${name} = `));
+  if (line === undefined) throw new Error(`${name}.ts declares no type ${name}`);
+  return line.slice(`export type ${name} = `.length).replace(/;$/, "");
+};
+/** An object type's keys in order, and each key's type, from a declaration's `{ key: type, ... }`. */
+const members = (body) =>
+  Object.fromEntries(
+    [...body.matchAll(/(?:^|[{,] )"?([a-z][a-z0-9_]*)"?: ((?:\[[^\]]*\])|[^,]+)/g)].map(([, key, type]) => [key, type.trim()]),
+  );
+/** A union of words' members, from a declaration's `"a" | "b"`. */
+const words = (body) => [...body.matchAll(/"([^"]+)"/g)].map(([, word]) => word);
+/** A schema's own keys, but for the header's two, which the types leave out (they say what a file holds beside them). */
+const keys = (schema) => Object.keys(schema.properties).filter((key) => key !== "format" && key !== "version");
+
+// The TypeScript types (written by ts-rs from the Rust structs) and the schemas (written from the reader's tables)
+// come from two sources in the content crate: held here to name the same keys, lengths and words, so the two cannot
+// drift apart (engine-architect's round of 2026-11-27; ADR 0005 CD-3: both "from the same Rust types").
+test("the generated types and the schemas name the same keys, the same corner lengths and the same words", () => {
+  const map = schemas.map.properties;
+  const pairs = [
+    ["Movement", schemas.movement],
+    ["MapDocument", schemas.map],
+    ["Bounds", map.bounds],
+    ["Spawn", map.spawns.items],
+    ["Region", map.regions.items],
+  ];
+  for (const [name, schema] of pairs) {
+    const typed = members(declaration(name));
+    expect(Object.keys(typed).sort(), name).toEqual(keys(schema).sort());
+    // A corner is a tuple of as many numbers as the schema's fixed length.
+    for (const [key, type] of Object.entries(typed)) {
+      if (!type.startsWith("[")) continue;
+      const length = type.split(",").length;
+      const fixed = schema.properties[key];
+      expect([fixed.minItems ?? fixed.prefixItems?.length, fixed.maxItems], `${name}.${key}`).toEqual([length, length]);
+    }
+  }
+  // A shape: its own keys, then each form's (a box's type alone, a ramp's type and its side).
+  const shape = declaration("Shape");
+  const [own, forms] = shape.split(" & ");
+  const variants = forms.replace(/^\(|\)$/g, "").split(" | ").map((form) => members(form));
+  const schemaForms = map.shapes.items.oneOf;
+  expect(variants).toHaveLength(schemaForms.length);
+  variants.forEach((variant, at) => {
+    expect([...Object.keys(members(own)), ...Object.keys(variant)].sort(), `Shape form ${at}`).toEqual(keys(schemaForms[at]).sort());
+    expect(words(variant.type ?? ""), `Shape form ${at}`).toEqual([schemaForms[at].properties.type.const]);
+  });
+  // The words: a ramp's side and a region's ground.
+  expect(words(declaration("Toward"))).toEqual(schemaForms[1].properties.rises_toward.enum);
+  expect(words(declaration("Ground"))).toEqual(map.regions.items.properties.kind.enum);
 });
