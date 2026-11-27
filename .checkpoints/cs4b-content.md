@@ -12,7 +12,7 @@
   `git push origin cs/4b-content:claude/cool-pasteur-oiqk1r`, alone in its command; never a plain `git push`. The
   session's start folder is never switched · **Base:** origin/main 2483e9a741c4e552323c36523831a2f35de4002e (the
   merge of 4a, pull request #70)
-- **Last update:** 2026-11-27 01:18 Amsterdam (from the clock)
+- **Last update:** 2026-11-27 01:34 Amsterdam (from the clock)
 
 ## Sizes and stop lines (his answer of 2026-11-26, 14:09:13 UTC: SIZE-4B (b); which number is which)
 - **4b is two pull requests**, in engine-architect's cut; "each stands on its own: lines left over in 4b-1 do not
@@ -905,10 +905,12 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
     (4B-SCAN-CFG-TEST: three bites, one control).
   - **What of step 9 still waits for his DIFF-LIST answer:** the constructor taking the bundle, the page's
     fetch of `content.json`, the build running the bundle tool, the first recording's frozen content.
-- **Step 10, one more piece that needs no content file: the maps the loader takes, through the world's builder
-  (2026-11-27; built, in its local checks at 01:18; NOT YET COMMITTED AS CODE: the patch is
-  `cs4b-content/wip-step10-fuzz-worlds.diff`, made by `git diff -- crates packages` on head 3951680; `git apply`
-  puts it back).** The sheet's row 10 names it ("the fuzz extended to `ContentSet -> StaticWorld::build`",
+- **Step 10, one more piece that needs no content file: the maps the loader takes, through the world's builder.
+  DONE (commit ad88341, pushed 2026-11-27 between 01:32 and 01:34 by the clock; the gate passes; the full local checks passed whole: 219 Rust
+  tests twice, 218 in release, client 129, sim-worker 51, types 8, 36 boundary tests, the type checks, 19 browser
+  tests in 3.5 min; the proof in Chromium takes 251 ms now; 4,769 written lines of 4b-2, of 8,450). The
+  container was restarted in the middle of the first run of the checks (the tree and the tools under `.gate/`
+  were kept; the patch saved in the notes was not needed and is removed); the second run passed whole.** The sheet's row 10 names it ("the fuzz extended to `ContentSet -> StaticWorld::build`",
   "hand-made hostile documents"); it was listed under the wiring, and needs no content file.
   - `crates/devtools/src/world_proofs.rs`: `judge_taken(&MapDocument) -> Result<bool, String>` (the builder's
     one refusal of a map that keeps the map kind's rules is a tree too deep; a built world holds the map's
@@ -939,7 +941,8 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
 - **CI, read 2026-11-27, 01:04: green on every code head up to c09f459** (gate with smoke, and toolchain): 2f058b2
   (runs 45908649135, 45908649409), e3acb41 (45910750962, 45910750974), 8e5a268 (45912515590, 45912515341: the
   first run with the static world's browser spec; the whole toolchain job took 11 min 29 s, so the browser
-  tests stay under CI's 5-minute stop), c09f459 (45913683931, 45913683934). 6290c85's runs were still going.
+  tests stay under CI's 5-minute stop), c09f459 (45913683931, 45913683934). Read again at 01:34: 6290c85 green too
+  (gate 45914579327, toolchain 45914579307, 9 min 6 s). ad88341's runs: to be read.
 - **To do before 4b-2 merges:** the licence texts for the hosted build (a follow-up for lane 2).
 - **GREY-COLOURS: (a), the default greys stand** (his message of 2026-11-26, 21:16:26 UTC, one letter: "a",
   `cs4-walk/mustafa-2026-11-26-grey-colours.md`; read as his answer to the one question the chat's update before
@@ -962,6 +965,8 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   time ahead of the clock, typed and not read. Corrected before it was committed.
 - The chat's update of 2026-11-27 was headed "00:06 Amsterdam" and was written before 00:05:10 by the machine's
   clock (the next event's own time stamp): a minute or two ahead of the clock. Told to him.
+- The card's entry for commit ad88341 was first written with a push time of 01:35 when the clock read 01:34: a
+  time ahead of the clock, typed and not read. Corrected before it was committed.
 - Commit 2f058b2's message gives the written lines as 2,626; the count, taken after the commit instead of
   before it, is 2,627. The message stays as it is (no history is rewritten); the card and the chat have 2,627.
 - The chat told him "Your second 'a' (23:00 Amsterdam)" as if he had sent a second message. He had not: it was
@@ -986,16 +991,15 @@ just continue as you were)". So: the chat's work and its agents' work are commit
 **Where everything is.** Branch `claude/cool-pasteur-oiqk1r` on origin (this chat's own; a session of another
 account works on its own branch from this head and never pushes here: his Lanes rule). The head: see the last
 "DONE" entries above (the card is saved with every push). Code that is not yet committed is saved as a patch in
-the notes and named in the card's newest entry (today: `cs4b-content/wip-step10-fuzz-worlds.diff`, until that
-entry says DONE). No agent is running. The board add-on is active for this chat (thread state: needs-musti, for
+the notes and named in the card's newest entry (none at this save: nothing is uncommitted). No agent is running. The board add-on is active for this chat (thread state: needs-musti, for
 DIFF-LIST).
 
-**State of 4b-2, by step** (4,350 written lines of 8,450 at 6290c85; two thirds is 5,633; rungs at 6,750 and 8,000):
+**State of 4b-2, by step** (4,769 written lines of 8,450 at ad88341; two thirds is 5,633; rungs at 6,750 and 8,000):
 - 6 the library's batch: done (298837a). 7 the built-file check: done (d313162, then 2f058b2 and e3acb41 for the
   advisories' rule). 8, first part, the two tools on test files: done (54e89d2). 10, the core, the static world
   on maps made in tests: done (8e5a268). 9, first piece, the type writer's manifest line and its rule: done
-  (c09f459); 9, second piece, the generated content types: done (6290c85). 4,350 written lines of 8,450. CI:
-  green on every code head through c09f459; 6290c85 to be read.
+  (c09f459); 9, second piece, the generated content types: done (6290c85). 10, the fuzz run and the hostile maps through the world's builder:
+  done (ad88341). CI: green on every code head through 6290c85; ad88341 to be read.
 - **Blocked on his own answer to DIFF-LIST** (asked 2026-11-26, 23:11 Amsterdam;
   `cs4b-content/question-2026-11-26-diff-list.md`): step 8's second part, step 9, step 10's wiring. A bare "a"
   has reached this chat twice as a repeat of his older message (`cs4-walk/redelivered-2026-11-26.md`): it is
