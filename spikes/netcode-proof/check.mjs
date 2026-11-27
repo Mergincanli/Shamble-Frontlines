@@ -2683,20 +2683,28 @@ export function webStep(runner = run, base = process.env, installed = installedT
 // ops/browser's installed modules: U8's browser driver, which one of ops/'s Node tests needs (UM-4 (b), (d)).
 export const OPS_BROWSER_MODULES = join(HERE, "ops", "browser", "node_modules");
 
+/** `env` without git's variables (every name that begins GIT_), as a copy: `env` is not changed (SEC-UM4-1). */
+export function withoutGitVars(env) {
+  return Object.fromEntries(Object.entries(env).filter(([k]) => !k.startsWith("GIT_")));
+}
+
 // The ops step (UM-4, u8-brief.md:524): U8's operator tests by Node's own glob over ops/ (`node --test ops/` fails on
 // Node 22.23), then ops/tests/wrappers.test.sh, both in HERE, through `runner`, as the web step. It fails, never skips,
 // when either fails, when no Node test ran, when the wrappers' last line is not their "N ok, 0 failed" summary with N
 // above 0 (UM4-1), and, running nothing, when ops/browser's install is missing (UM-4 (d)). `present` says whether that
-// install is there (check.test.mjs passes its own).
+// install is there, `base` is the environment the calls start from (check.test.mjs passes its own). Neither call gets
+// a GIT_ variable: U8's tests run git in temporary folders, and an inherited GIT_DIR (a git hook exports one) would put
+// their commits into the repository it names (SEC-UM4-1).
 export const OPS_MISSING =
-  "ops: ops/browser/node_modules is missing (UM-4 (d)): install it first with `npm ci --ignore-scripts --no-audit --no-fund --prefix ops/browser`, npm_config_ignore_scripts=true in its environment";
-export function opsStep(runner = run, present = () => existsSync(OPS_BROWSER_MODULES)) {
+  `ops: ops/browser/node_modules is missing (UM-4 (d)): install it first with \`npm ci --ignore-scripts --no-audit --no-fund --prefix ${join(HERE, "ops", "browser")}\`, npm_config_ignore_scripts=true in its environment`;
+export function opsStep(runner = run, present = () => existsSync(OPS_BROWSER_MODULES), base = process.env) {
   if (!present()) return { ok: false, out: OPS_MISSING };
-  const n = runner(process.execPath, ["--test", "ops/**/*.test.mjs"], HERE);
+  const env = withoutGitVars(base);
+  const n = runner(process.execPath, ["--test", "ops/**/*.test.mjs"], HERE, env);
   if (!n.ok) return failedRun(n, `the ops step's node tests (${nodeCounts(n.out)})`);
   // A glob that selects no test exits 0 with "# tests 0" (U7R-TE-4): that fails, never passes.
   if (!(Number(n.out.match(/^# tests (\d+)/m)?.[1] ?? 0) > 0)) return failedRun(n, "the ops step's node tests (none ran)");
-  const w = runner("bash", ["ops/tests/wrappers.test.sh"], HERE);
+  const w = runner("bash", ["ops/tests/wrappers.test.sh"], HERE, env);
   if (!w.ok) return failedRun(w, "the ops step's wrappers test", n.out);
   // `run` joins stdout before stderr (check.mjs:1960-1962): the wrappers' summary is read from stdout.
   const last = (w.stdout || w.out).trim().split("\n").at(-1) ?? "";

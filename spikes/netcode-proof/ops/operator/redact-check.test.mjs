@@ -158,7 +158,7 @@ test("--staged reads the index, and --pre-push reads the pushed commits and thei
   const dir = tempDir();
   const cwd = process.cwd();
   const env = {
-    ...process.env,
+    ...Object.fromEntries(Object.entries(process.env).filter(([k]) => !k.startsWith("GIT_"))),
     GIT_AUTHOR_NAME: "t",
     GIT_AUTHOR_EMAIL: "t@example.invalid",
     GIT_COMMITTER_NAME: "t",
@@ -194,7 +194,7 @@ test("--pre-push reads a merge commit's own changes", () => {
   const dir = tempDir();
   const cwd = process.cwd();
   const env = {
-    ...process.env,
+    ...Object.fromEntries(Object.entries(process.env).filter(([k]) => !k.startsWith("GIT_"))),
     GIT_AUTHOR_NAME: "t",
     GIT_AUTHOR_EMAIL: "t@example.invalid",
     GIT_COMMITTER_NAME: "t",

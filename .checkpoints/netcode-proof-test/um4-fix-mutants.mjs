@@ -93,6 +93,29 @@ function nthIndex(text, s, n) {
 }
 const env = Object.fromEntries(Object.entries(process.env).filter(([k]) => k !== "NODE_TEST_CONTEXT"));
 const only = process.argv[2];
+const runTests = (pattern) =>
+  spawnSync(process.execPath, ["--test", `--test-name-pattern=${pattern}`, "check.test.mjs"], { cwd: SPIKE, env, encoding: "utf8", timeout: 600_000 });
+const counts = (r) => ({ tests: Number(r.stdout.match(/^# tests (\d+)/m)?.[1] ?? 0), fail: Number(r.stdout.match(/^# fail (\d+)/m)?.[1] ?? 0) });
+
+// `baseline`: every pattern once on the fixed, unmutated tree. Each must select a test and pass (tests > 0, fail 0).
+const BASELINE = [
+  ["T1", T1, "/home/user/Shamble-Frontlines/.gate/um4-fix/base-t1.log"],
+  ["WEB", WEB, "/home/user/Shamble-Frontlines/.gate/um4-fix/base-web.log"],
+  ["T2", T2, "/home/user/Shamble-Frontlines/.gate/um4-fix/base-t2.log"],
+  ["T4", T4, "/home/user/Shamble-Frontlines/.gate/um4-fix/base-t4.log"],
+  ["PIN", PIN, "/home/user/Shamble-Frontlines/.gate/um4-fix/base-pin.log"],
+  ["VICTIM", VICTIM, "/home/user/Shamble-Frontlines/.gate/um4-fix/base-victim.log"],
+];
+if (only === "baseline") {
+  for (const [id, pattern, log] of BASELINE) {
+    const r = runTests(pattern);
+    const { tests, fail } = counts(r);
+    const verdict = r.status === 0 && tests > 0 && fail === 0 ? "PASS" : "FAIL";
+    writeFileSync(log, `baseline ${id}\ntest pattern: ${pattern}\nexit ${r.status}; tests ${tests}, fail ${fail}: ${verdict}\n\n${r.stdout}${r.stderr}`);
+    console.log(`baseline ${id}: ${verdict} (tests ${tests}, fail ${fail}, exit ${r.status}) ${log}`);
+  }
+  process.exit(0);
+}
 
 for (const m of MUTANTS) {
   if (only && m.id !== only) continue;

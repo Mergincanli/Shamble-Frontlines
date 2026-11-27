@@ -58,6 +58,7 @@ import {
   manifestKeyProblems,
   marksProblems,
   NOT_TICK_COUNTS,
+  OPS_BROWSER_MODULES,
   opsStep,
   readBackCheck,
   readComparison,
@@ -78,6 +79,8 @@ import {
   webStep,
   workspaceLintProblems,
 } from "./check.mjs";
+// SEC-UM4-1's env filter, read off the module so this file loads (and its pin fails by name) on a check.mjs without it.
+import * as checkModule from "./check.mjs";
 import {
   BEGIN,
   HASH_WASM_EXPORTS,
@@ -1982,15 +1985,21 @@ test("the web step: npm ci in security's form only when web/ lacks TypeScript 6.
     assert.equal(r.calls[0].env.npm_config_ignore_scripts, "true");
     assert.deepEqual(r.calls.slice(1).map((c) => c.args.join(" ")), [tsc, tests]);
   }
-  // Each part failing fails the step, and nothing after it runs: never a skip.
-  for (const [at, what] of [[0, "npm ci"], [1, "tsc"], [2, "node tests"]]) {
+  // Each part failing fails the step, and nothing after it runs: never a skip. The Node part's stand-in counts its
+  // tests, one failing, so only that part's exit guard can fail the step (T-1's lesson; W1).
+  const boom = { ok: false, out: "boom\n", stdout: "", status: 1 };
+  for (const [at, what, failure, message] of [
+    [0, "npm ci", boom, /^the web step's npm ci failed/],
+    [1, "tsc", boom, /^the web step's tsc failed/],
+    [2, "node tests", { ok: false, out: "# tests 3\n# pass 2\n# fail 1\n", stdout: "", status: 1 }, /^the web step's node tests \(2 of 3 tests passed\) failed/],
+  ]) {
     const results = [ok, ok, ok];
-    results[at] = { ok: false, out: "boom\n", stdout: "", status: 1 };
+    results[at] = failure;
     r = recorder(results);
     s = webStep(r.runner, {}, () => null);
     assert.equal(s.ok, false, what);
     assert.equal(r.calls.length, at + 1, what);
-    assert.ok(lastLine(s.out).startsWith(`the web step's ${what}`), lastLine(s.out));
+    assert.match(lastLine(s.out), message);
   }
   // A Node run that selects no test (exit 0, "# tests 0", or no count at all) fails too (U7R-TE-4).
   for (const zero of ["# tests 0\n# pass 0\n", "ran --test\n"]) {
@@ -2008,6 +2017,7 @@ const opsWrapOk = { ok: true, out: "wrappers.test.sh: 315 ok, 0 failed\n", stdou
 
 test("the ops step: U8's operator tests by Node's own glob, then the wrappers' test, both in the spike's folder (UM-4 (a))", () => {
   assert.equal(STEPS.ops.length, 0, "STEPS.ops(runner) defaults its runner");
+  assert.equal(OPS_BROWSER_MODULES, join(HERE, "ops", "browser", "node_modules"));
   const r = recorder([opsNodeOk, opsWrapOk]);
   const s = opsStep(r.runner, () => true);
   assert.equal(s.ok, true);
@@ -2019,14 +2029,21 @@ test("the ops step: U8's operator tests by Node's own glob, then the wrappers' t
 });
 
 test("the ops step: either part failing fails it, and nothing after the failing part runs, never a skip (UM-4 (a))", () => {
-  for (const [at, what] of [[0, "node tests"], [1, "wrappers test"]]) {
+  // Each stand-in passes the guards after its part's exit guard (a test count above 0; a valid summary), so only that
+  // exit guard can fail the step (T-1).
+  const nodeFail = "# tests 104\n# pass 103\n# fail 1\n";
+  const wrapFail = "wrappers.test.sh: 315 ok, 0 failed\n";
+  for (const [at, failure, message] of [
+    [0, { ok: false, out: nodeFail, stdout: nodeFail, status: 1 }, /^the ops step's node tests \(103 of 104 tests passed\) failed/],
+    [1, { ok: false, out: wrapFail, stdout: wrapFail, status: 1 }, /^the ops step's wrappers test failed/],
+  ]) {
     const results = [opsNodeOk, opsWrapOk];
-    results[at] = { ok: false, out: "boom\n", stdout: "boom\n", status: 1 };
+    results[at] = failure;
     const r = recorder(results);
     const s = opsStep(r.runner, () => true);
-    assert.equal(s.ok, false, what);
-    assert.equal(r.calls.length, at + 1, what);
-    assert.ok(lastLine(s.out).startsWith(`the ops step's ${what}`), lastLine(s.out));
+    assert.equal(s.ok, false, String(at));
+    assert.equal(r.calls.length, at + 1, String(at));
+    assert.match(lastLine(s.out), message);
   }
 });
 
@@ -2055,7 +2072,78 @@ test("the ops step: without ops/browser/node_modules it fails with one line nami
   assert.equal(s.ok, false);
   assert.equal(r.calls.length, 0);
   assert.equal(s.out.includes("\n"), false, "one line");
-  assert.match(s.out, /^ops: ops\/browser\/node_modules is missing \(UM-4 \(d\)\): install it first with `npm ci --ignore-scripts --no-audit --no-fund --prefix ops\/browser`/);
+  assert.equal(s.out, `ops: ops/browser/node_modules is missing (UM-4 (d)): install it first with \`npm ci --ignore-scripts --no-audit --no-fund --prefix ${join(HERE, "ops", "browser")}\`, npm_config_ignore_scripts=true in its environment`);
+});
+
+test("the ops step reads the wrappers' summary from stdout, and only as its last line (T-2)", () => {
+  // stderr follows stdout in `out` (check.mjs:1961-1963): a line there after the summary still passes.
+  const noisy = { ok: true, out: `${opsWrapOk.stdout}noise on stderr\n`, stdout: opsWrapOk.stdout, status: 0 };
+  let r = recorder([opsNodeOk, noisy]);
+  let s = opsStep(r.runner, () => true);
+  assert.equal(s.ok, true, s.out);
+  assert.match(lastLine(s.out), /^ops: 104 of 104 tests passed; wrappers\.test\.sh: 315 ok, 0 failed$/);
+  // A line after the summary on stdout: the summary is not the last line, so the step fails.
+  const extra = `${opsWrapOk.stdout}extra\n`;
+  r = recorder([opsNodeOk, { ok: true, out: extra, stdout: extra, status: 0 }]);
+  s = opsStep(r.runner, () => true);
+  assert.equal(s.ok, false);
+  assert.match(lastLine(s.out), /^the ops step's wrappers test \(its last line: extra\) failed/);
+});
+
+test("the ops step: both of its calls get the environment without any GIT_ variable (SEC-UM4-1)", () => {
+  // A git hook exports GIT_DIR: inherited, U8's temporary-repository tests would commit into the repository it names.
+  // The stand-in values name a path that does not exist; process.env is never written.
+  const nowhere = join(tmpdir(), "npt-sec-um4-1-no-such-repo", ".git");
+  const kept = { PATH: "/bin", HOME: "/nowhere", NPT_KEPT: "kept" };
+  const git = { GIT_DIR: nowhere, GIT_WORK_TREE: dirname(nowhere), GIT_INDEX_FILE: join(nowhere, "index"), GIT_CONFIG_COUNT: "0", GIT_EDITOR: "true" };
+  const base = { ...kept, ...git };
+  const r = recorder([opsNodeOk, opsWrapOk]);
+  assert.equal(opsStep(r.runner, () => true, base).ok, true);
+  assert.equal(r.calls.length, 2);
+  for (const c of r.calls) assert.deepEqual(c.env, kept, `${c.cmd} ${c.args.join(" ")}`);
+  assert.deepEqual(base, { ...kept, ...git }, "the base is not changed");
+  assert.equal(typeof checkModule.withoutGitVars, "function");
+  assert.deepEqual(checkModule.withoutGitVars(base), kept);
+});
+
+test("U8's temporary-repository tests leave the repository GIT_DIR names unchanged (SEC-UM4-1, UM4R-1)", (t) => {
+  // The real ops test files run as children with GIT_DIR and GIT_INDEX_FILE naming a scratch victim (review C2b F2's
+  // form, above): their git must stay in their own folders. The two variables exist only in the child's env.
+  const victim = mkdtempSync(join(tmpdir(), "npt-victim-"));
+  const hooks = mkdtempSync(join(tmpdir(), "npt-no-hooks-"));
+  const cwd = mkdtempSync(join(tmpdir(), "npt-victim-cwd-"));
+  t.after(() => {
+    for (const d of [victim, hooks, cwd]) rmSync(d, { recursive: true, force: true });
+  });
+  assert.ok(relative(join(HERE, "..", ".."), victim).startsWith(".."), `the victim ${victim} lies outside this repository`);
+  const env = Object.fromEntries(Object.entries(process.env).filter(([k]) => !k.startsWith("GIT_") && k !== "NODE_TEST_CONTEXT"));
+  const git = (...args) => {
+    const config = [`core.hooksPath=${hooks}`, "commit.gpgsign=false", "user.name=test", "user.email=test@example.invalid"];
+    const r = spawnSync("git", [...config.flatMap((c) => ["-c", c]), ...args], { cwd: victim, env, encoding: "utf8" });
+    assert.equal(r.status, 0, `git ${args.join(" ")}: ${r.stderr}`);
+  };
+  writeFileSync(join(victim, "keep.txt"), "kept\n");
+  git("init", "-q");
+  git("add", "-A");
+  git("commit", "-q", "-m", "victim");
+  const before = snapshot(victim);
+  assert.ok(Object.keys(before).includes("keep.txt") && Object.keys(before).some((f) => f.startsWith(".git")));
+  const child = { ...env, GIT_DIR: join(victim, ".git"), GIT_INDEX_FILE: join(victim, ".git", "index") };
+  assert.equal(child.GIT_DIR, join(victim, ".git"));
+  const files = [join(HERE, "ops", "tests", "operator.test.mjs"), join(HERE, "ops", "operator", "redact-check.test.mjs")];
+  const r = spawnSync(process.execPath, ["--test", "--test-reporter=tap", ...files], { cwd, env: child, encoding: "utf8", timeout: 120_000 });
+  const tap = `${r.stdout ?? ""}${r.stderr ?? ""}`;
+  assert.deepEqual(snapshot(victim), before, "the repository GIT_DIR names is unchanged, byte for byte");
+  // Not vacuous: the three tests that make temporary repositories ran, each `ok` or `not ok` (the hook-reading ones
+  // honour GIT_DIR by design, so their verdicts are not this test's).
+  for (const title of [
+    "pre-push: passes a clean push, refuses an address, a tampered copy and a missing copy",
+    "--staged reads the index, and --pre-push reads the pushed commits and their messages",
+    "--pre-push reads a merge commit's own changes",
+  ]) {
+    const escaped = title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    assert.match(tap, new RegExp(`^(?:not )?ok \\d+ - ${escaped}$`, "m"), `${title}\n${tap.slice(-3000)}`);
+  }
 });
 
 const lastLine = (text) => text.trimEnd().split("\n").at(-1);

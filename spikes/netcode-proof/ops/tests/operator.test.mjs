@@ -154,7 +154,7 @@ test("pre-push: passes a clean push, refuses an address, a tampered copy and a m
     const repo = join(dir, "repo");
     mkdirSync(join(home, "npt-operator"), { recursive: true });
     mkdirSync(repo);
-    const git = (...a) => execFileSync("git", ["-c", "user.name=t", "-c", "user.email=t@example.invalid", ...a], { cwd: repo, encoding: "utf8" }).trim();
+    const git = (...a) => execFileSync("git", ["-c", "user.name=t", "-c", "user.email=t@example.invalid", ...a], { cwd: repo, encoding: "utf8", env: Object.fromEntries(Object.entries(process.env).filter(([k]) => !k.startsWith("GIT_"))) }).trim();
     git("init", "-q");
     const push = (ref = "refs/heads/claude/npt-results") => {
       const sha = git("rev-parse", "HEAD");

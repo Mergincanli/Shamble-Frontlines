@@ -168,3 +168,9 @@ f949f2bfbffa972d4cc0e9beae5a1ecbc4430cd4f70a9566e4f4306b427dc25a  spikes/netcode
 #   unchanged (the root .gitignore's node_modules/ covers the real folder).
 # - npm printed "added 167 packages in 7s" and one deprecation notice (whatwg-encoding@3.1.1). npm audit not run
 #   (`--no-audit`, SEC-U7D-3); security's U8 reading of this lock stands (security-u8-deps.md C2, C3 (c)).
+# - The count (UM4H-1, in the security read's corrected words, review-um4-security.md:136-138): 167 = the lock's
+#   non-root entries (160 distinct name@version and 7 duplicate placements, security-u8-deps.md C0);
+#   security-r1-deps.md:158's 162 is a resolver's distinct count that adds two packages npm never places
+#   (security-u8-deps.md C1).
+# - The tools (SEC-UM4-2): npm 10.9.9, node v22.23.4; registry not recorded at the install (the lock's sha512
+#   integrity binds every tarball). Read on 2026-11-27 after the install, not recorded with it.

@@ -234,6 +234,23 @@ puts them inside check.mjs, so a whole run cannot leave them out.
     victim.
   - Carried: T-3 and UM4R-2 (STATUS follow-ups), T-5 (infra-engineer, after the close), the security seat's memory line
     (the card's follow-ups).
+- FIX PASS DONE LINES (logs under /home/user/Shamble-Frontlines/.gate/um4-fix/):
+  - H0 a7c4b25b (20:45:40): the saver's termination autosave, carrying the card's resume line; the explicit save
+    printed "nothing to save"; `git ls-remote` = HEAD; `pgrep -c -f "checkpoint.mjs watch"` printed 0.
+  - Base at H0 (light-base.log; exit 0; HEAD a7c4b25b; diff and untracked e3b0c442…): self 85 of 85; ops 104 of 104 and
+    "315 ok, 0 failed"; redact 11 of 11, 464 items, 0 findings; refs 2181 tracked files.
+  - Red first by name on the shipped check.mjs and helpers (red-first.log: tests 3, fail 3): the env pin (each call's
+    env undefined where the kept set was expected); the victim test (its byte-for-byte assert: the victim's HEAD,
+    COMMIT_EDITMSG and objects changed); the missing-folder pin (the relative prefix).
+  - Green on the fixed tree: each of the six name patterns 1 test, 0 fail (base-t1, base-web, base-t2, base-t4,
+    base-pin, base-victim .log).
+  - numstat: check.mjs 13/5, check.test.mjs 98/10, ops/tests/operator.test.mjs 1/1, ops/operator/redact-check.test.mjs
+    2/2. ops/ is 0 net, so U8 stays at 6,282 of 6,284; check.test.mjs's +88 is above the ruling's estimate of +45 to 60
+    (outside the stop; named in the report).
+  - Mutants, each KILLED by its named test, the assert read in each log: M1 and M3 (the either-part test, cases 0 and
+    1: s.ok true), W1 (the web test's node case: s.ok true), M4 (T-2's stderr-noise case), M10 (T-2's extra-line case),
+    M8 (T-4's path pin), M-env and M-wild (the env pin: a GIT_ key in a call's env); V1, V2 and V3 (each helper site
+    restored alone: the victim test's byte-for-byte assert). Then `sha256sum -c fixed.sha256`: all four OK.
 
 ## Size (for U8-FILLS)
 About 20-30 added lines by estimate: the step and its missing-folder line in check.mjs (about 12-18), the list entry
