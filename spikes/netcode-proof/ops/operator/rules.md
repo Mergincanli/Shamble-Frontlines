@@ -12,7 +12,7 @@ u8-brief.md rev 1.1 Block 7). Mustafa approves this file, `settings.json` and `P
 - **Folders:** the main folder is a clone on main, so main's rules load. The run's commit lives in the worktree
   `.gate/npt-run` (at X), the results in `.gate/npt-results` (the orphan branch `claude/npt-results`, `results/`
   only). Before reading either, the session checks it: the run worktree's `CLAUDE.md` and `.claude/` equal main's
-  (`git diff --quiet origin/main -- CLAUDE.md .claude`), the results worktree holds neither; on a mismatch it stops.
+  (`git diff --name-only origin/main -- CLAUDE.md .claude` prints nothing), the results worktree holds neither; on a mismatch it stops.
 - **The settings file** sits at `~/npt-operator/settings.json`, outside every worktree; its SHA-256 equals Stop B's
   record at each start, and the tree hash of main's `CLAUDE.md` and `.claude/` equals Stop B's record, else the
   four-attempt guard check (plan.md:1271-1277) runs again before anything else.
