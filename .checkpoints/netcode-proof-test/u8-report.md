@@ -88,7 +88,8 @@ stop set for U8 (history.md:7703-7722); nothing carried.
 Merged into the lane by the main session, plan u8-f1-merge-plan.md (U7's M0-M9 form with M3a), checked by the advisor
 (a3de649cd25e474df: APPROVE WITH CONDITIONS C1-C3, advisor-u8-f1-merge.md, applied word for word). Brief u8-f1-brief.md
 (C1-C7 applied); the builder's notes u8-f1-build.md (a7fe1b9f436f36bb1, on 77ffc95); snapshot wip/u8-f1-build.patch
-4d6a2484…7164 (6 files; removed by this merge, WIP-CLEAN). The commit: (fill at M8).
+4d6a2484…7164 (6 files; removed by this merge, WIP-CLEAN). The commit: the merge commit on H0 833c3f0 (its id is in
+the plan's M8 done line and on the card).
 - What it built, on six files under spikes/netcode-proof/ops/ (operator/PROMPT-R1.md, runs/R1.md, runs/r1.sh,
   tests/r1plan.test.mjs, tests/r1sh.test.mjs, tests/s14.test.mjs):
   - item 1 (ADV-U8H-1 under his RESULTS-PUSH (b)): probe_presence prints P1's l2_summary fields and the four P1 reads,
@@ -131,4 +132,13 @@ Merged into the lane by the main session, plan u8-f1-merge-plan.md (U7's M0-M9 f
   before. logq's non-object line is a STATUS follow-up, not a security finding.
 - The two wordings for his Stop B read (u8-f1-build.md, "Open"): "runs on `<results>\r1\s14` with no VM list"
   (S14-VMS, choice 25); the save's shorter reason.
-- M5: (fill). M7: (fill).
+- M5 (one counted run through main-run.sh, the lane lock, incremental off, cold after the part-clean;
+  .gate/u8-f1-merge/m5-check.log, 06:13:46-06:36:32 UTC, exit 0, HEAD 833c3f0; the run's diff hash 4d6a2484…7164 = the
+  patch's, no untracked file): `node --test 'ops/**/*.test.mjs'` 104 of 104, 0 fail (U7's M5's 101 + U8-F1's three);
+  `bash ops/tests/wrappers.test.sh` "315 ok, 0 failed"; `node check.mjs` all 12 steps pass: test 931 measured and
+  1,028 bites passed, 0 failed, 0 skipped; web 70 of 70; wasm 27,000 ticks native-native and native-Wasm, 0
+  mismatching, the hash-map bite caught at SS-s1 tick 1234 (all = U7's M5); self 80 of 80, marks 81 (rows unchanged),
+  refs 2,145 (= N0), redact 11 of 11 with 464 items, 0 findings (all = M0's base run, by C1).
+- M7: the node_modules link removed (the install in agent-abf71d95fc07b3522 kept); `node tools/gate.mjs --no-smoke`
+  GATE PASS (base b9aad01); `node .claude/scripts/repo-map-check.mjs` "repo map OK: 245 entries cover 110 required
+  paths"; `git status --short`: the 6 paths staged and notes only.

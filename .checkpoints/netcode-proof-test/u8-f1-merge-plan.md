@@ -198,3 +198,31 @@ the advisor rules."
   lines and the tracked wip/ files read before M7 and M8; UM-4's lines and U8-FILLS checked during M5. Chat about 30 %
   by estimate (no result event in the last two pages). Next: this line saved (H0), `git diff --quiet 6968215 H0 --
   spikes/`, the base run, M2, then M3a.
+- DONE 06:11:52-06:12:2x: saved and pushed 833c3f0; H0 833c3f000a6c0a2e4d2deb49ef76d259a6a8a939 (= origin, clean);
+  the no-save window is open. `git diff --quiet 6968215 H0 -- spikes/`: exit 0. Base run
+  (.gate/u8-f1-merge/light-base.log, 06:12:07-06:12:20, exit 0, HEAD 833c3f0, the lock held exclusively): refs 2,145
+  (N0; U7's M5 had 2,139, and notes since moved it: recorded, and on, by C1), marks 81 (drafts at 626df678…; rows
+  unchanged), self 80 of 80, redact 11 of 11, 464 items, 0 findings. M2: `git diff --quiet 77ffc95 H0 --` the 6
+  paths: exit 0. Next: M3a, then M3 and M4.
+- DONE 06:1x: M3a: `git update-index --refresh` exit 1, its one line ".checkpoints/netcode-proof-test/u8-f1-merge-plan.md:
+  needs update" (this unsaved file; no spikes/ path): the bar met; `git diff --quiet -- spikes/` exit 0; `git diff
+  --quiet HEAD -- spikes/` exit 0. M3: `git apply --check --index` exit 0. M4: `git apply --index` exit 0. `git status
+  --short`: exactly the 6 paths staged (6 M) and this file (unstaged). u8f1-m4-cmp.mjs: "6 paths in the patch; 6
+  byte-equal with mode 644 on both sides; 0 not" (exit 0). `git ls-files -s` of the 6: all 100644 (blobs 2ad43ca,
+  84342b9, 24122c0, c1384ca, e77feb0, eb11e52). `sha256sum` of the 6: the Facts' six. M4c: package.json 8370495d… and
+  package-lock.json a0efce8e… equal in agent-abf71d95fc07b3522 and in the main folder; ops/browser/node_modules absent,
+  the kept install there (`test -d`), then `ln -s` of it. Next: M5 in the background (.gate/u8-f1-merge/m5-check.log).
+- DONE 06:13:46-06:36:32: M5 (background bt9lcars6; .gate/u8-f1-merge/m5-check.log, exit 0; the lock held, incremental
+  off, cold after the part-clean; HEAD 833c3f0; the run's diff hash 4d6a2484…7164 = the patch's, untracked e3b0c442…
+  = none): ops 104 of 104, 0 fail; wrappers "315 ok, 0 failed"; check.mjs "all 12 steps pass": fmt 1.3 s; clippy
+  42.1 s; clippy-wasm32 11.0 s; doc 18.0 s; test 1,181.9 s, 931 and 1,028 passed, 0 failed, 0 skipped; deps 2.6 s
+  (the held line as U7's: "npt-client-wasm ships npt-client and wasm-bindgen only"); wasm 88.2 s, 27,000 ticks, 0
+  mismatching, the hash-map bite caught at SS-s1 tick 1234; refs 2,145 (= N0); marks 81, rows unchanged; self 80 of
+  80; web 70 of 70 (TypeScript 6.0.3); redact 11 of 11, 464 items, 0 findings. Every C1 bar met. Before M7 and M8
+  (the advisor tool's point 2): u7-merge-plan.md:214-249 read; the tracked wip/ files listed: only
+  wip/u8-f1-build.patch is U8-F1's (the other nine belong to other units).
+- DONE 06:3x: M7: `unlink` of ops/browser/node_modules (the install still in agent-abf71d95fc07b3522: `test -d` OK);
+  `node tools/gate.mjs --no-smoke` GATE PASS (base b9aad01; 1-4, 5b-5d PASS, 5a skipped); "repo map OK: 245 entries
+  cover 110 required paths"; `git status --short`: the 6 paths staged and notes only (msg-2026-11-28.md, this file,
+  um4-plan.md untracked). u8-report.md's M5 and M7 lines filled. Next: M8 (`git rm` of wip/u8-f1-build.patch, `git
+  add` of u8-report.md and this file, the numstat check, one commit), then the card save that pushes it.

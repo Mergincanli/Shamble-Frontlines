@@ -101,7 +101,7 @@ test("item 4: the probe's settings carry U6c's probe fields; the block stores an
   assert.match(p, /probe_presence "\$ROOMS" "02\$ATT" "\$\(setting 02 run\)" \| tee/);
 });
 
-test("item 4: probe_presence on fixture logs: present, a missing edge, a P1 drop, a missing log", () => {
+test("item 4: probe_presence on fixture logs: present, a missing edge, a P1 drop, a missing log; ADV-U8H-1's P1 integers", () => {
   withTemp((dir) => {
     const rooms = join(dir, "rooms");
     mkdirSync(rooms);
@@ -109,9 +109,12 @@ test("item 4: probe_presence on fixture logs: present, a missing edge, a P1 drop
       for (const leg of LEGS) writeFileSync(join(rooms, `room-02-${leg}.jsonl`), `${legHead(leg, heads[leg])}\n${logs[leg] ?? legLog()}`);
     };
     const all = () => r1bash(dir, ["probe_presence"], `probe_presence "${rooms}" 02 R1-probe-02`).trim().split("\n");
-    const run = () => all().filter((l) => !l.startsWith("report "));
+    const run = () => all().filter((l) => /^\w+: /.test(l));
     write({});
     assert.deepEqual(run(), LEGS.map((l) => `${l}: present at both edges`));
+    const ints = ["probe_up_window_count 1000000", "probe_down_window_count 1000000", "probe_window_ns 100000000000", "probe_up_window_ns 100000000000",
+      "probe_down_window_ns 100000000000", "probe_start_timer_slack_ns 1", "l2_timer_slack_ns 1", "probe_start_sched_policy 1 50", "l2_sched_policy 1 50", "non_integer_fields 0"];
+    assert.deepEqual(all().slice(12), ints.map((l) => `P1 ${l}`), "after the verdicts and reports: P1's l2_summary and its four reads, integers only");
     // advisor-u6c-r2.md:187-191: per leg, reported and never judged, the rise between the edges, the up span's excess in
     // intervals (probe_up_window_ns over 1 s / probe_rate_pps, less probe_sent_count) and the rise less the excess.
     write({ P1: legLog(7, 229, [], 1_000_000, 100_022_400_000) }, { P1: { params: { ...HEAD_READS, probe_rate_pps: 10000, probe_sent_count: 1_000_010 } } });
@@ -137,6 +140,8 @@ test("item 4: probe_presence on fixture logs: present, a missing edge, a P1 drop
     const drop = run();
     assert.match(drop[1], /^P1: INVALID: 2 drops on the probe's P1 socket between its reads \(C-U8-6\)/);
     assert.equal(drop[2], "P2: present at both edges", "a drop counts against P1 only");
+    write({ P1: legLog(7, 9).replace('"probe_window_ns":100000000000', '"probe_window_ns":"100 s","probe_ok":true') }, { P1: { params: { ...HEAD_READS, l2_sched_policy: "SCHED_UNKNOWN 0" } } });
+    assert.deepEqual(all().slice(12).filter((l) => !ints.includes(l.slice(3))), ["P1 l2_sched_policy -1 -1", "P1 non_integer_fields 2"], "an INVALID P1 prints too");
     write({ B1: legLog().replace('"udp_row_found":1', '"udp_row_found":0') });
     assert.equal(run()[5], "B1: INVALID: the socket's /proc/net/udp row was not read at both edges");
     write({ P4: legLog().replaceAll('"cpu_user_count":1000', '"cpu_user_count":"1000"') });
@@ -208,6 +213,16 @@ test("item 5: npt-load's settings carry the run's fields from the room's setting
   assert.match(fn("ds_selftest"), /\n  lg_block "\$d" 05 ds run ws\n/);
   assert.match(fn("load_ready"), /got=\$\(LG_BOUND=\$left lg "log \$1" \|\| true\)\n {4}grep -qx READY <<< "\$got" && return 0/);
   assert.doesNotMatch(R1, /load_up \d\d bots /, "no `bots` mode left");
+});
+
+test("ADV-U8H-1 (b): ds_selftest's ws_split.txt holds the ws_split event's integer fields, or one line saying there is none", () => {
+  withTemp((dir) => {
+    const stubs = "timing_invalid() { :; }; stat_cpu() { :; }; lg_block() { :; }; lg_keep() { :; }; keep() { :; }";
+    const ws = (log) => (writeFileSync(join(dir, "room-05.jsonl"), log), r1bash(dir, ["out", "logq", "ds_selftest"], `ROOMS="${dir}"; ${stubs}; ds_selftest`),
+      readFileSync(join(dir, "results", "ds-selftest", "ws_split.txt"), "utf8"));
+    assert.equal(ws(`{\n${ev("ws_split", "measured", { ws_late_up_count: 9, ws_late_down_p99_ns: 800, ws_mode: "x" })}\n`), "ws_late_up_count 9\nws_late_down_p99_ns 800\nws_split non_integer_fields 1\n");
+    assert.equal(ws(`${ev("ws_summary", "measured", { n: 1 })}\n`), "no ws_split event in the room log\n");
+  });
 });
 
 // Item 8: every required field of the merged Settings; values of the types it takes (it refuses unknown fields:

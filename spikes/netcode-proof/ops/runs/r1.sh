@@ -185,7 +185,7 @@ PY
 }
 # alone_min <room log>: the least `alone` over the log's affinity events.
 alone_min() { logq "$1" affinity alone | sort -n | head -n 1; }
-# One npt-log event field per line: logq <log> <event> <field>.
+# One npt-log event field per line: logq <log> <event> <field> (`-`: each such event's fields, one JSON object a line).
 logq() {
   python3 -I - "$1" "$2" "$3" << 'PY'
 import json, sys
@@ -196,8 +196,8 @@ try:
             r = json.loads(line)
         except ValueError:
             continue
-        if r.get("k") == "event" and r.get("ev") == ev and field in r.get("f", {}):
-            print(r["f"][field])
+        if r.get("k") == "event" and r.get("ev") == ev and (field == "-" or field in r.get("f", {})):
+            print(json.dumps(r["f"]) if field == "-" else r["f"][field])
 except OSError:
     pass
 PY
@@ -605,7 +605,7 @@ probe() {
 # INVALID: eval.rs:37-75). probe_presence <rooms dir> NN <settings run>.
 probe_presence() {
   python3 -I - "$1" "$2" "$3" << 'PY'
-import json, os, sys
+import json, os, re, sys
 rooms, nn, run = sys.argv[1:4]
 # NC-SB-9, NC-U6C-12 (U6c's merged names, SERIES.md:920-935, :952): each direction's rate is l2_summary's
 # probe_<d>_window_count over FP-1's probe_<d>_window_ns, 10,000 a second within 1 %; P1's two slack and policy reads
@@ -613,10 +613,12 @@ rooms, nn, run = sys.argv[1:4]
 # "unknown"; a policy reads "<name> <priority>": socket.rs:319, :358-362), the policy's name the same at both.
 RATE = 10000
 P1_READS = ("probe_start_timer_slack_ns", "probe_start_sched_policy", "l2_timer_slack_ns", "l2_sched_policy")
+POL = {"SCHED_OTHER": 0, "SCHED_FIFO": 1, "SCHED_RR": 2, "SCHED_BATCH": 3, "SCHED_IDLE": 5, "SCHED_DEADLINE": 6}
+pol = lambda p: f"{POL[p.split()[0]]} {int(p.split()[1])}" if type(p) is str and re.fullmatch(r"[A-Z_]+ -?\d+", p) and p.split()[0] in POL else "-1 -1"
 def rate(s, d):
     n, ns = (s.get(f"probe_{d}_{k}") for k in ("window_count", "window_ns"))
     return n * 1e9 / ns if type(n) is int and type(ns) is int and ns > 0 else None
-reports, unread = [], lambda v: "unread" if v is None else v
+reports, p1, unread = [], [], lambda v: "unread" if v is None else v
 for leg in ["P0", "P1", "P2", "P3", "P4", "B1"]:
     seen = {"leg_edge": {}, "cpu_stat": {}}
     head = foot = summ = None
@@ -640,6 +642,10 @@ for leg in ["P0", "P1", "P2", "P3", "P4", "B1"]:
     edge, cpu, rates = seen["leg_edge"], seen["cpu_stat"], [rate(summ or {}, d) for d in ("up", "down")]
     s0, pol0, s1, pol1 = (((head or {}).get("params") or {}).get(k) for k in P1_READS)
     p1_read = all(type(x) is int and x != 2**64 - 1 for x in (s0, s1)) and all(type(x) is str and x not in ("", "unknown") for x in (pol0, pol1))
+    if leg == "P1":  # ADV-U8H-1 (b): l2_summary's and the slack reads' integers; each policy as its number and priority
+        vals = list((summ or {}).items()) + [(P1_READS[0], s0), (P1_READS[2], s1)]
+        p1 = [f"P1 {k} {v}" for k, v in vals if re.fullmatch("[a-z0-9_]+", k) and type(v) is int]
+        p1 += [f"P1 {k} {pol(v)}" for k, v in ((P1_READS[1], pol0), (P1_READS[3], pol1))] + [f"P1 non_integer_fields {len(vals) - len(p1)}"]
     w0, w1 = (count(edge.get(ph, {}), "udp_drops_count") for ph in ("warmup", "after"))
     span, pps, sent = (count(f, k) for f, k in ((summ or {}, "probe_up_window_ns"), ((head or {}).get("params") or {}, "probe_rate_pps"),
         ((head or {}).get("params") or {}, "probe_sent_count")))
@@ -671,7 +677,7 @@ for leg in ["P0", "P1", "P2", "P3", "P4", "B1"]:
         print(f"P1: INVALID: {d} drops on the probe's P1 socket between its reads (C-U8-6): to the advisor before any L2 mark counts")
     else:
         print(f"{leg}: present at both edges")
-for r in reports:
+for r in reports + p1:
     print(r)
 PY
 }
@@ -709,6 +715,11 @@ ds_selftest() {
   stat_cpu "$d/stat-after.txt"
   lg_keep "$d" 05
   keep "$d" 05
+  # ADV-U8H-1 (b): the room's ws_split fields (condition 10's read), integers only, for the pushed summaries.
+  logq "$ROOMS/room-05$ATT.jsonl" ws_split - | python3 -I -c 'import json, re, sys
+f = json.loads((sys.stdin.read().splitlines() or ["null"])[0])
+ok = [f"{k} {v}" for k, v in f.items() if re.fullmatch("[a-z0-9_]+", k) and type(v) is int] if isinstance(f, dict) else []
+print("\n".join(ok + [f"ws_split non_integer_fields {len(f) - len(ok)}"]) if isinstance(f, dict) else "no ws_split event in the room log")' > "$d/ws_split.txt"
 }
 
 # s14_run <dir>: one npt-s14 run copied into <dir>, then compare.py's per-run standing on RS (NC-SB-12).

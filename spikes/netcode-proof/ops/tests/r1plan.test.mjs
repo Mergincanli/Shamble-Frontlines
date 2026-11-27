@@ -203,3 +203,10 @@ test("the dates recomputed from the cited lines and the rate (C6)", () => {
   assert.equal(round2(1.9 + 1.8 + 3.6), 7.3);
   assert.match(plan, /planned EUR 6\.62 \(1\.72 \+ 1\.56 \+ 3\.34\), caps EUR 7\.30 \(1\.90 \+ 1\.80 \+ 3\.60\)/);
 });
+
+test("ADV-U8H-1 (b), S14-PUSH (a): one pushed list, word for word, in PROMPT-R1.md section 6 and R1.md section 7", () => {
+  const list = (body) => body.replace(/\s+/g, " ").match(/`collect\/`.*?`s14-redact\.txt`/)?.[0];
+  assert.equal(list(text("runs/R1.md")), "`collect/`, `probe/presence.txt`, `ds-selftest/ws_split.txt`, `bringup/facts.txt`, `s14/` whole and `s14-redact.txt`");
+  assert.equal(list(text("operator/PROMPT-R1.md")), list(text("runs/R1.md")), "the same list in both files");
+  assert.deepEqual([text("operator/PROMPT-R1.md")].map((p) => [p.includes("`git -C <results> rev-parse --git-path hooks`"), /--vms[^]*runs?\s+on\s+`<results>\\r1\\s14`/.test(p), /runs?\s+on\s+`<results>\\r1\\s14`\s+with\s+no\s+VM\s+list/.test(p)])[0], [true, false, true], "SR-1: the hooks re-read just before the push; S14-VMS: the s14 folder's check names no --vms");
+});
