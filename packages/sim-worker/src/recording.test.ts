@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 import type { Sim } from "../pkg/sim_wasm.js";
-import { checkContent, checkReplayable, firstDifference, readHashes, readRecording, replayOn, STEP_BYTES, type Replayable } from "./recording.ts";
+import { checkContent, checkReplayable, firstDifference, LOCAL_MAP, readHashes, readRecording, replayOn, STEP_BYTES, type Replayable } from "./recording.ts";
 
 // The players' own type is what a replay drives: when its `input` takes more numbers, this line stops compiling
 // until `Replayable` and `replayStep` pass them. Types only: no test here needs the built file.
@@ -179,6 +179,9 @@ test("a replay makes the live host's calls in the live host's order, and refuses
   expect(cannot((_, bytes) => bytes.fill(0, 50, 82))).toBe(none);
   expect(why(bytesOf((_, bytes) => bytes.fill(0xc4, 50, 82)))).toBe(none);
   expect(why(bytesOf(() => {}, 3, MAP_ID))).toBe(none);
+  // Another map's recording: the match would be made on test-scene, so it is refused before any call.
+  expect(why(bytesOf((_, bytes) => bytes.fill(0xc4, 50, 82), 3, "other"))).toBe(`${start}map: a local match is played on test-scene alone`);
+  expect(LOCAL_MAP).toBe(MAP_ID);
   expect(cannot((view) => view.setUint32(STEPS_AT + 32, 1, true))).toBe(`${start}move: the input call does not take it yet`);
   expect(cannot((view) => view.setUint32(STEPS_AT + 2 * STEP_BYTES + 56, 1, true))).toBe(`${start}aim: the input call does not take it yet`);
   expect(cannot((view) => view.setUint32(STEPS_AT + 60, 1, true))).toBe(`${start}view time: the input call does not take it yet`);

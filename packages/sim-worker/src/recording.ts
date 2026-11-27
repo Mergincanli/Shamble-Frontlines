@@ -8,6 +8,8 @@ export const MAX_STEPS = 108_000;
 const MAX_MAP_ID_BYTES = 64;
 const MAGIC = "SHMBLREC";
 const TEST_SEED_MARK = "TESTSEED";
+/** The map a local match is played on: `sim_wasm::LOCAL_MAP`'s value (the boundary test reads it from the Rust source). */
+export const LOCAL_MAP = "test-scene";
 
 export interface RecordedStep {
   readonly hostMs: number;
@@ -135,6 +137,7 @@ export function checkReplayable(recording: Recorded): void {
   if (recording.startTick !== 0) throw cannot("start tick: a match starts at tick 0");
   if (recording.firstSequence !== 0) throw cannot("first command sequence: a match starts at sequence 0");
   if (recording.contentHash.every((byte) => byte === 0) || recording.mapId === "") throw cannot("content: its header names none (a match runs on content and a map)");
+  if (recording.mapId !== LOCAL_MAP) throw cannot(`map: a local match is played on ${LOCAL_MAP} alone`);
   if (recording.steps.some((step) => step.movement !== 0)) throw cannot("move: the input call does not take it yet");
   if (recording.steps.some((step) => step.ray.some((word) => word !== 0))) throw cannot("aim: the input call does not take it yet");
   if (recording.steps.some((step) => step.viewTick !== 0 || step.viewFraction !== 0)) throw cannot("view time: the input call does not take it yet");

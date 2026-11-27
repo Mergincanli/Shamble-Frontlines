@@ -7,7 +7,7 @@
 use std::fmt;
 
 use sim::{StateSink, World};
-use sim_wasm::{MODE_LOCAL, Sim};
+use sim_wasm::{LOCAL_MAP, MODE_LOCAL, Sim};
 
 use crate::recording::{Recording, Step, TEST_SEED_MARK, TickHashes};
 use crate::sha256::sha256;
@@ -72,6 +72,11 @@ fn check(recording: &Recording) -> Result<(), ReplayError> {
         (
             header.content_hash == [0; 32] || header.map_id.is_empty(),
             "content: its header names none (a match runs on content and a map)",
+        ),
+        (
+            // A local match is made on one map (`sim_wasm::LOCAL_MAP`), whatever else the content holds.
+            header.map_id != LOCAL_MAP,
+            "map: a local match is played on test-scene alone",
         ),
         (
             recording.steps.iter().any(|step| step.movement != 0),
@@ -324,6 +329,11 @@ mod tests {
         let none = cannot("content: its header names none (a match runs on content and a map)");
         assert_eq!(refused(&|r| r.header.content_hash = [0; 32]), none);
         assert_eq!(refused(&|r| r.header.map_id = String::new()), none);
+        // Another map's recording: the match would be made on test-scene, so it is refused before any call (its
+        // words name the one map, as `LOCAL_MAP` does).
+        let map = cannot("map: a local match is played on test-scene alone");
+        assert!(map.as_deref().is_some_and(|said| said.contains(LOCAL_MAP)));
+        assert_eq!(refused(&|r| r.header.map_id = "other".to_owned()), map);
         let aim = cannot("aim: the input call does not take it yet");
         assert_eq!(
             refused(&|r| r.steps[11].movement = 1),

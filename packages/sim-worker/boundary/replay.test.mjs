@@ -10,7 +10,7 @@ import { expect, test } from "vitest";
 import * as dev from "../../../.gate/rules-module/dev/devtools.js";
 import * as release from "../../../.gate/rules-module/release/devtools.js";
 import { initSync, Sim, tick_hz } from "../pkg/sim_wasm.js";
-import { checkContent, firstDifference, readHashes, readRecording, replayOn, replayStep } from "../src/recording.ts";
+import { checkContent, firstDifference, LOCAL_MAP, readHashes, readRecording, replayOn, replayStep } from "../src/recording.ts";
 import { readPlainFile } from "./plain-file.ts";
 
 // The committed recordings, each read only when it is a plain file in a plain folder (plain-file.ts).
@@ -31,6 +31,13 @@ function committed(name) {
   expect(hashes.recordingSha256).toBe(createHash("sha256").update(bytes).digest("hex"));
   return { bytes, recording: readRecording(bytes, tick_hz()), expected: hashes.lines, content: file(`${name}.content.json`) };
 }
+
+test("the replay's map is the local match's own, read from the Rust source", () => {
+  const source = readFileSync(new URL("../../../crates/sim-wasm/src/lib.rs", import.meta.url), "utf8");
+  const map = /^pub const LOCAL_MAP: &str = "([a-z0-9_-]+)";$/m.exec(source);
+  expect(map, "LOCAL_MAP in crates/sim-wasm/src/lib.rs").not.toBeNull();
+  expect(map?.[1]).toBe(LOCAL_MAP);
+});
 
 test("the manifest lists every recording's files with their length and digest, and there is at least one", () => {
   expect(names).toContain("first-loop");

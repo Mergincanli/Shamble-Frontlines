@@ -1215,8 +1215,18 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   builds ("the network is cut: no TCP connection to ...:443 (curl exit 7)"), and under the cut the two
   development-server cases passed in 2.7 s and 2.2 s with no "Compiling" line anywhere in the browser tests' window
   (16:33:10 to 16:36:55): the content tool ran `--locked` and compiled nothing.
-- **Step 10's wiring: the match holds the world of its map: COMMITTED** (2026-11-27, about 16:42 UTC; its full
-  local checks and the gate run after the commit, as for cut C, and are written here when they end).
+- **Step 10's wiring: the match holds the world of its map: DONE** (commit
+  **885d382**, pushed 2026-11-27 by 16:41:26 UTC, when CI's first job started on it; after the commit, on the same
+  files, the full local checks passed whole, 16:41:28 to 16:48:13 UTC: 229 Rust tests twice, 228 in release, format
+  and clippy clean, boundary 38, 29 browser tests in 209 s, the recordings what their scripts make, the players'
+  file 257,421 bytes in both pages; the gate passes with smoke; CI: gate and smoke green, the toolchain run started
+  16:41:26 UTC). **Its follow-up, a defect of its own found by the advisor tool's question and confirmed in the
+  code:** a recording whose header names another map that its content holds would have replayed on `test-scene`
+  without a word (`check_content` asks only that the content hold the header's map; the match is always made on
+  `LOCAL_MAP`; and since no state reads the world yet, its hashes would even have matched). Now refused before any
+  call in each runner, "map: a local match is played on test-scene alone" (`replay.rs`'s `check`; `recording.ts`'s
+  `checkReplayable`, with `LOCAL_MAP` tied to the Rust constant by the boundary test), with tests and plants C30 and
+  C31 (both caught); official count with it 6,659, raw 6,677.
   `sim_wasm::LOCAL_MAP` ("test-scene", the one map the content holds; the first recording's header names the same
   id); `CreateError::MapMissing` and `CreateError::World(WorldError)`, in the order seed, mode, content, map,
   world, padding (the order test covers the map; no map made in tests reaches the world's check, whose sentence is
@@ -1343,12 +1353,14 @@ again here. SEAT-OUT from him: stop at a whole point and report the last commit'
    `advisor-cutC.md` (the caps, the page's parse, the dev route), with the sheet and the test list revised in
    writing). Before step 10's first code push: CI on fbbd84d read green, and on its log the two Q3 points of
    `advisor-cutC.md` (the dev-server cases compile nothing; the network cut does not stop `cargo run --locked`).
-3. **Step 10's wiring** (the row at `reread-sheet.md:168`): `CreateError::MapMissing` and `::World`, the local
-   match holding the world of the map `test-scene`, and the built-file check's result recorded where the library
-   is first linked into the players' file. (The fuzz run through `StaticWorld::build` and the hostile documents
-   need no content file and are built: the card's entry "Step 10, one more piece".)
-4. **The look ahead before steps 11 and 12** (the count then, plus about 520 and 1,060, plus a fix pass of about
-   350; a rung that is reached moves its step: 11 to 4d, 12 to the start of 4c; past 8,450: stop and ask him).
+3. **Step 10's wiring: DONE** (885d382, with its follow-up for another map's recording; the card's entry "Step
+   10's wiring"). Official count at its end 6,635 (6,659 with the follow-up): the first rung (6,750) is not reached.
+4. **Step 11, the schema writer** (the sheet's row 11, revised at row 12 for the map's reading): its four
+   questions are with the advisor agent (`cs4b-content/advisor-step11-brief.md`; its notes `advisor-step11.md`);
+   **no code of it before that ruling**; and his STEP11-ROOM is asked in the chat (build it now, or move it to 4d
+   so the scene fits): without his answer when the ruling is back, it is built, as the ladder says. **The look
+   ahead before step 12** (the count then, plus about 1,060 and the map's reading moved there, plus a fix pass of
+   about 350; past 8,450: stop and ask him; a rung reached moves its step: 12 to the start of 4c).
 5. **The close:** `plants-4b2.py --anchors` (reads only: every plant's text still stands once; 51 edits, 0 wrong
    on 5c6738a), then `plants-4b2.py <commit>` whole; reviewers on the final diff (rust-reviewer, engine-architect,
    security-auditor, test-engineer; netcode-architect for steps 9 and 10; graphics-engineer, perf-auditor and

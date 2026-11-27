@@ -284,6 +284,11 @@ PLANTS = [
     ("C29", "defect", "the match is made on whatever map comes first, not on the local map: on the players' file", ANY_MAP,
      chain((ENV, WASM), (ENV, boundary("sim-wasm"))),
      ["each class of refusal is an Error with a plain reason", "expected undefined to be an instance of Error"]),
+    # Step 10's follow-up (Builder V6): a recording of another map is refused before any call, in each runner.
+    ("C30", "defect", "a replay of another map's recording runs on the local map: natively", [(REPLAY_RS, "            header.map_id != LOCAL_MAP,", "            header.map_id != LOCAL_MAP && false,")], REPLAY_UNIT,
+     ["what_this_build_cannot_replay_is_refused_by_name_before_any_call", "map: a local match is played on test-scene alone"]),
+    ("C31", "defect", "a replay of another map's recording runs on the local map: in TypeScript", [(RECORDING_TS, "  if (recording.mapId !== LOCAL_MAP) throw cannot(", "  if (recording.mapId !== LOCAL_MAP && recording.mapId === \"\") throw cannot(")], SW_UNIT,
+     ["refuses what the input call cannot take", "map: a local match is played on test-scene alone"]),
 ]
 
 def note(name, kind, ok, what, detail):

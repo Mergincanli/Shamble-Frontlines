@@ -31,8 +31,11 @@ APPROVE, REVISE (with what) or ESCALATE (to Mustafa, with why), each on its own.
   shipped one". Block 1.10: "Neither reaches a shipped build (CD-3 :344-348)".
 - **Facts.** The field tables are shipped: `movement::FIELDS` (`crates/content/src/movement.rs:18-34`, 15 fields of
   name, unit and range) and `map::FACING`, read at run time by the reader, which the players' file links since cut C.
-  MEASURED (to be filled in by the builder before this brief is sent: one description added to one field, the
-  players' file built, its bytes searched for the text).
+  **Measured (2026-11-27, 16:52 UTC, on the players' file of 885d382, 257,421 bytes):** the table's `unit` column
+  is read by no code at run time (no `.unit` in `crates/content/src`, `crates/sim`, `crates/sim-wasm/src`), yet its
+  strings are in the players' file: "m/s2" and "1/s", whose one source is that column (`movement.rs:26`, `:31`),
+  are found in its bytes. So a `description` column in the same shipped table would ship its text in the players'
+  file too (the array is materialized whole), which is what CD-3 keeps out.
 - **Proposal.** The descriptions live in a test-only table beside the schema writer (`schema.rs`, `#![cfg(test)]`, as
   `ts_export.rs` is), keyed by each field's name, with a test that every field of `FIELDS` and every key of the map
   has exactly one description and no other; so no description reaches the players' file, as CD-3 says. The row's
