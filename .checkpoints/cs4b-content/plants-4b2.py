@@ -45,6 +45,21 @@ RECS = ("cargo", "test", "-p", "devtools", "--locked", "--test", "recordings")
 SW_UNIT = ("node", "../../node_modules/vitest/vitest.mjs", "run", "--dir", "src", "recording")
 SCAN = ("cargo", "test", "-p", "sim", "--locked", "--test", "rules_scan", "the_simulation_crate")
 def native(crate): return ("cargo", "test", "-p", crate, "--locked", "--test", "native_target", "--target-dir", ".gate/target-plant")
+# Step 9, cut C (Builder V6): the constructor takes the content, the Worker and the page carry it.
+LIB_RS, MESSAGES_TS, PANIC_TS = "crates/sim-wasm/src/lib.rs", "packages/sim-worker/src/messages.ts", "packages/sim-worker/src/panic-message.ts"
+CONTENT_TS, VITE_CONFIG = "packages/client/src/app/content.ts", "packages/client/vite.config.mjs"
+SW_MESSAGES = ("node", "../../node_modules/vitest/vitest.mjs", "run", "--dir", "src", "messages")
+SW_PANIC = ("node", "../../node_modules/vitest/vitest.mjs", "run", "--dir", "src", "panic-message")
+PAGE_CONTENT = ("node", "../../node_modules/vitest/vitest.mjs", "run", "src/app/content.test.ts")
+def boundary(name): return ("node", "node_modules/vitest/vitest.mjs", "run", "--root", f"{ROOT}/packages/sim-worker", "--dir", f"{ROOT}/packages/sim-worker/boundary", name)
+DEV_PLANT = f"{ROOT}/.gate/dist-plant-dev"
+DEV_PAGE = ("node", "--input-type=module", "-e", f'import {{ buildPage }} from "{ROOT}/packages/client/scripts/build.mjs"; await buildPage({{ production: false, outDir: "{DEV_PLANT}" }});')
+def chromium(spec): return ("node", "node_modules/@playwright/test/cli.js", "test", "-c", "packages/e2e/playwright.config.ts", "--project=chromium", "--workers=1", "--retries=0", "--trace", "off", "--reporter=list", spec)
+BROWSER_ENV = lambda dist: dict(ENV, SHAMBLE_DIST=dist, SHAMBLE_CHROMIUM="/opt/pw-browsers/chromium")
+def chain(*parts):
+    """Commands run in order, each with its environment, until one fails: the plant's output is all of theirs."""
+    return ("CHAIN",) + parts
+FOLD = [(LIB_RS, "            start_tick: 0,\n", "            start_tick: u32::from(bundle.first().copied().unwrap_or(0)),\n")]
 
 USE = "use wasm_bindgen::prelude::*;\n"
 MODS = "pub mod rng;\n"
@@ -234,6 +249,33 @@ PLANTS = [
     ("C15", "defect", "the TypeScript check takes any bundle", [(RECORDING_TS, "  if (digest.length !== recording.contentHash.length || digest.some((byte, at) => byte !== recording.contentHash[at])) {", "  if (digest.length !== recording.contentHash.length) {")], SW_UNIT,
      ["the content a replay is given is the one its recording's header names"]),
     ("C16", "control", "the clean recordings: the recordings' tests", [], RECS, []),
+    # Step 9, cut C (Builder V6): loading content changes no state (natively, in Node, in Chromium), and the Worker's
+    # and the page's new checks each catch their own defect. The fold is never run with make_recordings writing.
+    ("C17", "defect", "a content byte folded into the shared state at construction: natively", FOLD, RECS,
+     ["first-loop, Shared", "Difference { step: 1,"]),
+    ("C18", "defect", "a content byte folded into the shared state at construction: in Node, on the players' file", FOLD,
+     chain((ENV, WASM), (ENV, boundary("replay"))),
+     ["first-loop replays on the players' file to its hashes file, step for step", "expected 1 to be null"]),
+    ("C19", "defect", "a content byte folded into the shared state at construction: in Chromium, on the players' file", FOLD,
+     chain((ENV, WASM), (ENV, DEV_PAGE), (BROWSER_ENV(DEV_PLANT), chromium("tests/replay/determinism.spec.ts"))),
+     ["every recording replays in the browser's WebAssembly", "toBeNull", "Received: 1"]),
+    ("C20", "defect", "the Worker's start takes a bundle one byte over the loader's cap", [(MESSAGES_TS, "  return value instanceof ArrayBuffer && value.byteLength >= 1 && value.byteLength <= MAX_BUNDLE_BYTES;", "  return value instanceof ArrayBuffer && value.byteLength >= 1 && value.byteLength <= MAX_BUNDLE_BYTES + 1;")], SW_MESSAGES,
+     ["anything else is refused"]),
+    ("C21", "defect", "the Worker's cap is one byte above the loader's own", [(MESSAGES_TS, "export const MAX_BUNDLE_BYTES = 8 * 1024 * 1024;", "export const MAX_BUNDLE_BYTES = 8 * 1024 * 1024 + 1;")], boundary("sim-wasm"),
+     ["the Worker's cap on a bundle is the loader's own"]),
+    ("C22", "defect", "the Worker tells a thrown text uncut", [(PANIC_TS, "  return cutText(thrown instanceof Error ? thrown.message : String(thrown));", "  return thrown instanceof Error ? thrown.message : String(thrown);")], SW_PANIC,
+     ["a thrown text is cut to its bound with a mark"]),
+    ("C23", "defect", "the page takes an error text of any length", [(MESSAGES_TS, '      return typeof value["message"] === "string" && value["message"].length <= ERROR_TEXT_UNITS;', '      return typeof value["message"] === "string";')], SW_MESSAGES,
+     ["anything else from the Worker is refused"]),
+    ("C24", "defect", "the page reads its copy before the Worker's answer", [(CONTENT_TS, '    if (!link.ready) return "";', '    if (!link.ready && link.failure !== "") return "";')], PAGE_CONTENT,
+     ["a Worker that answers ready: the copy is read once"]),
+    ("C25", "defect", "the page's sentence for a failed fetch carries the server's own status text", [(CONTENT_TS, "the server answered ${response.status}` };", "the server answered ${response.status} ${response.statusText}` };")], PAGE_CONTENT,
+     ["what the page says of a failed fetch is fixed text"]),
+    ("C26", "defect", "the development server has no /content.json of its own: its page-for-any-address stands in",
+     [(VITE_CONFIG, "  plugins: [devContent],\n", "  plugins: [],\n")],
+     chromium("tests/skeleton/isolation.spec.ts"),
+     ["under Vite's dev server", "application/json"]),
+    ("C27", "control", "the clean Worker and page: the messages' and the content's tests", [], SW_MESSAGES, []),
 ]
 
 def note(name, kind, ok, what, detail):
@@ -252,7 +294,14 @@ def planted(name, kind, what, edits, command, words, cwd=None):
             if count != 1: return note(name, kind, False, what, f"the text to replace stands {count} times in {path}")
             open(path, "w").write(text.replace(old, new, 1))
         os.chdir(cwd or ROOT)
-        code, text = run(*command)
+        if command[0] == "CHAIN":
+            code, text = 0, ""
+            for env, part in command[1:]:
+                code, more = run(*part, env=env)
+                text += more
+                if code != 0: break
+        else:
+            code, text = run(*command, env=BROWSER_ENV(f"{ROOT}/.gate/dist-development") if command[0:2] == ("node", "node_modules/@playwright/test/cli.js") else None)
         os.chdir(ROOT)
         found = [word for word in words if word in text]
         ok = (code == 0) if kind == "control" else (code != 0 and len(found) == len(words))
@@ -323,19 +372,29 @@ def main():
     if sys.argv[1] == "--anchors": return anchors()
     commit, names = sys.argv[1], set(sys.argv[2:])
     print(f"plants on {commit}", flush=True)
+    # The players' file as the clean tree builds it, before any plant: what the run must leave behind.
+    global PLAYERS_BEFORE
+    run(*WASM)
+    PLAYERS_BEFORE = digest(PKG)
     touched = sorted({path for plant in PLANTS for path, _, _ in plant[3]})
     before = {path: digest(path) for path in touched}
     for name, kind, what, edits, command, words in PLANTS:
         if names and name not in names: continue
-        planted(name, kind, what, edits, command, words, cwd={UNIT: "packages/client", HAND: "packages/client", SW_UNIT: "packages/sim-worker"}.get(command))
+        # A chain runs from the root; it holds environments, which are no keys.
+        cwd = None if command[0] == "CHAIN" else {UNIT: "packages/client", HAND: "packages/client", PAGE_CONTENT: "packages/client", SW_UNIT: "packages/sim-worker", SW_MESSAGES: "packages/sim-worker", SW_PANIC: "packages/sim-worker"}.get(command)
+        planted(name, kind, what, edits, command, words, cwd=cwd)
     stamp_plants(names)
     native_plants(names)
     back = {path: digest(path) for path in touched} == before
+    # A plant built into the players' file (C18, C19) leaves it there: the clean build puts it back, checked by digest.
+    players_before = PLAYERS_BEFORE
+    players_back = run(*WASM)[0] == 0 and digest(PKG) == players_before
     defects = [ok for kind, ok, _ in OUT if kind == "defect"]
     controls = [ok for kind, ok, _ in OUT if kind == "control"]
     lines = [line for _, _, line in OUT]
     lines.append(f"DEFECT CHECKS: {sum(defects)} caught, {len(defects) - sum(defects)} not caught. CONTROLS: {sum(controls)} held, {len(controls) - sum(controls)} did not hold.")
     lines.append(f"EVERY FILE PUT BACK (sha256 of {len(touched)} files as at the start): {'yes' if back else 'NO'}")
+    lines.append(f"THE PLAYERS' FILE REBUILT TO ITS SHA256 FROM BEFORE THE PLANTS ({players_before[:12]}...): {'yes' if players_back else 'NO'}")
     if not names:
         os.chdir("packages/client"); unit = run(*UNIT)[0]; os.chdir(ROOT)
         exits = [run(*WASM)[0], unit, run(*SCAN)[0]]

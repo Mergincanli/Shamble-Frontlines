@@ -1373,9 +1373,17 @@ and unit-tested: the bounds (`panic-message.ts`: `THROWN_TEXT_UNITS` 512, `ERROR
 page's check of an `error`'s length, `WorkerLink.workerError`, `content.ts` (fetch, copy, `readBundle`,
 `PageContent`) with `content.test.ts`, `boot.ts`, the dev server's plugin in `vite.config.mjs` (build.mjs exports
 `writeContentBundle` and `DEV_CONTENT_DIR`), the isolation spec's `/content.json` lines, a new Chromium spec
-`packages/e2e/tests/skeleton/content.spec.ts`; the Worker, page and spec type checks pass. Not yet run: the
-development page's build, the Chromium specs, the plant, the full checks, the gate. Not yet written: the sheet's
-revision (Q2.4), the test list's departure note (Q1.5).
+`packages/e2e/tests/skeleton/content.spec.ts`; the Worker, page and spec type checks pass. **At 16:23 UTC:** the
+development page built; the whole Chromium suite ran (228 s): 28 of 29, and the 29th ("a Worker that cannot be
+loaded") caught a defect of cut C's own (a script that does not load gives a plain event with no `message`; the
+link's `workerError` now takes `undefined`, with a test); after the fix the page and content specs pass, 15 of 15.
+The plants script has cut C's plants C17 to C27 (the fold natively, in Node and in Chromium; the Worker's start
+check, its cap, the thrown-text cut, the page's error bound, the read before `ready`, the fixed fetch sentence, the
+dev server's route; one control): **10 of 10 caught, 1 control held, every file put back, the players' file rebuilt
+to 04733d44... as before** (the script now builds the players' file before the plants and checks its digest after).
+The isolation spec asks for `/content.json` before the page loads, so a missing route fails on its own check, not on
+a timeout. The sheet (rows 9 and 12, Q2.4) and the test list (the departure, Q1.5) are revised in writing. Next: the
+full local checks, the gate, the count, the commit and push (CI on e1e2dd4 is green), then the plants' whole run.
 
 ## Next steps (the sheet's revision 3, section G; each step ends with the count of written lines)
 - **4b-1:** 1 the content crate's manifests · 2 the reader, the writer, the bundle, the two kinds, the old tuning's

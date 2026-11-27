@@ -24,6 +24,11 @@ because "the build failed"; after the last plant the players' file is rebuilt to
   `target-feature` anywhere; `ENSURE_NO_PANIC` joins `CARGO_OVERRIDES`.
 - Errors echo at most 64 bytes of input, each byte outside 0x20 to 0x7E written as `\xNN`, and a whole message is
   capped (about 512 bytes) in Rust, in the Worker's trap message and in the page's message check (S-must 6).
+  **Departure, by the advisor agent's ruling of 2026-11-27 (`advisor-cutC.md`, Q1), for security-auditor to confirm
+  at the close:** "about 512" holds for the loader (512 bytes, `MESSAGE_BYTES`) and for the Worker's non-panic path
+  (512 UTF-16 code units, `THROWN_TEXT_UNITS`, tied to `MESSAGE_BYTES` by a test; the Worker's own error event is cut
+  the same way); the panic path keeps the hook's 1,016-byte room, which P10 itself counts as a cap; the page's check
+  is set to the longest real message, 1,040 code units (`ERROR_TEXT_UNITS`, the room plus the Worker's lead).
 
 ## Step 7, the built-file check (4b-2)
 - The names, target-features and instruction rules run on the **twin before the bindings tool** (T-must 1a), and

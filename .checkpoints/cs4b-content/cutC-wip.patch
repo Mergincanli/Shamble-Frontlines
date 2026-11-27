@@ -664,7 +664,7 @@ index 0000000..f2b2bbb
 +  }
 +}
 diff --git a/packages/client/src/app/worker-link.test.ts b/packages/client/src/app/worker-link.test.ts
-index 4c3c9f3..3a28246 100644
+index 4c3c9f3..ee37bdb 100644
 --- a/packages/client/src/app/worker-link.test.ts
 +++ b/packages/client/src/app/worker-link.test.ts
 @@ -49,11 +49,17 @@ function setUp() {
@@ -698,7 +698,7 @@ index 4c3c9f3..3a28246 100644
      [{ type: "surprise" }, "the Worker sent a message the page does not know"],
      [{ type: "report", stats: { ticks: 5 } }, "the Worker sent a message the page does not know"],
      [null, "the Worker sent a message the page does not know"],
-@@ -191,6 +200,21 @@ test("the match ends once, whoever ends it first, and nothing is posted to the W
+@@ -191,6 +200,24 @@ test("the match ends once, whoever ends it first, and nothing is posted to the W
    expect(other.link.end("again")).toBe(false);
  });
  
@@ -710,18 +710,21 @@ index 4c3c9f3..3a28246 100644
 +  expect([said.length, said.endsWith("..."), long.link.failure === said, long.port.terminated]).toEqual([512, true, true, 1]);
 +  // A second cause after the end is no second error.
 +  expect(long.link.workerError("again")).toBe("");
-+  // A short text whole; an event with no text says so.
++  // A short text whole; an event with an empty text, or with none (a script that did not load gives a plain event,
++  // whose `message` is undefined), says so.
 +  const short = setUp();
 +  expect(short.link.workerError("Failed to load the Worker's script")).toBe("Failed to load the Worker's script");
 +  const none = setUp();
 +  expect(none.link.workerError("")).toBe("the Worker failed");
++  const plain = setUp();
++  expect(plain.link.workerError(undefined)).toBe("the Worker failed");
 +});
 +
  test("what the link knows can be read and not written from outside", () => {
    const { link, ready, deliver } = setUp();
    ready();
 diff --git a/packages/client/src/app/worker-link.ts b/packages/client/src/app/worker-link.ts
-index a502596..46d8482 100644
+index a502596..e4bfa3e 100644
 --- a/packages/client/src/app/worker-link.ts
 +++ b/packages/client/src/app/worker-link.ts
 @@ -1,4 +1,4 @@
@@ -745,17 +748,19 @@ index a502596..46d8482 100644
    }
  
    /**
-@@ -223,6 +227,15 @@ export class WorkerLink {
+@@ -223,6 +227,17 @@ export class WorkerLink {
      return true;
    }
  
 +  /**
 +   * The Worker's own error event (a script that did not load, a throw outside the Wasm) ends the match. Its text is
-+   * the browser's and has no bound of its own: it is cut to the bound the Worker keeps for a thrown text. Returns the
-+   * reason, or an empty string when the match had already ended.
++   * the browser's and has no bound of its own: it is cut to the bound the Worker keeps for a thrown text. A script
++   * that did not load gives a plain event, with no text at all. Returns the reason, or an empty string when the match
++   * had already ended.
 +   */
-+  workerError(message: string): string {
-+    return this.end(cutText(message === "" ? "the Worker failed" : message)) ? this.#failure : "";
++  workerError(message: string | undefined): string {
++    const said = typeof message === "string" && message !== "" ? message : "the Worker failed";
++    return this.end(cutText(said)) ? this.#failure : "";
 +  }
 +
    /** The Worker's message event. Unpacking it is part of the hand-off's cost, so it happens in here, by name. */
@@ -1007,7 +1012,7 @@ index 0000000..681ceb8
 +  expect(count.asked).toBe(1);
 +});
 diff --git a/packages/e2e/tests/skeleton/isolation.spec.ts b/packages/e2e/tests/skeleton/isolation.spec.ts
-index 0ba96fd..8f319d1 100644
+index 0ba96fd..7dc94ed 100644
 --- a/packages/e2e/tests/skeleton/isolation.spec.ts
 +++ b/packages/e2e/tests/skeleton/isolation.spec.ts
 @@ -1,6 +1,7 @@
@@ -1018,15 +1023,26 @@ index 0ba96fd..8f319d1 100644
  import path from "node:path";
  import { fileURLToPath } from "node:url";
  import { expect, test } from "@playwright/test";
-@@ -48,6 +49,12 @@ for (const kind of ["dev server", "preview server"] as const) {
-           // (For a file that is not there this server answers 200 with the page itself, so the file's type is asked too.)
-           const players = await page.request.get(at("packages/sim-worker/pkg/sim_wasm_bg.wasm"));
-           expect([players.status(), players.headers()["content-type"]]).toEqual([200, "application/wasm"]);
-+          // The game's content: the bundle the build's own content tool writes (vite.config.mjs's plugin), byte for
-+          // byte the built page's. The folder the plugin writes it into is not served.
+@@ -32,6 +33,14 @@ for (const kind of ["dev server", "preview server"] as const) {
+             : await preview({ ...settings, build: { outDir: dist } });
+         const address = server.resolvedUrls?.local[0];
+         expect(address).toContain("127.0.0.1");
++        if (kind === "dev server") {
++          // First the game's content, which the page fetches before its Worker starts: the bundle the build's own
++          // content tool writes (vite.config.mjs's plugin), byte for byte the built page's. (This server answers an
++          // address it has no file for with the page itself, so the type is asked too.)
 +          const bundle = await page.request.get(`${address ?? ""}content.json`);
 +          expect([bundle.status(), bundle.headers()["content-type"]]).toEqual([200, "application/json"]);
 +          expect(new Uint8Array(await bundle.body())).toEqual(new Uint8Array(readFileSync(path.join(dist, "content.json"))));
++        }
+         await page.goto(address ?? "");
+         await running(page, 30);
+         const data = await report(page);
+@@ -48,6 +57,8 @@ for (const kind of ["dev server", "preview server"] as const) {
+           // (For a file that is not there this server answers 200 with the page itself, so the file's type is asked too.)
+           const players = await page.request.get(at("packages/sim-worker/pkg/sim_wasm_bg.wasm"));
+           expect([players.status(), players.headers()["content-type"]]).toEqual([200, "application/wasm"]);
++          // The folder the content plugin writes its bundle into is not served.
 +          expect((await page.request.get(at(".gate/dev-content/content.json"))).status()).toBe(403);
            expect((await page.request.get(at(".gate/rules-module/release/devtools_bg.wasm"))).status()).toBe(403);
            expect((await page.request.get(at(".gate/rules-module/dev/devtools.js"))).status()).toBe(403);
