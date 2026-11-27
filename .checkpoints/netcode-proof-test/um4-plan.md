@@ -67,7 +67,11 @@ puts them inside check.mjs, so a whole run cannot leave them out.
      re-read 11-27 14:3x: main moved to b8f02b0 (#78, CI and docs), taken in by MAIN-69 (main-69-plan.md rev 0.2, its
      merge on c795079; C's APPROVE WITH CONDITIONS M69-1 to -6), so this bar reads b8f02b0149cc928964e54e194cd9c4d68f52bd94
      once MAIN-69's push is on the remote; any other value stops (MAIN-52). Step 5's proviso also names c16777e's file
-     (PROMPT-R1.md:127-129, F1, net zero) beside d8b57b8's three;
+     (PROMPT-R1.md:127-129, F1, net zero) beside d8b57b8's three; the part-clean DONE 14:53 UTC as prep (his 14:52
+     message): `env CARGO_NET_OFFLINE=true flock -x …/.gate/shared-target/.lane.lock cargo clean --locked
+     --manifest-path …/spikes/netcode-proof/Cargo.toml --target-dir …/.gate/shared-target --profile dev` (no cargo,
+     rustc or npt process before it, `pgrep -c` 0): "Removed 5765 files, 7.1GiB total"; `ls -la` lists the lock and
+     CACHEDIR.TAG, no debug; df 14,574 MiB free (8,037 before), so step 0's 8,192 bar holds and step 5's run is cold;
    - free disk at least 8,192 MiB;
    - the saver stopped by TaskStop with its proof, and the no-save window running from H0 to step 7's push.
    Step 0 runs at the build, after his U8-FILLS answer, the same day as step 5 (choice 28).
