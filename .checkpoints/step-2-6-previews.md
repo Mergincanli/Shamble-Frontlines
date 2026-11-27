@@ -286,8 +286,16 @@ his LANE-RULES). Its brief: his paste of the start block (start-block-new-chat.m
   14:09:35, 15:53:35, 17:31:13, 18:16:41, 2026-11-27 12:25:00 UTC); STATUS lane 2's five lines (Last updated, #72's row, Next 3,
   Waiting, risks) one for one: 120 lines (L4 closed); ROADMAP's step 2.6 entry; REPO_MAP's report and runbook rows;
   the report (main b9aad01, the fourth take-in and the CI-WASM move, his answers, risk 2, next step, Decisions, For
-  Mustafa). Next: push; the advisor agent's review of the head (scope 851f004..head); then the token sitting message
-  with today's dates (start 2026-11-27, end 2027-02-25; STATUS reminder from 2027-02-11).
+  Mustafa). Pushed as 19034b7 (157f888..19034b7; CI on it: gate, smoke, toolchain, preview/tests green on both runs;
+  the planted jobs refused). The advisor agent's review (scope 851f004..19034b7; advisor-head-19034b7.md): APPROVE.
+  M-1 (Medium, the sitting message: the Account ID copied after the token would overwrite it): fixed before sending,
+  the Account ID secret first, then the token made and pasted at once; L-C (re-check the environment page after the
+  secrets), L-D (both tabs of the Actions page), L-E (#72 must not conflict at the fresh run; checked: mergeable)
+  folded into the message. For the end-date commit: L-A (the start block's DECISIONS header traces items 8 and 9 to
+  no pushed file: say they came from Builder V2's hand-over message, read from the transcript only), L-B (main taken
+  in five times, not four: e3b3642b, main 07d673b0 #71, by Builder V2; the report, STATUS #72's row, ROADMAP), L-F
+  (two "Records" lines in DECISIONS say "below" for entries above). T14: the token sitting message sent
+  (token-sitting-message.md, dates 2026-11-27 to 2027-02-25, reminder from 2027-02-11).
 - Item 6c checked 2026-11-26 after the push: no pull request of the Guard fix chat's protection for main is open or
   merged (the 12 most recently updated pull requests read with gh api). The token sitting waits.
 
