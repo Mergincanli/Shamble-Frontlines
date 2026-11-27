@@ -3,6 +3,23 @@ Seat: B a3de649cd25e474df, resumed by SendMessage (it read UM-4's pushed head at
 runs. Usage 0.58 at 20:09:41 (reset 20:50). The advisor tool read this plan first (20:1x): severity first, the fix
 split by owner, the variable list from a printed source, the proof bars, the rest by name.
 
+## B5: the head read of UM-4's fix pass (resume a3de649cd25e474df once CI on 1d4e81a reads all success)
+Sent: (not yet)
+
+```text
+UM-4 fix pass: your head read, from the main session (2026-11-27 21:0x UTC), as your ruling's section 5 says (not a round). Your rules as before (main's advisor.md, unchanged since c9bd268; main b8f02b0149cc928964e54e194cd9c4d68f52bd94). Read only, effort xhigh. Your one output file: /home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/advisor-um4-fix-head.md: plan first, a notes line after each check, each finished block saved at once, the last line "Status: COMPLETE <UTC time>". Write files with the Write and Edit tools only. No `git -C`, no cd into a worktree; one simple command per Bash call, git first in its own command; run no cargo, test, gate, light run, plant or mutant; never export GIT_DIR or any other git variable in a command; read nothing from the web; name variable names only, never values.
+
+The head: the fix commit f1b466825e8caf9b86aa8a626ac0786d4fba230d (parent H0 a7c4b25bbe46a443493162dc311cfea9954880e6, the saver's termination autosave carrying the resume line), pushed by the save 1d4e81a69cc06a182cea99232bd3bb02a8a4d49c (no skip marker). CI on 1d4e81a: <four runs, filled at send>.
+
+Check, each against its evidence:
+1. Every item of your ruling (advisor-um4-r1.md sections 2-4 and 6) against the commit (`git show --stat`, `git diff a7c4b25b f1b46682 -- …`) and um4-plan.md's "FIX PASS DONE LINES": (a) withoutGitVars and opsStep's `base`; (b) the three helper sites in place, numstat 1 1 and 2 2; T-1's stand-ins and exact messages; the web step's Node stand-in; T-2's two cases; T-4's pin; SEC-UM4-3's prefix and its pin built by join; UM4H-1's clause (S's words) and SEC-UM4-2's line in dependency-check.md.
+2. The logs under /home/user/Shamble-Frontlines/.gate/um4-fix/, each printed: red-first.log (3 of 3 failing, each for its own reason: the env pin's env assert, the victim test's byte-for-byte assert, the pin's prefix); base-t1, base-web, base-t2, base-t4, base-pin and base-victim .log (1 test each, 0 fail); m1, m3, w1, m4, m10, m8, m-env, m-wild, v1, v2 and v3 .log (each KILLED, and for the right assert: V1-V3 by the byte-for-byte assert, not the title assert); fixed.sha256 against the committed blobs (`git rev-parse f1b46682:<path>` beside `git hash-object` of each fixed-*.mjs copy); counted.log (self 88 of 88, ops 104 of 104 and "315 ok, 0 failed", redact 464 items and 0 findings, refs 2181; its diff line 446f383d… against `git diff a7c4b25b f1b46682 -- spikes/netcode-proof | sha256sum`); gate.txt (GATE PASS).
+3. Re-read (a) and (b) against S's probe (sec-um4-1-probe.md): does the victim test exercise the same hazard, and does anything in ops/ still build a temporary repository from the inherited environment (grep, read only)?
+4. The commit message (`git log -1 --format=%B f1b46682`): it claims only what the logs show; "red first" only for the three tests with a kept red log; the 3-of-5 correction of 8fb32bc8 present; check.test.mjs's +88 against your estimate (named in the report, not a stop).
+5. CI on 1d4e81a (`gh run view` per run, read only): all four success, attempt 1, headSha 1d4e81a; PR #40 not dirty.
+Then your verdict on the pushed head (APPROVE, APPROVE WITH FINDINGS or REVISE, each finding on the scale), whether UM-4 closes, Decisions needed (self-contained) and For Mustafa, then the status line. Your final reply: the verdict and, one line each, any finding.
+```
+
 ## B4: the message, as sent
 Sent: 20:15 UTC by SendMessage ("Resuming agent a3de649"); done when advisor-um4-r1.md's last line reads "Status:
 COMPLETE".
