@@ -6,8 +6,8 @@ your own round-1 findings with what was done about each. A third round comes onl
 
 **Where.** The git worktree `/home/user/Shamble-Frontlines/.gate/cs4b-2`, local branch `cs/4b-content` (pushed as
 `claude/ecstatic-wozniak-5cbdzs`). Round 1 read code head **c442a806d83dceac6a272b22ad67b7f01de476fa**. The fix
-pass is code head **FIXHEAD** (commits after it touch only `.checkpoints/`). What you read:
-`git diff c442a806d83dceac6a272b22ad67b7f01de476fa FIXHEAD -- . ":(exclude).checkpoints"`, and your own notes of round
+pass is code head **70f11e130ee9dc0aabbb61a01bb9d3a6c013418e** (commits after it touch only `.checkpoints/`). What you read:
+`git diff c442a806d83dceac6a272b22ad67b7f01de476fa 70f11e130ee9dc0aabbb61a01bb9d3a6c013418e -- . ":(exclude).checkpoints"`, and your own notes of round
 1, `.checkpoints/cs4b-content/<your-name>-review-4b2.md`. Between the two heads, `docs/DECISIONS.md` changed too
 (1c4906e: his six messages of the change-set, copied by script and checked back by
 `.checkpoints/cs4b-content/decisions-4b2.mjs check`): not yours to review unless your section names it.
@@ -26,6 +26,9 @@ pass is code head **FIXHEAD** (commits after it touch only `.checkpoints/`). Wha
   hit. Test `a_ray_beyond_the_reach_and_a_ramp_beyond_f32_give_no_hit` (rust-reviewer's probe at scales 1 and 1e5, a
   hit on the slope, the reach's edges and the next float above, a direction of 1e-45 with an endless limit, a ramp
   at plus and minus 3e38). Plants W14 (the reach), W15 (the cap), W16 (the NaN guard): each caught by that test.
+  (The next float above the reach is made from its bits: the simulation crate's source scan refused `next_up`, a
+  float method outside ADR 0004 part 7's list, in the test's first form; found by the local checks before the
+  commit.)
 - **RR-2 (Low)** the schema said nothing of the fewest spawns. Fixed: `map::MIN_SPAWNS` (1), the loader's refusal
   names it, the schema writes `minItems` 1 for spawns (regions: none), `map.schema.json` written again (+1 line);
   two schema tests; plant C48.
@@ -75,11 +78,17 @@ pass is code head **FIXHEAD** (commits after it touch only `.checkpoints/`). Wha
 - **Deferred, each to STATUS as a follow-up:** EA-7 and EA-8 (4c's plan), IE-1 (the CI Builder's file), IE-2 (a
   hosting change-set), TE-4's per-class counts (4c), TE-6 (kept as a backstop).
 
-**Evidence on FIXHEAD.** The full local checks (`.checkpoints/cs4b-content/local-checks.sh`), the gate with smoke,
-CI (gate, smoke, toolchain), and the plants: their run by name on the fix pass's 20 changed or new entries, and the
-whole run (`.checkpoints/cs4b-content/plants-4b2.txt`, its log `.gate/plants-4b2.log`). The card
+**Evidence on 70f11e130ee9dc0aabbb61a01bb9d3a6c013418e.** The full local checks
+(`.checkpoints/cs4b-content/local-checks.sh`: ALL LOCAL CHECKS PASSED, 21:17 UTC; 236 Rust tests twice, 235 in
+release, client 152, sim-worker 53, types 13, net 1, boundary 39, 29 Chromium tests in 217 s), the gate with smoke
+(PASS), CI (gate, smoke, toolchain: the main session reads it), and the plants: their run by name on the fix pass's
+changed or new entries, and the whole run (`.checkpoints/cs4b-content/plants-4b2.txt`, its log
+`.gate/plants-4b2.log`): WHOLERUN. The players' file: 257,421 bytes and 95,441 instructions walked, as at c442a80;
+its sha256 changed (2e886646... from 3660132b...): the file carries the path `crates/sim/src/collision.rs` once (the
+world's build has panic places there) and the fix pass moved lines in that file (read so, not proved byte by
+byte; rust-reviewer may judge it). The card
 (`.checkpoints/cs4b-content.md`, "The fix pass, round 1's findings") gives the times and the counts. The official
-count (`.checkpoints/cs4b-content/advisor-count-rule.md`): COUNT of 8,450.
+count (`.checkpoints/cs4b-content/advisor-count-rule.md`): 8,347 of 8,450.
 
 **Rules for you** (as in round 1).
 - You edit NO source file, no doc and no note but your own. You write only your notes,
@@ -105,7 +114,7 @@ count (`.checkpoints/cs4b-content/advisor-count-rule.md`): COUNT of 8,450.
   Mustafa or a session would hit; evidence that does not hold; his words misquoted or loosened), Medium (a real
   defect with a workaround or a small reach), Low (polish, wording). Round 2's findings get this round's one fix
   pass; whatever is still open after it, below Critical or High, becomes a STATUS follow-up (a third round only for
-  an open Critical or High). The written-line count stands at COUNT of the 8,450 stop line, so say for each fix you
+  an open Critical or High). The written-line count stands at 8,347 of the 8,450 stop line, so say for each fix you
   suggest about how many lines it takes. Cite file:line and what you ran for every finding; say what you did NOT
   check.
 - Your final answer to the main session: at most 20 lines: your verdict (PASS, or findings), then each finding as
@@ -140,5 +149,5 @@ condition 4 (a recording that covers the collision queries) with 4c.
 ## test-engineer
 Your TE-1, TE-3, TE-4, TE-5, TE-7 and TE-8 as built: the table-name test against your swap (and its rename's one
 row), C38 with its controls C39 and C40, C4's narrowing; the plants' new entries and their words (each a failure's
-own); the whole run on FIXHEAD; the deferral of TE-4's per-class counts and TE-6; whether any evidence the card now
+own); the whole run on 70f11e130ee9dc0aabbb61a01bb9d3a6c013418e; the deferral of TE-4's per-class counts and TE-6; whether any evidence the card now
 claims does not hold.

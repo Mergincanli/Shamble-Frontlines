@@ -1475,6 +1475,18 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   `soldier.json` swapped for `sprint_time_from_full_s` and `sprint_returns_at_pct`) with controls C53 (the second
   route) and C54 (the hand-over's check), for the whole run. Anchors: 106 edits of 104 plants, 0 wrong. The whole
   run comes before any round 2 reviewer starts; the brief's head and count are filled on the committed head.
+  **The full local checks, second run: ALL LOCAL CHECKS PASSED** (21:08 to 21:17:14 UTC, `.gate/local-checks.log`):
+  format and clippy clean; 236 Rust tests twice (the generated files written again unchanged), 235 in release (one
+  more each: the reach test); client 152, sim-worker 53, types 13, net 1; boundary 39; 29 Chromium tests in 217 s;
+  the recordings what their scripts make. **The gate: PASS with smoke** (`.gate/gate-fixpass.log`; +0 -0 symbols).
+  **The players' file:** 257,421 bytes as before, the built-file check walks 95,441 instructions as before, sha256
+  now 2e8866474b2279c0c571c85bf6e4e30a30e336c95e45410e8697a5a5c365cf00 (was 3660132b...): the file carries the path
+  `crates/sim/src/collision.rs` once (the world's build has panic places there), and the fix pass moved lines in
+  that file; the cast itself is in no step yet, so not in the file. (The new digest's cause is read so, not proved
+  byte by byte.) **Official count 8,347, raw 8,365** (21:18 UTC; 103 under the stop line). **The code commit:
+  70f11e130ee9dc0aabbb61a01bb9d3a6c013418e** (2026-11-27 21:19:05 UTC, pushed): the 22 source files, the new
+  `content-ties.test.mjs` among them, and the patch out of the notes; `git status --porcelain -- crates packages`
+  empty after it. **From 21:19 UTC: the plants' whole run on 70f11e1** (`.gate/plants-whole-3.out`).
 
 ## Slips of this chat's own rules, for the report
 - One git command did not start its own shell call: `git add .checkpoints/cs4b-content/review-brief-4b1.md` stood
