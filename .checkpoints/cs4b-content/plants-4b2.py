@@ -400,6 +400,8 @@ PLANTS = [
     ("C60", "defect", "a shape's corner in the generated type loses a number (engine-architect's round 2)", [(SHAPE_TS, " min: [number, number, number],", " min: [number, number],")], TYPES_UNIT,
      ["content-schema.test.mjs > the generated types and the schemas name the same keys", "Shape form 0.min"]),
     ("C61", "control", "the clean canonical tool: its tests", [], CANON, []),
+    ("C62", "defect", "the tools write to a path as given while they check it normalised, so a write that climbs out through a link lands outside (the advisor tool's read of round 2)", [(TESTLINES_FILE, "export function writePlain(file, text, base = path.dirname(file)) {\n  file = path.resolve(file);\n", "export function writePlain(file, text, base = path.dirname(file)) {\n")], HAND,
+     ["a write that climbs out through a link: expected 'WRITTEN' to be 'OUTSIDE'"]),
 ]
 
 def note(name, kind, ok, what, detail):

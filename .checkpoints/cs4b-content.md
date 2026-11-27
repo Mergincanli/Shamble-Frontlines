@@ -1544,6 +1544,21 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   tests in its scratch copy. Fix (about 2 lines): the groups by name in the same test. (Its list names movement, jump,
   stamina and pushing; the table also has `aim_down_sights`, which the fix must name.) Its slip: one `git log` after
   other commands in one call, a read.
+- **Round 2, engine-architect: PASS, two Lows** (`cs4b-content/engine-architect-review-4b2-round2.md`, DONE). EA-1 to
+  EA-6 closed (EA-3's two sentences in the draft with their condition numbers; EA-6: the players' file holds no
+  "test-soldier" and no "Walking speed"), EA-7 and EA-8 deferred as agreed. **F1** the tie test checks keys, words
+  and five types' corner lengths, not Shape's corners, and no member's kind (three drifts planted in a scratch copy
+  of the generated types all passed): fold the corner check into a helper run on Shape's own members too, and say
+  member kinds are not compared (about 4 lines). **F2** the report's "tests of the wiring" says more than holds:
+  `boot.ts`'s two calls are read and type-checked, not tested (1 line, report only).
+- **Round 2, netcode-architect: PASS, no finding** (`cs4b-content/netcode-architect-review-4b2-round2.md`, DONE). NA-1
+  and NA-2 closed; RR-1 the same answer on every target (native, the test module under Node in both profiles,
+  Chromium in the local checks), no committed recording or ray line changed, condition 4 left with 4c;
+  rust-reviewer's two Lows are wrong answers identical on every target (IEEE-defined, the NaN only compared). Its
+  carry, with TE-4's per-class ray counts to 4c: RR-1's three new paths run natively only; one ray of each kind in
+  the committed ray classes. Ran: Node boundary `replay` and `static-world` 8 of 8, native collision 9 of 9, devtools
+  `static_world`, `recordings`, `two_instances`, `two_processes` all passed.
+- **Round 2: every reviewer PASS, Lows only; no third round.**
 - **Round 2's one fix pass, the plan so far** (made only after the last reviewer ends, since they read the tree; all
   Lows, about 30 lines against 103 left): (A) the ramp guard `is_finite` for `above` and `rate`, with
   rust-reviewer's two probes as assertions; (B) `RAY_REACH`'s doc: the cap is in t, metres for a unit direction;
@@ -1555,6 +1570,39 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   two `boot.ts` calls are read and type-checked, not tested. Follow-up, not fixed: L2-4 (`serve.test.mjs`, outside
   this diff, from 3a). Plants for each that a test can see (W16's anchor moves; new W17, C55 to C59; (C) cannot be seen while
   `MIN_SPAWNS` is 1, said so), then the local checks, the gate, the count, the code commit, the whole run, CI.
+  **Written at 21:42 to 21:44 UTC** (A to H in the source; I in the report's draft), rustfmt applied (the two probes
+  take 20 lines in its form); collision 9 of 9, the source scan 9 of 9, content 43, the tools' tests 12, canonical 4,
+  types 13 pass; **official count 8,406, raw 8,424** (59 lines for round 2's fix pass; 44 under the stop line); the
+  patch in the notes, `fixpass2-wip.patch`, pushed in 1704ce1. **Its plants by name, 21:45 to 21:46 UTC**
+  (`.gate/plants-r2.out`; anchors 115 edits of 112 plants, 0 wrong): **11 caught of 11, 2 held of 2**: W16 (its
+  anchor moved to the new guard), W17, C55 (on Playwright's own "Error: same-site"), C56, C57 (on "a path that climbs
+  out through a link: expected 'OUTSIDE' to be 'INSIDE'"), C58 (on "to include 'hornet'"), C60, controls C59 and C61,
+  and C38, C43, C47, C52 again; every file put back (32 files); the players' file rebuilt to its digest from before
+  the plants, now a624ff32b1cc... (the loader's spawns check is in it). The source diff after the plants is the
+  saved patch byte for byte. **The full local checks from 21:46 UTC: stopped at 21:47** for the advisor tool's read
+  (about 21:47 UTC): `writePlain`'s new `path.resolve` had no test and no plant (C57 plants `readPlain` only). Added:
+  one write through the same `lnk/..` path, and the file beside the link's target must stay as it was; plant
+  **C62** (the line out of `writePlain`) caught on "a write that climbs out through a link: expected 'WRITTEN' to
+  be 'OUTSIDE'", C57 caught again (21:49 UTC); anchors 116 edits of 113 plants, 0 wrong. **Official count 8,408, raw
+  8,426** (42 under the stop line). Its other points, each to do: the players' file's numbers re-measured on the
+  committed head (the spawns check ships, so rust-reviewer's "code section byte-identical" holds for 70f11e1 only);
+  security-auditor's two left risks to the advisor agent as a named question and into the report's Risks, with
+  "no reviewer read round 2's fix pass, whose one change to shipped code is `map.rs`"; the go-question file and the
+  PR text pushed in the last notes commit before the notes leave the head, and that commit named; nothing pushed
+  after the final head; every chat update at a step's end with its two closing sections. **The full local checks
+  again, 21:49 to 21:56 UTC: ALL LOCAL CHECKS PASSED** (236 Rust tests twice, 235 in release; client 153, sim-worker
+  53, types 13, net 1; boundary 39; 29 Chromium tests in 215 s; the recordings what their scripts make). **The
+  players' file:** 257,421 bytes, 95,441 instructions walked, sha256
+  a624ff32b1cca3b48712d85662fba01f2c21f3304c638d663369a228737400b6. **The gate: PASS with smoke**
+  (`.gate/gate-r2.log`). **The code commit: 914f3b4fc5298968b775c81f0fb15ca270a88040** (21:57:46 UTC, pushed): the 7
+  source files and the patch out of the notes; the source's status empty after it. **From 21:58 UTC: the plants'
+  whole run on 914f3b4** (`.gate/plants-whole-4.out`); CI's toolchain run on 914f3b4 read before the next push.
+  **The whole run on 914f3b4, 21:58 to 22:04 UTC** (`plants-4b2.txt`): **104 caught of 104, 19 held of 19**, every
+  file put back (32 files), the players' file rebuilt to its digest (a624ff32b1cc...), the clean tree green; the
+  source's status empty after it. **CI on 914f3b4: green**: gate and smoke (run 46073641654), the toolchain run
+  (46073641671) 21:58:02 to 22:06:50 UTC (8 min 48 s, under its 25-minute limit). **From 22:04 UTC:** the verifier (`verifier-brief-4b2.md`, its notes `verifier-4b2.md`) and
+  docs-keeper (`docs-keeper-brief-4b2.md`, its notes `docs-keeper-4b2.md`) side by side; the report's draft brought
+  to the final code before the verifier reads it.
 
 ## Slips of this chat's own rules, for the report
 - One git command did not start its own shell call: `git add .checkpoints/cs4b-content/review-brief-4b1.md` stood
@@ -1619,7 +1667,10 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   each git command starts its own call (the shell's folder is the worktree already). (15) The same for gh, all reads
   of CI's state: three calls of 21:28 UTC put a `date` before `gh api`, and a watcher started at 21:27 UTC called
   `gh api` in a loop every 45 seconds (its calls never started their own shell call). The watcher was stopped at
-  21:29 UTC; CI is read since then by plain `gh api` calls alone in their call. Told to him in the chat.
+  21:29 UTC; CI is read since then by plain `gh api` calls alone in their call. Told to him in the chat. (16) One
+  more, at 21:55 UTC: a `git log -1 -- .checkpoints/cs4-walk.md` after a `cd` in one call. A read. Told to him.
+  (17) And at 22:06 UTC a `git diff --stat -- docs` after a `cd` in one call. A read. Told to him; from then on every
+  git call is a bare `git` line (the shell stands in the worktree).
 
 ## HAND-OVER: where another session picks this up (written 2026-11-27, 00:44 Amsterdam; kept current)
 His words of 2026-11-27, 00:43 Amsterdam (2026-11-26, 23:43:38 UTC; `cs4-walk/mustafa-2026-11-27-save-every-25-
@@ -1781,8 +1832,14 @@ step 11 (46c192f): each with its full local checks, the gate and CI green (CI on
 its toolchain run read at the next step). **Official count 7,978 at step 11, raw 7,996, of 8,450.** In hand: **the
 close** (HAND-OVER item 5): the plants' whole run twice (done), review round 1 (done, six reviewers), its one fix
 pass (done: code commit **70f11e1**, 21:19 UTC; the full local checks, the gate, the plants' whole run 97 of 97 and
-17 of 17; official count 8,347), round 2 on what changed (running from 21:26 UTC); then the verifier, docs-keeper,
-the report, the notes out of the head, the advisor agent, his go.
+17 of 17; official count 8,347; CI green on its code), round 2 on what changed (done: five reviewers, every one PASS,
+Lows only), its one fix pass (written and planted, 12 of 12 caught and 2 of 2 held; official count 8,408; the full
+local checks running from 21:49 UTC; then the gate, the code commit, the whole run, CI); then the verifier and
+docs-keeper, the report, the last notes commit (the go-question file and the pull request's text), the notes out
+of the head, the advisor agent on that head, his go. **The notes out of the head** (`.claude/CHECKPOINTS.md` §9.3: a
+ready head holds no `.checkpoints/` file): both `.checkpoints/cs4-walk*` and `.checkpoints/cs4b-content*` leave it,
+as 4b-1's final head 2542b1a did ("the take-in's notes leave the head"; main holds no `.checkpoints/` file); `git
+ls-tree -r --name-only HEAD -- .checkpoints` must print nothing; 4c brings back from history what it needs.
 
 ## Next steps (the sheet's revision 3, section G; each step ends with the count of written lines)
 - **4b-1:** 1 the content crate's manifests · 2 the reader, the writer, the bundle, the two kinds, the old tuning's

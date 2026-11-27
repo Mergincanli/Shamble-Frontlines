@@ -1,4 +1,4 @@
-plants on 70f11e130ee9dc0aabbb61a01bb9d3a6c013418e
+plants on 914f3b4fc5298968b775c81f0fb15ca270a88040
 P1 CAUGHT (defect): a fused multiply-add exported from our own bindings: exit 1, found 3 of 3 wanted texts
 P2 CAUGHT (defect): the same through the vector library the collision library brings, reached from the simulation: exit 1, found 3 of 3 wanted texts
 P3 CAUGHT (defect): a relaxed-SIMD fused multiply-add instruction: exit 1, found 3 of 3 wanted texts
@@ -103,6 +103,15 @@ C51 HELD (control): the replay, isolation and content specs in Chromium on a cle
 C52 CAUGHT (defect): test-engineer's own case: two rows the second route does not read trade fields, and the movement table their values: the table's names catch it: exit 1, found 2 of 2 wanted texts
 C53 HELD (control): the same case passes the second route, which reads neither value: exit 0, found 0 of 0 wanted texts
 C54 HELD (control): the same case passes the hand-over's own check, which compares the swapped table with the swapped content: exit 0, found 1 of 1 wanted texts
+W17 CAUGHT (defect): the ramp's guard looks for a NaN only, so infinities make a crossing of NaN or of -0.0 (rust-reviewer's round 2): exit 101, found 1 of 1 wanted texts
+C55 CAUGHT (defect): the dev server refuses a cross-site ask only, not another server of this machine (security-auditor's round 2): exit 1, found 2 of 2 wanted texts
+C56 CAUGHT (defect): the canonical tool reads from the file's own folder, so a linked content folder goes unseen (security-auditor's round 2): exit 1, found 1 of 1 wanted texts
+C57 CAUGHT (defect): the tools open a path as given while they check it normalised, so a path that climbs out through a link is read (security-auditor's round 2): exit 1, found 1 of 1 wanted texts
+C58 CAUGHT (defect): a row re-pointed to another unit's entry of the same name, and the movement table given its value (test-engineer's TE-9): the groups catch it: exit 1, found 2 of 2 wanted texts
+C59 HELD (control): the same re-pointed row passes the hand-over's own check, which compares values: exit 0, found 1 of 1 wanted texts
+C60 CAUGHT (defect): a shape's corner in the generated type loses a number (engine-architect's round 2): exit 1, found 2 of 2 wanted texts
+C61 HELD (control): the clean canonical tool: its tests: exit 0, found 0 of 0 wanted texts
+C62 CAUGHT (defect): the tools write to a path as given while they check it normalised, so a write that climbs out through a link lands outside (the advisor tool's read of round 2): exit 1, found 1 of 1 wanted texts
 S1 HELD (control): a page built from the walked file, by the page's step alone: exit 0
 S2 CAUGHT (defect): no stamp: exit 1
 S3 CAUGHT (defect): a stale stamp (another file's): exit 1
@@ -113,7 +122,7 @@ N3 CAUGHT (defect): the native tests of sim built with -Ctarget-cpu=haswell: exi
 N4 CAUGHT (defect): the native tests of devtools built with -Ctarget-feature=+avx2: exit 101, found 1 of 1 wanted texts
 N6 CAUGHT (defect): a cargo config file committed beside the workspace: exit 101
 N5 HELD (control): the native tests of content built with no flag: exit 0
-DEFECT CHECKS: 97 caught, 0 not caught. CONTROLS: 17 held, 0 did not hold.
-EVERY FILE PUT BACK (sha256 of 30 files as at the start): yes
-THE PLAYERS' FILE REBUILT TO ITS SHA256 FROM BEFORE THE PLANTS (2e8866474b22...): yes
+DEFECT CHECKS: 104 caught, 0 not caught. CONTROLS: 19 held, 0 did not hold.
+EVERY FILE PUT BACK (sha256 of 32 files as at the start): yes
+THE PLAYERS' FILE REBUILT TO ITS SHA256 FROM BEFORE THE PLANTS (a624ff32b1cc...): yes
 CLEAN TREE GREEN: the players' build with its built-file check, the build checks' tests, the source scan: exits [0, 0, 0]

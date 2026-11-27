@@ -1,10 +1,11 @@
 # Brief for docs-keeper: change-set 4b-2's docs pass (after the reviews and the verifier)
 
-DRAFT until the verifier's PASS: the marks [after] are filled by the main session before you start.
+Written by Builder V6 (the main session), 2026-11-27, after review round 2 and its fix pass. The verifier reads the
+same tree at the same time: it edits nothing, and you edit only `docs/`; neither of you runs the plants script.
 
 **Where.** The git worktree `/home/user/Shamble-Frontlines/.gate/cs4b-2`, local branch `cs/4b-content` (pushed as
 `claude/ecstatic-wozniak-5cbdzs`). The code's final head: `git log -1 --format=%H -- crates packages content
-Cargo.toml Cargo.lock` names it ([after]). The change-set: `git diff b8f02b0149cc928964e54e194cd9c4d68f52bd94 HEAD --
+Cargo.toml Cargo.lock` names it (914f3b4fc5298968b775c81f0fb15ca270a88040). The change-set: `git diff b8f02b0149cc928964e54e194cd9c4d68f52bd94 HEAD --
 . ":(exclude).checkpoints"`. What it is: the card `.checkpoints/cs4b-content.md`, from "## 4b-2 (the second pull
 request)" to "## Slips", and the report's draft `.checkpoints/cs4b-content/report-draft-4b2.md`.
 
@@ -62,7 +63,13 @@ and which points of an enemy's body the line is tested against". Quote nothing e
   - the per-class minimum counts of the committed rays: 4c, with the casts' first caller (test-engineer, TE-4);
   - `static-world.spec.ts`'s wall-clock bound stays as a backstop; a follow-up only if it ever flakes
     (test-engineer, TE-6);
-  - [after: round 2's findings left open below High, if any.]
+  - from round 2: `packages/client/serve.test.mjs` still skips its two link tests under CI where a link cannot be
+    made (security-auditor; outside 4b-2's diff, from change-set 3a; about 1 line); RR-1's three new paths run
+    natively only: one committed ray of each kind (beyond the reach, a limit cut to it, a ramp that overflows) with
+    TE-4's per-class counts in 4c (netcode-architect); the types-to-schemas test compares keys, corner lengths and
+    words, not a member's kind (number, string or which word list): 4c's reader of the types (engine-architect);
+    `boot.ts`'s two calls of the page's tested handling are read and type-checked, not tested (engine-architect);
+  - [after: anything else the verifier or the advisor agent leaves open.]
 - STATUS's length: at most 120 lines (his STATUS-DIET); lane 1's own lines only; text moved to the archive by
   script, byte for byte. Other lanes' lines are not yours to reword: if STATUS is still over 120, say which and how
   many lines each would free.
