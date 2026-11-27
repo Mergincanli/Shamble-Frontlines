@@ -32,7 +32,7 @@ by option. Then DONE.
 - N6 (legacy aim, corrects my design 3.7): the old game casts with far = 400 m and falls back to the GROUND plane (y = 0), keeping the last ground point when the ray never crosses it (legacy/shamble-game.js:1120-1126, `raycaster.far=400`, `intersectPlane(groundPlane)`, `aimPoint.copy(aimGround)`); my design said 500 m and the plane at fire height. Plan section 10 already says "the cursor ray's first hit, else the ground". Facing turns only beyond 2 cm horizontally (:2708-2709).
 - N7 (bounds): the loader holds a map's bounds inside the aim's reach, on the centimetre grid (content/src/map.rs:9-14, :316-335; AIM_REACH_CM 32,767 both ways, AIM_HEIGHT_MAX_CM 65,535; Mustafa 2026-11-26 "until the aim codec widens, the loader refuses a playable map larger than its reach"). So the room's aim check is integer compares against the bounds in cm, and no loaded map can hold a far corner at 1 km: PM-0004-39 can only be a sim-level map built in code (map.rs:15-16 says such a map "is no playable map").
 - N8 (float scan reach): the rule scan reads `crates/sim/src` and `crates/content/src` only (sim/tests/rules_scan.rs:1-7, :472). Float arithmetic written in `client-endpoint` (the ground crossing, the clamp, the rounding to cm) would sit outside it, though it decides a replayed, hashed value. Finding for step 2: that arithmetic lives in `sim` (beside `cast_ray`), the endpoint only calls it.
-- N9 (replay refusals): the native runner refuses a recording whose move, ray or view words are non-zero (devtools/src/replay.rs:79-100); the TS reader likewise (packages/sim-worker/src/recording.ts:141-143); the replay calls `input` with six numbers (replay.rs:150, recording.ts:160, e2e/tests/replay/determinism.spec.ts:26-27, :84). The format (version 1, 68 bytes a step) already holds move, ray and view (recording.rs:1-11, :71-90): no format change in 4c.
+- N9 (replay refusals): the native runner refuses a recording whose move, ray or view words are non-zero (devtools/src/replay.rs:81-84 move, :85-91 aim, :92-98 view time; line numbers rechecked with grep -n); the TS reader likewise (packages/sim-worker/src/recording.ts:141-143); the replay calls `input` with six numbers (replay.rs:150, recording.ts:160, e2e/tests/replay/determinism.spec.ts:26-27, :84). The format (version 1, 68 bytes a step) already holds move, ray and view (recording.rs:1-11, :71-90): no format change in 4c.
 - N10 (frozen content): first-loop.content.json (8,375 B) holds maps/test-scene.json and movement/soldier.json at movement version 1 with 15 fields (content/src/movement.rs:13-35); the reader refuses unknown and missing keys and there is no default (4B-FIRST-DEFAULT). Any field the movement kind gains (NO-SOURCE (a) or (b)) makes the frozen first-loop content unloadable, so first-loop must be frozen anew (`make_recordings --freeze first-loop`) in the same commit.
 - N11 (manifests): room and client-endpoint depend on protocol and sim only (their Cargo.toml); sim on content and parry3d; sim-wasm on all five. 4B-WORLD-ROOM wants `content` kept out of room's and endpoint's manifests, so the bounds and the world reach them as sim types (`StaticWorld`), never as `MapDocument`. Their tests still need a world: either a dev-dependency on content (a manifest change, the dependency hold) or a world made through sim (which already depends on content). Engine-architect's call; step 2 needs it settled.
 - N12 (constructors to change): `Room::new(setup, content_hash)` (room/lib.rs:105; callers room/lib.rs:314, :655, room/tests/any_bytes.rs:117, local_match.rs:66); `Endpoint::new(content_hash, first_sequence, pad)` (endpoint.rs:117; callers endpoint.rs:400, :620, client-endpoint/tests/any_bytes.rs:131, local_match.rs:67); `LocalMatch::new(.., world)` (local_match.rs:58; callers sim-wasm lib.rs:122, local_match.rs:213, :399, :413, sim-wasm/tests/step_alloc.rs:86); `LocalMatch::static_world()` read at sim-wasm lib.rs:406.
@@ -44,7 +44,7 @@ by option. Then DONE.
 - N18 (pacer): the due time of the tick a wake runs is `#nextDueMs` before the step (pacing.ts:101-104); `afterTick(now)` gets only the start (:104), and the block message carries startAt and doneAt only (host.ts:184-194; messages.ts:56). The stamp is a pacer signature change, not new state.
 - N19 (blend allowance, corrects my design 3.6): with the allowance at the 90th percentile of lateness, about 10 % of ticks hold for a few ms; by my estimate (2 frames in 9.6 affected at 144 Hz, about 29 % error each) std/mean comes to about 5.8 %, over the mark. The allowance must sit at the top of the window (the largest of the last 64 arrivals, or the 99th percentile of the last 300), held within [0, P/2]. The test pins whichever is built.
 - N20 (two-block plants): with the render time t - P - d and only two blocks held, the needed pair is gone whenever the newest arrived early in its window (a window of d minus lateness each tick); the other two-block form (fraction paced from the newest's arrival) moves with every lateness difference. The test that must fail with two plants both forms, so it is not won against a straw man.
-- N21 (pause in the blend): after a rebase the due times of two consecutive ticks lie the hidden time apart. Blending by due time slides or jumps; taking each held block's time from its tick against the newest's due (time(k) = due(newest) - (tick(newest) - tick(k)) x P) holds the paused picture until the render time reaches the new tick and then blends one tick: no slide across the pause and no jump, which also removes the 0.2 to 0.44 m jump my design gave RESUME-FLASH (a).
+- N21 (SUPERSEDED by "N21 CORRECTED" below: its rule is the one rejected there as A) (pause in the blend): after a rebase the due times of two consecutive ticks lie the hidden time apart. Blending by due time slides or jumps; taking each held block's time from its tick against the newest's due (time(k) = due(newest) - (tick(newest) - tick(k)) x P) holds the paused picture until the render time reaches the new tick and then blends one tick: no slide across the pause and no jump, which also removes the 0.2 to 0.44 m jump my design gave RESUME-FLASH (a).
 - N22 (pins step 2 breaks): `sim-wasm.test.mjs:82, :97-98` (input calls of six), `:253` (the glue text "input(post, held, p0, p1, p2, p3)" reaching one export; the prototype list `:246` gains no name); `host.test.ts:28-31, :98-99, :292` (six numbers), `:303` (one input per tick stays); `step_alloc.rs:89-100` (a `Post` literal of three fields); `world.rs:301` (22 and 54, only if the record grows).
 - N23 (hide and the move): the host lets go of the keys at hide by `#held = 0` (host.ts:121-122). Once the post carries a move made from those keys, the host must zero the move there too, or the first tick after the return walks on with the old move until the page's first post.
 - N24 (record width): if the World's record (world.rs:115, the whole `PlayerCommand`) takes the new move and aim, `SHARED_STATE_BYTES` goes from 22 to 30 and every first-loop hash moves in step 2 (inputs unchanged); if the record stays buttons and presses (what the echo and the press base need) and the move and aim are consumed by the soldier, step 2 moves no hash.
@@ -85,10 +85,12 @@ and an aim outside the map; one jump per command (3B-ONE-PER-TICK).
   direction: V3 }`; `NONE` (`:28-32`) gains zeros and `None`.
 - REMOVE `post.rs:34-48` `from_words`; ADD `from_numbers(number, held, counts: [u32; 4], movement: u32, ray: [f32; 6])
   -> Self`, total (any 13 numbers): the move from the low 16 bits (x bits 0-7, y bits 8-15, as `i8`: the recording's
-  own packing, recording.rs:80-81), then `clamp_move`; the ray `None` unless all six numbers are finite (PM-0004-24's
+  own packing, recording.rs:81-82), then `clamp_move`; the ray `None` unless all six numbers are finite (PM-0004-24's
   "checked where it enters").
 - ADD `post.rs` `pub fn clamp_move(x: i8, y: i8) -> (i8, i8)`: integers only; while x^2 + y^2 > 127^2 the longer
-  component steps toward 0, so (-128, 0) becomes (-127, 0) and the eight keyboard directions at 0 yaw ((+-127, 0),
+  component steps toward 0, **and on a tie both step** (the page rounds to nearest, so a keyboard diagonal arrives as
+  (90, 90): 127 x 0.7071 = 89.8; 90^2 + 90^2 = 16,200 > 16,129, and both stepping gives (89, 89) with the direction
+  kept), so (-128, 0) becomes (-127, 0) and the eight keyboard directions at 0 yaw ((+-127, 0),
   (0, +-127), (+-89, +-89)) stay as they are. (My design had it; 3b did not build it: post.rs holds none.)
 - CHANGE `endpoint.rs:81-88`: `Sent` gains `aim: AimCm`, the aim cast when the command was built, so every repeat
   carries the aim it first carried. CHANGE `:90-110`: `Endpoint` gains `world: StaticWorld` (its own copy) and
@@ -117,8 +119,9 @@ and an aim outside the map; one jump per command (3B-ONE-PER-TICK).
   derives Clone, collision.rs:94): engine-architect's call.
 - CHANGE `local_match.rs:35-51, :58-84`: the `world` field leaves `LocalMatch` (to the room and the endpoint); REMOVE
   `static_world()` (`:96-100`), its one reader `sim-wasm lib.rs:406` reads the room's.
-- REMOVE `devtools/src/replay.rs:79-93` the two refusals "move: the input call does not take it yet" and "aim: ...";
-  KEEP `:94-100` (view time). CHANGE `:150` the input call: 13 numbers, the ray's floats from the recorded bits
+- REMOVE `devtools/src/replay.rs:81-91` the two refusals "move: the input call does not take it yet" (`:81-84`) and
+  "aim: ..." (`:85-91`); KEEP `:76-80` (the map) and `:92-98` (view time); CHANGE the refusal test `:312-350` (its move
+  and aim cases, `:337-341`, become recordings that replay). CHANGE `:150` the input call: 13 numbers, the ray's floats from the recorded bits
   (`f32::from_bits`).
 **TypeScript**
 - CHANGE `packages/sim-worker/src/messages.ts:25-42`: the input post gains `move` (one number: the packed word, at
@@ -142,7 +145,7 @@ and an aim outside the map; one jump per command (3B-ONE-PER-TICK).
 ### 1.2 Tests, each with its planted defect (bottom-up lines; Rust then TypeScript)
 | # | Where | What it holds | Planted defect that must turn it red |
 |---|---|---|---|
-| T2-1 | `post.rs` | `clamp_move` over all 65,536 pairs: result within 127, unchanged if inside, each part only toward 0, sign kept; the eight directions unchanged (25) | `<` for `<=` in the length test, so (127, 0) moves |
+| T2-1 | `post.rs` | `clamp_move` over all 65,536 pairs: result within 127, unchanged if inside, each part only toward 0, sign kept; the eight directions unchanged; the ties pinned: (90, 90) -> (89, 89), (-90, 90) -> (-89, 89) (25) | `<` for `<=` in the length test, so (127, 0) moves |
 | T2-2 | `post.rs` | `from_numbers` takes any numbers; a NaN, an infinity in any one of the six ray numbers gives no ray; spare move and held bits ignored (30) | the finite check on five of the six numbers |
 | T2-3 | `sim/src/aim.rs` | a ray onto the step's top gives its point in cm; one that misses gives the ground crossing; one to the sky, one parallel to the ground, keep the last; a hit at 401 m is no hit; a point beyond the bounds is clamped to the bound's cm; the rounding of a half centimetre pinned (70) | the fallback plane at fire height (my old design); the reach 500 m; no clamp |
 | T2-4 | `collision.rs` | `bounds_cm` exact at the reach's edges (+-32,767; 0 to 65,535); `holds_cm` on each face true, 1 cm past false; bounds off the grid refused by name (30) | the bounds narrowed through `f32` before the cm (an off-by-one at a face) |
@@ -254,8 +257,12 @@ stamped with the time its tick was due; the page blends between ticks; the Worke
   (today two, `:287-292`); `#takeBlock(buffer, startAt, doneAt, dueAt)`; it keeps a ring of (arrival - due) for the
   allowance.
 - ADD `packages/client/src/app/blend.ts` (lane 1): the render time r = frame time - P - d, with P = 1000 / tick rate
-  and d the allowance: **the largest (arrival - due) of the last 64 blocks, held within [0, P / 2]** (corrects my
-  design's 90th percentile: N19); the pair: the first held block whose stamped due lies after r, and the one before
+  and d the allowance: **it rises at once to the largest (arrival - due) of the last 64 blocks and falls gradually
+  (a slew of about 1 ms per second), held within [0, P / 2]; the estimator is pinned by B1** (corrects my design's
+  90th percentile, N19, and a fall at once: when the window's largest ages out, d would drop by up to 8 ms in one
+  frame, a forward step of more than one 144 Hz frame's motion every couple of seconds, which by the same arithmetic
+  sits near the 5 % mark, not clear of it; a rise is continuous, because it happens only when a block arrives later
+  than d, while the page holds the newest, and the new d puts the render time exactly at that held block); the pair: the first held block whose stamped due lies after r, and the one before
   it; **the fraction measured back from the newer block's own due: f = clamp(1 - (due(newer) - r) / P, 0, 1)** (N21's
   rule B: after a pause or a dropped gap it holds the paused tick and blends one period, never back, never a slide
   over the hidden time); no held block after r: the newest whole (never extrapolate). Placing (never sliding) a row
@@ -288,8 +295,10 @@ stamped with the time its tick was due; the page blends between ticks; the Worke
 ### 2.4 What changed since my design
 1. The row is engine-architect's 36 bytes plus the vertical velocity and `ready` (40), and there is no placement
    counter (the plan's choices 1, 6.2): my `placement` field and flag bit leave the snapshot and the block.
-2. The allowance moves from the 90th percentile of 64 to the largest of 64 (N19), and the fraction is measured back
-   from the newer block's due (N21 rule B), which removes the jump my design gave the first block after a pause.
+2. The allowance moves from the 90th percentile of 64 to a rule that rises at once to the largest of 64 and falls
+   gradually, its estimator pinned by B1 (N19; the 5 % figures are arithmetic, not measurements), and the fraction is
+   measured back from the newer block's due (N21 rule B), which removes the jump my design gave the first block
+   after a pause.
 3. The pool goes to 16 (3B-POOL-16's own number), not the 6 of my design.
 4. DEPART-4 (a) accepted three blocks and the due time on the message (N26): no question left there.
 5. `PictureFrame` is still two blocks and a time (picture.ts:24-30): its change is engine-architect's, lane 2's file.
@@ -354,7 +363,7 @@ bin/make_recordings.rs:4-6), so a value he tunes later never moves an old record
   (`:154`) from 1 entry to 3: `("walk", "test-scene", walk)`, `("lane-walk", "test-scene", lane_walk)`; each gets its
   `.vector.txt` at `VECTOR_TICK` 900 (`:157`). The rays are written as `f32` bits from points the script aims at
   (inputs, not simulation values, so the script's arithmetic is free).
-- CHANGE `devtools/src/replay.rs:181-205` `impl StateSink for Lines`: gains `f32` (hex bits and decimal) once step 1
+- CHANGE `devtools/src/replay.rs:181-201` `impl StateSink for Lines`: gains `f32` (hex bits and decimal) once step 1
   gives `StateSink` its float method (rust-reviewer's F12). ADD a finite read in the runner: after every step it
   visits the state and fails naming the tick and the field of the first value that is not finite (PM-0004-24's "read
   by the replay runner itself on the release builds"); `replay()` and the two-process children report it.
@@ -456,7 +465,7 @@ Plan rows: 6b "130 / 110" (the paced replay in the real Worker, development buil
 |---|---|---|---|
 | R1 | `replay-host.test.ts` (a stand-in `Sim` whose hash depends on the ray, a made-up clock) | the recorded numbers reach `input`, the recorded host time reaches `step` whatever the clock says, posts ignored and counted, the first differing step named (40) | the replay taking the newest post's (live) ray |
 | R2 | `messages.test.ts` | `replay` taken in development, refused in production; `replay-done`'s shape (10) | the production guard taking `replay` |
-| R3 | `packages/e2e/tests/replay/paced.spec.ts` (Chromium only: it draws the page, which CI's Firefox cannot, FF-DRAW) | a 300-tick slice of `lane-walk` at live pace, three times: the camera still; the camera orbiting by script; frames thinned to about 30 a second: each equal to its file, ignored posts above 0 (60) | R1's plant (the orbiting run differs). Control: a draw from the page's own generator changes nothing |
+| R3 | `packages/e2e/tests/paced/paced.spec.ts`, a folder of its own: the firefox project takes `replay/**/*.spec.ts` (playwright.config.ts:40), and CI's Firefox cannot draw the page (FF-DRAW); the plan's 6b row names `packages/e2e/tests/replay/`, which the sheet corrects (or names the config change) | a 300-tick slice of `lane-walk` at live pace, three times: the camera still; the camera orbiting by script; frames thinned to about 30 a second: each equal to its file, ignored posts above 0 (60) | R1's plant (the orbiting run differs). Control: a draw from the page's own generator changes nothing |
 | R4 | `build-checks` tests | the replay's marker in the production build is refused (5) | the marker left off the list |
 **Count:** code 130 (the replay host 60, messages 15, worker 10, the button and its fetch 35, the marker and the adapter
 10) / tests 115: **245 against the plan's 240.**
@@ -610,7 +619,8 @@ Facts only; the advisor agent rules on any reorder.
 8. CI: 6b's paced replay needs the CI Builder's answer to 4B-CHROMIUM-TIME first (N15); the 2,000,000-command runs go
    in the release line, which has room (N16).
 9. Corrections to my own design of 2026-11-25, all applied above: the aim falls back to the ground plane at 400 m (N6);
-   the blend's allowance is the largest of 64, not the 90th percentile (N19); the fraction is measured back from the
+   the blend's allowance rises at once to the largest of 64 and falls gradually, not the 90th percentile, the
+   estimator pinned by B1 (N19); the fraction is measured back from the
    newer block's due (N21, rule B); the pool is 16; there is no placement counter; first-loop moves with step 1.
 
 ## Counts, one line per block (bottom-up, unmultiplied; plus or minus 30 %)

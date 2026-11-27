@@ -10,7 +10,7 @@
   `/home/user/Shamble-Frontlines` is never switched.
 - **Base:** origin/main dae6d107fdbe942567104bcf1c9a2cbc6b3a1e0f (pull request #79's merge commit), taken in by
   fast-forward from b7145273.
-- **Last update:** 2026-11-28 00:27 Amsterdam (from the clock)
+- **Last update:** 2026-11-28 01:08 Amsterdam (from the clock)
 
 ## Steps done
 1. **4b-2 merged and main taken in** (2026-11-27). Pull request #79 merged by merge commit dae6d107 at 23:12:04 UTC,
@@ -88,9 +88,14 @@ The plan sheet: three reads run (see "Running work"); the main session writes th
 - **Next:** this card's "Next steps", in that order.
 
 ## Running work
-- Since 00:27 Amsterdam, three design reads against main dae6d107 (at most three agents at a time), each writing
-  only its own file in `.checkpoints/cs4c-soldier/`: engine-architect (`engine-architect-read.md`: the scene step
-  first, then SIZE-4C's seam, then steps 3 to 5's page parts and 4B-WORLD-ROOM), netcode-architect
-  (`netcode-architect-read.md`: steps 2, 3, 6, 6b, 6c, RESUME-FLASH by option, the order if his answers come late),
-  rust-reviewer (`rust-reviewer-read.md`: step 1's pieces, 4B-RAY-COUNTS, what MOVE-RULES and NO-SOURCE change).
-  The main session commits their files with the notes at each save.
+- Design reads against main dae6d107 (at most three agents at a time), each writing only its own file in
+  `.checkpoints/cs4c-soldier/`; the main session commits their files with the notes at each save:
+  - engine-architect (`engine-architect-read.md`): blocks 1 (the scene, folded into the sheet's section D), 2
+    (SIZE-4C's seam) and 3 (steps 3 to 5) done; block 4 (4B-WORLD-ROOM) running.
+  - netcode-architect (`netcode-architect-read.md`): steps 2, 3, 6, 6b, 6c, RESUME-FLASH by option, the order if his
+    answers come late: running.
+  - rust-reviewer (`rust-reviewer-read.md`): DONE (folded into the sheet's E1: BODY-SHAPE, SWEEP-ROUTE, libm's
+    dependency hold, the pins re-made in step 1).
+  - game-designer (`game-designer-read.md`, since about 01:05 Amsterdam): the sandbox's own step rule, BODY-SHAPE's
+    options for him, the push's formulas and four limits, GROUND and the slope's unit: running.
+- The scene's before picture: `.gate/scene-before-4c.png` (main's page, 3 draw calls), by `shot-4c.mjs`.
