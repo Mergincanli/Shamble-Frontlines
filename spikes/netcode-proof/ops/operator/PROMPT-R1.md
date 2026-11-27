@@ -126,7 +126,8 @@ Every laptop reading is rough, not judged; R8 judges the seven marks once he nam
    `| Out-File -Encoding utf8 <results>\r1\s14-redact.txt` (not `>`, which writes UTF-16), its last line in step 4's
    summary. Unless its saved last line reads `… checked, 0 finding(s)`, no push (an empty file included): stop and tell him.
    Just before the push, in PowerShell, `git -C <results> rev-parse --git-path hooks` must print the clone's own hooks folder, the one
-   holding pre-push; anything else: stop and tell him. Then push to `claude/npt-results` after the pre-push hook passes (a prompt).
+   holding pre-push; anything else: stop and tell him.
+   Then, in the same PowerShell, push to `claude/npt-results` after the pre-push hook passes (a prompt).
 3. Tell him to delete LG first, then RS, each before its delete-by, first checking that no kept Primary IP shows the
    bin icon. Delete Brave's link file from the USB stick, and `.gate\npt-run-links\` on the laptop.
 4. A three-line summary for him: what ran, what was INVALID or stopped, what goes to the advisor.

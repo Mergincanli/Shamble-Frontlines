@@ -445,7 +445,7 @@ test("2.9 SEC-SB-5: a differing or empty expected dist makes host and browsers r
     assert.equal(readFileSync(join(bring, "DIST-DIFFERS"), "utf8"), "./npt_client_wasm_bg.wasm\n", "the differing file named");
     assert.equal(run(served.replace("b".repeat(64), "c".repeat(64)), `touch "${bring}/DIST-ACCEPTED"\n`), "SERVED", "his word");
     assert.match(run(`${served}${"d".repeat(64)}  ./extra.js\n`), /differs/, "a file missing on RS");
-    assert.match(run(text("runs/r1-dist.sha256")), /differs/, "the committed list, unfilled, is empty: refused");
+    assert.match(run(text("runs/r1-dist.sha256").replace(/^(?!#).*\n/gm, "")), /differs/, "the comment alone: refused");
     assert.match(readFileSync(join(bring, "DIST-DIFFERS"), "utf8"), /the expected list is empty/);
   });
   assert.ok(fn("bringup").indexOf('dist_check "$d"') < fn("bringup").indexOf('touch "$d/done"'), "bring-up still ends done");

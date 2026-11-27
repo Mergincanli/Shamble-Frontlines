@@ -203,7 +203,7 @@ test("item 9: a leg's .jsonl is one npt-log log: Header's fields exactly, the pa
   const none = config.legHeader(RUN, LEG, { version: "v" }, machine);
   assert.deepEqual([none.machine.clock_res_ns, none.params.records_dropped_count], [0, null]);
   // Y from rs.yaml's commit line, filled at Stop B; the zeros refused.
-  const rs = text("cloud-init/rs.yaml");
+  const rs = text("cloud-init/rs.yaml").replace(/ {6}[0-9a-f]{40}\n/, `      ${"0".repeat(40)}\n`);
   assert.throws(() => config.codeCommit(rs), /not filled/);
   assert.equal(config.codeCommit(rs.replace(/ {6}0{40}\n/, `      ${"ab".repeat(20)}\n`)), "ab".repeat(20));
   // read() returns the clock step and the dropped count; save() writes legLog with the time limit's end.
