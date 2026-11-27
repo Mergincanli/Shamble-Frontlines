@@ -306,6 +306,11 @@ main (gate run 934 with smoke, toolchain run 232).
 ## Recent work
 *(Newest first, a few lines each. Older items fold into "Build history" above.)*
 
+**CI-TIME [2026-11-27, reviewed]** — #78, by the chat he calls CI Builder: the `toolchain` job's time limit 15 to 25
+minutes (`.github/workflows/toolchain.yml:38`, his exact text approved in advance; nothing else; the 5-minute browser
+stops stay), since Builder V4's newest head took 13 minutes. The advisor agent, security-auditor and infra-engineer
+approved; it merges on his go. Report: `docs/reports/2026-11-27-ci-time.md`.
+
 **Change-set 4b-1 of the build plan, Content [2026-11-26, reviewed]** — cs4b-content, the first of 4b's two pull
 requests (his SIZE-4B (b)), by lane 1, the chat he calls Builder V4: the content crate with no dependency (one reader
 for a cut grammar of JSON that refuses everything else, the canonical writer, the bundle with the movement and map
