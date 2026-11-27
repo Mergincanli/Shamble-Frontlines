@@ -1,5 +1,5 @@
 # The 15:50 UTC window, 2026-11-27: the messages (written 11:2x UTC; sent only inside the window)
-**Status: WRITTEN, NOT SENT.** PULLED FORWARD by his message of 13:55 UTC (history.md:8163-8186: LEAN-MODE item 3
+**Status: SENT 14:09 UTC (D, B and NB, three at once).** PULLED FORWARD by his message of 13:55 UTC (history.md:8163-8186: LEAN-MODE item 3
 ended, so the 16:20 limit below no longer binds). At step 0 (13:5x) main read b8f02b0 (#78 ci-time, CI and docs), not
 b9aad01: by the advisor tool's ruling (14:0x) D, B and NB go anyway (D's target is pinned, B and NB only read, and
 main's advisor.md is not among #78's paths); this file's "else MAIN-52 first, nothing below" was my own step-0 rule,
@@ -34,7 +34,7 @@ The target is pinned (the advisor tool, 11:1x): PROMPT-R1.md is one of U8-F1's s
 lane commit (the operator rewordings, choice 31) can make git refuse the fast-forward.
 
 ## D: U8-F1's builder a7fe1b9f436f36bb1 (resumed; its worktree .claude/worktrees/agent-a7fe1b9f436f36bb1, detached at 77ffc95)
-Not sent. Only after the three checks above hold, and only before 16:20.
+Sent 14:09 UTC (resumed: "Resuming agent a7fe1b9"), after the three checks above held (14:0x).
 Pulled forward from the 15:50 window (Mustafa's message of 13:55 UTC), U8-F1's builder D: bring your worktree onto the lane commit 28ea74e by three git commands, after
 three reads; write no file (the advisor's rulings: advisor-u8-f1-head.md block 4, advisor-u7-ff.md block 1).
 Three commands in your own worktree, each its own call, in this order. Paste each command's full output in your reply.
@@ -65,7 +65,7 @@ authored (advisor-u7-ff.md:26-30), holds, so D's record says "main's kit files a
 three checks above re-run 14:0x, all as at 11:1x.
 
 ## B: a3de649cd25e474df (resumed; it ruled the rewordings in advisor-u8-f1-head.md block 3): their head read
-Not sent. With D, before 16:20.
+Sent 14:09 UTC with D (resumed: "Resuming agent a3de649"); its message opens with one added line naming the read and the pull-forward.
 Read the pushed rewordings as the advisor (main's .claude/agents/advisor.md, by `git show
 origin/main:.claude/agents/advisor.md`; read only, no cargo, no git write): commit
 d8b57b82d08ffafbec4d1b3c0c556d0fefeda5da, the three net-zero rewordings your block 3 (c) ruled
@@ -93,7 +93,7 @@ substitution or wildcard in the name of a file that is written, moved, copied or
 tools for it."
 
 ## NB: a10848a10f73ed39e (resumed; it wrote advisor-nb2-merge.md's NB2-C1 to -C12): the check of NB2-ONEWAY's merge plan
-Not sent. With D and B (3 at once), before 16:20.
+Sent 14:09 UTC with D and B, 3 at once (resumed: "Resuming agent a10848a"); its message opens with one added line naming the check and the pull-forward, and cites history.md:8163-8186.
 As the advisor (main's .claude/agents/advisor.md, by `git show origin/main:.claude/agents/advisor.md`; read only, no
 cargo, no git write), check .checkpoints/netcode-proof-test/nb2b-merge-plan.md: the plan for Mustafa's word of
 2026-11-27 12:25 UTC (history.md:8133-8151, word for word there) to merge Builder 2's one-way delay work at tip
