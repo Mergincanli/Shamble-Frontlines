@@ -213,6 +213,13 @@ PLANTS = [
     ("C6", "control", "the clean content: the content folder's tests", [], FILES, []),
     ("C7", "control", "the clean content: the static world's tests", [], PROOF, []),
     ("C8", "control", "the clean content: the hand-over's tests", [], HAND, []),
+    # Step 9, cut A (Builder V6): the page carries the content bundle.
+    ("C9", "defect", "the build writes no content bundle into the page", [(BUILD, "  writeContentBundle(outDir);\n", "")], PAGE,
+     ["the built page is refused", "content.json: the page holds no content bundle"]),
+    ("C10", "defect", "the page's bundle cap is one byte above the loader's", [(CHECKS, "export const MAX_CONTENT_BYTES = 8 * 1024 * 1024;", "export const MAX_CONTENT_BYTES = 8 * 1024 * 1024 + 1;")], UNIT,
+     ["the bundle's cap is the game's loader's own, read from its source"]),
+    ("C11", "defect", "the check takes a content.json anywhere in the page's folder", [(CHECKS, "  const bundle = files.find(({ name }) => name === CONTENT_FILE);", "  const bundle = files.find(({ name }) => name.endsWith(CONTENT_FILE));")], UNIT,
+     ["a page folder without content.json beside index.html, or with one larger than the loader takes, is refused"]),
 ]
 
 def note(name, kind, ok, what, detail):

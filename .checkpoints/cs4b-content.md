@@ -15,7 +15,7 @@
   `claude/cool-pasteur-oiqk1r` ends at 7f5ba3966def8c36e2c3863c6b2fda7b4b9a9169 and is never pushed to again (his
   Lanes rule: one account per branch) · **Base:** 4b-1's origin/main 2483e9a741c4e552323c36523831a2f35de4002e (the
   merge of 4a, pull request #70); 4b-2 counts against b9aad01954be666340a7ec5c6e9fc9353b11abf1 (the merge of 4b-1)
-- **Last update:** 2026-11-27 15:51 Amsterdam (from the clock)
+- **Last update:** 2026-11-27 16:04 Amsterdam (from the clock)
 
 ## Sizes and stop lines (his answer of 2026-11-26, 14:09:13 UTC: SIZE-4B (b); which number is which)
 - **4b is two pull requests**, in engine-architect's cut; "each stands on its own: lines left over in 4b-1 do not
@@ -1092,6 +1092,28 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
     C4**: what the second route is for); the last lane post a millimetre taller (the committed tree, C5); the
     three clean runs (C6 to C8). Every planted number is read from its file and changed by script. The names
     were first S1 to S8, which the stamp plants already use; renamed before any record of them was kept.
+- **CI on step 8's head 5cef19f: green** (gate run 46019544265; toolchain run 46019544144, 14:50:37 to 15:03:06
+  UTC by the run's own times: 12 min 29 s of its 25).
+- **Step 9, cut A: the page carries the content bundle: DONE** (commit
+  **ccde0d48c93f5cf3d42cdecab9daf46bec949d30**, pushed 2026-11-27 about 15:04 UTC, after CI on 5cef19f was read
+  green; the gate passes with smoke; the full local checks passed whole, 14:56:38 to 15:03:16 UTC: 222 Rust tests
+  twice, 221 in release, client 139, sim-worker 51, types 8, net 1, 36 boundary tests, 19 browser tests in 198 s,
+  the recordings unchanged, the players' file unchanged; `content.json` 8,375 bytes in both pages;
+  `cs4b-content/step9-order.md`, revision 2; **5,200 written lines of 4b-2**: the cut took 71). `build-checks.mjs`:
+  `CONTENT_FILE` ("content.json"), `MAX_CONTENT_BYTES` (8 MiB, the loader's own `MAX_BUNDLE_BYTES`) and
+  `contentProblems(files)` (a page folder without `content.json` beside `index.html`, or with one larger than the
+  loader takes, is refused); `build.mjs`: `buildPage` runs `content_bundle` into the page's folder after Vite has
+  built it (`writeContentBundle`: its own cargo call with the build's settings refusals and its own target folder,
+  `.gate/target-content`), then holds the folder to `contentProblems` with the other page checks.
+  `build-checks.test.mjs` +2 (the refusals at 0, at the cap and one byte above, and in a subfolder; **the cap
+  read from the loader's own source line and held equal**). The production page: "2 content files, a bundle of
+  8375 bytes, sha256 b9901bc9...7fd3: written to .../dist-production/content.json"; the page's table lists
+  `content.json` 8,375 bytes. Plants C9 to C11 in `plants-4b2.py`, run by hand with P19: the build writing no
+  bundle (the page refused by name), the cap a byte above the loader's (its tie test by name), a bundle taken
+  from a subfolder (its test by name): 3 caught, the clean production page built (P19 held), every file put
+  back. Main 2483e9a's recording files copied out by `git show` into `.gate/cs4b/main-recordings/` for cut B,
+  before any tool writes: each equal to the branch's (sha256 1c05e6b8... rec, 6ac4b9cc... hashes, b766f0c1...
+  vector, 48f07158... manifest).
 
 ## Slips of this chat's own rules, for the report
 - One git command did not start its own shell call: `git add .checkpoints/cs4b-content/review-brief-4b1.md` stood
@@ -1255,9 +1277,9 @@ in two lines.
 4b-2 (2026-11-27, 15:14 Amsterdam, from the clock; Builder V6): every piece of steps 6 to 10 that needs no content
 file is built and pushed (head of the code: 5c6738a; 4,956 written lines of 8,450). DIFF-LIST is answered (a).
 The HAND-OVER list's items 0 and 1 are done (35e96ad: main in; 5cef19f: step 8's second part; 5,129 written lines).
-In hand (15:51 Amsterdam): its item 2, step 9, in the three cuts of `cs4b-content/step9-order.md`, from cut A (the
-build writes `content.json`). CI on 5cef19f is read before the next code push (a code push cancels a toolchain
-run in progress).
+Step 9's cut A is done (ccde0d4). In hand (16:04 Amsterdam, from the clock): cut B of `cs4b-content/step9-order.md` (the
+recording's frozen content, with the constructor untouched). CI on ccde0d4 is read before the next code push (a
+code push cancels a toolchain run in progress).
 
 ## Next steps (the sheet's revision 3, section G; each step ends with the count of written lines)
 - **4b-1:** 1 the content crate's manifests · 2 the reader, the writer, the bundle, the two kinds, the old tuning's

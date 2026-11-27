@@ -14,7 +14,13 @@ browser tests until the page sends it; a replay needs the frozen bundle first): 
 refuses a page folder without `content.json`, or with one over 8 MiB, with its tests and plants. Nothing reads the
 file yet. Before it: every way the specs serve the page is listed (the built folder, Vite's development and preview
 servers, the page opened as a file): each must serve `content.json`, or its spec must say what the page shows without
-it (the page reads it only from cut C on).
+it (the page reads it only from cut C on). **Listed (2026-11-27, at cut A):** (1) Playwright's web server, `node
+serve.mjs` in the built development folder (`playwright.config.ts:51`): it holds `content.json` from cut A on; (2)
+Vite's preview server on the built folder (`isolation.spec.ts:32`): the same; (3) **Vite's development server on the
+sources** (`isolation.spec.ts:31`): no `content.json` there, so cut C must make it served there (engine-architect's
+block 1.9 plans a serve-only plugin for that, CD-7) or the spec must say what the page shows without it; (4) the
+page opened as a file (`file-url.spec.ts:12`): it "either runs or says how to serve it", and a fetch from a file
+address must end in that notice, never a broken page. Each is settled in cut C before its commit.
 
 **Cut B, the recording's content, with the constructor untouched.** First the `git show` copies of main 2483e9a's
 recording files, taken before any tool writes (`.gate/cs4b/main-recordings/`). Then
