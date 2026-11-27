@@ -1,0 +1,8 @@
+FOR THE GUARD FIX CHAT. From Mustafa, 27 November, 14:45 Amsterdam (written with my Advisor).
+
+1. ADDITIONS-OK: (a), take all nine. Tell me in two lines, without waiting for a reply: does item 8 change how the PR Advisor routine merges, or how a chat that has no GitHub connector gets a merge done? My second personal account's builder may be such a chat; today my Advisor's thread merges for it on my tap.
+2. SIZE-LINE: (a), go on past the stop line. No split.
+3. USAGE: this account's Opus stands at about 3 percent until Tuesday 1 December, 20:00, and I want you to use it. So save and push after every kit edit, and keep the card exact about which edits are in and which are not. A cut in the middle must lose nothing, and nobody may mistake a half-applied change for a finished one. If the usage ends, you continue on Tuesday from the card.
+4. Tell me when you are at the point where the edits start. I then switch this chat to Accept edits.
+5. FEWER-ASKS, a new item for your next change-set (the guard change-set). No work on it now. The guard asks me for every shell write whose file name holds a variable, a substitution or a wildcard, also when the file is plainly a scratch file. I want fewer of these prompts without weakening the ask for kit and gate files. In that change-set's plan, with the security-auditor: what the guard can safely read itself (for example a shortcut that is set to a full path earlier in the same command), what stays an ask, and the tests for both. My standing rule to the chats (files spelled out in full) stays until then.
+6. Rules unchanged: git and gh always start their own command, with no other program in front of them. In a shell command, spell out every file you write with its full path.

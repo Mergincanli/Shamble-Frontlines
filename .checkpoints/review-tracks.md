@@ -146,6 +146,13 @@
     ADDITIONS-OK and SIZE-LINE, recommended (a) both, with SA-PA-5, the connector fix and the binary floor as
     information, and my slip (a gap of a class still open on main named in checkpoint c6f530a; reworded in cdf1624).
 
+29. His answers, 2026-11-27 14:45 Amsterdam (saved: mustafa-2026-11-27-additions-size-usage.md): ADDITIONS-OK (a), all
+    nine; SIZE-LINE (a), go on, no split; USAGE: save and push after every kit edit, the card exact about which edits
+    are in; he switches the chat to Accept edits when told the edits start; FEWER-ASKS queued for the guard
+    change-set (no work now). Answered his item-1 question in chat (no change for the PR Advisor routine or for a chat
+    with no GitHub connector). Main moved to b8f02b01 (#78; kit files unchanged, DECISIONS +54): take it in before
+    docs-keeper writes DECISIONS.
+
 ## Current step
 Narrow re-checks of the second fix pass (advisor agent: track hunks, guard SA-RC-5/6, the advisor.md line-end gloss;
 security-auditor: its SA-RC fixes). In parallel, his answers: ADDITIONS-OK, SIZE-LINE (past the stop line); SA-PA-5,
@@ -156,6 +163,8 @@ SA-RC-5 and the binary-file floor as information. Then the applies (about 12 ask
 2. Applies, cmp, suites, gate, one commit; build-review round; verifier; docs-keeper; report; PR; head review; his go.
 
 ## Decisions taken
+- ADDITIONS-OK (a) and SIZE-LINE (a) · Mustafa · 2026-11-27 14:45 Amsterdam
+- FEWER-ASKS: an item for the guard change-set's plan (with security-auditor) · Mustafa · 2026-11-27 14:45 Amsterdam
 - SPEED-ORDER (b): review tracks before the guard change-set · Mustafa · 2026-11-26
 - SOURCE-GO (a) rides with the review tracks · Mustafa · 2026-11-26 15:05
 
