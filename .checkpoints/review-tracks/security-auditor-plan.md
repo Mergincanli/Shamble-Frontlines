@@ -137,3 +137,13 @@ returns no decision on main and on the copy (pre-existing, not widened; the hunk
 merge check; suite 1580/1581 (only the mutation runner's text anchor for the changed line fails, expected).
 Class: standard merge names closable here; other merge-capable tool names stay for Mustafa as on main.
 SA-RC-9 hunk (build copy, 2026-11-27): APPROVE; closed for standard merge names (merge/auto-merge by last part, exact mcp__github__); RC3-L1 fold checked (comment-edit read on any connector, fail-closed on a non-GitHub tool, no widening); remainder class for Mustafa unchanged; probes sa-recheck9, sa-recheck11.
+
+## Build review of the applied state (real folder, 2026-11-27)
+cmp: 7 kit files, CLAUDE.md, DECISIONS equal the build copy; whole build tree equal. track.mjs build edit after my
+last approval: comment re-wrap only (diffed against rt3). Suites: guard 1581, track 85, settings 127. Probes 7/8/9/11 on
+the real files: same as on the copy. New probes: sa-a2.mjs, sa-a34.mjs (scratchpad).
+- A1: Critical by class, FORGED-PASS (SA-PA-5 / INPUT-RUN class); no new defect; not explicitly accepted by him: for Mustafa.
+- A2: Medium, REPO-PIN; integer part Low. Follow-up.
+- A3: Critical by class, shell-route forms (same residual as A1): for Mustafa.
+- A4: Low, UNSCANNED-VERBS. Follow-up.
+Verdict: APPROVE of the applied state as built; the FORGED-PASS residual goes to Mustafa.

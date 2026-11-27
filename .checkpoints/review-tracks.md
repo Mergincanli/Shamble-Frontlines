@@ -200,6 +200,13 @@ and gh() (7) after the definitions it uses (6); each state in between parses and
     checkpoint 33/33, kept-logs 9 pass (10 tests), track 85/85; gate PASS (--no-smoke; CI runs smoke). The repository
     map lacks the two new script files (docs-keeper).
 
+35. Build review, security part: APPROVE of the applied state (cmp: all files equal the copy; suites and its probes on
+    the real files). Ratings of the automated findings: A1 and A3 together FORGED-PASS (SA-PA-5 / INPUT-RUN class;
+    shell-route forms), Critical by class, a decision for him (FORGED-PASS: accept now with his Advisor's comparison
+    as the catch, or keep every merge on a prompt until R4-1's change-set); A2 REPO-PIN Medium (STATUS follow-up, or
+    folded into a fix pass); A4 UNSCANNED-VERBS Low (follow-up). Noted: MERGE-PROMPT (d) is not yet in DECISIONS
+    (docs-keeper records it); his saved (d) answer is one byte because his message was the single letter.
+
 ## Current step
 Narrow re-checks of the second fix pass (advisor agent: track hunks, guard SA-RC-5/6, the advisor.md line-end gloss;
 security-auditor: its SA-RC fixes). In parallel, his answers: ADDITIONS-OK, SIZE-LINE (past the stop line); SA-PA-5,
