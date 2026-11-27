@@ -1,0 +1,668 @@
+{
+ "when": "2026-11-26T10:48:42.800Z",
+ "commit": "80b67487caf2bd588f38a965c615daa11edeecfe",
+ "room": "27",
+ "server": {
+  "path": "/home/user/Shamble-Frontlines/.claude/worktrees/agent-a9873cdba07a3219e/.gate/u7/t5ii-bin/npt-server",
+  "sha256": "0db5ca7c0537ddf527c69f1107cd6d7179acbc02e33056e87f2fc4d6bbf95676"
+ },
+ "host": {
+  "path": "/home/user/Shamble-Frontlines/.claude/worktrees/agent-a9873cdba07a3219e/.gate/u7/t5ii-bin/npt-host",
+  "sha256": "5c7c7201c2d342e598f73f923aead25571a9b43f1826db4873b813847ccb561b"
+ },
+ "dist": {
+  "index.html": "46febaacfc3b2fa43a3b342c39293f0f25ca861efa98cc2f4267cca475f35f95",
+  "main.js": "c9be4a1666f9f1086999f46ed0dc38ccd702450bb3f975c7c1cf33685e41ccec",
+  "worker.js": "4f060d1851c530f86767efdcf5f3fee68e0e702ef393fcf5fede3e653ae71857",
+  "lib.js": "4f374eafe567444bf53c802cb94b2e104fe9b7743e0fbc26c6387c073fdc4bbe",
+  "hooks.js": "be1c4ce736532704c8c1c9dd042b4fd0273d6b90eee4651158c33a00f83cf814",
+  "npt_client_wasm.js": "b355d85ca53dd9534b460d3e5c3b180296a740ecd4043741d070a058be103965",
+  "npt_client_wasm_bg.wasm": "901a649231dc9c217204b121a2800641c3c6aa9cd3cb9d42eb5657452b0a0e77"
+ },
+ "bites_dist": {
+  "index.html": "46febaacfc3b2fa43a3b342c39293f0f25ca861efa98cc2f4267cca475f35f95",
+  "main.js": "c9be4a1666f9f1086999f46ed0dc38ccd702450bb3f975c7c1cf33685e41ccec",
+  "worker.js": "4f060d1851c530f86767efdcf5f3fee68e0e702ef393fcf5fede3e653ae71857",
+  "lib.js": "4f374eafe567444bf53c802cb94b2e104fe9b7743e0fbc26c6387c073fdc4bbe",
+  "hooks.js": "cd7be6c0a3696dbe1759a6da221a577f2a68e5aafb160e09db83570b44332972",
+  "npt_client_wasm.js": "b355d85ca53dd9534b460d3e5c3b180296a740ecd4043741d070a058be103965",
+  "npt_client_wasm_bg.wasm": "901a649231dc9c217204b121a2800641c3c6aa9cd3cb9d42eb5657452b0a0e77"
+ },
+ "dist_log": {
+  "path": "/home/user/Shamble-Frontlines/.gate/u7/rs/final-dist.log",
+  "sha256": "15ceb7bd21e3fa9fde7eec0afa0851d739414f3aac06bc87788a987ac3dd2fc5"
+ },
+ "bites_log": {
+  "path": "/home/user/Shamble-Frontlines/.gate/u7/rs/final-dist.log",
+  "sha256": "15ceb7bd21e3fa9fde7eec0afa0851d739414f3aac06bc87788a987ac3dd2fc5"
+ },
+ "browser": {
+  "path": "/opt/pw-browsers/chromium-1243/chrome-linux64/chrome",
+  "version": "153.0.8010.12",
+  "headless": true
+ },
+ "playwright_core": "1.56.1",
+ "command": "node web/e2e/t5ii.mjs --server /home/user/Shamble-Frontlines/.claude/worktrees/agent-a9873cdba07a3219e/.gate/u7/t5ii-bin/npt-server --server-sha256 0db5ca7c0537ddf527c69f1107cd6d7179acbc02e33056e87f2fc4d6bbf95676 --host /home/user/Shamble-Frontlines/.claude/worktrees/agent-a9873cdba07a3219e/.gate/u7/t5ii-bin/npt-host --host-sha256 5c7c7201c2d342e598f73f923aead25571a9b43f1826db4873b813847ccb561b --chromium /opt/pw-browsers/chromium-1243/chrome-linux64/chrome --playwright /home/user/Shamble-Frontlines/tools/node_modules/playwright-core/index.mjs --dist /home/user/Shamble-Frontlines/.claude/worktrees/agent-a9873cdba07a3219e/.gate/netcode-proof-test/t5-dist --bites-dist /home/user/Shamble-Frontlines/.claude/worktrees/agent-a9873cdba07a3219e/.gate/netcode-proof-test/dist-bites --commit 80b67487caf2bd588f38a965c615daa11edeecfe --dist-log /home/user/Shamble-Frontlines/.gate/u7/rs/final-dist.log --bites-log /home/user/Shamble-Frontlines/.gate/u7/rs/final-dist.log",
+ "console_probe": {
+  "worker_marker": true,
+  "worker_csp": true,
+  "status": "Done: page csp 1; worker csp 1; worker fetch refused in 1 ms; violation connect-src",
+  "error": null,
+  "page_csp": 1,
+  "worker_csp_count": 1,
+  "responses": [
+   [
+    "/probe.html",
+    200
+   ],
+   [
+    "/probe.js",
+    200
+   ],
+   [
+    "/lib.js",
+    200
+   ],
+   [
+    "/probe-worker.js",
+    200
+   ],
+   [
+    "/lib.js",
+    200
+   ]
+  ],
+  "failed": [],
+  "lines": [
+   {
+    "type": "error",
+    "page": true,
+    "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+   },
+   {
+    "type": "log",
+    "page": true,
+    "text": "npt-probe: worker console"
+   },
+   {
+    "type": "error",
+    "page": true,
+    "text": "Connecting to 'http://127.0.0.1:9/npt-probe-page' violates the following Content Security Policy directive: \"connect-src 'self' https://rs.nt.shamblefrontlines.com:* wss://rs.nt.shamblefrontlines.com:* https://rs-b.nt.shamblefrontlines.com:"
+   },
+   {
+    "type": "error",
+    "page": true,
+    "text": "Fetch API cannot load http://127.0.0.1:9/npt-probe-page. Refused to connect because it violates the document's Content Security Policy."
+   }
+  ]
+ },
+ "marks": {
+  "m1_smoke_wt_playing_ms": 264,
+  "m1_within_3_s": true,
+  "m2_smoke_ws_playing_ms": 254,
+  "m3_cert_14d_ok": [
+   [
+    1
+   ],
+   [
+    1
+   ],
+   [
+    1
+   ]
+  ],
+  "m4_wrong_hash_ok": [
+   0
+  ],
+  "m5_fallback": {
+   "status": "WebSocket · Playing",
+   "playing_ns": [
+    1564100000
+   ]
+  },
+  "m6_mds_reads": [
+   1024,
+   1024
+  ],
+  "m7_record_problems": [],
+  "m7_csp_lines": [],
+  "m7_csp_violations": {
+   "1-smoke-wt": [
+    0
+   ],
+   "2-smoke-ws": [
+    0
+   ],
+   "3-cert-14d": [
+    0,
+    0,
+    0
+   ],
+   "4-wt-attempts-wrong-hash": [
+    0
+   ],
+   "5-fallback": [
+    0
+   ],
+   "6-mds": [
+    0
+   ],
+   "8a-bite-read-once": [
+    0
+   ],
+   "8b-bite-no-wt-timeout": [
+    0
+   ],
+   "C8-real-host": [
+    0,
+    0
+   ]
+  },
+  "m8_read_once_reads": 1,
+  "m8_no_wt_timeout_fallbacks": 1,
+  "m8_no_wt_timeout_playing_ns": [
+   4067000000
+  ],
+  "m9_room_log": "no per-slot refusal or forged count in the binary's log (tick_loop.rs:1159-1185): not readable",
+  "commands": {
+   "1-smoke-wt": [
+    {
+     "commands": 149,
+     "last_run_command": 146,
+     "unencodable_commands": 0,
+     "refused": 0
+    }
+   ],
+   "2-smoke-ws": [
+    {
+     "commands": 89,
+     "last_run_command": 86,
+     "unencodable_commands": 0,
+     "refused": 0
+    }
+   ],
+   "3-cert-14d": [
+    {
+     "commands": 27,
+     "last_run_command": 24,
+     "unencodable_commands": 0,
+     "refused": 0
+    },
+    {
+     "commands": 29,
+     "last_run_command": 26,
+     "unencodable_commands": 0,
+     "refused": 0
+    },
+    {
+     "commands": 28,
+     "last_run_command": 25,
+     "unencodable_commands": 0,
+     "refused": 0
+    }
+   ],
+   "4-wt-attempts-wrong-hash": [
+    {}
+   ],
+   "5-fallback": [
+    {
+     "commands": 44,
+     "last_run_command": 41,
+     "unencodable_commands": 0,
+     "refused": 0
+    }
+   ],
+   "6-mds": [
+    {
+     "commands": 327,
+     "last_run_command": 325,
+     "unencodable_commands": 0,
+     "refused": 0
+    }
+   ],
+   "8a-bite-read-once": [
+    {
+     "commands": 327,
+     "last_run_command": 325,
+     "unencodable_commands": 0,
+     "refused": 0
+    }
+   ],
+   "8b-bite-no-wt-timeout": [
+    {
+     "commands": 148,
+     "last_run_command": 145,
+     "unencodable_commands": 0,
+     "refused": 0
+    }
+   ],
+   "C8-real-host": [
+    {
+     "commands": 57,
+     "last_run_command": 55,
+     "unencodable_commands": 0,
+     "refused": 0
+    },
+    {
+     "commands": 58,
+     "last_run_command": 56,
+     "unencodable_commands": 0,
+     "refused": 0
+    }
+   ]
+  }
+ },
+ "c8": {
+  "host_listening": true,
+  "statuses": [
+   [
+    "WebTransport · Playing",
+    278,
+    null
+   ],
+   [
+    "WebSocket · Playing",
+    265,
+    null
+   ]
+  ],
+  "dist_types": [
+   {
+    "path": "/",
+    "status": 200,
+    "type": "text/html; charset=utf-8",
+    "as_listed": true
+   },
+   {
+    "path": "/main.js",
+    "status": 200,
+    "type": "text/javascript; charset=utf-8",
+    "as_listed": true
+   },
+   {
+    "path": "/worker.js",
+    "status": 200,
+    "type": "text/javascript; charset=utf-8",
+    "as_listed": true
+   },
+   {
+    "path": "/lib.js",
+    "status": 200,
+    "type": "text/javascript; charset=utf-8",
+    "as_listed": true
+   },
+   {
+    "path": "/hooks.js",
+    "status": 200,
+    "type": "text/javascript; charset=utf-8",
+    "as_listed": true
+   },
+   {
+    "path": "/npt_client_wasm.js",
+    "status": 200,
+    "type": "text/javascript; charset=utf-8",
+    "as_listed": true
+   },
+   {
+    "path": "/npt_client_wasm_bg.wasm",
+    "status": 200,
+    "type": "application/wasm",
+    "as_listed": true
+   }
+  ],
+  "responses": [
+   {
+    "path": "/",
+    "status": 200,
+    "type": "text/html; charset=utf-8",
+    "ip": "127.0.0.1",
+    "port": 31000
+   },
+   {
+    "path": "/main.js",
+    "status": 200,
+    "type": "text/javascript; charset=utf-8",
+    "ip": "127.0.0.1",
+    "port": 31000
+   },
+   {
+    "path": "/lib.js",
+    "status": 200,
+    "type": "text/javascript; charset=utf-8",
+    "ip": "127.0.0.1",
+    "port": 31000
+   },
+   {
+    "path": "/hooks.js",
+    "status": 200,
+    "type": "text/javascript; charset=utf-8",
+    "ip": "127.0.0.1",
+    "port": 31000
+   },
+   {
+    "path": "/worker.js",
+    "status": 200,
+    "type": "text/javascript; charset=utf-8",
+    "ip": "127.0.0.1",
+    "port": 31000
+   },
+   {
+    "path": "/lib.js",
+    "status": 200,
+    "type": "text/javascript; charset=utf-8",
+    "ip": "127.0.0.1",
+    "port": 31000
+   },
+   {
+    "path": "/npt_client_wasm.js",
+    "status": 200,
+    "type": "text/javascript; charset=utf-8",
+    "ip": "127.0.0.1",
+    "port": 31000
+   },
+   {
+    "path": "/npt/cert-hash-27.json",
+    "status": 200,
+    "type": "application/json",
+    "ip": "127.0.0.1",
+    "port": 31000
+   },
+   {
+    "path": "/npt_client_wasm_bg.wasm",
+    "status": 200,
+    "type": "application/wasm",
+    "ip": "127.0.0.1",
+    "port": 31000
+   },
+   {
+    "path": "/",
+    "status": 200,
+    "type": "text/html; charset=utf-8",
+    "ip": "127.0.0.1",
+    "port": 31000
+   },
+   {
+    "path": "/main.js",
+    "status": 200,
+    "type": "text/javascript; charset=utf-8",
+    "ip": "127.0.0.1",
+    "port": 31000
+   },
+   {
+    "path": "/hooks.js",
+    "status": 200,
+    "type": "text/javascript; charset=utf-8",
+    "ip": "127.0.0.1",
+    "port": 31000
+   },
+   {
+    "path": "/lib.js",
+    "status": 200,
+    "type": "text/javascript; charset=utf-8",
+    "ip": "127.0.0.1",
+    "port": 31000
+   },
+   {
+    "path": "/worker.js",
+    "status": 200,
+    "type": "text/javascript; charset=utf-8",
+    "ip": "127.0.0.1",
+    "port": 31000
+   },
+   {
+    "path": "/lib.js",
+    "status": 200,
+    "type": "text/javascript; charset=utf-8",
+    "ip": "127.0.0.1",
+    "port": 31000
+   },
+   {
+    "path": "/npt_client_wasm.js",
+    "status": 200,
+    "type": "text/javascript; charset=utf-8",
+    "ip": "127.0.0.1",
+    "port": 31000
+   },
+   {
+    "path": "/npt_client_wasm_bg.wasm",
+    "status": 200,
+    "type": "application/wasm",
+    "ip": "127.0.0.1",
+    "port": 31000
+   }
+  ],
+  "every_response_from_npt_host": true,
+  "failed": [],
+  "csp_lines": [],
+  "csp_violations": [
+   0,
+   0
+  ]
+ },
+ "files": [
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/1-smoke-wt/hash-27.json",
+   "sha256": "d43a135ee093d2e62e07cb09303123ac7d5ad4c98dd881c4faa363845246c2cc"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/1-smoke-wt/result.json",
+   "sha256": "44b248092b81a7a3d7b02561a043e6a5f70ca6de5169ffe27622ac8b82627c05"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/1-smoke-wt/room.jsonl",
+   "sha256": "a14f069cf4f2ab23dd6ec2dda1f2d23184e1843712c77136f8d7e08ac1d44a17"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/1-smoke-wt/room.stderr.txt",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/1-smoke-wt/room.stdout.txt",
+   "sha256": "ab466d3f7d3a7ae47af766ca0796ddfd76943ffe97c60055e4ca19825ce4b886"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/1-smoke-wt/settings.json",
+   "sha256": "e26ec8dad25c4ce092e32fa4334b491f5cf6f70f1e27ef4445710bd404270f42"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/2-smoke-ws/hash-27.json",
+   "sha256": "b1c8a70979a54c50960c0e996981e34f040285f568ee1dbf5d7c543de8526552"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/2-smoke-ws/result.json",
+   "sha256": "ed67816ec33a5d96ee63b01b123f63392f5617ade3471c7681b89a911cb07e07"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/2-smoke-ws/room.jsonl",
+   "sha256": "fbb890267fc801896b2111b08e004aac8354eb1fb1db590a9e7a763f8338abe6"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/2-smoke-ws/room.stderr.txt",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/2-smoke-ws/room.stdout.txt",
+   "sha256": "ab466d3f7d3a7ae47af766ca0796ddfd76943ffe97c60055e4ca19825ce4b886"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/2-smoke-ws/settings.json",
+   "sha256": "1b5977f6ea4777f8e23a147956e1b1d27ddb7827f07a970b9c8ba2a407dcc217"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/3-cert-14d/hash-27.json",
+   "sha256": "9f654a1861118ccaf0a2961f1950eb1890fd21f5279e83f17a8da5e54250e0b4"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/3-cert-14d/result.json",
+   "sha256": "3498cb925d0e0e1a66e0f2a4a7c6ef74d3996240ed32d993e5bdf74c755183d5"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/3-cert-14d/room.jsonl",
+   "sha256": "5a94c7a3222b2db5054478a5d5fda9bb3adf2acad1dfa5be3ca4ca6815622d47"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/3-cert-14d/room.stderr.txt",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/3-cert-14d/room.stdout.txt",
+   "sha256": "ab466d3f7d3a7ae47af766ca0796ddfd76943ffe97c60055e4ca19825ce4b886"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/3-cert-14d/settings.json",
+   "sha256": "2e3b9db2237ebffdaf13bac29881773238df977951be594f5926e5332e71a48a"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/4-wt-attempts-wrong-hash/hash-27.json",
+   "sha256": "f5011edba09e020d0ddadcbadf678f38131c86ae2e5524497b98cdf3dc85a502"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/4-wt-attempts-wrong-hash/result.json",
+   "sha256": "2f3d723ddaadda629f5b8ddfeea9148c1c207b4a9bcfb8d761389cd405086333"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/4-wt-attempts-wrong-hash/room.jsonl",
+   "sha256": "860b3fc6e8f223e505d4712dba5ab619089cfc34c1c986792c61afe6a2203a38"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/4-wt-attempts-wrong-hash/room.stderr.txt",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/4-wt-attempts-wrong-hash/room.stdout.txt",
+   "sha256": "ab466d3f7d3a7ae47af766ca0796ddfd76943ffe97c60055e4ca19825ce4b886"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/4-wt-attempts-wrong-hash/settings.json",
+   "sha256": "0f8f5dafe8fdeed1ed0eb0d688aaa56dc33316a32e9c949fa884835cdc20855a"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/5-fallback/hash-27.json",
+   "sha256": "ca9276b2f16361fd01c32c5a73c9240dee87a1679243a58484dc2e7efc933685"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/5-fallback/result.json",
+   "sha256": "f265de39b54dd2fd3752ba155f34345e69f3e58698787e3a6465016dabcfad44"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/5-fallback/room.jsonl",
+   "sha256": "46081aa3fa748533ea078fb20e324a6ce32334faf0649f4e66e4c34adbb731d0"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/5-fallback/room.stderr.txt",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/5-fallback/room.stdout.txt",
+   "sha256": "ab466d3f7d3a7ae47af766ca0796ddfd76943ffe97c60055e4ca19825ce4b886"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/5-fallback/settings.json",
+   "sha256": "9ab68484414edf98c997bb2da1c936b7b0a4ab64836202d6ed3818ca90ddcb4e"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/6-mds/hash-27.json",
+   "sha256": "ebc08efb3542c290e92f055b88f205ed59b8d1471e38e7318c6fa6e18f8d3f52"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/6-mds/result.json",
+   "sha256": "d2c566aae66a55dc6cacb8a03cc0c872d5b368a1b645a95831bb53b8a78cf3bf"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/6-mds/room.jsonl",
+   "sha256": "8c00bc3a020261f8e472c74f1ba446321084f6bda0dd47f14794717b934ca8b2"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/6-mds/room.stderr.txt",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/6-mds/room.stdout.txt",
+   "sha256": "ab466d3f7d3a7ae47af766ca0796ddfd76943ffe97c60055e4ca19825ce4b886"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/6-mds/settings.json",
+   "sha256": "a6b3234d64998b325123b33645a4004525504a0ec0c3922ebcfcbc65eeba4e5d"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/8a-bite-read-once/hash-27.json",
+   "sha256": "bd2eb5d5fcb5b240018c1a94a3a84219aeabd8269d6e2cdb5662e9db20b09e92"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/8a-bite-read-once/result.json",
+   "sha256": "93f3e0f90f82916183e101097230d6881c88c8bbd4abba21e08e1927183f84ed"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/8a-bite-read-once/room.jsonl",
+   "sha256": "1868d91815f24b4f7cede2dcff67fc82b481c24ef29abca5007190ecdcccd727"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/8a-bite-read-once/room.stderr.txt",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/8a-bite-read-once/room.stdout.txt",
+   "sha256": "ab466d3f7d3a7ae47af766ca0796ddfd76943ffe97c60055e4ca19825ce4b886"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/8a-bite-read-once/settings.json",
+   "sha256": "4c651c631ee3d9836ab4ad04337e235a553663fd027f0f4202886e85d679944c"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/8b-bite-no-wt-timeout/hash-27.json",
+   "sha256": "ca202083be82f109001e454b09af6bdc82cccf921c29ed1eab8642819abb5fe5"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/8b-bite-no-wt-timeout/result.json",
+   "sha256": "abbab11edccc42af1e85abbffd2730433a691718770135c8970ab5a1bf92b121"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/8b-bite-no-wt-timeout/room.jsonl",
+   "sha256": "66693309ce733e68bf5271077f39b94d12190eb8ec74789dd11d5eaa1c084936"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/8b-bite-no-wt-timeout/room.stderr.txt",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/8b-bite-no-wt-timeout/room.stdout.txt",
+   "sha256": "ab466d3f7d3a7ae47af766ca0796ddfd76943ffe97c60055e4ca19825ce4b886"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/8b-bite-no-wt-timeout/settings.json",
+   "sha256": "c4c5d6176c54865f4699034bf5024171df7c531c8f7ea06e5a07c7050df4040e"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/C8-real-host/hash-27.json",
+   "sha256": "59a07a078e23f54e0c352ce7ed5d800fe7ba9910c4de6eafc3dbd5591199e612"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/C8-real-host/host-keys.txt",
+   "sha256": "781864cf8af8cde8e645e9bedbe89889ab9087ec77f70e1b52cbde3bc4e5b627"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/C8-real-host/host.json",
+   "sha256": "01ab176d4fbaa00b3be8889b9cc5975ea9b7dca50be094e279884ee386caa0e4"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/C8-real-host/result.json",
+   "sha256": "cabb1bb9e86f2e382c13ed33067f4a7bc73732a9d1d8a49b52b6e8c1c8bd5ddb"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/C8-real-host/room.jsonl",
+   "sha256": "46e28871a43cee53cbc253d5706fccc867a4dc4c5b84e1bb99b28a1648bbd5ab"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/C8-real-host/room.stderr.txt",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/C8-real-host/room.stdout.txt",
+   "sha256": "ab466d3f7d3a7ae47af766ca0796ddfd76943ffe97c60055e4ca19825ce4b886"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-26T10-48-42-618Z/C8-real-host/settings.json",
+   "sha256": "67e91676462e7aed1b1dae25b4b7028a8fd5f8783cd22a3266e56a668d3f4078"
+  }
+ ]
+}

@@ -48,13 +48,13 @@ form: worktree_patch.py writes the tracked diff first (`git diff HEAD --binary`,
 by `git diff --no-index --binary /dev/null <f>` (:19-22), while main-run.sh hashes `git diff HEAD -- .` from
 spikes/netcode-proof (:26 `cd "$S"`, :42; the log's line 2 prints that folder), which sorts all paths together. U7's
 patch had 33 new files, so the bytes differ in order; U8-F1's had none, so they matched.
-- **Verified 08:5x** (a pipe with git first, read only, no file; `git diff --output` was refused by the guard, "not
+- **Verified 08:4x** (a pipe with git first, read only, no file; `git diff --output` was refused by the guard, "not
   allowed here", and not retried): `git diff dc51f0e 6968215 -- spikes/netcode-proof | sha256sum` gives
   0a4a6eedb6a541fc77f1a3d3efd24cb5a73851f60579d7c7f08f98f3a088c7c7, U7's M5 header exactly. So U7's tree at M5 was the
   merged commit's spike content byte for byte. The control, `git diff 833c3f0 ddb06ff -- spikes/netcode-proof |
   sha256sum`, gives 4d6a248425aebb25b317cf2da363e00915e8f2b13eb6f26a6a259a5e0f3f7164, U8-F1's header and patch.
 
-## MAIN-68's silent checks, re-run from commits (08:5x; each by `git diff --name-only`, nothing printed)
+## MAIN-68's silent checks, re-run from commits (08:4x; each by `git diff --name-only`, nothing printed)
 - C68B-3, the root manifests equal main's (main-68-plan.md:76, :247, :321): b9aad01..6b4a0d3 and b9aad01..HEAD (with
   `.claude/` too), over Cargo.lock, Cargo.toml, crates, packages, package.json, package-lock.json.
 - Step 5's `.claude/` equal to main's (main-68-plan.md:319): b9aad01..6b4a0d3 -- .claude/.

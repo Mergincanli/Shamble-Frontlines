@@ -247,6 +247,23 @@ the advisor rules."
   at the same paths and saves; ffcheck 35 ADDED and 10 differing; the builder, resumed in a window, `git add`s those 45,
   then `git merge --ff-only`, then `git status --short` empty; the evidence kept first by `cp -a`, `diff -rq` and a
   sha256 list; then a plain remove; any refusal: it stays until PR #40's close), in a later window.
+- M9, the builder worktree, the main session's part DONE 08:4x-08:5x UTC on 11-27:
+  - The two notes copied onto the lane at their worktree paths (`cp`, each its own call; sha256 a65282fa...a34c and
+    d073228f...9c93, equal to the worktree's and the wip copies) and saved: 0efbbef.
+  - ffcheck 80b6748..0efbbef: exactly 35 ADDED present (the two notes and U7's 33) and 10 differing (U7's 10), nothing
+    else; 68 modified paths present, 68 hash-object ids read. `git diff --name-only 6968215 0efbbef -- spikes/` lists
+    only U8-F1's six, none of U7's 43, so the 45 staged paths will equal 0efbbef.
+  - The keep-first copy into /home/user/Shamble-Frontlines/.gate/u7/kept-agent-a9873/ (`cp -a` of the worktree's
+    .gate/u7/ and of .gate/netcode-proof-test/t5-dist/, dist-bites/ and failed-steps/, each its own call; nothing
+    moved); `diff -rq` of each original and copy printed nothing; u7-kept-list.md holds the one `find … -exec sha256sum
+    {} +`, 332 lines for 332 files. It was copied by `cp` from the tool's own saved copy of that output (58.4 KB), not
+    rewritten by Write: the same bytes, a departure from the form's letter, named to A. Run 3's and run 4's
+    summary.json copied into the notes as u7-t5ii-run3-summary.json (b17d2201...) and u7-t5ii-run4-summary.json
+    (100b27d1..., as the report cites), both read whole first: hashes, local paths and loopback addresses only.
+  - Left, and new: the fast-forward 80b6748..0efbbef also brings MAIN-68's kit and CI files into the builder's worktree
+    (.claude/hooks/routine-guard.mjs and its test, .github/workflows/toolchain.yml: main's reviewed versions). The
+    rule says agents may not edit kit files, and A's form did not weigh this. So A rules it first (the 10:50 window);
+    the builder's three commands go only on A's yes; else the form's fallback (b). Then the plain remove.
 
 ## Risks
 - M5's counts move with MAIN-68 and Builder 2: each bar comes from this merge's own base run on its own H0 (MAIN-68's
