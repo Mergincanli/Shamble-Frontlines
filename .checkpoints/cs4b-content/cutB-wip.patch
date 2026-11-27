@@ -1,0 +1,981 @@
+diff --git a/crates/content/src/bundle.rs b/crates/content/src/bundle.rs
+index 636a490..5df7cfd 100644
+--- a/crates/content/src/bundle.rs
++++ b/crates/content/src/bundle.rs
+@@ -250,11 +250,40 @@ pub fn write(files: &[(&str, &str)]) -> String {
+     ])))
+ }
+ 
++/// The test bundle: the two kinds' test files (`map::TEST_TEXT`, whose map is `test-scene`, and
++/// `movement::TEST_TEXT`), for the crates' tests and the tools' (never content: no value of the game rests on it).
++/// It is the one bundle every caller passes that replays no committed recording; a committed recording replays on
++/// the frozen bundle its header names.
++#[must_use]
++pub fn test_bundle() -> String {
++    write(&[
++        ("maps/test-scene.json", crate::map::TEST_TEXT),
++        ("movement/test-soldier.json", crate::movement::TEST_TEXT),
++    ])
++}
++
+ #[cfg(test)]
+ mod tests {
+     use super::*;
+     use crate::movement::TEST_TEXT;
+ 
++    #[test]
++    fn the_test_bundle_loads_and_holds_the_map_local_play_asks_for() {
++        let set = load(test_bundle().as_bytes()).expect("the test bundle loads");
++        assert_eq!(
++            set.map("test-scene").map(|map| map.shapes.len()),
++            Some(1)
++        );
++        assert!(set.movement("test-soldier").is_some());
++        // Its map file is in canonical form: the loader would refuse it otherwise, and a file holds it as it is.
++        assert_eq!(
++            crate::write::canonical(
++                &crate::json::parse(crate::map::TEST_TEXT.as_bytes()).expect("the test map parses")
++            ),
++            crate::map::TEST_TEXT
++        );
++    }
++
+     fn kind_of(bundle: &str) -> Kind {
+         load(bundle.as_bytes()).expect_err("refused").kind
+     }
+diff --git a/crates/content/src/map.rs b/crates/content/src/map.rs
+index f0ec674..bb53f43 100644
+--- a/crates/content/src/map.rs
++++ b/crates/content/src/map.rs
+@@ -394,6 +394,11 @@ pub fn check(map: &MapDocument) -> Result<(), Error> {
+     )
+ }
+ 
++/// A valid map file's text in canonical form with made-up sizes, for this crate's tests and the tools' (never a
++/// content file: no value of the game rests on it). Its id is the one local play asks for, `test-scene`, so a bundle
++/// made of it (`bundle::test_bundle`) serves every caller that replays no committed recording.
++pub const TEST_TEXT: &str = "{\n  \"bounds\": {\n    \"max\": [\n      50,\n      20,\n      50\n    ],\n    \"min\": [\n      -50,\n      0,\n      -50\n    ]\n  },\n  \"format\": \"shamble-map\",\n  \"id\": \"test-scene\",\n  \"regions\": [],\n  \"shapes\": [\n    {\n      \"id\": \"step\",\n      \"max\": [\n        1,\n        0.55,\n        1\n      ],\n      \"min\": [\n        0,\n        0,\n        0\n      ],\n      \"type\": \"box\"\n    }\n  ],\n  \"spawns\": [\n    {\n      \"at\": [\n        0,\n        0,\n        -5\n      ],\n      \"facing_deg\": 90,\n      \"id\": \"a\"\n    }\n  ],\n  \"version\": 1\n}\n";
++
+ #[cfg(test)]
+ pub(crate) mod tests {
+     use super::*;
+diff --git a/crates/devtools/src/bin/make_recordings.rs b/crates/devtools/src/bin/make_recordings.rs
+index 2083729..b0e2f7b 100644
+--- a/crates/devtools/src/bin/make_recordings.rs
++++ b/crates/devtools/src/bin/make_recordings.rs
+@@ -1,15 +1,18 @@
+ //! Makes the committed recordings from their scripts: `cargo run -p devtools --bin make_recordings` writes every
+-//! file into `crates/devtools/recordings/`; with `--check` it writes nothing, compares what is there byte for byte
+-//! and exits 1 naming each file that differs (for a hashes file, the first step that does). The plain test run
+-//! makes the same check (`tests/recordings.rs`).
++//! file into `crates/devtools/recordings/` from the frozen content there; with `--check` it writes nothing, compares
++//! what is there byte for byte and exits 1 naming each file that differs (for a hashes file, the first step that
++//! does). The plain test run makes the same check (`tests/recordings.rs`). `--freeze <name>` is the one writer of a
++//! recording's frozen content: it writes the bundle of today's `content/` as `<name>.content.json`, after which the
++//! plain run makes the recording again on it (only when a recording is meant to move to new content).
+ 
+ use std::path::Path;
+ use std::process::ExitCode;
+ 
+-use devtools::files::{check, write};
++use devtools::files::{check, freeze, write};
+ 
+ fn main() -> ExitCode {
+     let folder = Path::new(env!("CARGO_MANIFEST_DIR")).join("recordings");
++    let content = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../content");
+     let arguments: Vec<String> = std::env::args().skip(1).collect();
+     let result = match arguments.iter().map(String::as_str).collect::<Vec<_>>()[..] {
+         [] => write(&folder)
+@@ -17,7 +20,9 @@ fn main() -> ExitCode {
+         ["--check"] => {
+             check(&folder).map(|()| "the recordings are what their scripts make".to_owned())
+         }
+-        _ => Err("usage: make_recordings [--check]".to_owned()),
++        ["--freeze", name] => freeze(&folder, name, &content)
++            .map(|file| format!("written to {}: {file}", folder.display())),
++        _ => Err("usage: make_recordings [--check | --freeze <name>]".to_owned()),
+     };
+     match result {
+         Ok(done) => {
+diff --git a/crates/devtools/src/bin/replay.rs b/crates/devtools/src/bin/replay.rs
+index c5b56d5..4ad63e1 100644
+--- a/crates/devtools/src/bin/replay.rs
++++ b/crates/devtools/src/bin/replay.rs
+@@ -1,4 +1,6 @@
+-//! Replays a recording natively: `cargo run -p devtools --bin replay -- <what> <recording.rec> [...]`.
++//! Replays a recording natively: `cargo run -p devtools --bin replay -- <what> <recording.rec> [...]`. A recording
++//! is replayed on the frozen content beside it, `<name>.content.json` for `<name>.rec`, which must be the content its
++//! header names.
+ //!
+ //! - `hashes <rec>` prints the hashes file this build gives for it;
+ //! - `check <rec> <hashes>` compares this build with a hashes file and exits 1 at the first step that differs;
+@@ -15,16 +17,23 @@ use devtools::replay::{replay, state_at};
+ fn run(arguments: &[&str]) -> Result<String, String> {
+     let read = |path: &str| std::fs::read(path).map_err(|error| format!("{path}: {error}"));
+     let recording = |bytes: &[u8]| Recording::decode(bytes).map_err(|error| error.to_string());
++    // The frozen content beside the recording.
++    let content = |rec: &str| match rec.strip_suffix(".rec") {
++        Some(stem) => read(&format!("{stem}.content.json")),
++        None => Err(format!("{rec}: a recording's file name ends in .rec")),
++    };
+     match *arguments {
+         ["hashes", rec] => {
+             let bytes = read(rec)?;
+-            let lines = replay(&recording(&bytes)?).map_err(|error| error.to_string())?;
++            let lines =
++                replay(&recording(&bytes)?, &content(rec)?).map_err(|error| error.to_string())?;
+             Ok(hashes_text(&bytes, &lines))
+         }
+         ["check", rec, hashes] => {
+             let bytes = read(rec)?;
+             let expected = parse_hashes(&bytes, &String::from_utf8_lossy(&read(hashes)?))?;
+-            let got = replay(&recording(&bytes)?).map_err(|error| error.to_string())?;
++            let got =
++                replay(&recording(&bytes)?, &content(rec)?).map_err(|error| error.to_string())?;
+             let shared = first_difference(&expected, &got, Column::Shared);
+             match shared.or_else(|| first_difference(&expected, &got, Column::Whole)) {
+                 None => Ok(format!("{} steps, every hash as in the file\n", got.len())),
+@@ -44,8 +53,8 @@ fn run(arguments: &[&str]) -> Result<String, String> {
+         }
+         ["state", rec, tick] => {
+             let tick = tick.parse().map_err(|_| format!("{tick} is no tick"))?;
+-            let lines =
+-                state_at(&recording(&read(rec)?)?, tick).map_err(|error| error.to_string())?;
++            let lines = state_at(&recording(&read(rec)?)?, &content(rec)?, tick)
++                .map_err(|error| error.to_string())?;
+             lines.ok_or_else(|| format!("the recording never reaches tick {tick}"))
+         }
+         _ => {
+diff --git a/crates/devtools/src/files.rs b/crates/devtools/src/files.rs
+index 73aae6f..503d1a5 100644
+--- a/crates/devtools/src/files.rs
++++ b/crates/devtools/src/files.rs
+@@ -1,8 +1,11 @@
+ //! The committed recordings as files (`crates/devtools/recordings/`): what the scripts make, written there by
+ //! `make_recordings` and compared with what is there by `make_recordings --check` and by the plain test run, byte
+-//! for byte. Per recording: `<name>.rec`, `<name>.hashes`, and `<name>.vector.txt`, the state at one tick field by
+-//! field and its shared bytes (the word-size vector: the same text on a 32-bit and a 64-bit target). `manifest.txt` lists
+-//! every file with its length and SHA-256.
++//! for byte. Per recording: `<name>.content.json`, the frozen content its match runs on (the bundle of `content/` as
++//! it was when `make_recordings --freeze <name>` wrote it, its one writer: an input of the scripts, never made
++//! again by them); `<name>.rec`, whose header names that bundle by its sha256 and the map it is played on;
++//! `<name>.hashes`; and `<name>.vector.txt`, the state at one tick field by field and its shared bytes (the
++//! word-size vector: the same text on a 32-bit and a 64-bit target). `manifest.txt` lists every file with its length
++//! and SHA-256.
+ 
+ use std::io::Read as _;
+ use std::path::Path;
+@@ -10,22 +13,37 @@ use std::path::Path;
+ use sim::state_hash::fnv1a_64;
+ 
+ use crate::compare::{Column, first_difference};
++use crate::content_files::{bundle, walk};
+ use crate::recording::{Recording, hashes_text, manifest_line, parse_hashes};
+ use crate::replay::{replay, shared_bytes_at, state_at};
+-use crate::scripts::{RECORDINGS, VECTOR_TICK};
++use crate::scripts::{Content, RECORDINGS, VECTOR_TICK};
+ use crate::sha256::hex;
+ 
+ pub const MANIFEST: &str = "manifest.txt";
+ 
++/// The name of a recording's frozen content, beside it.
++#[must_use]
++pub fn frozen_name(recording: &str) -> String {
++    format!("{recording}.content.json")
++}
++
++/// The frozen content of the committed recording `name` in `folder`, read through the plain read.
++///
++/// # Errors
++/// The file missing, or no plain file, by name.
++pub fn frozen(folder: &Path, name: &str) -> Result<Vec<u8>, String> {
++    read_plain(folder, &frozen_name(name)).map_err(|why| format!("{name}: its frozen content: {why}"))
++}
++
+ /// The vector file's text: the state at `tick` as lines, one named field each, then the shared state's canonical
+ /// bytes there as hex and their hash. The same text must come out natively and in WebAssembly.
+ ///
+ /// # Errors
+-/// A recording that does not replay or never reaches the tick, in plain words.
+-pub fn vector_text(recording: &Recording, tick: u32) -> Result<String, String> {
++/// A recording that does not replay on `bundle` or never reaches the tick, in plain words.
++pub fn vector_text(recording: &Recording, bundle: &[u8], tick: u32) -> Result<String, String> {
+     let never = || format!("the recording never reaches tick {tick}");
+-    let state = state_at(recording, tick).map_err(|error| error.to_string())?;
+-    let bytes = shared_bytes_at(recording, tick).map_err(|error| error.to_string())?;
++    let state = state_at(recording, bundle, tick).map_err(|error| error.to_string())?;
++    let bytes = shared_bytes_at(recording, bundle, tick).map_err(|error| error.to_string())?;
+     let (state, bytes) = (state.ok_or_else(never)?, bytes.ok_or_else(never)?);
+     Ok(format!(
+         "{state}tick {tick} shared bytes {} fnv1a64 {:016x}\n",
+@@ -34,33 +52,56 @@ pub fn vector_text(recording: &Recording, tick: u32) -> Result<String, String> {
+     ))
+ }
+ 
+-/// Every file the scripts make, by name, in the manifest's order, the manifest last.
++/// Every file the scripts make from the frozen content beside them in `folder`, by name, in the manifest's order,
++/// the manifest last. The manifest also lists each recording's frozen content (first among its files), which the
++/// scripts read and never make.
+ ///
+ /// # Errors
+-/// A script whose recording has no file form or does not replay: a bug in the script, said in plain words.
+-pub fn made() -> Result<Vec<(String, Vec<u8>)>, String> {
++/// A frozen content file missing; a script whose recording has no file form or does not replay on its content: a
++/// bug in the script, or content that is not the recording's, said in plain words.
++pub fn made(folder: &Path) -> Result<Vec<(String, Vec<u8>)>, String> {
+     let mut files = Vec::new();
+-    for (name, script) in RECORDINGS {
+-        let recording = script();
++    let mut manifest = String::new();
++    for (name, map_id, script) in RECORDINGS {
++        let content = frozen(folder, name)?;
++        let recording = script(&Content::of(&content, map_id));
+         let bytes = recording
+             .encode()
+             .map_err(|error| format!("{name}: {error}"))?;
+-        let lines = replay(&recording).map_err(|error| format!("{name}: {error}"))?;
++        let lines = replay(&recording, &content).map_err(|error| format!("{name}: {error}"))?;
+         let hashes = hashes_text(&bytes, &lines);
+-        let vector =
+-            vector_text(&recording, VECTOR_TICK).map_err(|error| format!("{name}: {error}"))?;
+-        files.push((format!("{name}.rec"), bytes));
+-        files.push((format!("{name}.hashes"), hashes.into_bytes()));
+-        files.push((format!("{name}.vector.txt"), vector.into_bytes()));
++        let vector = vector_text(&recording, &content, VECTOR_TICK)
++            .map_err(|error| format!("{name}: {error}"))?;
++        manifest.push_str(&manifest_line(&frozen_name(name), &content));
++        for (file, made) in [
++            (format!("{name}.rec"), bytes),
++            (format!("{name}.hashes"), hashes.into_bytes()),
++            (format!("{name}.vector.txt"), vector.into_bytes()),
++        ] {
++            manifest.push_str(&manifest_line(&file, &made));
++            files.push((file, made));
++        }
+     }
+-    let manifest: String = files
+-        .iter()
+-        .map(|(name, bytes)| manifest_line(name, bytes))
+-        .collect();
+     files.push((MANIFEST.to_owned(), manifest.into_bytes()));
+     Ok(files)
+ }
+ 
++/// Freezes today's content for the committed recording `name`: the bundle of the content folder `content` (read and
++/// judged by the game's loader, as the page's build reads it) is written into `folder` as `<name>.content.json`.
++/// It is that file's one writer (`make_recordings --freeze <name>`), run when a recording is meant to move to new
++/// content, after which `make_recordings` makes the recording again on it (the change-set's report says why).
++///
++/// # Errors
++/// No recording of that name; the content folder as the content tool refuses it; a file that could not be written.
++pub fn freeze(folder: &Path, name: &str, content: &Path) -> Result<String, String> {
++    if !RECORDINGS.iter().any(|(recorded, _, _)| *recorded == name) {
++        return Err(format!("no committed recording is named {name:?}"));
++    }
++    let text = bundle(&walk(content)?)?;
++    write_plain(folder, &frozen_name(name), text.as_bytes())?;
++    Ok(frozen_name(name))
++}
++
+ /// Refuses what is in the tree and is no plain file: a link there could lead a read or a write anywhere, and the
+ /// repository's tree is not trusted. Nothing there yet is fine.
+ fn plain(folder: &Path, name: &str) -> Result<(), String> {
+@@ -194,21 +235,21 @@ pub fn write_plain(folder: &Path, name: &str, bytes: &[u8]) -> Result<(), String
+ /// # Errors
+ /// What `made` gives, a path that is a link or no plain file, or a file that could not be written.
+ pub fn write(folder: &Path) -> Result<Vec<String>, String> {
+-    let files = made()?;
++    let files = made(folder)?;
+     for (name, bytes) in &files {
+         write_plain(folder, name, bytes)?;
+     }
+     Ok(files.into_iter().map(|(name, _)| name).collect())
+ }
+ 
+-/// Compares `folder` with what the scripts make and writes nothing: every file there, byte for byte, and no file
+-/// there that the scripts do not make.
++/// Compares `folder` with what the scripts make from the frozen content there and writes nothing: every file there,
++/// byte for byte, and no file there that the scripts do not make or read.
+ ///
+ /// # Errors
+ /// Each file that is missing, differs, is not listed or is no plain file, by name; for a hashes file, the first step
+ /// that differs.
+ pub fn check(folder: &Path) -> Result<(), String> {
+-    let files = made()?;
++    let files = made(folder)?;
+     plain(folder, "")?;
+     let mut wrong = Vec::new();
+     for (name, bytes) in &files {
+@@ -227,8 +268,9 @@ pub fn check(folder: &Path) -> Result<(), String> {
+         .filter_map(|entry| Some(entry.ok()?.file_name().to_string_lossy().into_owned()))
+         .collect();
+     found.sort();
++    let read = |name: &str| RECORDINGS.iter().any(|(recorded, _, _)| frozen_name(recorded) == name);
+     for name in found {
+-        if !files.iter().any(|(made, _)| *made == name) {
++        if !files.iter().any(|(made, _)| *made == name) && !read(&name) {
+             wrong.push(format!("{name:?} is in the folder and no script makes it"));
+         }
+     }
+diff --git a/crates/devtools/src/replay.rs b/crates/devtools/src/replay.rs
+index 327b14e..b2fa059 100644
+--- a/crates/devtools/src/replay.rs
++++ b/crates/devtools/src/replay.rs
+@@ -10,6 +10,7 @@ use sim::{StateSink, World};
+ use sim_wasm::{MODE_LOCAL, Sim};
+ 
+ use crate::recording::{Recording, Step, TEST_SEED_MARK, TickHashes};
++use crate::sha256::sha256;
+ 
+ /// Why a recording is not replayed.
+ #[derive(Debug, Clone, PartialEq, Eq)]
+@@ -17,6 +18,8 @@ pub enum ReplayError {
+     /// The recording holds something this build's entry points cannot take. It is refused whole: nothing that was
+     /// recorded is ever silently left out of a replay.
+     Cannot(&'static str),
++    /// The bundle given is not the content the recording's header names, or not one this match can run on.
++    Content(String),
+     /// The match was not created.
+     Create(String),
+ }
+@@ -25,11 +28,31 @@ impl fmt::Display for ReplayError {
+     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+         match self {
+             Self::Cannot(what) => write!(f, "this build cannot replay this recording's {what}"),
++            Self::Content(why) => write!(f, "the content is not the recording's: {why}"),
+             Self::Create(why) => write!(f, "the match was not created: {why}"),
+         }
+     }
+ }
+ 
++/// Holds `bundle` to what the recording's header names, before any call: its sha256 is the header's content hash,
++/// the game's loader takes it, and it holds the header's map.
++fn check_content(recording: &Recording, bundle: &[u8]) -> Result<(), ReplayError> {
++    let header = &recording.header;
++    if sha256(bundle) != header.content_hash {
++        return Err(ReplayError::Content(
++            "its sha256 is not the content hash the header names".to_owned(),
++        ));
++    }
++    let set = content::load(bundle).map_err(|error| ReplayError::Content(error.message()))?;
++    if set.map(&header.map_id).is_none() {
++        return Err(ReplayError::Content(format!(
++            "it holds no map {:?}",
++            header.map_id
++        )));
++    }
++    Ok(())
++}
++
+ /// What this build's entry points cannot take yet, checked before the first call.
+ fn check(recording: &Recording) -> Result<(), ReplayError> {
+     let header = &recording.header;
+@@ -47,8 +70,8 @@ fn check(recording: &Recording) -> Result<(), ReplayError> {
+             "first command sequence: a match starts at sequence 0",
+         ),
+         (
+-            header.content_hash != [0; 32] || !header.map_id.is_empty(),
+-            "content: this build takes none",
++            header.content_hash == [0; 32] || header.map_id.is_empty(),
++            "content: its header names none (a match runs on content and a map)",
+         ),
+         (
+             recording.steps.iter().any(|step| step.movement != 0),
+@@ -82,12 +105,15 @@ pub struct Replay<'a> {
+ }
+ 
+ impl<'a> Replay<'a> {
+-    /// Creates the match from the recording's seed and drops the time before its first step.
++    /// Creates the match from the recording's seed, on `bundle`, the content its header names, and drops the time
++    /// before its first step.
+     ///
+     /// # Errors
+-    /// A recording this build cannot replay, by the name of what it cannot take.
+-    pub fn new(recording: &'a Recording) -> Result<Self, ReplayError> {
++    /// A recording this build cannot replay, by the name of what it cannot take; a bundle that is not the content
++    /// the header names.
++    pub fn new(recording: &'a Recording, bundle: &[u8]) -> Result<Self, ReplayError> {
+         check(recording)?;
++        check_content(recording, bundle)?;
+         let mut sim = Sim::create(&recording.header.seed, MODE_LOCAL, 0)
+             .map_err(|error| ReplayError::Create(error.message()))?;
+         if let Some(first) = recording.steps.first() {
+@@ -128,12 +154,12 @@ impl Iterator for Replay<'_> {
+     }
+ }
+ 
+-/// Replays the whole recording: the hashes after each step.
++/// Replays the whole recording on `bundle`: the hashes after each step.
+ ///
+ /// # Errors
+ /// As `Replay::new`.
+-pub fn replay(recording: &Recording) -> Result<Vec<TickHashes>, ReplayError> {
+-    Ok(Replay::new(recording)?.collect())
++pub fn replay(recording: &Recording, bundle: &[u8]) -> Result<Vec<TickHashes>, ReplayError> {
++    Ok(Replay::new(recording, bundle)?.collect())
+ }
+ 
+ /// A reader of the state that writes one `name = value` line per field. The seed's bytes are never written.
+@@ -180,10 +206,11 @@ pub fn state_lines(world: &World) -> String {
+ /// Replays until the world is at `tick` and hands it to `read`; `None` when the recording never reaches that tick.
+ fn at<T>(
+     recording: &Recording,
++    bundle: &[u8],
+     tick: u32,
+     read: impl Fn(&World) -> T,
+ ) -> Result<Option<T>, ReplayError> {
+-    let mut replay = Replay::new(recording)?;
++    let mut replay = Replay::new(recording, bundle)?;
+     loop {
+         if replay.world().tick() == tick {
+             return Ok(Some(read(replay.world())));
+@@ -198,16 +225,24 @@ fn at<T>(
+ ///
+ /// # Errors
+ /// As `Replay::new`.
+-pub fn state_at(recording: &Recording, tick: u32) -> Result<Option<String>, ReplayError> {
+-    at(recording, tick, state_lines)
++pub fn state_at(
++    recording: &Recording,
++    bundle: &[u8],
++    tick: u32,
++) -> Result<Option<String>, ReplayError> {
++    at(recording, bundle, tick, state_lines)
+ }
+ 
+ /// The shared state's canonical bytes when the world is at `tick`: what the word-size vector pins.
+ ///
+ /// # Errors
+ /// As `Replay::new`.
+-pub fn shared_bytes_at(recording: &Recording, tick: u32) -> Result<Option<Vec<u8>>, ReplayError> {
+-    at(recording, tick, |world| {
++pub fn shared_bytes_at(
++    recording: &Recording,
++    bundle: &[u8],
++    tick: u32,
++) -> Result<Option<Vec<u8>>, ReplayError> {
++    at(recording, bundle, tick, |world| {
+         let mut bytes = Vec::new();
+         world.write_shared_state(&mut bytes);
+         bytes
+@@ -221,7 +256,12 @@ mod tests {
+     use crate::recording::Header;
+     use crate::scripts::test_seed;
+ 
+-    /// Twelve steps: button 0 held on the even ones, and pressed once on each.
++    /// The test bundle (`content::bundle::test_bundle`), the content the small recordings run on.
++    fn bundle() -> Vec<u8> {
++        content::bundle::test_bundle().into_bytes()
++    }
++
++    /// Twelve steps: button 0 held on the even ones, and pressed once on each; on the test bundle's map.
+     fn small(name: &str) -> Recording {
+         let step = |index: u32| Step {
+             post: index + 1,
+@@ -235,8 +275,8 @@ mod tests {
+                 start_tick: 0,
+                 first_sequence: 0,
+                 tick_rate: 30,
+-                content_hash: [0; 32],
+-                map_id: String::new(),
++                content_hash: sha256(&bundle()),
++                map_id: "test-scene".to_owned(),
+             },
+             steps: (0..12).map(step).collect(),
+         }
+@@ -245,17 +285,17 @@ mod tests {
+     #[test]
+     fn a_replay_gives_the_same_hashes_every_time_and_the_seed_only_in_the_whole_column() {
+         let (a, b) = (small("a"), small("b"));
+-        let first = replay(&a).expect("it replays");
++        let first = replay(&a, &bundle()).expect("it replays");
+         assert_eq!(first.len(), 12);
+         assert!((1u32..).zip(&first).all(|(tick, line)| line.tick == tick));
+-        assert_eq!(replay(&a).as_ref(), Ok(&first));
++        assert_eq!(replay(&a, &bundle()).as_ref(), Ok(&first));
+         // Another seed: the same shared hashes, other whole hashes, from the first step on.
+-        let other = replay(&b).expect("it replays");
++        let other = replay(&b, &bundle()).expect("it replays");
+         assert_eq!(first_difference(&first, &other, Column::Shared), None);
+         let whole = first_difference(&first, &other, Column::Whole).expect("the seeds differ");
+         assert_eq!(whole.step, 1);
+         // Step by step it is the same run, and the room refused nothing.
+-        let mut stepped = Replay::new(&a).expect("it replays");
++        let mut stepped = Replay::new(&a, &bundle()).expect("it replays");
+         assert_eq!(stepped.next(), Some(first[0]));
+         assert_eq!(stepped.by_ref().last(), Some(first[11]));
+         // The first step carries the join, so the first command runs in the second.
+@@ -268,7 +308,9 @@ mod tests {
+         let refused = |change: &dyn Fn(&mut Recording)| {
+             let mut recording = small("a");
+             change(&mut recording);
+-            Replay::new(&recording).err().map(|error| error.to_string())
++            Replay::new(&recording, &bundle())
++                .err()
++                .map(|error| error.to_string())
+         };
+         let cannot = |what: &str| Some(format!("this build cannot replay this recording's {what}"));
+         assert_eq!(
+@@ -279,9 +321,9 @@ mod tests {
+             refused(&|r| r.header.first_sequence = 1),
+             cannot("first command sequence: a match starts at sequence 0")
+         );
+-        let content = cannot("content: this build takes none");
+-        assert_eq!(refused(&|r| r.header.content_hash[31] = 1), content);
+-        assert_eq!(refused(&|r| r.header.map_id = "yard".to_owned()), content);
++        let none = cannot("content: its header names none (a match runs on content and a map)");
++        assert_eq!(refused(&|r| r.header.content_hash = [0; 32]), none);
++        assert_eq!(refused(&|r| r.header.map_id = String::new()), none);
+         let aim = cannot("aim: the input call does not take it yet");
+         assert_eq!(
+             refused(&|r| r.steps[11].movement = 1),
+@@ -300,14 +342,64 @@ mod tests {
+         assert_eq!(refused(&|_| ()), None);
+     }
+ 
++    /// The bundle a replay is given is held to the header before the match is made: a valid bundle that differs in
++    /// one value is refused by name, and so are one the loader refuses and one without the header's map.
++    #[test]
++    fn content_other_than_the_header_names_is_refused_by_name_before_the_match_is_made() {
++        let recording = small("a");
++        let refused = |bundle: &[u8], recording: &Recording| {
++            Replay::new(recording, bundle)
++                .err()
++                .map(|error| error.to_string())
++        };
++        let walk = "\"walk_speed_m_per_s\": 6\n";
++        assert_eq!(content::movement::TEST_TEXT.matches(walk).count(), 1);
++        let other = content::bundle::write(&[
++            ("maps/test-scene.json", content::map::TEST_TEXT),
++            (
++                "movement/test-soldier.json",
++                &content::movement::TEST_TEXT.replace(walk, "\"walk_speed_m_per_s\": 6.5\n"),
++            ),
++        ]);
++        assert!(content::load(other.as_bytes()).is_ok());
++        assert_eq!(
++            refused(other.as_bytes(), &recording),
++            Some(
++                "the content is not the recording's: its sha256 is not the content hash the header names"
++                    .to_owned()
++            )
++        );
++        // Bytes the loader refuses, and a bundle without the header's map, each named by the header's own hash.
++        let named = |bundle: &[u8]| {
++            let mut recording = small("a");
++            recording.header.content_hash = sha256(bundle);
++            recording
++        };
++        let broken = refused(b"{}", &named(b"{}")).expect("refused");
++        assert!(
++            broken.starts_with("the content is not the recording's: "),
++            "{broken}"
++        );
++        let movement_only =
++            content::bundle::write(&[("movement/test-soldier.json", content::movement::TEST_TEXT)]);
++        assert_eq!(
++            refused(
++                movement_only.as_bytes(),
++                &named(movement_only.as_bytes())
++            ),
++            Some("the content is not the recording's: it holds no map \"test-scene\"".to_owned())
++        );
++        assert_eq!(refused(&bundle(), &recording), None);
++    }
++
+     /// The live host drops time when it starts, after a stall and on resume (`rebase`), and a recording holds none
+     /// of those calls. That is sound only while a rebase moves the schedule and nothing of the state: with one
+     /// before every step, every hash is the same.
+     #[test]
+     fn a_rebase_before_every_step_changes_no_hash() {
+         let recording = small("a");
+-        let plain = replay(&recording).expect("it replays");
+-        let mut rebased = Replay::new(&recording).expect("it replays");
++        let plain = replay(&recording, &bundle()).expect("it replays");
++        let mut rebased = Replay::new(&recording, &bundle()).expect("it replays");
+         let mut got = Vec::new();
+         for step in &recording.steps {
+             rebased.sim.rebase(step.host_ms + 5_000.0);
+@@ -319,7 +411,7 @@ mod tests {
+     #[test]
+     fn the_state_s_lines_name_every_field_and_never_show_the_seed() {
+         let recording = small("a");
+-        let lines = state_at(&recording, 3)
++        let lines = state_at(&recording, &bundle(), 3)
+             .expect("it replays")
+             .expect("tick 3 is reached");
+         // Two commands have run by tick 3 (the first step carried the join), each with one press of button 0.
+@@ -335,20 +427,20 @@ mod tests {
+                 && !lines.contains(seed_as_numbers.trim_matches(['[', ']']))
+         );
+         // Before the first step, and past the last.
+-        let start = state_at(&recording, 0)
++        let start = state_at(&recording, &bundle(), 0)
+             .expect("it replays")
+             .expect("the start");
+         assert!(start.starts_with("tick = 0\nplayer.buttons = 0\n"));
+-        assert_eq!(state_at(&recording, 13), Ok(None));
++        assert_eq!(state_at(&recording, &bundle(), 13), Ok(None));
+         // The shared bytes: the tick, the buttons, the sixteen counts.
+-        let bytes = shared_bytes_at(&recording, 3)
++        let bytes = shared_bytes_at(&recording, &bundle(), 3)
+             .expect("it replays")
+             .expect("tick 3 is reached");
+         assert_eq!(bytes, [&[3, 0, 0, 0, 1, 0, 2][..], &[0; 15]].concat());
+         // Two runs that differ in one held button differ in that field, by name.
+         let mut other = small("a");
+         other.steps[2].held = 3;
+-        let got = state_at(&other, 3)
++        let got = state_at(&other, &bundle(), 3)
+             .expect("it replays")
+             .expect("tick 3 is reached");
+         assert_eq!(
+diff --git a/crates/devtools/src/scripts.rs b/crates/devtools/src/scripts.rs
+index 57e1aab..372e25b 100644
+--- a/crates/devtools/src/scripts.rs
++++ b/crates/devtools/src/scripts.rs
+@@ -6,6 +6,27 @@
+ use sim::{SEED_BYTES, TICK_HZ};
+ 
+ use crate::recording::{Header, Recording, Step, TEST_SEED_MARK};
++use crate::sha256::sha256;
++
++/// What a recording's header names of the content its match ran on (netcode-architect's route (i), change-set 4b):
++/// the sha256 of the bundle's exact bytes, and the id of the map in it the match is played on. A committed
++/// recording's bundle lies frozen beside it (`<name>.content.json`, which only `make_recordings --freeze` writes).
++#[derive(Debug, Clone, PartialEq, Eq)]
++pub struct Content {
++    pub sha256: [u8; 32],
++    pub map_id: String,
++}
++
++impl Content {
++    /// The content of `bundle`'s exact bytes, played on its map `map_id`.
++    #[must_use]
++    pub fn of(bundle: &[u8], map_id: &str) -> Self {
++        Self {
++            sha256: sha256(bundle),
++            map_id: map_id.to_owned(),
++        }
++    }
++}
+ 
+ /// The page's buttons, as `packages/client/src/input/keyboard.ts` numbers them.
+ const W: u32 = 1 << 0;
+@@ -52,9 +73,9 @@ impl Jitter {
+ /// in one tick and now and then six at once, which the endpoint's pacer has to spread; a page that is fast (several
+ /// posts between two ticks, so post numbers are skipped) and now and then slow (no new post, so the same one is
+ /// handed in again); host times a tick apart with up to 6 ms of jitter, never running backwards. The counts wrap
+-/// past 255 on the way.
++/// past 255 on the way. Its header names `content`, the content the match runs on.
+ #[must_use]
+-pub fn looped(name: &str, steps: u32, salt: u64) -> Recording {
++pub fn looped(name: &str, steps: u32, salt: u64, content: &Content) -> Recording {
+     let mut jitter = Jitter(0x5348_4D42_4C52_4543 ^ salt);
+     let turn = (salt % 8) as u32;
+     let mut counts = [0u8; 16];
+@@ -112,8 +133,8 @@ pub fn looped(name: &str, steps: u32, salt: u64) -> Recording {
+             start_tick: 0,
+             first_sequence: 0,
+             tick_rate: TICK_HZ as u16,
+-            content_hash: [0; 32],
+-            map_id: String::new(),
++            content_hash: content.sha256,
++            map_id: content.map_id.clone(),
+         },
+         steps: made,
+     }
+@@ -121,15 +142,16 @@ pub fn looped(name: &str, steps: u32, salt: u64) -> Recording {
+ 
+ /// The first recording: one minute of the loop.
+ #[must_use]
+-pub fn first_loop() -> Recording {
+-    looped("first-loop", 1_800, 0)
++pub fn first_loop(content: &Content) -> Recording {
++    looped("first-loop", 1_800, 0, content)
+ }
+ 
+-/// A script: it makes one recording, the same every time.
+-pub type Script = fn() -> Recording;
++/// A script: it makes one recording on the content it is given, the same every time.
++pub type Script = fn(&Content) -> Recording;
+ 
+-/// Every committed recording: its name and the script that makes it.
+-pub const RECORDINGS: [(&str, Script); 1] = [("first-loop", first_loop)];
++/// Every committed recording: its name, the map of its frozen content its match is played on, and the script that
++/// makes it.
++pub const RECORDINGS: [(&str, &str, Script); 1] = [("first-loop", "test-scene", first_loop)];
+ 
+ /// The tick whose shared bytes each recording's word-size vector pins.
+ pub const VECTOR_TICK: u32 = 900;
+@@ -147,10 +169,23 @@ mod tests {
+         assert_eq!(test_seed(&"n".repeat(40))[8..], [b'n'; 24]);
+     }
+ 
++    /// The test bundle's content, on its map.
++    fn test_content() -> Content {
++        Content::of(content::bundle::test_bundle().as_bytes(), "test-scene")
++    }
++
++    #[test]
++    fn a_recording_s_header_names_the_content_it_is_given() {
++        let content = test_content();
++        assert_eq!(content.sha256, sha256(content::bundle::test_bundle().as_bytes()));
++        let header = first_loop(&content).header;
++        assert_eq!((header.content_hash, header.map_id), (content.sha256, content.map_id));
++    }
++
+     /// The script holds what its text says it holds: checked on the steps themselves.
+     #[test]
+     fn the_first_loop_holds_what_its_description_says() {
+-        let recording = first_loop();
++        let recording = first_loop(&test_content());
+         let steps = &recording.steps;
+         assert_eq!(steps.len(), 1_800);
+         assert!(recording.encode().is_ok());
+@@ -192,7 +227,7 @@ mod tests {
+         assert!(gaps().all(|gap| gap > 27.0 && gap < 40.0));
+         assert!(gaps().any(|gap| gap < 30.0) && gaps().any(|gap| gap > 36.0));
+         // Another salt is another stream of the same kind.
+-        let other = looped("first-loop", 1_800, 3);
++        let other = looped("first-loop", 1_800, 3, &test_content());
+         assert_ne!(other.steps, recording.steps);
+         assert_eq!(other.header, recording.header);
+     }
+diff --git a/crates/devtools/src/wasm.rs b/crates/devtools/src/wasm.rs
+index 75862b9..a5a23d7 100644
+--- a/crates/devtools/src/wasm.rs
++++ b/crates/devtools/src/wasm.rs
+@@ -37,28 +37,29 @@ fn read_recording(bytes: &[u8]) -> Result<Recording, String> {
+     Recording::decode(bytes).map_err(|error| format!("error: {error}"))
+ }
+ 
+-/// The hashes file this module gives for a recording, both columns: the same runner as the native one, compiled to
+-/// WebAssembly. The whole-state column is why it lives here and not on the players' file, which gives the shared
+-/// hash only.
++/// The hashes file this module gives for a recording on `bundle`, the content its header names, both columns: the
++/// same runner as the native one, compiled to WebAssembly. The whole-state column is why it lives here and not on
++/// the players' file, which gives the shared hash only.
+ #[wasm_bindgen]
+ #[must_use]
+-pub fn replay_hashes(recording: &[u8]) -> String {
++pub fn replay_hashes(recording: &[u8], bundle: &[u8]) -> String {
+     let replayed = read_recording(recording)
+-        .and_then(|read| replay(&read).map_err(|error| format!("error: {error}")));
++        .and_then(|read| replay(&read, bundle).map_err(|error| format!("error: {error}")));
+     match replayed {
+         Ok(lines) => hashes_text(recording, &lines),
+         Err(why) => why,
+     }
+ }
+ 
+-/// The vector file's text for `tick` as this module gives it (`files::vector_text`): the state as lines, one named
+-/// field each (the seed is never among them), then the shared state's bytes and their hash. Compared line by line
+-/// with the native text, it shows which fields two targets disagree on.
++/// The vector file's text for `tick` as this module gives it (`files::vector_text`), the recording replayed on
++/// `bundle`: the state as lines, one named field each (the seed is never among them), then the shared state's bytes
++/// and their hash. Compared line by line with the native text, it shows which fields two targets disagree on.
+ #[wasm_bindgen]
+ #[must_use]
+-pub fn replay_state_at(recording: &[u8], tick: u32) -> String {
+-    let text = read_recording(recording)
+-        .and_then(|read| vector_text(&read, tick).map_err(|error| format!("error: {error}")));
++pub fn replay_state_at(recording: &[u8], bundle: &[u8], tick: u32) -> String {
++    let text = read_recording(recording).and_then(|read| {
++        vector_text(&read, bundle, tick).map_err(|error| format!("error: {error}"))
++    });
+     text.unwrap_or_else(|why| why)
+ }
+ 
+diff --git a/crates/devtools/tests/recordings.rs b/crates/devtools/tests/recordings.rs
+index 0cd1c96..c16605e 100644
+--- a/crates/devtools/tests/recordings.rs
++++ b/crates/devtools/tests/recordings.rs
+@@ -1,14 +1,16 @@
+ //! The committed recordings, natively (ADR 0004's milestone and its foundation line; PM-0004-19): every file is
+-//! what its script makes, and every recording replays to its hashes file, in both columns. The same check is
+-//! `make_recordings --check`. The files are read from disk when the test runs, never built into the program.
++//! what its script makes from the frozen content beside it, and every recording replays on that content to its
++//! hashes file, in both columns. The same check is `make_recordings --check`. The files are read from disk when the
++//! test runs, never built into the program.
+ 
+ use std::path::{Path, PathBuf};
+ 
+ use devtools::compare::{Column, first_difference};
+-use devtools::files::{MANIFEST, check, made, read_plain, vector_text, write};
++use devtools::files::{MANIFEST, check, frozen, frozen_name, made, read_plain, vector_text, write};
+ use devtools::recording::{Recording, parse_hashes};
+ use devtools::replay::Replay;
+ use devtools::scripts::{RECORDINGS, VECTOR_TICK};
++use devtools::sha256::sha256;
+ 
+ fn folder() -> PathBuf {
+     Path::new(env!("CARGO_MANIFEST_DIR")).join("recordings")
+@@ -26,18 +28,22 @@ fn every_committed_file_is_what_its_script_makes() {
+ #[test]
+ fn every_recording_replays_to_its_hashes() {
+     let manifest = String::from_utf8(read(MANIFEST)).expect("the manifest is text");
+-    for (name, _) in RECORDINGS {
+-        // The manifest lists the recording's three files.
+-        for suffix in ["rec", "hashes", "vector.txt"] {
++    for (name, map_id, _) in RECORDINGS {
++        // The manifest lists the recording's frozen content and its three files.
++        for suffix in ["content.json", "rec", "hashes", "vector.txt"] {
+             let line = format!("{name}.{suffix}: bytes ");
+             assert_eq!(manifest.matches(&line).count(), 1, "{line}");
+         }
+         let bytes = read(&format!("{name}.rec"));
+         let recording = Recording::decode(&bytes).expect("a committed recording reads");
++        // Its header names the frozen content beside it, by its sha256, and the map it is played on.
++        let content = frozen(&folder(), name).unwrap_or_else(|why| panic!("{why}"));
++        assert_eq!(recording.header.content_hash, sha256(&content));
++        assert_eq!(recording.header.map_id, map_id);
+         let hashes = String::from_utf8(read(&format!("{name}.hashes"))).expect("text");
+         let expected = parse_hashes(&bytes, &hashes).expect("its hashes file reads");
+         assert_eq!(expected.len(), recording.steps.len());
+-        let mut replay = Replay::new(&recording).expect("this build replays it");
++        let mut replay = Replay::new(&recording, &content).expect("this build replays it");
+         let got: Vec<_> = replay.by_ref().collect();
+         for column in [Column::Shared, Column::Whole] {
+             let difference = first_difference(&expected, &got, column);
+@@ -55,16 +61,21 @@ fn every_recording_replays_to_its_hashes() {
+         );
+         // The word-size vector: the shared bytes at its tick, the same on every target.
+         let vector = String::from_utf8(read(&format!("{name}.vector.txt"))).expect("text");
+-        assert_eq!(vector_text(&recording, VECTOR_TICK), Ok(vector));
++        assert_eq!(vector_text(&recording, &content, VECTOR_TICK), Ok(vector));
+     }
+ }
+ 
+-/// A copy of the recordings' folder with one thing done to it, in the test run's own scratch folder.
++/// A copy of the recordings' folder with one thing done to it, in the test run's own scratch folder: the frozen
++/// content as it is committed, and every file the scripts make from it.
+ fn changed(case: &str, change: impl Fn(&Path)) -> Result<(), String> {
+     let copy = Path::new(env!("CARGO_TARGET_TMPDIR")).join(format!("recordings-{case}"));
+     let _ = std::fs::remove_dir_all(&copy);
+     std::fs::create_dir_all(&copy).expect("a scratch folder");
+-    for (name, bytes) in made().expect("the scripts make their files") {
++    for (name, _, _) in RECORDINGS {
++        let content = frozen(&folder(), name).unwrap_or_else(|why| panic!("{why}"));
++        std::fs::write(copy.join(frozen_name(name)), content).expect("a scratch file");
++    }
++    for (name, bytes) in made(&folder()).expect("the scripts make their files") {
+         std::fs::write(copy.join(name), bytes).expect("a scratch file");
+     }
+     change(&copy);
+@@ -85,10 +96,26 @@ fn the_check_names_each_file_that_differs_is_missing_or_is_not_listed() {
+             std::fs::write(folder.join(name), bytes).expect("the file");
+         }
+     };
+-    // One bit of one step's input.
+-    let rec =
+-        changed("rec", flip("first-loop.rec", 87 + 900 * 68 + 9)).expect_err("a changed .rec");
++    // One bit of one step's input: the header's length is the file's less its 1,800 steps of 68 bytes.
++    let header = read("first-loop.rec").len() - 1_800 * 68;
++    let rec = changed("rec", flip("first-loop.rec", header + 900 * 68 + 9))
++        .expect_err("a changed .rec");
+     assert_eq!(rec, "first-loop.rec differs");
++    // The frozen content gone, or one bit of it changed: the scripts cannot make the recording on it, by name.
++    let gone = changed("content-gone", |folder| {
++        std::fs::remove_file(folder.join("first-loop.content.json")).expect("the file goes");
++    })
++    .expect_err("no frozen content");
++    assert!(
++        gone.starts_with("first-loop: its frozen content: first-loop.content.json: "),
++        "{gone}"
++    );
++    let content = changed("content", flip("first-loop.content.json", 40))
++        .expect_err("a changed frozen content");
++    assert!(
++        content.starts_with("first-loop: the content is not the recording's: "),
++        "{content}"
++    );
+     // One hex digit of the shared hash of step 900: the line is "900 <16 hex> <16 hex>\n".
+     let hashes = String::from_utf8(read("first-loop.hashes")).expect("text");
+     let line = hashes.find("\n900 ").expect("step 900's line") + 1;
+diff --git a/crates/devtools/tests/two_instances.rs b/crates/devtools/tests/two_instances.rs
+index abcdeac..ef5bbc1 100644
+--- a/crates/devtools/tests/two_instances.rs
++++ b/crates/devtools/tests/two_instances.rs
+@@ -9,18 +9,22 @@ use devtools::compare::{Column, first_difference};
+ use devtools::files::read_plain;
+ use devtools::recording::{Recording, parse_hashes};
+ use devtools::replay::{Replay, replay};
+-use devtools::scripts::{first_loop, looped};
++use devtools::scripts::{Content, first_loop, looped};
+ 
+ #[test]
+ fn two_matches_stepped_in_turn_each_give_their_own_hashes() {
+-    let (first, second) = (first_loop(), looped("second-loop", 1_500, 5));
+-    let alone = [&first, &second].map(|recording| replay(recording).expect("it replays"));
++    // Both play on the first recording's frozen content.
++    let folder = Path::new(env!("CARGO_MANIFEST_DIR")).join("recordings");
++    let bundle = read_plain(&folder, "first-loop.content.json").expect("the frozen content");
++    let content = Content::of(&bundle, "test-scene");
++    let (first, second) = (first_loop(&content), looped("second-loop", 1_500, 5, &content));
++    let alone = [&first, &second].map(|recording| replay(recording, &bundle).expect("it replays"));
+     // The two are different matches: their hashes differ in both columns from the first step with a command.
+     for column in [Column::Shared, Column::Whole] {
+         assert!(first_difference(&alone[0], &alone[1], column).is_some());
+     }
+-    let mut a = Replay::new(&first).expect("it replays");
+-    let mut b = Replay::new(&second).expect("it replays");
++    let mut a = Replay::new(&first, &bundle).expect("it replays");
++    let mut b = Replay::new(&second, &bundle).expect("it replays");
+     let mut together = [Vec::new(), Vec::new()];
+     // In turn, and unevenly: one step of the first, then up to two of the second.
+     for round in 0..1_800u32 {
+@@ -36,7 +40,6 @@ fn two_matches_stepped_in_turn_each_give_their_own_hashes() {
+         }
+     }
+     // And the first of them is the committed recording: its hashes are the file's.
+-    let folder = Path::new(env!("CARGO_MANIFEST_DIR")).join("recordings");
+     let bytes = read_plain(&folder, "first-loop.rec").expect("the committed recording");
+     assert_eq!(Recording::decode(&bytes).as_ref(), Ok(&first));
+     let hashes = read_plain(&folder, "first-loop.hashes").expect("its hashes file");
+diff --git a/crates/devtools/tests/two_processes.rs b/crates/devtools/tests/two_processes.rs
+index 6a4e76a..9fb1847 100644
+--- a/crates/devtools/tests/two_processes.rs
++++ b/crates/devtools/tests/two_processes.rs
+@@ -15,7 +15,7 @@ use devtools::compare::{Column, first_difference};
+ use devtools::files::read_plain;
+ use devtools::recording::{Recording, TickHashes, parse_hashes};
+ use devtools::replay::replay;
+-use devtools::scripts::{RECORDINGS, looped};
++use devtools::scripts::{Content, RECORDINGS, looped};
+ 
+ /// The variable that, with the parent's own arguments, makes a run of this program a child.
+ const ROLE: &str = "SHAMBLE_TWO_PROCESSES_CHILD";
+@@ -30,10 +30,19 @@ fn child_report() -> String {
+     use std::fmt::Write;
+     let fingerprint = RandomState::new().hash_one(0x5348_4D42u32);
+     let mut report = format!("\n{LINE}fingerprint {fingerprint:016x}\n");
+-    let long = looped(LONG.0, LONG.1, 9);
+-    let scripted = RECORDINGS.iter().map(|(name, script)| (*name, script()));
+-    for (name, recording) in scripted.chain([(LONG.0, long)]) {
+-        for step in replay(&recording).expect("it replays") {
++    // Every recording on its own frozen content; the long match on the first one's.
++    let folder = Path::new(env!("CARGO_MANIFEST_DIR")).join("recordings");
++    let frozen = |name: &str| {
++        read_plain(&folder, &format!("{name}.content.json")).expect("the frozen content")
++    };
++    let first = frozen("first-loop");
++    let long = looped(LONG.0, LONG.1, 9, &Content::of(&first, "test-scene"));
++    let scripted = RECORDINGS.iter().map(|(name, map_id, script)| {
++        let bundle = frozen(name);
++        (*name, script(&Content::of(&bundle, map_id)), bundle)
++    });
++    for (name, recording, bundle) in scripted.chain([(LONG.0, long, first.clone())]) {
++        for step in replay(&recording, &bundle).expect("it replays") {
+             let (tick, shared, whole) = (step.tick, step.shared, step.whole);
+             // Writing into a `String` cannot fail.
+             let _ = writeln!(report, "{LINE}{name} {tick} {shared:016x} {whole:016x}");
+@@ -95,7 +104,7 @@ fn two_more_processes_give_the_same_hashes_as_each_other_and_as_the_files() {
+         "not valid: the two processes did not differ in their hash-map state"
+     );
+     // Step for step, in both columns: the two children agree, and the first step that differs is named.
+-    let names = RECORDINGS.iter().map(|(name, _)| *name).chain([LONG.0]);
++    let names = RECORDINGS.iter().map(|(name, _, _)| *name).chain([LONG.0]);
+     for name in names {
+         let (a, b) = (steps_of(&one, name), steps_of(&two, name));
+         for column in [Column::Shared, Column::Whole] {

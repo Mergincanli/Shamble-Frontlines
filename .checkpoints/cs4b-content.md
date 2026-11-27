@@ -1114,6 +1114,22 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   back. Main 2483e9a's recording files copied out by `git show` into `.gate/cs4b/main-recordings/` for cut B,
   before any tool writes: each equal to the branch's (sha256 1c05e6b8... rec, 6ac4b9cc... hashes, b766f0c1...
   vector, 48f07158... manifest).
+- **Step 9, cut B, IN PROGRESS (uncommitted; saved 15:12 UTC as `cs4b-content/cutB-wip.patch`, 11 files of
+  `crates/content` and `crates/devtools`; to restore: `git apply` it on 2a98ace, then `cargo run -p devtools
+  --bin make_recordings -- --freeze first-loop` and `cargo run -p devtools --bin make_recordings`, which make the
+  four recording files again):** the content crate's test map (`map::TEST_TEXT`, id `test-scene`) and
+  `bundle::test_bundle()`; `scripts::Content` (a bundle's sha256 and the map), `looped`/`first_loop` taking it,
+  `RECORDINGS` naming each recording's map; `replay.rs`'s `check_content` (the sha256 the header names, the
+  loader's yes, the header's map) before the match is made, `ReplayError::Content`, and a header of zeros
+  refused; `files.rs`'s `frozen`, `frozen_name`, `made(folder)` (the frozen content an input, first in the
+  manifest), `freeze`; `make_recordings --freeze <name>`; the replay tool reading the frozen content beside a
+  recording; the test module's `replay_hashes(rec, bundle)` and `replay_state_at(rec, bundle, tick)`; the tests.
+  `first-loop.content.json` written by the freeze: 8,375 bytes, sha256 b9901bc9...7fd3, **the page's own
+  `content.json` byte for byte**. **The proof against main's `git show` copies holds**
+  (`cs4b-content/recordings-proof.mjs`, its output `recordings-proof.txt`): the 1,800 step records, the hashes
+  file's lines 2 to 1,801 and the vector file the same; by design the header's content hash and map id (`""` to
+  `"test-scene"`, 10 bytes), line 1 and three manifest lines. Left in cut B: the TypeScript side (`recording.ts`,
+  its test, the Node replay test, the browser replay spec), then the checks.
 
 ## Slips of this chat's own rules, for the report
 - One git command did not start its own shell call: `git add .checkpoints/cs4b-content/review-brief-4b1.md` stood

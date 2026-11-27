@@ -1,0 +1,17 @@
+same: the 1800 step records (122400 bytes at the file's end)
+same: the header up to the content hash (magic, version, seed, start tick, first sequence, tick rate)
+same: the step count (1800)
+by design: the content hash: 0000000000000000000000000000000000000000000000000000000000000000 (none) -> b9901bc9e0244aee8888fc965284c2fe952abc8b38a49c6621d575df8ecd7fd3
+by design: the map id: "" -> "test-scene" (the file 10 bytes longer)
+same: the header's content hash is the frozen content's sha256 (first-loop.content.json, 8375 bytes)
+same: the hashes file's 1801 lines and its last line end
+same: the hashes file's lines 2 to 1801, every step's shared and whole hash
+by design: the hashes file's line 1: "shamble-hashes 1 1c05e6b8b2a2cdda54b4196cf38ae4864613d8998217dff800e86e315bdc6cf1 1800" -> "shamble-hashes 1 200a793d997df58c77a7c26a76575c743a844c9ce887c8535eb6162388dee0df 1800"
+same: line 1 names the branch's recording by its sha256
+same: first-loop.vector.txt, byte for byte
+by design: a manifest line new or changed: first-loop.content.json: bytes 8375  sha256 b9901bc9e0244aee8888fc965284c2fe952abc8b38a49c6621d575df8ecd7fd3
+by design: a manifest line new or changed: first-loop.rec: bytes 122497  sha256 200a793d997df58c77a7c26a76575c743a844c9ce887c8535eb6162388dee0df
+by design: a manifest line new or changed: first-loop.hashes: bytes 69180  sha256 18fbc3a8f07cd25dec051087fd7bf9ff053cd634c1b3b611dc4c2490b8dc099b
+by design: a manifest line of main's gone or changed: first-loop.rec: bytes 122487  sha256 1c05e6b8b2a2cdda54b4196cf38ae4864613d8998217dff800e86e315bdc6cf1
+by design: a manifest line of main's gone or changed: first-loop.hashes: bytes 69180  sha256 6ac4b9cca47049510ddc6bf170c8241120f93a680f967027ec8df893cf8d565e
+every difference is one by design
