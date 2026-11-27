@@ -79,7 +79,7 @@ choice; recorded in risk 1 and section 5). GUARD-MARK still closes SA-RT-1's pro
 Read: diffs of routine-guard.mjs, routine-guard.test.mjs, guard.mjs, advisor.md (both sides), security-auditor.md,
 CLAUDE.md.new; track.mjs, track.test.mjs. Probes and patched copies: session scratchpad only.
 Sources: code.claude.com/docs/en/hooks (agent_id: subagent or in-process teammate); gh 2.89.0 --help for every pr/issue
-verb (comment, body and body-file flags; -R inherited); toolchain.yml:16-18 (no path filter); settings.json allow list.
+verb (comment, body and body-file flags; the inherited flags); toolchain.yml:16-18 (no path filter); settings.json allow list.
 Findings (id, severity, class):
 - SA-PA-1 Medium: MARK-FORMS (SA-RT3-1 partly open; plain gh forms).
 - SA-PA-2 Critical (by class; precondition unmeasured): MARK-THROW (fail open).

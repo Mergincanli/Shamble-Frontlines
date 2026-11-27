@@ -207,6 +207,19 @@ and gh() (7) after the definitions it uses (6); each state in between parses and
     folded into a fix pass); A4 UNSCANNED-VERBS Low (follow-up). Noted: MERGE-PROMPT (d) is not yet in DECISIONS
     (docs-keeper records it); his saved (d) answer is one byte because his message was the single letter.
 
+36. Build review, the advisor agent: APPROVE of the applied state (cmp, suites, gate, file list, modes). PASS-FORGE (the
+    same risk as FORGED-PASS) to him: (a) accept until the guard change-set, its fix first there; (b) the .gate script
+    runners off the no-prompt list now; (c) the no-prompt merge off until then; it and I recommend (a), security-auditor
+    (c) for a real lock now. REPO-PIN, A4, RC2-L1, RC3-L1, SA-RT2-1's guard-file half: STATUS follow-ups. Taking main in
+    (main touched DECISIONS, STATUS, ROADMAP, REPO_MAP, a report, toolchain.yml): park the main folder on a new local
+    branch from origin/main, a worktree of this branch under .gate/rt-sync, merge origin/main there (an ask: it writes
+    .github/), push, and docs-keeper, the report and checkpoint saves work there.
+37. Verifier: PASS WITH NOTES (gate --no-smoke PASS; full gate's smoke cannot run here, a Chromium build mismatch; suites
+    as stated and also on the tree merged with main; fix-words20 on the merge-base 44/65/52/1, on today's main 47/65/52/1;
+    fix-mutate 58/62 as claimed; files equal the copy). Notes: size is 1029 added (kit 990, CLAUDE.md 39), not 1019 (the
+    SA-RC-9 fix came after step 28); the repository map lacks the two new files; one notes line named a flag next to a
+    class label still open on main: reworded to class words (history keeps the earlier line).
+
 ## Current step
 Narrow re-checks of the second fix pass (advisor agent: track hunks, guard SA-RC-5/6, the advisor.md line-end gloss;
 security-auditor: its SA-RC fixes). In parallel, his answers: ADDITIONS-OK, SIZE-LINE (past the stop line); SA-PA-5,

@@ -67,3 +67,28 @@ since (only .github/workflows/toolchain.yml and docs).
 - Second runs: track 85/85, settings 127/127, checkpoint 33/33, kept-logs 9 pass/0 fail (stable).
 - Launcher allow path is tested: routine-guard.test.mjs:3993-4005 (day allow printed; routines and ConfigChange never;
   a mutant dropping `!role` is caught).
+
+## After the advisor call
+- HEAD moved during the run: 793d0ec9 (session saver, 14:53 UTC) on cd1a300b, touching only .checkpoints/ (it also
+  committed this file and verifier-words-base.mjs). Kit content unchanged since dcd8f563.
+- Plan match: plan.md "Build steps" table and "Critical files" = exactly the 8 files; settings.json and NIGHT_SHIFT.md
+  "not changed" (confirmed, not in the diff); no game code planned, gate +0 -0. The plan names kit parts (GUARD-MARK,
+  allow output, track.mjs parts), not exact kit symbol names; new names seen: track.mjs exports classify, pick,
+  wordsCheck, otherAdded, twinPaths, addedLines; routine-guard.mjs adds MARK, MARK_DENY, MARK_BIG, COMMENTS_JQ
+  (export), passAllows, and an `input` parameter on mcp() and mergeCheck(). All map to planned parts.
+- Size: numstat on the 8 files = 1029 added (kit 990, CLAUDE.md 39); the card's last figure (step 28) is 1019 (kit 980).
+  His SIZE-LINE (a) set no cap, so only the report figure needs the update.
+- Main moved (PR #78: DECISIONS +3 entries, no lines removed; toolchain.yml). track.test.mjs reads docs/DECISIONS.md by
+  entry id. Merged tree (git merge-tree HEAD origin/main = 6cbe8669, unpacked to .gate/verify-rt-merged, not a git
+  repo): track 85/85, routine-guard 1581/1581, settings 126/127; the 1 fail (S4, needs a git folder) fails the same on
+  main's tree unpacked the same way (.gate/verify-rt-mainx): a method artifact, not the merge.
+- Step 5, history: git log -i -G over origin/main..HEAD -- .checkpoints for each word: only added lines, never removed,
+  so history holds nothing HEAD does not. The 793d0ec9 hits for the search words are this file's own list of words.
+- Step 5, the two questions: :8-11 (day-session error path) already stated in main's routine-guard.test.mjs:7 and ends
+  at the normal prompt: OK. :134-139 (connector-name shape) is closed by this change and shown by the pushed kit diff;
+  the remainder is a class phrase: OK. :82 with :90 (a CLI flag named in a sources line, beside a class label for a
+  gap the notes mark pre-existing on main and open after merge, ending at a prompt): a hint, not a reproduction: Low.
+- Not my scope but seen: security-auditor's build review (793d0ec9) rates A1/A3 FORGED-PASS Critical by class, for
+  Mustafa's decision; the PR cannot merge before he decides it.
+- Removed my worktree .gate/verify-rt-main. Left (gitignored): .gate/verify-rt-merged(.tar), .gate/verify-rt-mainx(.tar),
+  .gate/rt-track-mut (fix-mutate's own scratch).
