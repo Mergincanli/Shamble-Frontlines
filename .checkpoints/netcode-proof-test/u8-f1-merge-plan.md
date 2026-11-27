@@ -226,3 +226,10 @@ the advisor rules."
   cover 110 required paths"; `git status --short`: the 6 paths staged and notes only (msg-2026-11-28.md, this file,
   um4-plan.md untracked). u8-report.md's M5 and M7 lines filled. Next: M8 (`git rm` of wip/u8-f1-build.patch, `git
   add` of u8-report.md and this file, the numstat check, one commit), then the card save that pushes it.
+- DONE 06:4x: M8: `git rm` of wip/u8-f1-build.patch (WIP-CLEAN; the only U8-F1 file under wip/); `git add` of
+  u8-report.md and this file; staged exactly the 6 (M), the 1 D and the 2 M; `git diff --cached --numstat 833c3f0 --
+  spikes/` = the patch's numstat line for line, `--shortstat` "6 files changed, 105 insertions(+), 12 deletions(-)";
+  the commit ddb06ffe829495023aaf12bbb9e5d27ce12c5da9 (9 files; no skip marker), HEAD^1 = H0, `git diff --quiet HEAD
+  -- spikes/` exit 0. Pushed by the card save that carries this line. Next: M9 (the saver restarted; CI on the pushed
+  head, push and pull request; B's read of the pushed head in the 10:50 window; then U8-F1's builder worktree by the
+  re-ruled form with Q3's scratch-folder addition).
