@@ -51,27 +51,37 @@ rust-reviewer's two maths allow-list entries (`rust-reviewer-cutC.md`); security
 The gate's symbol counts are the legacy files' (+0 -0); nothing under `legacy/` changes.
 
 ## Evidence
-- **Size:** 7,978 written lines (raw with the recordings 7,996) against his stop line 8,450; 2.5 times the designs'
-  count for steps 6 to 11 (3,155 by the sheet's rows: 110, 890, 545, 830, 540, 240; 4b-1 was 2.17, 4a 2.4). His one
-  sentence at two thirds came at cut B (5,668 by the count then in use, given at once).
+- **Size:** 8,347 written lines (raw with the recordings 8,365) against his stop line 8,450, at the fix pass's code
+  (70f11e1); 7,978 at step 11's end, so round 1's fix pass wrote 369. 2.6 times the designs' count for steps 6 to 11
+  (3,155 by the sheet's rows: 110, 890, 545, 830, 540, 240; 4b-1 was 2.17, 4a 2.4). His one sentence at two thirds
+  came at cut B (5,668 by the count then in use, given at once). [after: round 2's fix pass, if any.]
 - **Every code head of this seat** (5cef19f, ccde0d4, e1e2dd4, fbbd84d, 885d382, c68b8d5 with dcb5e6b, 46c192f,
-  c442a80): the full local checks passed whole (at step 11: 235 Rust tests twice, 234 in release, clippy and format
-  clean, the generated files written again unchanged, client 148, sim-worker 53, types 12, net 1, boundary 39, 29
-  Chromium tests in 208 s, the recordings what their scripts make), the gate with smoke, CI green (toolchain 9 min 43
-  s to 13 min 2 s; the job's limit is 25 minutes). [after: c442a80's toolchain run; the final head.]
-- **Planted defects** (`plants-4b2.py`, 84 plants plus 4 stamp and 6 native ones): the first whole run on c442a80, 83
-  caught of 83, 10 of 11 controls held (P19's page step ran after a refused build, with no stamp: a defect of the
-  script, fixed); the second whole run [after]. Every file put back, the players' file rebuilt to its digest.
+  c442a80, 70f11e1): the full local checks passed whole (at the fix pass, 70f11e1: 236 Rust tests twice, 235 in
+  release, clippy and format clean, the generated files written again unchanged, client 152, sim-worker 53, types
+  13, net 1, boundary 39, 29 Chromium tests in 217 s, the recordings what their scripts make), the gate with smoke,
+  CI green (toolchain 9 min 43 s to 13 min 2 s; the job's limit is 25 minutes). CI keeps only the newest push's
+  toolchain run on a branch, so a notes push cancels the code commit's own run; the run read is the newest head's,
+  whose code is the same. [after: the final head's runs.]
+- **Planted defects** (`plants-4b2.py`): on c442a80 (84 plants plus 4 stamp and 6 native ones), the first whole run
+  caught 83 of 83 and held 10 of 11 controls (P19's page step ran after a refused build, with no stamp: a defect of
+  the script, fixed), the second held all. Round 1's fix pass added 20 entries, each fix shown red on the defect it
+  closes and green again (W14 to W16, C38 to C54), and made a control hold only if it also says its words. **The
+  whole run on 70f11e1** (`plants-4b2.txt`): 97 defects caught of 97, 17 controls held of 17, every file put back
+  (30 files by sha256), the players' file rebuilt to its digest, the clean tree green.
 - **Loading content changed no state:** at cut B, `first-loop.hashes` lines 2 to 1,801, `first-loop.vector.txt` and
   the 1,800 step records equal main's `git show` copies; since then every recording file is byte for byte cut B's. A
   content byte folded into the shared state fails at step 1 natively, in Node and in Chromium (plants C17 to C19).
 - **The players' file:** 54,514 bytes on main, 217,692 with the loader (cut C), 257,421 with the world's tree
-  (step 10; gzip 100,215, brotli 82,101), sha256 3660132be46b33a4fbf59404b47a85a2436cfea47251adf386a42e529b800644;
-  the built-file check walks 95,441 instructions and refuses nothing; no word of a description or a schema in it.
+  (step 10; gzip 100,215, brotli 82,101); the built-file check walks 95,441 instructions and refuses nothing; no
+  word of a description or a schema in it. At the fix pass the same size and instruction count, and a new sha256,
+  2e8866474b2279c0c571c85bf6e4e30a30e336c95e45410e8697a5a5c365cf00 (was 3660132b...): the file carries the path
+  `crates/sim/src/collision.rs` once (panic places of the world's build), and the fix pass moved lines in that file;
+  the ray cast is in no step yet, so not in the file (read so, not proved byte by byte).
 - **The browser:** the page's content spec (one fetch, the served bytes the built file's, one changed value refused at
-  its file and line, seven hostile bundles shown only as the loader's sentence with no element, a failed fetch
-  starting no Worker); the isolation spec's dev server serves the build's bundle byte for byte. Firefox runs the rules
-  and replay specs only (CI).
+  its file and line, seven hostile bundles each shown only as the loader's own sentence for its class, whole, with
+  no element, a failed fetch starting no Worker); the isolation spec's dev server serves the build's bundle byte for
+  byte, refuses another site's ask with 403 and a fixed sentence, and passes an address with no path to Vite's own
+  handlers. Firefox runs the rules and replay specs only (CI).
 - **The table's names** (test-engineer's TE-1, High, at round 1): the second route reads 5 of the table's 15 values,
   and a swap between any two rows it does not read passed every check (its proof: the rows and `soldier.json` swapped,
   `--check` and every cargo test green). Step 8's sentence ("a row swapped within one of those [equal] pairs passes
@@ -82,10 +92,37 @@ The gate's symbol counts are the legacy files' (+0 -0); nothing under `legacy/` 
 - **Not verified:** the boundary and page specs run in Chromium, not Firefox; no Firefox run of the players' file's
   content refusals; the collision world is built but queried by nothing in a match (4c).
 
-## Reviews [after]
-rust-reviewer, security-auditor, netcode-architect, engine-architect, test-engineer, infra-engineer: one round, then
-one fix pass. The design reads during the build: rust-reviewer (steps 0, 10, cut C), security-auditor (the batch,
-the advisories, the test list), netcode-architect (route (i)), engine-architect, test-engineer (the test list).
+## Reviews
+Round 1 on c442a80, six reviewers, then one fix pass (70f11e1); round 2 on what changed [after]. The design reads
+during the build: rust-reviewer (steps 0, 10, cut C), security-auditor (the batch, the advisories, the test list),
+netcode-architect (route (i)), engine-architect, test-engineer (the test list).
+- **test-engineer: REVISE, one High.** TE-1 (the second route left a swap of two of the ten rows it does not read
+  open; step 8's sentence stated the gap too small): fixed (the table-name test; C38 caught, C39 and C40 held; its
+  own case C52 caught, C53 and C54 held). Lows: TE-2 (two native `cfg!` assertions can never fail, sim's
+  `compile_error!` stops such a build first: said here), TE-3 (a link test skipped where it cannot make a link:
+  fails under CI now), TE-4 (no meeting ray with a -0.0 direction part: added; the per-class minimum counts of the
+  committed rays: 4c), TE-5 (the hostile bundles passed on any refusal: each pinned to the loader's sentence), TE-6
+  (a wall-clock bound in a correctness spec: kept as a backstop), TE-7 (a test title that claimed too much:
+  retitled), TE-8 (plants run on a folded players' file with no paired control: clean builds first, controls C50
+  and C51).
+- **rust-reviewer: PASS with one Medium and two Lows.** RR-1 (Medium: a ray with huge finite numbers overflowed in the cast and gave
+  a wrong hit; no caller in 4b-2): fixed (the reach, the cap, the NaN guard; W14 to W16 caught). RR-2 (Low: the
+  schema said nothing of the fewest spawns): fixed. RR-3 (Low: a stale doc): fixed. Rulings (1), (8), (9): fine.
+- **engine-architect: one Medium, the rest Low or carried to 4c.** EA-1 (Medium: after the loader's refusal the page kept its copy of the
+  bundle, up to 8 MiB, for its life): fixed, with tests of the wiring (C41, C42 caught). Lows: EA-2 (types and
+  schemas from two sources, untied): a tie test (C47); EA-3 (two sentences for this report): written above, under
+  "Decisions and deviations"; EA-4 (the page's own copy of the format and version): tied to the loader's (C46); EA-5
+  (= NA-2) fixed; EA-6 (test helpers in the shipped crate's docs): hidden; EA-7 and EA-8: 4c's plan. Ruling (3)
+  (the map's reading moved with its reader) confirmed.
+- **security-auditor: PASS with three Lows.** SA-1 (an address with no path made the plugin's error page): fixed
+  (C44); SA-2 (another site's page could make the developer's browser start the content tool): fixed, 403 and
+  nothing started (C43); SA-3 (the tools checked one folder for a link, and opened following one): fixed (C45).
+  Rulings (2) and (4) confirmed, (1) fine.
+- **netcode-architect: PASS, two Lows.** NA-1 (the Node runner checked the content before what it can replay):
+  fixed; NA-2 (a stale doc): fixed.
+- **infra-engineer: PASS, two forward Lows, nothing to fix in 4b-2.** IE-1 (CI's Chromium run uses 3.6 to 3.9 of its
+  5 minutes: a split or a new limit before 4c adds a long spec; a CI file, so the CI Builder's) and IE-2
+  (`content.json` keeps a fixed name beside hashed files: no-cache or a hashed name when hosting is built).
 
 ## Decisions and deviations
 - His: DIFF-LIST (a); GUARD-RETRY (a); STEP12-GO (a); STEP11-ROOM unanswered, so the ladder built step 11.
@@ -106,13 +143,35 @@ the advisories, the test list), netcode-architect (route (i)), engine-architect,
   Worker script that does not load gives no message (cut C, caught by an existing spec); a replay of another map's
   recording would have run on `test-scene` (step 10's follow-up); a tie test read a file around his LINKS-CHECK scan
   (caught by the local checks before any push).
-- Slips of this chat's rules: listed in the card's "Slips" (times typed ahead of the clock, git after another program
-  in a read, a merge commit without attribution, the CI limit told as 15 minutes when it is 25).
+- In round 1's fix pass: C4 now runs the hand-over's own check alone (the new table-name test in the same file
+  catches C4's pair); a control holds only if it also says the words it names (C4, C40 and C54 must show their one
+  test passing); the new plants' words are the failure's own (Playwright prints the failing line's neighbours too,
+  so C43 and C44 read the assertions' own messages); the ray test's first form used `next_up`, which the simulation
+  crate's source scan refuses (ADR 0004 part 7's list), so the next float is made from its bits (found by the local
+  checks before the commit).
+- Slips of this chat's rules: listed in the card's "Slips" (times typed ahead of the clock, git and gh after another
+  program in reads, a merge commit without attribution, the CI limit told as 15 minutes when it is 25, two wrong
+  counts of the fix pass's plants told in the chat, one notes commit whose note on the board said more than that the
+  add-on is active).
 
 ## Risks
 1. The world is built and held but queried by nothing yet: its first real test is 4c's movement and aim.
 2. The players' file grew 4.7 times (mostly the standard library's number reading and writing); recorded, not gated.
 3. CI's toolchain run varies with the runner (9:43 to 13:02); 12 minutes under its limit.
+
+## Follow-ups (in `docs/STATUS.md`'s 4b-2 line and its archive block, by docs-keeper [after: their ids])
+- heapless 0.9.4 or later when rstar or parry3d next move (security-auditor's dependency read).
+- The licence texts for the hosted build (security-auditor).
+- The schema's `unit` column ships in the players' file and nothing reads it at run time (the advisor agent, step 11).
+- The first field with a default goes to the advisor agent first, with `read.rs`'s "nothing missing" rule (step 11).
+- 4c carries the re-read's condition 4: a recording that covers the first collision query.
+- The generated content types have no reader until 4c (EA-3); the local match's world moves to the room when 4c's
+  step queries it, and a rule keeps `content` out of the room's and the client endpoint's manifests (EA-7); 4c's
+  editor panel imports the schema limit function from product code (EA-8).
+- CI's Chromium run near its 5-minute limit (IE-1, the CI Builder's); `content.json`'s fixed name when hosting is
+  built (IE-2).
+- The committed rays' per-class minimum counts (TE-4, 4c); the static-world spec's wall-clock bound (TE-6, kept).
+- [after: round 2's findings left open below High, if any.]
 
 ## Proposed next step
 Change-set 4c, starting with the page's scene and the map's reading (moved from 4b-2), then the soldier's walk on the

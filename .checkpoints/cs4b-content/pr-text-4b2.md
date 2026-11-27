@@ -36,11 +36,13 @@ gate file is touched.
   later (test-only: nothing of it reaches the players' file).
 
 ### Evidence, in short [after]
-- Written lines: 7,978 against the stop line of 8,450 (the official count, `advisor-count-rule.md`).
-- Planted defects: [after] (the whole run's result file).
-- Reviews: [after]. The verifier: [after].
+- Written lines: 8,347 against the stop line of 8,450 (the official count, `advisor-count-rule.md`). [after: round 2.]
+- Planted defects: the whole run on the fix pass's code caught 97 of 97 and held 17 controls of 17, every file put
+  back. [after: the final head's run, if the code changes again.]
+- Reviews: round 1 by six reviewers (one High, two Mediums, the rest Low; each fixed or deferred with its reason),
+  then one fix pass; round 2 on what changed [after]. The verifier: [after].
 - CI on the final code: [after].
-- The players' file: 257,421 bytes (54,514 on main), sha256 3660132be46b33a4fbf59404b47a85a2436cfea47251adf386a42e529b800644: recorded, not gated.
+- The players' file: 257,421 bytes (54,514 on main), sha256 2e8866474b2279c0c571c85bf6e4e30a30e336c95e45410e8697a5a5c365cf00: recorded, not gated.
 
 ### Not in it
 - The page's scene and the map's reading field by field: the start of 4c (his STEP12-GO (a)).

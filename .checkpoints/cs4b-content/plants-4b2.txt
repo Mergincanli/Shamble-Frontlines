@@ -1,4 +1,4 @@
-plants on c442a806d83dceac6a272b22ad67b7f01de476fa
+plants on 70f11e130ee9dc0aabbb61a01bb9d3a6c013418e
 P1 CAUGHT (defect): a fused multiply-add exported from our own bindings: exit 1, found 3 of 3 wanted texts
 P2 CAUGHT (defect): the same through the vector library the collision library brings, reached from the simulation: exit 1, found 3 of 3 wanted texts
 P3 CAUGHT (defect): a relaxed-SIMD fused multiply-add instruction: exit 1, found 3 of 3 wanted texts
@@ -49,7 +49,7 @@ T10 CAUGHT (defect): an Export made at 60 steps a second is handed over: exit 1,
 C1 CAUGHT (defect): his movement table holds a value one step of a double from his Export's (the hand-over's check on the real files): exit 1, found 1 of 1 wanted texts
 C2 CAUGHT (defect): the same value, caught by the second route: exit 101, found 1 of 1 wanted texts
 C3 CAUGHT (defect): two rows of the table send their values to each other's field, and the movement table is written from that table (the second route): exit 101, found 1 of 1 wanted texts
-C4 HELD (control): the same mis-mapped pair passes the hand-over's own check, which is what the second route is for: exit 0, found 0 of 0 wanted texts
+C4 HELD (control): the same mis-mapped pair passes the hand-over's own check, which is what the second route is for: exit 0, found 1 of 1 wanted texts
 C5 CAUGHT (defect): the test scene's last lane post one millimetre taller: its world is not the committed one: exit 101, found 1 of 1 wanted texts
 C6 HELD (control): the clean content: the content folder's tests: exit 0, found 0 of 0 wanted texts
 C7 HELD (control): the clean content: the static world's tests: exit 0, found 0 of 0 wanted texts
@@ -83,6 +83,26 @@ C34 CAUGHT (defect): a property without its description: exit 101, found 1 of 1 
 C35 CAUGHT (defect): a schema file edited by hand: exit 101, found 1 of 1 wanted texts
 C36 CAUGHT (defect): a field renamed without the files written again: exit 101, found 1 of 1 wanted texts
 C37 HELD (control): the clean schemas: the content crate's export tests: exit 0, found 0 of 0 wanted texts
+W14 CAUGHT (defect): a ray beyond the reach is cast (rust-reviewer's overflow): exit 101, found 1 of 1 wanted texts
+W15 CAUGHT (defect): an endless limit is taken as endless: exit 101, found 1 of 1 wanted texts
+W16 CAUGHT (defect): a ramp's NaN goes on as if it were a number: exit 101, found 1 of 1 wanted texts
+C38 CAUGHT (defect): two rows whose Export values are equal trade fields (test-engineer's swap): the content needs no change, the table's names catch it: exit 1, found 2 of 2 wanted texts
+C39 HELD (control): the same equal pair passes the second route, which compares values: exit 0, found 0 of 0 wanted texts
+C40 HELD (control): the same equal pair passes the hand-over's own check, which compares values: exit 0, found 1 of 1 wanted texts
+C41 CAUGHT (defect): the page keeps its copy when the Worker refuses: exit 1, found 1 of 1 wanted texts
+C42 CAUGHT (defect): the page keeps its copy when the Worker itself fails: exit 1, found 1 of 1 wanted texts
+C43 CAUGHT (defect): another site's ask for /content.json starts the content tool: exit 1, found 2 of 2 wanted texts
+C44 CAUGHT (defect): an address that reads as no path makes the plugin's own error page: exit 1, found 2 of 2 wanted texts
+C45 CAUGHT (defect): the tools check the file's own folder only, not the folders above it: exit 1, found 1 of 1 wanted texts
+C46 CAUGHT (defect): the page's bundle version is not the loader's: exit 1, found 1 of 1 wanted texts
+C47 CAUGHT (defect): a generated type loses a key the schema names: exit 1, found 1 of 1 wanted texts
+C48 CAUGHT (defect): the schema writes no fewest spawns: exit 101, found 1 of 1 wanted texts
+C49 CAUGHT (defect): the loader's sentence for a key that is there twice changes: the page's spec pins it: exit 1, found 2 of 2 wanted texts
+C50 HELD (control): the boundary tests on a clean build of the players' file: exit 0, found 0 of 0 wanted texts
+C51 HELD (control): the replay, isolation and content specs in Chromium on a clean build: exit 0, found 0 of 0 wanted texts
+C52 CAUGHT (defect): test-engineer's own case: two rows the second route does not read trade fields, and the movement table their values: the table's names catch it: exit 1, found 2 of 2 wanted texts
+C53 HELD (control): the same case passes the second route, which reads neither value: exit 0, found 0 of 0 wanted texts
+C54 HELD (control): the same case passes the hand-over's own check, which compares the swapped table with the swapped content: exit 0, found 1 of 1 wanted texts
 S1 HELD (control): a page built from the walked file, by the page's step alone: exit 0
 S2 CAUGHT (defect): no stamp: exit 1
 S3 CAUGHT (defect): a stale stamp (another file's): exit 1
@@ -93,7 +113,7 @@ N3 CAUGHT (defect): the native tests of sim built with -Ctarget-cpu=haswell: exi
 N4 CAUGHT (defect): the native tests of devtools built with -Ctarget-feature=+avx2: exit 101, found 1 of 1 wanted texts
 N6 CAUGHT (defect): a cargo config file committed beside the workspace: exit 101
 N5 HELD (control): the native tests of content built with no flag: exit 0
-DEFECT CHECKS: 83 caught, 0 not caught. CONTROLS: 11 held, 0 did not hold.
-EVERY FILE PUT BACK (sha256 of 28 files as at the start): yes
-THE PLAYERS' FILE REBUILT TO ITS SHA256 FROM BEFORE THE PLANTS (3660132be46b...): yes
+DEFECT CHECKS: 97 caught, 0 not caught. CONTROLS: 17 held, 0 did not hold.
+EVERY FILE PUT BACK (sha256 of 30 files as at the start): yes
+THE PLAYERS' FILE REBUILT TO ITS SHA256 FROM BEFORE THE PLANTS (2e8866474b22...): yes
 CLEAN TREE GREEN: the players' build with its built-file check, the build checks' tests, the source scan: exits [0, 0, 0]

@@ -1486,7 +1486,64 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   byte by byte.) **Official count 8,347, raw 8,365** (21:18 UTC; 103 under the stop line). **The code commit:
   70f11e130ee9dc0aabbb61a01bb9d3a6c013418e** (2026-11-27 21:19:05 UTC, pushed): the 22 source files, the new
   `content-ties.test.mjs` among them, and the patch out of the notes; `git status --porcelain -- crates packages`
-  empty after it. **From 21:19 UTC: the plants' whole run on 70f11e1** (`.gate/plants-whole-3.out`).
+  empty after it. **The plants' whole run on 70f11e1, 21:19 to 21:25 UTC** (`plants-4b2.txt`, 119 lines): **97
+  defects caught of 97, 17 controls held of 17**, every file put back (30 files by sha256), the players' file rebuilt
+  to its digest (2e8866474b22...), the clean tree green (exits [0, 0, 0]); C52 (test-engineer's own swap) caught,
+  C53 and C54 held (C54 with its one test shown passing); `git status --porcelain -- crates packages Cargo.toml
+  Cargo.lock content` empty after it. **CI on 70f11e1:** gate and smoke green (run 46069521913); its toolchain run
+  (46069522189) was cancelled at 21:20:58 UTC by the next notes push (787c099): CI keeps only the newest push's
+  toolchain run on a branch. The run read is the one on 5990e7e (46069923055; the same code): **green**, the job
+  21:23:12 to 21:36:02 UTC (12 min 50 s, under its 25-minute limit); the gate and smoke green on 5990e7e too (run
+  46069923030). **Round 2 from 21:26 UTC:** rust-reviewer, security-auditor and test-engineer (brief
+  `review-brief-4b2-round2.md`); engine-architect and netcode-architect when a seat frees (three at a time). The
+  tools on the real files at 21:30 UTC: `testlines.mjs --check` ("15 values, each his Export's", sha256
+  a9d47785...), `content_bundle --check` (2 content files, a bundle of 8,375 bytes, sha256 b9901bc9...: "every file
+  is what the loader takes; nothing written").
+- **Round 2, security-auditor: PASS, four Lows, none blocking** (`cs4b-content/security-auditor-review-4b2-round2.md`,
+  DONE; its scratch scripts `vite-round2.mjs`, `walk-round2.mjs` under `.gate/security-auditor-4b2-scratch/`). SA-1,
+  SA-2, SA-3 closed (each run in a scratch copy of the real config and tools: `//` gets Vite's own page, no header,
+  `same-origin` and `none` are served, `same-site`, `cross-site`, mixed case, empty and doubled headers get the 403;
+  a link anywhere on the walk refused, `O_NOFOLLOW` gives ELOOP, outside the base refused). TE-5 and TE-3 fine. Its
+  Lows, numbered here in its final answer's order (its notes number three of them otherwise): **L2-1** the isolation spec asks only `cross-site`, so a rule narrowed to `from === "cross-site"` would pass
+  (one more ask with `same-site`, about 2 lines); **L2-2** nothing holds `canonical.mjs`'s passing of `base` (a test
+  with `content/` as a link, about 4 lines); **L2-3** latent: the walk checks the normalised path while `openSync`
+  opens the string as given, so `lnk/../` read outside the base in its scratch run; no caller reaches it (every path
+  is made by `path.join`) (`file = path.resolve(file)` first in `readPlain` and `writePlain`, 2 lines); **L2-4**
+  outside this diff, from change-set 3a: `serve.test.mjs` still skips its two link tests under CI (about 1 line, or
+  a follow-up). Two risks for the main session to accept or not: a browser that sends no `Sec-Fetch-Site` is served
+  like a tool (dev server only); a folder swapped for a link between the check and the open is followed (a race on
+  the developer's own disk). Its own slip: three read-only git calls after `cd … &&` or `;`. **engine-architect
+  launched at 21:33 UTC** in its seat.
+- **Round 2, rust-reviewer: PASS, three Lows** (`cs4b-content/rust-reviewer-review-4b2-round2.md`, DONE). RR-1, RR-2,
+  RR-3 closed; 2^20 a sound bound (the loader's coordinates stay within ±10,000 m, so every product stays finite and
+  t stays within [0, 2^20]); step 10's four conditions unchanged; the test's values each pin one branch; the new
+  branches the same bits natively and in WebAssembly (comparisons and NaN tests, no new arithmetic linked). **The
+  players' file's new sha256, judged on its own builds** (release wasm32 from both heads, 288,101 and 288,103 bytes
+  with names): the code section byte-identical; the data differs in 6 bytes, five of them `collision.rs` line numbers
+  moved by +11 and one a line shift in another file; the name section 2 bytes longer, and the players' file strips
+  that section. Its Lows: **(1)** the ramp guard looks for NaN only: an infinite `above` and `rate` give a NaN
+  crossing, and an infinite `rate` alone a -0.0 crossing, each a wrong hit at t = 0 in a code-built world (probes:
+  ramp [0,-1e33,-1]..[1e33,1e33,1] toward +x, origin (0,0,0), direction (0,-2^20,0), limit 100; ramp
+  [0,0,-1]..[1e33,1,1], origin (0,0.5,0), direction (0,+2^20,0)); no loader-taken map reaches it (fix: `is_finite`
+  for both, 0 new lines, and about 6 test lines). **(2)** `RAY_REACH`'s doc says the cap is 2^20 metres; it is 2^20 in
+  t, metres only for a unit direction: the one in-reach answer the fix pass changed (origin (-5000,0.5,0.5), direction
+  (1e-3,0,0), limit 1e7: a hit at t = 5e6 before the cap, none now) (about 2 doc lines). **(3)** nit: `map.rs:341`
+  checks `is_empty()`, not `len() < MIN_SPAWNS` (1 line). Its runs (own target, `--locked`): fmt, clippy `-D
+  warnings`, the workspace tests and the release tests of sim, content and sim-wasm (341 tests), the wasm32 release
+  build. **netcode-architect launched at 21:35 UTC** in its seat.
+- **Round 2, test-engineer: PASS, one new Low** (`cs4b-content/test-engineer-review-4b2-round2.md`, DONE; its plant
+  script `test-engineer-4b2-r2plants.py`, its group plant's log `.gate/test-engineer-4b2-scratch/r2-group-cargo.log`).
+  TE-1, TE-3, TE-4 (the -0.0 rays; the per-class counts to 4c as agreed), TE-5, TE-7, TE-8 closed; TE-2 closed (said
+  in the report); TE-6 deferred as agreed. It replayed its swap on 70f11e1 (the name test fails on its own words),
+  found C4's pair caught by the name test too, C21 failing only its own 2 cap tests, C43, C44 and C49 each finding
+  their words inside the right test's failure block, the totals 97 of 97 and 17 of 17, and the card's step 8, the
+  test's doc and the report's draft saying the gap and its closing correctly. **TE-9 (Low, a missing negative):** the
+  name test holds each row's field to the last step of its Export name, not its group; his Export has
+  `values.hornet.body_radius_m` 0.45 and `values.hornet.step_up_m` 0.3 beside the soldier's rows, and a row re-pointed
+  to `hornet.body_radius_m` with `soldier.json` given 0.45 passes `--check`, the 12 hand-over tests and the cargo
+  tests in its scratch copy. Fix (about 2 lines): the groups by name in the same test. (Its list names movement, jump,
+  stamina and pushing; the table also has `aim_down_sights`, which the fix must name.) Its slip: one `git log` after
+  other commands in one call, a read.
 
 ## Slips of this chat's own rules, for the report
 - One git command did not start its own shell call: `git add .checkpoints/cs4b-content/review-brief-4b1.md` stood
@@ -1545,7 +1602,13 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   (about 21:06 UTC). The 17 new entries are 13 defects and 4 controls; the run of 20 by name was 15 defects caught
   (those 13, C21 and C26) and 5 controls held (those 4 and C4). Found by the advisor tool's read; corrected to him
   in the next chat message. The card's own entry had the right numbers. (13) For one notes commit (89866fd) the
-  card's note on the board said a little more than that the add-on is active; trimmed in the next.
+  card's note on the board said a little more than that the add-on is active; trimmed in the next. (14) Two more git
+  commands did not start their own call, both reads: at 21:00 UTC a `git status --porcelain` after a `cd` and a
+  `date`, and at 21:29 UTC a `git diff --stat -- .checkpoints` after a `cd`. Told to him in the chat; since then
+  each git command starts its own call (the shell's folder is the worktree already). (15) The same for gh, all reads
+  of CI's state: three calls of 21:28 UTC put a `date` before `gh api`, and a watcher started at 21:27 UTC called
+  `gh api` in a loop every 45 seconds (its calls never started their own shell call). The watcher was stopped at
+  21:29 UTC; CI is read since then by plain `gh api` calls alone in their call. Told to him in the chat.
 
 ## HAND-OVER: where another session picks this up (written 2026-11-27, 00:44 Amsterdam; kept current)
 His words of 2026-11-27, 00:43 Amsterdam (2026-11-26, 23:43:38 UTC; `cs4-walk/mustafa-2026-11-27-save-every-25-
@@ -1632,7 +1695,8 @@ again here. SEAT-OUT from him: stop at a whole point and report the last commit'
    decided). The count at its end, 7,978, was under the second rung, and the look ahead before step 12, about
    9,630, past 8,450: **he chose STEP12-GO (a) at 20:03:18 UTC: step 12, with the map's reading, moves to the
    start of 4c, and 4b-2 closes with steps 6 to 11** (the card's "Decisions taken").
-5. **The close, now:** the last code commit (a comment of `content.ts` that named step 12); `plants-4b2.py
+5. **The close, now** (where it stands: "Current step" below; done so far: the plants' whole runs, review round 1,
+   its fix pass at 70f11e1 with its whole run; round 2 running): the last code commit (a comment of `content.ts` that named step 12); `plants-4b2.py
    --anchors` (reads only), then `plants-4b2.py <commit>` whole, alone in the worktree (it edits source files one
    plant at a time); then the reviewers on the final diff (b9aad01 to the head), three at a time, one round, then
    one fix pass (a second round only on what changed): rust-reviewer, security-auditor (the dev server's route, the
@@ -1699,14 +1763,15 @@ never a test cut or thinned to fit CI's limit (his CI-TIME); a toolchain run sto
 in two lines.
 
 ## Current step
-4b-2 (2026-11-27, 22:01 Amsterdam, from the clock; Builder V6). **Steps 6 to 11 done; step 12 moved to the start
+4b-2 (2026-11-27, 22:28 Amsterdam, from the clock; Builder V6). **Steps 6 to 11 done; step 12 moved to the start
 of 4c by his STEP12-GO (a), received 20:03:18 UTC.** On this seat: 35e96ad (main in), 5cef19f (step 8's second
 part), step 9 in three cuts (ccde0d4, e1e2dd4, fbbd84d), step 10's wiring (885d382, with c68b8d5 and dcb5e6b),
 step 11 (46c192f): each with its full local checks, the gate and CI green (CI on 46c192f: gate and smoke green,
 its toolchain run read at the next step). **Official count 7,978 at step 11, raw 7,996, of 8,450.** In hand: **the
 close** (HAND-OVER item 5): the plants' whole run twice (done), review round 1 (done, six reviewers), its one fix
-pass (in progress: every fix written and unit-tested, saved as the notes' patch at f14905f; the plants for the
-fixes running; then the checks and the code commit), then round 2 on what changed.
+pass (done: code commit **70f11e1**, 21:19 UTC; the full local checks, the gate, the plants' whole run 97 of 97 and
+17 of 17; official count 8,347), round 2 on what changed (running from 21:26 UTC); then the verifier, docs-keeper,
+the report, the notes out of the head, the advisor agent, his go.
 
 ## Next steps (the sheet's revision 3, section G; each step ends with the count of written lines)
 - **4b-1:** 1 the content crate's manifests · 2 the reader, the writer, the bundle, the two kinds, the old tuning's
@@ -1758,9 +1823,9 @@ fixes running; then the checks and the code commit), then round 2 on what change
   plain text), and the reviewers for step 12 (graphics-engineer, perf-auditor, art-director) are not called.
 
 ## Running work
-- From 21:01 UTC: the plants script on the fix pass's 20 changed or new plants (W14 to W16, C4, C21, C26, C38 to
-  C51), on f14905f's tree with the fix pass applied; it edits source files one plant at a time and puts each back,
-  so nothing else touches `crates/`, `packages/` or `content/` until it ends. Then: the format and lint checks, the
-  count, the full local checks, the gate, the code commit (the patch out of the notes), the plants' whole run.
+- From 21:26 UTC: review round 2's first three (rust-reviewer, security-auditor, test-engineer), each writing
+  `<name>-review-4b2-round2.md`; then engine-architect and netcode-architect. CI's toolchain run on 5990e7e
+  (46069923055) is read before the next push. Then: round 2's one fix pass if needed, the verifier, docs-keeper,
+  the report, the notes out of the head, the advisor agent.
 - rust-reviewer's read of cut C's two names ended (DONE). Its own disassembly run filled the disk for a while (its
   notes' warning: never `llvm-objdump -d` on the twins); it deleted that output, 54 GB free again.

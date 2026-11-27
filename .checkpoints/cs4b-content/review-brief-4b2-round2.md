@@ -88,7 +88,10 @@ test-engineer" in `.checkpoints/cs4b-content.md`):
 release, client 152, sim-worker 53, types 13, net 1, boundary 39, 29 Chromium tests in 217 s), the gate with smoke
 (PASS), CI (gate, smoke, toolchain: the main session reads it), and the plants: their run by name on the fix pass's
 changed or new entries, and the whole run (`.checkpoints/cs4b-content/plants-4b2.txt`, its log
-`.gate/plants-4b2.log`): WHOLERUN. The players' file: 257,421 bytes and 95,441 instructions walked, as at c442a80;
+`.gate/plants-4b2.log`): the whole run on 70f11e1, 21:19 to 21:25 UTC: 97 planted defects caught of 97, 17 controls
+held of 17, every file put back (30 files by sha256), the players' file rebuilt to its digest from before the plants,
+the clean tree green. Since the fix pass a control holds only if it also says the words it names (C4, C40 and C54,
+each run with `-t`, must show their one test passing). The players' file: 257,421 bytes and 95,441 instructions walked, as at c442a80;
 its sha256 changed (2e886646... from 3660132b...): the file carries the path `crates/sim/src/collision.rs` once (the
 world's build has panic places there) and the fix pass moved lines in that file (read so, not proved byte by
 byte; rust-reviewer may judge it). The card
