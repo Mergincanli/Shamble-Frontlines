@@ -15,7 +15,7 @@ import { tmpdir } from 'node:os';
 import { basename, dirname, join } from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { decide, realIo, REPO } from './routine-guard.mjs';
+import { COMMENTS_JQ, decide, realIo, REPO } from './routine-guard.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const P = '/repo';
@@ -42,13 +42,18 @@ function fakeIo(o = {}) {
     role = '', branch = 'cs/x', branchDiff = 'docs/a.md\n', staged = 'docs/a.md\n', unstaged = '',
     tracked = ['tools/gate.mjs', '.claude/scripts/checkpoint.mjs', 'tools/village.py', 'tools/preview.js', 'docs/a.md', 'changed.mjs'],
     changed = ['changed.mjs'], manifestSame = true, npmrc = [],
-    headSha = SHA, prHeadSha = headSha, fork = false, checks = [['gate', 'completed', 'success'], ['smoke', 'completed', 'success']],
+    headSha = SHA, prHeadSha = headSha, fork = false, checks: rawChecks = [['gate', 'completed', 'success'], ['smoke', 'completed', 'success']], noToolchain = false,
+    comments = null, // review tracks: the PR's comments as the guard's merge-check read answers them (one JSON object per line; a string is sent as is)
     prFiles = 'docs/a.md\t\n', ghFail = false,
     // kit-v3-5: total_count and changed_files default to what is listed (noTotal, noChanged leave the field out)
-    totalCount = checks.length, noTotal = false, changedFiles = lineCount(prFiles), noChanged = false,
+    totalCount: rawTotal, noTotal = false, changedFiles = lineCount(prFiles), noChanged = false,
     // kit-v3-5 (SA5-1): an untracked tools/npm-shrinkwrap.json, or a tracked one that differs from main's
     untrackedShrinkwrap = false, shrinkwrapDiffers = false,
   } = o;
+  // review tracks: a green toolchain run rides every check list, unless the case names toolchain itself, opts out
+  // (noToolchain), or sets total_count (the count cases read the list exactly as given)
+  const checks = noToolchain || rawTotal !== undefined || rawChecks.some(([n]) => n === 'toolchain') ? rawChecks : [...rawChecks, ['toolchain', 'completed', 'success']];
+  const totalCount = rawTotal ?? checks.length;
   // prHeadSha is what the PR object reports as its head; headSha is the SHA the check-runs are keyed by (= the expected
   // head in the green case). They differ only in the "head moved" case, to isolate the head-equality check.
   const pr = (ref, n) => JSON.stringify({ number: n, head: { sha: prHeadSha, ref, repo: { full_name: fork ? 'someone/fork' : REPO } }, base: { repo: { full_name: REPO } }, ...(noChanged ? {} : { changed_files: changedFiles }) });
@@ -57,8 +62,9 @@ function fakeIo(o = {}) {
     [`repos/${REPO}/pulls/5`]: pr('cs/other', 5),
     [`repos/${REPO}/issues/comments/111`]: JSON.stringify({ issue_url: `https://api.github.com/repos/${REPO}/issues/16` }),
     [`repos/${REPO}/issues/comments/222`]: JSON.stringify({ issue_url: `https://api.github.com/repos/${REPO}/issues/27` }),
-    [`repos/${REPO}/commits/${headSha}/check-runs?per_page=100`]: JSON.stringify({ ...(noTotal ? {} : { total_count: totalCount }), check_runs: checks.map(([name, status, conclusion]) => ({ name, status, conclusion })) }),
+    [`repos/${REPO}/commits/${headSha}/check-runs?per_page=100`]: JSON.stringify({ ...(noTotal ? {} : { total_count: totalCount }), check_runs: checks.map(([name, status, conclusion, completed_at = '2026-11-27T10:00:00Z']) => ({ name, status, conclusion, completed_at })) }),
     [`repos/${REPO}/pulls/27/files?per_page=100`]: prFiles,
+    ...(comments ? { [`repos/${REPO}/issues/27/comments?per_page=100`]: comments.map((c) => (typeof c === 'string' ? c : JSON.stringify(c))).join('\n') } : {}),
   };
   return {
     env: role ? { SHAMBLE_ROLE: role } : {},
@@ -88,6 +94,9 @@ function fakeIo(o = {}) {
       const path = args.find((x) => x.startsWith('repos/'));
       // kit-v3-5 (TE1): the file list answers only the guard's exact read (every page, the @tsv filter)
       if (path?.includes('/files?') && !(args.includes('--paginate') && args[args.indexOf('--jq') + 1] === TSV_FILTER)) return { code: 1, out: '' };
+      // review tracks: the comment list answers only the guard's exact read. gh does the paging, so these pinned arguments
+      // (every page, the exported filter) are the only proof that a PASS on a later page is read.
+      if (path?.includes('/comments?') && !(args.includes('--paginate') && args[args.indexOf('--jq') + 1] === COMMENTS_JQ)) return { code: 1, out: '' };
       return path in ghAnswers ? { code: 0, out: ghAnswers[path] } : { code: 1, out: '' };
     },
     exists: (p) => (basename(p) === '.npmrc' ? npmrc.includes(p) : true),
