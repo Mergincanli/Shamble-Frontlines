@@ -208,8 +208,32 @@ puts them inside check.mjs, so a whole run cannot leave them out.
   - SEC-UM4-3 (Low): OPS_MISSING's `--prefix ops/browser` is relative to the operator's shell; it fails closed from the
     repository root.
   - UM4H-1 CONFIRMED, with a corrected clause (review-um4-security.md:136-138).
-  - Next: the advisor agent's ruling on the round (T-1 to T-5, SEC-UM4-1 to -3, UM4H-1), then the fix pass, its commit,
-    CI and the head read.
+- The round's ruling (advisor-um4-r1.md, B4, "Status: COMPLETE 2026-11-27 20:36 UTC"): every item APPROVE; SEC-UM4-1
+  stays Medium, widened by UM4R-1 (redact-check.test.mjs:157-191 and :193-230 build their temporary repositories from
+  the inherited environment too, and also run in the redact step); both halves of the fix now; no second round
+  (NPT-TRIM); one fix-pass commit by the main session.
+- THE FIX PASS, recorded before any edit (advisor-um4-r1.md section 6):
+  - Files: spikes/netcode-proof/check.mjs; spikes/netcode-proof/check.test.mjs; spikes/netcode-proof/ops/tests/
+    operator.test.mjs (:157, one line in place); spikes/netcode-proof/ops/operator/redact-check.test.mjs (:161 and :197,
+    one line each in place); dependency-check.md's UM-4 record (S's corrected clause word for word, SEC-UM4-2's line);
+    this file. ops/ stays 0 net by numstat (1 1 and 2 2), so U8 stays at 6,282 of 6,284; a site that needs more stops
+    before its edit, and OPS-GIT-ENV-B goes to him.
+  - Symbols: check.mjs exports `withoutGitVars(env)` (a copy with every key that begins `GIT_` left out; pure);
+    `opsStep(runner, present, base = process.env)` passes `withoutGitVars(base)` to both calls; OPS_MISSING names the
+    absolute prefix `join(HERE, "ops", "browser")`; STEPS.ops unchanged.
+  - New tests in check.test.mjs: "the ops step: both of its calls get the environment without any GIT_ variable
+    (SEC-UM4-1)"; "U8's temporary-repository tests leave the repository GIT_DIR names unchanged (SEC-UM4-1, UM4R-1)";
+    "the ops step reads the wrappers' summary from stdout, and only as its last line (T-2)". Changed: the either-part
+    test (T-1's stand-ins, exact messages), the web step's test (its Node part's stand-in, exact message), the first ops
+    test (T-4's path pin), the missing-folder test (its pin built by join).
+  - Proof: red first by name (the env pin, the victim test) on the shipped code; each helper site restored alone turns
+    the victim test red; mutants M1, M3, W1, M4, M10, M8, M-env and M-wild each killed by a named test
+    (um4-fix-mutants.mjs, logs under /home/user/Shamble-Frontlines/.gate/um4-fix/); the counted run `node check.mjs
+    --only self,ops,redact,refs` through main-run.sh; `node tools/gate.mjs --no-smoke`; the repo map. No git variable
+    is ever exported in a shell command: GIT_DIR exists only inside the victim test's child env, naming its mkdtemp
+    victim.
+  - Carried: T-3 and UM4R-2 (STATUS follow-ups), T-5 (infra-engineer, after the close), the security seat's memory line
+    (the card's follow-ups).
 
 ## Size (for U8-FILLS)
 About 20-30 added lines by estimate: the step and its missing-folder line in check.mjs (about 12-18), the list entry
