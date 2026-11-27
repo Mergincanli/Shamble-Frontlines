@@ -8159,3 +8159,28 @@ From Mustafa, 27 November (written with my Advisor). A standing rule against nee
   and Edit tools do it; kit and gate writes still ask him first. It binds this session and every agent: each brief
   carries his three rule sentences word for word.
   Transcript line 113476 (a queue-operation remove at 12:37:29.264Z, when the running turn took it), 463 characters.
+
+## Mustafa, 2026-11-27 13:55 UTC, in this chat: NO WAITING FOR WINDOWS, TAKEIN-CODE (b), #75-GO (a), Builder 2's command when ready (word for word)
+```text
+FOR THE NETCODE CHAT. From Mustafa, 27 November, 14:45 Amsterdam (written with my Advisor).
+
+1. NO WAITING FOR WINDOWS. My lean-mode rule "new agents only in the first 30 minutes after a usage reset" ends now. Whenever usage is there, start the next step at once, at any hour, and pull your scheduled window starts forward. Do not wait for 15:50 UTC today if you can work now. What stays: only R1's path, at most three agents, every agent saves each finished block at once, and after a cut you continue from the notes and redo nothing. One limit: do not start a step that must not be cut, such as a merge's no-save stretch, unless the usage left covers it.
+2. TAKEIN-CODE: (b), with exactly the conditions you listed. You send me the one line, and the advisor still reads the pushed result.
+3. #75-GO: (a). Yes, #75 merged on my go. I gave it in Builder V4's chat on 26 November at 18:52:56 UTC ("you can go merge it"), for head 2542b1a0c109e54c514cf63d1c2e2de8932a1a7b. It is saved by script on branch claude/cool-pasteur-oiqk1r as `.checkpoints/cs4-walk/mustafa-2026-11-26-go-merge-75.md` and enters DECISIONS with lane 1's next docs pass.
+4. Builder 2's merge: name the command as soon as you are ready for it. It does not have to wait for the evening.
+5. Rules unchanged: git and gh always start their own command, with no other program in front of them. In a shell command, spell out every file you write with its full path.
+```
+- **Read as** (the main session's reading, not his words): (1) LEAN-MODE item 3 ENDED: the next step starts whenever
+  usage allows, at any hour; the scheduled window starts are pulled forward (the 15:50 window's three seats run now).
+  Kept: only R1's path; at most 3 agents; every agent saves each finished block at once; after a cut, continue from
+  the notes and redo nothing. The limit: a step that must not be cut (a merge's no-save stretch) starts only when the
+  usage left covers it (read from the session's rate-limit events). (2) TAKEIN-CODE (b), the conditions as listed in
+  msg-2026-11-27.md:71-77: a code pull request reviewed and merged on main comes in with its numbers re-derived at the
+  take-in's first step and no new advisor check, if it touches no kit, CI, manifest, lockfile, spikes/, design or look
+  doc or mark row, main's CI is green and the conflicts are the same; one line to him; the advisor still reads the
+  pushed result. (3) #75-GO (a): #75 merged on his go (Builder V4's chat, 2026-11-26 18:52:56 UTC, head 2542b1a0…);
+  nothing more for this lane; his record is lane 1's (claude/cool-pasteur-oiqk1r), into DECISIONS at its docs pass.
+  (4) NB2-ONEWAY: the merge command is named as soon as the steps before it allow (its plan check first), not held for
+  the evening. (5) The interim rule and FULL-PATHS unchanged.
+  Written 14:45 Amsterdam (13:45 UTC) by his header; transcript line 113867 (a queue-operation enqueue at
+  13:55:41.836Z), 1429 characters.
