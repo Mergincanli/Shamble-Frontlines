@@ -7,8 +7,10 @@ revision 4: section 6 and the sections it names), three reads against today's co
 re-read carries the part's exact symbols to add and to remove, taken from the designs' tables as they stand that
 day." **No file outside `.checkpoints/` is edited before the advisor agent's verdict.**_
 
-**Status of this revision: being written.** Sections D and E fill in as the three reads finish; until then they
-say "pending".
+**Status of this revision: complete for the advisor agent's review** (2026-11-28, about 01:20 Amsterdam), from four
+finished reads: engine-architect, netcode-architect and rust-reviewer (DONE), and game-designer's on BODY-SHAPE and the
+push's numbers, still running: its result comes as an addendum, and the movement step is held for BODY-SHAPE in any
+case.
 
 ## A. Since the plan was approved (2026-11-25)
 - **Merged:** 4a (pull request #70, main 2483e9a), 4b-1 (#75, b9aad01), 4b-2 (#79, dae6d107, at head b7145273 on his go
@@ -210,7 +212,93 @@ by option; block 4 its risks. What the sheet takes from it:
 - **Its size:** 1,300 / 1,260 by the designs' count on the route of our own sweeps (the plan: 1,240 / 1,090); with the
   ray counts, the sweep proof and NO-SOURCE's fields about 1,430 / 1,370.
 
-### E2 to E7: pending netcode-architect's read and engine-architect's last block
+### E3 to E5, the page side: engine-architect's blocks 3 and 4 (`engine-architect-read.md`, lines 395 to 565, DONE)
+The read's block 3 is a delta against its design 4.1 to 4.10 with today's file:line; what the sheet takes from it:
+- **Step 3's layout (crates/client-endpoint):** `ElementType::F32`; `Section.rows` (with `end_of` and the hash's
+  stream); sections `own` (1 row of 20 bytes) and `soldiers` (48 rows of 40); `header.soldier_count` (the header 8 to
+  12 bytes, `tick` and `layout_hash` unmoved); the soldier row: `id` (slot and generation), position, velocity, yaw,
+  pitch, flags (occupied, alive, grounded, sprinting; aiming joins in 4d), team, `ready`, one reserved byte; the
+  block 1,988 bytes. **New since the plan:** the stamina bar has no field anywhere, so the owner's section takes
+  `stamina u8` (a share of a full bar) and `own_flags u8` (bit 0: sprint locked) in its spare space, the size staying
+  20; the lock cannot be worked out from the stamina (run dry, it stays locked until the bar is back at its share),
+  so it is a hashed state bit in the simulation and a wire bit, **raised for rust-reviewer and netcode-architect**.
+- **Step 3's page part:** `PictureFrame` becomes `{ older, newer, blend, timeMs }` with the blocks as the `DataView`
+  the link already makes once per block (a view made per frame would fail allocation.spec.ts's limit); `WorkerLink`
+  keeps a ring of three `{ buffer, view, dueAt }` (DEPART-4's three newest blocks); `app/blend.ts`; `dueAt` from the
+  pacer's own due time (`afterTick(now, dueMs)`), posted with each block; the Worker's pool from 4 to 16 (3B-POOL-16).
+- **Step 4:** picture.ts gains `cursorRay`, `cameraYaw`, `plainLines` (sized for its first user, the aim line) and the
+  start option `panelHost`, and `PictureContent.camera`; `soldier/stand-in.ts` and `rows.ts`; `camera/follow.ts`
+  from the camera file's values (his Export's framing replaces the old game's: DIFF-LIST); `input/move.ts` (the move
+  as one packed word, as the 13-number call has it); `input/pointer.ts` (no mouse button is a game button in 4c: the
+  right button is 4d's, so 3B-BLUR-TEST holds W in 4c and gains the button in 4d); `hud/stamina.ts` (a plain
+  production meter, hidden when full and not locked); the readout's rows; `DEV_MARKERS` + `"aim-line"`; the
+  production scan reads `.css` too and the development rules move to their own file (3B-CSS-PROD). **The camera's
+  content kind moves from step 5 to step 4,** where its first reader (the follow camera) is: `crates/content/src/
+  camera.rs` (format `shamble-camera` 1, his Export's 21 camera values by their own names and units), the camera file
+  written by the Testlines tool from his Export, the bundle's folders, the schema writer, the generated `Camera` type,
+  `readCamera` on the page. The scene's overview camera leaves at step 4.
+- **Step 5:** the panel (backquote, sliders whose limits come from the generated camera schema through one product
+  function, `numberLimits(schema)` moved into `@shamble/types`: 4B-LIMIT-IMPORT); the five old presets as a `presets`
+  list in the camera kind, written by script from `docs/legacy-tuning.json` (each sets the 6 values the old preset
+  set, never 15 invented ones); "copy values" by one browser-safe copy of the content's canonical rule, which
+  `canonical.mjs` then imports. What TUNE-HOME and RESUME-FLASH change, option by option: the read's 3.6 (TUNE-HOME
+  (a) has "copy values" print his Export's names instead of the file's bytes; RESUME-FLASH (b) adds a `dark()` call on
+  the key diagram when the tab hides).
+- **NO-SOURCE's one page consequence:** the stand-in's height and the body's are one number; under (a) and (b) it is a
+  movement field the page reads (`readMovement`, the generated `Movement`'s first page reader), so no 1.80 m constant
+  sits in the page.
+- **4B-WORLD-ROOM (block 4):** the room owns the authority's static world (and the match's `Rules` and spawns), taken
+  in `Room::new` and borrowed by `World::authority_step` each tick; never inside `World` (it is not state) and never
+  beside the room in `LocalMatch` (the room is also the native server's match). The constructor that loads the
+  content builds it, so no `[dependencies]` line changes; **`content` joins the room's `[dev-dependencies]`** for its
+  tests, a lockfile change under the dependency hold (security-auditor first); a layering test in devtools
+  (`tests/layering.rs`) keeps `content` out of the room's and the client endpoint's manifests and sources, with two
+  planted defects. With step 1, the first step that queries the world inside the room.
+- **The page side's open points for others:** the zero-ray meaning (netcode-architect: whether an all-zero ray means
+  "no ray this post"; needed only under SIZE-4C (c)); step 3's Rust lines split between the snapshot and the block
+  (netcode-architect); the sprint-lock bit and the stamina's wire (rust-reviewer and netcode-architect); under (c),
+  whether PM-0004-28 ("before 4c merges") may be met in 4c-3 (the advisor agent).
+
+### E2, E3's timing, E6, E6b, E6c: netcode-architect's read (`netcode-architect-read.md`, blocks 1 to 6, DONE)
+The read holds every symbol with today's file:line and each test with its planted defect; what the sheet takes:
+- **Step 2, the command path** (block 1; 315 / 630 against the plan's 385 / 530): the aim's maths in `sim::aim` (so
+  the simulation's float scan covers it); the old game's rule corrected: the aim falls back to the ground plane
+  beyond a 400 m reach (not the design's 500 m and fire-height plane); the map's bounds added to `StaticWorld` in
+  whole centimetres; the host zeroes the move when the tab hides; the first aim clamped into the bounds; the replay
+  readers' refusals of a move and an aim go (replay.rs:81-91, recording.ts:141-142); `clamp_move` steps both parts on
+  a tie. **The post: 13 numbers with the move packed in one word** (the plan's 6.2 (2) and the recording's format;
+  engine-architect's design 3.6 had 14, and its read now follows the 13).
+- **Step 3's wire and timing** (block 2; about the plan's 320 / 340 with engine-architect's layout): the block
+  message carries `dueAt` (a pacer signature change); the page keeps three blocks; the pool goes to 16; the blend
+  picks its pair by the stamped due times and measures the fraction back from the newer block's due (worked by hand
+  for the first frame after a pause: no jump, no step back); the allowance rises at once and falls gradually, its
+  estimator pinned by its test B1.
+- **Step 6, the recordings** (block 3; 245 / 170): `first-loop` moves in step 1's commit (as rust-reviewer found) and
+  is frozen anew whenever the movement kind gains a field; new `walk` (2,400 ticks) and `lane-walk` (1,200), with
+  `walk_reaches.rs` proving every query kind is hit; his FEATURE-COMPARE condition needs no new browser spec (Firefox
+  already runs `tests/replay/**`); 4B-RAY-WASM as three lines in `static-world.txt` (rust-reviewer picks the three
+  rays and owns 4B-RAY-COUNTS).
+- **Steps 6b and 6c** (block 4; 6b 130 / 115, 6c 45 / 220): the paced spec needs a folder of its own,
+  `tests/paced/`, because the Firefox project runs everything under `replay/` (**the plan's 6b row is corrected**);
+  PM-0004-39 can only use a map built in code, since the loader refuses bounds beyond 327.67 m.
+- **RESUME-FLASH by option** (block 5): (a) about 5 / 40 beyond steps 1 and 3; (b) 10 / 20 more; (c) the host's two
+  hide lines removed and two tests reversed; (d1) a reserved button bit, about 25 / 40; (d2) a new call, so a new
+  recording format and every recording made anew.
+- **The order if his movement answers come late** (block 6, facts; the advisor agent rules): of steps 2 and 3 all
+  but three pieces need neither step 1 nor any of his answers (the jump rule J1 to J5, the room's snapshot fill with
+  S4, and a soldier to fill the block's row); built before step 1, nothing is built twice in substance, and three
+  things are touched twice (the constructors, the snapshot's soldier field list, and first-loop's hashes, the last
+  only if the world keeps the command's move and aim). His FEATURE-COMPARE condition binds the pull request, not the
+  order: `walk` lands in the pull request that brings step 1 and the cast.
+- **Its calls for the sheet** (its closing list): the record's width (it recommends that the world does not keep the
+  command's move and aim, so step 2 moves no hash; rust-reviewer's read has the shared state write them: **a clash
+  for the advisor agent**); one home for the bounds (the aim's centimetres and the movement's metres, built once);
+  the room's and endpoint's tests get a world through `content` as a dev-dependency (engine-architect's block 4); the
+  jump's rule J1 to J5 counted once (it sits in both reads); the soft push is in no recording (one slot), so its
+  sameness across targets needs a WebAssembly run of its own; 6b's spec waits for the CI Builder's answer to
+  4B-CHROMIUM-TIME; **three readings not in DEPART-4's fourteen, for his word**: PM-0004-60 at 2,000,000 commands in
+  CI's release line (not 10 million nightly through a fuzzer); PM-0002-14 met in its ray half only until change-set 8
+  brings the view time; PM-0004-20's hash half on `walk` (one soldier), its flag-off timing not runnable.
 
 ## F. Sizes, the ladder and the stop lines
 - By the designs' count: steps 1 to 7, 7,315; step S about 740 (engine-architect's recount; 630 before); together
@@ -248,4 +336,36 @@ by option; block 4 its risks. What the sheet takes from it:
 - **Risks:** CI's Chromium run uses 3.6 to 3.9 of its 5 minutes (4B-CHROMIUM-TIME): 4c's browser tests may pass it,
   and the fix is a CI edit, the CI Builder's, with his yes first. Others pending the reads.
 
-## H. What I ask of the advisor agent — written when D and E are in
+## H. What I ask of the advisor agent
+1. **Step 0 and step S: APPROVE or REVISE now.** Neither waits for a movement answer. Step 0 is made after your verdict
+   and waits for PASTE-BREAKS, BOARD-WORDS and DESIGN-CLASH; step S is built after your verdict, and its reviews wait for
+   his SIZE-4C answer (under (a) they run on 4c's final diff).
+2. **Step S's hold:** this chat told him it holds step S to about 1,420 written lines until he answers SIZE-4C (the
+   plan's rule on the first sheet's 630). engine-architect's recount (740) gives about 1,665 by the same rule, and the
+   step is expected at about 1,600 to 2,000. The hold is this chat's own limit, not his line: does it stay at 1,420,
+   or follow the plan's rule on the recount? Either way the count is said to him at each step's end.
+3. **The count rule in 4c:** your count ruling of 2026-11-27 held the generated TypeScript counted "to the end of
+   4b-2". Counted in 4c too, or not?
+4. **Step S's reviewers:** graphics-engineer, perf-auditor, engine-architect, security-auditor, test-engineer, as 4b's
+   plan named them for this step; whether art-director reads a greybox.
+5. **SWEEP-ROUTE** (E1): accept our own sweeps as a departure recorded for his acceptance (DEPART list), or keep the
+   library's queries as the Walk card under his go words it ("our own movement on parry3d's queries")? Or is it his
+   to answer now?
+6. **The record's width** (E2's calls): the world keeps the command's move and aim in the shared state
+   (rust-reviewer's read) or not (netcode-architect's, so step 2 moves no hash)? And one home for the bounds
+   (centimetres for the aim, metres for the movement).
+7. **The order while his movement answers are out** (netcode-architect's block 6; rust-reviewer's block 3's list):
+   may the pieces that need no answer be built before step 1's movement (steps 2 and 3 but for J1 to J5, the room's
+   snapshot fill and a soldier for the row; step 1's table, rules, jump, stamina, easing, facing and the sweeps' common
+   part), or does the plan's order stand?
+8. **The dependency holds 4c reopens:** libm as a direct dependency of `sim` (E1) and `content` in the room's
+   dev-dependencies (E3 to E5): one batch for security-auditor before either is committed, pushed or built?
+9. **Readings and departures for his word or for dated pointers** (E1 to E6): our own sweeps (item 5); the three
+   readings netcode-architect lists (PM-0004-60 at 2,000,000 in CI's release line; PM-0002-14 in its ray half;
+   PM-0004-20's hash half on `walk`); the camera kind at step 4, not step 5; the stamina and the sprint lock in the
+   owner's section; the plan's step 6 corrections (first-loop re-made in step 1; the paced spec in `tests/paced/`).
+   Which go to him now, and which wait for the drafts' next revision as dated pointers?
+10. **BODY-SHAPE** (E1; game-designer's read is running and its result comes as an addendum): the movement step is
+    held until it is settled with him. Anything else you need before you would approve steps 1 to 7 once his answers
+    are in?
+11. **Under SIZE-4C (c) only:** may PM-0004-28 ("before 4c merges") be met in 4c-3 (engine-architect's seam)?

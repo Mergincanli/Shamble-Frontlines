@@ -237,6 +237,9 @@ stamped with the time its tick was due; the page blends between ticks; the Worke
   119` `end_of` becomes rows times stride; `:84-103` `BLOCK_LAYOUT`: the header's `soldier_count`, the soldier section
   (48 rows of 40 bytes: the row is slot i), the owner's section (the local soldier's id, team, the aim the endpoint
   sent); `block.rs:22-79` the writer; `layout_ts.rs`; `packages/types` regenerated; `worker-link.ts:5-16` offsets.
+  **The header's `soldier_count`** is written by the block writer from what the endpoint holds: 0 until the first
+  snapshot that carries the soldier (so before the join is answered and before the first snapshot), then 1 in 4c (one
+  slot, and the snapshot carries only the owner's record); from change-set 5, the slots the snapshot's records fill.
   The yaw and pitch for the row: computed from the soldier's facing and aim where engine-architect puts it (Rust with
   the pinned libm's arc tangent, which joins the float vectors, plan 5.3; or the page's `Math.atan2`, allowed because
   they are no simulation values). In the client endpoint, a direct `libm` line would be a manifest change.
@@ -276,10 +279,10 @@ stamped with the time its tick was due; the page blends between ticks; the Worke
 |---|---|---|---|
 | S1 | `protocol` codec tests | the soldier record round-trips with every flag combination; NaN, an infinity or a signalling NaN in any float refuses the snapshot; an unknown flag bit refuses it; the longest snapshot is `MAX_SNAPSHOT_BYTES` (40) | the finite check on all floats but one |
 | S2 | `decoder_inputs.rs` | the generator's soldier part; 10 million per type, no panic, a decode re-encodes to the same bytes (15) | a soldier part that encodes `-0.0` and decodes `0.0` (two wire forms) |
-| S3 | `endpoint.rs` tests | row 0 of the block is the decoded soldier; a refused snapshot leaves the row as it was and counts `refused`; before the join the header's count is 0 (30) | the row written before the finite check |
+| S3 | `endpoint.rs` tests | row 0 of the block is the decoded soldier; a refused snapshot leaves the row as it was and counts `refused`; the header's count is 0 before the first snapshot that carries the soldier and 1 after it (30) | the row written before the finite check |
 | S4 | a native test in `sim-wasm` (PM-0001-17's first piece, my design 3.4) | over a replay of `walk`, the endpoint's decoded soldier serialised through the state's visitor equals the room's soldier's bytes, every tick (30) | the endpoint narrowing a float through `f64` and back with a rounding step |
 | B1 | `blend.test.ts` (PM-0002-26's smoothness clause, the blend alone) | frames at exactly 60, 120 and 144 Hz over 18,000 ticks; blocks due every P; arrivals = due + lateness drawn from a seeded distribution **assumed** through his two numbers (median 1.967 ms, p99 14.07 ms, one Brave run) plus the report's copy and delivery; a mover at 6.3 m/s: std / mean of the drawn step per frame at most 5 % with three blocks, at each rate; the fraction always in [0, 1], r never past the newest's due (70) | (P1) the same rule with only the two newest held; (P2) two held, the fraction paced from the newest's arrival (N20: the test is not won against one weak form); (P3) the newest drawn without blending; (P4) the fraction not clamped. P1 to P3 must exceed 5 % at 144 Hz; P4 must break the [0, 1] check. The 90th-percentile allowance is printed as a reading, not asserted (my 5.8 % is arithmetic) |
-| B2 | `blend.test.ts` | a pause of 60 s and one of 6 minutes between ticks 100 and 101 (due times by the rebase), a dropped gap of 9 ticks, and a block later than d: on a mover going one way the drawn position never goes back; the frames after the return draw tick 100 exactly until r passes due(101) - P; no frame steps more than its own motion plus one late block's catch-up (50) | rule A of N21 (every block re-timed from the newest by ticks): a step back; blending by (r - due(older)) / (due(newer) - due(older)): a jump of nearly a tick at the return |
+| B2 | `blend.test.ts` | a pause of 60 s and one of 6 minutes between ticks 100 and 101 (due times by the rebase), a dropped gap of 9 ticks, and a block later than d: on a mover going one way the drawn position never goes back; the frames after the return draw tick 100 exactly until r passes due(101) - P; no frame steps more than its own motion plus one late block's catch-up; and the allowance falling (an outlier of 14 ms leaving the window of 64): no frame steps more than its own motion (60) | rule A of N21 (every block re-timed from the newest by ticks): a step back; blending by (r - due(older)) / (due(newer) - due(older)): a jump of nearly a tick at the return; the allowance falling at once: a forward step of up to 8 ms of motion in one frame |
 | B3 | `host.test.ts`, `pacing.test.ts` | each block's `dueAt` is its own tick's due time on the shared clock (the first after a rebase is the rebase's time plus P; in a catch-up wake each tick its own, not the wake's start); `dueAt <= startAt <= doneAt` (25) | the start stamped as the due |
 | B4 | `messages.test.ts` | a block message without `dueAt`, with a non-finite one, or with `dueAt > startAt`, refused (15) | the order check left out |
 | B5 | `worker-link.test.ts` (replaces `:67-73`, "keeps the two newest blocks") | the three newest kept with their due times; the fourth sent back with the next frame's post; none sent back twice (20) | two kept |
@@ -287,7 +290,7 @@ stamped with the time its tick was due; the page blends between ticks; the Worke
 
 ### 2.3 The count (bottom-up, unmultiplied)
 - Mine: code: `protocol` 60, `room` 10, `endpoint` 25 (Rust 95); `pacing.ts` 5, `host.ts` 10, `messages.ts` 10,
-  `worker-link.ts` 35, `blend.ts` 60 (TS 120): **215**. Tests: S1 to S4 115; B1 to B6 200: **315**.
+  `worker-link.ts` 35, `blend.ts` 60 (TS 120): **215**. Tests: S1 to S4 115; B1 to B6 210: **325**.
 - engine-architect's layout and writer (layout.rs, block.rs, layout_ts, types, picture.ts): by its own design about
   105 code and 25 tests in this row (its block 3); its read gives today's figure.
 - **About 320 / 340 together, the plan's row.** Not counted: the regenerated TypeScript.
@@ -618,14 +621,16 @@ Facts only; the advisor agent rules on any reorder.
 7. The soft push is in no recording (one slot): its cross-target identity needs its own WebAssembly run (N29).
 8. CI: 6b's paced replay needs the CI Builder's answer to 4B-CHROMIUM-TIME first (N15); the 2,000,000-command runs go
    in the release line, which has room (N16).
-9. Corrections to my own design of 2026-11-25, all applied above: the aim falls back to the ground plane at 400 m (N6);
+9. J1 to J5 (the jump's rule, 10 code / 80 tests) are counted in my step 2 (block 1.3), though their code is built
+   in step 1's movement: if rust-reviewer's step 1 count holds them too, count them once.
+10. Corrections to my own design of 2026-11-25, all applied above: the aim falls back to the ground plane at 400 m (N6);
    the blend's allowance rises at once to the largest of 64 and falls gradually, not the 90th percentile, the
    estimator pinned by B1 (N19); the fraction is measured back from the
    newer block's due (N21, rule B); the pool is 16; there is no placement counter; first-loop moves with step 1.
 
 ## Counts, one line per block (bottom-up, unmultiplied; plus or minus 30 %)
 - Block 1, step 2: 315 code / 630 tests = 945 (plan 385 / 530 = 915).
-- Block 2, step 3: mine 215 / 315 = 530; with engine-architect's layout about 320 / 340 (plan 320 / 340).
+- Block 2, step 3: mine 215 / 325 = 540; with engine-architect's layout about 320 / 340 (plan 320 / 340).
 - Block 3, step 6: mine 245 / 170 = 415 (plan 320 / 230 = 550, the rest being the other designs' marks).
 - Block 4, step 6b: 130 / 115 = 245 (plan 130 / 110); step 6c: 45 / 220 = 265 (plan 30 / 180).
 - Block 5, RESUME-FLASH: (a) about 5 / 40 beyond steps 1 and 3; (b) 10 / 20 more; (c) about 5 changed, two tests
