@@ -197,7 +197,7 @@ index 5d19aa8..9862fda 100644
  
  /// The loopback of a local match: each slot takes the longest message there is, and one step moves at most two
 diff --git a/crates/sim/src/collision.rs b/crates/sim/src/collision.rs
-index d0949d7..c28f644 100644
+index d0949d7..d01e382 100644
 --- a/crates/sim/src/collision.rs
 +++ b/crates/sim/src/collision.rs
 @@ -24,6 +24,12 @@ use crate::vec::V3;
@@ -266,7 +266,7 @@ index d0949d7..c28f644 100644
          assert_eq!(
              cast(&built, [0.0, 0.5, -3.0], [0.0, 0.0, 1.0]),
              Some((0, 3.0))
-@@ -697,6 +720,69 @@ mod tests {
+@@ -697,6 +720,68 @@ mod tests {
          );
      }
  
@@ -302,12 +302,11 @@ index d0949d7..c28f644 100644
 +        assert_eq!(cast(&built, [13.0, 3.0, 1.0], [0.0, -2e6, 0.0]), None);
 +        let edge = cast(&built, [13.0, 3.0, 1.0], [0.0, -RAY_REACH, 0.0]).expect("at the reach");
 +        assert_eq!(edge.0, ramp_px);
++        // The next float above the reach, by its bits (ADR 0004 part 7's list holds `to_bits`, not `next_up`).
++        let beyond = f32::from_bits(RAY_REACH.to_bits() + 1);
++        assert_eq!(cast(&built, [13.0, 3.0, 1.0], [0.0, -beyond, 0.0]), None);
 +        assert_eq!(
-+            cast(&built, [13.0, 3.0, 1.0], [0.0, -RAY_REACH.next_up(), 0.0]),
-+            None
-+        );
-+        assert_eq!(
-+            built.cast_ray(v(RAY_REACH.next_up(), 3.0, 1.0), v(0.0, -1.0, 0.0), 10.0),
++            built.cast_ray(v(beyond, 3.0, 1.0), v(0.0, -1.0, 0.0), 10.0),
 +            None
 +        );
 +        // A direction so short that no shape is within reach: an endless limit reaches `RAY_REACH`, not infinity, so

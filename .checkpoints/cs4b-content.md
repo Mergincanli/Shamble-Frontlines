@@ -1020,8 +1020,8 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
     main is taken in once, before 4b-2 changes a shared doc. VISION-RULE, an addition (his item 9, a to e): for
     the docs pass, no code now; open, in his words: "the exact eye height, which reaches the game through my
     Export, and which points of an enemy's body the line is tested against". Saving every 25 minutes, the
-    agents' work too; SEAT-OUT: stop at a whole point and report the last commit's id. The board: not set up for
-    this chat; nothing is posted there.
+    agents' work too; SEAT-OUT: stop at a whole point and report the last commit's id. The board add-on is active
+    for this chat (his message of 2026-11-27 in the chat, which replaced that line of item 10).
   - **Pull requests:** this chat cannot open or merge one: the guard keeps `gh api` read-only
     (`routine-guard.mjs:1466`, "GitHub writes go through the GitHub MCP tools"), the environment refuses `gh pr`,
     and no GitHub MCP tool is attached. At the close the pull request's title and text go in the notes; his
@@ -1055,7 +1055,10 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
     route takes five values that stand once among the fifteen** (walk speed, sprint multiplier, gravity, the
     refill time by its other name, push strength): three pairs are equal (the two easing times 0.164, body and
     push radius 0.4, step-up and the sights multiplier 0.55), so **a row swapped within one of those pairs
-    passes every check**: said in the test and in the report as not verified.
+    passes every check**: said in the test and in the report as not verified. **Corrected at round 1's fix pass
+    (test-engineer's TE-1, High): the gap was wider, since a swap between any two of the ten rows the second route
+    does not read passed every check. It is closed by the table-name test (see "The fix pass" below), and the
+    not-verified line is gone from the test's doc and the report's draft.**
 - **Step 8, second part: the content files from his Export, and the tests on the real files: DONE** (commit
   **5cef19f8648860160c0e95f2bf5e4ed3a06590af**, 2026-11-27 14:50:27 UTC, pushed; on his DIFF-LIST (a); the gate
   passes with smoke; the full local checks passed whole, 14:40:27 to 14:46:45 UTC: 222 Rust tests twice, 221 in
@@ -1460,7 +1463,19 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   Found in the log: Playwright's frame of a failing line also prints its neighbours, so C43's and C44's first
   words (each one's own line of code) stood in both frames and told neither apart. They now read the assertion's
   own message (`-   403,` in the diff, `Expected: not 500`); run again at 21:05 UTC: both caught. **Official count
-  8,348, raw 8,366** (21:05 UTC; 102 under the stop line). **Running from 21:05 UTC:** the full local checks.
+  8,348, raw 8,366** (21:05 UTC; 102 under the stop line). **The full local checks, first run (from 21:05 UTC):
+  stopped** at `cargo test`: the simulation crate's source scan refused `next_up` twice in the new collision test
+  (`collision.rs:756`, `:760`: a float method outside ADR 0004 part 7's list; the scan reads test code too). Fixed
+  with the next float's bits (`f32::from_bits(RAY_REACH.to_bits() + 1)`, as `collision.rs:687` already does); the
+  scan (9 of 9) and the collision tests (9 of 9) pass; format clean. **Second run from 21:08 UTC.** The advisor
+  tool's read (about 21:07 UTC), each done: TE-1's sentence corrected in the card's step 8 entry and taken out of
+  the report's draft (where the closing now stands); EA-3's two sentences added to the report's draft and the pull
+  request's text (they were not there: the brief said they were); a control now holds only if it also says its
+  words when it names any, and C4 and C40 (each run with `-t`) must say `Tests  1 passed | 11 skipped (12)` (their
+  log already did: each ran its one test); test-engineer's own case for TE-1 added as C52 (rows and
+  `soldier.json` swapped for `sprint_time_from_full_s` and `sprint_returns_at_pct`) with controls C53 (the second
+  route) and C54 (the hand-over's check), for the whole run. Anchors: 106 edits of 104 plants, 0 wrong. The whole
+  run comes before any round 2 reviewer starts; the brief's head and count are filled on the committed head.
 
 ## Slips of this chat's own rules, for the report
 - One git command did not start its own shell call: `git add .checkpoints/cs4b-content/review-brief-4b1.md` stood
@@ -1514,6 +1529,11 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   it was committed. (10) The same for engine-architect's launch: "about 20:31" written when the clock read 20:26:57;
   corrected before it was committed. From here every time in the card is written only after the clock is read.
   (11) At the fix pass (about 20:50 UTC) one `git diff --stat` stood after a `cargo test` in one call. A read.
+  (12) **The chat told him two wrong counts of the fix pass's plants:** "17 new plants: 14 planted defects, 3
+  controls" (about 21:00 UTC) and "each fix catching the defect it closes (17 of 17), and the 5 controls held"
+  (about 21:06 UTC). The 17 new entries are 13 defects and 4 controls; the run of 20 by name was 15 defects caught
+  (those 13, C21 and C26) and 5 controls held (those 4 and C4). Found by the advisor tool's read; corrected to him
+  in the next chat message. The card's own entry had the right numbers.
 
 ## HAND-OVER: where another session picks this up (written 2026-11-27, 00:44 Amsterdam; kept current)
 His words of 2026-11-27, 00:43 Amsterdam (2026-11-26, 23:43:38 UTC; `cs4-walk/mustafa-2026-11-27-save-every-25-
@@ -1528,7 +1548,7 @@ just continue as you were)". So: the chat's work and its agents' work are commit
 A session of another account that takes this over works on its own branch from this branch's head and never pushes
 here (his Lanes rule). The head: see the newest entries above (the card is saved with every push, at least every
 25 minutes: his item 10). Code that is not yet committed is saved as a patch in the notes and named in the card's
-newest entry (none at this save). No agent is running. No board for this chat: post nothing there (his item 10).
+newest entry (none at this save). No agent is running. The board add-on is active for this chat.
 This seat's container is new: its `.gate/` held nothing of Builder V4's, so the machine-only list below is made
 again here. SEAT-OUT from him: stop at a whole point and report the last commit's id.
 
@@ -1708,8 +1728,8 @@ fixes running; then the checks and the code commit), then round 2 on what change
 ## Decisions taken
 - His go for the merge of #70 and his answers to the six decisions · Mustafa · 2026-11-26, 12:21:17 UTC.
 - His rules for this chat: no CI, kit or gate file is written here; never a push to another chat's branch; git and
-  gh always start their own command, one git per shell call. The board add-on was active for Builder V4's chat; it
-  is not set up for Builder V6's (nothing is posted there).
+  gh always start their own command, one git per shell call. The board add-on was active for Builder V4's chat,
+  and is active for Builder V6's (his message of 2026-11-27 in the chat).
 - DIFF-LIST (a): his Export's list at 30 steps is his; its movement values become the game's starting movement
   table; a later Export replaces them the same way · Mustafa · 2026-11-27, received 13:57:21 UTC
   (`cs4-walk/mustafa-2026-11-27-builder-v6.md`, item 7).

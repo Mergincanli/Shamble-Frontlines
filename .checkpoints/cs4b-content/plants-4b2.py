@@ -121,6 +121,12 @@ POST_OLD, POST_NEW = millimetre_up(MAP_FILE, "yard_lane_post_50")
 EQUAL_ROWS_OLD, EQUAL_ROWS_NEW = fields_swapped(TABLE_FILE, "speed_up_time_to_90pct_s", "stop_time_to_10pct_s")
 # The hand-over's own check on the repository's files, without the table-name test the fix pass added beside it.
 HAND_REAL = HAND + ("-t", "the check holds content/movement/soldier.json to his saved Export")
+# What a run of HAND_REAL must say: its one test ran and passed (a pattern that matched none would pass on nothing).
+ONE_RAN = ["Tests  1 passed | 11 skipped (12)"]
+# Test-engineer's own case for TE-1: two rows the second route does not read trade fields, and the movement table
+# their values, so the hand-over's check agrees with it.
+TE_ROWS_OLD, TE_ROWS_NEW = fields_swapped(TABLE_FILE, "sprint_time_from_full_s", "sprint_returns_at_pct")
+TE_OLD, TE_NEW, _, _ = numbers_swapped(SOLDIER, "sprint_returns_at_pct", "sprint_time_from_full_s")
 
 # name, kind, what the defect is, the edits (file, text there once, its replacement), the command, the words its output must hold
 PLANTS = [
@@ -247,7 +253,7 @@ PLANTS = [
      [f"values.stamina.refill_time_from_empty_s is {REFILL_TEXT} in his Export, and the loader's stamina_refill_time_s is {SPRINT_TEXT}"]),
     # Since the fix pass the hand-over's test file also holds the table-name test, which catches this pair (C38's
     # kind): C4 runs the hand-over's own check alone, as it did before that test was there.
-    ("C4", "control", "the same mis-mapped pair passes the hand-over's own check, which is what the second route is for", [(TABLE_FILE, ROWS_OLD, ROWS_NEW), (SOLDIER, STAMINA_OLD, STAMINA_NEW)], HAND_REAL, []),
+    ("C4", "control", "the same mis-mapped pair passes the hand-over's own check, which is what the second route is for", [(TABLE_FILE, ROWS_OLD, ROWS_NEW), (SOLDIER, STAMINA_OLD, STAMINA_NEW)], HAND_REAL, ONE_RAN),
     ("C5", "defect", "the test scene's last lane post one millimetre taller: its world is not the committed one", [(MAP_FILE, POST_OLD, POST_NEW)], PROOF,
      ["the test scene's world is not the committed one"]),
     ("C6", "control", "the clean content: the content folder's tests", [], FILES, []),
@@ -339,7 +345,7 @@ PLANTS = [
     ("C38", "defect", "two rows whose Export values are equal trade fields (test-engineer's swap): the content needs no change, the table's names catch it", [(TABLE_FILE, EQUAL_ROWS_OLD, EQUAL_ROWS_NEW)], HAND,
      ["testlines.test.mjs > his Export and the game's first movement table, the repository's own files > every row of the table sends its Export value to the field of the same name", "expected 'stop_time_to_10pct_s' to be 'speed_up_time_to_90pct_s'"]),
     ("C39", "control", "the same equal pair passes the second route, which compares values", [(TABLE_FILE, EQUAL_ROWS_OLD, EQUAL_ROWS_NEW)], FILES, []),
-    ("C40", "control", "the same equal pair passes the hand-over's own check, which compares values", [(TABLE_FILE, EQUAL_ROWS_OLD, EQUAL_ROWS_NEW)], HAND_REAL, []),
+    ("C40", "control", "the same equal pair passes the hand-over's own check, which compares values", [(TABLE_FILE, EQUAL_ROWS_OLD, EQUAL_ROWS_NEW)], HAND_REAL, ONE_RAN),
     ("C41", "defect", "the page keeps its copy when the Worker refuses", [(CONTENT_TS_FILE, "  const read = content.afterMessage(link);\n  if (problem !== \"\") return problem;", "  if (problem !== \"\") return problem;\n  const read = content.afterMessage(link);")], PAGE_CONTENT,
      ["content.test.ts > however the match ends before the Worker's ready"]),
     ("C42", "defect", "the page keeps its copy when the Worker itself fails", [(CONTENT_TS_FILE, "  const problem = link.workerError(message);\n  content.afterMessage(link);", "  const problem = link.workerError(message);")], PAGE_CONTENT,
@@ -364,6 +370,10 @@ PLANTS = [
     ("C50", "control", "the boundary tests on a clean build of the players' file", [], chain((ENV, WASM), (ENV, BOUNDARY_ALL)), []),
     ("C51", "control", "the replay, isolation and content specs in Chromium on a clean build", [],
      chain((ENV, WASM), (ENV, DEV_PAGE), (BROWSER_ENV(DEV_PLANT), chromium("tests/replay/determinism.spec.ts", "tests/skeleton/isolation.spec.ts", "tests/skeleton/content.spec.ts"))), []),
+    ("C52", "defect", "test-engineer's own case: two rows the second route does not read trade fields, and the movement table their values: the table's names catch it", [(TABLE_FILE, TE_ROWS_OLD, TE_ROWS_NEW), (SOLDIER, TE_OLD, TE_NEW)], HAND,
+     ["testlines.test.mjs > his Export and the game's first movement table, the repository's own files > every row of the table sends its Export value to the field of the same name", "expected 'sprint_returns_at_pct' to be 'sprint_time_from_full_s'"]),
+    ("C53", "control", "the same case passes the second route, which reads neither value", [(TABLE_FILE, TE_ROWS_OLD, TE_ROWS_NEW), (SOLDIER, TE_OLD, TE_NEW)], FILES, []),
+    ("C54", "control", "the same case passes the hand-over's own check, which compares the swapped table with the swapped content", [(TABLE_FILE, TE_ROWS_OLD, TE_ROWS_NEW), (SOLDIER, TE_OLD, TE_NEW)], HAND_REAL, ONE_RAN),
 ]
 
 def note(name, kind, ok, what, detail):
@@ -392,8 +402,9 @@ def planted(name, kind, what, edits, command, words, cwd=None):
             code, text = run(*command, env=BROWSER_ENV(f"{ROOT}/.gate/dist-development") if command[0:2] == ("node", "node_modules/@playwright/test/cli.js") else None)
         os.chdir(ROOT)
         found = [word for word in words if word in text]
-        ok = (code == 0) if kind == "control" else (code != 0 and len(found) == len(words))
-        note(name, kind, ok, what, f"exit {code}, found {len(found)} of {len(words)} wanted texts" + ("" if ok or kind == "control" else f"; missing {[w for w in words if w not in found]}"))
+        # A control holds when its command passes and says the words it names, if any (a narrowed run's own count).
+        ok = (code == 0 if kind == "control" else code != 0) and len(found) == len(words)
+        note(name, kind, ok, what, f"exit {code}, found {len(found)} of {len(words)} wanted texts" + ("" if ok else f"; missing {[w for w in words if w not in found]}"))
     finally:
         os.chdir(ROOT)
         for path, original in originals.items(): open(path, "w").write(original)

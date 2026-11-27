@@ -45,6 +45,9 @@ gate file is touched.
 ### Not in it
 - The page's scene and the map's reading field by field: the start of 4c (his STEP12-GO (a)).
 - A recording that covers the collision queries: 4c's, with the first query.
+- A reader of the generated content types: they stay unread until 4c's map reading, held meanwhile by their tests
+  (the export test and the tie to the schemas).
+- The development server's watch and reload: only its serving of `/content.json` is built.
 
 **The head the advisor agent approved:** [after].
 

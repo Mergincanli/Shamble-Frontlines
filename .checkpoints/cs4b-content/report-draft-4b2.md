@@ -72,9 +72,15 @@ The gate's symbol counts are the legacy files' (+0 -0); nothing under `legacy/` 
   its file and line, seven hostile bundles shown only as the loader's sentence with no element, a failed fetch
   starting no Worker); the isolation spec's dev server serves the build's bundle byte for byte. Firefox runs the rules
   and replay specs only (CI).
-- **Not verified:** a swap within one of the three equal pairs of his movement values passes every check (step 8);
-  the boundary and page specs run in Chromium, not Firefox; no Firefox run of the players' file's content refusals;
-  the collision world is built but queried by nothing in a match (4c).
+- **The table's names** (test-engineer's TE-1, High, at round 1): the second route reads 5 of the table's 15 values,
+  and a swap between any two rows it does not read passed every check (its proof: the rows and `soldier.json` swapped,
+  `--check` and every cargo test green). Step 8's sentence ("a row swapped within one of those [equal] pairs passes
+  every check") stated that gap too small. Closed at the fix pass: a test on the real table holds every row's field
+  to the last step of its Export name, but for one named rename, so no two rows can trade fields, equal values or
+  not; plant C38 (two rows of equal values trade fields, the content unchanged) is caught by it, and its controls C39
+  and C40 show that both routes that compare values pass that swap.
+- **Not verified:** the boundary and page specs run in Chromium, not Firefox; no Firefox run of the players' file's
+  content refusals; the collision world is built but queried by nothing in a match (4c).
 
 ## Reviews [after]
 rust-reviewer, security-auditor, netcode-architect, engine-architect, test-engineer, infra-engineer: one round, then
@@ -90,6 +96,12 @@ the advisories, the test list), netcode-architect (route (i)), engine-architect,
   thrown text, the panic's 1,016-byte room whole, the page's check at 1,040, against the test list's "about 512"); no
   `default` column, the descriptions in a test-only table (step 11, Q1 and Q2); the manifest beside his Export
   written by script; `fma4` dropped from the native assertion; the plants' P19 fixed in the script.
+- Two things this change-set leaves for later on purpose (engine-architect's EA-3): the generated content types have
+  no reader in 4b-2, because the map's reading moved to 4c with its one reader; until then only their tests hold them
+  (the export test, which writes them again unchanged, and, since the fix pass, a test that ties them to the schemas)
+  (the advisor agent's cut C ruling, Q2's condition 5). And of engine-architect's block 1.9 only the serving part is
+  built: the development server answers `/content.json` with what the build's own content tool writes, on each ask;
+  there is no watch and no reload (Q3's condition 7).
 - Found and fixed in the build: the constructor said "the content is refused:" twice (cut C, before its commit); a
   Worker script that does not load gives no message (cut C, caught by an existing spec); a replay of another map's
   recording would have run on `test-scene` (step 10's follow-up); a tie test read a file around his LINKS-CHECK scan
