@@ -10,7 +10,7 @@
   `/home/user/Shamble-Frontlines` is never switched.
 - **Base:** origin/main dae6d107fdbe942567104bcf1c9a2cbc6b3a1e0f (pull request #79's merge commit), taken in by
   fast-forward from b7145273.
-- **Last update:** 2026-11-28 00:18 Amsterdam (from the clock)
+- **Last update:** 2026-11-28 00:27 Amsterdam (from the clock)
 
 ## Steps done
 1. **4b-2 merged and main taken in** (2026-11-27). Pull request #79 merged by merge commit dae6d107 at 23:12:04 UTC,
@@ -25,10 +25,12 @@
    go", 22:50:52 UTC), `mustafa-2026-11-27-may-merge.md` (22:52:26 UTC), `mustafa-2026-11-27-design-notes.md` (his
    design notes of 22:15 Amsterdam, 22:58:25 UTC, 7,117 bytes). His message of 23:00:39 UTC is not saved in the
    repository until he answers BOARD-WORDS (the question file).
+3. **The questions, asked** (deb337ad; in the chat at about 00:25 Amsterdam): `.checkpoints/cs4c-soldier/
+   question-2026-11-28-before-4c.md`, the four the plan lists before 4c (MOVE-RULES, NO-SOURCE, RESUME-FLASH,
+   TUNE-HOME), then SIZE-4C, BOARD-WORDS, PASTE-BREAKS and DESIGN-CLASH. No answer yet.
 
 ## Current step
-The questions to him: `.checkpoints/cs4c-soldier/question-2026-11-28-before-4c.md` (the four the plan lists before
-4c, SIZE-4C, BOARD-WORDS, PASTE-BREAKS, DESIGN-CLASH). Then the plan sheet.
+The plan sheet: three reads run (see "Running work"); the main session writes the sheet around them.
 
 ## Next steps
 1. **The plan sheet** `.checkpoints/cs4c-soldier/reread-sheet.md`, revision 1, against main dae6d107: step 0 (the first
@@ -79,9 +81,16 @@ The questions to him: `.checkpoints/cs4c-soldier/question-2026-11-28-before-4c.m
   `/home/user/Shamble-Frontlines/.gate/cs4b-2`. A session of another account works on its own branch from this
   branch's head and never pushes here (his Lanes rule). SEAT-OUT from him: stop at a whole point and report the last
   commit's id.
-- **State:** nothing of 4c is built; no file outside `.checkpoints/` differs from main. No agent runs; no saver runs
-  (the main session commits and pushes the notes by hand).
+- **State:** nothing of 4c is built; no file outside `.checkpoints/` differs from main. Three reads run (see
+  "Running work"); no saver runs (the main session commits and pushes the notes by hand, at least every 25 minutes).
+  If this seat ends while they run, their files hold whatever blocks they finished: a new read continues after the
+  last complete block.
 - **Next:** this card's "Next steps", in that order.
 
 ## Running work
-- No agent runs.
+- Since 00:27 Amsterdam, three design reads against main dae6d107 (at most three agents at a time), each writing
+  only its own file in `.checkpoints/cs4c-soldier/`: engine-architect (`engine-architect-read.md`: the scene step
+  first, then SIZE-4C's seam, then steps 3 to 5's page parts and 4B-WORLD-ROOM), netcode-architect
+  (`netcode-architect-read.md`: steps 2, 3, 6, 6b, 6c, RESUME-FLASH by option, the order if his answers come late),
+  rust-reviewer (`rust-reviewer-read.md`: step 1's pieces, 4B-RAY-COUNTS, what MOVE-RULES and NO-SOURCE change).
+  The main session commits their files with the notes at each save.
