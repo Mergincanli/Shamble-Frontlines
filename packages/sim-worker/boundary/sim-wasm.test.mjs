@@ -15,6 +15,7 @@ import { MAX_BUNDLE_BYTES } from "../src/messages.ts";
 import { MAX_TICKS_PER_WAKE } from "../src/pacing.ts";
 import { PANIC_TEXT_ROOM, readPanicMessage, THROWN_TEXT_UNITS, trapMessage } from "../src/panic-message.ts";
 import { copyBlock } from "../src/read-block.ts";
+import { LOCAL_MAP } from "../src/recording.ts";
 import { readPlainFile } from "./plain-file.ts";
 
 const SEED = new Uint8Array(32).fill(7);
@@ -185,6 +186,14 @@ test("the Worker's bound on a thrown text is the loader's own bound on its sente
   const bound = /^pub const MESSAGE_BYTES: usize = (\d+);$/m.exec(source);
   expect(bound, "MESSAGE_BYTES in crates/content/src/error.rs").not.toBeNull();
   expect(Number(bound?.[1])).toBe(THROWN_TEXT_UNITS);
+});
+
+test("the replays' map is the local match's own, read from the Rust source", () => {
+  // recording.ts refuses a recording of any other map, because the match is always made on this one.
+  const source = readFileSync(new URL("../../../crates/sim-wasm/src/lib.rs", import.meta.url), "utf8");
+  const map = /^pub const LOCAL_MAP: &str = "([a-z0-9_-]+)";$/m.exec(source);
+  expect(map, "LOCAL_MAP in crates/sim-wasm/src/lib.rs").not.toBeNull();
+  expect(map?.[1]).toBe(LOCAL_MAP);
 });
 
 test("the Worker's cap on a bundle is the loader's own: one byte more is refused for its size, and the cap itself is not", () => {
