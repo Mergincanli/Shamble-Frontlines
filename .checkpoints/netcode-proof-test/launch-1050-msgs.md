@@ -1,5 +1,5 @@
 # The 10:50 UTC window, 2026-11-27: the messages (written 08:5x UTC, rev 3 09:1x after two advisor-tool reads; sent only inside the window)
-**Status: WRITTEN, NOT SENT.** Each message below gets a "Sent HH:MM UTC" line when it goes; the window has run only
+**Status: B and A1 SENT 10:58 UTC (both resumed); A2 and C not sent yet.** Each message below gets a "Sent HH:MM UTC" line when it goes; the window has run only
 for the messages that carry one (this file existing does not mean the window ran). An agent's file is done only when
 its last line reads "Status: COMPLETE <date and UTC time>"; without it the file is half-written and that agent is
 resumed from it.
@@ -18,7 +18,7 @@ xhigh) with the same message and that seat's notes file instead, inside the wind
 Every message carries the two standing sentences word for word, and the EXIT-SILENT sentence after them.
 
 ## B: a3de649cd25e474df (resumed; it checked U8-F1's merge plan): the head read of U8-F1's pushed merge
-Not sent.
+Sent 10:58 UTC (resumed; the text below unwrapped, with a first line naming the seat and its file).
 Read U8-F1's pushed merge as the advisor (main's .claude/agents/advisor.md, by `git show
 origin/main:.claude/agents/advisor.md`; read only, no cargo, no git write): the merge commit
 ddb06ffe829495023aaf12bbb9e5d27ce12c5da9 on H0 833c3f0, pushed in 08e8b0f1c13888d9627ebd1130e74f921ff73765 (CI on
@@ -49,7 +49,7 @@ whole. Rule, each in its own block:
 Write .checkpoints/netcode-proof-test/advisor-u8-f1-head.md (plan first, then each block as it is done); end with
 "Decisions needed" and "For Mustafa", then, once every block is written, the last line `Status: COMPLETE <date and UTC
 time, as 2026-11-27T11:05Z>`.
-Re-checked at sending: (to fill at 10:5x: main; HEAD = origin, clean; CI on 08e8b0f unchanged; df).
+Re-checked at sending (10:5x UTC): main b9aad01; HEAD 0bb9328 = origin, clean; CI on 08e8b0f unchanged (the same four runs, all success at attempt 1, nothing newer on the branch); df 7,790 MiB free.
 Write files with the Write and Edit tools only (no sed, no shell redirect, no python writes; never `cargo fmt` writing
 files: apply rustfmt's diff by Edit); an agent with no Edit tool rewrites its notes file whole with Write. git and gh
 always start their own command, with no other program in front of them. In this tool a command that exits non-zero
@@ -58,7 +58,7 @@ only forms whose output carries the answer (`git diff --name-only` or `--stat`, 
 quote that output.
 
 ## A1: a0530735048f1620a (resumed; it wrote advisor-u7-head.md and its re-rule): U7's builder fast-forward
-Not sent.
+Sent 10:58 UTC (resumed; unwrapped, with a first line naming the seat and its file, and one paragraph pointing to section C and its two added lines).
 As the advisor (main's advisor.md, by `git show origin/main:.claude/agents/advisor.md`; read only, no cargo, no git
 write), two rulings, each its own block, in a new file:
 1. **U7's builder fast-forward, ruled.** The main session's part of your "Item 6, re-ruled" is done (u7-merge-plan.md,
@@ -80,7 +80,7 @@ write), two rulings, each its own block, in a new file:
 Write .checkpoints/netcode-proof-test/advisor-u7-ff.md (plan first, then each block as it is done); end with "Decisions
 needed" and "For Mustafa", then, once both blocks are written, the last line `Status: COMPLETE <date and UTC time, as
 2026-11-27T10:58Z>`.
-Re-checked at sending: (to fill at 10:5x: main; HEAD = origin, clean; ffcheck on 0efbbef unchanged).
+Re-checked at sending (10:5x UTC): main b9aad01; HEAD 0bb9328 = origin, clean; ffcheck on 0efbbef unchanged (35 ADDED present, 10 differing; 68 of 68 hash-object ids read).
 Write files with the Write and Edit tools only (no sed, no shell redirect, no python writes; never `cargo fmt` writing
 files: apply rustfmt's diff by Edit); an agent with no Edit tool rewrites its notes file whole with Write. git and gh
 always start their own command, with no other program in front of them. In this tool a command that exits non-zero
@@ -109,10 +109,10 @@ only forms whose output carries the answer (`git diff --name-only` or `--stat`, 
 quote that output.
 
 ## C: U7's builder a9873cdba07a3219e (resumed; its worktree .claude/worktrees/agent-a9873cdba07a3219e at 80b6748)
-Not sent. Only when A1's block 1 opens with "go", and only before 11:20.
+Not sent. Only when A1's block 1 opens with "go" (or a "go" whose conditions are literal text changes to this message; a condition that adds a command or changes the target makes a new message, for the next window), and only before 11:20. A refused resume of C is not replaced by a fresh agent (a fresh agent is not in that worktree): it means fallback (b) for this window.
 Three commands in your own worktree, each its own call, in this order. Paste each command's full output in your reply.
 Write no file at all in this task, not even a notes line: your two notes are among the staged paths, and any write
-leaves the worktree unclean. If git refuses at any step, stop there and report its message word for word. If step 3
+leaves the worktree unclean. If anything refuses or denies a step (git, a hook or a permission prompt), stop there, quote its message word for word, and try no other form. If step 3
 prints anything at all, paste it and stop. Remove, restore or move nothing.
 First three reads, each its own call; if any differs from its "must", paste it, stop, and stage nothing:
 - `git rev-parse --show-toplevel` must print /home/user/Shamble-Frontlines/.claude/worktrees/agent-a9873cdba07a3219e.
@@ -129,7 +129,7 @@ always start their own command, with no other program in front of them. In this 
 without printing can show nothing at all, the same as a pass (seen with `test`, `git diff --quiet` and `grep -q`): use
 only forms whose output carries the answer (`git diff --name-only` or `--stat`, `ls -d`, `cmp -s`, sha256 lists), and
 quote that output.
-After C (the main session): `git worktree list`. If it no longer names that worktree (the harness removed an unchanged
+After C (the main session; not bound to the window, as it starts no agent; only when C's step 3 printed nothing and A1's block 2 accepts the keep-list, since anything owed on it is owed while the worktree exists): `git worktree list`. If it no longer names that worktree (the harness removed an unchanged
 agent worktree on its own on 11-26, the card's 15:09 line), record that and run no remove. If it shows it at 0efbbef,
 `git worktree remove /home/user/Shamble-Frontlines/.claude/worktrees/agent-a9873cdba07a3219e`, plain, from the main
 folder (a refusal: the worktree stays, the message to A). Its branch ref worktree-agent-a9873cdba07a3219e may stay (if removed, only by `git
