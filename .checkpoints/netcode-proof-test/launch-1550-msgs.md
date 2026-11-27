@@ -7,8 +7,8 @@ pastes all its outputs.
 Step 0 at the window, each its own call, in printing forms (EXIT-SILENT, exit-silent.md): the reset seen (resetsAt
 1795794600, 15:50 UTC; read it again with list_events, kinds rate_limit_event, and set the next window's wake-up from
 it); `git ls-remote origin refs/heads/main` still b9aad01 (else MAIN-52 first, nothing below); `git status --short
---branch` shows HEAD = origin and nothing else; ListAgents; `df -m /home/user`; the saver running (bk0rhq5v6 ends
-about 12:10: if it ended, restart it in the card's form). Then the advisor tool once on this file.
+--branch` shows HEAD = origin and nothing else; ListAgents; `df -m /home/user`; the saver running (bj5t1t1dh ends
+about 13:23: if it ended, restart it in the card's form). Then the advisor tool once on this file.
 The order: D and B at once (B only reads, so D's are the only git steps in a worktree, as B's form asks); at most 3
 agents. Everything new starts before 16:20 (LEAN-MODE); what
 misses 16:20 waits for the next window. A refused resume of D is not replaced by a fresh agent (a fresh agent is not in
