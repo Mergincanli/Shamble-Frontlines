@@ -41,7 +41,10 @@ try {
   if (!input) throw new Error('unreadable hook input');
   const { decide, realIo } = await import('./routine-guard.mjs');
   const d = await decide(input, realIo());
-  if (d && d.deny === undefined && d.ask !== undefined) print(d.ask, false, event === 'PreToolUse' && !role);
+  if (d && d.allow !== undefined && d.deny === undefined && d.ask === undefined) {
+    // review tracks, MERGE-PROMPT (d): only a day session's qualifying merge skips the prompt; anything else stays silent
+    if (event === 'PreToolUse' && !role) process.stdout.write(JSON.stringify({ hookSpecificOutput: { hookEventName: 'PreToolUse', permissionDecision: 'allow', permissionDecisionReason: String(d.allow).slice(0, 2000) } }));
+  } else if (d && d.deny === undefined && d.ask !== undefined) print(d.ask, false, event === 'PreToolUse' && !role);
   else if (d) print(d.deny, d.interrupt);
 } catch (e) {
   if (role) print(`guard error (${String(e?.message ?? e).slice(0, 300)}): refused, because a routine fails closed`, true);
