@@ -1401,6 +1401,33 @@ and 2) and the bounded fuzz run (his words: before the first value rests on the 
   fixed name with no hash beside hashed Wasm and scripts: when hosting is built, serve `index.html` and
   `content.json` as no-cache, or give the bundle a hashed name (a hosting change-set's). Not checked by it: the
   preview hand-off steps (skipped on push runs), lane 2's `preview.yml`, any host's caching.
+- **Round 1, test-engineer: REVISE, one High** (`cs4b-content/test-engineer-review-4b2.md`, DONE; scratch scripts
+  `test-engineer-4b2-logfails.py`, `-swap.py`). The plants' whole run holds (83 of 83, 11 of 11; every plant whose
+  needle is a test title has that test among its FAILED lines; C21 failed on its own cap numbers); T-must 13 holds on
+  its own evidence. **TE-1 (High, evidence that does not hold)** the not-verified sentence of step 8's second part
+  (card :1055-1058, the report's draft, `content_files.rs:378-380`) states the gap too small: the second route reads
+  5 of 15 fields, and the other 10 hold four more values that stand once (air control 100, jump reach 3.071, sprint
+  returns at 30, sprint time 7): a swap between two of those passes every check (proved in its scratch copy: the
+  table's rows and `soldier.json` swapped, `--check` exit 0, every cargo test green). Fix (its proposal): one
+  assertion on the real table: every row's field is the last step of its Export name, but for the one named rename
+  (`stamina.refill_time_from_empty_s` to `stamina_refill_time_s`; 14 of 15 rows follow the rule, read at 20:43
+  UTC); that closes every swap, the equal pairs included, and the not-verified line goes. Its Lows: **TE-2** the cfg!
+  assertions in `crates/sim/tests/native_target.rs:22` and `crates/devtools/tests/native_target.rs:22` can never fail
+  (sim's `compile_error!` stops such a build first; N2 to N4 show no FAILED test line): the report says so. **TE-3**
+  `build-checks.test.mjs:884-895` (and `:147`) skip when a link cannot be made, against "fails, never skips, under
+  CI" (`test-list.md:179-180`): fail when `CI` is set. **TE-4** no ray that meets a shape has a -0.0 direction part:
+  add one; the per-class minimum counts of the committed rays: to 4c. **TE-5** the seven hostile bundles pass on any
+  refusal: pin each class's sentence. **TE-6** `static-world.spec.ts:47`'s wall-clock bound: kept (a backstop
+  against a slow loop; the spec's own timeout bounds a hang), a follow-up if it ever flakes. **TE-7** the Vitest
+  schema test's title overclaims: retitle. **TE-8** C20 to C29 ran on the folded players' file C19 leaves, with no
+  paired clean control: a clean build before them, and controls.
+- **The fix pass, round 1's findings (in hand from 20:43 UTC), each fixed or deferred:** fixed: TE-1, RR-1, EA-1,
+  SA-1, SA-2, SA-3, RR-2, RR-3, NA-1, NA-2 (= EA-5), EA-2, EA-3 (the report), EA-4, EA-6, TE-2 (the report), TE-3,
+  TE-4 (the -0.0 ray), TE-5, TE-7, TE-8 (the plants script). Deferred, each a follow-up with its reason: EA-7 and
+  EA-8 (4c's plan), IE-1 (the CI Builder's file), IE-2 (a hosting change-set), TE-4's per-class counts (4c, with
+  the casts' first caller), TE-6 (kept as a backstop). Then: the count (stop line 8,450), the full local checks, the
+  gate, the plants' whole run again, CI; round 2 on what changed (security-auditor, rust-reviewer, engine-architect,
+  netcode-architect, test-engineer); the verifier; docs-keeper; the report; the advisor agent.
 
 ## Slips of this chat's own rules, for the report
 - One git command did not start its own shell call: `git add .checkpoints/cs4b-content/review-brief-4b1.md` stood
