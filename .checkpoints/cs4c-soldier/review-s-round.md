@@ -38,6 +38,19 @@ frees 578 of 578 geometries and 109 of 109 materials; the counts 32 / 267 / 162 
 re-run); the WebAssembly file unchanged at 257,421 B; the development bundle +7,344 B raw, +2,649 B gzip. Not verified:
 WebGPU counts, real-GPU frame times, the base production bundle's size, the one-time hitch when the map arrives.
 
+## security-auditor: APPROVE (no security finding open)
+| Id | Severity | Finding | Disposition |
+|---|---|---|---|
+| S-1 | Medium | = GE-F1 (not security; its probe copies the fit's maths: never ends at aspect 0 or NaN); a page opened at width 0 freezes its tab at the Worker's `ready`. | **Fix** (with GE-F1): clamp the width, the fit refuses a bad aspect and caps its steps, a test at aspect 0 |
+| S-2 | Low | No test feeds the map reader an own `__proto__` key (`content.test.ts:251-269`); a later copy through `Object.assign` before the key check would let an extra key through unseen. | **Fix:** a test with an own `__proto__` key (as `JSON.parse` makes one), refused by the closed key set, with its plant |
+| S-note | Low (docs) | The pointer at `docs/LOOP_V2.md:16` sits mid-sentence: the line holds the end of the centre-field sentence ("centre.") and then two more sentences, the second running on to line 17, so the line's end cuts "Tech lifts the / whole team" (the advisor agent's F-S0-2: no sentence cut). | **Fix:** `place-4c.mjs fix-16` (tested on a scratch copy; `loop-check-4c.mjs` now holds the pointer right after "centre."), run by docs-keeper in its docs pass (his item 2: docs-keeper places his text) |
+Checked correct by it: map text reaches the page only through `textContent` (overlay.ts:36, boot.ts:36); every map
+object has exactly its listed keys, read through `Object.hasOwn` (content.ts:86, 118, 155-203); unknown folders,
+formats and versions refused (content.ts:210-238), each refusal a fixed sentence quoting nothing it read;
+`window.__shambleScene` and the inventory in the development build only (boot.ts:124, three-picture.ts:79-81), the
+production scan failing on either marker; the docs after the code head carry no secret, key, board address or
+personal detail beyond his own messages copied whole.
+
 Checked correct by engine-architect: the boundary as designed; `readMap` member for member against map.rs; `LOCAL_MAP` without
 recording.ts; the production page's `inventory(){return null}` and no development marker; 4B-TYPES-READER,
 4B-MEMBER-KINDS and 4B-BOOT-CALLS met; nothing per frame; nothing no VISION §6 item needs. Not run: a browser.

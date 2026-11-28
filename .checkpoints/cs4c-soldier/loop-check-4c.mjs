@@ -38,6 +38,20 @@ if (EDITOR_POINTER !== '(2026-11-27: see §14)'.normalize()) throw new Error(`th
  */
 const LOOP_POINTERS = new Map([[16, POINTER], [33, POINTER], [35, POINTER], [52, SILO_POINTER], [151, POINTER], [154, POINTER], [156, POINTER], [181, POINTER]]);
 const LOOP_LINES = [...LOOP_POINTERS.keys()];
+/**
+ * Where a line's own sentence ends before the line does, the pointer stands right after that sentence, not at the
+ * line's end (the advisor agent's F-S0-2, "so no sentence is cut"; security-auditor's note of 2026-11-28 on step S's
+ * review): line 16 holds the end of section 1's sentence on the centre field ("centre.") and then two more sentences,
+ * the second of which runs on to line 17.
+ */
+const AFTER_SENTENCE = new Map([[16, 'centre.']]);
+const withPointer = (was, n) => {
+  const pointer = LOOP_POINTERS.get(n);
+  const end = AFTER_SENTENCE.get(n);
+  if (end === undefined) return `${was} ${pointer}`;
+  if (was.indexOf(end) < 0 || was.indexOf(end) !== was.lastIndexOf(end)) throw new Error(`main's line ${n} does not hold "${end}" once`);
+  return was.replace(end, `${end} ${pointer}`);
+};
 /** By DESIGN-CLASH (a): the end of EDITOR_V2.md's "Objectives as data" bullet, lines 45 to 47, so no sentence is cut. */
 const EDITOR_LINES = [47];
 const HEADER_LINE = 5;
@@ -66,7 +80,7 @@ for (let i = 0; i < main.length; i += 1) {
     const added = is.slice(was.length + 1);
     if ((added.match(/\. |\.$/g) ?? []).length !== 1) fail(`docs/LOOP_V2.md:${n}: more than one sentence added: "${added}"`);
   } else if (LOOP_POINTERS.has(n)) {
-    if (is !== `${was} ${LOOP_POINTERS.get(n)}`) fail(`docs/LOOP_V2.md:${n}: not main's line with his pointer at its end`);
+    if (is !== withPointer(was, n)) fail(`docs/LOOP_V2.md:${n}: not main's line with his pointer at the end of its sentence`);
   } else if (is !== was) fail(`docs/LOOP_V2.md:${n}: changed from main's`);
 }
 console.log(`docs/LOOP_V2.md: main's ${main.length - 1} lines unchanged but the header's one sentence and his pointer at lines ${LOOP_LINES.join(', ')}; section 14 from line ${at + 1}`);
