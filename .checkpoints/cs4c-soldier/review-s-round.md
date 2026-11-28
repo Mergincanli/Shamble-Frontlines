@@ -88,7 +88,20 @@ TE-1's plants; WebGPU.
   a window a few pixels wide still frames at a great distance with near 0.1 (depth fighting on a floor about a pixel
   wide), folded into the deferred GE-F2; and the resize comment's "held at one pixel" was true of the aspect only:
   **reworded** in the next code commit (a comment, no code). Not verified: a canvas 0 wide on WebGPU (no adapter).
-- **test-engineer:** running.
+- **test-engineer: APPROVE** (`review-s2-test-engineer.md`, its scratch plants in `.gate/te-review2/`): TE-1 to TE-8
+  closed, and G-3, GE-F5, S-2, EA-3, EA-4, EA-5 and GE-F1; no Critical, High or Medium. The plant run on 2b2f44c2 is
+  real (45 of 45, 3 of 3 controls; it read each failing line: F1 caught by the 90 s timeout against 0.4 s clean, no
+  process left; F2 and F14 by a TypeError inside the named test, the failure each guard prevents; F17 on the browser's
+  corner compare, skeleton.spec.ts:95; F4, F6, F7, F9, F10 and F11 were its round 1 plants that passed at c1de41e5).
+  **Five Low gaps, measured on a scratch copy, each a STATUS follow-up** (the review budget: no round 3 for Lows):
+  TE2-1 `frameCamera` may drop the turn toward the map (`scene.ts:318`) or the projection update (`:320`) with all 11
+  scene tests passing; TE2-2 the search's limit is tested from one side only (at 10 in place of 19 every test passes,
+  yet a 9:16 window on the largest map gets no camera); TE2-3 the readout's "refused" wiring (`boot.ts:166`) is reached
+  by no test; TE2-4 the grid test checks its lines' count and ends, not where they stand; TE2-5 the overview's aim
+  height is never checked on the raised map (`scene.ts:274`). Not verified by it: these against the browser specs; F1
+  under CI's job timeout; WebGPU. A negative aspect still returns a mirrored view, which the resize's clamp keeps from
+  happening.
+- **Round 2 closed:** both APPROVE; 0645432f rewords the one comment (no code). The verifier next.
 
 ## The fix pass (one, after all six; then the verifier)
 - **Fixed:** the Medium found four times (GE-F1, EA-1, P-1, S-1) and TE-1; the Lows G-3/EA-2, GE-F5, TE-2 to TE-8,

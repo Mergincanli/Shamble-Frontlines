@@ -133,6 +133,14 @@ fn eps(body: Body) -> f32 { if body == Body::Cyl { 0.0 } else { 0.005 } }
 /// its file:line; nothing of the sandbox's code seen here). Body (3a) only.
 static SETBACK_GUARD: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
 const TINY: f32 = 1e-6;
+// Block 10's switches: on = as game-designer's block 7 reads the code (OLD_HEAD=1, OLD_SETBACK=1, OLD_LANDING=1 give
+// block 9's forms back); WALK_SWEEP=1 sweeps the walk's wall pass; PULL_CLIP=1 sweeps the pull.
+static TRACE_BITS: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+static OLD_HEAD: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+static OLD_SETBACK: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+static OLD_LANDING: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+static WALK_SWEEP: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+static PULL_CLIP: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
 static OWN_TOP: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
 static HEAD_WIDTH: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
 
@@ -156,8 +164,14 @@ fn at_slope_head(world: &[Block], b: &Block, x: f32, z: f32, feet: f32) -> bool 
         let h = height_near(r, x, z);
         // "the slope's rise across the body": the body's radius (default) or its whole width (env HEAD_WIDTH=1).
         let across = if HEAD_WIDTH.load(std::sync::atomic::Ordering::Relaxed) { 2.0 * R } else { R };
-        if h < feet - 0.05 || h > feet + across * grade(r) + 0.005 { return false; }
+        let top = if OLD_HEAD.load(std::sync::atomic::Ordering::Relaxed) { feet + across * grade(r) + 0.005 } else { feet + STEP + across * grade(r) + 0.005 };
+        if h < feet - 0.05 || h > top { return false; }
         if (b.max[1] - r.max[1]).abs() > 0.01 { return false; }
+        if !OLD_HEAD.load(std::sync::atomic::Ordering::Relaxed) {
+            // yard.ts:281 as read: the slope's height at the box's point nearest him is at least the box's top - 0.55.
+            let (bx_, bz_) = nearest(b, x, z);
+            return height_at(r, bx_, bz_) >= b.max[1] - STEP;
+        }
         let high = if up { r.max[a] } else { r.min[a] };
         let face = if up { b.min[a] } else { b.max[a] };
         let o = 2 - a; // the across axis
@@ -193,6 +207,11 @@ fn walls(world: &[Block], s: &mut S, test_feet: f32, _e: f32) -> u32 {
                 if further {
                     if a == 0 { s.x = c; } else { s.z = c; }
                     s.setbacks += 1;
+                    if !OLD_SETBACK.load(std::sync::atomic::Ordering::Relaxed) {
+                        // The set-back is a push like any other: the slide removes his speed up the slope.
+                        let v = if a == 0 { &mut s.vx } else { &mut s.vz };
+                        if (up && *v > 0.0) || (!up && *v < 0.0) { *v = 0.0; }
+                    }
                     let moved = (p - c).abs();
                     if moved > s.max_setback { s.max_setback = moved; }
                 }
@@ -271,8 +290,13 @@ fn tick(world: &[Block], s: &mut S, _body: Body, wish: (f32, f32), speed: f32, j
         s.vx = wish.0 * speed;
         s.vz = wish.1 * speed;
     }
-    s.x += s.vx * DT;
-    s.z += s.vz * DT;
+    if WALK_SWEEP.load(std::sync::atomic::Ordering::Relaxed) {
+        let (mx, mz) = (s.vx * DT, s.vz * DT);
+        sweep_walk(world, s, mx, mz, test_feet, true);
+    } else {
+        s.x += s.vx * DT;
+        s.z += s.vz * DT;
+    }
     s.wall_hits += walls(world, s, test_feet, 0.005);
     // The step-up (yard.ts:230-256, N17): the body circle overlaps, the top above the feet after the arc and within
     // test feet + 0.555, headroom, not from below, not at a slope's head, moving toward it or already over it.
@@ -301,7 +325,8 @@ fn tick(world: &[Block], s: &mut S, _body: Body, wish: (f32, f32), speed: f32, j
         if px * s.vx + pz * s.vz < 0.0 { s.pullv = None; } else {
             let len = (px * px + pz * pz).sqrt();
             let (sx, sz) = if len < PULL_MIN { (px, pz) } else { (px * PULL_SHARE, pz * PULL_SHARE) };
-            s.x += sx; s.z += sz;
+            if std::env::var("TRACE9").is_ok() { println!("      pull from x {:.4} by {sx:.4} test_feet {test_feet:.3}", s.x); }
+            if PULL_CLIP.load(std::sync::atomic::Ordering::Relaxed) { sweep_walk(world, s, sx, sz, test_feet, false); } else { s.x += sx; s.z += sz; }
             s.pull_carry += (sx * sx + sz * sz).sqrt();
             s.pullv = if len < PULL_MIN { None } else { Some((px - sx, pz - sz)) };
         }
@@ -316,7 +341,7 @@ fn tick(world: &[Block], s: &mut S, _body: Body, wish: (f32, f32), speed: f32, j
         if h <= lim && h > surf { surf = h; }
     }
     if !s.grounded {
-        if s.vy <= 0.0 && s.y <= surf { if surf > 0.0 && surf - s.y_moved > s.below_top { s.below_top = surf - s.y_moved; } s.y = surf; s.vy = 0.0; s.grounded = true; }
+        if (s.vy <= 0.0 || !OLD_LANDING.load(std::sync::atomic::Ordering::Relaxed)) && s.y <= surf { if surf > 0.0 && surf - s.y_moved > s.below_top { s.below_top = surf - s.y_moved; } s.y = surf; s.vy = 0.0; s.grounded = true; }
         s.airborne_ticks += u32::from(!s.grounded);
     } else {
         // The snap: 0.2 m plus (the tick's whole displacement + 0.15) x the steepest ramp under the foot (G8).
@@ -342,6 +367,88 @@ fn tick(world: &[Block], s: &mut S, _body: Body, wish: (f32, f32), speed: f32, j
     // G10: the push reads each mover's velocity (after the slide).
     s.lvx = s.vx;
     s.lvz = s.vz;
+    if TRACE_BITS.load(std::sync::atomic::Ordering::Relaxed) { eprintln!("T {speed} {:08x} {:08x} {:08x}", s.x.to_bits(), s.z.to_bits(), s.y.to_bits()); }
+}
+
+/// The walk's wall pass as a sweep (block 10): the move swept against the shapes that are walls for him at the
+/// tick's start (block 9's wall test), stopped at contact with no skin and the contact axis put exactly on the
+/// grown face (so that a face contact gives push-out's own bits), one slide; ramps whose width holds his centre at
+/// either end are left to the push-out and set-back after it. `slide_speed` removes the speed into the wall.
+fn sweep_walk(world: &[Block], s: &mut S, mut mx: f32, mut mz: f32, test_feet: f32, slide_speed: bool) {
+    for _ in 0..2 {
+        if mx == 0.0 && mz == 0.0 { break; }
+        let mut best: Option<(f32, f32, f32, usize)> = None;
+        for (i, b) in world.iter().enumerate() {
+            if b.min[1] >= test_feet + BODY_H - TINY { continue; }
+            let h = height_near(b, s.x, s.z);
+            if h <= test_feet + TINY && !OWN_TOP.load(std::sync::atomic::Ordering::Relaxed) { continue; }
+            let no_wall = h <= test_feet + STEP + 0.005 && headroom(world, h, s.x, s.z) && b.min[1] <= test_feet + TINY;
+            if no_wall || at_slope_head(world, b, s.x, s.z, test_feet) { continue; }
+            if let Some((a, _)) = b.ramp {
+                let o = 2 - a;
+                let (q0, q1) = if a == 0 { (s.z, s.z + mz) } else { (s.x, s.x + mx) };
+                if (q0 > b.min[o] && q0 < b.max[o]) || (q1 > b.min[o] && q1 < b.max[o]) { continue; }
+            }
+            if let Some((t, nx, nz)) = sweep_rect0(b, s.x, s.z, mx, mz) { if best.is_none_or(|bb| t < bb.0) { best = Some((t, nx, nz, i)); } }
+        }
+        match best {
+            None => { s.x += mx; s.z += mz; break; }
+            Some((t, nx, nz, i)) => {
+                let b = world[i];
+                if nz == 0.0 && (nx == 1.0 || nx == -1.0) { s.x = if nx > 0.0 { b.max[0] + R } else { b.min[0] - R }; s.z += mz * t; }
+                else if nx == 0.0 && (nz == 1.0 || nz == -1.0) { s.z = if nz > 0.0 { b.max[2] + R } else { b.min[2] - R }; s.x += mx * t; }
+                else { s.x += mx * t; s.z += mz * t; }
+                let (rx, rz) = (mx * (1.0 - t), mz * (1.0 - t));
+                let vn = rx * nx + rz * nz;
+                mx = rx - vn * nx; mz = rz - vn * nz;
+                if slide_speed { let v = s.vx * nx + s.vz * nz; if v < 0.0 { s.vx -= v * nx; s.vz -= v * nz; } }
+            }
+        }
+    }
+}
+
+/// Block 6's swept circle against a footprint with no skin: touching (within 1e-6) and moving along or away is no hit.
+fn sweep_rect0(b: &Block, px: f32, pz: f32, dx: f32, dz: f32) -> Option<(f32, f32, f32)> {
+    let (qx, qz) = nearest(b, px, pz);
+    let (ex, ez) = (px - qx, pz - qz);
+    let d0 = (ex * ex + ez * ez).sqrt();
+    if d0 <= R + TINY {
+        if d0 > 0.0 {
+            // On a face, the face's own normal (axis-aligned), so the slide is exact; at a corner, the radial one.
+            let (nx, nz) = if ex == 0.0 { (0.0, ez.signum()) } else if ez == 0.0 { (ex.signum(), 0.0) } else { (ex / d0, ez / d0) };
+            if dx * nx + dz * nz >= 0.0 { return None; }
+            return Some((0.0, nx, nz));
+        }
+        return None;
+    }
+    let (lo, hi) = ([b.min[0] - R, b.min[2] - R], [b.max[0] + R, b.max[2] + R]);
+    let (p, d) = ([px, pz], [dx, dz]);
+    let (mut t0, mut t1, mut axis) = (0.0_f32, 1.0_f32, 2usize);
+    for k in 0..2 {
+        if d[k] == 0.0 { if p[k] < lo[k] || p[k] > hi[k] { return None; } continue; }
+        let (mut a, mut c) = ((lo[k] - p[k]) / d[k], (hi[k] - p[k]) / d[k]);
+        if a > c { std::mem::swap(&mut a, &mut c); }
+        if a > t0 { t0 = a; axis = k; }
+        if c < t1 { t1 = c; }
+        if t0 > t1 { return None; }
+    }
+    if axis == 2 { return None; }
+    let (hx, hz) = (px + dx * t0, pz + dz * t0);
+    if (hx >= b.min[0] && hx <= b.max[0]) || (hz >= b.min[2] && hz <= b.max[2]) {
+        let (nx, nz) = if axis == 0 { (-d[0].signum(), 0.0) } else { (0.0, -d[1].signum()) };
+        return Some((t0, nx, nz));
+    }
+    let cx = if hx < b.min[0] { b.min[0] } else { b.max[0] };
+    let cz = if hz < b.min[2] { b.min[2] } else { b.max[2] };
+    let (fx, fz) = (px - cx, pz - cz);
+    let a = dx * dx + dz * dz;
+    let bq = 2.0 * (fx * dx + fz * dz);
+    let cq = fx * fx + fz * fz - R * R;
+    let disc = bq * bq - 4.0 * a * cq;
+    if disc < 0.0 { return None; }
+    let t = (-bq - disc.sqrt()) / (2.0 * a);
+    if !(0.0..=1.0).contains(&t) { return None; }
+    Some((t, (fx + dx * t) / R, (fz + dz * t) / R))
 }
 
 /// A body inside a solid: the centre inside a footprint with the feet more than 1 mm below the top there (and the
@@ -359,6 +466,7 @@ fn embedded(world: &[Block], s: &S, body: Body) -> bool {
 }
 
 fn start(x: f32, z: f32, y: f32) -> S {
+    if TRACE_BITS.load(std::sync::atomic::Ordering::Relaxed) { eprintln!("S"); }
     S { x, z, y, vy: 0.0, grounded: true, pull: None, stepped: None, steps: 0, falls_unjumped: 0, airborne_ticks: 0, max_float: 0.0, open_float: 0.0, fall_at: None,
         cfg: Cfg { land_prev: LAND_PREV_ALL.load(std::sync::atomic::Ordering::Relaxed), ..Cfg::default() }, vx: 0.0, vz: 0.0, lvx: 0.0, lvz: 0.0, fall_from: None, flickers: 0, head_hits: 0, max_drop: 0.0, wall_hits: 0, y_moved: 0.0, below_top: 0.0,
         pullv: None, pull_carry: 0.0, setbacks: 0, max_setback: 0.0, max_rise: 0.0 }
@@ -928,6 +1036,7 @@ fn block9(world: &[Block], body: Body, v0: f32) {
         for _ in 0..40 {
             tick(&pull_map, &mut s, body, (1.0, 0.0), sp, false, v0);
             if embedded(&pull_map, &s, body) { emb += 1; deepest = deepest.max(s.x - (65.2 - R)); }
+            if std::env::var("TRACE9").is_ok() && sp == 6.3 && d == 1.2 { println!("    t x {:.4} y {:.3} grounded {} pull {:?} inside {}", s.x, s.y, s.grounded, s.pullv, embedded(&pull_map, &s, body)); }
         }
         println!("pull onto a 0.2 m deep step before a 3 m wall speed {sp} start {:.2}: ended x {:.4} feet {:.2}, ticks inside the wall {emb} (deepest {deepest:.4} m)", 65.0 - R - d, s.x, s.y);
     }}
@@ -989,6 +1098,9 @@ fn block9(world: &[Block], body: Body, v0: f32) {
 fn main() {
     let body = match std::env::args().nth(1).as_deref() { Some("3a") => Body::A3, Some("3b") => Body::B3, Some("3x") => Body::X3, _ => Body::Cyl };
     if std::env::args().nth(1).as_deref() == Some("2w") { WALL_DISC.store(true, std::sync::atomic::Ordering::Relaxed); }
+    for (k, f) in [("OLD_HEAD", &OLD_HEAD), ("OLD_SETBACK", &OLD_SETBACK), ("OLD_LANDING", &OLD_LANDING), ("WALK_SWEEP", &WALK_SWEEP), ("PULL_CLIP", &PULL_CLIP), ("TRACE_BITS", &TRACE_BITS)] {
+        if std::env::var(k).is_ok() { f.store(true, std::sync::atomic::Ordering::Relaxed); }
+    }
     if std::env::var("HEADROOM_ON_OWN_TOP").is_ok() { OWN_TOP.store(true, std::sync::atomic::Ordering::Relaxed); }
     if std::env::var("HEAD_WIDTH").is_ok() { HEAD_WIDTH.store(true, std::sync::atomic::Ordering::Relaxed); }
     if std::env::var("SETBACK_GUARD").is_ok() { SETBACK_GUARD.store(true, std::sync::atomic::Ordering::Relaxed); }

@@ -769,3 +769,12 @@ Block 1.4 and 1.5 were written before BODY-SHAPE; with (3a) built to the sandbox
 Not run: the sandbox itself; Node or browsers; the push on a ramp; four or more soldiers; easing in the push.
 
 DONE
+
+## Block 10. game-designer's block 7 (N25 to N27) applied to body (3a); the swept wall pass and the pull's clip measured; HEADROOM-FEET both ways (2026-11-28)
+### Plan
+1. rr-body-proto-7.rs gains: the slope-head window with the step-up (yard.ts:265) and the :281 test in place of my face test; the set-back's slide (movement.ts:147-157); standing with no test on upward speed (movement.ts:195); a swept wall pass for the walk (switch WALK_SWEEP); the pull clipped by the same sweep (switch PULL_CLIP); every tick's position bits written to stderr, so that two runs compare tick by tick.
+2. Every block 5, 6 and 9 case, sweep off and on, clip off and on: bit-equal or not, and where not, at 6.3 and 9.576 m/s.
+3. HEADROOM-FEET both ways on the window wall (3.0 m wall, 0.2 m thick, sill 0.9 m, opening 1.2 m) and a crate under an upper floor.
+4. What changes in block 1 and its count. 5. DONE.
+
+### Notes
