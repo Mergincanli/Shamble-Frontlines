@@ -15,8 +15,11 @@ compile_error!(
     "the simulation is built without the fma and avx2 target features: unset RUSTFLAGS, target-cpu and target-feature"
 );
 
+pub mod aim;
 pub mod collision;
+pub mod ids;
 pub mod rng;
+pub mod soldiers;
 pub mod state_hash;
 pub mod time;
 pub mod vec;
