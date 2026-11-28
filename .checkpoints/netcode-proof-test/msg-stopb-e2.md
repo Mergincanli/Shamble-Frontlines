@@ -1,4 +1,4 @@
-# E2: Stop B's message to him (DRAFT 0.2, 04:5x UTC on 11-28; sent after X, B6's read of X first; one screen)
+# E2: Stop B's message to him (DRAFT 0.2, 04:3x UTC on 11-28; sent after X, B6's read of X first; one screen)
 Status: skeleton from msg-stopb.md, replan.md:14-45, replan-units.md:55-66, history.md:7866-7872 (LEAN-MODE B) and
 :8027-8044 (his 19:14 item 2). 0.2: sections 1-4 checked against today's files after the advisor tool's read of 0.1's
 fills (U6j merged, npt-super not a stub, the killed-room figure built, the control socket local). <TO FILL> marks what
