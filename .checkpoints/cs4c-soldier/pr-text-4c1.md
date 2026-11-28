@@ -34,8 +34,9 @@ commit that takes the notes out (the one before it holds them).
 ### Evidence, in short [after]
 - Written lines: 1,565 (the hold 1,665).
 - Planted defects: 45 caught of 45, 3 controls held of 3, every file put back (on 2b2f44c2).
-- Reviews: round 1 by six reviewers (one Medium found by four of them, one Medium of test-engineer's, the rest Low;
-  each fixed or deferred to STATUS with its owner), one fix pass; round 2 by graphics-engineer and test-engineer,
+- Reviews: round 1 by six reviewers (one Medium found by four of them; one Medium of test-engineer's; two of
+  art-director's, AD-1 fixed in his checklist and AD-4 deferred to 4c-2's step 4; the rest Low; each fixed or deferred
+  to STATUS with its owner), one fix pass; round 2 by graphics-engineer and test-engineer,
   both APPROVE. The verifier [after]. The advisor agent on the final head [after].
 - CI on the last code commit 0645432f: gate, smoke and toolchain green (runs 46146007607 and 46146007608). [after:
   the final head's runs.]

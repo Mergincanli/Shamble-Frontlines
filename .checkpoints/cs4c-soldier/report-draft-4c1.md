@@ -18,15 +18,16 @@ that frames the whole map; the readout names the content files and counts the sc
 November go into the register and the design docs (step 0), before any other docs commit of 4c.
 
 ## Outcome
-DONE for step 0 and step S. Two review rounds (all six reviewers by the end, the second round's two APPROVE, Lows
-only left as follow-ups) and one fix pass; the verifier [after]; the advisor agent reads the final head, which holds
+DONE for step 0 and step S. Two review rounds (all six reviewers by the end, the second round's two APPROVE; one
+Medium, art-director's AD-4, deferred to 4c-2's step 4, and Lows left as follow-ups) and one fix pass; the verifier
+[after]; the advisor agent reads the final head, which holds
 this report, and its verdict comes in the builder chat and on the board. His Brave check decides.
 
 ## Plan and approval
 The plan sheet's revision 2 (`reread-sheet.md`, sections D and G), approved for step 0 and step S by the advisor
 agent (`advisor-reread-4c.md`: APPROVE with conditions 1 to 9; steps 1 to 7 not yet, its item 10). Each condition:
 (1) the inventory's marker is the thrown sentence `INVENTORY_UNKNOWN` (`render/inventory.ts:11`), which the
-build's marker check names (`build-checks.mjs:203`); (2) until he answered SIZE-4C only step S and notes went on the
+build's marker check names (`build-checks.mjs:204-212`); (2) until he answered SIZE-4C only step S and notes went on the
 branch (no code or docs commit between c1de41e5 and step 0's af789ef3); (3) STREET-GREY was its own question, and he
 answered (b), "I look at it at the scene's Brave check"; (4) the hold of about 1,665 lines, told to him before the
 count passed 1,420; (5) art-director joined the five reviewers on a narrow brief; (6) his Brave-then-Firefox list,
@@ -34,7 +35,7 @@ each step with its expected result, is art-director's (below, "For Mustafa"); (7
 LOOP_V2 and EDITOR_V2 against main (`loop-check-4c.mjs`), BOARD-WORDS (b)'s method before it ran, section 14's tie to
 his message's digest (`section14-4c.mjs`), each pointer at the end of its sentence (LOOP_V2:16 moved there in the
 docs pass, the security review's note); (8) step 0 waited for PASTE-BREAKS, BOARD-WORDS and DESIGN-CLASH (all
-answered at 12:10 Amsterdam) and landed (af789ef3, 7cbf8226) before any other docs commit of 4c; (9) risk tier 1,
+answered in his message sent at 11:43:45 UTC, which gives 12:10 Amsterdam as its time) and landed (af789ef3, 7cbf8226) before any other docs commit of 4c; (9) risk tier 1,
 needs-mustafa.
 
 ## What changed (31 files outside the notes at 9283d302, 1,974 lines added and 186 removed, against main dae6d107; this report is one more)
@@ -55,14 +56,19 @@ needs-mustafa.
   closed surfaces, the nearest fit, the grid's extent, the greys' whole range, every drawn corner; the map's words
   tied to the loader's; the inventory's kinds typed; the page's own refusal named in the readout ("refused").
 - **The docs pass** (9283d302, docs-keeper's): STATUS, ROADMAP, the archive, REPO_MAP; LOOP_V2:16's pointer moved.
-- Beyond the plan's symbol table, from the fix pass: `frameCamera`, `MOST_DOUBLINGS`, `VIEW_MARGIN` exported, the
-  overview's `null`, `KINDS` and `isKind` in the inventory, `MAP_FORMS`, `MAP_TOWARDS` and `MAP_GROUNDS` exported,
+- **Beyond the plan's symbol table** (engine-architect's table 1.10): from step S, the exported types `Floor` and
+  `FloorKind` (`render/scene.ts`) and `ContentFileRow` and `SceneRows` (`overlay/report.ts`), the browser specs'
+  `SceneObject` type and `scene()` (`e2e/tests/skeleton/report.ts`), and `LOCAL_MAP` in a module of its own
+  (`sim-worker/src/local-map.ts`; the plan had it only re-exported); from the fix pass, `frameCamera`, `VIEW_MARGIN`
+  and the `Overview` type (exported; the overview's answer may now be `null`), `MOST_DOUBLINGS` (a module constant),
+  `KINDS` and `isKind` in the inventory, `MAP_FORMS`, `MAP_TOWARDS` and `MAP_GROUNDS` (exported),
   `PageContent.refused` and the readout's "refused" row. The gate's symbol counts are the legacy files' (+0 -0;
   GATE PASS with smoke at 9283d302, `.gate/gate-4c1-docs.log`); nothing under `legacy/` changes.
 
 ## Evidence
 - **Size:** 1,565 written lines (`count-4c.mjs` on `git diff --numstat dae6d107 0645432f -- crates packages`):
-  bc7720f3 1,277, c1de41e5 11, the fix pass 276, 0645432f 1; under the hold of 1,665; 2.1 times its recount of 740.
+  the count after each code commit, bc7720f3 1,277, c1de41e5 1,288, the fix pass 1,564 (its own diff adds 340 lines),
+  0645432f 1,565 (its diff adds 2); under the hold of 1,665; 2.1 times its recount of 740.
 - **The full local checks** on the fix pass's files (12:29 UTC): ALL LOCAL CHECKS PASSED (the page's 176 unit tests,
   the Worker's 53, the types' 14, 29 Chromium tests in 232 s). **CI:** on 2b2f44c2 gate, smoke and toolchain green
   (runs 46145018063, 46145018054; toolchain 9 min 53 s); on 0645432f gate, smoke and toolchain green (runs
@@ -76,8 +82,10 @@ needs-mustafa.
   arrives before or after the first frame (`counts-order-4c.mjs`). perf-auditor: about 4.1 KB more allocated a frame
   with the test scene, all inside three.js's per-object drawing, none in this change's code; the hand-off unchanged
   at about 93 B a frame; the camera fit about 22 µs a resize; each floor swap frees every geometry and material.
-- **The builds:** the players' file unchanged (no file under `crates/`; 257,421 bytes); the development page 7,344
-  bytes larger (2,649 gzip); the production page holds `inventory(){return null}` and neither development marker.
+- **The builds:** the players' file unchanged (no file under `crates/`; 257,421 bytes); the development page's script
+  840,441 bytes against main's 832,897 (+7,544, +2,718 with gzip -9: the verifier, at this code; perf-auditor's
+  +7,344 was measured at c1de41e5); the production page holds `inventory(){return null}` and neither development
+  marker.
 - **His words:** `decisions-4c.mjs check`, `section14-4c.mjs check` and `loop-check-4c.mjs` pass at 9283d302; STATUS's
   quotes of his item 12 b and c equal his saved message byte for byte (`quote-check-12bc.mjs`).
 - **The after picture:** [after: the verifier's retake].
@@ -88,23 +96,34 @@ needs-mustafa.
 ## Reviews
 Round 1 on c1de41e5, six reviewers, three at a time, then one fix pass (2b2f44c2); round 2 on what changed, by the
 two that asked for changes in their lane, then the one comment (0645432f). Every finding: `review-s-round.md`.
+Round 1's verdicts: graphics-engineer REVISE (GE-F1), perf-auditor REVISE (only for P-1), test-engineer REVISE (TE-1);
+engine-architect, security-auditor and art-director (on its narrow brief) APPROVE.
 - **The Medium found four times** (graphics-engineer's GE-F1, engine-architect's EA-1, perf-auditor's P-1,
   security-auditor's S-1): the overview's search for a camera distance never ended at an aspect of 0 or NaN, so a
   window of no width froze the page. Fixed: the search tries at most 20 distances and gives none past them, the
   camera stays as it was then, the resize holds the width at one pixel; tests at 0, NaN and the largest map.
 - **test-engineer's TE-1 (Medium):** the ground and the patches had no test of their corners, height or facing:
   fixed. Its Lows TE-2 to TE-8 fixed, among them the framing moved where a Node test reaches it (TE-7).
-- **The other Lows fixed:** G-3 / EA-2 and GE-F5 (a map raised above 0), EA-3 to EA-6, S-2 (an own `__proto__` key),
-  the security review's note on LOOP_V2:16 (moved in the docs pass), AD-1 (his checklist rewritten).
+- **art-director's AD-1 (Medium, his checklist): fixed**, its steps 1, 2, 3 and 6 rewritten (the zip's README and
+  "For Mustafa"). **The other Lows fixed:** G-3 / EA-2 and GE-F5 (a map raised above 0), EA-3 to EA-6, S-2 (an own
+  `__proto__` key), the security review's note on LOOP_V2:16 (moved in the docs pass).
 - **Deferred to STATUS** (each with its owner): GE-F2 (the depth range on a large map), GE-F3 with P-2 (draw calls on
   the largest map), GE-F4 (WebGPU pipelines on the map's arrival), AD-4 (Medium: the readout over a window under
   about 600 px tall, until step 4's follow camera); AD-2 and AD-3 go to his Brave check.
 - **Round 2: graphics-engineer APPROVE** (GE-F1 and GE-F5 closed; one comment reworded, 0645432f); **test-engineer
   APPROVE** (every finding closed; five Low gaps, TE2-1 to TE2-5, to STATUS). No round 3. No reviewer read 0645432f
   (a comment); the advisor agent reads it on the final head.
+- **The verifier:** FAIL on the report's first draft, for its words only (two Mediums: art-director's two Mediums told
+  as Lows; the symbols beyond the plan named in part; and five Lows: a size measured at c1de41e5, the fix pass's
+  share of the count, two citations, his message's time), each corrected; every number it checked held (its own
+  full local checks, the count, his words, five of the plants against the log and two of its own, eleven "fixed"
+  rows in the code, the docs' rows, the after picture). [after: its re-check of the corrections.] Its one new test
+  gap goes to STATUS as V-1 (Low): the street's and the grass's greys are tested as different, not for which is
+  darker (a swap passes all 11 scene tests; the code's street 0x40 under the grass's 0x50 matches his step 3).
 
 ## Decisions and deviations
-- His, 2026-11-28 12:10 Amsterdam (`docs/DECISIONS.md`, 11:43:45 UTC): SIZE-4C (b) and the one-branch way (item 6);
+- His, in his message of 2026-11-28 (it gives 12:10 Amsterdam as its time; sent at 11:43:45 UTC, 12:43 Amsterdam;
+  `docs/DECISIONS.md`): SIZE-4C (b) and the one-branch way (item 6);
   STREET-GREY (b); BOARD-WORDS (b); PASTE-BREAKS (a); DESIGN-CLASH (a); DIGEST-NOTE (a). The advisor agent's: the
   hold, the count with generated TypeScript in, the six reviewers.
 - Found in the build: the plants' first run missed a ramp drawn with another side's faces, so the test now holds each
@@ -115,7 +134,8 @@ two that asked for changes in their lane, then the one comment (0645432f). Every
   front of git in two reads; a notes commit (bfe447a3) holding a whole message's digest and length, found by the
   automated security review, the method fixed, left as it is by his DIGEST-NOTE (a); told to him "no change at 6.3
   and 9.576 m/s" for 4c-2's swept wall pass, which block 10 measured otherwise (below); question 13 said his
-  sandbox's maps never met its case, wrong (his metrics room's window wall), corrected at 13:58 Amsterdam. An agent's:
+  sandbox's maps never met its case, wrong (his metrics room's window wall), corrected at 13:58 Amsterdam; a time in
+  the plan sheet written as 14:20 without reading the clock (it was 14:15), corrected at once. An agent's:
   game-designer read his Testlines repository by its public address before his TESTLINES yes (told to him).
 
 ## For 4c-2, said here so nothing is lost (not in this pull request)
