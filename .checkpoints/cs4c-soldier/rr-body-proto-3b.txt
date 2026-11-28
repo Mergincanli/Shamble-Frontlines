@@ -1,0 +1,93 @@
+step 0.55 speed 6.3 start 28.40: PASS x 31.1300 feet 0.5500 steps 1 unjumped-falls 0 airborne-ticks 0
+step 0.55 speed 6.3 start 28.47: PASS x 31.2000 feet 0.5500 steps 1 unjumped-falls 0 airborne-ticks 0
+step 0.55 speed 6.3 start 28.53: PASS x 31.0500 feet 0.5500 steps 1 unjumped-falls 0 airborne-ticks 0
+step 0.55 speed 9.576 start 28.40: PASS x 31.2728 feet 0.5500 steps 1 unjumped-falls 0 airborne-ticks 0
+step 0.55 speed 9.576 start 28.47: PASS x 31.0236 feet 0.5500 steps 1 unjumped-falls 0 airborne-ticks 0
+step 0.55 speed 9.576 start 28.53: PASS x 31.0836 feet 0.5500 steps 1 unjumped-falls 0 airborne-ticks 0
+step 0.55 speed 13.27 start 28.40: PASS x 31.0540 feet 0.5500 steps 1 unjumped-falls 0 airborne-ticks 0
+step 0.55 speed 13.27 start 28.47: PASS x 31.1240 feet 0.5500 steps 1 unjumped-falls 0 airborne-ticks 0
+step 0.55 speed 13.27 start 28.53: PASS x 31.1840 feet 0.5500 steps 1 unjumped-falls 0 airborne-ticks 0
+step 0.56 speed 6.3 start 32.40: PASS x 33.6000 feet 0.0000 steps 0 unjumped-falls 0 airborne-ticks 0
+step 0.56 speed 6.3 start 32.47: PASS x 33.6000 feet 0.0000 steps 0 unjumped-falls 0 airborne-ticks 0
+step 0.56 speed 6.3 start 32.53: PASS x 33.6000 feet 0.0000 steps 0 unjumped-falls 0 airborne-ticks 0
+step 0.56 speed 9.576 start 32.40: PASS x 33.6000 feet 0.0000 steps 0 unjumped-falls 0 airborne-ticks 0
+step 0.56 speed 9.576 start 32.47: PASS x 33.6000 feet 0.0000 steps 0 unjumped-falls 0 airborne-ticks 0
+step 0.56 speed 9.576 start 32.53: PASS x 33.6000 feet 0.0000 steps 0 unjumped-falls 0 airborne-ticks 0
+step 0.56 speed 13.27 start 32.40: PASS x 33.6000 feet 0.0000 steps 0 unjumped-falls 0 airborne-ticks 0
+step 0.56 speed 13.27 start 32.47: PASS x 33.6000 feet 0.0000 steps 0 unjumped-falls 0 airborne-ticks 0
+step 0.56 speed 13.27 start 32.53: PASS x 33.6000 feet 0.0000 steps 0 unjumped-falls 0 airborne-ticks 0
+slow step 0.55 speed 1 start 28.40 walk on: PASS x 31.0333 feet 0.5500 centre past the face 1.0333 steps 1 unjumped-falls 0
+slow step 0.55 speed 1 start 28.40 stop at touch: PASS x 29.6333 feet 0.5500 centre past the face -0.3667 steps 1 unjumped-falls 0
+slow step 0.55 speed 1 start 28.47 walk on: PASS x 31.0033 feet 0.5500 centre past the face 1.0033 steps 1 unjumped-falls 0
+slow step 0.55 speed 1 start 28.47 stop at touch: PASS x 29.6033 feet 0.5500 centre past the face -0.3967 steps 1 unjumped-falls 0
+slow step 0.55 speed 1 start 28.53 walk on: PASS x 31.0300 feet 0.5500 centre past the face 1.0300 steps 1 unjumped-falls 0
+slow step 0.55 speed 1 start 28.53 stop at touch: PASS x 29.6300 feet 0.5500 centre past the face -0.3700 steps 1 unjumped-falls 0
+slow step 0.55 speed 2 start 28.40 walk on: PASS x 31.0000 feet 0.5500 centre past the face 1.0000 steps 1 unjumped-falls 0
+slow step 0.55 speed 2 start 28.40 stop at touch: PASS x 29.6000 feet 0.5500 centre past the face -0.4000 steps 1 unjumped-falls 0
+slow step 0.55 speed 2 start 28.47 walk on: PASS x 31.0034 feet 0.5500 centre past the face 1.0034 steps 1 unjumped-falls 0
+slow step 0.55 speed 2 start 28.47 stop at touch: PASS x 29.6033 feet 0.5500 centre past the face -0.3967 steps 1 unjumped-falls 0
+slow step 0.55 speed 2 start 28.53 walk on: PASS x 31.0634 feet 0.5500 centre past the face 1.0634 steps 1 unjumped-falls 0
+slow step 0.55 speed 2 start 28.53 stop at touch: PASS x 29.6633 feet 0.5500 centre past the face -0.3367 steps 1 unjumped-falls 0
+slow step 0.55 speed 6.3 start 28.40 stop at touch: PASS x 29.6600 feet 0.5500 centre past the face -0.3400 steps 1 unjumped-falls 0
+slow step 0.55 speed 6.3 start 28.47 stop at touch: PASS x 29.7300 feet 0.5500 centre past the face -0.2700 steps 1 unjumped-falls 0
+slow step 0.55 speed 6.3 start 28.53 stop at touch: PASS x 29.7900 feet 0.5500 centre past the face -0.2100 steps 1 unjumped-falls 0
+ledge 3.05 speed 6.3 jump 0.3 m out: PASS feet 3.0500 x 36.280 on-top-tick Some(12) unjumped-falls 0 airborne-ticks 12
+ledge 3.05 speed 6.3 jump 0.8 m out: PASS feet 3.0500 x 36.280 on-top-tick Some(12) unjumped-falls 0 airborne-ticks 12
+ledge 3.05 speed 6.3 jump 1.2 m out: PASS feet 3.0500 x 36.280 on-top-tick Some(12) unjumped-falls 0 airborne-ticks 12
+ledge 3.05 speed 9.576 jump 0.3 m out: PASS feet 3.0500 x 36.515 on-top-tick Some(12) unjumped-falls 0 airborne-ticks 12
+ledge 3.05 speed 9.576 jump 0.8 m out: PASS feet 3.0500 x 36.515 on-top-tick Some(12) unjumped-falls 0 airborne-ticks 12
+ledge 3.05 speed 9.576 jump 1.2 m out: PASS feet 3.0500 x 36.515 on-top-tick Some(12) unjumped-falls 0 airborne-ticks 12
+ledge 3.05 speed 13.27 jump 0.3 m out: PASS feet 3.0500 x 36.369 on-top-tick Some(13) unjumped-falls 0 airborne-ticks 13
+ledge 3.05 speed 13.27 jump 0.8 m out: PASS feet 3.0500 x 36.369 on-top-tick Some(13) unjumped-falls 0 airborne-ticks 13
+ledge 3.05 speed 13.27 jump 1.2 m out: PASS feet 3.0500 x 36.369 on-top-tick Some(13) unjumped-falls 0 airborne-ticks 13
+ledge 3.1 speed 6.3 jump 0.3 m out: PASS feet 0.0000 x 39.600 on-top-tick None unjumped-falls 0 airborne-ticks 27
+ledge 3.1 speed 6.3 jump 0.8 m out: PASS feet 0.0000 x 39.600 on-top-tick None unjumped-falls 0 airborne-ticks 27
+ledge 3.1 speed 6.3 jump 1.2 m out: PASS feet 0.0000 x 39.600 on-top-tick None unjumped-falls 0 airborne-ticks 27
+ledge 3.1 speed 9.576 jump 0.3 m out: PASS feet 0.0000 x 39.600 on-top-tick None unjumped-falls 0 airborne-ticks 27
+ledge 3.1 speed 9.576 jump 0.8 m out: PASS feet 0.0000 x 39.600 on-top-tick None unjumped-falls 0 airborne-ticks 27
+ledge 3.1 speed 9.576 jump 1.2 m out: PASS feet 0.0000 x 39.600 on-top-tick None unjumped-falls 0 airborne-ticks 27
+ledge 3.1 speed 13.27 jump 0.3 m out: PASS feet 0.0000 x 39.600 on-top-tick None unjumped-falls 0 airborne-ticks 27
+ledge 3.1 speed 13.27 jump 0.8 m out: PASS feet 0.0000 x 39.600 on-top-tick None unjumped-falls 0 airborne-ticks 27
+ledge 3.1 speed 13.27 jump 1.2 m out: PASS feet 0.0000 x 39.600 on-top-tick None unjumped-falls 0 airborne-ticks 27
+ramp gentle 25% speed 6.3 start 38: up PASS (float open 0.0000 / at the seams 0.0700 m, airborne ticks 0, falls 0) down PASS (float open 0.0000 / seams 0.0250 m, airborne ticks 0, falls 0)
+ramp gentle 25% speed 6.3 start 38.07: up PASS (float open 0.0000 / at the seams 0.0525 m, airborne ticks 0, falls 0) down PASS (float open 0.0000 / seams 0.0075 m, airborne ticks 0, falls 0)
+ramp gentle 25% speed 6.3 start 38.13: up PASS (float open 0.0000 / at the seams 0.0900 m, airborne ticks 0, falls 0) down PASS (float open 0.0000 / seams 0.0000 m, airborne ticks 0, falls 0)
+ramp gentle 25% speed 9.576 start 38: up PASS (float open 0.0000 / at the seams 0.0742 m, airborne ticks 0, falls 0) down PASS (float open 0.0000 / seams 0.0000 m, airborne ticks 0, falls 0)
+ramp gentle 25% speed 9.576 start 38.07: up PASS (float open 0.0000 / at the seams 0.0567 m, airborne ticks 0, falls 0) down PASS (float open 0.0000 / seams 0.0000 m, airborne ticks 0, falls 0)
+ramp gentle 25% speed 9.576 start 38.13: up PASS (float open 0.0000 / at the seams 0.0417 m, airborne ticks 0, falls 0) down PASS (float open 0.0000 / seams 0.0261 m, airborne ticks 0, falls 0)
+ramp gentle 25% speed 13.27 start 38: up PASS (float open 0.0000 / at the seams 0.0913 m, airborne ticks 0, falls 0) down PASS (float open 0.0000 / seams 0.0000 m, airborne ticks 0, falls 0)
+ramp gentle 25% speed 13.27 start 38.07: up PASS (float open 0.0000 / at the seams 0.0738 m, airborne ticks 0, falls 0) down PASS (float open 0.0000 / seams 0.0354 m, airborne ticks 0, falls 0)
+ramp gentle 25% speed 13.27 start 38.13: up PASS (float open 0.0000 / at the seams 0.0588 m, airborne ticks 0, falls 0) down PASS (float open 0.0000 / seams 0.0204 m, airborne ticks 0, falls 0)
+ramp steep 50% speed 6.3 start 38: up PASS (float open 0.0000 / at the seams 0.1400 m, airborne ticks 0, falls 0) down PASS (float open 0.0000 / seams 0.0500 m, airborne ticks 0, falls 0)
+ramp steep 50% speed 6.3 start 38.07: up PASS (float open 0.0000 / at the seams 0.1050 m, airborne ticks 0, falls 0) down PASS (float open 0.0000 / seams 0.0150 m, airborne ticks 0, falls 0)
+ramp steep 50% speed 6.3 start 38.13: up PASS (float open 0.0000 / at the seams 0.1800 m, airborne ticks 0, falls 0) down PASS (float open 0.0000 / seams 0.0000 m, airborne ticks 0, falls 0)
+ramp steep 50% speed 9.576 start 38: up PASS (float open 0.0000 / at the seams 0.1484 m, airborne ticks 0, falls 0) down PASS (float open 0.0000 / seams 0.0000 m, airborne ticks 0, falls 0)
+ramp steep 50% speed 9.576 start 38.07: up PASS (float open 0.0000 / at the seams 0.1134 m, airborne ticks 0, falls 0) down PASS (float open 0.0000 / seams 0.0000 m, airborne ticks 0, falls 0)
+ramp steep 50% speed 9.576 start 38.13: up PASS (float open 0.0000 / at the seams 0.0834 m, airborne ticks 0, falls 0) down PASS (float open 0.0000 / seams 0.0522 m, airborne ticks 0, falls 0)
+ramp steep 50% speed 13.27 start 38: up PASS (float open 0.0000 / at the seams 0.1825 m, airborne ticks 0, falls 0) down PASS (float open 0.0000 / seams 0.0000 m, airborne ticks 0, falls 0)
+ramp steep 50% speed 13.27 start 38.07: up PASS (float open 0.0000 / at the seams 0.1475 m, airborne ticks 0, falls 0) down PASS (float open 0.0000 / seams 0.0708 m, airborne ticks 0, falls 0)
+ramp steep 50% speed 13.27 start 38.13: up PASS (float open 0.0000 / at the seams 0.1175 m, airborne ticks 0, falls 0) down PASS (float open 0.0000 / seams 0.0408 m, airborne ticks 0, falls 0)
+roof house a 95% speed 6.3 jump 0.5 m out: edge gained true, highest standing 4.700 m (ridge 4.7), float open 0.0000 / seams 0.2768, unjumped-falls 0
+roof house a 95% speed 6.3 jump 1 m out: edge gained true, highest standing 4.700 m (ridge 4.7), float open 0.0000 / seams 0.2768, unjumped-falls 0
+roof house a 95% speed 6.3 jump 1.5 m out: edge gained true, highest standing 4.700 m (ridge 4.7), float open 0.0000 / seams 0.3055, unjumped-falls 0
+roof house a 95% speed 9.576 jump 0.5 m out: edge gained true, highest standing 4.700 m (ridge 4.7), float open 0.0000 / seams 0.0771, unjumped-falls 0
+roof house a 95% speed 9.576 jump 1 m out: edge gained true, highest standing 4.700 m (ridge 4.7), float open 0.0000 / seams 0.0771, unjumped-falls 0
+roof house a 95% speed 9.576 jump 1.5 m out: edge gained true, highest standing 4.700 m (ridge 4.7), float open 0.0000 / seams 0.0771, unjumped-falls 0
+roof house a 95% speed 13.27 jump 0.5 m out: edge gained true, highest standing 4.700 m (ridge 4.7), float open 0.0000 / seams 0.0404, unjumped-falls 0
+roof house a 95% speed 13.27 jump 1 m out: edge gained true, highest standing 4.700 m (ridge 4.7), float open 0.0000 / seams 0.0404, unjumped-falls 0
+roof house a 95% speed 13.27 jump 1.5 m out: edge gained true, highest standing 4.700 m (ridge 4.7), float open 0.0000 / seams 0.0404, unjumped-falls 0
+roof house b 89% speed 6.3 jump 0.5 m out: edge gained true, highest standing 4.300 m (ridge 4.3), float open 0.0000 / seams 0.1789, unjumped-falls 0
+roof house b 89% speed 6.3 jump 1 m out: edge gained true, highest standing 4.300 m (ridge 4.3), float open 0.0000 / seams 0.1789, unjumped-falls 0
+roof house b 89% speed 6.3 jump 1.5 m out: edge gained true, highest standing 4.300 m (ridge 4.3), float open 0.0000 / seams 0.2058, unjumped-falls 0
+roof house b 89% speed 9.576 jump 0.5 m out: edge gained true, highest standing 4.300 m (ridge 4.3), float open 0.0000 / seams 0.0723, unjumped-falls 0
+roof house b 89% speed 9.576 jump 1 m out: edge gained true, highest standing 4.300 m (ridge 4.3), float open 0.0000 / seams 0.0723, unjumped-falls 0
+roof house b 89% speed 9.576 jump 1.5 m out: edge gained true, highest standing 4.300 m (ridge 4.3), float open 0.0000 / seams 0.0723, unjumped-falls 0
+roof house b 89% speed 13.27 jump 0.5 m out: edge gained true, highest standing 4.300 m (ridge 4.3), float open 0.0000 / seams 0.0790, unjumped-falls 0
+roof house b 89% speed 13.27 jump 1 m out: edge gained true, highest standing 4.300 m (ridge 4.3), float open 0.0000 / seams 0.0790, unjumped-falls 0
+roof house b 89% speed 13.27 jump 1.5 m out: edge gained true, highest standing 4.300 m (ridge 4.3), float open 0.0000 / seams 0.0790, unjumped-falls 0
+off platform 1.0 m speed 6.3: fell (centre past the edge when it started: Some(0.30998993) m), feet now 0.520
+off platform 1.0 m speed 9.576: fell (centre past the edge when it started: Some(0.23439026) m), feet now 0.787
+off platform 1.0 m speed 13.27: fell (centre past the edge when it started: Some(0.2116661) m), feet now 0.880
+off step 0.55 m speed 6.3: fell (centre past the edge when it started: Some(0.2599945) m), feet now 0.070
+off step 0.55 m speed 9.576: fell (centre past the edge when it started: Some(0.27680206) m), feet now 0.337
+off step 0.55 m speed 13.27: fell (centre past the edge when it started: Some(0.32699966) m), feet now 0.560

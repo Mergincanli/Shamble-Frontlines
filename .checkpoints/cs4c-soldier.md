@@ -10,7 +10,7 @@
   `/home/user/Shamble-Frontlines` is never switched.
 - **Base:** origin/main dae6d107fdbe942567104bcf1c9a2cbc6b3a1e0f (pull request #79's merge commit), taken in by
   fast-forward from b7145273.
-- **Last update:** 2026-11-28 01:00 Amsterdam (from the clock; the save before said 01:08, a time written without
+- **Last update:** 2026-11-28 01:15 Amsterdam (from the clock; an earlier save said 01:08, a time written without
   reading the clock: it was 00:57)
 
 ## Steps done
@@ -34,8 +34,18 @@
    the three finished reads; the question file gained SIZE-4C's refinement (recommendation now (b)) and STREET-GREY
    (79cfc4c0), posted on the board.
 
+5. **game-designer's read** (DONE): the sandbox's own step rule (a 0.4 m body, a flat 0.15 m foot, a pull, a 0.2 m
+   snap), BODY-SHAPE's options, the push's numbers; the question file corrected from it (5597b00d). It fetched his
+   Testlines repository read-only by its public address, outside the one repository this session has attached: told
+   to him. rust-reviewer re-runs its prototype with that body (running).
+6. **The advisor agent's verdict on the sheet's revision 1** (`advisor-reread-4c.md`, DONE): **step 0 and step S
+   APPROVED with conditions 1 to 9; steps 1 to 7 not yet** (its item 10). The sheet is revision 2 with every condition
+   applied; the question file gained DEPART-4C, STREET-GREY restated, SIZE-4C's branch consequence and the scene's new
+   hold.
+
 ## Current step
-The advisor agent's review of the sheet; game-designer's read on BODY-SHAPE. Then: step 0 and step S by its verdict.
+**Step S, the scene: the build** (by the sheet's section D, revision 2). The branch rule (condition 2): until he
+answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and prototypes only.
 
 ## Next steps
 1. **The plan sheet** `.checkpoints/cs4c-soldier/reread-sheet.md`, revision 1, against main dae6d107: step 0 (the first
@@ -56,8 +66,10 @@ The advisor agent's review of the sheet; game-designer's read on BODY-SHAPE. The
 ## What leaves first if the count runs high (his SIZE-4B point 2, applied to 4c; confirmed in the sheet)
 - The plan's own ladder: at 13,150 written lines the far-corner map (PM-0004-39) moves to 4d, and he is told before
   it moves. Nothing else moves; at the stop line the chat stops and he decides.
-- The stop line with the scene inside is his (SIZE-4C). Until he answers, the scene is held to the lowest line any
-  option gives it (the plan's rule, its planned size times 1.25: about 1,420), so no answer is taken for him.
+- The stop line with the scene inside is his (SIZE-4C). Until he answers, the scene is held to about 1,665 written
+  lines (the advisor agent's item 2: the plan's rule on the recount, 740 x 1.8 x 1.25); one sentence to him before
+  the count passes 1,420; the two-thirds sentence at about 1,110; at 1,665 the build stops. What leaves the scene first,
+  said to him before it moves: the overview camera (only under SIZE-4C (a)), then the readout's per-file headers.
 
 ## Open findings
 - None yet for 4c.
@@ -101,8 +113,8 @@ The advisor agent's review of the sheet; game-designer's read on BODY-SHAPE. The
   - rust-reviewer (`rust-reviewer-read.md`): DONE (folded into the sheet's E1: BODY-SHAPE, SWEEP-ROUTE, libm's
     dependency hold, the pins re-made in step 1).
   - engine-architect: DONE (block 4, 4B-WORLD-ROOM, folded into the sheet's E3 to E5).
-  - game-designer (`game-designer-read.md`, since 00:56 Amsterdam): the sandbox's own step rule, BODY-SHAPE's options
-    for him, the push's formulas and four limits, GROUND and the slope's unit: running.
-  - **the advisor agent** (`advisor-reread-4c.md`, since 01:00 Amsterdam): the sheet's revision 1 (78fd901e), its
-    section H: step 0 and step S for APPROVE now, rulings on items 2 to 11: running.
+  - game-designer (`game-designer-read.md`): DONE.
+  - the advisor agent (`advisor-reread-4c.md`): DONE (its verdict above).
+  - **rust-reviewer, resumed** (its block 5 in `rust-reviewer-read.md`): the prototype re-run with the sandbox's body
+    (the 0.15 m foot, the pull, the 0.2 m snap), on the steps, the ledges, the ramps, the roofs and edges: running.
 - The scene's before picture: `.gate/scene-before-4c.png` (main's page, 3 draw calls), by `shot-4c.mjs`.

@@ -206,6 +206,40 @@ holds.
   steps, the 3.05 and 3.10 m ledges, the ramps); the run is going on now, and its result comes with the next update.
   Fallback (2), with its overhang and float said to him before his Brave check.
 
+## Added at 01:15 Amsterdam (from the clock), after the advisor agent's verdict on the plan sheet (`advisor-reread-4c.md`)
+The advisor agent approved the first docs commit and the scene, with conditions, and holds the soldier's steps until
+the points above are settled. Three things for him follow from its verdict.
+### 10. DEPART-4C: three places where the soldier's build departs from wording he has approved
+- **Why it matters:** his rule of 2026-11-14 is that no pass mark is dropped or loosened without his word, and the
+  build plan's Walk card under his go says "our own movement on parry3d's queries". **Needed before the movement step.**
+- **The three, each with the option recommended:**
+  1. **SWEEP-ROUTE:** the soldier's body sweeps are our own code on the world's corners, as the ray already is, with the
+     collision library keeping its tree and checking our answers in the tests, instead of the library's own sweep
+     (which may allocate memory when two shapes truly overlap, and settles ties by a tolerance). The marks PM-0004-20 and
+     PM-0004-35 get new wording to match (the library then gives the players' file only its tree). Said plainly: our
+     sweeps are measured on boxes only so far (the ramp's sweep, about 80 lines, is untried). Recommended: yes.
+  2. **PM-0004-60 at 2,000,000 hostile commands** in CI's release run, where the mark says 10 million a night through a
+     fuzzing tool: a lower count unless the 10 million is placed at a named later change-set (the nightly job is the CI
+     Builder's). Recommended: yes, with the 10 million placed at the change-set that brings the nightly job.
+  3. **PM-0004-20 on the walk recording** (one soldier), where the mark says 48 soldiers over 18,000 ticks: the
+     48-soldier run and its timing placed at the first build that can show them. Recommended: yes.
+- **Options:** (a) all three as recommended; (b) the ones he names; (c) none: the library's sweeps, and the marks as
+  worded.
+### STREET-GREY, restated (it must be answered before the scene's pull request merges)
+- **Option (a), one grey for street and grass, is the plain reading of his GREY-COLOURS (a)** ("higher is lighter": both
+  lie at height 0). (b), two neutral greys so the street shows, is only a default he can veto, as the plan promised
+  him "a street". The scene is built with (b) meanwhile, since he checks it in Brave before it merges; his letter, or his
+  Brave check naming it, is needed before then.
+### SIZE-4C: one more consequence, and the scene's hold
+- **The branch:** pull request #79 came from this same branch, so until he answers SIZE-4C only the first docs commit
+  and the scene go on it; anything of the soldier committed earlier would make (b) and (c) impossible to cut without
+  rewriting history. **(a) releases the rest at once.** Under (b) or (c), while the scene's pull request is under
+  review, even a notes push would move its head, so notes would stay on this machine for that time, which his
+  25-minute save rule does not allow for long.
+- **The scene's hold:** by the advisor agent's ruling the hold follows the recount, about 1,665 written lines (the plan's
+  rule on 740), not the 1,420 said above; he hears one sentence before the count passes 1,420, and the build stops at
+  1,665 unless his SIZE-4C answer sets another line.
+
 ## One line, no question
 STEP12-GO is in the register already (`docs/DECISIONS.md:183`, since 4b-2's docs pass), so it is not written again.
 Only his go for 4b-2's merge, his word on merging and his design notes (and his message of 23:59, by BOARD-WORDS) go

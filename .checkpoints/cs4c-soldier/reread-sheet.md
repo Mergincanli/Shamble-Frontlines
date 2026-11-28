@@ -7,11 +7,16 @@ revision 4: section 6 and the sections it names), three reads against today's co
 re-read carries the part's exact symbols to add and to remove, taken from the designs' tables as they stand that
 day." **No file outside `.checkpoints/` is edited before the advisor agent's verdict.**_
 
-**Status of this revision: complete for the advisor agent's review** (2026-11-28, 00:59 Amsterdam, the commit's clock
-time of 78fd901e), from four
-finished reads: engine-architect, netcode-architect and rust-reviewer (DONE), and game-designer's on BODY-SHAPE and the
-push's numbers, still running: its result comes as an addendum, and the movement step is held for BODY-SHAPE in any
-case.
+**Revision 2: the advisor agent's verdict applied** (`advisor-reread-4c.md`, on revision 1 at 78fd901e): **step 0
+and step S APPROVED, with conditions 1 to 9; steps 1 to 7 not yet** (its item 10, thirteen points, listed in section
+H). Each condition is applied where it lands, marked "(condition n)". Revision 1 was written from four reads
+(engine-architect, netcode-architect and rust-reviewer, then game-designer's on BODY-SHAPE and the push, since DONE).
+
+**The branch rule (condition 2; F-ORD-1):** pull request #79's head was this same branch, so until he answers SIZE-4C
+only step 0 and step S go on it: anything of steps 1 to 7 committed before his answer would make (b) and (c)
+impossible to cut without rewriting history. Meanwhile notes and prototypes only. Told to him as a consequence of his
+choice: "(a) releases the rest at once". Under (b) or (c), once 4c-1's head is under review even a notes push moves it,
+so notes would then stay local, which his 25-minute save rule does not allow for long: his to weigh in SIZE-4C.
 
 ## A. Since the plan was approved (2026-11-25)
 - **Merged:** 4a (pull request #70, main 2483e9a), 4b-1 (#75, b9aad01), 4b-2 (#79, dae6d107, at head b7145273 on his go
@@ -75,6 +80,24 @@ needs it; if his answers come after step S's code, step 0 still lands before any
 - **`docs/adr/README.md`** (the register): one dated line that names LOOP_V2's section 14.
 - **Evidence:** `decisions-4c.mjs check` (every quoted line byte for byte, each saved file against its own size and
   sha256); the section-14 check; `git diff --stat` touching only those three files (four with EDITOR_V2); the gate.
+- **The advisor agent's conditions on step 0 (condition 7):**
+  - **A byte check against main (F-S0-5):** a script shows that the head's LOOP_V2, with section 14, the pointers and
+    the header's sentence taken out, equals main's byte for byte; that each pointer is exactly his string "(2026-11-27:
+    resource points replace open fields, see §14)" at exactly the listed lines; and EDITOR_V2 likewise under
+    DESIGN-CLASH. (`git diff --stat` shows files, not that nothing else moved: his item 3, "Keep the old text for the
+    history ... Change nothing else in the design docs".)
+  - **Each pointer at the end of the sentence or bullet that names the field (F-S0-2),** so no sentence is cut: section
+    1's sentence ends on line 16, section 3's bullets on 33 and 35, section 9's first bullet on 151.
+  - **The as-pasted file tied to the saved message's digest (F-S0-3):** `section14-4c.mjs` checks
+    `section14-as-pasted.md` against sha256 2bd82216... (3,063 bytes) before it mends or checks.
+  - **The method for BOARD-WORDS (b), written before it runs (F-S0-1):** `decisions-4c.mjs` quotes whole messages only; under
+    (b) the saved file is the message less its item 3, with a header line saying item 3 is left out and why; the header
+    gives the shown text's digest, which the check verifies; and the whole message's digest is recorded beside it, so
+    that it can be checked against the transcript. Written into the script before it is run.
+- **Its landing (condition 8):** step 0 waits for PASTE-BREAKS, BOARD-WORDS and DESIGN-CLASH, lands before any other docs
+  commit of 4c, and the pull request that carries it is not marked ready before it (its evidence: F-S0-5's check and
+  `decisions-4c.mjs check`). **Risk tier 1, needs-mustafa (condition 9):** LOOP_V2 and the register are decision docs,
+  and the register holds his words.
 
 ## D. Step S, the page's scene (exact): engine-architect's block 1 (`engine-architect-read.md`, lines 32 to 298)
 The read's block 1 holds every ruling with today's file:line; this section is what the build carries out.
@@ -110,7 +133,10 @@ The read's block 1 holds every ruling with today's file:line; this section is wh
   aspect, replaced by the follow camera at step 4.
 - **The development inventory:** `render/inventory.ts` reads each drawn object's own geometry buffer, name and
   material colour (never a list the builder wrote beside the meshes); `window.__shambleScene` installed in boot's
-  development block; two new `DEV_MARKERS` (`"__shambleScene"`, `"scene-inventory"`), so the production scan refuses a
+  development block; two new `DEV_MARKERS`: `"__shambleScene"` and the fixed sentence `readInventory` throws when the
+  floor holds an object it does not know (`INVENTORY_UNKNOWN`, "the scene inventory met an object it does not know": a
+  live string of the module's own code, so the development build keeps it, where an unreferenced tag constant would be
+  dropped there too and the both-ways marker check would fail) (condition 1); so the production scan refuses a
   production build that holds either and a development build that lacks either.
 - **The readout:** `ReportData.content` (`"holding"`, `"none"`, or the files with their formats and versions) and
   `ReportData.scene` (the map's id and its counts of boxes, ramps and regions), counted once at delivery and never in
@@ -129,8 +155,8 @@ The read's block 1 holds every ruling with today's file:line; this section is wh
 **The exact symbols** (the read's table 1.10):
 | | Symbols |
 |---|---|
-| Add | picture.ts: `PictureContent`, `Picture.setContent`, `SceneObject`, `Picture.inventory`. render/scene.ts (new): `buildEmptyScene` (moved; returns `{ scene, camera, floor }`), `buildMapFloor(map)`, `solidPoints(shape)`, `greyOf(top, lowest, tallest)`, `groundGrey(kind)`, `disposeFloor(floor)`, `overview(bounds, aspect)`. render/inventory.ts (new): `readInventory(floor)`, `INVENTORY_TAG`. app/content.ts: `MAP_FORMAT`, `MAP_VERSION`, `MOVEMENT_FORMAT`, `MOVEMENT_VERSION`, `CONTENT_KINDS`, `NOT_THE_MAP`, `ContentFile`, `ReadContent`, `readMap`, `readContent`, private `closed`, `corner`, `word`, `text`. sim-worker/src/index.ts: `LOCAL_MAP` re-exported. overlay/report.ts: `ContentRows`, `ReportData.content`, `ReportData.scene`. boot.ts: `window.__shambleScene`. build-checks.mjs: two `DEV_MARKERS`. render/scene.test.ts (new). |
-| Change | three-picture.ts: `createThreePicture` (the floor, `setContent`, `inventory`, the overview in `setContent` and `resize`). content.ts: `PageContent`'s constructor and `afterMessage`, its comment. boot.ts: the hand-off, `data()`, the second hook. report.ts: `readoutLines`, `formatReport`. e2e: skeleton.spec.ts (the counts' read, the broken-Worker tests), content.spec.ts (the refused bundles' counts), report.ts's `Report` type, render-counts.json's shape. content.test.ts, content-ties.test.mjs, content-schema.test.mjs, report.test.ts, build-checks.test.mjs. |
+| Add | picture.ts: `PictureContent`, `Picture.setContent`, `SceneObject`, `Picture.inventory`. render/scene.ts (new): `buildEmptyScene` (moved; returns `{ scene, camera, floor }`), `buildMapFloor(map)`, `solidPoints(shape)`, `greyOf(top, lowest, tallest)`, `groundGrey(kind)`, `disposeFloor(floor)`, `overview(bounds, aspect)`. render/inventory.ts (new): `readInventory(floor)`, `INVENTORY_UNKNOWN` (its thrown sentence, the marker: condition 1). app/content.ts: `MAP_FORMAT`, `MAP_VERSION`, `MOVEMENT_FORMAT`, `MOVEMENT_VERSION`, `CONTENT_KINDS`, `NOT_THE_MAP`, `ContentFile`, `ReadContent`, `readMap`, `readContent`, private `closed`, `corner`, `word`, `text`. sim-worker/src/index.ts: `LOCAL_MAP` re-exported. overlay/report.ts: `ContentRows`, `ReportData.content`, `ReportData.scene`. boot.ts: `window.__shambleScene`. build-checks.mjs: two `DEV_MARKERS`. render/scene.test.ts (new). |
+| Change | three-picture.ts: `createThreePicture` (the floor, `setContent`, `inventory`, the overview in `setContent` and `resize`; `declare const __SHAMBLE_DEVTOOLS__`). docs/REPO_MAP.md (docs-keeper, at the docs pass). content.ts: `PageContent`'s constructor and `afterMessage`, its comment. boot.ts: the hand-off, `data()`, the second hook. report.ts: `readoutLines`, `formatReport`. e2e: skeleton.spec.ts (the counts' read, the broken-Worker tests), content.spec.ts (the refused bundles' counts), report.ts's `Report` type, render-counts.json's shape. content.test.ts, content-ties.test.mjs, content-schema.test.mjs, report.test.ts, build-checks.test.mjs. |
 | Remove | render/empty-scene.ts (its code moves into scene.ts unchanged). `readBundle` as `PageContent`'s default reader (it stays, called by `readContent`). |
 
 **The tests, each with its planted defect** (the read's table 1.11; the plants script runs every one): T1 to T8 in
@@ -146,10 +172,17 @@ both backends; the seven hostile bundles leave the empty floor and its counts; a
 "none"; the production build holds neither marker; allocation on base and head).
 
 **Its size:** about 362 code and 378 tests by the designs' count (about 740, against the 630 this sheet first said),
-so about 1,600 to 2,000 written lines at the measured rates: above the 1,420 the step was to be held to until his
-SIZE-4C (section H asks the advisor agent about that hold). What could leave first, said to him before it moves: the
-overview camera (only under SIZE-4C (a), where the follow camera frames the scene before 4c merges), then the per-file
-headers of the readout (the rows would name paths alone).
+so about 1,600 to 2,000 written lines at the measured rates. **The hold follows the recount (condition 4):** about
+1,665 written lines (740 x 1.8 x 1.25), said to him in one sentence before the count passes 1,420; the two-thirds
+sentence at about 1,110; at 1,665 the step stops; his SIZE-4C line wins when he gives one. What could leave first,
+said to him before it moves: the overview camera (only under SIZE-4C (a), where the follow camera frames the scene
+before 4c merges), then the per-file headers of the readout (the rows would name paths alone).
+
+**Build by symbol (F-S-3, a Low):** the read's line numbers for boot.ts, three-picture.ts and content.spec.ts do not
+exist at dae6d107 (those files have 178, 80 and 101 lines); every claim holds by symbol (`PageContent` at boot.ts:61,
+the development block :114-159, `__shambleReport` :159, `visibilitychange` :106-107; `buildEmptyScene` at
+three-picture.ts:37, `draw` :53, `counters` :57, `resize` :68; content.spec.ts's baseline :10, its poll :87-88). The
+report cites the right lines.
 
 **A look point the read raises, his to veto (STREET-GREY):** the street and the grass both lie at height 0, so by
 "higher is lighter" alone they take one grey and the street does not show, while the plan's section 2 says he sees "a
@@ -318,9 +351,11 @@ The read holds every symbol with today's file:line and each test with its plante
   plan's rule on the recount.
 - The count is taken at each step's end by 4b-2's method (`count-4c.mjs` in this folder, from `count-4b2.mjs` at
   59f6cc7): `git diff --numstat dae6d107 -- crates packages`, added lines; the vectors' data and what `make_recordings`
-  writes left out; everything else in, the generated TypeScript included. The advisor agent's count ruling of
-  2026-11-27 held the generated TypeScript counted "to the end of 4b-2": whether it stays counted in 4c is its to rule
-  (section H).
+  writes left out; everything else in, the generated TypeScript included. **The advisor agent's ruling for 4c (its
+  item 3):** the generated TypeScript stays counted in all of 4c (the measured rates the stop lines use were taken with
+  it in); each part is counted from the main commit it starts on (4c-1 from dae6d107; under (b) or (c) the next part
+  from the main that holds 4c-1's merge); the about 35 lines moved from empty-scene.ts count as added, and the report
+  says so.
 
 ## G. Evidence, reviewers, his checks, risks
 - **Step S:** a visual change. Before and after pictures of the real page, made by `shot-4c.mjs` (this folder) on
@@ -328,16 +363,66 @@ The read holds every symbol with today's file:line and each test with its plante
   00:36 Amsterdam): main's page, built from this branch at 8df0a4e (main's code), WebGL 2 fallback on the
   container's software renderer, 3 draw calls, 3 triangles, 62 lines, 3 geometries, 3 textures, 6 programs (the
   committed baseline exactly), errors 0; the picture is `.gate/scene-before-4c.png` (not committed: a binary).
-  Then the render counts after, with the same method; the browser tests; the gate. Reviewers on its diff, as 4b's
-  plan named them for this step: graphics-engineer and perf-auditor; with engine-architect (the interface file),
-  security-auditor (content text shown on the page) and test-engineer. art-director's lens is the old game's locked
-  look and the war room's UI: whether it reads a greybox is the advisor agent's call. His Brave check: the street
-  corner and the training yard in greys.
+  Then the render counts after, with the same method; the browser tests; the gate. **Reviewers on its diff (condition
+  5): six**, three at a time, one round: graphics-engineer and perf-auditor (as 4b's plan named them for this step),
+  engine-architect (the interface file), security-auditor (content text shown on the page), test-engineer, and
+  art-director on a narrow brief: whether the greybox reads (heights told apart from the overview, sides against tops,
+  the street shown or not by STREET-GREY, the readout's rows readable) and its Brave checklist; no judgement against
+  ART_DIRECTION (the old game's) or LOOK_V2 (the greybox decides nothing).
+- **His check of step S (condition 6), in Brave and once in Firefox, about 5 minutes, on the zip's development build,
+  each step with its expected result:**
+  1. Open the page as the zip's README says (`node serve.mjs` in its folder, then the address it prints). **Expected:**
+     the grey street corner and training yard in one overview from above at an angle; the readout's first line names
+     the backend; "errors: 0".
+  2. Look at the blocks. **Expected:** the two houses with their gable roofs, the alley, the cover wall; the yard's two
+     low steps, its ledges, the platforms with their ramps, the thin wall and the 50 m lane; each block's grey lighter
+     the higher its top (the roofs' ridges lightest, the 0.55 m step the darkest block), sides darker than tops.
+  3. Look at the ground. **Expected, by his STREET-GREY letter:** (b) the street in a grey of its own, darker than every
+     block, beside the grass; (a) one grey for street and grass; (c) the patches as outlines.
+  4. Read the readout's two new lines. **Expected:** "content: maps/test-scene.json shamble-map 1 ·
+     movement/soldier.json shamble-movement 1" and "scene: test-scene · 17 boxes · 6 ramps · 6 regions".
+  5. Press "Copy report" and paste it into the chat. **Expected:** the same rows (`content.*`, `scene.*`), "errors: 0",
+     the render counts.
+  6. Open the same page once in Firefox. **Expected:** the same scene and rows, "errors: 0".
 - **Steps 1 to 7:** pending the reads.
 - **Risks:** CI's Chromium run uses 3.6 to 3.9 of its 5 minutes (4B-CHROMIUM-TIME): 4c's browser tests may pass it,
   and the fix is a CI edit, the CI Builder's, with his yes first. Others pending the reads.
 
-## H. What I ask of the advisor agent
+## H. The advisor agent's verdict on revision 1, and what is left before steps 1 to 7
+**Verdict** (`advisor-reread-4c.md`, its section "Verdict"): step 0 and step S APPROVED with conditions 1 to 9 (each
+applied above where it lands); steps 1 to 7 not yet. Its rulings on items 2 to 11: item 2, the hold follows the recount
+(about 1,665; section D); item 3, the generated TypeScript stays counted (section F); item 4, six reviewers with
+art-director's narrow brief (section G); item 5, SWEEP-ROUTE is his, put to him as one question with two readings of
+marks (DEPART-4C: our own sweeps with PM-0004-20's and PM-0004-35's new wording, measured on boxes only, the library
+then giving the players' file its tree only; PM-0004-60 at 2,000,000 commands in CI's release line against the mark's
+10 million nightly through a fuzzer, unless the 10 million is placed at a named change-set; PM-0004-20's hash half on
+`walk`, one soldier, against the mark's 48 over 18,000 ticks, with the 48-soldier run and the flag-off timing placed at
+the first build that can show them); item 6, every value a later tick reads is in the hashed state, and a tick with no
+command keeps the held move and aim as it keeps held buttons today (world.rs:143-145): recommended netcode-architect's
+record (i) with the held move in the soldier's hashed row, one home for the bounds derived once from the map's bounds
+(metres for the sweeps, whole centimetres rounded inward for the aim) with a test tying them; item 7, pieces before step
+1's movement are allowed under (a), or under (b) and (c) once 4c-1 has merged, on six conditions; item 8, one whole
+dependency batch (libm in the workspace and `sim`; `content` in the room's dev-dependencies, and the client endpoint's
+if its tests need a world; the lockfile by resolve-only commands; `cargo tree -e features -i libm` before and after),
+kept as a patch in the notes and not applied, so step S's pushes are never held; item 9, DEPART-4C to him now, the rest
+recorded by the advisor agent as dated pointers (PM-0002-14's view-time half at change-set 8; the camera kind at step
+4; the stamina share and the sprint lock in the owner's section; first-loop re-made in step 1; the paced spec in
+`tests/paced/`; PM-0004-15 on a 64-slot table through the capacity parameter); item 11, under (c) PM-0004-28 is met in
+4c-3, with netcode-architect's written yes on the zero ray.
+
+**Before it approves steps 1 to 7 (its item 10):** (1) BODY-SHAPE settled with him on the corrected rows (sent:
+question file at 5597b00d); (2) a prototype of the chosen body on both ramps and the seam at x 45, the in-air step-up
+(3.05 m gained, 3.10 m not), landing, the snap, a ceiling and the push, with numbers, before the movement code
+(rust-reviewer's re-run, running); (3) SWEEP-ROUTE answered; (4) GROUND ruled by engine-architect (recommended: the
+bounds' bottom is solid ground, a line in map.rs and a test); (5) FACING-SPAWN picked with its reviewers; (6) the slope:
+a grade in percent, and whether a limit exists at all is his (MOVE-RULES row 9); (7) item 6 applied; (8) NO-SOURCE's
+rows in the Testlines table with `--check` taking rows with no export, and its plant; any new movement field's version
+rule; (9) `Rules::take`'s refusals, and jump tests against `jump_reach_m` as read; (10) the dependency hold answered;
+(11) the CI Builder's request for 4B-CHROMIUM-TIME sent now, through him; (12) the recount of steps 1 to 7 with the
+part's stop line, its two-thirds sentence and its rungs on the card before step 1; (13) section G's line for steps 1 to
+7 replaced by each step's evidence, reviewers and his checklist.
+
+**Revision 1's asks, as they were put (kept for the record):**
 1. **Step 0 and step S: APPROVE or REVISE now.** Neither waits for a movement answer. Step 0 is made after your verdict
    and waits for PASTE-BREAKS, BOARD-WORDS and DESIGN-CLASH; step S is built after your verdict, and its reviews wait for
    his SIZE-4C answer (under (a) they run on 4c's final diff).
