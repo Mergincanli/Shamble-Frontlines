@@ -221,8 +221,20 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   `/home/user/Shamble-Frontlines/.gate/cs4b-2`. A session of another account works on its own branch from this
   branch's head and never pushes here (his Lanes rule). SEAT-OUT from him: stop at a whole point and report the last
   commit's id.
-- **State (17:48 Amsterdam, from the clock): C3 committed and pushed after this notes commit (CI then runs on its
-  code head); security-auditor reads it next (F9).** The plants' whole run on 4b5f922c plus C3 (`plants-4c2.txt`):
+- **State (17:52 Amsterdam, from the clock): C3 = d7e260f7c1c903719023ff4424a92a5130a54975, pushed; CI: gate and
+  smoke green (run 46167247237), toolchain running (46167247231, started 16:50:02 UTC); security-auditor reading the
+  commit (its notes `security-auditor-c3.md`; brief: items 1 to 5 of its conditions and the three flagged points: the
+  visibility before `mod`, the raw-name rule, the recorded vectors). 4c-2: 2,953 written lines against 946fef73 (C1
+  442, C2 459, C3 2,052). Board posted (200). C4's edits wait for that verdict (a fix to C3 goes in its own commit
+  first).** C4's design, all in the notes: rust-reviewer-read.md block 16's C4 row (the symbols and the tests by row),
+  11.1 items 0 and 1 (the start and the fold), 11.2 (the 60-byte row, the record, `visit_shared` = 2,902 bytes), 11.6
+  (sim, room, protocol, endpoint, sim-wasm, devtools lines), 11.7 rows 22, 25, 27, 28, 31, 33 to 39, 11.8 (the pins
+  re-made: world.rs's known answers by the second implementation, first-loop re-frozen and re-made);
+  netcode-architect-read.md 9.2 (B4 and W-1 to W-4) and 9.3 (the room's half: the fill, `refused_move`, `refused_aim`,
+  `refused()`, the doc, the NONE tie, any_bytes, T2-6, T2-7); engine-architect-read.md block 7 (F1: the room owns
+  rules, statics and spawns; `World { tick, player, soldiers, seed }`); B16-2 (`Room.rules` borrowed in C4, owned in
+  C5) and B17-6 (C4's maths list: about 14 entries for the dev twin, not 4). Earlier state (17:48), kept: C3 committed and pushed after this notes commit (CI then runs on its
+  code head); security-auditor reads it next (F9). The plants' whole run on 4b5f922c plus C3 (`plants-4c2.txt`):
   **29 of 29 defects caught** (C1's 2, C2's 13, C3's P1 to P10 and PV1 to PV4), every file put back; 10 of 12 controls
   held at once, the other two (RC4, PVC1) exited 0 but with wrong expected words of mine (layering has 4 tests now;
   the Node run is 6 files and 41 tests): corrected and re-run by name, both HELD. Notable: PV1 (one bit of every exp
