@@ -844,7 +844,7 @@ DONE
 
 ### 11.3 The one sweep and every rule (the 2.5D form; block 10's measured form)
 - **`sweep_circle`** (new `body.rs`; our own, no library: SWEEP-ROUTE): a 0.4 m circle swept by (dx, dz) against the footprints of the shapes that are walls at the tick's start, found through the tree's candidates for the swept box (allocation-free, the tree's inline stack). Contacts: touching within 0.1 mm and moving along or away is no hit; a start exactly on the grown face is a contact (the slab test's "a >= t0"); a face contact puts the contact axis exactly on the grown face (push-out's own bits); a corner uses the radial normal; no skin; one slide; the speed into the wall is removed. Ramps: a ramp whose width holds his centre is swept only when he comes from beyond its exposed high end; otherwise it is left to the set-back. Its sides are swept like any wall. Ties go to the lower shape index.
-- **Is a wall** (for him, at test feet f; N19, N20, G5): skip a shape whose bottom is at or above f + 1.8 - 1e-6; skip a top at or below f (HEADROOM-FEET (a), a flag: `HeadroomFeet::OwnTopNeverWall` default, `SandboxTest` the other); not a wall if the height nearest his centre <= f + 0.55 + 0.005 with headroom (no floating underside strictly inside top .. top + 1.8 over the 0.4 m circle less 1e-6) and its bottom <= f + 1e-6; nor at a slope's head.
+- **Is a wall** (for him, at test feet f; N19, N20, G5): skip a shape whose bottom is at or above f + 1.8 - 1e-6; under HEADROOM-FEET (a) only, skip a top at or below f (a flag: `HeadroomFeet::SandboxTest`, his sandbox's rule, is the default by the advisor agent's Q2 until he answers; `OwnTopNeverWall` only through a test-only constructor; block 13); not a wall if the height nearest his centre <= f + 0.55 + 0.005 with headroom (no floating underside strictly inside top .. top + 1.8 over the 0.4 m circle less 1e-6) and its bottom <= f + 1e-6; nor at a slope's head.
 - **The slope-head rule** (G4, yard.ts:264-281 as game-designer reads it): a resting box, level within 1 cm with the top of a ramp under the 0.4 m circle whose height near him lies in f - 0.05 .. f + 0.55 + 0.4 x grade + 0.005, and where the ramp's height at the box's nearest point is >= box top - 0.55, is neither a wall nor a step target.
 - **The set-back** (N20, G6): a ramp that is a wall with his centre within its width and over the slope: set back along the slope to where its height is f + 0.55 (from the ramp's own low height; no 5 mm), only if he is further up; his speed up the slope is removed (movement.ts:147-157). Beyond the high end, the sweep has already stopped him (G6's guard is the sweep's ramp rule).
 - **The step-up** (N17, G2): the 0.4 m circle overlaps; the top is above the feet after the arc (+1e-6) and <= test feet + 0.55 + 0.005; headroom; bottom <= feet + 1e-6; not at a slope's head; his velocity points toward the shape's nearest point **or his centre is already over its footprint**; the highest such top wins. On a hit the pull is fixed: toward the shape's nearest point, length distance - 0.9 x 0.15.
@@ -874,7 +874,7 @@ DONE
   - a foot radius over the body radius;
   - a pull share outside (0, 1];
   - a step allowance or snap outside [0, step-up].
-- **`HEADROOM_FEET`**: a `rules.rs` const (default (a)); `Rules` carries it, and a test-only constructor runs (b).
+- **`HEADROOM_FEET`**: a `rules.rs` const, `HeadroomFeet::SandboxTest` (b) by default (the advisor agent's Q2); `Rules` carries it; `Rules::with_headroom_feet` (`#[cfg(test)]`) runs `OwnTopNeverWall` (a). It flips only on his word (question 13).
 
 ### 11.5 exp and sincos, and the dependency batch (one commit)
 - `crates/sim/src/fmath.rs`, the one file that names `libm`, by full path only:
@@ -940,17 +940,18 @@ DONE
 | 12 | G2: the 36 ledge jumps spend 0 ticks inside | "toward" without "or already over it" (1 to 3 ticks inside at 13.27) |
 | 13 | G3: off the 0.55 step toward the 0.56 step, caught in 3 of 30 phases at 6.3, 30 of 30 at 9.576 | test feet at the tick's start (caught at walk too) |
 | 14 | G4: the x 45 seams rise at most 0.0175 / 0.035 m at every speed | the window without the 0.55 (0.125 at 13.27) |
-| 15 | G5 and HEADROOM-FEET: a step with a beam over its edge is a wall; a floating plank is a wall from the ground; the window wall walked whole under (a), stopped 0.40 m short under (b); the floor over a crate likewise | headroom ignoring the feet under (a) (the flicker on the step under the beam: 6 to 12 falls in 40 ticks) |
+| 15 | G5 and HEADROOM-FEET, each layout under both modes (block 13): his window wall (3.0 m, sill 0.9, opening 1.2) walked along its top: (b) stopped 0.40 m short of the window stretch (x 53.6), (a) walked whole (x 58); dropped onto that stretch: (b) put off the wall to the ground, (a) stands; the floor over a 1.5 m crate: (b) stopped 0.40 m short (x 63.6), (a) walked; a step with a beam over its edge: a wall in both; a floating plank: a wall from the ground in both; a beam 1 m into a 0.55 m step: on the step 0.40 m short of the beam, 1 step, 0 falls, in both (with the sweep; the 6 to 12 falls in 40 ticks of B9-2 come only from a push-out wall pass, pinned as the sandbox's push-out behaviour by the prototype's model, not the game's); the walk and lane-walk routes' hashes equal under both modes (the test scene holds no shape where (b) can bite) | each mode run with the other's rule (red on the window wall and the crate); the wall pass as a push-out under (b) (the flicker returns) |
 | 16 | the head bump: a jump under a 2.0 m beam stops the feet at 0.20 m, upward speed 0, then a fall | the bump at the tick's end position |
 | 17 | landings: 240 runs, no bounce, no fall after landing; the high drop onto a 2.0 m top lands 21 of 21 | the crossing in standing, after the walls (4 of 21 miss) |
 | 18 | the snap: down both ramps at three speeds, 0 airborne ticks; the 0.55 step a fall (0.55 > 0.2) | the snap's slope from the centre's ramp only |
 | 19 | easing from rest at the steps and ledges (72 runs) | `air_share` applied on the ground |
 | 20 | the push: 16 cases (block 6 F) on velocities; slot orders bit-identical bar the one-spot case, its tie by id | the push applied in place in pair order (a slot swap changes the bits) |
-| 21 | the oracle (DEPART-4C (a) (1)): every form pair, the circle against a box and against a ramp, swept horizontally at seeded heights, our contact t against parry3d's cast of a Cylinder against a Cuboid and against the ramp's ConvexPolyhedron, within 1e-5 | the ramp's side taken at its high end's height |
+| 21 | the oracle (DEPART-4C (a) (1); F3): our circle's sweep against parry3d's cast of the 1.8 m Cylinder, horizontal moves at seeded feet heights. Compared: a box's four vertical faces and four vertical edges; a ramp's two side faces, its exposed high-end face and the vertical edges they share; hit times within 1e-5 and **no hit against no hit** (a miss where the library hits fails). Left out, with why: the ramp's low end and its slope face (our sweep never meets them: a ramp met within its width is the set-back's and the step-up's, 11.3), every top and bottom face (vertical motion is the arc's, not the sweep's), and any contact where our wall test and the face's height at the library's contact point fall on opposite sides of feet + 0.555 (a step for us; counted, not compared). Seeded heights include each shape's bottom and top at plus and minus 1e-4 (both hit or both miss); exactly equal heights counted, not compared | the ramp's side taken at its high end's height; a miss reported as no contact where the library hits |
 | 22 | the record and NONE: netcode-architect's restore (P1 to P3), the room's pin, N-1 to N-3; my S-1 to S-3 (block 8); one room test on a world wholly past the reach (engine-architect 6.2) | each of theirs as written; NONE turning the facing (S-1); a `clamp_cm` that unwraps an empty box |
 | 23 | GROUND T1: on a map whose bounds start at y 2, a soldier spawned 1 m up lands at exactly 2 | the floor at y 0 |
 | 24 | no allocation: a counting allocator around `authority_step`, 1,800 ticks of 12 scripted soldiers (walk, sprint, jump, step, push, starts inside shapes) | 64 bytes allocated per tick; a sweep collecting into a `Vec` |
 | 25 | `visit_shared` names every field (the pattern), 2,902 shared bytes, the row's order | a row field left out (`held_move: _`) |
+| 26 | J1 to J5, the jump's rule (3B-ONE-PER-TICK; netcode-architect-read.md:162, moved here from its step 2 by the advisor agent's Q4 condition 5): 255 presses in one grounded command make one jump; a press in the air makes none and none is kept for the landing; Space held jumps again at each landing; two commands in one tick, each +1, one jump; a tap shorter than a tick one jump | a jump per press; presses kept for the landing; the held bit read alone |
 
 ### 11.8 The pins, re-made in the same commit
 The commit that first puts a soldier in the hashed state (the batch's commit, 11.5) re-makes:
@@ -971,7 +972,7 @@ CI is green at that commit (the advisor agent's item 7, condition 4). Step 2 the
 | exp and sincos vectors, maths-allowed entries | 100 / 60 |
 | the record, NONE, the bounds' one home (netcode-architect 7 and 8, engine-architect 5 and 6) | 30 / 205 |
 | content's 13 fields, the table rows, `--check` | 60 / 60 |
-| **Step 1** | **about 1,510 / 1,840 (3,350 lines; block 12 adds the two made maps, +10 tests)** |
+| **Step 1** | **about 1,520 / 1,945 (3,465 lines; block 12's two made maps +10 tests; block 13: J1 to J5 +10 / +80, test 15 both modes +10, test 21's faces +15)** |
 The movement row (720 / 850) is block 1's sweeps plus movement (690 / 680) re-made as block 10's 2.5D form: blocks 5, 6, 9 and 10. It agrees with the sheet's "about 3,350 in all" (I4b). Not in it: block 2's ray counts and sweep proof (90 / 70, step 1 or 6, the sheet's call).
 
 ### 11.10 What this supersedes
@@ -1023,3 +1024,11 @@ DONE
 4. **The count:** 11.9 moves to about 1,510 / 1,840 (+10 tests for the two made maps); with the ridge fix, if taken later, +15 / +20.
 
 DONE
+
+## Block 13. The advisor agent's Q2, Q4 and F3 (advisor-steps1to7.md): HEADROOM-FEET (b) as the default, every case re-run; test 15, test 21, J1 to J5 (2026-11-28)
+### Plan
+1. Re-run blocks 5, 6, 9 (with 10's cases) and 12 on the design's form (sweep and clip on), under (b) and under (a), printed outputs and per-tick bit traces; list every differing case.
+2. Rewrite 11.7's numbers that move under (b); test 15 by mode and layout; 11.6's switch.
+3. Test 21's faces; J1 to J5 as a row; the recordings under both modes; 11.9. 4. DONE.
+
+### Notes
