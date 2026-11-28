@@ -331,20 +331,6 @@ off-side steep off +z x 44.6 speed 6.3: PASS from 1.3000: fell (centre past the 
 off-side steep off +z x 44.6 speed 9.576: PASS from 1.3000: fell (centre past the side when it started: Some(0.23439693)) airborne-ticks 9 embedded-ticks 0 flickers 0
 off-side steep off +z x 44.6 speed 13.27: PASS from 1.3000: fell (centre past the side when it started: Some(0.2116661)) airborne-ticks 9 embedded-ticks 0 flickers 0
 # B. landings
-land ledge 2.9 jump false speed 9.576 dir (1.0, 0.0): FAIL landed Some((9, 3.05)) bounce-ticks 0 embedded-ticks 0 flickers 1 airborne 3
-land ledge 2.9 jump false speed 13.27 dir (1.0, 0.0): FAIL landed Some((7, 3.05)) bounce-ticks 0 embedded-ticks 0 flickers 1 airborne 3
-land ledge 3.05 jump false speed 6.3 dir (1.0, 0.0): FAIL landed Some((14, 3.1)) bounce-ticks 0 embedded-ticks 0 flickers 1 airborne 6
-land ledge 3.05 jump false speed 9.576 dir (1.0, 0.0): FAIL landed Some((9, 3.1)) bounce-ticks 0 embedded-ticks 0 flickers 1 airborne 3
-land ledge 3.05 jump false speed 13.27 dir (1.0, 0.0): FAIL landed Some((7, 3.1)) bounce-ticks 0 embedded-ticks 0 flickers 1 airborne 3
-land platform 1.0 jump false speed 6.3 dir (-1.0, 0.0): FAIL landed None bounce-ticks 0 embedded-ticks 0 flickers 0 airborne 0
-land platform 1.0 jump false speed 9.576 dir (-1.0, 0.0): FAIL landed None bounce-ticks 0 embedded-ticks 0 flickers 0 airborne 0
-land platform 1.0 jump false speed 13.27 dir (-1.0, 0.0): FAIL landed None bounce-ticks 0 embedded-ticks 0 flickers 0 airborne 0
-land platform 1.5 jump false speed 6.3 dir (-1.0, 0.0): FAIL landed None bounce-ticks 0 embedded-ticks 0 flickers 0 airborne 0
-land platform 1.5 jump false speed 9.576 dir (-1.0, 0.0): FAIL landed None bounce-ticks 0 embedded-ticks 0 flickers 0 airborne 0
-land platform 1.5 jump false speed 13.27 dir (-1.0, 0.0): FAIL landed None bounce-ticks 0 embedded-ticks 0 flickers 0 airborne 0
-land step 0.55 jump false speed 6.3 dir (1.0, 0.0): FAIL landed Some((12, 0.56)) bounce-ticks 0 embedded-ticks 0 flickers 1 airborne 6
-land step 0.55 jump false speed 9.576 dir (1.0, 0.0): FAIL landed Some((8, 0.56)) bounce-ticks 0 embedded-ticks 0 flickers 1 airborne 4
-land step 0.55 jump false speed 13.27 dir (1.0, 0.0): FAIL landed Some((5, 0.56)) bounce-ticks 0 embedded-ticks 0 flickers 1 airborne 2
 land outcome ledge 2.9 -> 0.00: 41 runs
 land outcome ledge 2.9 -> 3.05: 3 runs
 land outcome ledge 2.9 -> 0.55: 2 runs
@@ -359,14 +345,14 @@ land outcome ledge 3.05 -> 0.74: 1 runs
 land outcome ledge 3.05 -> 2.50: 1 runs
 land outcome ledge 3.05 -> 1.00: 1 runs
 land outcome platform 1.0 -> 0.00: 40 runs
-land outcome platform 1.0 -> -1.00: 3 runs
+land outcome platform 1.0 -> walked down, never airborne: 3 runs
 land outcome platform 1.0 -> 0.69: 1 runs
 land outcome platform 1.0 -> 0.15: 1 runs
 land outcome platform 1.0 -> 1.50: 1 runs
 land outcome platform 1.0 -> 0.27: 1 runs
 land outcome platform 1.0 -> 3.10: 1 runs
 land outcome platform 1.5 -> 0.00: 37 runs
-land outcome platform 1.5 -> -1.00: 3 runs
+land outcome platform 1.5 -> walked down, never airborne: 3 runs
 land outcome platform 1.5 -> 1.00: 4 runs
 land outcome platform 1.5 -> 0.57: 1 runs
 land outcome platform 1.5 -> 0.43: 1 runs
@@ -376,23 +362,23 @@ land outcome step 0.55 -> 0.56: 3 runs
 land outcome step 0.55 -> 0.00: 40 runs
 land outcome step 0.55 -> 2.90: 3 runs
 land outcome step 0.55 -> 3.05: 2 runs
-land: largest drop in one airborne tick 0.5533 m (the landing test reaches 0.55 m above the feet)
+land: largest drop in one airborne tick 0.5533 m; deepest moved feet below a top (not the ground) in its landing tick 0.3696 m (the landing test reaches 0.55 m above the feet)
 air time off the 2.9 ledge walking -x at 6.3, jump false: airborne ticks 14 landing tick Some(22); exact fall time 0.4916 s = 14.75 ticks (+ the walk to the edge)
 air time off the 2.9 ledge walking -x at 6.3, jump true: airborne ticks 33 landing tick Some(33); exact fall time 1.1305 s = 33.91 ticks (+ the walk to the edge)
-# B2. a fall from 8 to 9 m onto a 2.0 m top (made map), the reading's landing and the candidate fix
-high drop, land on a top crossed in the tick false: 0 of 11 missed the top (fell inside it and were put out to the ground)
-high drop, land on a top crossed in the tick true: 0 of 11 missed the top (fell inside it and were put out to the ground)
+# B2. a fall from 10 to 18 m onto a 2.0 m top (made map), the reading's landing and the candidate fix
+high drop from 10 to 18 m, land on a top crossed in the tick false: 4 of 21 missed the top (fell inside it and were put out to the ground)
+high drop from 10 to 18 m, land on a top crossed in the tick true: 0 of 21 missed the top (fell inside it and were put out to the ground)
 # C. the snap
 snap speed 6.3: allowance flat 0.2, 25 % 0.2900 (drop a tick 0.0525), 50 % 0.3800 (drop 0.1050), the 0.55 step 0.55 > 0.2: a fall
-  down the 0.55 step at 6.3: fell airborne ticks 6 flickers 1 feet 0.560
+  down the 0.55 step at 6.3: fell airborne ticks 6 flickers 0 feet 0.560
   down the gentle ramp at 6.3: PASS largest drop a tick 0.0775, smallest margin under the allowance 0.1700, airborne ticks 0
   down the steep ramp at 6.3: PASS largest drop a tick 0.1550, smallest margin under the allowance 0.1150, airborne ticks 0
 snap speed 9.576: allowance flat 0.2, 25 % 0.3173 (drop a tick 0.0798), 50 % 0.4346 (drop 0.1596), the 0.55 step 0.55 > 0.2: a fall
-  down the 0.55 step at 9.576: fell airborne ticks 4 flickers 1 feet 0.560
+  down the 0.55 step at 9.576: fell airborne ticks 4 flickers 0 feet 0.560
   down the gentle ramp at 9.576: PASS largest drop a tick 0.0798, smallest margin under the allowance 0.1364, airborne ticks 0
   down the steep ramp at 9.576: PASS largest drop a tick 0.1596, smallest margin under the allowance 0.0940, airborne ticks 0
 snap speed 13.27: allowance flat 0.2, 25 % 0.3481 (drop a tick 0.1106), 50 % 0.4962 (drop 0.2212), the 0.55 step 0.55 > 0.2: a fall
-  down the 0.55 step at 13.27: fell airborne ticks 2 flickers 1 feet 0.560
+  down the 0.55 step at 13.27: fell airborne ticks 2 flickers 0 feet 0.560
   down the gentle ramp at 13.27: PASS largest drop a tick 0.1106, smallest margin under the allowance 0.1376, airborne ticks 0
   down the steep ramp at 13.27: PASS largest drop a tick 0.2212, smallest margin under the allowance 0.1328, airborne ticks 0
 # D. easing (k 0.37375 a tick, up = stop, air 100 %)
@@ -485,7 +471,7 @@ push three into a wall [sweep]: min distance 0.2437 end distance 0.7998 overlapp
 # tally (case group: runs, passes)
 tally A ramps from the side: 306 runs, 306 pass
 tally A2 off a ramp's side: 24 runs, 24 pass
-tally B landings: 240 runs, 226 pass
+tally B landings: 240 runs, 240 pass
 tally C snap down the ramps: 6 runs, 6 pass
 tally D easing at the steps: 48 runs, 48 pass
 tally D easing at the ledges: 24 runs, 24 pass

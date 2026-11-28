@@ -28,6 +28,7 @@ const MAX_STEP: f32 = 0.25;
 const HEAD_ON_GATE: f32 = 0.2;
 const KEEP_GATE: f32 = 0.1;
 const SKIN: f32 = 0.001;
+static WALL_DISC: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
 
 #[derive(Clone, Copy, PartialEq, Debug)]
 enum Body { A3, B3, Cyl, X3 }
@@ -122,7 +123,7 @@ struct S {
     steps: u32, falls_unjumped: u32, airborne_ticks: u32, max_float: f32, open_float: f32, fall_at: Option<(f32, f32)>,
     // block 6
     cfg: Cfg, vx: f32, vz: f32, lvx: f32, lvz: f32, fall_from: Option<f32>, flickers: u32, head_hits: u32,
-    max_drop: f32, wall_hits: u32,
+    max_drop: f32, wall_hits: u32, y_moved: f32, below_top: f32,
 }
 
 fn eps(body: Body) -> f32 { if body == Body::Cyl { 0.0 } else { 0.005 } }
@@ -133,7 +134,7 @@ fn walls(world: &[Block], s: &mut S, test_feet: f32, e: f32) -> u32 {
     let mut n = 0;
     for b in world {
         if floating(b, test_feet, s.cfg) { continue; }
-        let h = height_near(b, s.x, s.z);
+        let h = if WALL_DISC.load(std::sync::atomic::Ordering::Relaxed) { height_max(b, s.x, s.z, R) } else { height_near(b, s.x, s.z) };
         if h <= test_feet + STEP + e || !overlaps(b, s.x, s.z, R) { continue; }
         n += 1;
         let (nx, nz) = nearest(b, s.x, s.z);
@@ -171,6 +172,7 @@ fn tick(world: &[Block], s: &mut S, body: Body, wish: (f32, f32), speed: f32, ju
             if lowest.is_finite() { s.y = lowest - BODY_H; if s.vy > 0.0 { s.vy = 0.0; } test_feet = s.y.max(y0); s.head_hits += 1; }
         }
         if y0 - s.y > s.max_drop { s.max_drop = y0 - s.y; }
+        s.y_moved = s.y;
     }
     // The move: block 5's (wish x speed) or, with easing, the eased velocity.
     let (mv, dir);
@@ -229,7 +231,7 @@ fn tick(world: &[Block], s: &mut S, body: Body, wish: (f32, f32), speed: f32, ju
         if h <= lim && h > surf { surf = h; }
     }
     if !s.grounded {
-        if s.vy <= 0.0 && s.y <= surf { s.y = surf; s.vy = 0.0; s.grounded = true; }
+        if s.vy <= 0.0 && s.y <= surf { if surf > 0.0 && surf - s.y_moved > s.below_top { s.below_top = surf - s.y_moved; } s.y = surf; s.vy = 0.0; s.grounded = true; }
         s.airborne_ticks += u32::from(!s.grounded);
     } else {
         let allow = if body == Body::Cyl { STEP } else { SNAP + (mv + FOOT) * slope_under(world, s.x, s.z) };
@@ -240,7 +242,7 @@ fn tick(world: &[Block], s: &mut S, body: Body, wish: (f32, f32), speed: f32, ju
         }
     }
     if s.grounded {
-        if let Some(f) = s.fall_from.take() { if s.y >= f - 0.01 { s.flickers += 1; } }
+        if let Some(f) = s.fall_from.take() { if (s.y - f).abs() < 1e-3 { s.flickers += 1; } }
     }
     for b in world {
         if b.ramp.is_some() && s.x >= b.min[0] && s.x <= b.max[0] && s.z >= b.min[2] && s.z <= b.max[2] && s.grounded {
@@ -269,7 +271,7 @@ fn embedded(world: &[Block], s: &S, body: Body) -> bool {
 
 fn start(x: f32, z: f32, y: f32) -> S {
     S { x, z, y, vy: 0.0, grounded: true, pull: None, stepped: None, steps: 0, falls_unjumped: 0, airborne_ticks: 0, max_float: 0.0, open_float: 0.0, fall_at: None,
-        cfg: Cfg::default(), vx: 0.0, vz: 0.0, lvx: 0.0, lvz: 0.0, fall_from: None, flickers: 0, head_hits: 0, max_drop: 0.0, wall_hits: 0 }
+        cfg: Cfg::default(), vx: 0.0, vz: 0.0, lvx: 0.0, lvz: 0.0, fall_from: None, flickers: 0, head_hits: 0, max_drop: 0.0, wall_hits: 0, y_moved: 0.0, below_top: 0.0 }
 }
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -504,7 +506,7 @@ fn pf(b: bool) -> &'static str { if b { "PASS" } else { "FAIL" } }
 fn block6(world: &[Block], body: Body, v0: f32) {
     let speeds = [6.3_f32, 9.576, 13.27];
     let mut tally: Vec<(&str, u32, u32)> = Vec::new();
-    let mut count = |name: &'static str, pass: bool, tally: &mut Vec<(&'static str, u32, u32)>| {
+    let count = |name: &'static str, pass: bool, tally: &mut Vec<(&'static str, u32, u32)>| {
         if let Some(t) = tally.iter_mut().find(|t| t.0 == name) { t.1 += 1; t.2 += u32::from(pass); } else { tally.push((name, 1, u32::from(pass))); }
     };
 
@@ -572,6 +574,7 @@ fn block6(world: &[Block], body: Body, v0: f32) {
     let dirs = [(1.0_f32, 0.0_f32), (-1.0, 0.0), (0.0, 1.0), (0.0, -1.0), (0.7071, 0.7071), (0.7071, -0.7071), (-0.7071, 0.7071), (-0.7071, -0.7071)];
     let mut land_hist: Vec<(String, u32)> = Vec::new();
     let mut worst_drop = 0.0_f32;
+    let mut worst_below = 0.0_f32;
     for (name, x0, z0, y0) in tops { for jump in [false, true] { for sp in speeds { for dir in dirs {
         let mut s = start(x0, z0, y0);
         let (mut landed_at, mut emb, mut bounce) = (None, 0u32, 0u32);
@@ -589,15 +592,17 @@ fn block6(world: &[Block], body: Body, v0: f32) {
                 if after >= 15 { break; }
             } else if was_air && s.grounded { landed_at = Some((t, s.y)); }
         }
-        let pass = landed_at.is_some() && bounce == 0 && emb == 0 && s.flickers == 0;
+        let walked_down = landed_at.is_none() && s.airborne_ticks == 0;
+        let pass = (landed_at.is_some() || walked_down) && bounce == 0 && emb == 0 && s.flickers == 0;
         count("B landings", pass, &mut tally);
+        if s.below_top > worst_below { worst_below = s.below_top; }
         if s.max_drop > worst_drop { worst_drop = s.max_drop; }
-        let key = format!("{name} -> {:.2}", landed_at.map_or(-1.0, |l| l.1));
+        let key = if walked_down { format!("{name} -> walked down, never airborne") } else { format!("{name} -> {:.2}", landed_at.map_or(-1.0, |l| l.1)) };
         if let Some(h) = land_hist.iter_mut().find(|h| h.0 == key) { h.1 += 1; } else { land_hist.push((key, 1)); }
         if !pass { println!("land {name} jump {jump} speed {sp} dir {dir:?}: FAIL landed {landed_at:?} bounce-ticks {bounce} embedded-ticks {emb} flickers {} airborne {}", s.flickers, s.airborne_ticks); }
     }}}}
     for h in &land_hist { println!("land outcome {}: {} runs", h.0, h.1); }
-    println!("land: largest drop in one airborne tick {worst_drop:.4} m (the landing test reaches {STEP} m above the feet)");
+    println!("land: largest drop in one airborne tick {worst_drop:.4} m; deepest moved feet below a top (not the ground) in its landing tick {worst_below:.4} m (the landing test reaches {STEP} m above the feet)");
     // Air time against the arc: walking off the 2.9 m ledge to the ground and jumping off it.
     for jump in [false, true] {
         let mut s = start(31.5, -2.5, 2.9);
@@ -607,17 +612,17 @@ fn block6(world: &[Block], body: Body, v0: f32) {
         println!("air time off the 2.9 ledge walking -x at 6.3, jump {jump}: airborne ticks {} landing tick {t_land:?}; exact fall time {:.4} s = {:.2} ticks (+ the walk to the edge)", s.airborne_ticks, exact, exact / DT);
     }
     // B2. The high drop (made map, block 4 there: top 2.0 m): a fall from 8.0 to 9.0 m in 0.1 m steps, onto the top.
-    println!("# B2. a fall from 8 to 9 m onto a 2.0 m top (made map), the reading's landing and the candidate fix");
+    println!("# B2. a fall from 10 to 18 m onto a 2.0 m top (made map), the reading's landing and the candidate fix");
     let cmap = ceiling_map();
     for land_prev in [false, true] {
         let mut miss = 0;
-        for k in 0..11 {
-            let mut s = start(56.0, 6.0, 8.0 + k as f32 * 0.1);
+        for k in 0..21 {
+            let mut s = start(56.0, 6.0, 10.0 + k as f32 * 0.4);
             s.grounded = false; s.cfg.land_prev = land_prev;
             for _ in 0..60 { tick(&cmap, &mut s, body, (0.0, 0.0), 0.0, false, v0); if s.grounded { break; } }
             if s.y != 2.0 { miss += 1; }
         }
-        println!("high drop, land on a top crossed in the tick {land_prev}: {miss} of 11 missed the top (fell inside it and were put out to the ground)");
+        println!("high drop from 10 to 18 m, land on a top crossed in the tick {land_prev}: {miss} of 21 missed the top (fell inside it and were put out to the ground)");
     }
 
     // C. The snap's numbers: the allowance and the drop a tick, down the 0.55 m step and down the two ramps.
@@ -780,6 +785,7 @@ fn block6(world: &[Block], body: Body, v0: f32) {
 
 fn main() {
     let body = match std::env::args().nth(1).as_deref() { Some("3a") => Body::A3, Some("3b") => Body::B3, Some("3x") => Body::X3, _ => Body::Cyl };
+    if std::env::args().nth(1).as_deref() == Some("2w") { WALL_DISC.store(true, std::sync::atomic::Ordering::Relaxed); }
     let world = scene();
     let v0 = (2.0 * G * (REACH - STEP)).sqrt();
     match std::env::args().nth(2).as_deref() { Some("b5") => block5(&world, body, v0), _ => block6(&world, body, v0) }
