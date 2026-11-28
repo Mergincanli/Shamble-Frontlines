@@ -221,7 +221,11 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   `/home/user/Shamble-Frontlines/.gate/cs4b-2`. A session of another account works on its own branch from this
   branch's head and never pushes here (his Lanes rule). SEAT-OUT from him: stop at a whole point and report the last
   commit's id.
-- **State (18:04 Amsterdam, from the clock; first written as 18:06 without reading it, corrected): C3 is green in CI
+- **State (18:13 Amsterdam, from the clock): C3's fix pass committed after this notes commit (the code head, so CI
+  runs on it); its full local checks passed (`.gate/local-checks-c3b.log`: the players' file 58548ac7..., unchanged;
+  Node 41 of 41; the browser tests 29 of 29 in 212 s), the gate PASS (`.gate/gate-c3b.log`), the tree byte for byte
+  the saved `c3b-wip.patch` (removed in this commit). Next: CI on it, then security-auditor's round 2 on what changed
+  (brief in the scratchpad), then C4.** Earlier state (18:04 Amsterdam, from the clock; first written as 18:06 without reading it, corrected): C3 is green in CI
   (gate and smoke run 46167247237, toolchain run 46167247231, finished 17:04:20 UTC, 14 min 18 s). security-auditor on C3 (`security-auditor-c3.md`): REVISE on one
   Medium; the batch's approval stands (the five digests exact, no sixth file); items 1 to 5 MET but for M1; its three
   points: (a) a visibility before `mod` is within its ruling, (b) the libm conditions hold with the raw-name rule,
