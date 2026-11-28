@@ -64,6 +64,30 @@ street 67 against the grass 80, both darker than every block; the readout's two 
 the map's. `?backend=webgl` reads "asked for by ?backend=webgl" (checked). Not checked: WebGPU, a real GPU, Firefox.
 Pictures: `.gate/art-director-s-*.png`; its build `.gate/dist-art-director-s`.
 
+## test-engineer: REVISE (one Medium, seven Lows)
+| Id | Severity | Finding | Disposition |
+|---|---|---|---|
+| TE-1 | Medium | The ground and the street and grass patches have no test of their corners or of which way they face (`scene.ts:170-176`, `:210`, `:223-227`): three planted defects on a copy (each patch over half its depth; every floor piece facing down, so it vanishes from above; the ground at 30 m instead of the map's bounds) all passed the 8 scene tests; E1 checks patches by name only (`skeleton.spec.ts:61`). | **Fix:** tests of the ground's and each patch's corners, height (the bounds' bottom, on a raised map: G-3) and facing (up), each with its plant |
+| TE-2 | Low | GE-F5's raised map does not catch GE-F5's own case: a floor drawn as one triangle twice keeps the volume at 6.000 from the origin or the box's centre. Every edge shared by exactly two triangles in opposite directions catches it (7 edges unpaired) and a missing floor (4 unpaired). | **Fix:** the edge-pairing check beside the volume check |
+| TE-3 | Low | "As near as fits" is not tested: a camera ten times farther passes `scene.test.ts:181-201`. | **Fix:** the corners fit at the returned distance and not a little nearer |
+| TE-4 | Low | The grid's lines' ends are never checked (`scene.test.ts:148`): lines planted to start at z 0 pass. | **Fix:** the grid's extent equals the bounds |
+| TE-5 | Low | "A higher block is lighter" is held at one pair of heights only (`scene.test.ts:125-128`): a planted four-grey version passes. | **Fix:** never darker over the whole range in 1 cm steps, and the two ends |
+| TE-6 | Low | E1 compares each block's x values and top only (`skeleton.spec.ts:62-67`): z, the bottom and a ramp's direction are not checked in the browser. | **Fix:** E1 compares every corner |
+| TE-7 | Low | No test imports `three-picture.ts`: the reframe on resize (`:102`) and the camera's far rule (`:51`) are untested; the aspect-0 guard must sit where a Node test reaches it. | **Fix:** the camera's framing moves into `scene.ts` (a helper the picture calls), tested in Node |
+| TE-8 | Low | `plants-4c.txt`'s full run names acd7d4f; the full re-run on the final code is not recorded. | **Fix:** the whole plant set re-run on the fix pass's head, the new tests' plants with it |
+How to run the aspect-0 plant (its note): Vitest's per-test timeout does not stop a synchronous loop; the plant run
+needs an outer timeout (or a worker thread with a deadline). Not verified by it: whether the browser specs catch
+TE-1's plants; WebGPU.
+
+## The fix pass (one, after all six; then the verifier)
+- **Fixed:** the Medium found four times (GE-F1, EA-1, P-1, S-1) and TE-1; the Lows G-3/EA-2, GE-F5, TE-2 to TE-8,
+  EA-3 to EA-6, S-2 (cheap, in the same files); S-note by docs-keeper in the docs pass (`place-4c.mjs fix-16`); AD-1 in
+  his checklist.
+- **Deferred** (STATUS follow-ups, each with its owner and the change-set it waits for): GE-F2 (the depth range on a
+  large map), GE-F3 with P-2 (draw calls on the largest map: merge the floor by material), GE-F4 (WebGPU pipelines
+  built on the map's arrival), AD-4 (the readout over a short window; the overview leaves at step 4); AD-2 and AD-3
+  go to his Brave check.
+
 Checked correct by engine-architect: the boundary as designed; `readMap` member for member against map.rs; `LOCAL_MAP` without
 recording.ts; the production page's `inventory(){return null}` and no development marker; 4B-TYPES-READER,
 4B-MEMBER-KINDS and 4B-BOOT-CALLS met; nothing per frame; nothing no VISION §6 item needs. Not run: a browser.
