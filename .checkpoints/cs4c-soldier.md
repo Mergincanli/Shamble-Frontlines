@@ -260,7 +260,12 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
     are pushed before the answer (02:46): a patch in the notes is no manifest or lockfile, which is all DEP-HOLD names,
     and the advisor agent's item 8 keeps the batch a patch so that pushes are never held; nothing applies it before
     the answer (the first version's files were held back by the advisor tool's caution, which is not needed for a
-    patch). Running from
+    patch). rust-reviewer's block 8 DONE: YES to "no aim yet" = (-32,768, 0, 0): the row's `aim_cm: AimCm` (i16, u16,
+    i16) becomes required and holds NONE from spawn, beside `facing: [f32; 2]`, `held_move: [i8; 2]` and the body's
+    carry; the facing rule compares the integers first and leaves the facing bit for bit on NONE; tests S-1 to S-3
+    beside netcode-architect's N-1 to N-3; first-loop's hashes move in step 1 (the row joins the hashed state), and
+    step 2 moves none only if NONE lands whole in step 1 (endpoint.rs:258 writing NONE in place of (0, 0, 0)). Running
+    from
     02:44 Amsterdam: security-auditor on the reworded batch (with RR1's correction of its item 3), rust-reviewer's
     block 8 and engine-architect's block 6 ("no aim yet"; the aim area in the constructors).
 - **The sheet's revision 3** (from 02:14 Amsterdam): the record rule applied with its confirmations outstanding, the

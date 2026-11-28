@@ -707,3 +707,25 @@ DONE
 Not run: the players' real build (its profile and wasm-opt may inline differently), Node and the browsers on the vectors (native only), folding r >= 45 to keep sincos on its direct path (not needed: 0 off without it).
 
 DONE
+
+## Block 8. netcode-architect's NA2, "no aim yet" (its read, block 8.3, :871-917) (2026-11-28)
+### Plan
+1. Read 8.3 and 7.2, endpoint.rs:258 (today's (0, 0, 0) aim), the replay's aim handling. 2. Yes or no; the row,
+`visit_shared` and the facing rule. 3. Tests from my side. 4. first-loop. 5. DONE.
+
+### Notes
+- [B8-1] Today the endpoint writes `AimPoint { x: 0, y: 0, z: 0 }` into every command (client-endpoint/src/endpoint.rs:258). The recordings hold the page's ray inputs, all zero today: replay.rs:90 and :337 refuse a non-zero ray ("aim: the input call does not take it yet"). So the hashed state is what moves, not the recorded inputs: whatever aim value step 1 puts into the soldier's row enters every tick's hash from step 1 on.
+- [B8-2] NONE = (-32,768, 0, 0) cannot be confused with a point the simulation makes or holds. Every aim the room passes lies inside the bounds, and the bounds lie inside +-32,767 cm (map.rs:33-37; aim_reach.rs per B8-N4). In the simulation the compare is three integer equalities, with no float and no rounding, so it gives the same answer on both targets.
+
+### Answer: YES
+- **The row** (1.1, as amended by B6-R) holds `aim_cm: AimCm`: x i16, y u16, z i16, the wire's own widths. This is now **required**: a `V3` aim would need a flag of its own to say "none". It is set to `AimCm::NONE` at spawn and overwritten by each real aim in the room's oldest-first fold; NONE leaves it as it is, and so does a tick with no command. Beside it in the row: `facing: [f32; 2]` (FACING-SPAWN (a)'s direction from the spawn, B7-3: quarter turns exact, no -0.0), `held_move: [i8; 2]`, and the body's carry (`pull`/`stepped`, B6-R).
+- **`visit_shared`** writes the 6 bytes of `aim_cm` in its slot of the row: x as its two's-complement bits through `u16`, y, then z. The sink already has `u16`, so it needs no new method for this. A restore from those bytes gives NONE back exactly.
+- **The facing rule**, one compare first: if `aim_cm == AimCm::NONE` (all three fields), the facing is left untouched: not recomputed, not normalised again, its bits unchanged. Otherwise the aim's metres (each field divided by 100 as f32, after the compare, so NONE is never converted) turn the facing toward it when it lies more than 2 cm away horizontally. The simulation compares the whole value; the room's check means any other x of -32,768 never reaches it.
+- **Tests from my side,** besides netcode-architect's N-1 to N-3, which I take as written:
+  - S-1: a spawn facing 90 is (1, 0) by bits, and stays bit-identical through 30 ticks with no command, then 30 ticks of NONE while walking. Plant: the facing recomputed or normalised again on a NONE tick (bits drift).
+  - S-2: after a real aim A, NONE ticks keep turning him toward A as he walks past it (the held aim is kept). Plant: NONE resetting the row's aim, or the facing, to the spawn's.
+  - S-3: the restore test of B6-R, run with NONE in the row.
+  - N-2's plant (NONE read as the point (-327.68, 0, 0)) also covers converting before the compare.
+- **first-loop:** YES, it moves in step 1. Step 1 already re-makes it, because the row joins the hashed state (B8-1). It moves **none in step 2 only if** NONE lands whole in step 1: `AimCm::NONE` in the row from spawn, the room's fold with its NONE case, the facing's keep, and endpoint.rs:258 writing NONE in place of (0, 0, 0). If step 1 wrote (0, 0, 0) and step 2 switched to NONE, every hash from the first tick would move again in step 2. Agreed with netcode-architect's condition 1.
+
+DONE
