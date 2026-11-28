@@ -76,7 +76,7 @@ export const MATHS_ALLOWED = [
   },
   {
     routine: "libm::math::rem_pio2::rem_pio2::medium",
-    why: "rem_pio2's path for an argument whose high word is 0x3ff921fb (just under pi/2: a heading's rest above about 89.9999991 degrees, rust-reviewer's block 17, B17-8): up to three rounds of subtraction, plain f64 arithmetic. Pinned by sincos's vectors, whose 1,000 seeded rests on (89.9999991, 90) degrees and edges take this path.",
+    why: "rem_pio2's path for an argument whose high word is 0x3ff921fb: from 0x3ff921fb00000000 (1.570796012878418 rad, a heading's rest of about 89.99998 degrees; security-auditor's L-2 on C4 corrected block 17's B17-8, which put it at about 89.9999991) to just under pi/2 on facing_of's domain: up to three rounds of subtraction, plain f64 arithmetic. Pinned by sincos's vectors, which hold that edge and the double below it, and whose 1,000 seeded rests on (89.9999991, 90) degrees lie inside the band and take this path.",
   },
   {
     routine: "libm::math::rem_pio2_large::rem_pio2_large",
@@ -109,7 +109,7 @@ export const MATHS_ALLOWED = [
   },
   {
     routine: "libm::math::support::float_traits",
-    why: "libm's float trait for f64 (is_sign_negative, to_bits, from_bits as the build names them): bit reads and bit casts, exact, no arithmetic. Used by the generic floor.",
+    why: "libm's float trait for f64 (is_sign_negative, to_bits, from_bits as the build names them): bit reads and bit casts, exact, no arithmetic. Used by the generic floor. A module path: the entry lifts every function of the module, printed or not (security-auditor's L-1 on C4 read them): besides these, canonicalize (a multiply by one), narrow and widen (f64 to f32 and back), signum, abs, copysign and normalize, each the same on every target but for a NaN's bits; its fma is lifted by the path but refused by the fused rule whatever this list says.",
   },
   {
     routine: "libm::math::support::float_traits::Float::ex",
@@ -129,6 +129,6 @@ export const MATHS_ALLOWED = [
   },
   {
     routine: "libm::math::support::int_traits",
-    why: "libm's integer traits (cast_from, cast, signed and unsigned between i32, u32, i64 and u64, as the build names them): integer conversions, the same on every target. Used by the generic scalbn (cast_from, cast), and by the float trait and the generic floor (signed, unsigned).",
+    why: "libm's integer traits (cast_from, cast, signed and unsigned between i32, u32, i64 and u64, as the build names them): integer conversions, the same on every target. Used by the generic scalbn (cast_from, cast), and by the float trait and the generic floor (signed, unsigned). A module path: the entry lifts every function of the module, printed or not (security-auditor's L-1 on C4 read them): besides these, the casts from integers to floats and narrowing_div, integer steps and IEEE conversions, the same on every target.",
   },
 ];
