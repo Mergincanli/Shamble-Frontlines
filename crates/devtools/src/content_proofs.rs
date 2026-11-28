@@ -273,7 +273,7 @@ impl File {
         let mut members = vec![
             ("format".to_owned(), text(movement::FORMAT)),
             ("id".to_owned(), text(&id)),
-            ("version".to_owned(), "1".to_owned()),
+            ("version".to_owned(), movement::VERSION.to_string()),
         ];
         let mut read = format!("Movement {{ id: {id:?}");
         for field in &FIELDS {
@@ -535,9 +535,20 @@ const BAD_NUMBERS: [(&str, usize, &str); 24] = [
     ("12345678901234567890123456", 0, "NumberTooLong { len: 26, cap: 25 }"),
 ];
 
-/// A `version` no build reads, with the double it is.
+/// A bundle `version` no build reads, with the double it is.
 const VERSIONS: [(&str, f64); 5] = [
     ("2", 2.0),
+    ("0", 0.0),
+    ("1.5", 1.5),
+    ("-1", -1.0),
+    ("4294967296", 4_294_967_296.0),
+];
+
+/// A movement file's `version` the typed read does not take (its newest only, `movement::VERSION`, 2), with the double
+/// it is: version 1 among them, which lacks version 2's thirteen fields and has no migration.
+const MOVEMENT_VERSIONS: [(&str, f64); 6] = [
+    ("1", 1.0),
+    ("3", 3.0),
     ("0", 0.0),
     ("1.5", 1.5),
     ("-1", -1.0),
@@ -802,9 +813,9 @@ fn case(class: &str, rng: &mut Rng) -> Case {
                 let kind = format!("WrongFormat {{ found: {found}, expected: \"shamble-movement\" }}");
                 return refuse(put(at, &format!("\"{other}\"")), at + 2, 13, "format", kind);
             }
-            let (text, value) = VERSIONS[rng.below(5)];
+            let (text, value) = MOVEMENT_VERSIONS[rng.below(MOVEMENT_VERSIONS.len())];
             let at = place_of("version").unwrap_or(0);
-            let kind = format!("WrongVersion {:016x} 1", value.to_bits());
+            let kind = format!("WrongVersion {:016x} {}", value.to_bits(), movement::VERSION);
             refuse(put(at, text), at + 2, 14, "version", kind)
         }
         // The text as the file has it, and the id it is read as (the last holds a line feed, written as its escape).

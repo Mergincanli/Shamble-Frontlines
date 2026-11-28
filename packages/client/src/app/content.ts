@@ -37,12 +37,13 @@ export const NOT_THE_MAP = "the map the game's loader took does not read as a ma
 
 /**
  * Each content kind's `format` and newest `version`, as the loader writes and reads them (crates/content/src/map.rs,
- * movement.rs; tied by `content-ties.test.mjs`), and the bundle's folder for each (bundle.rs, `FOLDERS`).
+ * movement.rs; tied by `content-ties.test.mjs`), and the bundle's folder for each (bundle.rs, `FOLDERS`). The loader's
+ * typed read takes the newest version only (an older file is migrated first, ADR 0005's CD-4), and so does the page.
  */
 export const MAP_FORMAT = "shamble-map";
 export const MAP_VERSION = 1;
 export const MOVEMENT_FORMAT = "shamble-movement";
-export const MOVEMENT_VERSION = 1;
+export const MOVEMENT_VERSION = 2;
 export const CONTENT_KINDS: ReadonlyMap<string, { readonly format: string; readonly newest: number }> = new Map([
   ["maps", { format: MAP_FORMAT, newest: MAP_VERSION }],
   ["movement", { format: MOVEMENT_FORMAT, newest: MOVEMENT_VERSION }],
@@ -233,7 +234,7 @@ export function readContent(kept: Uint8Array): Outcome<ReadContent> {
     }
     const format = isObject(tree) ? own(tree, "format") : undefined;
     const version = isObject(tree) ? own(tree, "version") : undefined;
-    if (format !== kind.format || typeof version !== "number" || !Number.isInteger(version) || version < 1 || version > kind.newest) return fault;
+    if (format !== kind.format || version !== kind.newest) return fault;
     files.push({ path, format: kind.format, version });
     if (path === `maps/${LOCAL_MAP}.json`) {
       const read = readMap(tree);

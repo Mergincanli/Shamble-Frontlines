@@ -255,7 +255,9 @@ impl<'a> Object<'a> {
         Object::of(node, &path)
     }
 
-    /// Every file starts the same way: its kind's `format`, a `version` this build reads, and its `id`.
+    /// Every file starts the same way: its kind's `format`, its `version`, and its `id`. The typed read takes the
+    /// kind's newest version only: a file of an older version is migrated to the newest before it is read (ADR 0005's
+    /// CD-4), so a version under the newest is refused here as a version, never read as the newest.
     pub fn header(&mut self, format: &'static str, newest: u32) -> Result<&'a str, Error> {
         let (node, path) = self.take("format")?;
         match &node.value {
@@ -270,7 +272,7 @@ impl<'a> Object<'a> {
             _ => return Err(wrong_type(node, &path, "a string")),
         }
         let (node, path) = self.take("version")?;
-        whole_in(node, &path, 1, newest).map_err(|error| match error.kind {
+        whole_in(node, &path, newest, newest).map_err(|error| match error.kind {
             // A version is refused as a version: the file's own number, and the newest this build reads.
             Kind::NotAWholeNumber { bits } => Error::at(
                 error.line,
@@ -440,6 +442,29 @@ mod tests {
             header("{\"id\": \"a\", \"version\": 1}"),
             Err(Kind::MissingKey { key: "format" })
         );
+    }
+
+    /// The typed read takes a kind's newest version only (the advisor agent's VERSION-RULE ruling, 2026-11-28): an
+    /// older version is refused as a version, as a newer one is, and is never read as the newest.
+    #[test]
+    fn the_header_takes_the_newest_version_only() {
+        let header = |version: &str| {
+            let text =
+                format!("{{\"format\": \"shamble-test\", \"id\": \"a\", \"version\": {version}}}");
+            let top = parse(text.as_bytes()).expect("valid text");
+            Object::of(&top, "")
+                .expect("an object")
+                .header("shamble-test", 2)
+                .map(str::to_owned)
+                .map_err(|error| error.kind)
+        };
+        assert_eq!(header("2"), Ok("a".to_owned()));
+        for version in ["1", "3", "0", "1.5", "-1"] {
+            assert!(
+                matches!(header(version), Err(Kind::WrongVersion { newest: 2, .. })),
+                "{version}"
+            );
+        }
     }
 
     #[test]

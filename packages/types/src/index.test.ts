@@ -89,8 +89,21 @@ test("values of the eight content types build as a content file writes them (the
     push_strength_per_s: 10,
     push_radius_m: 0.5,
     ads_speed_multiplier: 0.5,
+    body_height_m: 1.75,
+    foot_radius_m: 0.2,
+    pull_share_per_step: 0.25,
+    pull_done_under_m: 0.05,
+    pull_to_foot_pct: 80,
+    step_allowance_m: 0.01,
+    snap_down_m: 0.25,
+    push_height_gap_m: 0.75,
+    push_sideways_share: 0.6,
+    push_keep_going_share: 0.4,
+    push_most_m_per_step: 0.2,
+    push_head_on_gate_m_per_s: 0.3,
+    push_keep_going_gate_m_per_s: 0.15,
   };
   expect(map.shapes.map((shape) => shape.type)).toEqual(["box", "ramp"]);
   expect([flat.type, wedge.id, thin.min.length]).toEqual(["ramp", "roof", 2]);
-  expect(Object.keys(movement)).toHaveLength(16);
+  expect(Object.keys(movement)).toHaveLength(29);
 });

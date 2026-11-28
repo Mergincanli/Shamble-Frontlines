@@ -6,7 +6,7 @@
     },
     {
       "path": "movement/soldier.json",
-      "text": "{\n  \"ads_speed_multiplier\": 0.55,\n  \"air_control_pct\": 100,\n  \"body_radius_m\": 0.4,\n  \"format\": \"shamble-movement\",\n  \"gravity_m_per_s2\": 24,\n  \"id\": \"soldier\",\n  \"jump_reach_m\": 3.071,\n  \"push_radius_m\": 0.4,\n  \"push_strength_per_s\": 8,\n  \"speed_up_time_to_90pct_s\": 0.164,\n  \"sprint_multiplier\": 1.52,\n  \"sprint_returns_at_pct\": 30,\n  \"sprint_time_from_full_s\": 7,\n  \"stamina_refill_time_s\": 5,\n  \"step_up_m\": 0.55,\n  \"stop_time_to_10pct_s\": 0.164,\n  \"version\": 1,\n  \"walk_speed_m_per_s\": 6.3\n}\n"
+      "text": "{\n  \"ads_speed_multiplier\": 0.55,\n  \"air_control_pct\": 100,\n  \"body_height_m\": 1.8,\n  \"body_radius_m\": 0.4,\n  \"foot_radius_m\": 0.15,\n  \"format\": \"shamble-movement\",\n  \"gravity_m_per_s2\": 24,\n  \"id\": \"soldier\",\n  \"jump_reach_m\": 3.071,\n  \"pull_done_under_m\": 0.03,\n  \"pull_share_per_step\": 0.5,\n  \"pull_to_foot_pct\": 90,\n  \"push_head_on_gate_m_per_s\": 0.2,\n  \"push_height_gap_m\": 1,\n  \"push_keep_going_gate_m_per_s\": 0.1,\n  \"push_keep_going_share\": 0.5,\n  \"push_most_m_per_step\": 0.25,\n  \"push_radius_m\": 0.4,\n  \"push_sideways_share\": 0.7,\n  \"push_strength_per_s\": 8,\n  \"snap_down_m\": 0.2,\n  \"speed_up_time_to_90pct_s\": 0.164,\n  \"sprint_multiplier\": 1.52,\n  \"sprint_returns_at_pct\": 30,\n  \"sprint_time_from_full_s\": 7,\n  \"stamina_refill_time_s\": 5,\n  \"step_allowance_m\": 0.005,\n  \"step_up_m\": 0.55,\n  \"stop_time_to_10pct_s\": 0.164,\n  \"version\": 2,\n  \"walk_speed_m_per_s\": 6.3\n}\n"
     }
   ],
   "format": "shamble-content-bundle",

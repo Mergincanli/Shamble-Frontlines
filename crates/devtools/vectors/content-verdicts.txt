@@ -1,39 +1,39 @@
 shamble-content-verdicts 1 20261126 500
-a valid file|500|a63056b5420a0d80
-a refused word|500|700d9bd595af15fb
-a byte-order mark|500|06bbf2089e9db361
-a forbidden byte between values|500|8d4fab7b913f7519
-a tab or a carriage return|500|645c0fc85c537c18
-a comment|500|fd98e076e6b66cb1
-a number that is no number|500|110649927ba8c8e5
-a forbidden byte in a string|500|823f764479d4bfe5
-an escape the content does not use|500|a7de19ffa58fcb86
-a text that ends early|500|9a4c7cbd7045a237
-a comma or a colon out of place|500|01e25f29e1af44f2
-brackets that do not match|500|fcba4476c8c6c974
-nesting past the cap|500|8f58c6174932867e
-a key that is there twice|500|c809899d68cfbb51
-a key that is no key|500|06d13b7fcbc76dab
-more values than a document holds|50|e098d7df25f00fea
-a file past the byte cap|50|1eff1324df8a7f82
-a key the kind does not have|500|a3c25f24f0abced7
-a key that is missing|500|2129d5ccd20088bb
-a value of the wrong type|500|5305d12220df5a4e
-a number outside its range|500|5a1d79ede1ad6d2f
-another format or version|500|aa8383b7a899f0b0
-an id that is no id|500|892bc5b0c1a74239
-an id that is not the file's name|500|cf7bdf90d631880e
-a text not in canonical form|500|ed42affbb16753c6
-a valid map|500|b60f1e1a29a18686
-a map's list too long or a word it does not know|500|da9f5d55eb2b0e53
-a map's box off its grid, too thin or outside the bounds|500|f4dc7eed11a7595a
-a map past the aim's reach, with no spawn or an id twice|500|804874907c017bcf
-a valid bundle|500|ea7d76ca6d16950b
-a path that is no content path|500|4872004d4dcf3136
-paths out of order|500|3c93c65592b2c42d
-more files than a bundle holds|500|e47b7f010e5d1b2c
-a bundle with a key too many or too few|500|7b3cc68d551bf4c7
-another bundle format or version|500|2aa70bf03a69ee0e
-a bundle past a byte cap|50|4f0c9bfce549af81
-a file refused, in a bundle|500|abafe2a03688b110
-the fuzz run's first inputs|2000|bdc06de36c1d328c
+a valid file|500|06a1c54690a0d6d9
+a refused word|500|bd55cf8db11aca8f
+a byte-order mark|500|653f19a3ccabda2b
+a forbidden byte between values|500|7920b78cdf2cda7c
+a tab or a carriage return|500|05b0c39f26872b7f
+a comment|500|da52741f3358b32b
+a number that is no number|500|36d26dcbe448a13b
+a forbidden byte in a string|500|fbb31302e76245c7
+an escape the content does not use|500|bd2af7f739c2cd9f
+a text that ends early|500|73ead2145dc774eb
+a comma or a colon out of place|500|a15888c1d7cc1093
+brackets that do not match|500|475ac8fd7f8ccaa5
+nesting past the cap|500|72c846c078b5beb7
+a key that is there twice|500|8f1ed9f0c476f9f3
+a key that is no key|500|9c203c241f2bd85e
+more values than a document holds|50|19392f75cb8ddab4
+a file past the byte cap|50|89500207bc0e3f13
+a key the kind does not have|500|50d9b37951fdd9cc
+a key that is missing|500|d1ad44c12c0d0393
+a value of the wrong type|500|e97f03058a2a856f
+a number outside its range|500|a3221aec96adc3af
+another format or version|500|a406e2a82f365e4a
+an id that is no id|500|062f5c23a530a05b
+an id that is not the file's name|500|c73634abb34d0a25
+a text not in canonical form|500|75abf81f24757185
+a valid map|500|d2f7c554592d1919
+a map's list too long or a word it does not know|500|b9d65867101b67dd
+a map's box off its grid, too thin or outside the bounds|500|abd50e00e2c10a84
+a map past the aim's reach, with no spawn or an id twice|500|721666aaa71082d3
+a valid bundle|500|68dee2ac04ae896d
+a path that is no content path|500|92614a3ec30db37b
+paths out of order|500|9bfbe0fa14ef97e0
+more files than a bundle holds|500|54cc7bf70cd8d21f
+a bundle with a key too many or too few|500|5ba4430ae2af07b1
+another bundle format or version|500|166e71d7c495f9bc
+a bundle past a byte cap|50|bb6dd82ed798f627
+a file refused, in a bundle|500|4d272cdeb987823a
+the fuzz run's first inputs|2000|ed78d3fe5f74fded

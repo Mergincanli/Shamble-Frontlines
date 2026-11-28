@@ -109,7 +109,7 @@ for (const [name, query] of [["the default backend", ""], ["the forced WebGL 2 f
     expect(data.scene).toEqual({ map: map.id, boxes: 17, ramps: 6, regions: 6 });
     expect(data.content).toEqual([
       { path: "maps/test-scene.json", format: "shamble-map", version: 1 },
-      { path: "movement/soldier.json", format: "shamble-movement", version: 1 },
+      { path: "movement/soldier.json", format: "shamble-movement", version: 2 },
     ]);
     await expect(page.locator("#overlay pre")).toContainText("scene: test-scene · 17 boxes · 6 ramps · 6 regions");
     // The test scene's render counts are the committed ones for this backend: a missed freeing of the empty floor

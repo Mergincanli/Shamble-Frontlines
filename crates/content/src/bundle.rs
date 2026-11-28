@@ -163,8 +163,9 @@ pub fn load(bytes: &[u8]) -> Result<ContentSet, Error> {
         ));
     }
     let (line, col) = (top.line, top.col);
+    // The newest version only, as every kind's typed read (read.rs's `header`): an older one is migrated first.
     bundle
-        .whole("version", 1, VERSION)
+        .whole("version", VERSION, VERSION)
         .map_err(|error| match error.kind {
             Kind::NotAWholeNumber { bits } => Error::at(
                 error.line,
@@ -463,16 +464,17 @@ mod tests {
         let error = load(write(&[("movement/test-soldier.json", &broken)]).as_bytes())
             .expect_err("out of range");
         assert_eq!(error.file.as_deref(), Some("movement/test-soldier.json"));
+        // `step_up_m` stands on the test text's line 29 since its version 2 (thirteen fields sort before it).
         assert_eq!(
             (error.line, error.col, error.path.as_str()),
-            (16, 16, "step_up_m")
+            (29, 16, "step_up_m")
         );
         // A file that is valid but not canonical: refused, with the place of its first wrong byte.
-        let loose = TEST_TEXT.replace("\"version\": 1,", "\"version\": 1 ,");
+        let loose = TEST_TEXT.replace("\"version\": 2,", "\"version\": 2 ,");
         let error = load_file("movement/test-soldier.json", loose.as_bytes())
             .expect_err("a space before a comma");
         assert!(matches!(error.kind, Kind::NotCanonical { .. }));
-        assert_eq!((error.line, error.col), (18, 15));
+        assert_eq!((error.line, error.col), (31, 15));
         assert_eq!(error.file.as_deref(), Some("movement/test-soldier.json"));
     }
 

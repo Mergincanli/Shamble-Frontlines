@@ -3,7 +3,9 @@ import {
   CONTENT_URL,
   type ContentLink,
   fetchContent,
+  MAP_VERSION,
   type MessageLink,
+  MOVEMENT_VERSION,
   NOT_A_BUNDLE,
   NOT_THE_MAP,
   type Outcome,
@@ -122,7 +124,7 @@ const READ_MAP = { id: MAP.id, bounds: MAP.bounds, spawns: MAP.spawns, shapes: M
 /** A copy of `MAP`'s tree, to change one thing in. */
 const tree = (): Record<string, unknown> => JSON.parse(JSON.stringify(MAP)) as Record<string, unknown>;
 /** A movement file's head, all the page reads of it. */
-const MOVEMENT_TEXT = '{\n  "format": "shamble-movement",\n  "id": "soldier",\n  "version": 1\n}\n';
+const MOVEMENT_TEXT = '{\n  "format": "shamble-movement",\n  "id": "soldier",\n  "version": 2\n}\n';
 /** A whole bundle the loader would take, from its files in path order. */
 const bundleOf = (files: readonly { path: string; text: string }[]): string =>
   `${JSON.stringify({ files, format: "shamble-content-bundle", version: 1 }, null, 2)}\n`;
@@ -179,7 +181,7 @@ test("a Worker that answers ready: the copy is read once and delivered once, the
     picture: { map: READ_MAP },
     files: [
       { path: "maps/test-scene.json", format: "shamble-map", version: 1 },
-      { path: "movement/soldier.json", format: "shamble-movement", version: 1 },
+      { path: "movement/soldier.json", format: "shamble-movement", version: 2 },
     ],
   });
 });
@@ -373,6 +375,20 @@ test("the bundle's files: each folder's kind, format and version, and the local 
   const newer = mapText.replace('"version": 1', '"version": 2');
   expect(readContent(encode(bundleOf([{ path: "maps/test-scene.json", text: newer }])))).toEqual({ ok: false, problem: NOT_A_BUNDLE });
   expect(readContent(encode(bundleOf([{ path: "maps/test-scene.json", text: "not json" }])))).toEqual({ ok: false, problem: NOT_A_BUNDLE });
+});
+
+test("each kind is read at its newest version only: a movement file at version 1 or 3 is refused", () => {
+  // The loader's typed read takes the newest version only (an older file is migrated first, ADR 0005's CD-4), and so
+  // does the page: version 1 of the movement kind lacks version 2's thirteen fields.
+  const mapText = `${JSON.stringify(MAP, null, 2)}\n`;
+  const withMovement = (text: string) => readContent(encode(bundleOf([{ path: "maps/test-scene.json", text: mapText }, { path: "movement/soldier.json", text }])));
+  const read = withMovement(MOVEMENT_TEXT);
+  if (!read.ok) throw new Error(read.problem);
+  expect(read.value.files.map((file) => file.version)).toEqual([MAP_VERSION, MOVEMENT_VERSION]);
+  expect(MOVEMENT_VERSION).toBe(2);
+  for (const version of ['"version": 1', '"version": 3', '"version": 0', '"version": 1.5', '"version": "2"']) {
+    expect(withMovement(MOVEMENT_TEXT.replace('"version": 2', version)), version).toEqual({ ok: false, problem: NOT_A_BUNDLE });
+  }
 });
 
 test("the link the content starts is the page's own link type", () => {

@@ -27,10 +27,22 @@
       "minimum": 0,
       "type": "number"
     },
+    "body_height_m": {
+      "description": "His height, for headroom and the head bump, in metres.",
+      "maximum": 4,
+      "minimum": 0.5,
+      "type": "number"
+    },
     "body_radius_m": {
       "description": "His body against walls and ledges: its radius, in metres.",
       "maximum": 2,
       "minimum": 0.1,
+      "type": "number"
+    },
+    "foot_radius_m": {
+      "description": "The small circle round his centre that he stands on, so he holds a little past an edge: its radius, in metres.",
+      "maximum": 2,
+      "minimum": 0.01,
       "type": "number"
     },
     "format": {
@@ -53,15 +65,75 @@
       "minimum": 0,
       "type": "number"
     },
+    "pull_done_under_m": {
+      "description": "A carry left shorter than this is given all at once, in metres.",
+      "maximum": 1,
+      "minimum": 0,
+      "type": "number"
+    },
+    "pull_share_per_step": {
+      "description": "After a step-up, the share of the carry onto the step left that he gets each step, from 0 to 1.",
+      "exclusiveMinimum": 0,
+      "maximum": 1,
+      "type": "number"
+    },
+    "pull_to_foot_pct": {
+      "description": "The carry brings his centre this share of his foot circle short of the step's edge, in percent.",
+      "maximum": 100,
+      "minimum": 0,
+      "type": "number"
+    },
+    "push_head_on_gate_m_per_s": {
+      "description": "The push turns sideways only when the two close faster than this, in metres per second.",
+      "maximum": 20,
+      "minimum": 0,
+      "type": "number"
+    },
+    "push_height_gap_m": {
+      "description": "Two soldiers whose feet are this far apart in height or more do not push, in metres.",
+      "maximum": 5,
+      "minimum": 0,
+      "type": "number"
+    },
+    "push_keep_going_gate_m_per_s": {
+      "description": "The keep-going limit applies only when he moves faster than this, in metres per second.",
+      "maximum": 20,
+      "minimum": 0,
+      "type": "number"
+    },
+    "push_keep_going_share": {
+      "description": "The most of his own step forward a push may undo, from 0 to 1.",
+      "maximum": 1,
+      "minimum": 0,
+      "type": "number"
+    },
+    "push_most_m_per_step": {
+      "description": "The most one step's push may move him, in metres.",
+      "maximum": 2,
+      "minimum": 0,
+      "type": "number"
+    },
     "push_radius_m": {
       "description": "Body size for pushing: its radius, in metres.",
       "maximum": 2,
       "minimum": 0.1,
       "type": "number"
     },
+    "push_sideways_share": {
+      "description": "How far a head-on push turns sideways, so the two slide round each other, from 0 to 1.",
+      "maximum": 1,
+      "minimum": 0,
+      "type": "number"
+    },
     "push_strength_per_s": {
       "description": "How stiffly two soldiers push apart, per second.",
       "maximum": 100,
+      "minimum": 0,
+      "type": "number"
+    },
+    "snap_down_m": {
+      "description": "A drop he walks down instead of falling, plus the slope under his foot, in metres.",
+      "maximum": 1.5,
       "minimum": 0,
       "type": "number"
     },
@@ -95,6 +167,12 @@
       "maximum": 120,
       "type": "number"
     },
+    "step_allowance_m": {
+      "description": "How far above the step-up a top may be and still be walked onto, in metres.",
+      "maximum": 0.1,
+      "minimum": 0,
+      "type": "number"
+    },
     "step_up_m": {
       "description": "What he walks onto without jumping: the highest step, in metres.",
       "maximum": 1.5,
@@ -108,7 +186,7 @@
       "type": "number"
     },
     "version": {
-      "const": 1,
+      "const": 2,
       "description": "The version of the movement format the file is written in."
     },
     "walk_speed_m_per_s": {
@@ -121,18 +199,31 @@
   "required": [
     "ads_speed_multiplier",
     "air_control_pct",
+    "body_height_m",
     "body_radius_m",
+    "foot_radius_m",
     "format",
     "gravity_m_per_s2",
     "id",
     "jump_reach_m",
+    "pull_done_under_m",
+    "pull_share_per_step",
+    "pull_to_foot_pct",
+    "push_head_on_gate_m_per_s",
+    "push_height_gap_m",
+    "push_keep_going_gate_m_per_s",
+    "push_keep_going_share",
+    "push_most_m_per_step",
     "push_radius_m",
+    "push_sideways_share",
     "push_strength_per_s",
+    "snap_down_m",
     "speed_up_time_to_90pct_s",
     "sprint_multiplier",
     "sprint_returns_at_pct",
     "sprint_time_from_full_s",
     "stamina_refill_time_s",
+    "step_allowance_m",
     "step_up_m",
     "stop_time_to_10pct_s",
     "version",

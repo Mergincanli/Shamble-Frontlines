@@ -38,7 +38,7 @@ const CONTENT = `{
   "id": "soldier",
   "sprint_multiplier": 1.5,
   "stamina_refill_time_s": 4,
-  "version": 1,
+  "version": 2,
   "walk_speed_m_per_s": 5.25
 }
 `;
@@ -51,7 +51,67 @@ describe("the hand-over's rules", () => {
     expect(fills().map(({ field }) => field)).toEqual(["walk_speed_m_per_s", "sprint_multiplier", "body_radius_m", "stamina_refill_time_s"]);
     expect(contentText(fills())).toBe(CONTENT);
     expect(checkProblems(EXPORT, TABLE, CONTENT)).toEqual([]);
-    expect(HEADER).toEqual({ format: "shamble-movement", id: "soldier", version: 1 });
+    expect(HEADER).toEqual({ format: "shamble-movement", id: "soldier", version: 2 });
+  });
+
+  // The converter writes the movement kind's newest version, the one the loader's typed read takes (the advisor
+  // agent's VERSION-RULE ruling, 2026-11-28): its HEADER is tied to movement.rs's own VERSION and FORMAT.
+  test("the header's format and version are the movement kind's own in the loader's source", () => {
+    const source = readFileSync(path.join(import.meta.dirname, "../../../crates/content/src/movement.rs"), "utf8");
+    expect(/^pub const FORMAT: &str = "([^"]+)";$/m.exec(source)?.[1]).toBe(HEADER.format);
+    expect(Number(/^pub const VERSION: u32 = (\d+);$/m.exec(source)?.[1])).toBe(HEADER.version);
+  });
+
+  test("a row with no place in his Export fills its field with its own value and names its place in his sandbox", () => {
+    const sandboxRow = { field: "foot_radius_m", value: 0.15, sandbox: "src/movement.ts:59-60", unit: "m", what: "his foot" };
+    const table = rows((list) => [...list, sandboxRow]);
+    const { fills: made, problems } = readRows(EXPORT, table);
+    expect(problems).toEqual([]);
+    expect(made.at(-1)).toEqual({ field: "foot_radius_m", place: null, sandbox: "src/movement.ts:59-60", value: 0.15 });
+    const text = contentText(made);
+    expect(JSON.parse(text).foot_radius_m).toBe(0.15);
+    expect(checkProblems(EXPORT, table, text)).toEqual([]);
+    expect(checkProblems(EXPORT, table, text.replace('"foot_radius_m": 0.15', '"foot_radius_m": 0.2'))).toEqual([
+      `${PATHS.target}: foot_radius_m is 0.2, and his sandbox has 0.15 (src/movement.ts:59-60)`,
+    ]);
+    expect(checkProblems(EXPORT, table, text.replace('  "foot_radius_m": 0.15,\n', ""))).toEqual([`${PATHS.target} has no foot_radius_m (his sandbox's src/movement.ts:59-60)`]);
+    expect(tableMarkdown(EXPORT, table).split("\n").at(-1)).toBe("| his sandbox: src/movement.ts:59-60 | m |  | his foot | `foot_radius_m` | 0.15 |");
+  });
+
+  test("a sandbox row without its value, its place or its field, and an Export row with a value of its own, are refused", () => {
+    const refused = (row, why) => {
+      const { problems } = readRows(EXPORT, rows((list) => [...list, row]));
+      expect(problems, JSON.stringify(row)).toHaveLength(1);
+      expect(problems[0], JSON.stringify(row)).toContain(why);
+    };
+    const sandboxRule = "a row with no place in his Export fills a field with its own value and names its place in his sandbox";
+    refused({ field: "foot_radius_m", value: 0.15 }, sandboxRule);
+    refused({ field: "foot_radius_m", value: 0.15, sandbox: "  " }, sandboxRule);
+    refused({ field: "foot_radius_m", value: 0.15, sandbox: 7 }, sandboxRule);
+    refused({ value: 0.15, sandbox: "src/movement.ts:59" }, sandboxRule);
+    refused({ must_be: 0.15, sandbox: "src/movement.ts:59" }, sandboxRule);
+    refused({ field: "foot_radius_m", sandbox: "src/movement.ts:59" }, "it has no value");
+    refused({ field: "foot_radius_m", value: "0.15", sandbox: "src/movement.ts:59" }, '"0.15" is not a number a content file can hold');
+    refused({ field: "foot_radius_m", value: Number.NaN, sandbox: "src/movement.ts:59" }, "is not a number a content file can hold");
+    refused({ field: "walk_speed_m_per_s", value: 6, sandbox: "src/movement.ts:1" }, "the field walk_speed_m_per_s is filled twice");
+    const exportRule = "a row with a place in his Export takes its value from there, with no value or sandbox line of its own";
+    refused({ export: "movement.walk_speed_m_per_s", field: "speed", value: 6 }, exportRule);
+    refused({ export: "movement.walk_speed_m_per_s", field: "speed", sandbox: "src/movement.ts:1" }, exportRule);
+  });
+
+  test("his Export's measured block is read by a measured. place, and by none while the values hold a group of that name", () => {
+    const exp = { ...structuredClone(EXPORT), measured: { soldier_height_m: 1.8 } };
+    const table = rows((list) => [...list, { export: "measured.soldier_height_m", field: "body_height_m", unit: "m", what: "his height" }]);
+    const { fills: made, problems } = readRows(exp, table);
+    expect(problems).toEqual([]);
+    expect(made.at(-1)).toEqual({ field: "body_height_m", place: "measured.soldier_height_m", sandbox: null, value: 1.8 });
+    const text = contentText(made);
+    expect(checkProblems(exp, table, text.replace('"body_height_m": 1.8', '"body_height_m": 1.9'))).toEqual([
+      `${PATHS.target}: body_height_m is 1.9, and his Export has 1.8 (measured.soldier_height_m)`,
+    ]);
+    expect(readRows(EXPORT, table).problems).toEqual(['row 6 ("measured.soldier_height_m"): his Export has no such value']);
+    const clash = { ...exp, values: { ...exp.values, measured: { soldier_height_m: 1.7 } } };
+    expect(readRows(clash, table).problems).toEqual(['row 6 ("measured.soldier_height_m"): his Export has no such value']);
   });
 
   test("the check finds a value one step of a double away, a field nobody fills, a field that is gone, and a form that differs", () => {
@@ -88,7 +148,7 @@ describe("the hand-over's rules", () => {
     for (const field of ["../.claude/settings.json", "/etc/passwd", "content/source/x.json", "soldier.json", "", "Walk", "__proto__", "format", "id", "version", 7]) {
       refused((list) => [...list.slice(0, 4), { ...list[4], field }], `${JSON.stringify(field)} is not a field's name`);
     }
-    refused((list) => [...list, { export: "movement.walk_speed_m_per_s", field: "speed", file: "../x" }], "a row holds export, field, must_be, old_game, unit, what and nothing else, not file");
+    refused((list) => [...list, { export: "movement.walk_speed_m_per_s", field: "speed", file: "../x" }], "a row holds export, field, must_be, old_game, sandbox, unit, value, what and nothing else, not file");
     refused((list) => [...list, "movement.walk_speed_m_per_s"], "not an object");
     // A place his Export does not have, in each way a place can be missing.
     for (const place of ["movement.jump_m", "weapons.walk_speed_m_per_s", "movement", "movement.walk_speed_m_per_s.x", "__proto__.constructor", "toString.name", 5]) {
@@ -144,7 +204,7 @@ describe("the hand-over's rules", () => {
 
   test("the table people read is printed from the rows and the Export's own values", () => {
     expect(tableMarkdown(EXPORT, TABLE).split("\n")).toEqual([
-      "| His Export (`values.`...) | Unit | The old game's name | What it is | In `movement/soldier.json` | His value |",
+      "| His Export (`values.`... or `measured.`...), or his sandbox | Unit | The old game's name | What it is | In `movement/soldier.json` | His value |",
       "|---|---|---|---|---|---|",
       "| `stamina.stamina_on` |  |  | the game has stamina on | must be true | true |",
       "| `movement.walk_speed_m_per_s` | m/s | T.moveSpeed | walking speed | `walk_speed_m_per_s` | 5.25 |",
@@ -183,10 +243,10 @@ describe("the hand-over's files", () => {
   test("write, then the check: the file holds his values; a second write gives the same bytes", () => {
     const folder = tree("clean");
     expect(() => run("--check", folder, PATHS, pinned)).toThrow("ENOENT");
-    expect(run("write", folder, PATHS, pinned)).toBe(`${PATHS.target}: 4 values from his Export (sha256 ${pinned.slice(0, 8)}...), written`);
+    expect(run("write", folder, PATHS, pinned)).toBe(`${PATHS.target}: 4 values, 4 from his Export (sha256 ${pinned.slice(0, 8)}...) and 0 from his sandbox, written`);
     expect(readFileSync(path.join(folder, PATHS.target), "utf8")).toBe(CONTENT);
     expect(readdirSync(path.join(folder, "content/movement"))).toEqual(["soldier.json"]);
-    expect(run("--check", folder, PATHS, pinned)).toBe(`${PATHS.target}: 4 values, each his Export's (sha256 ${pinned.slice(0, 8)}...)`);
+    expect(run("--check", folder, PATHS, pinned)).toBe(`${PATHS.target}: 4 values, 4 from his Export (sha256 ${pinned.slice(0, 8)}...) and 0 from his sandbox, each as the table names it`);
     run("write", folder, PATHS, pinned);
     expect(readFileSync(path.join(folder, PATHS.target), "utf8")).toBe(CONTENT);
   });
@@ -288,8 +348,8 @@ describe("the hand-over's files", () => {
 });
 
 describe("his Export and the game's first movement table, the repository's own files", () => {
-  test("the check holds content/movement/soldier.json to his saved Export through the table: every value, bit for bit, in the writer's form", () => {
-    expect(run("--check")).toBe(`${PATHS.target}: 15 values, each his Export's (sha256 ${EXPORT_SHA256.slice(0, 8)}...)`);
+  test("the check holds content/movement/soldier.json to his saved Export and his sandbox through the table: every value, bit for bit, in the writer's form", () => {
+    expect(run("--check")).toBe(`${PATHS.target}: 28 values, 16 from his Export (sha256 ${EXPORT_SHA256.slice(0, 8)}...) and 12 from his sandbox, each as the table names it`);
   });
 
   // The check above reads the values through the table, so a row sent to the wrong field would pass it, whatever
@@ -297,18 +357,37 @@ describe("his Export and the game's first movement table, the repository's own f
   // is the last step of its Export name, but for the one rename named here, so no two rows can trade fields. And
   // its group is one of the soldier's, so no row reads another unit's entry of the same name (his Export also holds
   // the hornet's body radius and step: test-engineer's round 2).
-  test("every row of the table sends its Export value to the field of the same name, but for one named rename", () => {
-    const RENAMED = { "stamina.refill_time_from_empty_s": "stamina_refill_time_s" };
-    const GROUPS = ["movement", "jump", "stamina", "pushing", "aim_down_sights"];
+  test("every row of the table sends its Export value to the field of the same name, but for two named renames", () => {
+    const RENAMED = { "stamina.refill_time_from_empty_s": "stamina_refill_time_s", "measured.soldier_height_m": "body_height_m" };
+    const GROUPS = ["movement", "jump", "stamina", "pushing", "aim_down_sights", "measured"];
     const { rows } = JSON.parse(readFileSync(path.join(import.meta.dirname, "../../..", PATHS.table), "utf8"));
-    const filled = rows.filter((row) => row.field !== undefined);
-    expect(filled).toHaveLength(15);
+    const filled = rows.filter((row) => row.field !== undefined && row.export !== undefined);
+    expect(filled).toHaveLength(16);
     for (const { export: name, field } of filled) {
       expect(field, name).toBe(RENAMED[name] ?? name.split(".").at(-1));
       expect(GROUPS, name).toContain(name.split(".")[0]);
     }
-    // The rename stands in the table once, and every field once: the rule above leaves no row out.
-    expect(filled.filter(({ export: name }) => name in RENAMED)).toHaveLength(1);
-    expect(new Set(filled.map(({ field }) => field)).size).toBe(15);
+    // Each rename stands in the table once, and every field once: the rule above leaves no row out.
+    expect(filled.filter(({ export: name }) => name in RENAMED)).toHaveLength(2);
+    expect(new Set(filled.map(({ field }) => field)).size).toBe(16);
+  });
+
+  // His NO-SOURCE (b) of 2026-11-28: the numbers his sandbox keeps in its code fill the twelve fields named here, each
+  // with its place in his sandbox, and no other; together with the sixteen Export rows they are the movement kind's
+  // 28 fields, each filled once.
+  test("the twelve sandbox rows fill the twelve fields his sandbox keeps in its code, each with its place there", () => {
+    const SANDBOX_FIELDS = [
+      "foot_radius_m", "pull_share_per_step", "pull_done_under_m", "pull_to_foot_pct", "step_allowance_m", "snap_down_m",
+      "push_height_gap_m", "push_sideways_share", "push_keep_going_share", "push_most_m_per_step", "push_head_on_gate_m_per_s",
+      "push_keep_going_gate_m_per_s",
+    ];
+    const { rows } = JSON.parse(readFileSync(path.join(import.meta.dirname, "../../..", PATHS.table), "utf8"));
+    const fromSandbox = rows.filter((row) => row.export === undefined);
+    expect(fromSandbox.map(({ field }) => field)).toEqual(SANDBOX_FIELDS);
+    for (const row of fromSandbox) {
+      expect(Number.isFinite(row.value), row.field).toBe(true);
+      expect(row.sandbox, row.field).toMatch(/^src\/[a-z]+\.ts:\d+/);
+    }
+    expect(new Set(rows.map(({ field }) => field).filter(Boolean)).size).toBe(28);
   });
 });

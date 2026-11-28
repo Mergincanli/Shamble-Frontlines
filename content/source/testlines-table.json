@@ -111,6 +111,109 @@
       "old_game": "T.adsMoveMult",
       "unit": "times",
       "what": "walking speed while aiming"
+    },
+    {
+      "export": "measured.soldier_height_m",
+      "field": "body_height_m",
+      "old_game": "none (walls and houses endlessly high: no headroom)",
+      "unit": "m",
+      "what": "his height, for headroom and the head bump"
+    },
+    {
+      "field": "foot_radius_m",
+      "old_game": "none (the old game stands him on the point under his centre: shamble-game.js:2539)",
+      "sandbox": "src/movement.ts:59-60, used :163, :194, :199",
+      "unit": "m",
+      "value": 0.15,
+      "what": "the small circle round his centre that he stands on, so he holds a little past an edge"
+    },
+    {
+      "field": "pull_share_per_step",
+      "old_game": "none (no pull: he rises once his centre crosses the step's edge, shamble-game.js:2539-2540)",
+      "sandbox": "src/movement.ts:61-62, used :186-190",
+      "unit": "share",
+      "value": 0.5,
+      "what": "after a step-up, the share of the carry onto the step left that he gets each step"
+    },
+    {
+      "field": "pull_done_under_m",
+      "old_game": "none (no pull)",
+      "sandbox": "src/movement.ts:63, used :186",
+      "unit": "m",
+      "value": 0.03,
+      "what": "a carry left shorter than this is given all at once"
+    },
+    {
+      "field": "pull_to_foot_pct",
+      "old_game": "none (no pull)",
+      "sandbox": "src/movement.ts:172 (0.9 x the foot radius)",
+      "unit": "%",
+      "value": 90,
+      "what": "the carry brings his centre this share of his foot circle short of the step's edge"
+    },
+    {
+      "field": "step_allowance_m",
+      "old_game": "none (a surface more than T.stepUp above his feet is refused, no allowance: shamble-game.js:2533-2535)",
+      "sandbox": "src/yard.ts:38-39, used :219, :245, :265, :309",
+      "unit": "m",
+      "value": 0.005,
+      "what": "how far above the step-up a top may be and still be walked onto"
+    },
+    {
+      "field": "snap_down_m",
+      "old_game": "none (no snap: he falls in small hops, shamble-game.js:2537-2540)",
+      "sandbox": "src/movement.ts:64-65, used :199 with the slope term",
+      "unit": "m",
+      "value": 0.2,
+      "what": "a drop he walks down instead of falling, plus the slope under his foot"
+    },
+    {
+      "field": "push_height_gap_m",
+      "old_game": "none (no such rule)",
+      "sandbox": "src/push.ts:10-11, used :43",
+      "unit": "m",
+      "value": 1,
+      "what": "two soldiers whose feet are this far apart in height or more do not push"
+    },
+    {
+      "field": "push_sideways_share",
+      "old_game": "none (no such rule)",
+      "sandbox": "src/push.ts:12-13, used :71-72",
+      "unit": "share",
+      "value": 0.7,
+      "what": "how far a head-on push turns sideways, so the two slide round each other"
+    },
+    {
+      "field": "push_keep_going_share",
+      "old_game": "none (no such rule)",
+      "sandbox": "src/push.ts:14-15, used :99-104",
+      "unit": "share",
+      "value": 0.5,
+      "what": "the most of his own step forward a push may undo"
+    },
+    {
+      "field": "push_most_m_per_step",
+      "old_game": "none (no such rule)",
+      "sandbox": "src/push.ts:16-17, used :106-110",
+      "unit": "m",
+      "value": 0.25,
+      "what": "the most one step's push may move him"
+    },
+    {
+      "field": "push_head_on_gate_m_per_s",
+      "old_game": "none (no such rule)",
+      "sandbox": "src/push.ts:65",
+      "unit": "m/s",
+      "value": 0.2,
+      "what": "the push turns sideways only when the two close faster than this"
+    },
+    {
+      "field": "push_keep_going_gate_m_per_s",
+      "old_game": "none (no such rule)",
+      "sandbox": "src/push.ts:95-96",
+      "unit": "m/s",
+      "value": 0.1,
+      "what": "the keep-going limit applies only when he moves faster than this"
     }
   ],
   "version": 1

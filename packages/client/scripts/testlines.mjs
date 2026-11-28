@@ -39,7 +39,8 @@ export const PATHS = {
 export const EXPORT_SHA256 = "a9d47785ed8f70d895d10480d180c9bba5a67f7e955e0c460c0c1bef7718c4ab";
 
 /** The header of the file `write` makes: the movement kind's format and version, and the table's id. */
-export const HEADER = { format: "shamble-movement", id: "soldier", version: 1 };
+// The version is the movement kind's newest (crates/content/src/movement.rs's VERSION; a test ties the two).
+export const HEADER = { format: "shamble-movement", id: "soldier", version: 2 };
 /** The most bytes one read takes: far above any of these files. */
 export const MAX_READ_BYTES = 1024 * 1024;
 
@@ -130,30 +131,51 @@ export function readSource({ exportText, manifestText, tableText }, pinned = EXP
   return { exp, table };
 }
 
-/** A row's keys: where the value stands in the Export, then either the field it fills or the value it must have. */
-const ROW_KEYS = ["export", "field", "must_be", "old_game", "unit", "what"];
-
-/** The value at `values.<group>.<name>` of the Export, or nothing when the Export has no such place. */
-function exportValue(exp, place) {
-  const steps = typeof place === "string" ? place.split(".") : [];
-  return steps.length === 2 ? own(own(own(exp, "values"), steps[0]), steps[1]) : undefined;
-}
+/**
+ * A row's keys: where the value stands in the Export, then either the field it fills or the value it must have; or,
+ * for a number his sandbox keeps in its code and not in its Export (his NO-SOURCE (b) of 2026-11-28), no place in
+ * the Export but the field, its `value` and its place in his sandbox (`sandbox`: file and lines).
+ */
+const ROW_KEYS = ["export", "field", "must_be", "old_game", "sandbox", "unit", "value", "what"];
 
 /**
- * The table's rows, read strictly: `fills` (field, place and value, for the rows that fill a field of the content
- * file) and one line in `problems` for everything a row may not be. A row has only the keys of `ROW_KEYS`; it
- * names a place the Export has; it fills a field, named as a key is (never a path), with a finite number, or it
- * holds the Export to one value (`must_be`: the step rate, stamina being on); no field is filled twice.
+ * The value at `values.<group>.<name>` of the Export, or at `measured.<name>` (his Export's block of what it measured
+ * on screen), or nothing when the Export has no such place. While the Export's values hold a group named `measured`
+ * too, no `measured.` place is read at all: a place names one value or none.
+ */
+function exportValue(exp, place) {
+  const steps = typeof place === "string" ? place.split(".") : [];
+  if (steps.length !== 2) return undefined;
+  if (steps[0] !== "measured") return own(own(own(exp, "values"), steps[0]), steps[1]);
+  return own(own(exp, "values"), "measured") === undefined ? own(own(exp, "measured"), steps[1]) : undefined;
+}
+
+/** Where a filled value comes from, as the check's lines name it: whose it is, and its place there. */
+const fromWhere = ({ place, sandbox }) =>
+  place === null ? ["his sandbox", sandbox] : ["his Export", place.startsWith("measured.") ? place : `values.${place}`];
+
+/**
+ * The table's rows, read strictly: `fills` (field, place or sandbox line, and value, for the rows that fill a field
+ * of the content file) and one line in `problems` for everything a row may not be. A row has only the keys of
+ * `ROW_KEYS`. A row with a place in the Export names a place the Export has, holds no value or sandbox line of its
+ * own, and fills a field, named as a key is (never a path), with a finite number, or holds the Export to one value
+ * (`must_be`: the step rate, stamina being on). A row with no place in the Export fills a field with its own finite
+ * `value` and names its place in his sandbox. No field is filled twice.
  */
 export function readRows(exp, table) {
   const fills = [];
   const problems = [];
   for (const [at, row] of table.rows.entries()) {
-    const said = `row ${at + 1} (${JSON.stringify(own(row, "export"))})`;
-    const value = exportValue(exp, own(row, "export"));
+    const fromSandbox = isObject(row) && !Object.hasOwn(row, "export");
+    const said = fromSandbox ? `row ${at + 1} (his sandbox's ${JSON.stringify(own(row, "field"))})` : `row ${at + 1} (${JSON.stringify(own(row, "export"))})`;
+    const value = fromSandbox ? own(row, "value") : exportValue(exp, own(row, "export"));
     const extra = isObject(row) ? Object.keys(row).filter((key) => !ROW_KEYS.includes(key)) : ["not an object"];
     if (extra.length > 0) problems.push(`${said}: a row holds ${ROW_KEYS.join(", ")} and nothing else, not ${extra.join(", ")}`);
-    else if (value === undefined) problems.push(`${said}: his Export has no such value`);
+    else if (fromSandbox && (typeof row.sandbox !== "string" || row.sandbox.trim() === "" || Object.hasOwn(row, "must_be") || !Object.hasOwn(row, "field"))) {
+      problems.push(`${said}: a row with no place in his Export fills a field with its own value and names its place in his sandbox`);
+    } else if (!fromSandbox && (Object.hasOwn(row, "value") || Object.hasOwn(row, "sandbox"))) {
+      problems.push(`${said}: a row with a place in his Export takes its value from there, with no value or sandbox line of its own`);
+    } else if (value === undefined) problems.push(fromSandbox ? `${said}: it has no value` : `${said}: his Export has no such value`);
     else if (Object.hasOwn(row, "must_be") === Object.hasOwn(row, "field")) problems.push(`${said}: a row fills a field or holds the Export to a value, one of the two`);
     else if (Object.hasOwn(row, "must_be")) {
       if (!Object.is(value, row.must_be)) problems.push(`${said}: his Export has ${JSON.stringify(value)}, and the game is built for ${JSON.stringify(row.must_be)}`);
@@ -161,7 +183,7 @@ export function readRows(exp, table) {
       problems.push(`${said}: ${JSON.stringify(row.field)} is not a field's name`);
     } else if (typeof value !== "number" || !Number.isFinite(value)) problems.push(`${said}: ${JSON.stringify(value)} is not a number a content file can hold`);
     else if (fills.some((fill) => fill.field === row.field)) problems.push(`${said}: the field ${row.field} is filled twice`);
-    else fills.push({ field: row.field, place: row.export, value });
+    else fills.push({ field: row.field, place: fromSandbox ? null : row.export, sandbox: fromSandbox ? row.sandbox : null, value });
   }
   return { fills, problems };
 }
@@ -194,9 +216,11 @@ export function checkProblems(exp, table, text) {
   for (const [key, value] of Object.entries(HEADER)) {
     if (!Object.is(own(content, key), value)) lines.push(`${PATHS.target}: ${key} is ${JSON.stringify(own(content, key))}, not ${JSON.stringify(value)}`);
   }
-  for (const { field, place, value } of fills) {
-    if (!Object.hasOwn(content, field)) lines.push(`${PATHS.target} has no ${field} (his Export's values.${place})`);
-    else if (!Object.is(content[field], value)) lines.push(`${PATHS.target}: ${field} is ${shown(content[field])}, and his Export has ${shown(value)} (values.${place})`);
+  for (const fill of fills) {
+    const { field, value } = fill;
+    const [whose, where] = fromWhere(fill);
+    if (!Object.hasOwn(content, field)) lines.push(`${PATHS.target} has no ${field} (${whose}'s ${where})`);
+    else if (!Object.is(content[field], value)) lines.push(`${PATHS.target}: ${field} is ${shown(content[field])}, and ${whose} has ${shown(value)} (${where})`);
   }
   for (const key of Object.keys(content)) {
     if (!Object.hasOwn(HEADER, key) && !fills.some(({ field }) => field === key)) lines.push(`${PATHS.target}: no row of the table fills ${key}`);
@@ -237,9 +261,11 @@ export function tableMarkdown(exp, table) {
   const cell = (value) => (value === undefined ? "" : String(value).replaceAll("|", "\\|"));
   const rows = table.rows.map((row) => {
     const goes = Object.hasOwn(row, "field") ? `\`${row.field}\`` : `must be ${JSON.stringify(row.must_be)}`;
-    return `| \`${cell(row.export)}\` | ${cell(row.unit)} | ${cell(row.old_game)} | ${cell(row.what)} | ${goes} | ${cell(JSON.stringify(exportValue(exp, row.export)))} |`;
+    const where = Object.hasOwn(row, "export") ? `\`${cell(row.export)}\`` : `his sandbox: ${cell(row.sandbox)}`;
+    const value = Object.hasOwn(row, "export") ? exportValue(exp, row.export) : row.value;
+    return `| ${where} | ${cell(row.unit)} | ${cell(row.old_game)} | ${cell(row.what)} | ${goes} | ${cell(JSON.stringify(value))} |`;
   });
-  return ["| His Export (`values.`...) | Unit | The old game's name | What it is | In `movement/soldier.json` | His value |", "|---|---|---|---|---|---|", ...rows].join("\n");
+  return ["| His Export (`values.`... or `measured.`...), or his sandbox | Unit | The old game's name | What it is | In `movement/soldier.json` | His value |", "|---|---|---|---|---|---|", ...rows].join("\n");
 }
 
 /** One mode of the script on the files of `paths` under `base`. Returns what to print; throws what stops it. */
@@ -256,12 +282,18 @@ export function run(mode, base = root, paths = PATHS, pinned = EXPORT_SHA256) {
   if (mode === "write") {
     if (problems.length > 0) throw new Error(`the table is refused, nothing is written:\n  ${problems.join("\n  ")}`);
     writePlain(path.join(base, paths.target), contentText(fills), base);
-    return `${paths.target}: ${fills.length} values from his Export (sha256 ${pinned.slice(0, 8)}...), written`;
+    return `${paths.target}: ${counted(fills, pinned)}, written`;
   }
   if (mode !== "--check") throw new Error("usage: testlines.mjs --check | write | compare-old | table");
   const lines = checkProblems(exp, table, read("target"));
-  if (lines.length > 0) throw new Error(`the content is not his Export's:\n  ${lines.join("\n  ")}`);
-  return `${paths.target}: ${fills.length} values, each his Export's (sha256 ${pinned.slice(0, 8)}...)`;
+  if (lines.length > 0) throw new Error(`the content is not his Export's and his sandbox's as the table names them:\n  ${lines.join("\n  ")}`);
+  return `${paths.target}: ${counted(fills, pinned)}, each as the table names it`;
+}
+
+/** How many values a file holds, and from where: his Export (by its sha256) and his sandbox. */
+function counted(fills, pinned) {
+  const fromSandbox = fills.filter(({ place }) => place === null).length;
+  return `${fills.length} values, ${fills.length - fromSandbox} from his Export (sha256 ${pinned.slice(0, 8)}...) and ${fromSandbox} from his sandbox`;
 }
 
 if (process.argv[1] !== undefined && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

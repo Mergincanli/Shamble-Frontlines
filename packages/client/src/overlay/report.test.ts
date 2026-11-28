@@ -43,7 +43,7 @@ const DATA: ReportData = {
   worker: null,
   content: [
     { path: "maps/test-scene.json", format: "shamble-map", version: 1 },
-    { path: "movement/soldier.json", format: "shamble-movement", version: 1 },
+    { path: "movement/soldier.json", format: "shamble-movement", version: 2 },
   ],
   scene: { map: "test-scene", boxes: 17, ramps: 6, regions: 6 },
 };
@@ -54,7 +54,7 @@ test("the readout names the backend, the ticks, the errors, the last pause and t
     "ticks: 900 at 30 a second · blocks: 900 of 44 bytes",
     "frames: 60.0 a second · frame time 16.67 ms (p99 17.20 ms)",
     "messages: sent 899 · received 900 · refused 0",
-    "content: maps/test-scene.json shamble-map 1 · movement/soldier.json shamble-movement 1",
+    "content: maps/test-scene.json shamble-map 1 · movement/soldier.json shamble-movement 2",
     "scene: test-scene · 17 boxes · 6 ramps · 6 regions",
     "presses: 12 made · 12 echoed · 0 lost · 0 doubled",
     "errors: 0",
@@ -131,12 +131,12 @@ test("the report is plain text with one named value per line", () => {
 test("the content and the scene: each file with its own format and version, the copy's states in words, the scene's counts", () => {
   const lines = (data: Partial<ReportData>): string[] => readoutLines({ ...DATA, ...data }).slice(4, 6);
   expect(lines({})).toEqual([
-    "content: maps/test-scene.json shamble-map 1 · movement/soldier.json shamble-movement 1",
+    "content: maps/test-scene.json shamble-map 1 · movement/soldier.json shamble-movement 2",
     "scene: test-scene · 17 boxes · 6 ramps · 6 regions",
   ]);
-  // Each file's version is its own, never the other file's.
-  const mixed = lines({ content: [{ path: "maps/test-scene.json", format: "shamble-map", version: 1 }, { path: "movement/soldier.json", format: "shamble-movement", version: 2 }] });
-  expect(mixed[0]).toBe("content: maps/test-scene.json shamble-map 1 · movement/soldier.json shamble-movement 2");
+  // Each file's version is its own, never the other file's: the two swapped read swapped.
+  const mixed = lines({ content: [{ path: "maps/test-scene.json", format: "shamble-map", version: 2 }, { path: "movement/soldier.json", format: "shamble-movement", version: 1 }] });
+  expect(mixed[0]).toBe("content: maps/test-scene.json shamble-map 2 · movement/soldier.json shamble-movement 1");
   expect(lines({ content: "holding", scene: null })).toEqual(["content: waiting for the loader", "scene: empty"]);
   expect(lines({ content: "none", scene: null })).toEqual(["content: not read, the match stopped first", "scene: empty"]);
   // The page's own refusal reads as such, as the notice says it (step S's review, EA-5), not as nothing read.
@@ -145,7 +145,7 @@ test("the content and the scene: each file with its own format and version, the 
   const report = formatReport(DATA).split("\n");
   for (const expected of [
     "content.maps/test-scene.json: shamble-map 1",
-    "content.movement/soldier.json: shamble-movement 1",
+    "content.movement/soldier.json: shamble-movement 2",
     "scene.map: test-scene",
     "scene.boxes: 17",
     "scene.ramps: 6",
