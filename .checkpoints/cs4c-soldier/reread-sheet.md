@@ -7,7 +7,8 @@ revision 4: section 6 and the sections it names), three reads against today's co
 re-read carries the part's exact symbols to add and to remove, taken from the designs' tables as they stand that
 day." **No file outside `.checkpoints/` is edited before the advisor agent's verdict.**_
 
-**Status of this revision: complete for the advisor agent's review** (2026-11-28, about 01:20 Amsterdam), from four
+**Status of this revision: complete for the advisor agent's review** (2026-11-28, 00:59 Amsterdam, the commit's clock
+time of 78fd901e), from four
 finished reads: engine-architect, netcode-architect and rust-reviewer (DONE), and game-designer's on BODY-SHAPE and the
 push's numbers, still running: its result comes as an addendum, and the movement step is held for BODY-SHAPE in any
 case.

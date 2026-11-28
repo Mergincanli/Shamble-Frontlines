@@ -10,7 +10,8 @@
   `/home/user/Shamble-Frontlines` is never switched.
 - **Base:** origin/main dae6d107fdbe942567104bcf1c9a2cbc6b3a1e0f (pull request #79's merge commit), taken in by
   fast-forward from b7145273.
-- **Last update:** 2026-11-28 01:08 Amsterdam (from the clock)
+- **Last update:** 2026-11-28 01:00 Amsterdam (from the clock; the save before said 01:08, a time written without
+  reading the clock: it was 00:57)
 
 ## Steps done
 1. **4b-2 merged and main taken in** (2026-11-27). Pull request #79 merged by merge commit dae6d107 at 23:12:04 UTC,
@@ -29,8 +30,12 @@
    question-2026-11-28-before-4c.md`, the four the plan lists before 4c (MOVE-RULES, NO-SOURCE, RESUME-FLASH,
    TUNE-HOME), then SIZE-4C, BOARD-WORDS, PASTE-BREAKS and DESIGN-CLASH. No answer yet.
 
+4. **The plan sheet, revision 1** (78fd901e, 00:59 Amsterdam): `.checkpoints/cs4c-soldier/reread-sheet.md`, from
+   the three finished reads; the question file gained SIZE-4C's refinement (recommendation now (b)) and STREET-GREY
+   (79cfc4c0), posted on the board.
+
 ## Current step
-The plan sheet: three reads run (see "Running work"); the main session writes the sheet around them.
+The advisor agent's review of the sheet; game-designer's read on BODY-SHAPE. Then: step 0 and step S by its verdict.
 
 ## Next steps
 1. **The plan sheet** `.checkpoints/cs4c-soldier/reread-sheet.md`, revision 1, against main dae6d107: step 0 (the first
@@ -92,10 +97,12 @@ The plan sheet: three reads run (see "Running work"); the main session writes th
   `.checkpoints/cs4c-soldier/`; the main session commits their files with the notes at each save:
   - engine-architect (`engine-architect-read.md`): blocks 1 (the scene, folded into the sheet's section D), 2
     (SIZE-4C's seam) and 3 (steps 3 to 5) done; block 4 (4B-WORLD-ROOM) running.
-  - netcode-architect (`netcode-architect-read.md`): steps 2, 3, 6, 6b, 6c, RESUME-FLASH by option, the order if his
-    answers come late: running.
+  - netcode-architect (`netcode-architect-read.md`): DONE (folded into the sheet's E2, E3's timing, E6, E6b, E6c).
   - rust-reviewer (`rust-reviewer-read.md`): DONE (folded into the sheet's E1: BODY-SHAPE, SWEEP-ROUTE, libm's
     dependency hold, the pins re-made in step 1).
-  - game-designer (`game-designer-read.md`, since about 01:05 Amsterdam): the sandbox's own step rule, BODY-SHAPE's
-    options for him, the push's formulas and four limits, GROUND and the slope's unit: running.
+  - engine-architect: DONE (block 4, 4B-WORLD-ROOM, folded into the sheet's E3 to E5).
+  - game-designer (`game-designer-read.md`, since 00:56 Amsterdam): the sandbox's own step rule, BODY-SHAPE's options
+    for him, the push's formulas and four limits, GROUND and the slope's unit: running.
+  - **the advisor agent** (`advisor-reread-4c.md`, since 01:00 Amsterdam): the sheet's revision 1 (78fd901e), its
+    section H: step 0 and step S for APPROVE now, rulings on items 2 to 11: running.
 - The scene's before picture: `.gate/scene-before-4c.png` (main's page, 3 draw calls), by `shot-4c.mjs`.
