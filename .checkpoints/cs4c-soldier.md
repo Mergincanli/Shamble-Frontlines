@@ -10,7 +10,7 @@
   `/home/user/Shamble-Frontlines` is never switched.
 - **Base:** origin/main dae6d107fdbe942567104bcf1c9a2cbc6b3a1e0f (pull request #79's merge commit), taken in by
   fast-forward from b7145273.
-- **Last update:** 2026-11-28 02:55 Amsterdam (from the clock; an earlier save said 01:08, a time written without
+- **Last update:** 2026-11-28 12:48 Amsterdam (from the clock; an earlier save said 01:08, a time written without
   reading the clock: it was 00:57; an edit at 02:04 wrote "02:06", also unread, corrected here)
 
 ## Steps done
@@ -157,9 +157,29 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
 - Ladder rung: 13,150 (the far-corner map). Two thirds of the stop line: told to him in one sentence.
 
 ## Decisions taken
+- **His answers of 2026-11-28, 12:10 Amsterdam** (sent 11:43:45 UTC; saved by script, whole, as
+  `.checkpoints/cs4-walk/mustafa-2026-11-28-answers.md`, 4,516 bytes, sha256 3b14fb63...; the transcript holds it twice
+  from a restart, the second copy the one answered): MOVE-RULES (a) as starting rules, each his to change after he has
+  played, rows 6 and 7 confirmed again at 4d, row 9 open (as the sandbox for now; build nothing that depends on roofs
+  being walkable or not); NO-SOURCE (b); RESUME-FLASH (b); TUNE-HOME (b); SIZE-4C (b), the soldier's stop line 18,700
+  (reached before the early look: tell him in two lines and build on to it; past the line nothing after the early look
+  starts without his word); the one-branch way of his item 6 (finish the scene, tell him its final head with its full
+  id and the Brave steps, then build the soldier on top; his Advisor opens the scene's pull request from a branch of
+  its own at exactly that head; scene changes after his Brave check go into the soldier's pull request; take main in
+  once when the scene's merge is on main); BOARD-WORDS (b); PASTE-BREAKS (a); DESIGN-CLASH (a), with his own pointer at
+  LOOP_V2's silo line; STREET-GREY (b); BODY-SHAPE (3a); DEPART-4C (a) on his terms (the library checks our sweeps for
+  every shape, the ramp included, before the movement step counts as done; the old and new wording of PM-0004-20 and
+  -35 side by side, the new asking no less; PM-0004-60 and PM-0004-20's 48-soldier run stay open in STATUS, each named
+  with the change-set that meets it); FALL-STEP (c) by reading, else (a); DIGEST-NOTE (a); TESTLINES yes (read only by
+  its public address; numbers and behaviour only, no code copied; not attached); "no aim yet" fine; CHROME-TIME (the CI
+  Builder parked until Tuesday 1 December 20:00; never cut or thin a test; a run stopped at the limit is re-run once,
+  twice stopped is told in two lines; a head for the advisor agent needs a green run); while he is away: save every 25
+  minutes, new questions into the question file with a recommendation, the advisor agent decides what it may; one git
+  per shell call. He is away until Sunday 29 November, 12:00.
 - His go for 4b-2's merge (22:50:52 UTC) and his word on merging (22:52:26 UTC): saved as above.
-- His message of 23:00:39 UTC: MERGE-ROUTE (a), his Advisor merged #79; and how 4c starts (this card's Goal). Its
-  saved copy waits for BOARD-WORDS.
+- His message of 23:00:39 UTC: MERGE-ROUTE (a), his Advisor merged #79; and how 4c starts (this card's Goal). Saved by
+  BOARD-WORDS (b), without its item 3, as `.checkpoints/cs4-walk/mustafa-2026-11-27-merge-route.md` (1,284 bytes shown,
+  sha256 91b6783a...; the whole message's digest only in the chat).
 - Standing rules: git and gh always start their own command, with no other program in front of them; every file a
   shell command writes is spelled out with its full path (or written with the Write and Edit tools); no CI, kit or
   gate file is written here; no value of his is typed by hand; times come from the clock; commit and push at least
@@ -170,8 +190,14 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   `/home/user/Shamble-Frontlines/.gate/cs4b-2`. A session of another account works on its own branch from this
   branch's head and never pushes here (his Lanes rule). SEAT-OUT from him: stop at a whole point and report the last
   commit's id.
-- **State (02:10 Amsterdam, from the clock):** step S is built and proven on the branch: code commits bc7720f3 (the
-  scene) and c1de41e5 (the volume check). **CI on 8bee8365 (the head holding both): gate, smoke and toolchain green**
+- **State (12:48 Amsterdam, from the clock): his answers are in (12:10; "Decisions taken"), and he is away until
+  Sunday 29 November, 12:00.** Now: step S's six reviews (three running: graphics-engineer, perf-auditor,
+  engine-architect, each writing `review-s-<agent>.md`), step 0 (the register by `decisions-4c.mjs`; LOOP_V2's section
+  14, the pointers, the header sentence, EDITOR_V2's pointer and the register line placed by docs-keeper, his item 2),
+  then the fix pass, the verifier, the docs pass, the report with the pull request's title and text, the notes out of
+  the head, CI green, the advisor agent on that head; then he is told the final head and the Brave steps, and the
+  soldier is built on top (his item 6). Earlier state, kept: step S is built and proven on the branch: code commits
+  bc7720f3 (the scene) and c1de41e5 (the volume check). **CI on 8bee8365 (the head holding both): gate, smoke and toolchain green**
   (the toolchain 01:00:03 to 01:10:04 UTC). Step 0 is not written (it waits for his answers). The dependency batch for
   the later steps (libm in `sim`, `content` in the tests of `room` and `client-endpoint`) is a patch in the notes, NOT
   applied: `deps-4c.diff` with its digests `deps-4c.sha256`, made in the scratch worktree `.gate/deps-4c`.
