@@ -146,7 +146,7 @@
 - **Finished, resumable by SendMessage (each from its own notes):** U8's builder ac59cce3e5d002441 (worktree at 03d9ff3;
   notes u8-fix-m5.md; not U8-F1's builder: its worktree cannot fast-forward); NB2's plan check
   a10848a10f73ed39e (advisor-nb2-merge.md); U7's seats a7e9ea55113c067cb (netcode) and afe1a8309ac6f0a68 (test).
-- **Scheduled:** the day message trig_01RCgk286A8qbPbD82bP8LCC (one-shot, 23:05 UTC on 11-28: msg-2026-11-29.md, a pointer to E2 only, his one message); check-in trig_01EKqNqwZrQTVJ6caAyRrug5 (cron 34 */4; fired 08:34, nothing stopped, chat 688 MB; next 12:34 and 16:34 UTC); the 06:51 resume point trig_01AgqT9HtZpK3toet4Aap9W2 fired 06:51 (spent); the older one-shots fired and spent (this card at 53346e55).
+- **Scheduled:** the day message trig_01RCgk286A8qbPbD82bP8LCC (one-shot, 23:05 UTC on 11-28: msg-2026-11-29.md 0.2: the cut line and a pointer to E2, no ask of its own); check-in trig_01EKqNqwZrQTVJ6caAyRrug5 (cron 34 */4; fired 08:34, nothing stopped, chat 688 MB; next 12:34 and 16:34 UTC); the 06:51 resume point trig_01AgqT9HtZpK3toet4Aap9W2 fired 06:51 (spent); the older one-shots fired and spent (this card at 53346e55).
   The five-hour windows: reset 06:50 and 11:50 UTC (resetsAt 1795866600, read 11:45: usage 0.03).
   PR #40 is subscribed (CI and review events wake this session; re-subscribe after a compact to read its rules event). The fired reminders stay (A.4).
   (MAIN-66's and MAIN-67's step logs, the 19:4x-23:2x chat-size and order lines: this card at 9aa6dde.)
