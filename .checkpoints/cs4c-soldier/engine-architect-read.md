@@ -593,6 +593,165 @@ Started 2026-11-28 on branch cs/4c-soldier at 3ab59bd7. Read only; this file is 
 - N40. My own row (engine-architect-cs4.md:512, carried into block 3.2 above): `yaw` f32, radians, "the convention (0 toward +z, positive toward +x, or legacy's) is stated in the layout's doc and pinned by a test"; map.rs:58-62 shows the two are one (legacy turns by `atan2(dir.x, dir.z)`). Who computes it is step 3's open route: the endpoint with libm's arc tangent (my design :404-405) or the page's `Math.atan2` (rust-reviewer-read 1.8, :293-295).
 - N41. The held aim at spawn is open and tied to this point: netcode-architect-read.md:648-649 ("the held aim is whatever FACING-SPAWN picks"); its 7.3 (2) gives `Endpoint::new` a first aim of `clamp_cm` of (0, 0, 0), and its zero-ray rule keeps the endpoint's last aim until a ray arrives. So, before any ray, commands carry the map's origin as the aim: on the test scene the yard's spawns (x 25 to 27, facing 90, +x) would turn toward -x on the first command, whatever FACING-SPAWN gives (inferred from the read, not run).
 
+## Block 5. GROUND and FACING-SPAWN (the advisor agent's item 10, points 4 and 5) (DONE)
+Against cs/4c-soldier at 3ab59bd7 (main dae6d107 with step S). Counts are my estimates of written new lines, code /
+tests, plus or minus 30 %.
+
+### 5.1 GROUND: the statements, reconciled
+| Statement | What it says | Bounds from y 0 | Bounds from y h > 0 |
+|---|---|---|---|
+| map.rs:39; schema.rs:146-147; aim_reach.rs:45 | an aim's height counts "above the floor at 0" | y 0 is the bounds' bottom | calls y 0 "the floor", h below the bounds' bottom, where nothing may lie |
+| map.rs:325, :330 | `bounds.min[1]` any whole centimetre from 0 up | | such a map loads |
+| step S: scene.ts:197, :210-211, :231-235, :263-265 | the ground, the regions and the grid at `bounds.min[1]` | drawn at 0 | drawn at h |
+| netcode-architect-read.md:62-63 (a design, not code) | the aim falls back to the plane y = 0 | at the floor | h below the drawn floor |
+- They agree for every map that exists (N27: all start at 0) and part for a map whose bounds start above 0. What an
+  aim's height counts from is y 0 and stays y 0 (the wire's unsigned 16 bits, aim_reach.rs); the word "floor" there is
+  the defect: it takes the bottom to be at 0, which the check does not make so.
+- **Findings, on the one scale:**
+  - **G-1 (Low, against the map kind, mine):** map.rs:39, schema.rs:146-147 and aim_reach.rs:45 call y 0 "the floor"
+    while map.rs:325 lets the floor stand above it. Fix: the words of 5.2.
+  - **G-2 (Medium if built as written, against netcode-architect's aim design; its owner answers, NA1):** on a map
+    whose bounds start at h the fallback crosses y 0 below the drawn floor, h / tan(pitch) farther along than the floor
+    point the cursor shows, and the clamp lifts only its y back. Small reach (no map starts above 0 today); High once
+    one does. Fix: the crossing at the floor, the lower y of `bounds_m` (netcode-architect-read 7.3's one home).
+  - **G-3 (Low, against step S's evidence, not its code):** step S draws at the bounds' bottom, which 5.2 makes right,
+    but no test tells the bounds' bottom from y 0 (scene.test.ts:21 at min y 0; :149 asserts the literal 0), so a
+    planted `floorY = 0` passes them all. Fix: T2 of 5.2. A Low: it rides the movement step's commit (4c-2) and
+    triggers no push of its own (the review budget; F-ORD-1).
+  - Nothing against step S's code.
+- **The other fix, not recommended:** refuse every `bounds.min[1]` but 0, so the floor is y 0 and every statement is
+  true as written. Cost: a refusal kind and its sentence, the schema's lower y from [0, 655.35] to exactly 0,
+  content_proofs' refusal class gains a case, the editor writes 0: about 15 / 25. It narrows what a map file may say
+  (no committed file is refused: N27), so by the rule the brief applies to FACING-SPAWN (b) it would be his to decide.
+  Not needed: under 5.2 every part reads one face, the bounds' lower y, so a raised map is right everywhere and the
+  format stays as it is.
+
+### 5.2 GROUND: the rule
+- **Ruling (owner of the map kind): the bounds' bottom is solid ground**, flat and walkable, under the whole of the
+  bounds' x and z: a soldier with no shape under him stands on it; a fall ends on it, landing as on any walkable top;
+  a ray going down stops on it, as on the old game's ground plane beside its statics (shamble-core.js:1507, :1516).
+  Regions are drawn on it (map.rs:383 already: "A region lies on the ground"). The four sides are MOVE-RULES row 8's
+  (his question: "the map's edge is the map's own bounds"); the top is the movement's (rust-reviewer-read F11: a
+  ceiling); neither is ruled here. No word of his changes: none of his rules names the bottom (N30, N39), and the old
+  game's soldiers stand on a ground plane at 0 under every map.
+- **Not taken: a ground shape in every map** (rust-reviewer-read 1.4 item 2, option (b)). A shape lies inside the
+  bounds and is at least 1 cm thick (map.rs:11-12), so its top stands at least 1 cm above the drawn ground and step S
+  would draw it as a block over the ground and every region, hiding them; a fall still needs an end below it; and it
+  takes one of the 512 shapes and a test in every ray.
+- **Where it is written**, in the commit that first makes the movement read it (step 1, in 4c-2):
+  1. map.rs's module doc (:3-6), one sentence: "`bounds` is the playable box; its bottom is solid ground under the
+     whole box: a soldier with nothing under him stands on it, and a fall ends on it." (2 lines)
+  2. map.rs:39 becomes "in centimetres above y 0 (the aim's zero; the bounds' bottom, the ground, lies at or above
+     it)"; schema.rs:146-147 and aim_reach.rs:45 take the same words; schema.rs:56's bounds description gains "its
+     bottom is the ground", which moves one line of the committed schema (its tests compare it). (about 5 lines)
+  3. The check: no change. It is a meaning, not a range; the bottom stays any whole centimetre from 0 up.
+  4. One home: the floor is the lower y of `bounds_m`, derived once in `StaticWorld::build` (netcode-architect-read
+     7.3); the sweeps and the aim read it there; the page reads `bounds.min[1]` from the map (step S); the two are tied
+     as block 1.2 ties the corners (Math.fround of the map's number equals the simulation's f32).
+- **Tests, each with its plant (each plant must turn its test red):**
+  - T1 (sim, step 1): on a made map whose bounds start at y 2, with no shape under the spawn, a soldier spawned 1 m
+    above the floor falls and lands at exactly y 2 (grounded, vertical speed 0); on the test scene at 0 (step 1's own
+    landing test). Plant: the sweep's floor at y 0 (the raised map's soldier falls on through 2 m).
+  - T2 (page, scene.test.ts): with the same raised bounds, the ground's, every region's and every grid line's y equal
+    2. Plant: `floorY = 0` at scene.ts:197.
+  - T3 (aim, netcode-architect's if NA1 is yes): on the raised map a cursor ray that misses every shape ends on the
+    floor, at the x and z where the ray meets y 2. Plant: the plane at y 0.
+- **Count:** about 7 lines of words (map.rs, schema.rs, aim_reach.rs) and 2 of code (the aim's crossing reads the
+  floor; the sweep's floor plane is already in step 1's count, rust-reviewer-read 1.4 item 2) / about 42 of tests
+  (T1 20, T2 10, T3 12).
+
+### 5.3 FACING-SPAWN: the three options
+Today `facing_deg` is any degree in [0, 360) (map.rs:58-66); the soldier keeps his facing as a direction
+(rust-reviewer-read 1.1, `facing: [f32; 2]`; 1.7); the test scene's eight spawns all face 90 (N34).
+
+| | (a) libm's sine and cosine | (b) quarter turns only | (c) degrees until the first aim |
+|---|---|---|---|
+| Where it runs | once per spawn point when a match starts, in the constructor that takes the match's spawns beside `Rules::take` (at most 16, map.rs:27); never in the step | the same place, a four-row table | in the state, every tick until the first aim farther than 2 cm |
+| Maths | one routine, `libm::sincos` (N31); degrees to radians by one multiply with a pinned constant (ADR 0004:275; K's f64 bits 3f91df46a2529d39) | none | none in the simulation; the endpoint's yaw from degrees is degrees x K, one multiply (the two conventions are one: N40) |
+| Quarter turns exact | only if whole quarter turns are taken out first (N32; RR3); else 90 gives (1, 6.1e-17) | yes | yes |
+| What a map file may say | unchanged | narrowed: every degree but four refused (no committed file is: N34) | unchanged |
+| The guards | the scan names `sincos` and `sincosf` with a bite (they pass it today: N37), then one allowance at the one call site; maths-allowed.mjs gains `libm::math::sincos` and whatever the built file prints of N38's candidates (1 to 6 entries: rust-reviewer's count); PM-0004-22's vectors (at least 10,000 inputs, natively, in Node and in each browser engine) | none | none |
+| The manifest batch | no manifest line; the root comment names only the exponential (N33), so it must change, its digest moves, and the batch goes to security-auditor again (5.6) | unchanged | unchanged |
+| State, wire, block, recordings | one direction from the first tick: rust-reviewer's Soldier, netcode-architect's OwnSoldier (its 2.1: "the facing as step 1 holds it") and my row unchanged | as (a) | two forms of one field (5.4) |
+| Count (estimate) | about 25 (the routine with its quarter turns 15, the scan 5, the comment 2, the vectors' generator 3 beyond its exp lines), plus the list's entries / about 45 (quarter turns exact, 45 and 120 by bits against a reference, the scan's bite and control, the vectors' run) | about 30 / 30 (a refusal kind and its sentence, the schema's four values, content_proofs' generator and a refusal case, the table) | about 35 / 60 |
+| Whose | rust-reviewer (the maths); security-auditor (the batch, again) | **his decision** (5.5) | rust-reviewer (the state); netcode-architect (the wire, the recordings) |
+
+### 5.4 (c) in full: the row, the state, a recording
+- **The row (block 3.2):** `yaw f32 @28` and `pitch f32 @32` keep their place and meaning. The endpoint writes the
+  yaw from two sources: degrees x K while the state holds degrees, the arc tangent of the direction after. That fixes
+  step 3's open route at the endpoint: the page's `Math.atan2` route reads a direction, which the degrees form does not
+  have without a sine and a cosine, unless a flag bit (bit 5) says which meaning the field holds, which puts two
+  meanings of one field across the boundary.
+- **The state:** yes, the hashed state holds the degrees until the first aim farther than 2 cm: `facing` becomes a
+  two-form field (a tag byte, then 4 bytes of degrees or 8 of direction), written by `visit_shared` with its tag. A
+  soldier with no commands (a bot's slot, an idle player) keeps the degrees form for as long as none arrives.
+- **A recording or a restore:** each tick's digest holds the tag and the degrees until the first aim; a replay agrees
+  (it is deterministic), but every reader of the field takes both forms: the block writer; netcode-architect's
+  OwnSoldier (a tag on the wire, the codec refusing an unknown one); change-set 7's reset from the snapshot; devtools'
+  `Lines` (replay.rs:181). A restore must give the tag back exactly, or the digest after it differs.
+- **Later:** any rule of the simulation that reads the facing as a direction (none in 4c) meets the degrees form and
+  needs a sine and a cosine inside the step, which 1.7 keeps out, or converts at its first read: (c) moves the routine
+  later and into the step; it does not remove it.
+
+### 5.5 What goes to Mustafa
+- Under (a), the recommendation: **nothing.** No word of his changes; the map kind keeps any degree, as today.
+- Only if a reviewer wants (b), ready to ask:
+  **FACING-QUARTER.** *Question:* should a spawn on a map face only the four main directions (0, 90, 180 or 270
+  degrees) instead of any direction? *Why it matters:* any direction needs one reviewed sine-and-cosine routine, run
+  once per spawn point when a match starts; four directions need none, but the map format then refuses every other
+  direction. *Options:* (a) any direction, as today, and the routine joins with its proofs; (b) the four main
+  directions only: the map reader refuses the others; no map changes today (all eight spawns of the test scene face
+  90), but the editor's rotate snapping to 15° and 45° (a default of his editor brief) could not be used for spawns,
+  and on a three-team map turned at 120° (the default layout of his loop brief, section 9) at most one team's spawns
+  could face a main direction (engine-architect's reading of the two briefs, not a word of his on spawns).
+  *Recommended:* (a).
+- Pointer only (N35): the same 120° turn cannot keep a box axis-aligned; the map kind and the editor's mirroring meet
+  at editor slice 6, not in 4c. It weakens the 120° point as an argument against (b) (the kind cannot follow that
+  turn today either), so it supports the case against (b) without deciding it.
+
+### 5.6 Recommendation
+- **(a): `libm::sincos`, once per spawn point in the match-start constructor, exact on quarter turns.** It is ADR
+  0004 part 7's own route (N36) and the one map.rs:63-64 already promises; it touches no state, wire, block or
+  recording; its cost is guard work already set up for the exponential (the scan's allowance, the reviewed list,
+  PM-0004-22's vectors); the format stays open to any facing. (c) spreads two forms of one field over the state, the
+  wire, the block and every recording, for a facing his first cursor aim replaces; (b) is the least code but narrows
+  his format, and is his to decide.
+- **The batch: yes, (a) needs the root comment changed, and so a new answer.** It names "the exponential, once per
+  match" (N33); with the sine and cosine it would be wrong by omission. Recommended: reword the patch now, before it is
+  applied, to name both (for example "the exponential for the movement's easing shares, and the sine and cosine (one
+  routine) for the spawns' facings, each once per match"), and send the reworded batch to security-auditor once, its
+  F1 and F2 conditions standing. The patch, its digests and dependency-check.md are the main session's files; none of
+  the other four files changes.
+- **The held aim at spawn** (N41): recommended the spawn point in whole centimetres until a command brings an aim:
+  rounding a millimetre spawn moves it at most 0.71 cm, under the 2 cm rule, so the spawn's facing holds with no
+  maths. The endpoint's first aim, the map's origin, is NA2.
+
+### 5.7 Questions for rust-reviewer (the maths), answered in its own file
+- RR1. The scan refuses std's names only (N37): `libm::sincos(` passes it today, and so do `libm::expf(`, `sinf`,
+  `cosf` and `atan2f`. Should the refused names gain libm's own (at least `sincos` and `sincosf`, and `expf` and
+  `exp2f` beside the exponential's planned bites) before any allowance? My severity: Medium (the guard does not hold
+  for libm's own spellings; the built-file check covers a routine only when it is not inlined).
+- RR2. One routine, `libm::sincos` in f64 and then `as f32`, rather than `sin` and `cos`, or `sincosf`; and K's f64
+  bits pinned by a test?
+- RR3. Exact quarter turns by taking them out first (three compares give q; deg - 90 q is exact by Sterbenz's lemma;
+  the turn is a swap and a sign), or accept (1, 6.1e-17) at 90 and test by value?
+- RR4. Which of N38's candidates the built file prints, and so the reviewed list's entries (the count is yours), and
+  the vectors' domain (the remainder's [0, 90) x K and its edges).
+- RR5. The floor as the plane at `bounds_m`'s lower y beside the tree, not a 513th solid (the 512 cap and the tree's
+  committed bytes would move); T1 and its plant in step 1.
+
+### 5.8 Questions for netcode-architect (the row, the state, the recordings), answered in its own file
+- NA1. The aim's ground crossing (netcode-architect-read.md:62-63) at the floor, `bounds_m`'s lower y, instead of the
+  plane y = 0 (G-2), with T3 and its plant?
+- NA2. The held aim at spawn: the spawn point in whole centimetres? And `Endpoint::new`'s first aim, `clamp_cm` of
+  (0, 0, 0) (your 7.3 (2)), kept by the zero-ray rule until a ray arrives, turns a new soldier toward the map's origin
+  on his first command under every option (N41): accept that as the rule and say so, or keep the soldier's held aim
+  until the endpoint has a ray (and how, on the wire)?
+- NA3. Under (a) the facing is one direction from the first tick: do your OwnSoldier (2.1) and the recordings need no
+  change? Under (c) a tag joins the wire, the codec's checks and every recording's state (5.4): any reason to prefer
+  it?
+- B5 DONE.
+
 ## Not verified
 - Nothing was built or run for this read but one import of three/webgpu in plain Node (N7). Every count is the
   designs' estimate (plus or minus 30 %).
@@ -604,5 +763,10 @@ Started 2026-11-28 on branch cs/4c-soldier at 3ab59bd7. Read only; this file is 
 - netcode-architect's and rust-reviewer's parallel reads were not seen; the zero-ray meaning, step 3's Rust split,
   the sprint-lock bit, the stamina's wire and share, and the body-height field are theirs.
 - three's dispose bookkeeping (N11) was read in the built file, not run.
+- Block 5: libm 0.2.16's sine and cosine were read in the cargo cache, not built or run: which of its routines the
+  built file prints (N38) and whether its `sincos` gives N32's values are unmeasured. N32's values are glibc's,
+  through Python 3 on this machine, not the libm crate's.
+- Block 5: the scan's gap (N37) and every plant of 5.2 are read from the source, not run; T1 to T3 and the counts are
+  estimates. netcode-architect's block 7 was read as its file stood during this block.
 
 DONE

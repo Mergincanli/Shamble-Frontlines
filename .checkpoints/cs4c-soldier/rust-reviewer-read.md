@@ -575,3 +575,87 @@ DONE
 - [B6-7] Snap numbers (3a/3b, the reading's 0.2 + (move + 0.15) x slope): flat 0.2; 25 %: 0.290 / 0.317 / 0.348 at 6.3 / 9.576 / 13.27 m/s against a drop of 0.053 / 0.080 / 0.111 a tick; 50 %: 0.380 / 0.435 / 0.496 against 0.105 / 0.160 / 0.221; smallest margin measured down the ramps (seams included) 0.094 m (steep, 9.576): 6 of 6 down runs per body with 0 airborne ticks. Down the 0.55 step 0.55 > 0.2: a fall (3a/3b); body 2's snap is the step-up 0.55: snapped. Easing (k 0.37375 a tick, up = stop, air 100 %): 48 of 48 step runs from rest 0.05 to 1.2 m out, walking on or letting go the tick the step fires, and 24 of 24 ledge jumps from rest, every body.
 - [B6-8] The push (14 cases x 2 wall rules x every slot order, per body; velocities = this tick's displacement / dt after the walls, the reading not saying which velocity; perpendicular side x (-n.z, n.x), the reading not saying which; standing not run again after the push, the reading not saying): no walker is ever stopped by the push on open ground (0 stalled ticks), every pair ends 0.80 m apart or walked past, none ever inside a solid, never a fall caused by the push; head-on at 6.3 they overlap to 0.236 m between centres for 4 ticks and pass with 0.119 m sideways each (13.27: 0.305 m, 2 ticks); one standing: displaced 0.35 m along and 0.19 m aside; both standing 0.3 m apart: 0.80 m in 31 ticks; into the 3.10 m ledge's face: the walker slides round his mate and both end against the wall side by side 0.80 m apart; at the 1.0 m height gap: 0 pushes (HEIGHT_GAP is ">= 1.0"); across the 0.55 step: pushed, neither ends inside it. MAX_STEP (0.25) never bit (largest push 0.147 m, three meeting); KEEP_GOING bit 5 times (three meeting). Push-out and sweep end bit-identical in every case (each pushed body began touching the wall, and both rules keep the tangent part; they differ only by the 1 mm skin when a push starts clear of a wall). Slot orders: bit-identical in 13 of 14 cases; the exception is two bodies on one spot, where the tie rule (n = +x from the lower slot; the sandbox's is a per-pair angle by trigonometry, push.ts:51-55) picks by slot by construction: the game's tie rule must use the soldier id and the slot-swap test must swap ids with slots or leave coincidence out. 3a = 3b in every push run; body 2 differs only on the step (it snaps off the far side, then the 0.56 step stops it).
 - [B6-9] Ceilings (made map; the reading has no head rule, only "with headroom" and "not a floating block" for the step and the wall, game-designer-read block 1, yard.ts:243-245, :309; block 5's floating test, bottom above the head, is MY formula): walking under a 2.0 m beam: passes (bottom above the 1.8 m head); into a 1.7 m beam: stopped 0.40 m out; up the 0.55 step under a 2.2 m beam: stands on the step 0.40 m short of the beam. Jumping standing under the 2.0 m beam with no head rule (C1): the head goes through the beam (feet to 2.52 m, head 4.32 m), then the wall test puts him out sideways 1.40 m in one tick (x 56.0 to 54.6); jumping while walking at it: mantles onto the beam's top (feet 2.30). With a head stop (C2, 7 prototype lines): feet stop at 0.20 m (head at the bottom, 2.0), he falls back where he stood. All three bodies alike.
+
+### What ran
+`rr-body-proto-6.rs` beside this file (rustc 1.99.1 -O, edition 2024, f32; sha256 451aed00...282648; binary under
+`.gate/rr6/`); outputs `rr-body-proto-6-3a.txt`, `-3b.txt`, `-2.txt` (body 2 as block 5 built it) and `-2w.txt` (body 2
+with one line changed, B6-2). Its "b5" mode reproduces block 5's four outputs byte for byte (B6-1). Same pass rule as
+block 5 (the outcome, and no fall without a jump), plus two counters block 5 lacked: ticks with the body inside a
+solid, and flickers (an unjumped fall that comes back to the height it fell from). Every rule is game-designer-read's
+reading (block 1 the body, block 3 the push); where the reading stops, the row says which stand-in ran.
+
+### The table (runs per body; "pass" = outcome and no unjumped fall, no flicker, never inside, unless the row says)
+| Case | (3a) | (3b) | (2) as block 5 | (2w) | Stand-in where the reading stops |
+|---|---|---|---|---|---|
+| Ramps from their sides, both ramps, both directions, 8 or 9 x, 3 speeds, 3 starts (306) | 306 | 306 | **198**: 108 walk into the ramp at ground level, 3 to 6 ticks inside (B6-2) | 306 | wall = block 5's push-out; the sandbox's set-back along the slope NOT run (no formula in the reading) |
+| ... where on, where stopped | on the slope up to gentle x 43.1 / steep 43.0, at the slope's height under the centre; else stopped 0.40 m out | same | band gentle 42.9-43.1, steep 42.8-43.0 fails | on up to gentle 42.0 / steep 42.6 (disc height), else stopped | |
+| Off a ramp's side (24) | 24: falls once the foot leaves (centre 0.21-0.31 m past), snaps from 0.15 m | 24, same | 24: snaps up to 0.55 m | 24 | |
+| Landings: 5 tops (2.9, 3.05, platforms 1.0 and 1.5, step 0.55) x 8 directions x walk-off/jump x 3 speeds, then 15 still ticks (240) | 240: no bounce, no fall after landing | 240 | 240 | 240 | landing tick = the tick the feet reach a top under the foot within 0.55 m |
+| ... air time off the 2.9 m ledge at 6.3 m/s | walk-off 14 airborne ticks (exact 14.75), jump 33 (exact 33.91) | same | same | same | |
+| ... largest drop in one tick / deepest below a non-ground top at landing | 0.553 / 0.370 m (< 0.55: the test scene never misses) | same | 0.553 / 0.430 | same | |
+| High drop, made map, 10-18 m onto a 2.0 m top (21) | **4 miss** (end on the ground beside it); 0 with the crossing fix (B6-4) | same | same | same | which feet surfaceAt uses: not in the reading |
+| Snap down the ramps at 3 speeds (6) | 6; allowance 0.290-0.496 m against drops 0.053-0.221 m a tick, smallest margin 0.094 m (B6-7) | 6 | 6 (snap = step-up 0.55) | 6 | |
+| Snap down the 0.55 step | a fall (0.55 > 0.2), about 6 airborne ticks | same | snapped (0.55 <= 0.55) | same | |
+| Easing from rest at the 0.55 / 0.56 steps, walk on or let go at the step (48) | 48 | 48 | 48 | 48 | k 0.37375 a tick, up = stop, air 100 %, rest under 1e-4 m/s |
+| Easing, ledge jumps from rest (24) | 24 (3.05 caught, 3.10 not) | 24 | 24 | 24 | |
+| Block 5's ledge jumps with the inside counter (36) | **28**: at 13.27 m/s, 3 ticks inside the 2.9 m box, 1 inside the 3.05 m box, then on top; 36 with "toward" judged from the tick's start (B6-5) | same | same | same | "while moving towards it": no formula in the reading |
+| Ceilings (made map): cost only, the reading has no head rule | C1 (none): jump under a 2.0 m beam, head through it, put out 1.40 m sideways in one tick; jumping at it mantles onto it; at 13.27 m/s 3 ticks inside it. C2 (head stop): feet stop at 0.20 m, falls back | same | same | same | the floating test (bottom above the head) is mine |
+| Walk under a 2.0 m beam / into a 1.7 m beam / up a step under a 2.2 m beam | under / stopped 0.40 m out / on the step 0.40 m short of the beam | same | same | same | |
+| Push, 14 cases (head-on 6.3 and 13.27, glancing, one still, both still, one spot, into a wall and glancing, across the 0.55 step both ways, the 1.0 m gap, three meeting, three still, three into a wall) x push-out and sweep x every slot order | never stopped on open ground, every pair ends 0.80 m apart or past, none inside, no fall from the push; MAX_STEP never bit (largest 0.147 m), KEEP_GOING 5 times; push-out = sweep bit for bit in all 14; slot orders identical in 13 (not: two on one spot, by construction) (B6-8) | = (3a) bit for bit | = (2w) | differs from (3a) only on the step | velocity = displacement / dt; turn side x (-n.z, n.x); standing not re-run after the push; one-spot tie n = +x from the lower slot |
+Not run: the sandbox itself; its set-back along the slope; its headroom test (no formula); the far corner (block 1.11:
+step 6c's); a push on a ramp; four or more soldiers (sums of three terms or more are where f32 order shows, block 1.9).
+
+### What the runs change
+- (3a) and (3b) pass every case here as block 5 built them, except two model holes every body shares: (i) the
+  in-air step-up's "toward" (B6-5: inside the ledge for 1 to 3 ticks at sprint) and (ii) a landing on a top crossed
+  inside one tick (B6-4: falls above about 5.4 m). Both fixes are a condition each, need no number and no rule of his,
+  and leave block 5's cases unchanged but for the 3.05 m ledge caught one tick earlier at 13.27 m/s. They belong in
+  step 1 under any body, with a test each (plants: "toward" from the tick's end; landing without the crossing).
+- (2) needs one more line (2w: the wall test reads the step's own height, the disc's highest point), or it walks
+  through the yard's ramps from their sides. With it, (2) passes every case; it also removes block 5's one-tick fall on
+  house b's roof at 13.27 m/s.
+- So no answer of his to BODY-SHAPE among (3a), (3b), (2) forces a re-run of these cases.
+
+### 2. The 2.5D question (shapes whose bottom is above the ground)
+- **The static test is exact.** An upright cylinder against an axis-aligned box or ramp overlaps exactly when its disc
+  overlaps the footprint and the two height ranges overlap (for a ramp, the top is the plane's highest point over the
+  disc's part of the footprint). That holds for a shape that starts anywhere: nothing in it assumes a shape rests on
+  the ground. What is not exact is the motion (horizontal, then vertical, with a push-out, not a 3D sweep), and that
+  is the same for a floating shape as for a resting one.
+- **But every test must carry the bottom, and block 5's 170 / 200 counted a world where no test needed it.** With a
+  shape above the ground: walking under it is right if the walls and the step skip a shape whose bottom is above the
+  head (block 5 has it: `floating`, my formula); standing under it is right (its top is out of the step's reach);
+  jumping into it has no rule at all (C1 above: through it and out sideways, a 1.4 m jump in one tick), so it needs a
+  head test (C2, 7 prototype lines) or a map without such space; the slope under the foot reads any ramp whose
+  footprint holds the centre, ignoring heights (rr-body-proto-6.rs `slope_under`), so a ramp overhead changes the snap
+  of a soldier under it: it must read the shape the foot stands on.
+- **The honest count for step 1**, against block 5's 170 / 200 (2.5D) and block 1.4's 260 / 260 (3D), each with the
+  two fixes of B6-4 and B6-5 (+10 / +25), which every route needs:
+  - if maps may hold space under a shape: 2.5D about **205 / 265** (+ the head test 20 / 30, the stood-on slope 5 / 10);
+  - if a map rule says there is no space under any shape: 2.5D about **180 / 225** in `sim`, plus the map check in
+    `content` (each shape above y 0 has its whole footprint on tops at exactly its bottom, a covering check over the
+    corners' grid; about 40 / 40, with a planted bridge refused); the test scene passes it (the roofs sit on their
+    houses, footprints equal);
+  - 3D (1.4): 260 / 260 plus the same two fixes in their 3D form and the head's stop (a vertical sweep that 1.4 has).
+  "Rests on another shape" is not enough as the rule: a beam on two posts rests on them and still has space under its
+  middle. The rule that makes 2.5D need no bottom handling is "no space under any shape" (the map is a height field).
+- **Who decides:** whether maps may have space under a shape (a bridge, a balcony, a tunnel, a gate's lintel) is a
+  design question for Mustafa (what his maps and editor may build; map.rs:9-13 and :317 on allow it today, and
+  nothing in the reading or the test scene uses it); the rule's wording and its check are engine-architect's (the map
+  kind's owner), once he answers. It is the same question as the ceiling's (below).
+
+### 3. The record rule (advisor-reread-4c.md:31): YES
+F17 stands and 1.6's "and the move and aim of the record" is withdrawn (it described option (ii)); B6-R above has the
+reasons, the Soldier row (`held_move: [i8; 2]`, `aim_cm: AimCm` in place of 1.1's `aim: V3`, `facing` kept) and what
+`visit_shared` writes under (i) (tick; the record's buttons and presses; then the 48 rows in slot order with every
+field), with the two tests and their plants.
+
+### New question for Mustafa (CEILING), tied to MOVE-RULES row 8 (my block 3: (a) "the head stops at a ceiling", (c) "no ceiling test")
+His sandbox by its reading has no head rule; the test scene has nothing above a soldier's head; the map kind allows it.
+(C1) no head rule, as the sandbox: free, but on a map with a beam a jump under it goes through and is put 1.4 m aside
+in one tick. (C2) the head stops at a shape's bottom and he falls back: about 20 / 30 lines. (C3) maps never have space
+under a shape: no ceiling exists, 2.5D stays smallest (about 180 / 225 in `sim` plus 40 / 40 in `content`), but no
+bridges or overhangs until he lifts it (then C2 joins). Recommended: (C3) now, since no map he has uses it; C2 when he
+wants one. If he answers row 8 (a), that is C2.
+
+DONE
