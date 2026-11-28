@@ -531,7 +531,8 @@ repeated. "Today" is main dae6d107 with 4c-1's scene in.
   its spawn points, in whatever sim types rust-reviewer's step 1 gives them), taken by value in `Room::new(setup,
   content_hash, statics, ...)`; `World::authority_step` takes `&StaticWorld` (and `&Rules`) as arguments, borrowed
   from the room each tick (room/src/lib.rs:282). The movement functions already take `&StaticWorld`, never `&World`
-  (design 2.1), so change-set 7's prediction passes the endpoint's own copy the same way.
+  (design 2.1), so change-set 7's prediction passes the endpoint's own copy the same way. [REFINED by block 7: the
+  types, signatures and the query counts' place are block 7's items 2 and 3 and B2.]
 - **Not in `World`:** the static world is never state (collision.rs:1-3; design 2.4: not hashed, rebuilt after a
   restore). Inside `World` it would ride every copy of the state (change-set 7's resets) and sit among the fields
   `write_state` hashes. **Not in `LocalMatch`:** the room is also the native server's match; a world held beside it
@@ -549,7 +550,8 @@ repeated. "Today" is main dae6d107 with 4c-1's scene in.
   any push). The client endpoint's tests the same, once its endpoint takes a world (step 2).
 - **A rule, since none exists (N26):** a test in devtools (tools may depend on everything), `tests/layering.rs`:
   the `[dependencies]` tables of crates/room/Cargo.toml and crates/client-endpoint/Cargo.toml name no `content`, and
-  no file under their `src/` names `content` (rules_scan.rs's tokenizer, :127-252, reused, not copied: moved to a
+  no file under their `src/` names `content` [SUPERSEDED by block 7, item 5 point 15: no non-test token of their
+  `src/` names it] (rules_scan.rs's tokenizer, :127-252, reused, not copied: moved to a
   shared place if needed); planted: a `content = { path = "../content" }` line in a copy of the manifest text, and a
   `use content::map::MapDocument;` in a copy of a room source, each must fail. It also holds what `sim` hands on of
   `content`: today one constant, `pub use content::time::UNITS_PER_SECOND` (sim/src/time.rs:8), and no document
@@ -560,6 +562,7 @@ repeated. "Today" is main dae6d107 with 4c-1's scene in.
   loses `world` and `static_world()` (local_match.rs:48-50, :63, :73, :96-100), and `new` hands the world on;
   `Sim::create` (lib.rs:121); the tests at lib.rs:399-410 (reads `local().room().statics()`), local_match.rs:203-213,
   tests/step_alloc.rs:84-86, room's two test sites. 4B-QUERY-RECORDING's first recorded query is then the room's.
+  [REFINED by block 7, item 5: the list by number; the test reads `local().room().statics()`.]
 - **When:** with the first step that queries it, step 1's movement inside the room's step: 4c-2 under the seam of
   block 2.
 - B4 DONE.
@@ -824,5 +827,301 @@ Counts are my estimates of written new lines, code / tests, plus or minus 30 %.
 - Block 5: the scan's gap (N37) and every plant of 5.2 are read from the source, not run; T1 to T3 and the counts are
   estimates. netcode-architect's block 7 was read as its file stood during this block.
 - Block 6: read only; the bit, the pitch rule and the room test are design, not built or run.
+
+DONE
+
+### Plan (block 7: the advisor agent's F1, WORLD-ROOM agreed in writing before step 1's code)
+Asked 2026-11-28 by the main session, on cs/4c-soldier at 695b45b9 (the Rust is main's dae6d107: 4c's commits since
+are page and notes only). Read only; this file is the only one I write.
+1. Read the clash: rust-reviewer-read 1.6 (:239-269) and 11.6 (:892-924), my block 4 (:529-565), the sheet's E
+   (:313-319), the advisor agent's F1 and Q4 (advisor-steps1to7.md:25-31, :136-158), netcode-architect-read's record
+   and restore lines (:72-84, :674-684).
+2. Read today's code: sim world.rs, lib.rs, collision.rs (StaticWorld, build, narrow), room lib.rs, sim-wasm lib.rs
+   and local_match.rs, client-endpoint endpoint.rs (struct, new), devtools replay.rs, the recordings' manifest and
+   frozen bundle, content bundle.rs and map.rs (spawns), the manifests, the batch (deps-4c-v2.diff), ADR 0004 parts 1,
+   3, 9, 10 and 17.
+3. Answer the six items of the brief with file:line; Q4's conditions; a notes line per finding; the block; B7 DONE.
+
+- N45. Today's `World` is `{ tick, player: PlayerCommand, seed }` (world.rs:112-117), "the whole state of one match"
+  (:111); both visitors name every field in an exhaustive pattern (:166-170, :180-184), so a field added to `World`
+  compiles only if handed over or written `_` in plain sight. The room owns the `World` (room/src/lib.rs:87-88) and
+  steps it at :282; `LocalMatch` owns the `StaticWorld` beside the room (local_match.rs:48-50, :63, :73), read only by
+  `static_world()` (:96-100) and one test (sim-wasm/src/lib.rs:401-410).
+- N46. ADR 0004 part 1 (:131-137) lists "the static colliders with their ids" among the state struct's tables; part 3
+  (:163-165) and part 10 (:365-367) say the static collision index is "rebuilt after a restore, never stored in a
+  snapshot", the static world "immutable for the match", and "a destructible piece's state lives in the sim's tables".
+  collision.rs:1-3 says the same ("never changes after, and is never part of a snapshot"). Read together: the
+  immutable static world is not state; a collider's changing state (none before destructibles) is a table in the state.
+  Part 1's "nothing lives outside the struct (no globals or statics in the sim crate)" is about Rust `static`s, whose
+  test is PM-0004-17 (ADR 0004:1138, "Bites: a `static` counter read by a phase"; devtools/tests/two_instances.rs).
+- N47. netcode-architect-read.md:83-84: "Whatever the World keeps is hashed (ADR 0004 part 9)". Part 9 (:342-344): the
+  sim writes "a canonical serialization of its whole state". A constant held in `World` but left out of `visit` would
+  break that sentence; a constant written into it would hash content the digest already names (N50).
+- N48. The record: `authority_step` stores the newest command whole (`self.player = *newest`, world.rs:150-152). Once
+  `PlayerCommand` gains `move_x`, `move_y` and `aim` (rust-reviewer-read 11.6, :904), a `player: PlayerCommand` field
+  keeps the newest move and aim in `World` while `visit_shared` writes only buttons and presses (11.2, :842-843):
+  unhashed state. netcode-architect named the narrow type, `PlayerRecord` (netcode-architect-read.md:78); block 11.6
+  has no such symbol (grep of rust-reviewer-read.md: no `PlayerRecord`). The record's readers outside world.rs: the
+  snapshot echo (room/src/lib.rs:286-296), room tests :461, :496, sim-wasm local_match.rs:267-268, :336, :370.
+- N49. `QueryCounts` (rust-reviewer-read 11.6, :899; block 2, :381-384) is "outside the state ... in the scratch the
+  step already owns; never hashed ... read through a `#[doc(hidden)]` accessor on the world": a second non-state field
+  in `World`. The room already holds its run's tallies beside the world (`counters: RoomCounters`,
+  room/src/lib.rs:45-68, :99, :133-135: "the counters are what a test, and later a metric, reads").
+- N50. How content is named today. The loader takes a bundle only byte for byte in canonical form (bundle.rs:3-11,
+  `document` :88-108), so one content set has one byte string and two different sets two different sha256 digests.
+  A recording's header names its content by sha256, and the replay refuses any other bundle before the match is made
+  (replay.rs:37-54), then makes the match through the players' own entry point on that bundle (`Sim::create`,
+  replay.rs:119-123); the manifest pins the frozen bundle's digest (recordings/manifest.txt:1, first-loop.content.json
+  b9901bc9...). ADR 0004 part 9 (:350-351): a recorded match is "the seed, the map and mode data, the content data's
+  hash and the per-tick inputs". In live play the join's hash is zeros on both sides until change-set 8 (CD-8)
+  (local_match.rs:20-22, :66-67; room/src/lib.rs:149); the bundle crosses once, into `Sim::create` (sim-wasm/src/
+  lib.rs:96-99, :116).
+- N51. The build half of "the same bundle gives the same constants": `StaticWorld::build` ranks shapes by id, so two
+  documents with the same shapes give the same world byte for byte (collision.rs:13-14, :212-254); its trees and rays
+  are committed and compared natively, in Node and in the browsers (devtools/tests/static_world.rs:1-5, PM-0004-32).
+  `Rules::take` and the spawns' facings have no such file yet: block 11.7's tests 2 to 4 (:930-933) pin them.
+- N52. Which movement document a match takes: none today (sim-wasm reads the map only, lib.rs:83-86, :116-117). The
+  repository's content and the frozen first-loop bundle hold `movement/soldier.json` (content_files.rs:363-366; grep of
+  first-loop.content.json's paths); the test bundle holds `movement/test-soldier.json` (bundle.rs:260-265), with
+  "test-soldier" in 49 lines of 7 files. bundle.rs:307: "which files a match needs is the match's to say, not the
+  loader's"; the map is named by `LOCAL_MAP` (sim-wasm/src/lib.rs:23-25). No block names the movement's id.
+- N53. Who uses the spawns, and when: no block says when the one player's soldier is made or at which spawn
+  (grep of the four reads for "spawn(", "join", "spawn 0": only `Soldiers::spawn`, rust-reviewer-read.md:74).
+  11.6 has `World::new` take the constants (:904); netcode-architect's routes start "from the spawn" (singular,
+  netcode-architect-read.md:351-362). The test scene's eight spawns in file order begin with `street_1` at
+  (-20, 0, -0.9), which is also the lowest id (content/maps/test-scene.json). ADR 0004 part 17 (:489, :501-503) makes
+  spawning a sim phase (barracks, respawn), which is change-set 5's and the loop's, not 4c's.
+- N54. The batch already gives room and client-endpoint `content` as a dev-dependency for their tests (deps-4c-v2.diff
+  :59-82), reviewed with five digests (dependency-check.md:30-34); their comments say "the room's code ... never names
+  `content` (devtools' tests/layering.rs holds that)". The room's unit tests live in src/lib.rs (:304-669), so a
+  layering rule over every token of src/ would fail on them; rules_scan.rs already marks test-only tokens
+  (:695-718: a `#![cfg(test)]` file, or the item after `#[cfg(test)]`).
+- N55. Every caller that builds or steps a `World` or a `Room` (grep over crates/): `World::new` at room/src/lib.rs:108,
+  sim/tests/state_hash_alloc.rs:70, devtools/tests/hash_cost.rs:40, world.rs tests (:241); `authority_step` at
+  room/src/lib.rs:282, state_hash_alloc.rs:94, hash_cost.rs:46, 23 lines of world.rs; `Room::new` at local_match.rs:66,
+  room/src/lib.rs:314, :655, room/tests/any_bytes.rs:117; `LocalMatch::new` at sim-wasm/src/lib.rs:122,
+  local_match.rs:213, :399, :413, sim-wasm/tests/step_alloc.rs:86. `Endpoint::new` (endpoint.rs:117) is not touched by
+  step 1 (11.6 changes only :258); step 2 gives it its own static world (netcode-architect-read.md:99-101).
+- N56. netcode-architect's restore test reads `read_shared(bytes, constants) -> World`, "the match constants (rules,
+  static world, spawns) and the seed come from the same build and setup, never from the bytes"
+  (netcode-architect-read.md:675-677). With the constants outside `World`, the reader takes the setup only.
+- N57. `make_recordings --freeze <name>` is "the one writer of a recording's frozen content" (devtools/src/bin/
+  make_recordings.rs:4-6). 11.8 (rust-reviewer-read.md:955-958) says first-loop is re-made "through its script"; the
+  sheet (:341) and netcode-architect-read.md:434 say first-loop is frozen anew whenever the movement kind gains a
+  field. Today's frozen soldier.json has the 15 fields; step 1's has 28 (11.4), so the re-freeze is part of 11.8.
+- N58. clippy runs at `all = warn` (Cargo.toml `[workspace.lints.clippy]`), whose `too_many_arguments` fires above 7
+  (clippy's default); today's `LocalMatch::new` has 5 (local_match.rs:58-64).
+
+## Block 7. WORLD-ROOM, one written answer: the match's constants, the state, and their tests (the advisor agent's F1) (DONE)
+Against cs/4c-soldier at 695b45b9 (main's Rust, dae6d107). Counts are my estimates of written new lines, code / tests,
+plus or minus 30 %. Part A is the ruling rust-reviewer confirms or refuses; Part B holds what it surfaced, each with
+its owner, so a disagreement there cannot hold step 1's code on Part A.
+
+### Part A. The ruling (the default: my block 4 and the sheet's E, :313-319), for rust-reviewer's yes or no
+- **A1. `World` is the state and nothing else.** The match's `Rules`, its `StaticWorld` and its spawn points are
+  constants of the match: built once from the content when the match starts, never changed, never copied with the
+  state, restored or hashed. They live in the `Room`, which owns the `World` beside them (room/src/lib.rs:87-88), and
+  are lent to the `World` per call. Not in `World`: ADR 0004 part 9 hashes "a canonical serialization of its whole
+  state" (:342-344; netcode-architect's "whatever the World keeps is hashed", its read :83-84), and part 3 copies the
+  state for re-simulation (:161-165), so a constant inside would either be hashed with content the digest already names
+  or ride every copy unhashed beside the state (N47). Not in `LocalMatch`: the room is also the native server's match
+  (block 4).
+- **A2. Read against ADR 0004 part 1** ("the static colliders with their ids" among the state's tables, :135): the
+  immutable static world is no state (parts 3 and 10, :163-165, :365-367; collision.rs:1-3); a collider's changing
+  state (a destructible's, none before then) will be a table in the state. Part 1's "nothing lives outside the struct"
+  bans Rust `static`s (PM-0004-17, :1138, two_instances.rs), which the room's owned values are not (N46).
+- **A3. Per call, never kept:** the room owns both the `World` and the constants, so a reference kept inside `World`
+  would point into its own owner (self-referential: not expressible in safe Rust without a lifetime on `World` that
+  the room could not satisfy). `World` stays without a lifetime parameter, and the borrow ends with each call. Room's
+  `step` lends disjoint fields of itself (`&self.rules`, `&self.statics`, `&mut self.world`), which compiles as is.
+- **A4. Who builds them, once per match:** the constructor that loads the content, `Sim::create`
+  (sim-wasm/src/lib.rs:105-126, today's `local_world` :83-86), through sim's own builders:
+  `StaticWorld::build(&MapDocument)` (collision.rs:212, exists), `Rules::take(&Movement)` (11.4) and
+  `spawn_points(&MapDocument)` (B3 below). On the server later, the native match start does the same. The room and the
+  client endpoint receive sim types only, so no `[dependencies]` line changes (block 4; N54).
+- **A5. The plain form is the default:** three fields of `Room` and three arguments, as the sheet has it. Considered and
+  not taken: one `MatchConstants { rules, statics, spawns }` value (Room::new 3 arguments, LocalMatch::new 5, about +15
+  code); it is a symbol beyond the sheet, so it comes only as a plan delta if rust-reviewer asks for it.
+
+### Part B. What the ruling surfaced, each ruled or given a default with its owner
+- **B1. The record is a `PlayerRecord`, not a `PlayerCommand` (ruled: item 1's "nothing else"; N48).** A
+  `player: PlayerCommand` field would keep the newest command's move and aim in `World` unhashed once `PlayerCommand`
+  gains them. `PlayerRecord { buttons: u16, presses: [u8; BUTTONS] }` with `NONE` (netcode-architect's name, its read
+  :78); the fold copies the newest command's buttons and presses into it (today's world.rs:150-152). Its readers move
+  with it: room/src/lib.rs:286-296, :461, :496; sim-wasm local_match.rs:267-268, :336, :370. About +12 code / 0 tests
+  (this block's T-A covers it). Owner of the confirmation: rust-reviewer and netcode-architect (record (i)).
+- **B2. The query counts leave `World` too (ruled: item 1; N49).** `QueryCounts` is a run's tally, not state: the room
+  holds `query_counts: QueryCounts` beside `counters` (room/src/lib.rs:99) and lends it `&mut` to the step; read
+  through `Room::query_counts()`. A restored or copied `World` (change-set 7) then carries no tally to double or reset.
+  Supersedes block 2's "in the scratch the step already owns ... a `#[doc(hidden)]` accessor on the world"
+  (rust-reviewer-read.md:381-385). The step's other scratch (the push sums, 11.1 item 3) is a local array inside the
+  step, no field. About +6 code.
+- **B3. The spawn points' type (a gap in 11.6, which names `spawns` with no type).** `SpawnPoint { at: V3, facing:
+  [f32; 2] }` in soldiers.rs, and `spawn_points(map: &MapDocument) -> Vec<SpawnPoint>` (at most 16, map.rs:27; built
+  once, so the `Vec` is no step allocation): ranked by id, as the shapes are (collision.rs:13-14), so the table does
+  not depend on the file's list order; `at` narrowed by the corners' own rule (collision.rs:101-108's `narrow`, made
+  `pub(crate)`: no minus zero); `facing` by `fmath::facing_of` (11.5; the scan's allowance stays (facing_of, sincos)).
+  About +20 code.
+- **B4. When the one soldier is made, and at which spawn (default given; owners netcode-architect for the when,
+  rust-reviewer for `Soldiers::spawn`; game-designer to say it is no rule of his; N53).**
+  - (a) default: `World::new` makes slot 0's soldier at the table's first point (the lowest id: `street_1`,
+    (-20, 0, -0.9), facing 90, on the test scene; the same point the file lists first), stamina full from `Rules`,
+    `aim_cm` NONE; an empty table (a map built in code only: map.rs:29, :341-349) makes none. A stand-in until LOOP_V2
+    section 2's barracks and ADR 0004 part 17's spawning phase (:489, :501-503), which are change-set 5's and the loop's.
+  - (b): the soldier is made inside the step at the tick the join is taken (spawning as a phase, part 17); the step then
+    borrows the spawns too and takes a join signal that netcode-architect defines. More code now (about +25), and
+    nothing in 4c needs a soldier absent before the join.
+- **B5. Which movement document the match takes (it blocks step 1's code whatever Part A says; N52).** Constraints:
+  works on the test bundle (`test-soldier`), the frozen first-loop bundle and the repository's (`soldier`); no change
+  to the recording's header or format; no batch file touched.
+  - (a) `LOCAL_SOLDIER = "soldier"` beside `LOCAL_MAP` (sim-wasm/src/lib.rs:23-25), `CreateError::SoldierMissing`:
+    the test bundle fails it, so content's movement `TEST_TEXT` and the test bundle take the id `soldier` and the lines
+    that name "test-soldier" with it (up to 49 lines in 7 files, packages/types/src/index.test.ts among them). About
+    +8 code, up to 49 lines edited.
+  - (c) **default:** the local match plays the bundle's one movement document, refusing a bundle with none or with
+    several (`CreateError::Soldier { found }`, its message in plain words); all three bundles hold exactly one today
+    (bundle.rs:260-265; content_files.rs:363-366; first-loop.content.json's paths), and so does every other bundle
+    written in code that reaches `Sim::create` or `Replay::new` (grep of `bundle::write(`: sim-wasm/src/lib.rs:357, :388,
+    :419 and devtools replay.rs:367, :394, one movement each, each refused before the movement check by the content,
+    the map or the digest; content_files.rs:110 writes the repository's content); and bundle.rs:307 already says
+    "which files a match needs is the match's to say". A mode that names its soldier comes with the change-set that
+    brings a second movement document, as `LOCAL_MAP`'s doc says of maps (:23-24). About +10 code / +10 tests.
+  - Not (b) `LOCAL_SOLDIER = "test-soldier"` (the repository's and frozen bundles fail), nor (d) an id in the
+    recording's header (a format change).
+  - Owner: rust-reviewer confirms in its table (it lands in sim-wasm's constructor, the boundary I hold).
+
+### Item 1. What `World` holds after step 1
+`World { tick: u32, player: PlayerRecord, soldiers: Soldiers, seed: [u8; SEED_BYTES] }`, and nothing else.
+- **Shared, hashed by both hashes:** the tick, the record (buttons and presses), the 48 rows in slot order
+  (`visit_shared`, 2,902 bytes: 11.2).
+- **The authority's part:** the seed (world.rs:116, :173), hashed by `state_hash` only, never by `shared_hash`
+  (world.rs:208-224). The brief's "the soldier table, the record, the tick, and nothing else" is the shared part; the
+  seed stays where it is (not a constant of the content: the setup's, and the random streams' positions join it).
+- **Not in `World`:** `Rules`, `StaticWorld`, the spawn points (Part A), the query counts (B2), the newest command's
+  move and aim (B1; they live in the row as `held_move` and `aim_cm`, 11.2).
+
+### Item 2. Where the three live, their types, who builds them
+| Constant | Type | Held by | Built by, once per match |
+|---|---|---|---|
+| rules | `sim::rules::Rules` (11.4) | `Room.rules` | `Rules::take(movement)` in `Sim::create`, movement per B5 |
+| statics | `sim::collision::StaticWorld` (collision.rs:94-99, `Clone`) | `Room.statics`; from step 2 the endpoint's own copy, `statics.clone()` made in `LocalMatch::new` (block 4; netcode-architect-read.md:99-101) | `StaticWorld::build(map)` in `Sim::create`, map `LOCAL_MAP` |
+| spawns | `Vec<sim::soldiers::SpawnPoint>` (B3) | `Room.spawns` | `spawn_points(map)` in `Sim::create` |
+- `LocalMatch` holds none of them: its `world` field and `static_world()` go (local_match.rs:48-50, :96-100), as 11.6 has.
+- The client endpoint holds none in step 1 (endpoint.rs:90-110 unchanged; 11.6's :258 only); its copy of the static
+  world is step 2's, its `Rules` copy change-set 7's prediction.
+
+### Item 3. The signatures
+- `World::new(setup: &MatchSetup, rules: &Rules, spawns: &[SpawnPoint]) -> World` (no longer `const`; borrows both for
+  the call; B4 (a)). Under B4 (b): `World::new(setup: &MatchSetup) -> World`, as today.
+- `World::authority_step(&mut self, rules: &Rules, statics: &StaticWorld, counts: &mut QueryCounts,
+  commands: &[PlayerCommand])`: every borrow lasts the call only (A3). Under B4 (b) it also takes
+  `spawns: &[SpawnPoint]` and the join signal; under either, the spawns are never kept.
+- `Room::new(setup: &MatchSetup, content_hash: [u8; 32], rules: Rules, statics: StaticWorld, spawns: Vec<SpawnPoint>)
+  -> Room`: owns them; total, as today (block 6.2: no refusal of a world with no aim box). Added: `Room::statics(&self)
+  -> &StaticWorld` (replaces `LocalMatch::static_world`, one test reader) and `Room::query_counts(&self) ->
+  &QueryCounts`. No accessor for `rules` or `spawns` (no reader).
+- `LocalMatch::new(setup, first_sequence, pad_bytes, link, rules: Rules, statics: StaticWorld, spawns:
+  Vec<SpawnPoint>) -> Option<Self>`: 7 arguments, at clippy's limit and not over it (N58); step 2 adds none (the
+  endpoint's copy is cloned inside).
+- `Sim::create(seed, mode, pad_bytes, bundle)` and the bindings' `Sim::new` (sim-wasm/src/lib.rs:105-110, :145): no
+  signature change (WB-HEALTH, :5-7). The body: load, the map (`MapMissing`), the movement (B5), `StaticWorld::build`
+  (`World`), `Rules::take` (new `CreateError::Rules(RulesError)`), `spawn_points`, `LocalMatch::new` (`PadBytes`), in
+  that order. `local_world` becomes `local_constants(set) -> Result<(Rules, StaticWorld, Vec<SpawnPoint>),
+  CreateError>`.
+- `Endpoint::new(content_hash, first_sequence, pad_bytes)` (endpoint.rs:117): unchanged in step 1.
+
+### Item 4. What the hash sees, what the digest names, and the replay
+- **The hash sees none of the three** and cannot: `visit` and `visit_shared` are methods of `World` with no argument
+  that reaches the room, and `World` holds no constant (item 1). The state still holds values a constant set at spawn
+  (the spawn's `at` and `facing`, a full stamina): those are state, hashed as the row.
+- **What the digest names:** the content's bytes, and through them the content. The loader takes a bundle only byte for
+  byte in canonical form (bundle.rs:3-11, :88-108), so one content set has one byte string and one sha256 (N50).
+- **Where 4c checks it:** a recording's header (its content hash) and the recordings' manifest (manifest.txt:1). The
+  replay refuses any bundle whose sha256 is not the header's, before the match is made (replay.rs:37-54), then makes the
+  match through `Sim::create` on that bundle (replay.rs:119-123), which builds the three anew; nothing of them is read
+  from the `.rec` or `.hashes` files. ADR 0004 part 9's recorded match is exactly "the seed, the map and mode data, the
+  content data's hash and the per-tick inputs" (:350-351). **Not checked in 4c:** the live join, whose content hash is
+  zeros on both sides until change-set 8 (local_match.rs:20-22, :66-67; room/src/lib.rs:149); in local play one bundle
+  crosses once, into `Sim::create` (sim-wasm/src/lib.rs:96-99), so the room and step 2's endpoint copy come from it.
+- **What the digest does not name: the code that derives the constants.** Held by: the static world's committed trees
+  and rays, natively, in Node and in the browsers (static_world.rs:1-5, PM-0004-32); 11.7's tests 2 to 4 (`Rules::take`
+  field by field and the shares within 1 ulp, `facing_of` by bits, the exp and sincos vectors on every target); and the
+  recordings, which move at the first tick a changed derivation acts. A rule that no recording exercises is held by
+  tests 2 to 4 alone.
+- **The re-freeze:** first-loop's frozen bundle holds today's 15-field soldier.json (N57). 11.8 must name
+  `make_recordings --freeze first-loop` after content's 13 new values land, then the plain run, in the same commit, so
+  the header's hash names the new bundle and the replay can build `Rules` from it.
+
+### Item 5. Changes to rust-reviewer's block 11.6, by number, for block 14 to confirm
+1. world.rs, `World`: gains `soldiers` only. Strike "and the match's constants (`rules`, `statics`, `spawns`), which
+   are not state" (rust-reviewer-read.md:904).
+2. world.rs, ADD `PlayerRecord { buttons, presses }` and `PlayerRecord::NONE`; `World.player: PlayerRecord`;
+   `World::player() -> &PlayerRecord` (B1).
+3. world.rs, CHANGE `World::new(setup, rules, spawns)` (B4 (a)).
+4. world.rs, CHANGE `authority_step(&mut self, rules, statics, counts, commands)` (item 3).
+5. soldiers.rs, ADD `SpawnPoint` and `spawn_points` (B3).
+6. collision.rs, CHANGE `narrow` (:103) to `pub(crate)` (B3).
+7. body.rs, `QueryCounts` stays; REMOVE block 2's accessor on the world (B2).
+8. lib.rs, the re-exports gain `PlayerRecord` and `SpawnPoint` (beside :26-28).
+9. room/src/lib.rs: `Room` gains `rules`, `statics`, `spawns`, `query_counts`; `Room::new` per item 3; ADD `statics()`
+   and `query_counts()`; :282 lends the four; :286-296 reads the `PlayerRecord`; its tests build the three once from
+   the test bundle (the batch's dev-dependency) and clone them per room; room/tests/any_bytes.rs:117 the same, once per
+   run, cloned per case.
+10. sim-wasm/src/lib.rs: `local_world` becomes `local_constants`; `CreateError` gains `Rules(RulesError)` and B5's
+    variant; the test :401-410 reads `local().room().statics()`.
+11. sim-wasm/src/local_match.rs: `LocalMatch::new` per item 3; `world` and `static_world()` removed (as 11.6); its tests
+    (:203-215) build the three.
+12. sim-wasm/tests/step_alloc.rs:81-86, sim/tests/state_hash_alloc.rs:70-94, devtools/tests/hash_cost.rs:40-46: build
+    the three and pass them.
+13. client-endpoint: nothing beyond :258 in step 1.
+14. content: nothing for B5 (c); under (a), `TEST_TEXT`'s id and its lines.
+15. devtools/tests/layering.rs (the batch's F2): its "no file under src/ names `content`" reads non-test tokens only
+    (rules_scan.rs:695-718's test-only marking, reused), since room's unit tests in src/lib.rs (:304-669) build the
+    constants from content through the batch's dev-dependency; the same line inside `#[cfg(test)] mod tests` is its
+    control (passes), outside it its plant (red). Supersedes my block 4's wording (:550-554).
+16. 11.7 gains rows T-A to T-F below; 11.9 about +40 code / +130 tests for B1 to B3, B5 (c) and the tests (rust-reviewer
+    recounts).
+17. Lines outside 11.6 that restate the old placement, superseded: rust-reviewer-read 1.6 (:244-246, :251-254: "into the
+    room's `World`"), its block 2 (:381-385), netcode-architect-read :675-677 (`read_shared(bytes, constants)` becomes
+    `read_shared(bytes, setup)`).
+
+### Item 6. The tests that hold the placement, each with a plant written against the code as built
+| # | Test | Plant (red, deterministically) |
+|---|---|---|
+| T-A | **The state rule** (sim/tests/rules_scan.rs, its tokenizer): in world.rs, every field of `struct World` is bound by name in exactly one of `visit` and `visit_shared`, and `visit_shared`'s pattern holds no `_` but `seed: _` (nested patterns included). It is the one test that sees a non-state field parked in `World`, which every hash, names, restore and two-builds test passes | (1) `counts: QueryCounts` added to `World`, written `counts: _` in both patterns (the defect F1 is about); (2) `player: PlayerCommand` with `move_x: _, move_y: _, aim: _` in `visit_shared`; (3) a field bound in both visitors. Control: the built `World` passes |
+| T-B | **One bundle, two builds** (sim/tests, at the `World` level, where step 1's `PlayerCommand` carries the move whatever the wire does before step 2): two worlds, each from its own `content::load` and its own three builds of the test bundle, the same 300 scripted commands (move, the sprint button, jump presses, onto the 0.55 m box of map.rs:412): per-tick shared and whole hashes equal; the two `tree_bytes()` equal, the two `Rules` equal, the two spawn tables equal | a `static` counter in `spawn_points` that moves each later build's `at` x by 1 mm per build made before it (PM-0004-17's bite; it bites on the test map's one spawn): the second world's soldier starts 1 mm off, the hashes differ at tick 0 |
+| T-C | **A rule's value changes, the bundle is the same** (world.rs's test module, since the mode's constructor is `#[cfg(test)]`): the test bundle, `Rules` under both HEADROOM-FEET modes (11.4 as block 13 has it), T-B's 300 commands on the test bundle's one-box map (map.rs:412: one 0.55 m box on the floor, no floating shape, so by block 13's own criterion, B13-3, the modes cannot differ there; my reading, not run): equal hashes at every tick | the mode written into the row at spawn (a `flags` bit set from `Rules`): the hashes differ at tick 0 |
+| T-D | **The bundle decides** (devtools replay.rs tests, through `Sim::create`): a short recording made on bundle X replays to its hashes; the same inputs on bundle Y (X with `jump_reach_m` changed, a rule a button reaches: until step 2 the replay refuses any move, replay.rs:81-84, and `Sim::input` takes six numbers, sim-wasm/src/lib.rs:166) with the header naming Y's digest equal X's hashes until the first jump's tick and differ from it on | `Sim::create` taking its movement from content's built-in `TEST_TEXT` instead of the bundle: Y replays equal to X |
+| T-E | **Built once:** sim-wasm/tests/step_alloc.rs (the counting allocator around `LocalMatch::step`, the whole exchange the room's step included, step_alloc.rs:1-4) gains a plant; 11.7's test 24 wraps `authority_step` below the room and would not see it | `self.statics.clone()` in `Room::step` every tick (the room holds no `MapDocument` to build from): allocations counted every tick |
+| T-F | **The state alone restores:** netcode-architect's restore test (11.7 test 22) with `read_shared(bytes, setup) -> World`, the step lent the same three | its plants as written (P1 to P3); the reader takes no constant, so B is made from the bytes and the setup alone (T-A is the structural guard) |
+| T-G | layering.rs's control (item 5, point 15) | `use content::map::MapDocument;` in a copy of room's non-test source |
+About 0 code / 130 tests (T-A 40, T-B 35, T-C 20, T-D 30, T-E 5); T-F and T-G are counted in their rows already.
+
+### Q4 (advisor-steps1to7.md:136-158): does this answer touch its conditions?
+- **Condition 2 (the batch lands whole):** the five batch files stay byte for byte (no manifest line changes: the
+  dev-dependencies are the batch's own, deps-4c-v2.diff:59-82). One rewording: layering.rs's non-test reading
+  (item 5, point 15) is F2's test, so security-auditor sees it when it reads the batch's commit (F9). The first callers
+  of exp and sincos are `Rules::take` and `spawn_points`, both in sim; the allowances stay in fmath.rs.
+- **Condition 3 (the record rule and NONE land whole in step 1):** B1's `PlayerRecord` is part of the record rule, so
+  it lands in step 1 too.
+- **Condition 4 (every commit that changes the hashed state re-makes the pins):** holds, and reaches one more case: the
+  known answers (world.rs:401-415) now depend on the constants (the spawn row: the test bundle's spawn `a` at
+  (0, 0, -5) facing 90, map.rs:412; its stamina from movement `TEST_TEXT`, movement.rs:107, which gains 13 fields in
+  step 1). world.rs's tests build on `content::bundle::test_bundle()` (sim depends on content), so a change to the test
+  bundle or to a derivation moves them, and that commit re-makes them by the second implementation.
+- **Conditions 1, 5, 6, 7, 8, 9:** not touched.
+
+### Not verified (block 7)
+- Read only: nothing built or run. "Compiles as is" (A3, disjoint field borrows) and "7 arguments pass clippy" (N58)
+  are from the language's and clippy's documented rules, not from a build.
+- T-A's scan is design: whether the tokenizer's patterns read nested `_` bindings as planned is unbuilt.
+- The 49 "test-soldier" lines (B5 (a)) are a grep count; which of them must change was not judged line by line.
+- B4 and B5 are defaults for their owners; game-designer has not said B4 (a) is no rule of his.
+- Whether step 1's room carries the wire's move into `PlayerCommand` (11.1 item 1 says the fold takes each command's
+  move; netcode-architect's read lists the room's move check under step 2): not settled here, so T-B drives the
+  `World` and T-D uses a jump, which reach the step without it.
+- The TypeScript tests and e2e specs that create a `Sim` were not grepped for their bundles; they load the built
+  content.json of `content/`, which holds one movement (content_files.rs:363-366), as far as read.
+- B7 DONE.
 
 DONE
