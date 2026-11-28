@@ -51,6 +51,19 @@ formats and versions refused (content.ts:210-238), each refusal a fixed sentence
 production scan failing on either marker; the docs after the code head carry no secret, key, board address or
 personal detail beyond his own messages copied whole.
 
+## art-director (narrow brief): APPROVE
+| Id | Severity | Finding | Disposition |
+|---|---|---|---|
+| AD-1 | Medium (the checklist, not the code) | The sheet's section G, step S's step 2, promises what does not show: no ridge line is visible (the far roof slope faces away from the camera); the 0.55 m and 0.56 m steps share a grey; blocks less than about 0.2 m apart (the steps, the three ledges) look the same. | **Fix:** his checklist (the zip's README and the report) takes art-director's rewritten steps 1, 2, 3 and 6 (`review-s-art-director.md`), about 6 minutes |
+| AD-4 | Medium | The readout panel is see-through near-black and its bottom edge sits at 213 px in every window size tried; in a window under about 600 px tall it lies over the houses and the yard's back row and darkens them, so brightness no longer shows height (`.gate/art-director-s-1280x480.png`). Workaround: a maximised window (now in step 1). | **Deferred** (STATUS follow-up): the overview camera is the scene's alone and leaves at step 4, where the follow camera at his Export's framing replaces it; step 4's design places the readout against the soldier's view. The workaround goes into his step 1 |
+| AD-2 | Low | The street shows, but faintly (13 levels apart: street 67, grass 80); within STREET-GREY (b) the setting is `PATCH_GREYS` (`scene.ts:22`). | His Brave check decides (he looks at STREET-GREY there); no change now |
+| AD-3 | Low | Brightness tells height on tops only: a tall block's front wall (101 to 106) is as dark as the lowest step's top (109). | His step 2 says so (AD-1's rewrite); no change |
+Measured by it (WebGL 2 fallback on the container's software renderer; Brave is final): four brightness bands from the
+overview (steps 109, platforms 119 to 131, ledges about 166, roofs 192 to 200); every top lighter than its sides; the
+street 67 against the grass 80, both darker than every block; the readout's two new rows read cleanly, their counts
+the map's. `?backend=webgl` reads "asked for by ?backend=webgl" (checked). Not checked: WebGPU, a real GPU, Firefox.
+Pictures: `.gate/art-director-s-*.png`; its build `.gate/dist-art-director-s`.
+
 Checked correct by engine-architect: the boundary as designed; `readMap` member for member against map.rs; `LOCAL_MAP` without
 recording.ts; the production page's `inventory(){return null}` and no development marker; 4B-TYPES-READER,
 4B-MEMBER-KINDS and 4B-BOOT-CALLS met; nothing per frame; nothing no VISION §6 item needs. Not run: a browser.

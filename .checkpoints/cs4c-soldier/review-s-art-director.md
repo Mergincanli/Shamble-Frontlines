@@ -46,14 +46,18 @@ and the Brave checklist (reread-sheet.md section G, step S). No judgement agains
 
 The greybox reads for what step S must show: four height bands told apart from the overview, sides darker than tops on
 every block, the street in its own grey under STREET-GREY (b), the two new rows readable. Nothing in the code needs a
-change for this brief. One finding is on his checklist's wording (fix it before he gets the checklist), the rest are Low.
+change for this brief. Two Mediums: his checklist's wording (AD-1, fix it before he gets the checklist) and the panel over
+the scene on a short window (AD-4, a checklist line now); the rest are Low. Neither blocks the head.
+
+Every picture cited below is the WebGL 2 fallback on the container's software renderer (SwiftShader), not WebGPU and not a
+real GPU; Brave is final.
 
 | Id | Severity | Finding | Where | Suggested fix |
 |---|---|---|---|---|
 | AD-1 | Medium | His checklist step 2 expects what the scene does not show: "the roofs' ridges lightest" (no ridge line is visible: the far roof slope faces away from the camera, N4); "the 0.55 m step the darkest block" (the 0.56 m step has the same grey, 109 = 109); "each block's grey lighter the higher its top" (true only between bands: the three ledges within 4 levels, the two steps equal). He would mark a correct scene as wrong, or confirm what he cannot see. | `reread-sheet.md` section G, step S, item 2; pictures `.gate/art-director-s-yard.png`, `.gate/art-director-s-houses.png` | Use step 2 of the checklist below in the report's "For Mustafa" (and the sheet). No code change. |
 | AD-2 | Low | The street shows, but faintly: 13 levels of 255 between street (67) and grass (80) on the software renderer; it meets (b) as he worded it. Whether it is strong enough is his eye's call in Brave; the lever, if he asks, is `PATCH_GREYS` (`scene.ts:22`), still inside (b), and by his 6d it goes into the soldier's pull request. | `scene.ts:21-22`; `.gate/art-director-s-head.png` (the band from the houses to the middle; the yard's lane, bottom right) | Say in step 3 where the two bands are and that the step is small. No code change now. |
 | AD-3 | Low | Brightness gives height on tops only: a tall block's front wall (101 to 106) is as dark as the lowest step's top (109). Inherent to a lit greybox; it could make him read a wall as a low block. | `scene.ts:64-66` (the sun and hemisphere light); `.gate/art-director-s-yard.png` (ledge fronts against the step tops) | Say it in step 2. Nothing to build: a look matter for LOOK_V2's change-set. |
-| AD-4 | Low | On a wide or short window the readout panel covers the map's far edge (1280 x 540: the far grass strip under the panel; no block hidden); at 800 wide the panel's backend line runs off the right edge. | `.gate/art-director-s-1280x540.png`, `.gate/art-director-s-800x900.png` | Follow-up (STATUS), not this step: the overview could fit the map below the panel. Mention it in step 1 so it does not surprise him. |
+| AD-4 | Medium | On a short window the readout panel (translucent near-black, bottom at 213 css px whatever the height) lies over the map and darkens what is under it, which falsifies the brightness-for-height read: at 1280 x 720 nothing is covered; at 1280 x 540 the roofs sit exactly at the panel's edge; at 1280 x 480 the roofs, the two steps and the ledge tops are under it and the roofs read dark. At 800 wide the backend line runs off the right edge. Workaround: a window at least about 600 px tall (maximised on his screen is fine). | `.gate/art-director-s-1280x540.png`, `.gate/art-director-s-1280x480.png`, `.gate/art-director-s-800x900.png` | Now: step 1 of the checklist below says it. Later, the main session's choice (fix pass or STATUS follow-up; after Sunday's freeze, by his 6d, into the soldier's pull request): fit the overview to the part of the window below the panel. |
 
 Not verified: anything on WebGPU or a real GPU (every picture here is the WebGL 2 fallback on SwiftShader); the
 greys on his screen; Firefox. Brave is final.
@@ -62,9 +66,9 @@ greys on his screen; Firefox. Brave is final.
 1. Open the page as the zip's README says (`node serve.mjs` in its folder, then the address it prints), in a normal
    Brave window. **Expected:** the whole map in one view from above at an angle (the street corner on the left, the
    training yard on the right); the readout's first line names the backend ("backend: WebGPU (...)" on most Windows
-   machines; "WebGL 2 fallback, because ..." is also fine, just tell me which); "errors: 0". If your window is short,
-   the black panel may cover the far edge of the ground; nothing else.
-2. Look at the blocks. **Expected:** two houses on the left, each a bright slab (the near side of its roof) over a
+   machines; "WebGL 2 fallback, because ..." is also fine, just tell me which); "errors: 0". Keep the window maximised (at least about
+   600 px tall): on a shorter window the black panel lies over the houses and the yard's back row and darkens them.
+2. Look at the blocks. **Expected:** two houses on the left with the narrow alley between them, each a bright slab (the near side of its roof) over a
    darker front wall, with the slanted end of the gable on its right; the ridge itself does not show from this angle.
    A low cover wall on the grass just past the street, below them. In the yard: two small dark squares (the 0.55 m and 0.56 m steps, the
    same grey), three ledges just in front of them (the same light grey), a thin wall like a line, two platforms
@@ -82,4 +86,19 @@ greys on his screen; Firefox. Brave is final.
    the render counts.
 6. Open the same page once in Firefox. **Expected:** the same scene, greys and rows, "errors: 0"; tell me its backend
    line. If Brave and Firefox both say WebGPU, open the page once more in Brave with `?backend=webgl` added to the
-   address and check the greys look the same (the pictures here could only show WebGL 2).
+   address (the first line then reads "backend: WebGL 2 fallback, asked for by ?backend=webgl ...", checked here) and
+   check the greys look the same (the pictures here could only show WebGL 2).
+
+Changes to his checklist against the sheet's section G: steps 1, 2, 3 and 6 reworded (step 1: keep the window maximised;
+step 2: what shows and what does not, the alley kept; step 3: where the two street strips are; step 6: the backend line
+and the optional `?backend=webgl` load); about 6 minutes instead of 5.
+
+## Calibration notes (no art-director memory folder exists in this repository; kept here for the main session)
+- The software render (SwiftShader, WebGL 2 fallback) of this scene is pixel-stable across runs: two runs 12 hours apart
+  gave an identical scene area at 1280 x 720, pixel ratio 2.
+- Pixel ratio 1 and 2 give the same street/grass step (about 13 levels); the 1 m grid does not drown it at 800 to 1920 wide.
+- The readout panel's bottom sits at 213 css px at every window size; below about 600 px of window height it covers
+  blocks of the test scene.
+- Lit greys come out 2 to 4 levels bluer than authored (the hemisphere light's sky 0xdfe8f0); below what an eye sees.
+
+DONE
