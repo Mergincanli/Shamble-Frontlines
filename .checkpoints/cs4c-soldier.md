@@ -10,7 +10,7 @@
   `/home/user/Shamble-Frontlines` is never switched.
 - **Base:** origin/main dae6d107fdbe942567104bcf1c9a2cbc6b3a1e0f (pull request #79's merge commit), taken in by
   fast-forward from b7145273.
-- **Last update:** 2026-11-28 02:44 Amsterdam (from the clock; an earlier save said 01:08, a time written without
+- **Last update:** 2026-11-28 02:48 Amsterdam (from the clock; an earlier save said 01:08, a time written without
   reading the clock: it was 00:57; an edit at 02:04 wrote "02:06", also unread, corrected here)
 
 ## Steps done
@@ -140,9 +140,9 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
 ## Key numbers
 - Step S as built: 1,288 written lines (bc7720f3 1,277, c1de41e5 11; `count-4c.mjs` at 3ab59bd7 against dae6d107),
   about 1.74 times its recount of 740.
-- Steps 1 to 7 recounted (the sheet's F2, revision 3.1 with the blocks of 02:25 to 02:33 Amsterdam): about 8,190 to
-  8,290 by the designs' count (the plan 7,315); by the plan's rule (2.25 times) a stop line of about 18,420 to 18,640;
-  each SIZE-4C option's line, two thirds and rung are in F2.
+- Steps 1 to 7 recounted (the sheet's F2, revision 3.2 with every block of tonight): about 8,295 to 8,395 by the
+  designs' count (the plan 7,315); by the plan's rule (2.25 times) a stop line of about 18,660 to 18,890; each
+  SIZE-4C option's line, two thirds and rung are in F2.
 - Measured written lines against the designs' count: 4a 2.4 times, 4b-1 2.17, 4b-2 2.7.
 - 4c by the designs' count: 7,315 (steps 1 to 7, the plan's section 6) and about 630 for the scene with the map's
   reading (230 / 260 by 4b's sheet, and 60 to 80 more with as many in tests) = about 7,950. At the measured rates:
