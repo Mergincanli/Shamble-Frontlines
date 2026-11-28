@@ -19,6 +19,25 @@ The plan's C1 bar: build 2 at Y must equal Y's committed list byte for byte. It 
 - The two worktree paths have the same length (stopb-a, stopb-b): the difference is in a value derived from the paths,
   not their length.
 
+## ROOT CAUSE, 02:1x UTC on 11-28 (proven)
+- The deciding build at Y0 (worktree .gate/stopb-c, a third path, fresh CARGO_HOME, build3-y0.log, 02:05-02:06): Wasm
+  2a97394b, equal to build 1. So Y0 gives 2a97394b on two paths and Y gives a94698198f73 on two paths: the Wasm depends
+  on the commit, not the path, and the build is otherwise deterministic.
+- The two Wasms differ in 9 bytes, all in the `producers` custom section (124 bytes each; every code, data, name and
+  target_features section equal): "processed-by ... wasm-bindgen 0.2.130 (87cb8677d)" at Y0, "(652e9513c)" at Y.
+- Why: wasm-bindgen-shared 0.2.130's build.rs (registry source, :10-21) runs `git rev-parse HEAD` in its own source
+  folder and, if it prints 9 or more characters, sets WBG_VERSION; lib.rs:407-412 appends " (<WBG_VERSION>)" to the
+  version written into `producers`. My build script put CARGO_HOME inside the worktree (.gate/stopb-*/.gate/cargo), so
+  that registry source sat inside our git worktree and git answered with the worktree's HEAD: our own commit's first 9
+  hex digits ended up in the Wasm. U7's run 4 (901a6492) differs the same way.
+- On RS: CARGO_HOME = /home/npt-build/.cargo (rs.yaml's `env -i HOME=$NB`, rustup-init's default), not inside any
+  repository (the clone is the sibling /home/npt-build/clone). There `git rev-parse` fails, WBG_VERSION stays unset and
+  `producers` reads "wasm-bindgen 0.2.130" with no hash: RS's Wasm equals none of the lists made so far.
+- The fix (a build method, no code change): CARGO_HOME, the wasm-bindgen root and its target outside any git repository
+  (as on RS), proven by `git rev-parse HEAD` failing in that folder; each build's Wasm read for "wasm-bindgen 0.2.130"
+  with no parenthesised hash in `producers`; two builds on two paths equal. Then the list's Wasm line is replaced (one
+  line in place) in a new commit after Y; Y0 (87cb8677) stands (its notes and stand-ins are not build inputs).
+
 ## Update 02:0x UTC on 11-28: NOT path-dependent (the reading below is disproved)
 - Worktree A recreated at Y (652e9513) on build 1's own path, with a fresh CARGO_HOME on build 1's path:
   a94698198f73... (build1-again.log, 02:01-02:03), equal to build 2's. Two paths at Y give the same Wasm.
