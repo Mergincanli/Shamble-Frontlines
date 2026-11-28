@@ -366,6 +366,19 @@ in this folder.)
   sweep's line said "already his DEPART-4C (a)", a reason game-designer withdrew (that answer compared our sweeps with
   the collision library's, not with his sandbox's push-out). The question and its options are unchanged.
 
+## For his information, not questions (added 2026-11-28, 16:15 Amsterdam, from the clock)
+- **AIM-DEAD-ZONE:** the walk plan he approved leaves one sandbox difference untaken (`.checkpoints/cs4-walk/plan.md`,
+  "Seventeen differences": "the sandbox holds the facing inside a wider circle round the soldier; Walk keeps the old
+  game's 2 cm"). game-designer's block 10 found that this wider circle, 0.3 m, is in his Export
+  (`constants.shot_geometry.aim_dead_zone_m`, with its note "an aim point closer than the dead zone (on the ground)
+  keeps the aim the soldier had"), which the plan's line did not say. The game keeps the plan's 2 cm: the soldier
+  turns toward any aim more than 2 cm away. He can feel it in the early look (moving the cursor close round the
+  soldier); if he wants the Export's 0.3 m there, it is one number, his to say.
+- **The movement file's version** goes from 1 to 2 in 4c-2 (the advisor agent's ruling, `advisor-version-rule.md`):
+  the thirteen new values are required, so a version-1 file cannot be read as version 2, and no converter from 1 to 2
+  is written (no version-1 movement file exists outside the repository's history; a converter would have to make up
+  the thirteen values). 4c-2's report lists this departure from ADR 0005's migration rule for his call.
+
 ## One line, no question
 STEP12-GO is in the register already (`docs/DECISIONS.md:183`, since 4b-2's docs pass), so it is not written again.
 Only his go for 4b-2's merge, his word on merging and his design notes (and his message of 23:59, by BOARD-WORDS) go

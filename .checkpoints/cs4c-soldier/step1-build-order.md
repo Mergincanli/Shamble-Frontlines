@@ -30,6 +30,13 @@ the wire into the hashed row without the room having checked it** (G2's rule).
   the test text; `content/movement/soldier.json` (the 13 values of NO-SOURCE (b), each marked "not from his Export";
   `body_height_m` from his Export's measured block); `content/source/testlines-table.json`'s rows with a `field` and
   no `export`, which `testlines.mjs --check` takes, and its planted row.
+- **The table's thirteen rows** (game-designer's block 10, `game-designer-read.md`: N38 to N40, the rows as JSON):
+  the twelve sandbox numbers each as a row with `field`, `value`, `sandbox` (its file:line at be608cad), `unit`,
+  `what` and `old_game` (the old game has none of them, `shamble-game.js:2532-2541`), which the converter learns to
+  take (a row with no `export` must carry a finite `value` and its `sandbox` line; its planted row claims an export
+  it does not have); the body height as an ordinary row from his Export's `measured.soldier_height_m` (1.8), which
+  the converter also learns to read (today it reads only `values.<group>.<name>`, `testlines.mjs:136-139`:
+  game-designer's Medium flag). The unit word for a fraction: "share" (new) or one of the table's own.
 - The first recording's frozen bundle re-frozen (`make_recordings --freeze first-loop`) and the recordings re-made:
   **their `.hashes` files byte-identical** (G5: no state changed), their headers naming the new bundle; `recordings.rs`
   green.

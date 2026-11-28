@@ -399,3 +399,124 @@ DONE (block 9, with corrections)
 3. Flag differences and missing numbers (N22's slope-head tolerances, the jump guard, the snap's slope term).
 4. Write the thirteen rows as JSON. 5. DONE.
 ### Notes
+- N38 (the twelve, values re-read at be608cad against rust-reviewer-read.md 11.4, :855-880): all twelve values agree. foot 0.15 (movement.ts:59-60), pull share 0.5 a step (:61-62), done under 0.03 m (:63, :186), to 0.9 of the foot (:172), allowance 0.005 m (yard.ts:38-39), snap 0.2 m (movement.ts:64-65, :199), push height gap 1.0 m (push.ts:10-11, :43, ">="), sideways 0.7 (:12-13, :71-72), keep-going 0.5 (:14-15, :100), most 0.25 m a step (:16-17, :106-110), head-on gate 0.2 m/s of relative speed (:65, ">"), keep-going gate 0.1 m/s of own speed (:96, ">"). None of them is in his Export (its values, derived, constants and measured blocks read: no movement constant there).
+- N39 (the old game, legacy/shamble-game.js, read): he stands on the point under his centre (tickVertical, :2532-2541; the surface at (pos.x, pos.z), :2539); no pull (he rises when his centre crosses the edge, :2539-2540); no step allowance (a surface more than T.stepUp above the feet is refused, :2533-2535; stepUp 0.55, docs/legacy-tuning.json:113); no snap (grounded is decided again every frame from the centre's surface: small hops down a slope, :2537-2540); no push between soldiers (the table's own "none (no such rule)" for push strength and radius); no height (walls endless, MOVE-RULES row 5).
+- N40 (flags): (i) body_height_m's place, measured.soldier_height_m (1.8, testlines-export.json:464-465), is OUTSIDE the Export's values block, and the table tool reads only values.<group>.<name> (packages/client/scripts/testlines.mjs:136-139 at HEAD, read through git show): as an ordinary row it is refused ("his Export has no such value", :156) unless the tool learns the measured block (Medium, for the main session). (ii) A number the movement needs and the twelve miss, from his Export itself: the facing's dead zone 0.3 m (Testlines weapons.ts:21 AIM_DEAD_ZONE, used main.ts:624-633: an aim point within 0.3 m of him keeps the facing he had; exported as constants.shot_geometry.aim_dead_zone_m, exporter.ts:179, testlines-export.json "constants"). The plan's facing rule uses the old game's 2 cm (rust-reviewer-read.md 1.5 item 12; block 8's facing rule "more than 2 cm away horizontally"). With the cursor near his feet the game would spin him where the sandbox holds him: High (a number of his Export replaced by the old game's), its row an export row once the tool reads the constants block (three levels deep). (iii) Not content, agreed with 11.4: the slope head's 1 cm and 5 cm, the head's 1 mm, the 1e-6 shrinks (tolerances, N22); the jump's 0.01 m guard is replaced by the refusal of a reach under the step. (iv) The snap's slope term needs no number of its own (the tick's displacement plus the foot radius, times the steepest grade under the foot, movement.ts:199).
+- N40 (ii) corrected: the 2 cm is the approved 4c plan's recorded choice, not a missing row: ".checkpoints/cs4-walk/plan.md:384-388: One is not taken (the sandbox holds the facing inside a wider circle round the soldier; Walk keeps the old game's 2 cm)". So it is NOT High and not a NO-SOURCE row. Low, information only: the sandbox's 0.3 m is in his Export (constants.shot_geometry.aim_dead_zone_m), not only in its code, which that plan line does not say; worth one clause when he looks at the facing in the early look (his item 16).
+
+### The thirteen rows (for the main session to place; the table's style; "sandbox" names the place at Testlines commit be608cad)
+```json
+[
+  {
+    "export": "measured.soldier_height_m",
+    "field": "body_height_m",
+    "old_game": "none (walls and houses endlessly high: no headroom)",
+    "unit": "m",
+    "what": "his height, for headroom and the head bump"
+  },
+  {
+    "field": "foot_radius_m",
+    "value": 0.15,
+    "sandbox": "src/movement.ts:59-60 (FOOT_RADIUS), used :163, :194, :199",
+    "old_game": "none (the old game stands him on the point under his centre: shamble-game.js:2539)",
+    "unit": "m",
+    "what": "the small circle round his centre that he stands on, so he holds a little past an edge"
+  },
+  {
+    "field": "pull_share_per_step",
+    "value": 0.5,
+    "sandbox": "src/movement.ts:61-62 (PULL_SHARE), used :186-190",
+    "old_game": "none (no pull: he rises once his centre crosses the step's edge, shamble-game.js:2539-2540)",
+    "unit": "share",
+    "what": "after a step-up, the share of the carry onto the step left that he gets each step"
+  },
+  {
+    "field": "pull_done_under_m",
+    "value": 0.03,
+    "sandbox": "src/movement.ts:63 (PULL_MIN), used :186",
+    "old_game": "none (no pull)",
+    "unit": "m",
+    "what": "a carry left shorter than this is given all at once"
+  },
+  {
+    "field": "pull_to_foot_pct",
+    "value": 90,
+    "sandbox": "src/movement.ts:172 (0.9 x the foot radius)",
+    "old_game": "none (no pull)",
+    "unit": "%",
+    "what": "the carry brings his centre this share of his foot circle short of the step's edge"
+  },
+  {
+    "field": "step_allowance_m",
+    "value": 0.005,
+    "sandbox": "src/yard.ts:38-39 (EPS), used :219, :245, :265, :309",
+    "old_game": "none (a surface more than T.stepUp above his feet is refused, no allowance: shamble-game.js:2533-2535)",
+    "unit": "m",
+    "what": "how far above the step-up a top may be and still be walked onto"
+  },
+  {
+    "field": "snap_down_m",
+    "value": 0.2,
+    "sandbox": "src/movement.ts:64-65 (SNAP_DOWN), used :199 with the slope term",
+    "old_game": "none (no snap: he falls in small hops, shamble-game.js:2537-2540)",
+    "unit": "m",
+    "what": "a drop he walks down instead of falling, plus the slope under his foot"
+  },
+  {
+    "field": "push_height_gap_m",
+    "value": 1.0,
+    "sandbox": "src/push.ts:10-11 (HEIGHT_GAP), used :43",
+    "old_game": "none (no such rule)",
+    "unit": "m",
+    "what": "two soldiers whose feet are this far apart in height or more do not push"
+  },
+  {
+    "field": "push_sideways_share",
+    "value": 0.7,
+    "sandbox": "src/push.ts:12-13 (SIDEWAYS), used :71-72",
+    "old_game": "none (no such rule)",
+    "unit": "share",
+    "what": "how far a head-on push turns sideways, so the two slide round each other"
+  },
+  {
+    "field": "push_keep_going_share",
+    "value": 0.5,
+    "sandbox": "src/push.ts:14-15 (KEEP_GOING), used :99-104",
+    "old_game": "none (no such rule)",
+    "unit": "share",
+    "what": "the most of his own step forward a push may undo"
+  },
+  {
+    "field": "push_most_m_per_step",
+    "value": 0.25,
+    "sandbox": "src/push.ts:16-17 (MAX_STEP), used :106-110",
+    "old_game": "none (no such rule)",
+    "unit": "m",
+    "what": "the most one step's push may move him"
+  },
+  {
+    "field": "push_head_on_gate_m_per_s",
+    "value": 0.2,
+    "sandbox": "src/push.ts:65",
+    "old_game": "none (no such rule)",
+    "unit": "m/s",
+    "what": "the push turns sideways only when the two close faster than this"
+  },
+  {
+    "field": "push_keep_going_gate_m_per_s",
+    "value": 0.1,
+    "sandbox": "src/push.ts:95-96",
+    "old_game": "none (no such rule)",
+    "unit": "m/s",
+    "what": "the keep-going limit applies only when he moves faster than this"
+  }
+]
+```
+Notes on the rows: "share" is a new unit word (a plain fraction from 0 to 1); the table has "times" for multipliers and "%" for percentages, so the main session may prefer one of those. The body height's row is an ordinary export row, but its place lies outside the Export's values block (N40 (i)): the tool must learn to read `measured`. Each sandbox place is at be608cad; movement.ts, yard.ts and push.ts are the same at 703fd922.
+
+### Answer (block 10; by reading at be608cad, nothing run, no code copied)
+1. All twelve values confirmed, each with its file:line, plain meaning and unit (rows above); the old game has none of them (it stands him on his centre's point, has no pull, no allowance, no snap, no push).
+2. No value differs from rust-reviewer's list. Flags: the body height's Export place (measured.soldier_height_m) lies outside the values block the table tool reads (testlines.mjs:136-139 at HEAD) (Medium); the sandbox's 0.3 m facing dead zone is in his Export's constants, against the plan's recorded 2 cm (plan.md:384-388: information, Low); the tolerances stay code constants, as 11.4 says.
+3. The thirteen rows are above.
+
+DONE
