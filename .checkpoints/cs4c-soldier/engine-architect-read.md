@@ -1005,7 +1005,7 @@ its owner, so a disagreement there cannot hold step 1's code on Part A.
 |---|---|---|---|
 | rules | `sim::rules::Rules` (11.4) | `Room.rules` | `Rules::take(movement)` in `Sim::create`, movement per B5 |
 | statics | `sim::collision::StaticWorld` (collision.rs:94-99, `Clone`) | `Room.statics`; from step 2 the endpoint's own copy, `statics.clone()` made in `LocalMatch::new` (block 4; netcode-architect-read.md:99-101) | `StaticWorld::build(map)` in `Sim::create`, map `LOCAL_MAP` |
-| spawns | `Vec<sim::soldiers::SpawnPoint>` (B3) | `Room.spawns` | `spawn_points(map)` in `Sim::create` |
+| spawns | `Vec<sim::soldiers::SpawnPoint>` (B3) | `Room.spawns` [SUPERSEDED by block 8: held by nobody; borrowed by `Room::new` for `World::new`, dropped at the end of `Sim::create`] | `spawn_points(map)` in `Sim::create` |
 - `LocalMatch` holds none of them: its `world` field and `static_world()` go (local_match.rs:48-50, :96-100), as 11.6 has.
 - The client endpoint holds none in step 1 (endpoint.rs:90-110 unchanged; 11.6's :258 only); its copy of the static
   world is step 2's, its `Rules` copy change-set 7's prediction.
@@ -1016,11 +1016,12 @@ its owner, so a disagreement there cannot hold step 1's code on Part A.
 - `World::authority_step(&mut self, rules: &Rules, statics: &StaticWorld, counts: &mut QueryCounts,
   commands: &[PlayerCommand])`: every borrow lasts the call only (A3). Under B4 (b) it also takes
   `spawns: &[SpawnPoint]` and the join signal; under either, the spawns are never kept.
-- `Room::new(setup: &MatchSetup, content_hash: [u8; 32], rules: Rules, statics: StaticWorld, spawns: Vec<SpawnPoint>)
+- [SUPERSEDED by block 8: `spawns: &[SpawnPoint]`, borrowed, nothing kept; `query_counts()` enters with its first
+  caller] `Room::new(setup: &MatchSetup, content_hash: [u8; 32], rules: Rules, statics: StaticWorld, spawns: Vec<SpawnPoint>)
   -> Room`: owns them; total, as today (block 6.2: no refusal of a world with no aim box). Added: `Room::statics(&self)
   -> &StaticWorld` (replaces `LocalMatch::static_world`, one test reader) and `Room::query_counts(&self) ->
   &QueryCounts`. No accessor for `rules` or `spawns` (no reader).
-- `LocalMatch::new(setup, first_sequence, pad_bytes, link, rules: Rules, statics: StaticWorld, spawns:
+- [SUPERSEDED by block 8: `spawns: &[SpawnPoint]`] `LocalMatch::new(setup, first_sequence, pad_bytes, link, rules: Rules, statics: StaticWorld, spawns:
   Vec<SpawnPoint>) -> Option<Self>`: 7 arguments, at clippy's limit and not over it (N58); step 2 adds none (the
   endpoint's copy is cloned inside).
 - `Sim::create(seed, mode, pad_bytes, bundle)` and the bindings' `Sim::new` (sim-wasm/src/lib.rs:105-110, :145): no
@@ -1063,7 +1064,7 @@ its owner, so a disagreement there cannot hold step 1's code on Part A.
 6. collision.rs, CHANGE `narrow` (:103) to `pub(crate)` (B3).
 7. body.rs, `QueryCounts` stays; REMOVE block 2's accessor on the world (B2).
 8. lib.rs, the re-exports gain `PlayerRecord` and `SpawnPoint` (beside :26-28).
-9. room/src/lib.rs: `Room` gains `rules`, `statics`, `spawns`, `query_counts`; `Room::new` per item 3; ADD `statics()`
+9. [SUPERSEDED by block 8, 8.2's point 5.9] room/src/lib.rs: `Room` gains `rules`, `statics`, `spawns`, `query_counts`; `Room::new` per item 3; ADD `statics()`
    and `query_counts()`; :282 lends the four; :286-296 reads the `PlayerRecord`; its tests build the three once from
    the test bundle (the batch's dev-dependency) and clone them per room; room/tests/any_bytes.rs:117 the same, once per
    run, cloned per case.
@@ -1123,5 +1124,72 @@ About 0 code / 130 tests (T-A 40, T-B 35, T-C 20, T-D 30, T-E 5); T-F and T-G ar
 - The TypeScript tests and e2e specs that create a `Sim` were not grepped for their bundles; they load the built
   content.json of `content/`, which holds one movement (content_files.rs:363-366), as far as read.
 - B7 DONE.
+
+DONE
+
+### Plan (block 8: the advisor agent's G1 on step 1's delta, advisor-delta-step1.md:18-22, :63-67)
+Asked 2026-11-28 by the main session. Read only; this file is the only one I write.
+1. Read G1, G3 and D1's condition 1 (advisor-delta-step1.md:18-28, :63-67), netcode-architect-read 9.2 (:1031-1035)
+   and B9-N16 (:1028), rust-reviewer-read's room line (:914) and row 40 (:972), local-checks.sh:14.
+2. A yes or a reader for `Room.spawns`; whether `rules`, `statics` and `query_counts` each have a reader in step 1.
+3. Rewrite block 7's items 2, 3 and 5.9 (marked in place as superseded); notes; DONE.
+
+- N59. local-checks.sh:14 runs `cargo clippy --workspace --all-targets --locked -- -D warnings`, so rustc's
+  `dead_code` warning "field is never read" fails the check. Under B4 (a) (netcode-architect 9.2: YES, :1031)
+  `World::new` reads the spawn table once, inside `Room::new`, from the argument, before any field is stored; no tick
+  reads it again (9.2, :1034), and block 7 gave the room no accessor for it (item 3). So `Room.spawns` has no reader.
+- N60. `Room.rules`: read by `Room::step` lending `&self.rules` to `authority_step` every tick (block 7 item 3;
+  rust-reviewer-read 11.1's heading, :812). Taking a reference to a field is a use of it, so the lint is quiet from
+  the commit where the step first takes `&Rules`, and not before (G3).
+- N61. `Room.statics`: read by the step's `&self.statics` every tick, by the room's aim check (`statics.holds_cm`,
+  rust-reviewer-read :914) and by `pub fn Room::statics()`, whose one caller is a test (sim-wasm/src/lib.rs:401-410
+  today's reader of `static_world()`).
+- N62. `Room.query_counts`: lent `&mut` to the step every tick (a use), and read by `pub fn Room::query_counts()`. A
+  `pub` method of a library crate is never "never used", so the lint is quiet either way. But no caller reads the
+  counts' values through the room in step 1: row 40 (Q-1, rust-reviewer-read :972) runs at the `World` level with its
+  own `QueryCounts`, and the counts' consumer, `walk_reaches.rs`, is step 6's (netcode-architect-read.md:407;
+  reread-sheet.md:557). The step only writes them (B9-N16, :1028; rust-reviewer-read :1142).
+
+## Block 8. The spawn table is borrowed, not kept; every other room field has its reader (DONE)
+### 8.1 The answer
+**YES to G1's default:** `Room::new` and `LocalMatch::new` borrow the spawn table (`spawns: &[SpawnPoint]`) for
+`World::new` and keep nothing, with no `#[allow(dead_code)]`; I name no reader in 4c. (Under B4 (b), which 9.2 did
+not take, the step would borrow the table every tick and the room would keep it; that reader comes with change-set
+5's spawning phase, if ever, and the field with it.)
+- `rules`: has its reader (the step's borrow every tick, N60); the field enters in the commit where `authority_step`
+  first takes `&Rules` (G3).
+- `statics`: has its readers (the step, the aim check, `Room::statics()`'s test, N61); it enters with the first of
+  them.
+- `query_counts`: the lint is quiet (the step's `&mut` every tick; a `pub` accessor), but nothing reads the values
+  through the room until step 6 (N62). So the field and its `&mut` lending enter with the first sweep that counts
+  (step 1, as 11.1 has it), and `Room::query_counts()` enters with its first caller (step 6's `walk_reaches.rs`, or an
+  earlier room test that reads it), not before.
+
+### 8.2 Block 7 rewritten (the old lines are marked in place)
+- **Item 2, the spawns' row:** `Vec<sim::soldiers::SpawnPoint>` (B3), built by `spawn_points(map)` in `Sim::create`,
+  borrowed by `LocalMatch::new` and then `Room::new` for `World::new`, held by nobody after the room is built: dropped
+  at the end of `Sim::create`. The other rows stand: `Room.rules`, `Room.statics` (and step 2's endpoint copy).
+- **Item 3, the two constructors:**
+  - `Room::new(setup: &MatchSetup, content_hash: [u8; 32], rules: Rules, statics: StaticWorld, spawns: &[SpawnPoint])
+    -> Room`: owns `rules` and `statics`, borrows `spawns` for `World::new(setup, &rules, spawns)` and keeps nothing;
+    total, as today. Accessors: `Room::statics()` (its test reader); `Room::query_counts()` with its first caller (8.1).
+  - `LocalMatch::new(setup, first_sequence, pad_bytes, link, rules: Rules, statics: StaticWorld,
+    spawns: &[SpawnPoint]) -> Option<Self>`: 7 arguments, as before.
+  - `Sim::create`: `local_constants(set)` still returns `(Rules, StaticWorld, Vec<SpawnPoint>)`; it passes `&spawns` to
+    `LocalMatch::new` and the table drops when `create` returns. `World::new` and `authority_step` as block 7 had them.
+- **Item 5, point 9:** room/src/lib.rs: `Room` gains `rules`, `statics` and `query_counts` (each in the commit of its
+  first reader, G3), and no `spawns`; `Room::new` per item 3 above; ADD `statics()` (and `query_counts()` with its first
+  caller); :282 lends `&self.rules`, `&self.statics` and `&mut self.query_counts`; :286-296 reads the `PlayerRecord`;
+  its tests build the three once from the test bundle (the batch's dev-dependency), clone `rules` and `statics` per room
+  and lend the table by reference; room/tests/any_bytes.rs:117 the same, once per run.
+- **Lines elsewhere that keep the table, for their owners:** rust-reviewer-read's room line (:914, `spawns:
+  Vec<SpawnPoint>` and "lends the four"); netcode-architect-read 9.2 (:1034, "The room keeps the spawn table").
+- Count: about -3 code (a field, its doc, its store); no test changes.
+
+### Not verified (block 8)
+- Read only, nothing built: that taking `&mut` or `&` of a field keeps rustc's "never read" quiet, and that an
+  unused `pub` method of a library crate draws no warning, are rustc's documented `dead_code` behaviour, not run here
+  (G1's own scratch crate showed the warning for the stored-only field).
+- B8 DONE.
 
 DONE
