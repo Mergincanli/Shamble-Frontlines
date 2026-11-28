@@ -590,3 +590,110 @@ start once these three lines are in rev 0.2:
   two test lines rewritten in place at 0 net; the fills. Option 2 adds no third in-place line.
 
 Status: COMPLETE 2026-11-27 22:12 UTC
+
+## Ruling on the dist difference
+Plan: read stopb-dist-diff.md whole. Read wasm-bindgen-shared 0.2.130's build.rs and lib.rs in the registry source
+myself. Check that the two hashes in `producers` are Y0's and Y's SHA prefixes. Then answer Q1-Q4. Read only; Bash for
+single git commands.
+
+### Notes (one line per check)
+- stopb-dist-diff.md (Read whole, 63 lines):
+  - five builds;
+  - the deciding build at Y0 on a third path (.gate/stopb-c) gave 2a97394b, the same as build 1;
+  - Y gave a94698198f73 on two paths, and again after a clean;
+  - the 9-byte difference is all in `producers`;
+  - the earlier path theory is withdrawn in the file's own words ("superseded").
+- /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wasm-bindgen-shared-0.2.130/build.rs:10-21 (Read):
+  `Command::new("git").arg("rev-parse").arg("HEAD")`, with no directory set, so it runs in the build script's own
+  folder, which cargo sets to the package's source folder. If 9 or more characters come back it prints
+  `cargo:rustc-env=WBG_VERSION=<first 9>`.
+- src/lib.rs:405-411 (Grep): `version()` = CARGO_PKG_VERSION, plus " (" + WBG_VERSION + ")" when that is set.
+- The two hashes are our commits:
+  - `git log -1 87cb8677` → 87cb8677d51535ea…, "Stop B Y0: the two security notes ...";
+  - `git log -1 652e9513` → 652e9513ce2c1369…, "Stop B Y: R1's expected dist list, from build 1 at Y0".
+  - The `producers` strings "(87cb8677d)" and "(652e9513c)" are exactly their first 9 characters.
+  - `git diff --numstat 87cb8677 652e9513 -- spikes/netcode-proof` → `7 0` on r1-dist.sha256 alone.
+  - So nothing but the commit's name separates the two builds.
+- On RS: rs.yaml:175-176 runs the build as npt-build under `env -i HOME=/home/npt-build PATH=… COMMIT REPO`.
+  - rustup-init's default CARGO_HOME there is /home/npt-build/.cargo, so cargo unpacks the registry source under it.
+    No git repository encloses that folder; the clone is the sibling /home/npt-build/clone (rs.yaml:188-192).
+  - `env -i` passes no GIT_* variable.
+  - So WBG_VERSION stays unset on RS, and `producers` reads plain "wasm-bindgen 0.2.130". This is reasoned from the
+    code and rs.yaml, not run on RS.
+  - Every list made so far carried a hash: build 1, build 2, and U7's run 4. None of them would equal RS's dist.
+
+### Findings
+- **STOPB-8 (High; caught before X by C1's bar, and resolved by the method below):**
+  - The container builds put CARGO_HOME inside the worktree, so wasm-bindgen's build script wrote our commit's SHA
+    prefix into the Wasm's `producers`.
+  - Y's list (652e9513) would have refused every page on R1's day (DIST-DIFFERS; r1.sh:130-131), the same harm as
+    STOPB-1.
+  - It is no code defect, and the earlier builds were not wrong in themselves. It is an environment difference from RS
+    that C3 did not name, and I did not name it either: my C6 listed cargo's variables but not where CARGO_HOME sits.
+  - **SEC-SB-5's two-path build did its job:** this was its first real result (u8-report.md:76), and its bar caught it.
+
+### Answers
+- **Q1: the root cause is accepted, and the fix sits inside C3.**
+  - The proof:
+    - the commit-for-path swap (Y0 gives 2a97394b on paths A and C; Y gives a94698198f73 on paths B and A);
+    - the 9 bytes that differ, all in `producers`;
+    - build.rs read line by line;
+    - the exact SHA prefixes.
+  - C3 asked for rs.yaml's own dist lines. RS runs them with CARGO_HOME outside any repository, so putting CARGO_HOME,
+    the wasm-bindgen `--root` and its CARGO_TARGET_DIR outside every repository reproduces RS's condition. It is not a
+    third deviation.
+  - The npm flags remain the one recorded deviation (option 2).
+- **Q2: the bars, with three additions. Yes, one line in his message.** Each of the two builds:
+  1. Runs with every `GIT_*` variable left out of its environment, as RS's `env -i` does. The names are printed, never
+     the values, beside C6's cargo names. Without it, an inherited GIT_DIR would hand build.rs a repository whatever
+     the folder.
+  2. Prints `git rev-parse HEAD` failing ("not a git repository") from inside that CARGO_HOME's unpacked
+     `registry/src/<index>/wasm-bindgen-shared-0.2.130` folder, which is build.rs's own folder, not just the
+     CARGO_HOME root. Run it after the install and the fetch, when the folder exists.
+  3. Prints its Wasm's `producers` entry: "wasm-bindgen 0.2.130" with no parenthesised suffix. A printing read of the
+     custom section; a silent grep does not count (EXIT-SILENT).
+  4. Equality, as before: two builds, two worktree paths (under .gate/, per the worktree rule) and two CARGO_HOMEs.
+     Their lists are equal byte for byte.
+  5. The new list's six other lines equal Y's six. Only the Wasm line moves, which shows the leak touched nothing else.
+  - **His message:** one line. "The expected list's Wasm carries wasm-bindgen's plain version, as RS will build it. A
+    first list carried our own commit's name through wasm-bindgen's build script and was voided before the fill. The
+    day's dist compare stays the wall." It goes with the void Y's SHA in the report, not on his screen.
+- **Q3: yes, a follow-up after R1, not now.**
+  - web/build.mjs (U7's file) refuses a Wasm whose `producers` names wasm-bindgen with any parenthesised suffix,
+    failing closed with its reason, beside its home-path scan (build.mjs:164). It does not strip the suffix: refusing
+    keeps the dist exactly wasm-bindgen's output and points the builder at the environment.
+  - It comes with a test and a plant.
+  - Taker: the next change to web/build.mjs. Named in the report's follow-ups.
+  - Now, it would be a code change to a build input, so a new Y and new builds, for a leak the method below already
+    closes.
+- **Q4: before the rebuild:**
+  - (a) Redo **both** builds outside every repository. Build 1's earlier Wasm carried Y0's name, so it stands for
+    nothing.
+    - Build 1′ runs at Y0 or at Y (equal inputs, now that the commit no longer leaks). It gives the list's new Wasm
+      line.
+    - Y′ = Y plus that one line replaced: `1 1` against Y; against Y0 still the list's file alone, `7 0`.
+    - Build 2′ runs at Y′ itself and must equal Y′'s non-comment lines.
+  - (b) Y (652e9513) stays in history, recorded as void in the report and on the card. It is never named in a
+    cloud-init file. X names Y′.
+  - (c) The scratchpad folders (npt-dist-a, npt-dist-b) are outside the repository, so FULL-PATHS holds by literal
+    paths. If the scratchpad is cleared mid-build, redo that build; nothing in it is evidence once the logs are under
+    .gate/stopb/.
+  - (d) The lane lock and C6's prints stay, now with the `GIT_*` names added.
+  - (e) X comes after MAIN-70 and after his answers on A2's host findings, as proposed.
+    - If MAIN-70 changes any path under spikes/netcode-proof, Q5's trigger (1) applies (a new Y0, Y′ and X).
+    - If it changes CLAUDE.md or .claude, trigger (2) applies (X takes them in, still naming Y′).
+  - (f) My head read covers Y′ with both new builds' logs, the three prints per build, and the `1 1` diff against Y.
+
+### Verdict
+**APPROVE the fix, with Q2's three added bars and Q4 (a)-(f).**
+- STOPB-8 is resolved by the method once both builds pass those bars.
+- Nothing here is Mustafa's to decide: it is a build method inside C3, with no code, stop, money or run-day change.
+
+### Decisions needed
+- None.
+
+### For Mustafa
+- Nothing to act on.
+- Q2's one line goes into Stop B's message.
+
+Status: COMPLETE 2026-11-28 02:14 UTC

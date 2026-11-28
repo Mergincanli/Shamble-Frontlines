@@ -106,7 +106,17 @@ going; free disk; usage read.
   outside the build's CARGO_HOME, so its self-update failed: first try's log). Two earlier tries stopped before any
   build (a shell quoting slip, then the self-update). Supporting line: six files equal U7's run 4; the wasm differs
   (2a97394b... against 901a6492...), U7's list being its snapshot tree's (B6: not a bar).
-- **Y DONE: 652e9513ce2c1369d8d6146e84109feadf021a55** (22:50): r1-dist.sha256 gains build 1's list byte for byte
+- **STOPB-8 (High, B6's ruling 02:14 UTC on 11-28, advisor-stopb-plan.md "## Ruling on the dist difference"):** build 2
+  at Y failed C1's bar; root cause stopb-dist-diff.md: wasm-bindgen-shared's build.rs wrote our commit's first 9 hex
+  digits into the Wasm's `producers` because CARGO_HOME sat inside the worktree; RS's CARGO_HOME is outside any
+  repository. Y (652e9513) is VOID and is never named in a cloud-init file. The fix, inside C3: CARGO_HOME, the
+  wasm-bindgen root and its target outside every repository (scratchpad/npt-dist-a and -b); per build the bars: every
+  `GIT_*` name printed and unset; `git rev-parse HEAD` failing in the cargo base and in wasm-bindgen-shared-0.2.130's
+  own registry folder; `producers` reading plain "wasm-bindgen 0.2.130" (the reader's red case: dist-c's Wasm prints
+  "(87cb8677d)"). Build 1' at Y (or Y0), then Y' = the list's Wasm line replaced in place (`1 1` against Y, `7 0`
+  against Y0), then build 2' at Y' itself, equal; the six other lines equal Y's. Y' after MAIN-70. A follow-up after R1
+  (B6's Q3): web/build.mjs refuses a hashed `producers` entry, with a test and a plant (the next change to build.mjs).
+- **Y DONE (void, STOPB-8): 652e9513ce2c1369d8d6146e84109feadf021a55** (22:50): r1-dist.sha256 gains build 1's list byte for byte
   (cmp), numstat `7 0` against Y0, counted run .gate/stopb/y-counted.log PASS; pushed by the save f49a7ba.
 - **C1, the order** [C1]: Y0 -> build 1 at Y0 (worktree A, CARGO_HOME A) -> Y = Y0 plus r1-dist.sha256's seven lines
   only, under its 4-line comment -> build 2 at Y (worktree B, CARGO_HOME B) -> X = Y plus the two commit lines and the

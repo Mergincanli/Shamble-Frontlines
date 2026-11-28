@@ -83,3 +83,148 @@ checked (advisor-main-69.md, M69-1 to M69-6). Printing forms only (ADV-M69-0: `-
   87cb8677**, which the plan's "Order" does not name (ADV-M70-3, Low).
 - **"Why".** history.md:2055-2057 holds his words (MAIN-52); :8168 is TAKEIN-CODE (b); light-takein-recipe.md:9-10 the
   light recipe's limit. Holds.
+
+## Block 2. Three more reads (02:1x UTC)
+- **The saver's secret scan** (checkpoint.mjs:143-155, :182-202): it scans only the notes staged under .checkpoints/
+  against HEAD (`diff --cached ... head -- DIR`), never main's files. So Cargo.lock's 64-hex checksums and #79's content
+  JSON do not pass through it; and its patterns (:42-53) name token prefixes, not bare hex. No trip expected.
+- **Who fetches the 33 packages.** Main's toolchain.yml:132 `cargo fetch --locked` and :158-169 `--locked` on every cargo
+  call: CI fetches exactly Cargo.lock's checksummed set, as on main. tools/gate.mjs, tools/smoke.mjs and
+  repo-map-check.mjs name no cargo (`git grep -c cargo` prints nothing). The light run's four steps build nothing. So no
+  local step of MAIN-70 fetches or builds them.
+- **Stop B's re-fill triggers** (stopb-plan.md:41-45): (1) "any commit changing a path under spikes/netcode-proof" and
+  (2) "main's CLAUDE.md or .claude moved and taken in". MAIN-70 trips neither (no spikes/ path, no kit path: Block 1).
+  Stop B's next Y0, Y and X carry main dae6d107 by A4 ("main's tip at Y0, Y and X"). On record.
+- HEAD moved by notes only: c333b75..40072dca (now) changes only .checkpoints/ files (`--name-only` outside
+  .checkpoints/ prints nothing; the whole form prints four notes). Remote branch 40072dca. H0 is fixed at step 1.
+
+## Verdict: APPROVE WITH CONDITIONS M70-1 to M70-9, for main's tip dae6d107fdbe942567104bcf1c9a2cbc6b3a1e0f
+Every fact the plan states holds by my own reads, except one area tally and one stale line citation (Lows). The take-in
+is due (MAIN-52: #79 changes code), the full form is right (#79 carries manifests and code, outside TAKEIN-CODE (b) and
+the light recipe), the one conflict is the STATUS.md table and MAIN-68's rule resolves it to main's file with the #40
+row swapped (120 lines). The conditions put back MAIN-68's and MAIN-69's bars the delta leaves implicit, write the
+resume line out for a merge that stops at a conflict, and name step 7's baseline. All Low; applied word for word, they
+need no new review. Step 7's read of the pushed head stays. Risk tier 1 for PR #40 after the merge (no kit, CI or gate
+file differs from main's). Plan checked: rev 0.1, sha256 ecac1d86...bdf, unchanged at 02:12 UTC.
+
+## Conditions (paste-ready)
+- **M70-1 (Low): step 1's anchor bar, whole.** `git merge-tree --write-tree --name-only H0 origin/main`: exit 1; one
+  tree line; the conflicted-file line docs/STATUS.md; exactly one CONFLICT line, "CONFLICT (content): Merge conflict in
+  docs/STATUS.md"; auto-merge lines for DECISIONS.md, REPO_MAP.md, STATUS.md and STATUS_ARCHIVE.md. Then, each alone, on
+  T (C68B-4's preconditions, STATUS.md only):
+  - `git diff --numstat b8f02b0 H0 -- docs/STATUS.md` prints "1 1", and `git diff -U0 b8f02b0 H0 -- docs/STATUS.md`
+    shows only the two #40 rows;
+  - `git diff --name-only -G'^[|] #40 [|]' b8f02b0 origin/main -- docs/STATUS.md` prints nothing;
+  - `git grep -c -E '^<<<<<<<' T -- docs/STATUS.md` prints a count of 1, and `git grep -n -E
+    '^(<<<<<<<|=======|>>>>>>>)' T -- docs/STATUS.md docs/STATUS_ARCHIVE.md docs/DECISIONS.md docs/REPO_MAP.md` prints
+    only STATUS.md's three markers;
+  - in `git show T:docs/STATUS.md`, every line between the markers starts with `|`.
+
+  A miss stops before step 2. T and its marker lines go into the plan by Edit (fe1b7220... on HEAD 2249d072 at this
+  check; not bound).
+- **M70-2 (Low): step 4's bars before the commit, after `git add docs/STATUS.md`, each alone, in addition to the plan's
+  (Q1; MAIN-68's C2 (b)):**
+  - `git diff --name-only --diff-filter=U` prints nothing;
+  - `git diff --cached --shortstat H0 -- . ':(exclude)docs/STATUS.md'` prints "106 files changed, 10824 insertions(+),
+    393 deletions(-)";
+  - `git diff --cached --name-only H0 -- spikes/ .checkpoints/` prints nothing;
+  - `git diff --cached --name-only T` prints only docs/STATUS.md (its control: the previous lines).
+
+  After the commit, `git diff --shortstat H0 HEAD` is expected at "107 files changed, 10839 insertions(+), 408
+  deletions(-)" (STATUS.md nets main's 15/15: the swapped #40 row is H0's on both sides); if it differs, the content
+  bars govern.
+- **M70-3 (Low): M69-1's three whole-tree bars, at step 5 after the content checks, each alone:**
+  - `git diff --name-only origin/main HEAD -- . ':(exclude)spikes/' ':(exclude).checkpoints/' ':(exclude)docs/'`
+    prints nothing;
+  - `git diff --name-only origin/main HEAD -- docs/` prints the usual six names (DECISIONS.md, REPO_MAP.md, STATUS.md,
+    STATUS_ARCHIVE.md, design/netcode-proof-messages.md, design/ws-reconnect.md);
+  - `git diff --name-only H0 HEAD -- spikes/ docs/design/ .checkpoints/` prints nothing.
+
+  They prove PR #40's diff against main holds no manifest, crate, package, content, kit or CI path, and they are the
+  control for step 6's DEP-HOLD line.
+- **M70-4 (Low): the resume line, word for word (C5 (a)).**
+
+  "MAIN-70 approved (advisor-main-70.md), running steps 1-7 for main dae6d107fdbe942567104bcf1c9a2cbc6b3a1e0f; usage at
+  step 1: <figure>, <go or no-go>. If `ls -d /home/user/Shamble-Frontlines/.git/MERGE_HEAD` lists the file and `git
+  rev-parse MERGE_HEAD` prints dae6d107fdbe942567104bcf1c9a2cbc6b3a1e0f, the merge is in progress: no save, no `git
+  merge --abort`, no reset. Then, if `git diff --name-only --diff-filter=U` prints docs/STATUS.md, resume at step 3; if
+  it prints nothing, resume at step 4's bars, then the commit. If MERGE_HEAD names anything else, the advisor rules. If
+  `git rev-parse HEAD^2` prints dae6d107fdbe942567104bcf1c9a2cbc6b3a1e0f and `git ls-remote origin
+  refs/heads/claude/netcode-proof-test-plan-hcky5g` prints another SHA than `git rev-parse HEAD`, resume at step 5.
+  advisor-main-70.md and this card may show unstaged: leave them; step 6's card save takes them. Anything else: the
+  advisor rules."
+- **M70-5 (Low): a move of main at step 1.** "The same conflicts" means exactly M70-1's: one block, in STATUS.md's
+  table. A move whose merges touch a manifest, a lockfile, CI, the kit, spikes/, a design or look doc or a mark row is
+  outside TAKEIN-CODE (b) and P-2 (a) (#79 itself would be): it stops before step 2 for a new check that reads only the
+  new merges and binds the new tip. Inside them, M69-3's lines hold (reviewed and merged read from the merge's message
+  or report; one line to him naming the pull requests).
+- **M70-6 (Low): step 7's baseline.** Main's toolchain run 46081134408, job 140780125932 (23:12:11-23:22:00 UTC, 9 min
+  49 s), compared line for line as M67-3 gives it (the `test result:` lines, the vitest `Test Files` and `Tests` lines,
+  every Playwright "passed" line, Chromium and Firefox). The old baseline 140547396571 no longer applies: #79 adds tests.
+  #74's two pull-request steps keep rev 4's step-6 bar. Record the toolchain job's run time beside the 25-minute limit
+  (#79's report: 8 min 48 s to 13 min 2 s on its heads).
+- **M70-7 (Low): room and runs at step 1.** `df -m /home/user/Shamble-Frontlines` read alone before the base light run;
+  below 4,096 MiB free stops before step 2 (4,944 at this check). `pgrep -a -f 'cargo|rustc|build.mjs'` names no build
+  (the Y0 rebuild in .gate/stopb-c has ended). The base light run keeps MAIN-69's timeout 7200000.
+- **M70-8 (Low): the facts, corrected by Edit (no new check).** The area list adds Cargo.toml 1, Cargo.lock 1,
+  content/maps 1, content/movement 1 (it summed to 103 of 107). The refs step is check.mjs:2729-2735 at HEAD, not
+  :2695-2700. "Order" names .gate/stopb-c (at Y0 87cb8677) beside stopb-a and stopb-b, also left in place.
+- **M70-9 (Low): on record in the plan, no action.** Main's dependency findings stay main's: 4B-HEAPLESS and
+  4B-LICENCES, and the two risks security-auditor left for acceptance (#79's report, Risks 4). docs/adr/README.md 7/4 and
+  DECISIONS.md 105/0 come in as main's text byte for byte (the MAIN-68 precedent for #75's register lines). The merge
+  commit keeps git's own message by `git commit --no-edit`, the card save carrying the attribution lines, as MAIN-68
+  step 4 and MAIN-69 did (#79's report lists an unattributed merge commit as a slip of its own chat; this lane's form is
+  its recorded precedent).
+
+## The plan's questions
+- **Q1. Is `git diff --cached --name-only H0` = main's 107 paths the right whole-tree bar? Right, but not enough
+  alone.** Names prove no content. MAIN-68's real form was C2 (b): the U-file line, the cached shortstat outside
+  STATUS.md against main's 106-file line, the spikes/notes line, and the anchor against T. M70-2 adds them; M70-3 adds
+  the bars against origin/main after the commit. Against H0, not origin/main, is right for the names (the branch's own
+  files differ from main).
+- **Q2. Is DEP-HOLD's equal-to-main exception enough with 33 registry packages? Yes; no lane security read is owed.**
+  - The rule's own text releases a file whose content equals main's (CHECKPOINTS.md §3; checkpoint.mjs:23-24, :135),
+    and M69-5's printing bar at step 6 proves the equality.
+  - The packages had their security read where they entered: #79's report :29-30 (security-auditor approved the
+    batch's five digests), :125 (the advisories), :161 (round 1 PASS), :219 (4B-HEAPLESS); merged on his go.
+  - The lane builds none: the spike is its own workspace (spikes/netcode-proof/Cargo.toml:4, no path dependency up),
+    and no MAIN-70 step runs cargo. CI fetches exactly the locked set (`cargo fetch --locked`, toolchain.yml:132), as
+    on main.
+  - After the merge, PR #40's diff against main holds none of the six files (M70-3), so PR #40's review sees no
+    dependency change. MAIN-68's no-security-read reasons carry; and unlike #73 at MAIN-68, #79's security rounds
+    ended PASS.
+- **Q3. May the guard tests (5e) be skipped? Yes.** #79 changes no .claude/ file (Block 1, both ways, with controls);
+  HEAD's .claude/ equals main's before and after; the guard tests last ran 1551/1551 on this guard (MAIN-68).
+
+## Findings (CLAUDE.md's scale)
+| Id | Severity | What | Fix |
+|---|---|---|---|
+| ADV-M70-1 | Low | Facts' area list sums to 103 of 107 (leaves out Cargo.toml, Cargo.lock, content/maps, content/movement). | M70-8 |
+| ADV-M70-2 | Low | Refs step cited at check.mjs:2695-2700; it is :2729-2735 at HEAD. | M70-8 |
+| ADV-M70-3 | Low | "Order" does not name .gate/stopb-c. | M70-8 |
+| ADV-M70-4 | Low | Step 1's anchor bar and C68B-4's preconditions not written out. | M70-1 |
+| ADV-M70-5 | Low | Step 4's whole-tree bar is names only. | M70-2 |
+| ADV-M70-6 | Low | M69-1's three bars not carried. | M70-3 |
+| ADV-M70-7 | Low | Resume line by pointer; MAIN-69's sends the expected MERGE_HEAD state to the advisor. | M70-4 |
+| ADV-M70-8 | Low | "The same conflicts" and the manifest limit for a later move not spelled out. | M70-5 |
+| ADV-M70-9 | Low | Step 7's baseline not named; the old one is stale (#79 adds tests). | M70-6 |
+| ADV-M70-10 | Low | Free disk 4,944 MiB against the 4,096 bar: thin. | M70-7 |
+| ADV-M68-5 | On record (main's) | R4-1 Critical, open on main by his R4-END (1). | Main's next guard change-set |
+
+## What I did not check
+- I ran nothing that writes: no merge, gate, light run or test. The conflict, the line numbers and the counts come from
+  the trial tree on HEAD 2249d072 (notes-only since; H0 is re-read at step 1).
+- #79's code, its 33 packages and its DECISIONS.md entries against his words: main's content, reviewed in its lane and
+  merged on his go; taken as it is.
+- How long the no-save stretch takes against the usage left: step 1's reading. It is MAIN-69's plus one Edit and the
+  step-4 bars.
+- The dist ruling (stopb-dist-diff.md): outside this plan, as the plan says.
+
+## Decisions needed
+None. MAIN-52 is his standing rule; #79 merged on his go by its own record; the conflict is the STATUS.md table and
+MAIN-68's checked rule resolves it.
+
+## For Mustafa
+Nothing. No browser check, no screenshot (no kit, CI or gate change-set), and the plain merge form passes the guard.
+
+Status: COMPLETE 2026-11-28T02:13Z
