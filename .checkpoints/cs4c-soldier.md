@@ -10,7 +10,7 @@
   `/home/user/Shamble-Frontlines` is never switched.
 - **Base:** origin/main dae6d107fdbe942567104bcf1c9a2cbc6b3a1e0f (pull request #79's merge commit), taken in by
   fast-forward from b7145273.
-- **Last update:** 2026-11-28 02:21 Amsterdam (from the clock; an earlier save said 01:08, a time written without
+- **Last update:** 2026-11-28 02:24 Amsterdam (from the clock; an earlier save said 01:08, a time written without
   reading the clock: it was 00:57; an edit at 02:04 wrote "02:06", also unread, corrected here)
 
 ## Steps done
@@ -201,4 +201,9 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
 - **BOARD-WORDS (b)'s method written and tested** (condition 7, F-S0-1; by 02:21 Amsterdam): `chat-words.mjs less`
   and `decisions-4c.mjs`'s reading of its header; tested in the scratchpad only (the sheet's section C has the
   numbers). His message of 23:59 is still in no file of the repository; it is saved only when he answers BOARD-WORDS.
+  **Changed by 02:24 Amsterdam** after the commit security review (Medium): the whole message's bytes and sha256 go
+  into no file of the repository (with the shown text published, they would let a reader confirm a guess of the
+  left-out line); they go to him in the chat. The local commit bfe447a3 had named the whole length and an 8-character
+  digest prefix in the sheet: fixed forward in the next commit, not rewritten (the Never list), and told to him.
+- **Step S's six review briefs written** (`review-briefs-step-s.md`), ready to send the moment SIZE-4C starts them.
 - The scene's before picture: `.gate/scene-before-4c.png` (main's page, 3 draw calls), by `shot-4c.mjs`.

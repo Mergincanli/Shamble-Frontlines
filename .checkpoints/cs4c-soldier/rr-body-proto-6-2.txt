@@ -1,0 +1,515 @@
+# A. ramps from their sides (wall rule: block 5's push-out, a stand-in for the set-back)
+side gentle from -z x 41.2 speed 6.3 start 1.13: PASS on the slope feet 0.1500 (slope at centre 0.0500, under the disc 0.1500) z 5.1300 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side gentle from -z x 41.2 speed 6.3 start 1.20: PASS on the slope feet 0.1500 (slope at centre 0.0500, under the disc 0.1500) z 5.2000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side gentle from -z x 41.2 speed 6.3 start 1.05: PASS on the slope feet 0.1500 (slope at centre 0.0500, under the disc 0.1500) z 5.0500 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side gentle from -z x 41.2 speed 9.576 start 1.27: PASS on the slope feet 0.1500 (slope at centre 0.0500, under the disc 0.1500) z 5.2728 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side gentle from -z x 41.2 speed 9.576 start 1.02: PASS on the slope feet 0.1500 (slope at centre 0.0500, under the disc 0.1500) z 5.0236 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side gentle from -z x 41.2 speed 9.576 start 1.08: PASS on the slope feet 0.1500 (slope at centre 0.0500, under the disc 0.1500) z 5.0836 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side gentle from -z x 41.2 speed 13.27 start 1.05: PASS on the slope feet 0.1500 (slope at centre 0.0500, under the disc 0.1500) z 5.0540 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side gentle from -z x 41.2 speed 13.27 start 1.12: PASS on the slope feet 0.1500 (slope at centre 0.0500, under the disc 0.1500) z 5.1240 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side gentle from -z x 41.2 speed 13.27 start 1.18: PASS on the slope feet 0.1500 (slope at centre 0.0500, under the disc 0.1500) z 5.1840 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side gentle from -z x 42 speed 6.3 start 1.13: PASS on the slope feet 0.3500 (slope at centre 0.2500, under the disc 0.3500) z 5.1300 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side gentle from -z x 42 speed 6.3 start 1.20: PASS on the slope feet 0.3500 (slope at centre 0.2500, under the disc 0.3500) z 5.2000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side gentle from -z x 42 speed 6.3 start 1.05: PASS on the slope feet 0.3500 (slope at centre 0.2500, under the disc 0.3500) z 5.0500 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side gentle from -z x 42 speed 9.576 start 1.27: PASS on the slope feet 0.3500 (slope at centre 0.2500, under the disc 0.3500) z 5.2728 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side gentle from -z x 42 speed 9.576 start 1.02: PASS on the slope feet 0.3500 (slope at centre 0.2500, under the disc 0.3500) z 5.0236 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side gentle from -z x 42 speed 9.576 start 1.08: PASS on the slope feet 0.3500 (slope at centre 0.2500, under the disc 0.3500) z 5.0836 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side gentle from -z x 42 speed 13.27 start 1.05: PASS on the slope feet 0.3500 (slope at centre 0.2500, under the disc 0.3500) z 5.0540 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side gentle from -z x 42 speed 13.27 start 1.12: PASS on the slope feet 0.3500 (slope at centre 0.2500, under the disc 0.3500) z 5.1240 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side gentle from -z x 42 speed 13.27 start 1.18: PASS on the slope feet 0.3500 (slope at centre 0.2500, under the disc 0.3500) z 5.1840 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side gentle from -z x 42.9 speed 6.3 start 1.13: FAIL neither feet 0.0000 (slope at centre 0.4750, under the disc 0.5750) z 5.1300 embedded-ticks 6 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 42.9 speed 6.3 start 1.20: FAIL neither feet 0.0000 (slope at centre 0.4750, under the disc 0.5750) z 5.2000 embedded-ticks 6 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 42.9 speed 6.3 start 1.05: FAIL neither feet 0.0000 (slope at centre 0.4750, under the disc 0.5750) z 5.0500 embedded-ticks 5 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 42.9 speed 9.576 start 1.27: FAIL neither feet 0.0000 (slope at centre 0.4750, under the disc 0.5750) z 5.2728 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 42.9 speed 9.576 start 1.02: FAIL neither feet 0.0000 (slope at centre 0.4750, under the disc 0.5750) z 5.0236 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 42.9 speed 9.576 start 1.08: FAIL neither feet 0.0000 (slope at centre 0.4750, under the disc 0.5750) z 5.0836 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 42.9 speed 13.27 start 1.05: FAIL neither feet 0.0000 (slope at centre 0.4750, under the disc 0.5750) z 5.0540 embedded-ticks 3 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 42.9 speed 13.27 start 1.12: FAIL neither feet 0.0000 (slope at centre 0.4750, under the disc 0.5750) z 5.1240 embedded-ticks 3 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 42.9 speed 13.27 start 1.18: FAIL neither feet 0.0000 (slope at centre 0.4750, under the disc 0.5750) z 5.1840 embedded-ticks 3 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 43 speed 6.3 start 1.13: FAIL neither feet 0.0000 (slope at centre 0.5000, under the disc 0.6000) z 5.1300 embedded-ticks 6 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 43 speed 6.3 start 1.20: FAIL neither feet 0.0000 (slope at centre 0.5000, under the disc 0.6000) z 5.2000 embedded-ticks 6 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 43 speed 6.3 start 1.05: FAIL neither feet 0.0000 (slope at centre 0.5000, under the disc 0.6000) z 5.0500 embedded-ticks 5 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 43 speed 9.576 start 1.27: FAIL neither feet 0.0000 (slope at centre 0.5000, under the disc 0.6000) z 5.2728 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 43 speed 9.576 start 1.02: FAIL neither feet 0.0000 (slope at centre 0.5000, under the disc 0.6000) z 5.0236 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 43 speed 9.576 start 1.08: FAIL neither feet 0.0000 (slope at centre 0.5000, under the disc 0.6000) z 5.0836 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 43 speed 13.27 start 1.05: FAIL neither feet 0.0000 (slope at centre 0.5000, under the disc 0.6000) z 5.0540 embedded-ticks 3 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 43 speed 13.27 start 1.12: FAIL neither feet 0.0000 (slope at centre 0.5000, under the disc 0.6000) z 5.1240 embedded-ticks 3 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 43 speed 13.27 start 1.18: FAIL neither feet 0.0000 (slope at centre 0.5000, under the disc 0.6000) z 5.1840 embedded-ticks 3 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 43.1 speed 6.3 start 1.13: FAIL neither feet 0.0000 (slope at centre 0.5250, under the disc 0.6250) z 5.1300 embedded-ticks 6 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 43.1 speed 6.3 start 1.20: FAIL neither feet 0.0000 (slope at centre 0.5250, under the disc 0.6250) z 5.2000 embedded-ticks 6 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 43.1 speed 6.3 start 1.05: FAIL neither feet 0.0000 (slope at centre 0.5250, under the disc 0.6250) z 5.0500 embedded-ticks 5 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 43.1 speed 9.576 start 1.27: FAIL neither feet 0.0000 (slope at centre 0.5250, under the disc 0.6250) z 5.2728 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 43.1 speed 9.576 start 1.02: FAIL neither feet 0.0000 (slope at centre 0.5250, under the disc 0.6250) z 5.0236 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 43.1 speed 9.576 start 1.08: FAIL neither feet 0.0000 (slope at centre 0.5250, under the disc 0.6250) z 5.0836 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 43.1 speed 13.27 start 1.05: FAIL neither feet 0.0000 (slope at centre 0.5250, under the disc 0.6250) z 5.0540 embedded-ticks 3 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 43.1 speed 13.27 start 1.12: FAIL neither feet 0.0000 (slope at centre 0.5250, under the disc 0.6250) z 5.1240 embedded-ticks 3 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 43.1 speed 13.27 start 1.18: FAIL neither feet 0.0000 (slope at centre 0.5250, under the disc 0.6250) z 5.1840 embedded-ticks 3 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 43.6 speed 6.3 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.6500, under the disc 0.7500) z 3.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 43.6 speed 6.3 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.6500, under the disc 0.7500) z 3.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 43.6 speed 6.3 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.6500, under the disc 0.7500) z 3.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 43.6 speed 9.576 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.6500, under the disc 0.7500) z 3.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 43.6 speed 9.576 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.6500, under the disc 0.7500) z 3.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 43.6 speed 9.576 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.6500, under the disc 0.7500) z 3.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 43.6 speed 13.27 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.6500, under the disc 0.7500) z 3.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 43.6 speed 13.27 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.6500, under the disc 0.7500) z 3.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 43.6 speed 13.27 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.6500, under the disc 0.7500) z 3.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 44.4 speed 6.3 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.8500, under the disc 0.9500) z 3.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 44.4 speed 6.3 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.8500, under the disc 0.9500) z 3.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 44.4 speed 6.3 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.8500, under the disc 0.9500) z 3.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 44.4 speed 9.576 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.8500, under the disc 0.9500) z 3.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 44.4 speed 9.576 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.8500, under the disc 0.9500) z 3.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 44.4 speed 9.576 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.8500, under the disc 0.9500) z 3.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 44.4 speed 13.27 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.8500, under the disc 0.9500) z 3.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 44.4 speed 13.27 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.8500, under the disc 0.9500) z 3.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 44.4 speed 13.27 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.8500, under the disc 0.9500) z 3.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 45 speed 6.3 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.0000, under the disc 1.0000) z 3.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 45 speed 6.3 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.0000, under the disc 1.0000) z 3.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 45 speed 6.3 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.0000, under the disc 1.0000) z 3.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 45 speed 9.576 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.0000, under the disc 1.0000) z 3.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 45 speed 9.576 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.0000, under the disc 1.0000) z 3.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 45 speed 9.576 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.0000, under the disc 1.0000) z 3.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 45 speed 13.27 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.0000, under the disc 1.0000) z 3.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 45 speed 13.27 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.0000, under the disc 1.0000) z 3.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from -z x 45 speed 13.27 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.0000, under the disc 1.0000) z 3.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 41.2 speed 6.3 start 1.20: PASS on the slope feet 0.1500 (slope at centre 0.0500, under the disc 0.1500) z 6.8000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side gentle from +z x 41.2 speed 6.3 start 1.06: PASS on the slope feet 0.1500 (slope at centre 0.0500, under the disc 0.1500) z 6.9400 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side gentle from +z x 41.2 speed 6.3 start 1.12: PASS on the slope feet 0.1500 (slope at centre 0.0500, under the disc 0.1500) z 6.8800 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side gentle from +z x 41.2 speed 9.576 start 1.02: PASS on the slope feet 0.1500 (slope at centre 0.0500, under the disc 0.1500) z 6.9848 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side gentle from +z x 41.2 speed 9.576 start 1.09: PASS on the slope feet 0.1500 (slope at centre 0.0500, under the disc 0.1500) z 6.9148 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side gentle from +z x 41.2 speed 9.576 start 1.15: PASS on the slope feet 0.1500 (slope at centre 0.0500, under the disc 0.1500) z 6.8548 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side gentle from +z x 41.2 speed 13.27 start 1.31: PASS on the slope feet 0.1500 (slope at centre 0.0500, under the disc 0.1500) z 6.6883 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side gentle from +z x 41.2 speed 13.27 start 1.38: PASS on the slope feet 0.1500 (slope at centre 0.0500, under the disc 0.1500) z 6.6183 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side gentle from +z x 41.2 speed 13.27 start 1.44: PASS on the slope feet 0.1500 (slope at centre 0.0500, under the disc 0.1500) z 6.5583 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side gentle from +z x 42 speed 6.3 start 1.20: PASS on the slope feet 0.3500 (slope at centre 0.2500, under the disc 0.3500) z 6.8000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side gentle from +z x 42 speed 6.3 start 1.06: PASS on the slope feet 0.3500 (slope at centre 0.2500, under the disc 0.3500) z 6.9400 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side gentle from +z x 42 speed 6.3 start 1.12: PASS on the slope feet 0.3500 (slope at centre 0.2500, under the disc 0.3500) z 6.8800 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side gentle from +z x 42 speed 9.576 start 1.02: PASS on the slope feet 0.3500 (slope at centre 0.2500, under the disc 0.3500) z 6.9848 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side gentle from +z x 42 speed 9.576 start 1.09: PASS on the slope feet 0.3500 (slope at centre 0.2500, under the disc 0.3500) z 6.9148 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side gentle from +z x 42 speed 9.576 start 1.15: PASS on the slope feet 0.3500 (slope at centre 0.2500, under the disc 0.3500) z 6.8548 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side gentle from +z x 42 speed 13.27 start 1.31: PASS on the slope feet 0.3500 (slope at centre 0.2500, under the disc 0.3500) z 6.6883 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side gentle from +z x 42 speed 13.27 start 1.38: PASS on the slope feet 0.3500 (slope at centre 0.2500, under the disc 0.3500) z 6.6183 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side gentle from +z x 42 speed 13.27 start 1.44: PASS on the slope feet 0.3500 (slope at centre 0.2500, under the disc 0.3500) z 6.5583 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side gentle from +z x 42.9 speed 6.3 start 1.20: FAIL neither feet 0.0000 (slope at centre 0.4750, under the disc 0.5750) z 6.8000 embedded-ticks 6 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 42.9 speed 6.3 start 1.06: FAIL neither feet 0.0000 (slope at centre 0.4750, under the disc 0.5750) z 6.9400 embedded-ticks 6 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 42.9 speed 6.3 start 1.12: FAIL neither feet 0.0000 (slope at centre 0.4750, under the disc 0.5750) z 6.8800 embedded-ticks 6 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 42.9 speed 9.576 start 1.02: FAIL neither feet 0.0000 (slope at centre 0.4750, under the disc 0.5750) z 6.9848 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 42.9 speed 9.576 start 1.09: FAIL neither feet 0.0000 (slope at centre 0.4750, under the disc 0.5750) z 6.9148 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 42.9 speed 9.576 start 1.15: FAIL neither feet 0.0000 (slope at centre 0.4750, under the disc 0.5750) z 6.8548 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 42.9 speed 13.27 start 1.31: FAIL neither feet 0.0000 (slope at centre 0.4750, under the disc 0.5750) z 6.6883 embedded-ticks 3 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 42.9 speed 13.27 start 1.38: FAIL neither feet 0.0000 (slope at centre 0.4750, under the disc 0.5750) z 6.6183 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 42.9 speed 13.27 start 1.44: FAIL neither feet 0.0000 (slope at centre 0.4750, under the disc 0.5750) z 6.5583 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 43 speed 6.3 start 1.20: FAIL neither feet 0.0000 (slope at centre 0.5000, under the disc 0.6000) z 6.8000 embedded-ticks 6 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 43 speed 6.3 start 1.06: FAIL neither feet 0.0000 (slope at centre 0.5000, under the disc 0.6000) z 6.9400 embedded-ticks 6 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 43 speed 6.3 start 1.12: FAIL neither feet 0.0000 (slope at centre 0.5000, under the disc 0.6000) z 6.8800 embedded-ticks 6 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 43 speed 9.576 start 1.02: FAIL neither feet 0.0000 (slope at centre 0.5000, under the disc 0.6000) z 6.9848 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 43 speed 9.576 start 1.09: FAIL neither feet 0.0000 (slope at centre 0.5000, under the disc 0.6000) z 6.9148 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 43 speed 9.576 start 1.15: FAIL neither feet 0.0000 (slope at centre 0.5000, under the disc 0.6000) z 6.8548 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 43 speed 13.27 start 1.31: FAIL neither feet 0.0000 (slope at centre 0.5000, under the disc 0.6000) z 6.6883 embedded-ticks 3 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 43 speed 13.27 start 1.38: FAIL neither feet 0.0000 (slope at centre 0.5000, under the disc 0.6000) z 6.6183 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 43 speed 13.27 start 1.44: FAIL neither feet 0.0000 (slope at centre 0.5000, under the disc 0.6000) z 6.5583 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 43.1 speed 6.3 start 1.20: FAIL neither feet 0.0000 (slope at centre 0.5250, under the disc 0.6250) z 6.8000 embedded-ticks 6 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 43.1 speed 6.3 start 1.06: FAIL neither feet 0.0000 (slope at centre 0.5250, under the disc 0.6250) z 6.9400 embedded-ticks 6 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 43.1 speed 6.3 start 1.12: FAIL neither feet 0.0000 (slope at centre 0.5250, under the disc 0.6250) z 6.8800 embedded-ticks 6 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 43.1 speed 9.576 start 1.02: FAIL neither feet 0.0000 (slope at centre 0.5250, under the disc 0.6250) z 6.9848 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 43.1 speed 9.576 start 1.09: FAIL neither feet 0.0000 (slope at centre 0.5250, under the disc 0.6250) z 6.9148 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 43.1 speed 9.576 start 1.15: FAIL neither feet 0.0000 (slope at centre 0.5250, under the disc 0.6250) z 6.8548 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 43.1 speed 13.27 start 1.31: FAIL neither feet 0.0000 (slope at centre 0.5250, under the disc 0.6250) z 6.6883 embedded-ticks 3 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 43.1 speed 13.27 start 1.38: FAIL neither feet 0.0000 (slope at centre 0.5250, under the disc 0.6250) z 6.6183 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 43.1 speed 13.27 start 1.44: FAIL neither feet 0.0000 (slope at centre 0.5250, under the disc 0.6250) z 6.5583 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 43.6 speed 6.3 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.6500, under the disc 0.7500) z 8.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 43.6 speed 6.3 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.6500, under the disc 0.7500) z 8.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 43.6 speed 6.3 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.6500, under the disc 0.7500) z 8.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 43.6 speed 9.576 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.6500, under the disc 0.7500) z 8.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 43.6 speed 9.576 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.6500, under the disc 0.7500) z 8.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 43.6 speed 9.576 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.6500, under the disc 0.7500) z 8.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 43.6 speed 13.27 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.6500, under the disc 0.7500) z 8.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 43.6 speed 13.27 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.6500, under the disc 0.7500) z 8.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 43.6 speed 13.27 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.6500, under the disc 0.7500) z 8.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 44.4 speed 6.3 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.8500, under the disc 0.9500) z 8.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 44.4 speed 6.3 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.8500, under the disc 0.9500) z 8.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 44.4 speed 6.3 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.8500, under the disc 0.9500) z 8.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 44.4 speed 9.576 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.8500, under the disc 0.9500) z 8.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 44.4 speed 9.576 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.8500, under the disc 0.9500) z 8.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 44.4 speed 9.576 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.8500, under the disc 0.9500) z 8.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 44.4 speed 13.27 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.8500, under the disc 0.9500) z 8.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 44.4 speed 13.27 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.8500, under the disc 0.9500) z 8.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 44.4 speed 13.27 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.8500, under the disc 0.9500) z 8.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 45 speed 6.3 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.0000, under the disc 1.0000) z 8.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 45 speed 6.3 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.0000, under the disc 1.0000) z 8.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 45 speed 6.3 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.0000, under the disc 1.0000) z 8.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 45 speed 9.576 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.0000, under the disc 1.0000) z 8.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 45 speed 9.576 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.0000, under the disc 1.0000) z 8.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 45 speed 9.576 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.0000, under the disc 1.0000) z 8.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 45 speed 13.27 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.0000, under the disc 1.0000) z 8.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 45 speed 13.27 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.0000, under the disc 1.0000) z 8.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side gentle from +z x 45 speed 13.27 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.0000, under the disc 1.0000) z 8.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 42.2 speed 6.3 start 1.20: PASS on the slope feet 0.3000 (slope at centre 0.1000, under the disc 0.3000) z 11.2000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side steep from -z x 42.2 speed 6.3 start 1.06: PASS on the slope feet 0.3000 (slope at centre 0.1000, under the disc 0.3000) z 11.0600 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side steep from -z x 42.2 speed 6.3 start 1.12: PASS on the slope feet 0.3000 (slope at centre 0.1000, under the disc 0.3000) z 11.1200 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side steep from -z x 42.2 speed 9.576 start 1.02: PASS on the slope feet 0.3000 (slope at centre 0.1000, under the disc 0.3000) z 11.0152 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side steep from -z x 42.2 speed 9.576 start 1.09: PASS on the slope feet 0.3000 (slope at centre 0.1000, under the disc 0.3000) z 11.0852 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side steep from -z x 42.2 speed 9.576 start 1.15: PASS on the slope feet 0.3000 (slope at centre 0.1000, under the disc 0.3000) z 11.1452 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side steep from -z x 42.2 speed 13.27 start 1.31: PASS on the slope feet 0.3000 (slope at centre 0.1000, under the disc 0.3000) z 11.3117 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side steep from -z x 42.2 speed 13.27 start 1.38: PASS on the slope feet 0.3000 (slope at centre 0.1000, under the disc 0.3000) z 11.3817 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side steep from -z x 42.2 speed 13.27 start 1.44: PASS on the slope feet 0.3000 (slope at centre 0.1000, under the disc 0.3000) z 11.4417 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side steep from -z x 42.6 speed 6.3 start 1.20: PASS on the slope feet 0.5000 (slope at centre 0.3000, under the disc 0.5000) z 11.2000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side steep from -z x 42.6 speed 6.3 start 1.06: PASS on the slope feet 0.5000 (slope at centre 0.3000, under the disc 0.5000) z 11.0600 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side steep from -z x 42.6 speed 6.3 start 1.12: PASS on the slope feet 0.5000 (slope at centre 0.3000, under the disc 0.5000) z 11.1200 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side steep from -z x 42.6 speed 9.576 start 1.02: PASS on the slope feet 0.5000 (slope at centre 0.3000, under the disc 0.5000) z 11.0152 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side steep from -z x 42.6 speed 9.576 start 1.09: PASS on the slope feet 0.5000 (slope at centre 0.3000, under the disc 0.5000) z 11.0852 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side steep from -z x 42.6 speed 9.576 start 1.15: PASS on the slope feet 0.5000 (slope at centre 0.3000, under the disc 0.5000) z 11.1452 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side steep from -z x 42.6 speed 13.27 start 1.31: PASS on the slope feet 0.5000 (slope at centre 0.3000, under the disc 0.5000) z 11.3117 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side steep from -z x 42.6 speed 13.27 start 1.38: PASS on the slope feet 0.5000 (slope at centre 0.3000, under the disc 0.5000) z 11.3817 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side steep from -z x 42.6 speed 13.27 start 1.44: PASS on the slope feet 0.5000 (slope at centre 0.3000, under the disc 0.5000) z 11.4417 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side steep from -z x 42.8 speed 6.3 start 1.20: FAIL neither feet 0.0000 (slope at centre 0.4000, under the disc 0.6000) z 11.2000 embedded-ticks 6 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 42.8 speed 6.3 start 1.06: FAIL neither feet 0.0000 (slope at centre 0.4000, under the disc 0.6000) z 11.0600 embedded-ticks 6 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 42.8 speed 6.3 start 1.12: FAIL neither feet 0.0000 (slope at centre 0.4000, under the disc 0.6000) z 11.1200 embedded-ticks 6 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 42.8 speed 9.576 start 1.02: FAIL neither feet 0.0000 (slope at centre 0.4000, under the disc 0.6000) z 11.0152 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 42.8 speed 9.576 start 1.09: FAIL neither feet 0.0000 (slope at centre 0.4000, under the disc 0.6000) z 11.0852 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 42.8 speed 9.576 start 1.15: FAIL neither feet 0.0000 (slope at centre 0.4000, under the disc 0.6000) z 11.1452 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 42.8 speed 13.27 start 1.31: FAIL neither feet 0.0000 (slope at centre 0.4000, under the disc 0.6000) z 11.3117 embedded-ticks 3 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 42.8 speed 13.27 start 1.38: FAIL neither feet 0.0000 (slope at centre 0.4000, under the disc 0.6000) z 11.3817 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 42.8 speed 13.27 start 1.44: FAIL neither feet 0.0000 (slope at centre 0.4000, under the disc 0.6000) z 11.4417 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 42.9 speed 6.3 start 1.20: FAIL neither feet 0.0000 (slope at centre 0.4500, under the disc 0.6500) z 11.2000 embedded-ticks 6 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 42.9 speed 6.3 start 1.06: FAIL neither feet 0.0000 (slope at centre 0.4500, under the disc 0.6500) z 11.0600 embedded-ticks 6 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 42.9 speed 6.3 start 1.12: FAIL neither feet 0.0000 (slope at centre 0.4500, under the disc 0.6500) z 11.1200 embedded-ticks 6 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 42.9 speed 9.576 start 1.02: FAIL neither feet 0.0000 (slope at centre 0.4500, under the disc 0.6500) z 11.0152 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 42.9 speed 9.576 start 1.09: FAIL neither feet 0.0000 (slope at centre 0.4500, under the disc 0.6500) z 11.0852 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 42.9 speed 9.576 start 1.15: FAIL neither feet 0.0000 (slope at centre 0.4500, under the disc 0.6500) z 11.1452 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 42.9 speed 13.27 start 1.31: FAIL neither feet 0.0000 (slope at centre 0.4500, under the disc 0.6500) z 11.3117 embedded-ticks 3 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 42.9 speed 13.27 start 1.38: FAIL neither feet 0.0000 (slope at centre 0.4500, under the disc 0.6500) z 11.3817 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 42.9 speed 13.27 start 1.44: FAIL neither feet 0.0000 (slope at centre 0.4500, under the disc 0.6500) z 11.4417 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 43 speed 6.3 start 1.20: FAIL neither feet 0.0000 (slope at centre 0.5000, under the disc 0.7000) z 11.2000 embedded-ticks 6 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 43 speed 6.3 start 1.06: FAIL neither feet 0.0000 (slope at centre 0.5000, under the disc 0.7000) z 11.0600 embedded-ticks 6 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 43 speed 6.3 start 1.12: FAIL neither feet 0.0000 (slope at centre 0.5000, under the disc 0.7000) z 11.1200 embedded-ticks 6 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 43 speed 9.576 start 1.02: FAIL neither feet 0.0000 (slope at centre 0.5000, under the disc 0.7000) z 11.0152 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 43 speed 9.576 start 1.09: FAIL neither feet 0.0000 (slope at centre 0.5000, under the disc 0.7000) z 11.0852 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 43 speed 9.576 start 1.15: FAIL neither feet 0.0000 (slope at centre 0.5000, under the disc 0.7000) z 11.1452 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 43 speed 13.27 start 1.31: FAIL neither feet 0.0000 (slope at centre 0.5000, under the disc 0.7000) z 11.3117 embedded-ticks 3 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 43 speed 13.27 start 1.38: FAIL neither feet 0.0000 (slope at centre 0.5000, under the disc 0.7000) z 11.3817 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 43 speed 13.27 start 1.44: FAIL neither feet 0.0000 (slope at centre 0.5000, under the disc 0.7000) z 11.4417 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 43.2 speed 6.3 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.6000, under the disc 0.8000) z 9.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 43.2 speed 6.3 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.6000, under the disc 0.8000) z 9.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 43.2 speed 6.3 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.6000, under the disc 0.8000) z 9.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 43.2 speed 9.576 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.6000, under the disc 0.8000) z 9.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 43.2 speed 9.576 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.6000, under the disc 0.8000) z 9.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 43.2 speed 9.576 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.6000, under the disc 0.8000) z 9.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 43.2 speed 13.27 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.6000, under the disc 0.8000) z 9.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 43.2 speed 13.27 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.6000, under the disc 0.8000) z 9.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 43.2 speed 13.27 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.6000, under the disc 0.8000) z 9.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 43.6 speed 6.3 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.8000, under the disc 1.0000) z 9.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 43.6 speed 6.3 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.8000, under the disc 1.0000) z 9.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 43.6 speed 6.3 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.8000, under the disc 1.0000) z 9.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 43.6 speed 9.576 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.8000, under the disc 1.0000) z 9.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 43.6 speed 9.576 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.8000, under the disc 1.0000) z 9.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 43.6 speed 9.576 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.8000, under the disc 1.0000) z 9.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 43.6 speed 13.27 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.8000, under the disc 1.0000) z 9.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 43.6 speed 13.27 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.8000, under the disc 1.0000) z 9.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 43.6 speed 13.27 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.8000, under the disc 1.0000) z 9.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 44.4 speed 6.3 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.2000, under the disc 1.4000) z 9.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 44.4 speed 6.3 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.2000, under the disc 1.4000) z 9.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 44.4 speed 6.3 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.2000, under the disc 1.4000) z 9.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 44.4 speed 9.576 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.2000, under the disc 1.4000) z 9.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 44.4 speed 9.576 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.2000, under the disc 1.4000) z 9.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 44.4 speed 9.576 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.2000, under the disc 1.4000) z 9.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 44.4 speed 13.27 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.2000, under the disc 1.4000) z 9.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 44.4 speed 13.27 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.2000, under the disc 1.4000) z 9.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 44.4 speed 13.27 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.2000, under the disc 1.4000) z 9.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 45 speed 6.3 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.5000, under the disc 1.5000) z 9.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 45 speed 6.3 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.5000, under the disc 1.5000) z 9.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 45 speed 6.3 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.5000, under the disc 1.5000) z 9.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 45 speed 9.576 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.5000, under the disc 1.5000) z 9.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 45 speed 9.576 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.5000, under the disc 1.5000) z 9.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 45 speed 9.576 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.5000, under the disc 1.5000) z 9.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 45 speed 13.27 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.5000, under the disc 1.5000) z 9.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 45 speed 13.27 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.5000, under the disc 1.5000) z 9.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from -z x 45 speed 13.27 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.5000, under the disc 1.5000) z 9.6000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 42.2 speed 6.3 start 1.13: PASS on the slope feet 0.3000 (slope at centre 0.1000, under the disc 0.3000) z 12.8700 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side steep from +z x 42.2 speed 6.3 start 1.20: PASS on the slope feet 0.3000 (slope at centre 0.1000, under the disc 0.3000) z 12.8000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side steep from +z x 42.2 speed 6.3 start 1.05: PASS on the slope feet 0.3000 (slope at centre 0.1000, under the disc 0.3000) z 12.9500 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side steep from +z x 42.2 speed 9.576 start 1.27: PASS on the slope feet 0.3000 (slope at centre 0.1000, under the disc 0.3000) z 12.7272 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side steep from +z x 42.2 speed 9.576 start 1.02: PASS on the slope feet 0.3000 (slope at centre 0.1000, under the disc 0.3000) z 12.9764 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side steep from +z x 42.2 speed 9.576 start 1.08: PASS on the slope feet 0.3000 (slope at centre 0.1000, under the disc 0.3000) z 12.9164 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side steep from +z x 42.2 speed 13.27 start 1.05: PASS on the slope feet 0.3000 (slope at centre 0.1000, under the disc 0.3000) z 12.9460 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side steep from +z x 42.2 speed 13.27 start 1.12: PASS on the slope feet 0.3000 (slope at centre 0.1000, under the disc 0.3000) z 12.8760 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side steep from +z x 42.2 speed 13.27 start 1.18: PASS on the slope feet 0.3000 (slope at centre 0.1000, under the disc 0.3000) z 12.8160 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side steep from +z x 42.6 speed 6.3 start 1.13: PASS on the slope feet 0.5000 (slope at centre 0.3000, under the disc 0.5000) z 12.8700 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side steep from +z x 42.6 speed 6.3 start 1.20: PASS on the slope feet 0.5000 (slope at centre 0.3000, under the disc 0.5000) z 12.8000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side steep from +z x 42.6 speed 6.3 start 1.05: PASS on the slope feet 0.5000 (slope at centre 0.3000, under the disc 0.5000) z 12.9500 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side steep from +z x 42.6 speed 9.576 start 1.27: PASS on the slope feet 0.5000 (slope at centre 0.3000, under the disc 0.5000) z 12.7272 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side steep from +z x 42.6 speed 9.576 start 1.02: PASS on the slope feet 0.5000 (slope at centre 0.3000, under the disc 0.5000) z 12.9764 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side steep from +z x 42.6 speed 9.576 start 1.08: PASS on the slope feet 0.5000 (slope at centre 0.3000, under the disc 0.5000) z 12.9164 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side steep from +z x 42.6 speed 13.27 start 1.05: PASS on the slope feet 0.5000 (slope at centre 0.3000, under the disc 0.5000) z 12.9460 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side steep from +z x 42.6 speed 13.27 start 1.12: PASS on the slope feet 0.5000 (slope at centre 0.3000, under the disc 0.5000) z 12.8760 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side steep from +z x 42.6 speed 13.27 start 1.18: PASS on the slope feet 0.5000 (slope at centre 0.3000, under the disc 0.5000) z 12.8160 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 1
+side steep from +z x 42.8 speed 6.3 start 1.13: FAIL neither feet 0.0000 (slope at centre 0.4000, under the disc 0.6000) z 12.8700 embedded-ticks 6 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 42.8 speed 6.3 start 1.20: FAIL neither feet 0.0000 (slope at centre 0.4000, under the disc 0.6000) z 12.8000 embedded-ticks 6 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 42.8 speed 6.3 start 1.05: FAIL neither feet 0.0000 (slope at centre 0.4000, under the disc 0.6000) z 12.9500 embedded-ticks 5 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 42.8 speed 9.576 start 1.27: FAIL neither feet 0.0000 (slope at centre 0.4000, under the disc 0.6000) z 12.7272 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 42.8 speed 9.576 start 1.02: FAIL neither feet 0.0000 (slope at centre 0.4000, under the disc 0.6000) z 12.9764 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 42.8 speed 9.576 start 1.08: FAIL neither feet 0.0000 (slope at centre 0.4000, under the disc 0.6000) z 12.9164 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 42.8 speed 13.27 start 1.05: FAIL neither feet 0.0000 (slope at centre 0.4000, under the disc 0.6000) z 12.9460 embedded-ticks 3 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 42.8 speed 13.27 start 1.12: FAIL neither feet 0.0000 (slope at centre 0.4000, under the disc 0.6000) z 12.8760 embedded-ticks 3 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 42.8 speed 13.27 start 1.18: FAIL neither feet 0.0000 (slope at centre 0.4000, under the disc 0.6000) z 12.8160 embedded-ticks 3 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 42.9 speed 6.3 start 1.13: FAIL neither feet 0.0000 (slope at centre 0.4500, under the disc 0.6500) z 12.8700 embedded-ticks 6 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 42.9 speed 6.3 start 1.20: FAIL neither feet 0.0000 (slope at centre 0.4500, under the disc 0.6500) z 12.8000 embedded-ticks 6 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 42.9 speed 6.3 start 1.05: FAIL neither feet 0.0000 (slope at centre 0.4500, under the disc 0.6500) z 12.9500 embedded-ticks 5 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 42.9 speed 9.576 start 1.27: FAIL neither feet 0.0000 (slope at centre 0.4500, under the disc 0.6500) z 12.7272 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 42.9 speed 9.576 start 1.02: FAIL neither feet 0.0000 (slope at centre 0.4500, under the disc 0.6500) z 12.9764 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 42.9 speed 9.576 start 1.08: FAIL neither feet 0.0000 (slope at centre 0.4500, under the disc 0.6500) z 12.9164 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 42.9 speed 13.27 start 1.05: FAIL neither feet 0.0000 (slope at centre 0.4500, under the disc 0.6500) z 12.9460 embedded-ticks 3 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 42.9 speed 13.27 start 1.12: FAIL neither feet 0.0000 (slope at centre 0.4500, under the disc 0.6500) z 12.8760 embedded-ticks 3 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 42.9 speed 13.27 start 1.18: FAIL neither feet 0.0000 (slope at centre 0.4500, under the disc 0.6500) z 12.8160 embedded-ticks 3 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 43 speed 6.3 start 1.13: FAIL neither feet 0.0000 (slope at centre 0.5000, under the disc 0.7000) z 12.8700 embedded-ticks 6 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 43 speed 6.3 start 1.20: FAIL neither feet 0.0000 (slope at centre 0.5000, under the disc 0.7000) z 12.8000 embedded-ticks 6 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 43 speed 6.3 start 1.05: FAIL neither feet 0.0000 (slope at centre 0.5000, under the disc 0.7000) z 12.9500 embedded-ticks 5 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 43 speed 9.576 start 1.27: FAIL neither feet 0.0000 (slope at centre 0.5000, under the disc 0.7000) z 12.7272 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 43 speed 9.576 start 1.02: FAIL neither feet 0.0000 (slope at centre 0.5000, under the disc 0.7000) z 12.9764 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 43 speed 9.576 start 1.08: FAIL neither feet 0.0000 (slope at centre 0.5000, under the disc 0.7000) z 12.9164 embedded-ticks 4 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 43 speed 13.27 start 1.05: FAIL neither feet 0.0000 (slope at centre 0.5000, under the disc 0.7000) z 12.9460 embedded-ticks 3 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 43 speed 13.27 start 1.12: FAIL neither feet 0.0000 (slope at centre 0.5000, under the disc 0.7000) z 12.8760 embedded-ticks 3 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 43 speed 13.27 start 1.18: FAIL neither feet 0.0000 (slope at centre 0.5000, under the disc 0.7000) z 12.8160 embedded-ticks 3 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 43.2 speed 6.3 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.6000, under the disc 0.8000) z 14.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 43.2 speed 6.3 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.6000, under the disc 0.8000) z 14.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 43.2 speed 6.3 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.6000, under the disc 0.8000) z 14.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 43.2 speed 9.576 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.6000, under the disc 0.8000) z 14.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 43.2 speed 9.576 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.6000, under the disc 0.8000) z 14.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 43.2 speed 9.576 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.6000, under the disc 0.8000) z 14.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 43.2 speed 13.27 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.6000, under the disc 0.8000) z 14.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 43.2 speed 13.27 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.6000, under the disc 0.8000) z 14.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 43.2 speed 13.27 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.6000, under the disc 0.8000) z 14.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 43.6 speed 6.3 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.8000, under the disc 1.0000) z 14.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 43.6 speed 6.3 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.8000, under the disc 1.0000) z 14.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 43.6 speed 6.3 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.8000, under the disc 1.0000) z 14.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 43.6 speed 9.576 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.8000, under the disc 1.0000) z 14.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 43.6 speed 9.576 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.8000, under the disc 1.0000) z 14.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 43.6 speed 9.576 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.8000, under the disc 1.0000) z 14.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 43.6 speed 13.27 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.8000, under the disc 1.0000) z 14.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 43.6 speed 13.27 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.8000, under the disc 1.0000) z 14.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 43.6 speed 13.27 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 0.8000, under the disc 1.0000) z 14.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 44.4 speed 6.3 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.2000, under the disc 1.4000) z 14.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 44.4 speed 6.3 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.2000, under the disc 1.4000) z 14.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 44.4 speed 6.3 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.2000, under the disc 1.4000) z 14.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 44.4 speed 9.576 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.2000, under the disc 1.4000) z 14.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 44.4 speed 9.576 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.2000, under the disc 1.4000) z 14.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 44.4 speed 9.576 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.2000, under the disc 1.4000) z 14.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 44.4 speed 13.27 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.2000, under the disc 1.4000) z 14.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 44.4 speed 13.27 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.2000, under the disc 1.4000) z 14.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 44.4 speed 13.27 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.2000, under the disc 1.4000) z 14.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 45 speed 6.3 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.5000, under the disc 1.5000) z 14.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 45 speed 6.3 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.5000, under the disc 1.5000) z 14.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 45 speed 6.3 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.5000, under the disc 1.5000) z 14.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 45 speed 9.576 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.5000, under the disc 1.5000) z 14.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 45 speed 9.576 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.5000, under the disc 1.5000) z 14.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 45 speed 9.576 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.5000, under the disc 1.5000) z 14.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 45 speed 13.27 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.5000, under the disc 1.5000) z 14.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 45 speed 13.27 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.5000, under the disc 1.5000) z 14.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+side steep from +z x 45 speed 13.27 start 0.40: PASS stopped at the side feet 0.0000 (slope at centre 1.5000, under the disc 1.5000) z 14.4000 embedded-ticks 0 flickers 0 unjumped-falls 0 steps 0
+# A2. off a ramp's side
+off-side gentle off -z x 41.6 speed 6.3: PASS from 0.2500: snapped down (centre past the side when it started: None) airborne-ticks 0 embedded-ticks 0 flickers 0
+off-side gentle off -z x 41.6 speed 9.576: PASS from 0.2500: snapped down (centre past the side when it started: None) airborne-ticks 0 embedded-ticks 0 flickers 0
+off-side gentle off -z x 41.6 speed 13.27: PASS from 0.2500: snapped down (centre past the side when it started: None) airborne-ticks 0 embedded-ticks 0 flickers 0
+off-side gentle off -z x 42.6 speed 6.3: PASS from 0.5000: snapped down (centre past the side when it started: None) airborne-ticks 0 embedded-ticks 0 flickers 0
+off-side gentle off -z x 42.6 speed 9.576: PASS from 0.5000: snapped down (centre past the side when it started: None) airborne-ticks 0 embedded-ticks 0 flickers 0
+off-side gentle off -z x 42.6 speed 13.27: PASS from 0.5000: snapped down (centre past the side when it started: None) airborne-ticks 0 embedded-ticks 0 flickers 0
+off-side gentle off -z x 43.6 speed 6.3: PASS from 0.7500: fell (centre past the side when it started: Some(0.52000046)) airborne-ticks 7 embedded-ticks 0 flickers 0
+off-side gentle off -z x 43.6 speed 9.576: PASS from 0.7500: fell (centre past the side when it started: Some(0.5536003)) airborne-ticks 7 embedded-ticks 0 flickers 0
+off-side gentle off -z x 43.6 speed 13.27: PASS from 0.7500: fell (centre past the side when it started: Some(0.6539998)) airborne-ticks 7 embedded-ticks 0 flickers 0
+off-side gentle off -z x 44.6 speed 6.3: PASS from 1.0000: fell (centre past the side when it started: Some(0.52000046)) airborne-ticks 8 embedded-ticks 0 flickers 0
+off-side gentle off -z x 44.6 speed 9.576: PASS from 1.0000: fell (centre past the side when it started: Some(0.5536003)) airborne-ticks 8 embedded-ticks 0 flickers 0
+off-side gentle off -z x 44.6 speed 13.27: PASS from 1.0000: fell (centre past the side when it started: Some(0.6539998)) airborne-ticks 8 embedded-ticks 0 flickers 0
+off-side steep off +z x 41.6 speed 6.3: PASS from 0.0000: snapped down (centre past the side when it started: None) airborne-ticks 0 embedded-ticks 0 flickers 0
+off-side steep off +z x 41.6 speed 9.576: PASS from 0.0000: snapped down (centre past the side when it started: None) airborne-ticks 0 embedded-ticks 0 flickers 0
+off-side steep off +z x 41.6 speed 13.27: PASS from 0.0000: snapped down (centre past the side when it started: None) airborne-ticks 0 embedded-ticks 0 flickers 0
+off-side steep off +z x 42.6 speed 6.3: PASS from 0.5000: snapped down (centre past the side when it started: None) airborne-ticks 0 embedded-ticks 0 flickers 0
+off-side steep off +z x 42.6 speed 9.576: PASS from 0.5000: snapped down (centre past the side when it started: None) airborne-ticks 0 embedded-ticks 0 flickers 0
+off-side steep off +z x 42.6 speed 13.27: PASS from 0.5000: snapped down (centre past the side when it started: None) airborne-ticks 0 embedded-ticks 0 flickers 0
+off-side steep off +z x 43.6 speed 6.3: PASS from 1.0000: fell (centre past the side when it started: Some(0.52000046)) airborne-ticks 8 embedded-ticks 0 flickers 0
+off-side steep off +z x 43.6 speed 9.576: PASS from 1.0000: fell (centre past the side when it started: Some(0.5535965)) airborne-ticks 8 embedded-ticks 0 flickers 0
+off-side steep off +z x 43.6 speed 13.27: PASS from 1.0000: fell (centre past the side when it started: Some(0.6539993)) airborne-ticks 8 embedded-ticks 0 flickers 0
+off-side steep off +z x 44.6 speed 6.3: PASS from 1.5000: fell (centre past the side when it started: Some(0.52000046)) airborne-ticks 10 embedded-ticks 0 flickers 0
+off-side steep off +z x 44.6 speed 9.576: PASS from 1.5000: fell (centre past the side when it started: Some(0.5535965)) airborne-ticks 10 embedded-ticks 0 flickers 0
+off-side steep off +z x 44.6 speed 13.27: PASS from 1.5000: fell (centre past the side when it started: Some(0.6539993)) airborne-ticks 10 embedded-ticks 0 flickers 0
+# B. landings
+land ledge 2.9 jump false speed 6.3 dir (1.0, 0.0): FAIL landed Some((14, 3.05)) bounce-ticks 0 embedded-ticks 0 flickers 1 airborne 4
+land ledge 2.9 jump false speed 9.576 dir (1.0, 0.0): FAIL landed Some((9, 3.05)) bounce-ticks 0 embedded-ticks 0 flickers 1 airborne 3
+land ledge 2.9 jump false speed 13.27 dir (1.0, 0.0): FAIL landed Some((7, 3.05)) bounce-ticks 0 embedded-ticks 0 flickers 1 airborne 2
+land ledge 3.05 jump false speed 6.3 dir (1.0, 0.0): FAIL landed Some((14, 3.1)) bounce-ticks 0 embedded-ticks 0 flickers 1 airborne 4
+land ledge 3.05 jump false speed 9.576 dir (1.0, 0.0): FAIL landed Some((9, 3.1)) bounce-ticks 0 embedded-ticks 0 flickers 1 airborne 3
+land ledge 3.05 jump false speed 13.27 dir (1.0, 0.0): FAIL landed Some((7, 3.1)) bounce-ticks 0 embedded-ticks 0 flickers 1 airborne 2
+land platform 1.0 jump false speed 6.3 dir (-1.0, 0.0): FAIL landed None bounce-ticks 0 embedded-ticks 0 flickers 0 airborne 0
+land platform 1.0 jump false speed 9.576 dir (-1.0, 0.0): FAIL landed None bounce-ticks 0 embedded-ticks 0 flickers 0 airborne 0
+land platform 1.0 jump false speed 13.27 dir (-1.0, 0.0): FAIL landed None bounce-ticks 0 embedded-ticks 0 flickers 0 airborne 0
+land platform 1.5 jump false speed 6.3 dir (-1.0, 0.0): FAIL landed None bounce-ticks 0 embedded-ticks 0 flickers 0 airborne 0
+land platform 1.5 jump false speed 9.576 dir (-1.0, 0.0): FAIL landed None bounce-ticks 0 embedded-ticks 0 flickers 0 airborne 0
+land platform 1.5 jump false speed 13.27 dir (-1.0, 0.0): FAIL landed None bounce-ticks 0 embedded-ticks 0 flickers 0 airborne 0
+land step 0.55 jump false speed 6.3 dir (1.0, 0.0): FAIL landed None bounce-ticks 0 embedded-ticks 0 flickers 0 airborne 0
+land step 0.55 jump false speed 6.3 dir (-1.0, 0.0): FAIL landed None bounce-ticks 0 embedded-ticks 0 flickers 0 airborne 0
+land step 0.55 jump false speed 6.3 dir (0.0, 1.0): FAIL landed None bounce-ticks 0 embedded-ticks 0 flickers 0 airborne 0
+land step 0.55 jump false speed 6.3 dir (0.0, -1.0): FAIL landed None bounce-ticks 0 embedded-ticks 0 flickers 0 airborne 0
+land step 0.55 jump false speed 6.3 dir (0.7071, 0.7071): FAIL landed None bounce-ticks 0 embedded-ticks 0 flickers 0 airborne 0
+land step 0.55 jump false speed 6.3 dir (0.7071, -0.7071): FAIL landed None bounce-ticks 0 embedded-ticks 0 flickers 0 airborne 0
+land step 0.55 jump false speed 6.3 dir (-0.7071, 0.7071): FAIL landed None bounce-ticks 0 embedded-ticks 0 flickers 0 airborne 0
+land step 0.55 jump false speed 6.3 dir (-0.7071, -0.7071): FAIL landed None bounce-ticks 0 embedded-ticks 0 flickers 0 airborne 0
+land step 0.55 jump false speed 9.576 dir (1.0, 0.0): FAIL landed None bounce-ticks 0 embedded-ticks 0 flickers 0 airborne 0
+land step 0.55 jump false speed 9.576 dir (-1.0, 0.0): FAIL landed None bounce-ticks 0 embedded-ticks 0 flickers 0 airborne 0
+land step 0.55 jump false speed 9.576 dir (0.0, 1.0): FAIL landed None bounce-ticks 0 embedded-ticks 0 flickers 0 airborne 0
+land step 0.55 jump false speed 9.576 dir (0.0, -1.0): FAIL landed None bounce-ticks 0 embedded-ticks 0 flickers 0 airborne 0
+land step 0.55 jump false speed 9.576 dir (0.7071, 0.7071): FAIL landed None bounce-ticks 0 embedded-ticks 0 flickers 0 airborne 0
+land step 0.55 jump false speed 9.576 dir (0.7071, -0.7071): FAIL landed None bounce-ticks 0 embedded-ticks 0 flickers 0 airborne 0
+land step 0.55 jump false speed 9.576 dir (-0.7071, 0.7071): FAIL landed None bounce-ticks 0 embedded-ticks 0 flickers 0 airborne 0
+land step 0.55 jump false speed 9.576 dir (-0.7071, -0.7071): FAIL landed None bounce-ticks 0 embedded-ticks 0 flickers 0 airborne 0
+land step 0.55 jump false speed 13.27 dir (1.0, 0.0): FAIL landed None bounce-ticks 0 embedded-ticks 0 flickers 0 airborne 0
+land step 0.55 jump false speed 13.27 dir (-1.0, 0.0): FAIL landed None bounce-ticks 0 embedded-ticks 0 flickers 0 airborne 0
+land step 0.55 jump false speed 13.27 dir (0.0, 1.0): FAIL landed None bounce-ticks 0 embedded-ticks 0 flickers 0 airborne 0
+land step 0.55 jump false speed 13.27 dir (0.0, -1.0): FAIL landed None bounce-ticks 0 embedded-ticks 0 flickers 0 airborne 0
+land step 0.55 jump false speed 13.27 dir (0.7071, 0.7071): FAIL landed None bounce-ticks 0 embedded-ticks 0 flickers 0 airborne 0
+land step 0.55 jump false speed 13.27 dir (0.7071, -0.7071): FAIL landed None bounce-ticks 0 embedded-ticks 0 flickers 0 airborne 0
+land step 0.55 jump false speed 13.27 dir (-0.7071, 0.7071): FAIL landed None bounce-ticks 0 embedded-ticks 0 flickers 0 airborne 0
+land step 0.55 jump false speed 13.27 dir (-0.7071, -0.7071): FAIL landed None bounce-ticks 0 embedded-ticks 0 flickers 0 airborne 0
+land outcome ledge 2.9 -> 3.05: 4 runs
+land outcome ledge 2.9 -> 0.00: 39 runs
+land outcome ledge 2.9 -> 0.55: 3 runs
+land outcome ledge 2.9 -> 3.10: 1 runs
+land outcome ledge 2.9 -> 0.38: 1 runs
+land outcome ledge 3.05 -> 3.10: 4 runs
+land outcome ledge 3.05 -> 2.90: 4 runs
+land outcome ledge 3.05 -> 0.00: 33 runs
+land outcome ledge 3.05 -> 0.55: 3 runs
+land outcome ledge 3.05 -> 0.54: 1 runs
+land outcome ledge 3.05 -> 0.84: 1 runs
+land outcome ledge 3.05 -> 2.50: 1 runs
+land outcome ledge 3.05 -> 1.00: 1 runs
+land outcome platform 1.0 -> 0.00: 38 runs
+land outcome platform 1.0 -> -1.00: 3 runs
+land outcome platform 1.0 -> 0.84: 1 runs
+land outcome platform 1.0 -> 0.89: 1 runs
+land outcome platform 1.0 -> 0.82: 1 runs
+land outcome platform 1.0 -> 0.03: 1 runs
+land outcome platform 1.0 -> 1.50: 1 runs
+land outcome platform 1.0 -> 0.55: 1 runs
+land outcome platform 1.0 -> 3.10: 1 runs
+land outcome platform 1.5 -> 0.00: 37 runs
+land outcome platform 1.5 -> -1.00: 3 runs
+land outcome platform 1.5 -> 1.00: 4 runs
+land outcome platform 1.5 -> 0.67: 1 runs
+land outcome platform 1.5 -> 0.47: 1 runs
+land outcome platform 1.5 -> 0.19: 1 runs
+land outcome platform 1.5 -> 0.45: 1 runs
+land outcome step 0.55 -> -1.00: 24 runs
+land outcome step 0.55 -> 0.00: 19 runs
+land outcome step 0.55 -> 2.90: 3 runs
+land outcome step 0.55 -> 3.05: 2 runs
+land: largest drop in one airborne tick 0.5533 m (the landing test reaches 0.55 m above the feet)
+air time off the 2.9 ledge walking -x at 6.3, jump false: airborne ticks 14 landing tick Some(24); exact fall time 0.4916 s = 14.75 ticks (+ the walk to the edge)
+air time off the 2.9 ledge walking -x at 6.3, jump true: airborne ticks 33 landing tick Some(33); exact fall time 1.1305 s = 33.91 ticks (+ the walk to the edge)
+# B2. a fall from 8 to 9 m onto a 2.0 m top (made map), the reading's landing and the candidate fix
+high drop, land on a top crossed in the tick false: 1 of 11 missed the top (fell inside it and were put out to the ground)
+high drop, land on a top crossed in the tick true: 0 of 11 missed the top (fell inside it and were put out to the ground)
+# C. the snap
+snap speed 6.3: allowance 0.55 everywhere (snap = step-up); a ramp's drop a tick 25 % 0.0525, 50 % 0.1050
+  down the 0.55 step at 6.3: snapped airborne ticks 0 flickers 0 feet 0.000
+  down the gentle ramp at 6.3: PASS largest drop a tick 0.0525, smallest margin under the allowance 0.4975, airborne ticks 0
+  down the steep ramp at 6.3: PASS largest drop a tick 0.1050, smallest margin under the allowance 0.4450, airborne ticks 0
+snap speed 9.576: allowance 0.55 everywhere (snap = step-up); a ramp's drop a tick 25 % 0.0798, 50 % 0.1596
+  down the 0.55 step at 9.576: snapped airborne ticks 0 flickers 0 feet 0.000
+  down the gentle ramp at 9.576: PASS largest drop a tick 0.0798, smallest margin under the allowance 0.4702, airborne ticks 0
+  down the steep ramp at 9.576: PASS largest drop a tick 0.1596, smallest margin under the allowance 0.3904, airborne ticks 0
+snap speed 13.27: allowance 0.55 everywhere (snap = step-up); a ramp's drop a tick 25 % 0.1106, 50 % 0.2212
+  down the 0.55 step at 13.27: snapped airborne ticks 0 flickers 0 feet 0.000
+  down the gentle ramp at 13.27: PASS largest drop a tick 0.1106, smallest margin under the allowance 0.4394, airborne ticks 0
+  down the steep ramp at 13.27: PASS largest drop a tick 0.2212, smallest margin under the allowance 0.3288, airborne ticks 0
+# D. easing (k 0.37375 a tick, up = stop, air 100 %)
+ease step 0.55 from 0.05 m speed 6.3 walk on: PASS x 31.0933 feet 0.5500 speed now 6.2067 steps 1 unjumped-falls 0 flickers 0
+ease step 0.55 from 0.05 m speed 6.3 let go at the step: PASS x 29.7600 feet 0.5500 speed now 0.0000 steps 1 unjumped-falls 0 flickers 0
+ease step 0.55 from 0.05 m speed 9.576 walk on: PASS x 31.2698 feet 0.5500 speed now 9.2142 steps 1 unjumped-falls 0 flickers 0
+ease step 0.55 from 0.05 m speed 9.576 let go at the step: PASS x 29.8692 feet 0.5500 speed now 0.0000 steps 1 unjumped-falls 0 flickers 0
+ease step 0.55 from 0.05 m speed 13.27 walk on: PASS x 31.0919 feet 0.5500 speed now 11.9918 steps 1 unjumped-falls 0 flickers 0
+ease step 0.55 from 0.05 m speed 13.27 let go at the step: PASS x 29.9923 feet 0.5500 speed now 0.0000 steps 1 unjumped-falls 0 flickers 0
+ease step 0.56 from 0.05 m speed 6.3 walk on: PASS x 33.6000 feet 0.0000 speed now 0.0000 steps 0 unjumped-falls 0 flickers 0
+ease step 0.56 from 0.05 m speed 6.3 let go at the step: PASS x 33.6000 feet 0.0000 speed now 0.0000 steps 0 unjumped-falls 0 flickers 0
+ease step 0.56 from 0.05 m speed 9.576 walk on: PASS x 33.6000 feet 0.0000 speed now 0.0000 steps 0 unjumped-falls 0 flickers 0
+ease step 0.56 from 0.05 m speed 9.576 let go at the step: PASS x 33.6000 feet 0.0000 speed now 0.0000 steps 0 unjumped-falls 0 flickers 0
+ease step 0.56 from 0.05 m speed 13.27 walk on: PASS x 33.6000 feet 0.0000 speed now 0.0000 steps 0 unjumped-falls 0 flickers 0
+ease step 0.56 from 0.05 m speed 13.27 let go at the step: PASS x 33.6000 feet 0.0000 speed now 0.0000 steps 0 unjumped-falls 0 flickers 0
+ease ledge 3.05 jump from rest 0.05 m out speed 6.3: PASS feet 3.0500 x 36.351
+ease ledge 3.05 jump from rest 0.05 m out speed 9.576: PASS feet 3.0500 x 36.320
+ease ledge 3.05 jump from rest 0.05 m out speed 13.27: PASS feet 3.0500 x 36.558
+ease ledge 3.05 jump from rest 0.3 m out speed 6.3: PASS feet 3.0500 x 36.351
+ease ledge 3.05 jump from rest 0.3 m out speed 9.576: PASS feet 3.0500 x 36.320
+ease ledge 3.05 jump from rest 0.3 m out speed 13.27: PASS feet 3.0500 x 36.558
+ease ledge 3.05 jump from rest 0.8 m out speed 6.3: PASS feet 3.0500 x 36.351
+ease ledge 3.05 jump from rest 0.8 m out speed 9.576: PASS feet 3.0500 x 36.320
+ease ledge 3.05 jump from rest 0.8 m out speed 13.27: PASS feet 3.0500 x 36.558
+ease ledge 3.05 jump from rest 1.2 m out speed 6.3: PASS feet 3.0500 x 36.351
+ease ledge 3.05 jump from rest 1.2 m out speed 9.576: PASS feet 3.0500 x 36.320
+ease ledge 3.05 jump from rest 1.2 m out speed 13.27: PASS feet 3.0500 x 36.558
+ease ledge 3.1 jump from rest 0.05 m out speed 6.3: PASS feet 0.0000 x 39.600
+ease ledge 3.1 jump from rest 0.05 m out speed 9.576: PASS feet 0.0000 x 39.600
+ease ledge 3.1 jump from rest 0.05 m out speed 13.27: PASS feet 0.0000 x 39.600
+ease ledge 3.1 jump from rest 0.3 m out speed 6.3: PASS feet 0.0000 x 39.600
+ease ledge 3.1 jump from rest 0.3 m out speed 9.576: PASS feet 0.0000 x 39.600
+ease ledge 3.1 jump from rest 0.3 m out speed 13.27: PASS feet 0.0000 x 39.600
+ease ledge 3.1 jump from rest 0.8 m out speed 6.3: PASS feet 0.0000 x 39.600
+ease ledge 3.1 jump from rest 0.8 m out speed 9.576: PASS feet 0.0000 x 39.600
+ease ledge 3.1 jump from rest 0.8 m out speed 13.27: PASS feet 0.0000 x 39.600
+ease ledge 3.1 jump from rest 1.2 m out speed 6.3: PASS feet 0.0000 x 39.600
+ease ledge 3.1 jump from rest 1.2 m out speed 9.576: PASS feet 0.0000 x 39.600
+ease ledge 3.1 jump from rest 1.2 m out speed 13.27: PASS feet 0.0000 x 39.600
+# E. ceilings (made map; C1 = no head rule with block 5's floating test, C2 = a head stop; cost only)
+ceiling C1 under the 2.0 beam at 6.3: x 58.5100 z 0.0000 feet 0.0000 head 1.8000 embedded-ticks 0 wall-pushes 0
+ceiling C1 into the 1.7 beam at 6.3: x 59.6000 z 0.0000 feet 0.0000 head 1.8000 embedded-ticks 0 wall-pushes 53
+ceiling C1 up the step under the 2.2 beam at 6.3: x 65.6000 z 0.0000 feet 0.5500 head 2.3500 embedded-ticks 0 wall-pushes 48
+ceiling C1 jump standing under the 2.0 beam at 6.3: highest feet 2.5202 (head 4.3202; beam bottom 2.0) ended x 54.6000 z 0.0000 feet 0.0000 sideways at most 0.0000 head-hits 0 embedded-ticks 0
+ceiling C1 jump walking under the 2.0 beam at 6.3: highest feet 2.3000 (head 4.1000; beam bottom 2.0) ended x 54.8100 z 0.0000 feet 2.3000 sideways at most 0.0000 head-hits 0 embedded-ticks 0
+ceiling C2 under the 2.0 beam at 6.3: x 58.5100 z 0.0000 feet 0.0000 head 1.8000 embedded-ticks 0 wall-pushes 0
+ceiling C2 into the 1.7 beam at 6.3: x 59.6000 z 0.0000 feet 0.0000 head 1.8000 embedded-ticks 0 wall-pushes 53
+ceiling C2 up the step under the 2.2 beam at 6.3: x 65.6000 z 0.0000 feet 0.5500 head 2.3500 embedded-ticks 0 wall-pushes 48
+ceiling C2 jump standing under the 2.0 beam at 6.3: highest feet 0.2000 (head 2.0000; beam bottom 2.0) ended x 56.0000 z 0.0000 feet 0.0000 sideways at most 0.0000 head-hits 1 embedded-ticks 0
+ceiling C2 jump walking under the 2.0 beam at 6.3: highest feet 2.3000 (head 4.1000; beam bottom 2.0) ended x 54.8100 z 0.0000 feet 2.3000 sideways at most 0.0000 head-hits 0 embedded-ticks 0
+ceiling C2 under the 2.0 beam at 9.576: x 58.7032 z 0.0000 feet 0.0000 head 1.8000 embedded-ticks 0 wall-pushes 0
+ceiling C2 into the 1.7 beam at 9.576: x 59.6000 z 0.0000 feet 0.0000 head 1.8000 embedded-ticks 0 wall-pushes 55
+ceiling C2 up the step under the 2.2 beam at 9.576: x 65.6000 z 0.0000 feet 0.5500 head 2.3500 embedded-ticks 0 wall-pushes 52
+ceiling C2 jump standing under the 2.0 beam at 9.576: highest feet 0.2000 (head 2.0000; beam bottom 2.0) ended x 56.0000 z 0.0000 feet 0.0000 sideways at most 0.0000 head-hits 1 embedded-ticks 0
+ceiling C2 jump walking under the 2.0 beam at 9.576: highest feet 2.3000 (head 4.1000; beam bottom 2.0) ended x 54.9192 z 0.0000 feet 2.3000 sideways at most 0.0000 head-hits 0 embedded-ticks 0
+ceiling C2 under the 2.0 beam at 13.27: x 58.6350 z 0.0000 feet 0.0000 head 1.8000 embedded-ticks 0 wall-pushes 0
+ceiling C2 into the 1.7 beam at 13.27: x 59.6000 z 0.0000 feet 0.0000 head 1.8000 embedded-ticks 0 wall-pushes 57
+ceiling C2 up the step under the 2.2 beam at 13.27: x 65.6000 z 0.0000 feet 0.5500 head 2.3500 embedded-ticks 0 wall-pushes 55
+ceiling C2 jump standing under the 2.0 beam at 13.27: highest feet 0.2000 (head 2.0000; beam bottom 2.0) ended x 56.0000 z 0.0000 feet 0.0000 sideways at most 0.0000 head-hits 1 embedded-ticks 0
+ceiling C2 jump walking under the 2.0 beam at 13.27: highest feet 2.5202 (head 4.3202; beam bottom 2.0) ended x 61.2350 z 0.0000 feet 2.0000 sideways at most 0.0000 head-hits 0 embedded-ticks 3
+# F. the push (share 0.23407 a tick)
+push head-on 6.3 [push-out]: min distance 0.2359 end distance 12.7608 overlapping pair-ticks 4 pushes 4 turned 4 kept-going 0 capped 0 largest push 0.0852 walker stalled ticks 0 embedded-ticks 0; [0] (68.379, 0.119, y 0.00) [1] (55.621, -0.119, y 0.00) | slot orders 2 bit-identical: true
+push head-on 6.3 [sweep]: min distance 0.2359 end distance 12.7608 overlapping pair-ticks 4 pushes 4 turned 4 kept-going 0 capped 0 largest push 0.0852 walker stalled ticks 0 embedded-ticks 0; [0] (68.379, 0.119, y 0.00) [1] (55.621, -0.119, y 0.00) | slot orders 2 bit-identical: true
+push head-on 13.27 [push-out]: min distance 0.3048 end distance 20.6326 overlapping pair-ticks 2 pushes 2 turned 2 kept-going 0 capped 0 largest push 0.0734 walker stalled ticks 0 embedded-ticks 0; [0] (73.316, -0.054, y 0.00) [1] (52.684, 0.054, y 0.00) | slot orders 2 bit-identical: true
+push head-on 13.27 [sweep]: min distance 0.3048 end distance 20.6326 overlapping pair-ticks 2 pushes 2 turned 2 kept-going 0 capped 0 largest push 0.0734 walker stalled ticks 0 embedded-ticks 0; [0] (73.316, -0.054, y 0.00) [1] (52.684, 0.054, y 0.00) | slot orders 2 bit-identical: true
+push glancing 0.5 m [push-out]: min distance 0.6036 end distance 12.7812 overlapping pair-ticks 2 pushes 2 turned 2 kept-going 0 capped 0 largest push 0.0297 walker stalled ticks 0 embedded-ticks 0; [0] (68.384, -0.050, y 0.00) [1] (55.616, 0.550, y 0.00) | slot orders 2 bit-identical: true
+push glancing 0.5 m [sweep]: min distance 0.6036 end distance 12.7812 overlapping pair-ticks 2 pushes 2 turned 2 kept-going 0 capped 0 largest push 0.0297 walker stalled ticks 0 embedded-ticks 0; [0] (68.384, -0.050, y 0.00) [1] (55.616, 0.550, y 0.00) | slot orders 2 bit-identical: true
+push one standing [push-out]: min distance 0.2041 end distance 4.7214 overlapping pair-ticks 10 pushes 10 turned 10 kept-going 0 capped 0 largest push 0.0904 walker stalled ticks 0 embedded-ticks 0; [0] (68.053, -0.191, y 0.00) [1] (63.347, 0.191, y 0.00) | slot orders 2 bit-identical: true
+push one standing [sweep]: min distance 0.2041 end distance 4.7214 overlapping pair-ticks 10 pushes 10 turned 10 kept-going 0 capped 0 largest push 0.0904 walker stalled ticks 0 embedded-ticks 0; [0] (68.053, -0.191, y 0.00) [1] (63.347, 0.191, y 0.00) | slot orders 2 bit-identical: true
+push both standing 0.3 m apart [push-out]: min distance 0.4170 end distance 0.8000 overlapping pair-ticks 31 pushes 60 turned 0 kept-going 0 capped 0 largest push 0.0585 walker stalled ticks 0 embedded-ticks 0; [0] (59.750, 0.000, y 0.00) [1] (60.550, 0.000, y 0.00) | slot orders 2 bit-identical: true
+push both standing 0.3 m apart [sweep]: min distance 0.4170 end distance 0.8000 overlapping pair-ticks 31 pushes 60 turned 0 kept-going 0 capped 0 largest push 0.0585 walker stalled ticks 0 embedded-ticks 0; [0] (59.750, 0.000, y 0.00) [1] (60.550, 0.000, y 0.00) | slot orders 2 bit-identical: true
+push both standing on one spot [push-out]: min distance 0.1873 end distance 0.8000 overlapping pair-ticks 33 pushes 60 turned 0 kept-going 0 capped 0 largest push 0.0936 walker stalled ticks 0 embedded-ticks 0; [0] (59.600, 0.000, y 0.00) [1] (60.400, 0.000, y 0.00) | slot orders 2 bit-identical: false
+push both standing on one spot [sweep]: min distance 0.1873 end distance 0.8000 overlapping pair-ticks 33 pushes 60 turned 0 kept-going 0 capped 0 largest push 0.0936 walker stalled ticks 0 embedded-ticks 0; [0] (59.600, 0.000, y 0.00) [1] (60.400, 0.000, y 0.00) | slot orders 2 bit-identical: false
+push into a wall (3.10 ledge face x 40) [push-out]: min distance 0.1596 end distance 0.8000 overlapping pair-ticks 38 pushes 58 turned 5 kept-going 0 capped 0 largest push 0.0871 walker stalled ticks 52 embedded-ticks 0; [0] (39.600, -2.100, y 0.00) [1] (39.600, -2.900, y 0.00) | slot orders 2 bit-identical: true
+push into a wall (3.10 ledge face x 40) [sweep]: min distance 0.1596 end distance 0.8000 overlapping pair-ticks 38 pushes 58 turned 5 kept-going 0 capped 0 largest push 0.0871 walker stalled ticks 52 embedded-ticks 0; [0] (39.600, -2.100, y 0.00) [1] (39.600, -2.900, y 0.00) | slot orders 2 bit-identical: true
+push into a wall, glancing [push-out]: min distance 0.4423 end distance 0.8000 overlapping pair-ticks 34 pushes 57 turned 4 kept-going 0 capped 0 largest push 0.0504 walker stalled ticks 52 embedded-ticks 0; [0] (39.600, -1.950, y 0.00) [1] (39.600, -2.750, y 0.00) | slot orders 2 bit-identical: true
+push into a wall, glancing [sweep]: min distance 0.4423 end distance 0.8000 overlapping pair-ticks 34 pushes 57 turned 4 kept-going 0 capped 0 largest push 0.0504 walker stalled ticks 52 embedded-ticks 0; [0] (39.600, -1.950, y 0.00) [1] (39.600, -2.750, y 0.00) | slot orders 2 bit-identical: true
+push across the 0.55 step, walker below [push-out]: min distance 0.2415 end distance 3.0436 overlapping pair-ticks 9 pushes 9 turned 9 kept-going 0 capped 0 largest push 0.0847 walker stalled ticks 11 embedded-ticks 0; [0] (33.600, -9.218, y 0.00) [1] (30.588, -8.782, y 0.55) | slot orders 2 bit-identical: true
+push across the 0.55 step, walker below [sweep]: min distance 0.2415 end distance 3.0436 overlapping pair-ticks 9 pushes 9 turned 9 kept-going 0 capped 0 largest push 0.0847 walker stalled ticks 11 embedded-ticks 0; [0] (33.600, -9.218, y 0.00) [1] (30.588, -8.782, y 0.55) | slot orders 2 bit-identical: true
+push across the 0.55 step, walker above [push-out]: min distance 0.2373 end distance 5.9124 overlapping pair-ticks 10 pushes 10 turned 10 kept-going 0 capped 0 largest push 0.0851 walker stalled ticks 0 embedded-ticks 0; [0] (23.402, -8.786, y 0.00) [1] (29.298, -9.214, y 0.00) | slot orders 2 bit-identical: true
+push across the 0.55 step, walker above [sweep]: min distance 0.2373 end distance 5.9124 overlapping pair-ticks 10 pushes 10 turned 10 kept-going 0 capped 0 largest push 0.0851 walker stalled ticks 0 embedded-ticks 0; [0] (23.402, -8.786, y 0.00) [1] (29.298, -9.214, y 0.00) | slot orders 2 bit-identical: true
+push at the 1.0 m gap (platform edge x 49) [push-out]: min distance 0.6000 end distance 0.6000 overlapping pair-ticks 34 pushes 0 turned 0 kept-going 0 capped 0 largest push 0.0000 walker stalled ticks 32 embedded-ticks 0; [0] (49.400, 6.000, y 0.00) [1] (48.800, 6.000, y 1.00) | slot orders 2 bit-identical: true
+push at the 1.0 m gap (platform edge x 49) [sweep]: min distance 0.6000 end distance 0.6000 overlapping pair-ticks 34 pushes 0 turned 0 kept-going 0 capped 0 largest push 0.0000 walker stalled ticks 32 embedded-ticks 0; [0] (49.400, 6.000, y 0.00) [1] (48.800, 6.000, y 1.00) | slot orders 2 bit-identical: true
+push three meet [push-out]: min distance 0.2568 end distance 8.4364 overlapping pair-ticks 18 pushes 18 turned 18 kept-going 5 capped 0 largest push 0.1469 walker stalled ticks 0 embedded-ticks 0; [0] (68.329, -0.093, y 0.00) [1] (55.692, -0.368, y 0.00) [2] (61.974, -5.999, y 0.00) | slot orders 6 bit-identical: true
+push three meet [sweep]: min distance 0.2568 end distance 8.4364 overlapping pair-ticks 18 pushes 18 turned 18 kept-going 5 capped 0 largest push 0.1469 walker stalled ticks 0 embedded-ticks 0; [0] (68.329, -0.093, y 0.00) [1] (55.692, -0.368, y 0.00) [2] (61.974, -5.999, y 0.00) | slot orders 6 bit-identical: true
+push three standing close [push-out]: min distance 0.4687 end distance 0.8000 overlapping pair-ticks 57 pushes 137 turned 0 kept-going 0 capped 0 largest push 0.1027 walker stalled ticks 0 embedded-ticks 0; [0] (59.750, -0.148, y 0.00) [1] (60.550, -0.148, y 0.00) [2] (60.150, 0.545, y 0.00) | slot orders 6 bit-identical: true
+push three standing close [sweep]: min distance 0.4687 end distance 0.8000 overlapping pair-ticks 57 pushes 137 turned 0 kept-going 0 capped 0 largest push 0.1027 walker stalled ticks 0 embedded-ticks 0; [0] (59.750, -0.148, y 0.00) [1] (60.550, -0.148, y 0.00) [2] (60.150, 0.545, y 0.00) | slot orders 6 bit-identical: true
+push three into a wall [push-out]: min distance 0.2437 end distance 0.7998 overlapping pair-ticks 102 pushes 112 turned 13 kept-going 0 capped 0 largest push 0.0879 walker stalled ticks 51 embedded-ticks 0; [0] (39.600, -1.971, y 0.00) [1] (39.600, -2.771, y 0.00) [2] (38.800, -2.758, y 0.00) | slot orders 6 bit-identical: true
+push three into a wall [sweep]: min distance 0.2437 end distance 0.7998 overlapping pair-ticks 102 pushes 112 turned 13 kept-going 0 capped 0 largest push 0.0879 walker stalled ticks 51 embedded-ticks 0; [0] (39.600, -1.971, y 0.00) [1] (39.600, -2.771, y 0.00) [2] (38.800, -2.758, y 0.00) | slot orders 6 bit-identical: true
+# tally (case group: runs, passes)
+tally A ramps from the side: 306 runs, 198 pass
+tally A2 off a ramp's side: 24 runs, 24 pass
+tally B landings: 240 runs, 204 pass
+tally C snap down the ramps: 6 runs, 6 pass
+tally D easing at the steps: 48 runs, 48 pass
+tally D easing at the ledges: 24 runs, 24 pass

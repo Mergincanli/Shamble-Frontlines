@@ -104,14 +104,21 @@ needs it; if his answers come after step S's code, step 0 still lands before any
     gives the shown text's digest, which the check verifies; and the whole message's digest is recorded beside it, so
     that it can be checked against the transcript. Written into the script before it is run. **Written and tested
     (revision 3, 2026-11-28):** `chat-words.mjs` gained the mode `less` (the message as `words` finds it, the one line
-    that starts with a given start left out, here "3. "; the header gives the whole message's bytes and sha256, the
-    left-out line's number and why, and the shown text's bytes and sha256); `decisions-4c.mjs`'s `saved` reads that
-    header, checks the shown text against its own digest and the line count, and the entry's bracket says "without its
-    line 5 of 8, left out because it names his board (the whole message, 1613 bytes with sha256 475c9061..., is in the
-    chat's transcript)". Tested in the scratchpad only, nothing of the message in the repository: `words` still makes
-    the saved design notes byte for byte (7,797 bytes); `less` gives his message of 23:59 whole at 1,613 bytes, shown
-    at 1,284 bytes with items 1, 2, 4, 5 and 6, and no "board" in the shown text; a scratch copy of the register took
-    all four entries newest first, `check` passed on each, and a planted one-byte change in the quoted text failed it.
+    that starts with a given start left out, here "3. "; the header gives the left-out line's number and why, and the
+    shown text's bytes and sha256); `decisions-4c.mjs`'s `saved` reads that header, checks the shown text against its
+    own digest and the line count, and the entry's bracket says "without its line 5 of 8, left out because it names
+    his board (the whole message is in the chat's transcript, by this id)". **Changed after the commit security review
+    of 2026-11-28 (Medium):** the whole message's bytes and sha256 are written into no file of the repository, since
+    a digest and a length of the whole beside the published shown text would let a reader confirm a guess of the
+    left-out line; `less` prints them for the chat only, and the chat gives them to him (the check against the
+    transcript is `less` run again into a scratch file). This departs from F-S0-1's "the whole message's digest
+    recorded" only in where it is recorded: in the chat, not the repository (for the advisor agent at its next
+    review). The notes commit bfe447a3 before this change named the whole message's length and the first eight
+    characters of its digest in this paragraph; nothing of the message's text is in the repository. Tested in the
+    scratchpad only: `words` still makes the saved design notes byte for byte (7,797 bytes); `less` shows his message
+    of 23:59 at 1,284 bytes with items 1, 2, 4, 5 and 6, no "board" in the shown text, and neither the whole message's
+    digest nor its byte count in the saved file; a scratch copy of the register took all four entries newest first,
+    `check` passed on each, and a planted one-byte change in the quoted text failed it.
 - **Its landing (condition 8):** step 0 waits for PASTE-BREAKS, BOARD-WORDS and DESIGN-CLASH, lands before any other docs
   commit of 4c, and the pull request that carries it is not marked ready before it (its evidence: F-S0-5's check and
   `decisions-4c.mjs check`). **Risk tier 1, needs-mustafa (condition 9):** LOOP_V2 and the register are decision docs,

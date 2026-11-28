@@ -11,9 +11,12 @@
 // <saved file> is a name in the notes folder; <out file> is always a full path, and the script refuses any other.
 // `less` (4c, for his answer BOARD-WORDS (b); the advisor agent's F-S0-1): the message as `words` finds it, with the
 // one line that starts with <line start> left out (for example "3. ", an item of a numbered message). The header gives
-// the whole message's bytes and sha256 (checked against the transcript: run `less` again into a scratch file and
-// compare), the line left out by its number and <why>, and the bytes and sha256 of the text shown below it, which is
-// what decisions-4c.mjs quotes and checks. No word is put in the left-out line's place.
+// the line left out by its number and <why>, and the bytes and sha256 of the text shown below it, which is what
+// decisions-4c.mjs quotes and checks. No word is put in the left-out line's place. The whole message's bytes and
+// sha256 are printed only, never written into the file: in a public repository a digest and a length of the whole
+// beside the shown text would let a reader confirm a guess of the left-out line (the commit security review of
+// 2026-11-28). The chat gives them to him, and `less` run again into a scratch file checks the saved file against
+// the transcript.
 // [after]: only messages sent after this time (as the transcript writes it), for a text he sent more than once.
 // A queued command whose `source_uuid` is the id of a message already in the record is that message handed to the
 // chat again (seen twice on 2026-11-26, each time right after the session's worker was restarted): it is no new
@@ -65,8 +68,9 @@ if (mode === 'words' || mode === 'exact' || mode === 'less') {
     const left = lines.flatMap((l, i) => (l.startsWith(start) ? [i] : []));
     if (left.length !== 1) { console.error(`expected one line that starts with the line start, found ${left.length}`); process.exit(1); }
     const shown = lines.filter((_, i) => i !== left[0]).join('\n');
-    writeFileSync(out, `# ${title}\n\n_Copied by script from the chat's transcript (${SESSION}), never retyped: ${how} of ${at} (uuid ${id}), whole (${size(t)}), shown here without its line ${left[0] + 1} of ${lines.length} (${size(shown)}), which is left out because ${why}. What it answers: ${answers}_\n\n---\n${shown}\n`);
-    console.log(`${out}: whole ${size(t)}; shown without line ${left[0] + 1} of ${lines.length}: ${size(shown)}; sent ${at}, uuid ${id}`);
+    writeFileSync(out, `# ${title}\n\n_Copied by script from the chat's transcript (${SESSION}), never retyped: ${how} of ${at} (uuid ${id}), shown here without its line ${left[0] + 1} of ${lines.length}, which is left out because ${why} (${size(shown)}). What it answers: ${answers}_\n\n---\n${shown}\n`);
+    console.log(`${out}: shown without line ${left[0] + 1} of ${lines.length}: ${size(shown)}; sent ${at}, uuid ${id}`);
+    console.log(`not written to the file, for the chat only: the whole message, ${size(t)}`);
   } else {
     writeFileSync(out, `# ${title}\n\n_Copied by script from the chat's transcript (${SESSION}), never retyped: ${how} of ${at} (uuid ${id}), whole (${size(t)}). What it answers: ${answers}_\n\n---\n${t}\n`);
     console.log(`${out}: ${size(t)}, sent ${at}, uuid ${id}`);

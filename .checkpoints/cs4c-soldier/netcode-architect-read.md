@@ -47,7 +47,7 @@ by option. Then DONE.
 - N21 (SUPERSEDED by "N21 CORRECTED" below: its rule is the one rejected there as A) (pause in the blend): after a rebase the due times of two consecutive ticks lie the hidden time apart. Blending by due time slides or jumps; taking each held block's time from its tick against the newest's due (time(k) = due(newest) - (tick(newest) - tick(k)) x P) holds the paused picture until the render time reaches the new tick and then blends one tick: no slide across the pause and no jump, which also removes the 0.2 to 0.44 m jump my design gave RESUME-FLASH (a).
 - N22 (pins step 2 breaks): `sim-wasm.test.mjs:82, :97-98` (input calls of six), `:253` (the glue text "input(post, held, p0, p1, p2, p3)" reaching one export; the prototype list `:246` gains no name); `host.test.ts:28-31, :98-99, :292` (six numbers), `:303` (one input per tick stays); `step_alloc.rs:89-100` (a `Post` literal of three fields); `world.rs:301` (22 and 54, only if the record grows).
 - N23 (hide and the move): the host lets go of the keys at hide by `#held = 0` (host.ts:121-122). Once the post carries a move made from those keys, the host must zero the move there too, or the first tick after the return walks on with the old move until the page's first post.
-- N24 (record width): if the World's record (world.rs:115, the whole `PlayerCommand`) takes the new move and aim, `SHARED_STATE_BYTES` goes from 22 to 30 and every first-loop hash moves in step 2 (inputs unchanged); if the record stays buttons and presses (what the echo and the press base need) and the move and aim are consumed by the soldier, step 2 moves no hash.
+- N24 (record width; its (i) half SUPERSEDED by block 7.2: the soldier's row holds the move and the aim): if the World's record (world.rs:115, the whole `PlayerCommand`) takes the new move and aim, `SHARED_STATE_BYTES` goes from 22 to 30 and every first-loop hash moves in step 2 (inputs unchanged); if the record stays buttons and presses (what the echo and the press base need) and the move and aim are consumed by the soldier, step 2 moves no hash.
 
 ## Block 1. Step 2, the command path, against today's code
 Plan row: "385 / 530". What it carries, page to room: the post gains the move and the cursor's ray; one input call of
@@ -67,14 +67,16 @@ and an aim outside the map; one jump per command (3B-ONE-PER-TICK).
   once the soldier faces it, hashed. Corrects my design 3.7 (fire-height plane, 500 m) to the old game's rule (N6).
 - CHANGE `collision.rs:94-99`: `StaticWorld` gains `bounds_cm: [[i32; 3]; 2]`, taken in `build` (`:212`) from
   `map.bounds` (on the centimetre grid for every loaded map, map.rs:9-14); a document built in code whose bounds are
-  off that grid is refused (`WorldError` gains `Bounds`, with its `message`). ADD `pub const fn bounds_cm(&self)`
+  off that grid is refused (`WorldError` gains `Bounds`, with its `message`) [SUPERSEDED by block 7.3: one step
+  inward off the grid, no refusal]. ADD `pub const fn bounds_cm(&self)`
   and `pub fn holds_cm(&self, aim: AimCm) -> bool`. Through this the room and the endpoint get the bounds as a `sim`
   type and never name `content` (4B-WORLD-ROOM, N11).
 - CHANGE `world.rs:33-51`: `PlayerCommand` gains `move_x: i8, move_y: i8, aim: AimCm`; `NONE` gains zeros; the doc
   (":33-34, ...join when a system reads them") says the move and the aim are read by the movement and the facing, and
   the view time joins with lag compensation (change-set 8). **The record (`world.rs:115`) is a choice with a hash
   consequence (N24):** (i) recommended, the record stays buttons and presses (a `PlayerRecord`, what the echo
-  `room/lib.rs:286-296` and the jump's press base need) and the soldier consumes move and aim: step 2 moves no hash;
+  `room/lib.rs:286-296` and the jump's press base need) and the soldier consumes move and aim: step 2 moves no hash [SUPERSEDED by block 7.2: the soldier's row holds
+  them, and a command-less tick keeps both];
   (ii) the record is the whole command: `SHARED_STATE_BYTES` 22 -> 30 (`world.rs:18`, the known answers `:301`
   and the second implementation's script), first-loop's `.hashes` and `.vector.txt` re-made in step 2 with its
   inputs byte-identical. Whatever the World keeps is hashed (ADR 0004 part 9); (i) keeps less for change-set 7's reset
@@ -86,7 +88,7 @@ and an aim outside the map; one jump per command (3B-ONE-PER-TICK).
 - REMOVE `post.rs:34-48` `from_words`; ADD `from_numbers(number, held, counts: [u32; 4], movement: u32, ray: [f32; 6])
   -> Self`, total (any 13 numbers): the move from the low 16 bits (x bits 0-7, y bits 8-15, as `i8`: the recording's
   own packing, recording.rs:81-82), then `clamp_move`; the ray `None` unless all six numbers are finite (PM-0004-24's
-  "checked where it enters").
+  "checked where it enters") [SUPERSEDED by block 7.4: `PostRay { None, Refused, Ray }`].
 - ADD `post.rs` `pub fn clamp_move(x: i8, y: i8) -> (i8, i8)`: integers only; while x^2 + y^2 > 127^2 the longer
   component steps toward 0, **and on a tie both step** (the page rounds to nearest, so a keyboard diagonal arrives as
   (90, 90): 127 x 0.7071 = 89.8; 90^2 + 90^2 = 16,200 > 16,129, and both stepping gives (89, 89) with the direction
@@ -99,7 +101,7 @@ and an aim outside the map; one jump per command (3B-ONE-PER-TICK).
   `aim_point(&self.world, ray, self.aim)` when the post has a ray, else `self.aim`; the command takes `move_x/move_y`
   from the post and `aim` from its `Sent`; `view_time` stays `{view_tick, 0}` (change-set 8, the plan's choice 2).
   CHANGE `:56-79` `Readout` gains `aims_kept` (commands whose aim was kept: no usable ray, or none that met the world
-  or the ground): read by tests; whether the block shows it is engine-architect's layout.
+  or the ground) [SUPERSEDED by block 7.4: `rays_refused` and `rays_missed`; an all-zero post counts in neither]: read by tests; whether the block shows it is engine-architect's layout.
 **Rust, `room`**
 - CHANGE `lib.rs:45-68` `RoomCounters` gains `refused_move`, `refused_aim`; `refused()` (`:73-79`) adds both.
 - CHANGE `lib.rs:86-100, :105` `Room` holds the authority's `StaticWorld` (4B-WORLD-ROOM: the movement queries it here
@@ -146,10 +148,10 @@ and an aim outside the map; one jump per command (3B-ONE-PER-TICK).
 | # | Where | What it holds | Planted defect that must turn it red |
 |---|---|---|---|
 | T2-1 | `post.rs` | `clamp_move` over all 65,536 pairs: result within 127, unchanged if inside, each part only toward 0, sign kept; the eight directions unchanged; the ties pinned: (90, 90) -> (89, 89), (-90, 90) -> (-89, 89) (25) | `<` for `<=` in the length test, so (127, 0) moves |
-| T2-2 | `post.rs` | `from_numbers` takes any numbers; a NaN, an infinity in any one of the six ray numbers gives no ray; spare move and held bits ignored (30) | the finite check on five of the six numbers |
+| T2-2 | `post.rs` | `from_numbers` takes any numbers; a NaN, an infinity in any one of the six ray numbers gives no ray [SUPERSEDED by block 7.4: a refused ray, counted]; spare move and held bits ignored (30) | the finite check on five of the six numbers |
 | T2-3 | `sim/src/aim.rs` | a ray onto the step's top gives its point in cm; one that misses gives the ground crossing; one to the sky, one parallel to the ground, keep the last; a hit at 401 m is no hit; a point beyond the bounds is clamped to the bound's cm; the rounding of a half centimetre pinned (70) | the fallback plane at fire height (my old design); the reach 500 m; no clamp |
-| T2-4 | `collision.rs` | `bounds_cm` exact at the reach's edges (+-32,767; 0 to 65,535); `holds_cm` on each face true, 1 cm past false; bounds off the grid refused by name (30) | the bounds narrowed through `f32` before the cm (an off-by-one at a face) |
-| T2-5 | `endpoint.rs` | PM-0002-14's native half: each command's aim is the cast of the post handed in for that tick (posts alternate rays onto two shapes); repeats carry their own first aim; the first aim lies inside bounds that exclude the origin; a post without a usable ray keeps the aim and counts `aims_kept`; a (-128, -128) post sends a move the room takes (90) | the previous post's ray cast; repeats cast again from the newest post; the first aim (0, 0, 0) unclamped |
+| T2-4 | `collision.rs` | `bounds_cm` exact at the reach's edges (+-32,767; 0 to 65,535); `holds_cm` on each face true, 1 cm past false; bounds off the grid refused by name (30) [SUPERSEDED by block 7.3's tie test] | the bounds narrowed through `f32` before the cm (an off-by-one at a face) |
+| T2-5 | `endpoint.rs` | PM-0002-14's native half: each command's aim is the cast of the post handed in for that tick (posts alternate rays onto two shapes); repeats carry their own first aim; the first aim lies inside bounds that exclude the origin; a post without a usable ray keeps the aim and counts `aims_kept` [SUPERSEDED by block 7.4's Z1 and Z2]; a (-128, -128) post sends a move the room takes (90) | the previous post's ray cast; repeats cast again from the newest post; the first aim (0, 0, 0) unclamped |
 | T2-6 | `room/lib.rs` | moves (127, 0), (0, -127), (89, 89), (-89, -89) taken; (90, 90), (-128, 0), (127, 127) refused and counted; an aim on each of the six faces taken, 1 cm past each refused; a refused command never runs, and its sequence counts as missing when the next one runs (70) | `<` for `<=`; the aim held to the `i16` range instead of the bounds; `refused_aim` left out of `refused()` |
 | T2-7 | `room/tests/any_bytes.rs:139-143` | the generator's move and aim over their full ranges (the aim is `{1, 2, 3}` today); its identities still hold (15) | as T2-6's third plant: the identity breaks |
 | T2-8 | `client-endpoint/tests/any_bytes.rs` | random posts with hostile rays (NaN, infinities, beyond 2^20, zero direction): no panic, every aim sent inside the bounds (25) | the clamp skipped on the ground fallback |
@@ -336,7 +338,7 @@ bin/make_recordings.rs:4-6), so a value he tunes later never moves an old record
   soldier stands at the local match's spawn, jumps (Space held at steps 600 to 699: a jump at each landing; taps at
   uneven gaps, two in one tick and bursts of six: one jump per command on a recording, 3B-ONE-PER-TICK), and holds
   Shift with no move (the stamina rule); no wall is met. Its aim: the zero ray has no direction, so the endpoint keeps
-  its first aim (step 2's clamped start) and the soldier turns toward it once. **Its hashes move from tick 1 in the
+  its first aim [SUPERSEDED by block 7.4: the zero ray is no ray, not cast and not counted; the same aim] (step 2's clamped start) and the soldier turns toward it once. **Its hashes move from tick 1 in the
   commit of step 1** (the soldier table enters the state), and in step 2's commit already if the record takes the
   move and aim (N24, choice ii): the recordings test (`tests/recordings.rs:29`) fails on any change of the state's
   bytes otherwise (rust-reviewer's F12 says the same). **Its frozen content is frozen anew** in the commit where the
@@ -608,7 +610,7 @@ Asked 2026-11-28 on head 3ab59bd7: (1) the record rule, (2) one home for the bou
 this block is my only write. rust-reviewer answers (1) from its side at the same time; I did not wait for it.
 
 ### 7.0 Plan
-1. Re-read the ruling (advisor-reread-4c.md :30-31, :40), my block 1.1 (:73-83, :84-102), block 6 (:579), N24, N30,
+1. Re-read the ruling (advisor-reread-4c.md :30-31, :40), my block 1.1 (:74-105), block 6 (:581), N24, N30,
    rust-reviewer-read 1.1 (:71-73) and 1.6 (:240-247), world.rs (:33-51, :112-117, :143-191), room/lib.rs (:262-300),
    map.rs (:9-14, :33-52, :244-250, :316-335, :645-646), collision.rs (:94-108, :212-250), endpoint.rs (:56-88),
    worker.ts (:53-54). A notes line per finding.
@@ -620,10 +622,10 @@ this block is my only write. rust-reviewer answers (1) from its side at the same
 
 ### 7.1 Notes (one line per finding)
 - B7-N1 (the record today): `World.player` is the whole `PlayerCommand` (buttons, presses), hashed as bytes 4 to 21 of the shared state (world.rs:18, :115, :185-187); `authority_step` keeps it when a tick has no command (:143-151). The room hands `&[]` to the world on a tick whose queue gives nothing due (room/lib.rs:262-282) and runs a late command in a later tick (`late`, :273-275); the echo reads the record (:286-296). So a starved tick reaches the world as a command-less tick, and nothing outside the world repeats a command today.
-- B7-N2 (my (i) left a gap): block 1.1 (:75-81) said the soldier "consumes" move and aim and never said what a tick with no command does; N24 (:50) the same. With nothing kept, a command-less tick would stop him, a rule change nobody chose. The ruling closes it; my answer below keeps the held move and aim in the soldier's row.
+- B7-N2 (my (i) left a gap): block 1.1 (:76-79) said the soldier "consumes" move and aim and never said what a tick with no command does; N24 (:50) the same. With nothing kept, a command-less tick would stop him, a rule change nobody chose. The ruling closes it; my answer below keeps the held move and aim in the soldier's row.
 - B7-N3 (the row's fields): rust-reviewer-read 1.1 (:71-73) gives the Soldier `aim: V3` and `facing: [f32; 2]` and no held move; its 1.6 (:246-247) has `visit_shared` write "the move and aim of the record", which contradicts its F17 (:29) taking (i). The move is the one new field.
 - B7-N4 (no signed method): `StateSink` has `u16`, `u32`, `bytes`, `secret` (world.rs:57-67) and no `i8`; the path form `i8::to_le_bytes(x)` is what the rule scan needs (world.rs:91-92). rust-reviewer adds `f32` in step 1 (F12), which the `aim: V3` field uses.
-- B7-N5 (no reader of the bytes): `write_state` is `#[cfg(test)]` (world.rs:188-195) and nothing reads canonical bytes back. A restore test needs a test-only reader; change-set 7's reset is the real one and is not built here.
+- B7-N5 (no reader of the bytes): `write_state` is `#[cfg(test)]` (world.rs:190-198) and nothing reads canonical bytes back. A restore test needs a test-only reader; change-set 7's reset is the real one and is not built here.
 - B7-N6 (first-loop's aim): first-loop runs on the test scene (N10) whose bounds hold the origin (x -32..80, y 0..20, z -24..24; N28), so the clamped start aim is (0, 0, 0) cm, exactly what today's endpoint writes (endpoint.rs:251-263). Its rays are all-zero bits (N9).
 - B7-N7 (the grid trap): `on_grid` rounds `value * 100` and keeps it only if it divides back to the same double (map.rs:244-250); 0.55 x 100 is not 55 to the last bit (map.rs:645-646), so a plain `ceil` on a lower face at 0.55 gives 56. `on_grid` is private to content today (`fn`, no `pub`).
 - B7-N8 (the far corner): block 4.3's map is built in code from 0 to 2,000 m on x and z: on the grid, but past the aim's reach (327.67 m, map.rs:33-40). My block 1.1's "off the grid refused" would not refuse it; a reach check in `build` would. `build` checks shape corners for finiteness and thickness (collision.rs:227-232), the bounds not at all.
@@ -662,7 +664,7 @@ move and the aim are the soldier's, kept in its row.
 - The record never takes move or aim: `visit_shared` writes the tick, the record (22 bytes as today), then the soldier
   rows. That settles rust-reviewer-read 1.6 (:246-247) against its F17 (:29) in (i)'s favour, if it agrees.
 
-**The restore test** (step 1, in world.rs's test module beside `write_state`, which is `#[cfg(test)]`, :188-195):
+**The restore test** (step 1, in world.rs's test module beside `write_state`, which is `#[cfg(test)]`, :190-198):
 - A test-only reader `read_shared(bytes, constants) -> World` that takes the shared bytes field by field in
   `visit_shared`'s order; the match constants (rules, static world, spawns) and the seed come from the same build and
   setup, never from the bytes. It is a test's tool, not change-set 7's reset (B7-N5).
@@ -696,11 +698,114 @@ move and the aim are the soldier's, kept in its row.
 So the commands the room runs in first-loop are byte-identical before and after step 2. In the other order (step 2
 before step 1, item 7's conditions) no soldier exists, nothing reads move or aim, and nothing moves (block 6 row 2g
 stands). First-loop moves in step 1's commit, which re-makes it anyway (F12).
+
+### 7.3 Answer 2, one home for the bounds: YES, `StaticWorld::build` derives both views once from `map.bounds`
+- **Both views, from the same f64 face, in `build` (collision.rs:212):** `bounds_m: [[f32; 3]; 2]`, each face narrowed
+  once by `narrow` (collision.rs:101-108, the shapes' own narrowing, so a code-built minus zero loses its sign), for
+  the sweeps (rust-reviewer's F11: the floor and the four sides as solid, the top at the bounds); and `bounds_cm:
+  [[i32; 3]; 2]`, from the f64 face (never from the narrowed `f32`) by **the loader's own grid rule**: content's
+  `on_grid(v, BOUNDS_GRID)` (map.rs:244-250), made `pub` (a one-word change in content; `BOUNDS_GRID` is already `pub`,
+  map.rs:52; sim already depends on content, so no manifest change and no copy of the rule). Only where it gives
+  `None` (a document built in code, off the grid) one step inward: c = round(v x 100); a lower face takes c + 1 if
+  c / 100 < v, an upper face c - 1 if c / 100 > v. Exact: the f64 division rounds monotonically and v is no grid value,
+  so the comparison is never equal. Not plain `ceil` and `floor`: 0.55 x 100 is not 55 to the last bit (map.rs:645-646),
+  so `ceil` puts a lower face at 0.55 on 56 (B7-N7).
+- **The aim's box:** `bounds_cm` held to the aim's reach (x and z within +-32,767, y 0 to 65,535: map.rs:33-40), once,
+  in `build`. Every loaded map lies inside the reach already (map.rs:319-335), so there the box is the bounds. A map
+  built in code past the reach still builds: block 4.3's 2 km map (0 to 2,000 m on x and z) gets the box 0 to 32,767 cm
+  on x and z and runs the simulation alone. A box empty on some axis (bounds wholly past 327.67 m, only a code-built
+  map can have it) is `None`; `Room::new` and `Endpoint::new` refuse such a world by name.
+- **Withdrawn, in so many words:** my block 1.1 line "a document built in code whose bounds are off that grid is
+  refused (`WorldError` gains `Bounds`, with its `message`)" (:69-71). Off the grid is no refusal now. `WorldError`
+  gains `Bounds` only for bounds that are not finite or have no thickness, the checks a shape gets (collision.rs:227-232),
+  which `build` does not make for the bounds today (B7-N8).
+- **Where the aim reads them:** only through `StaticWorld::clamp_cm(AimCm) -> AimCm` and `holds_cm(AimCm) -> bool`, on
+  the aim's box. Their callers: (1) `sim::aim::aim_point`: the hit, the ground crossing and the kept aim all leave
+  through `clamp_cm` (after `round` to whole centimetres and the saturating `as i32`, integer compares only);
+  (2) `Endpoint::new`: the first aim is `clamp_cm` of (0, 0, 0) (N13); (3) the room's per-command check (`holds_cm`,
+  counted as `refused_aim`, block 1.1). **`clamp_move` reads no bounds**: it holds the move's length to 127, integers
+  only (block 1.1, post.rs). The movement reads `bounds_m` only. The room and the endpoint never hold bounds of their
+  own: they get the world as a `sim` type (4B-WORLD-ROOM, N11).
+- **The test that ties them** (collision.rs tests, in place of T2-4's "bounds off the grid refused by name", :153):
+  on the test scene, a loaded map at the reach's edges (+-327.67; 0 to 655.35), a loaded map with a lower face at 0.55,
+  code-built documents off the grid (-32.004 to 80.004 on x, 0.005 to 20.001 on y), and the 2 km map: (a) on the grid
+  each face's cm equals `on_grid`'s count exactly (0.55 gives 55); (b) off the grid each face is inward by less than
+  1 cm, judged in f64 against the document's own number; (c) each face's metres equal `narrow` of the same f64;
+  (d) the aim's box lies inside both the cm bounds and the reach, and the 2 km map builds with the box 0 to 32,767;
+  (e) one face moved by 1 cm in the document moves exactly that face in both views. Plants, each red: (P1) plain `ceil`
+  and `floor` with no grid test (the 0.55 face on 56: a); (P2) outward rounding off the grid, lower faces floored
+  (-32.004 on -3,201, 1 cm outside the map: b and d); (P3) a reach refusal in `build` (the 2 km map does not build: d);
+  (P4) the metres made from the cm (`c as f32 / 100.0`) instead of from the f64 face (an off-grid wall moves up to
+  1 cm: c).
+- Count: code about 35 (block 1.1 had 20 for the bounds), tests about 40 (T2-4 had 30).
+
+### 7.4 Answer 3, the zero ray: YES (all-zero: no ray this post, aim kept, not counted; non-finite: refused and counted)
+- **The three kinds of post ray**, decided in `Post::from_numbers` in this order: **all-zero** when each of the six
+  numbers equals 0.0 **by value** (`== 0.0`: a minus zero counts as zero; a NaN never equals 0.0, so a NaN among five
+  zeros is not all-zero) gives `PostRay::None`; else **any number not finite** gives `PostRay::Refused`; else
+  `PostRay::Ray(Ray)`. So block 1.1's `ray: Option<Ray>` (:86-91) becomes `ray: PostRay`, three ways.
+- **What the endpoint does:** `None`: the aim is kept (the last aim it sent; on the first post the clamped start),
+  nothing counted. `Refused`: the aim is kept, `rays_refused` rises by 1. `Ray`: cast through `aim_point`; a hit or a
+  ground crossing is the new aim; a finite ray that meets neither (the sky, parallel to the ground, a zero direction
+  with a non-zero origin) keeps the aim and `rays_missed` rises by 1. The endpoint's last aim is the client's
+  input-side state, not the simulation's: every replay rebuilds it from the recorded posts from step 0, and what a
+  later tick reads of it is the soldier's held aim (7.2), which is hashed.
+- **Where the count lives:** `client_endpoint::Readout` (endpoint.rs:56-79) gains `rays_refused: u32` and
+  `rays_missed: u32` (block 1.1's `aims_kept`, renamed and narrowed: it no longer counts a post with no ray), each
+  wrapping like every count there ("Each count wraps", :56). **Not in the hashed state**: no tick reads them; they are
+  the client's counts, as `refused` and `late` are. Whether the block shows them is engine-architect's layout.
+- **The layer it covers:** the page-to-Worker guard still refuses a post whose ray numbers are not all finite
+  (`Number.isFinite`, block 1.1's `isPageToWorker`), and the Worker turns that into an error that ends the match
+  (worker.ts:53-54): from our own page a NaN is a bug and fails loudly. The count serves every caller of `Sim::input`
+  without that guard: the replays (replay.rs:150, recording.ts:160, determinism.spec.ts:26-27), H3's 200,000 hostile
+  posts, and the endpoint's tests (B7-N9). All-zero passes the guard (zeros are finite).
+- **Why it matters under SIZE-4C (c):** the first part posts six zeros every frame until the page makes its ray
+  (step 4, in the later part); under this rule each is no ray, so the soldier keeps the clamped start aim and both
+  counts stay 0 (no false refusals in the readout). First-loop's recorded rays (all-zero bits, N9) are the same case.
+- **Test Z1, the all-zero ray** (endpoint.rs tests, about 25 lines), on a map whose bounds exclude the origin (x 10 to
+  40): post 1 all-zero: the command's aim is the clamped start, not (0, 0, 0); post 2 a ray onto a box top: the aim is
+  that top's point; posts 3 to 22 all-zero, six of them with a minus zero in each of the six places in turn: every
+  command carries the **box top** (the last aim, not the start), and `rays_refused` and `rays_missed` stay 0. A cast of
+  a zero ray would also keep the aim (zero direction: no hit, no ground, N5), so the counts are what tells them apart.
+  Plants, each red: (P1) the all-zero ray cast as a ray (`rays_missed` 21); (P2) no ray resets the aim to the clamped
+  start (posts 3 to 22 carry the start); (P3) the all-zero test by bits (`to_bits() == 0`): the six minus-zero posts
+  become rays (`rays_missed` 6).
+- **Test Z2, the non-finite ray** (post.rs and endpoint.rs tests, about 30 lines): after a ray onto a box top, 24
+  posts each with one of the six numbers a quiet NaN, a signalling NaN pattern (`f32::from_bits(0x7FA0_0000)`), +inf
+  or -inf, the other five finite and not zero (6 places x 4), then 6 posts with one NaN among five zeros (each place):
+  every command keeps the box top, `rays_refused` rises by **exactly 1 per post** (30 in all), `rays_missed` stays 0,
+  no panic. Plants, each red: (P1) the finite check on five of the six numbers (T2-2's): the sixth place's 5 posts go
+  to the cast and are not refused (`rays_refused` 25); (P2) the all-zero test written as "no number above or below
+  zero" (`!(v > 0.0 || v < 0.0)`, true for a NaN): the 6 NaN-among-zeros posts count as no ray (`rays_refused` 24).
+- T2-11 (the guard refuses a non-finite ray number, `messages.test.ts`) stays as block 1.2 has it: the other layer.
+- Count: code about 10 (the three-way kind and the second counter); tests Z1 and Z2 about 55, of which T2-2's and
+  T2-5's ray cases (about 20) are no longer counted there: about +35.
+
+### 7.5 What block 7 supersedes, and the count
+Each older line also carries a "SUPERSEDED by block 7" mark in place; line numbers are as they stand after those marks.
+| Older line | Was | Now |
+|---|---|---|
+| N24 (:50), block 1.1 (:76-79) | (i): "the soldier consumes move and aim" | 7.2: the soldier's row holds them (`held_move` 2 bytes, `aim` 12); a command-less tick keeps both |
+| block 1.1 (:69-71) | "a document built in code whose bounds are off that grid is refused" | 7.3: withdrawn; one step inward off the grid; `WorldError::Bounds` only for bounds not finite or without thickness |
+| block 1.1 (:89-91), T2-2 (:151) | the ray `None` unless all six are finite | 7.4: `PostRay { None, Refused, Ray }`; all-zero is `None`, a non-finite number `Refused` |
+| block 1.1 (:103-104), T2-5 (:154) | `aims_kept` counts every kept aim, a post without a usable ray included | 7.4: `rays_refused` (non-finite) and `rays_missed` (finite, met nothing); an all-zero post counts in neither |
+| T2-4 (:153) | "bounds off the grid refused by name" | 7.3's tie test and its four plants |
+| block 3.1 (:340-341) | "the zero ray has no direction, so the endpoint keeps its first aim" | the zero ray is no ray (not cast, not counted): the same aim, by rule rather than by the cast |
+| "For the sheet" item 2 | the bounds' one home, flagged | settled by 7.3 |
+| "For the sheet" item 6 | "I recommend the narrow record" | (i) as ruled, with the held move and aim in the row (7.2), never the narrow record with nothing kept |
+- Moved between steps: `PlayerCommand`'s move and aim fields go to step 1 (rust-reviewer's 1.6), not step 2 (my 1.1),
+  so that step 2 moves no hash (7.2 condition 1). Block 6 row 2g stands.
+- **Count:** step 2 (block 1.3) from 315 / 630 to about **340 / 675** (the bounds' two views and the aim box +15 / +10;
+  the ray's three kinds and the second counter +10 / +35). Step 1 gains about **10 / 100** (the held move in the row;
+  the restore reader, the world test and the room's pin), counted in rust-reviewer's step 1 so they are counted once.
+
+DONE (block 7)
+
 ## For the sheet: overlaps and readings not yet listed (flagged, not resolved)
 1. The post's shape: 13 numbers with the move packed in one word (the plan, the recording's format) against
    engine-architect's design 3.6 (14: `move_x, move_z` as two numbers). I recommend 13 (block 1.1).
 2. The bounds on `StaticWorld`: the aim's cm (mine) and the movement's metres for the floor and the four sides
-   (rust-reviewer's F11): one home, built once (N30).
+   (rust-reviewer's F11): one home, built once (N30). [Settled by block 7.3.]
 3. 4B-RAY-WASM: the checkpoint card puts it in rust-reviewer's read too; mine gives where it runs (the static world's
    file), rust-reviewer picks the three rays and owns 4B-RAY-COUNTS.
 4. How the room's and the endpoint's tests get a world without naming `content` (N11): a dev-dependency (a manifest
@@ -710,7 +815,8 @@ stands). First-loop moves in step 1's commit, which re-makes it anyway (F12).
    its ray half only until change-set 8 brings the view time (block 1.4); PM-0004-20's hash half on `walk` (one
    soldier) and its flag-off timing not runnable (N27).
 6. The record's width (N24): whether the World keeps the command's move and aim decides whether step 2 moves any
-   hash. rust-reviewer's and engine-architect's choice; I recommend the narrow record.
+   hash. rust-reviewer's and engine-architect's choice; I recommend the narrow record. [SUPERSEDED by block 7.2: (i) as
+   ruled, the held move and aim in the soldier's row, never the narrow record with nothing kept.]
 7. The soft push is in no recording (one slot): its cross-target identity needs its own WebAssembly run (N29).
 8. CI: 6b's paced replay needs the CI Builder's answer to 4B-CHROMIUM-TIME first (N15); the 2,000,000-command runs go
    in the release line, which has room (N16).

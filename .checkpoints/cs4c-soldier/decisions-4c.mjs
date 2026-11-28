@@ -29,20 +29,19 @@ const ENTRIES = [
 
 const sha = (text) => createHash('sha256').update(text).digest('hex');
 // A saved message is whole, or (chat-words.mjs `less`, for BOARD-WORDS (b)) shown without one line: then the header
-// also gives the left-out line's number, why it is left out, and the shown text's bytes and sha256, which is what is
-// quoted and checked here; the whole message's bytes and sha256 are named in the entry, to be checked against the
-// chat's transcript (chat-words.mjs `less` run again into a scratch file).
+// gives the left-out line's number, why it is left out, and the shown text's bytes and sha256, which is what is quoted
+// and checked here. The whole message's bytes and sha256 are in no file of the repository (a digest and a length of
+// the whole beside the shown text would let a reader confirm a guess of the left-out line): the chat gives them to
+// him, and chat-words.mjs `less` run again into a scratch file checks the saved file against the transcript.
 function saved(file) {
   const all = readFileSync(NOTES + file, 'utf8');
   const cut = all.indexOf('\n---\n');
   const note = all.slice(0, cut);
   const text = all.slice(cut + 5).replace(/\n$/, '');
-  const m = note.match(/(?:the user message|the message he sent while the chat was working \(stored as a queued command\)) of (\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}:\d{2})\.\d+Z \(uuid ([0-9a-f-]{36})\), whole \((\d+) bytes, sha256 ([0-9a-f]{64})\)(?:, shown here without its line (\d+) of (\d+) \((\d+) bytes, sha256 ([0-9a-f]{64})\), which is left out because (.*?))?\. What it answers: (.*)_\s*$/s);
+  const m = note.match(/(?:the user message|the message he sent while the chat was working \(stored as a queued command\)) of (\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}:\d{2})\.\d+Z \(uuid ([0-9a-f-]{36})\), (?:whole|shown here without its line (\d+) of (\d+), which is left out because (.*?)) \((\d+) bytes, sha256 ([0-9a-f]{64})\)\. What it answers: (.*)_\s*$/s);
   if (!m) throw new Error(`${file}: its header does not read as a saved message's`);
-  const [, date, time, uuid, wholeBytes, wholeDigest, line, of, shownBytes, shownDigest, why, answers] = m;
-  const left = line === undefined ? null : { line, of, why, wholeBytes, wholeDigest };
-  const bytes = left ? shownBytes : wholeBytes;
-  const digest = left ? shownDigest : wholeDigest;
+  const [, date, time, uuid, line, of, why, bytes, digest, answers] = m;
+  const left = line === undefined ? null : { line, of, why };
   if (Buffer.byteLength(text) !== Number(bytes) || sha(text) !== digest) throw new Error(`${file}: the ${left ? 'shown text' : 'message'} is not the ${bytes} bytes with sha256 ${digest} its header gives`);
   if (left && text.split('\n').length !== Number(of) - 1) throw new Error(`${file}: the shown text is not the message less one line`);
   return { date, time, uuid, bytes, digest, left, answers: answers.trim().replace(/\.$/, ''), text, shown: text };
@@ -63,7 +62,7 @@ const closing = (s) => `Copied by script (${s.bytes} bytes, sha256 ${s.digest}):
 function entry(file, chat, summary, commit) {
   const s = saved(file);
   const how = s.left
-    ? `without its line ${s.left.line} of ${s.left.of}, left out because ${s.left.why} (the whole message, ${s.left.wholeBytes} bytes with sha256 ${s.left.wholeDigest}, is in the chat's transcript)`
+    ? `without its line ${s.left.line} of ${s.left.of}, left out because ${s.left.why} (the whole message is in the chat's transcript, by this id)`
     : 'whole';
   const head = `- **Taken by Mustafa, ${s.date}, ${s.time} UTC: ${summary}** (${chat}; message ${s.uuid}, ${how}; copied by script from the chat's saved file \`${NOTES}${file}\` (readable at commit ${commit} of the branch \`${BRANCH}\`), which the chat copied by script from its transcript). What it answers, in the chat's words (not his): ${s.answers}. ${closing(s)}`;
   return { ...s, block: `${wrap(head)}\n${quoted(s.shown)}\n` };
@@ -101,7 +100,7 @@ if (mode === 'write') {
     if (at < 0 || start < 0 || text.slice(start + end.length).slice(0, block.length) !== block) throw new Error(`${file}: its words in ${DECISIONS} are not the saved message's, byte for byte`);
     // And the quoted block ends there: the next line is no line of a quote.
     if (text.slice(start + end.length + block.length).startsWith('>')) throw new Error(`${file}: more quoted lines follow its words in ${DECISIONS}`);
-    const whole = s.left ? ` (the message less its line ${s.left.line}; whole: ${s.left.wholeBytes} bytes, sha256 ${s.left.wholeDigest.slice(0, 12)}...)` : '';
-    console.log(`${file}: ${Buffer.byteLength(s.shown)} of ${s.bytes} bytes quoted, sha256 ${s.digest.slice(0, 12)}...${whole}, in ${DECISIONS} word for word`);
+    const less = s.left ? ` (the message less its line ${s.left.line} of ${s.left.of})` : '';
+    console.log(`${file}: ${Buffer.byteLength(s.shown)} of ${s.bytes} bytes quoted, sha256 ${s.digest.slice(0, 12)}...${less}, in ${DECISIONS} word for word`);
   }
 } else throw new Error('usage: decisions-4c.mjs write <commit> | check');
