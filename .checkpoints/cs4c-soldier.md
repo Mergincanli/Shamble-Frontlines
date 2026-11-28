@@ -266,6 +266,26 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   re-exports. (13) the tests of rows 22, 25, 27, 28, 31, 33, 34, 35, 36, 37, 38 (bar the direct feed), 39; world.rs's
   known answers re-made by a second implementation written for it in the notes (no committed script exists: earlier
   change-sets' agents wrote theirs in notes), `world-known-answers-c4.py`, FNV-1a 64 over the canonical bytes.
+- **State (19:02 Amsterdam, from the clock): C4 builds whole and every Rust test passes; saved again as
+  `c4-wip.patch`.** Since 18:45: the room's tests (T2-6, N-1, W-3's stand-and-join half, the starved-tick pin with a
+  test-only count `handed` of the slice handed to the world, the world past the reach: the room's 22 unit tests
+  pass); any_bytes (honest moves inside the reach, honest aims inside the bounds or NONE, the three lies, a
+  per-message identity on `refused_move` and `refused_aim` for intact messages after the join, and `refused()` the
+  sum of the seven refusals: refused moves 2,490, refused aims 5,481 in the run); state_hash_alloc.rs and hash_cost.rs
+  on the test bundle; replay.rs's state-lines test pinned with his row (spawn (0, 0, -5) bits c0a00000, flags 7,
+  stamina 288,000,000 units, facing (1, 0), aim x 32768) and the shared bytes' 60-byte row. **The recordings made
+  again, as predicted:** `first-loop.content.json` (f0093b57...) and `first-loop.rec` (30f80fde...) byte for byte the
+  same; `first-loop.hashes` (its header unchanged, all 1,800 tick lines moved), `first-loop.vector.txt` (249 to 39,397
+  bytes: his row at street_1, (-20, 0, -0.9), facing +x, the frozen movement's stamina 315,000,000) and manifest.txt
+  moved. **The maths list (item 10):** the real production build printed 33 refusals, 21 unique paths (release twin 4:
+  exp, sincos, rem_pio2, rem_pio2_large; dev twin all 21), all inside B17-5's exp and sincos families, no
+  compiler_builtins and no C name: each its own entry with its why (rem_pio2_large's: linked, unreachable on [0, 360),
+  its table 66 words on 32-bit and 690 on 64-bit, a debug assertion on 64-bit only), checked against libm 0.2.16's
+  source for every "used by"; the production build then passes (players' file 287,113 bytes, from 258,488).
+  build-checks.test.mjs pins the 23 routines. A slip: one shell call ran `cd <libm's registry folder> && grep ...`
+  (read only, no git); the shell went back to the start folder and the worktree's own `cd` was run alone at once.
+  Next: T-A, T-B, W-2's stand half, row 33's three bundles, then the plants, the full local checks, the gate, C4's
+  commit.
 - **State (18:45 Amsterdam, from the clock): C4 in the worktree, saved again as `c4-wip.patch` (98,224 bytes, 18
   files):** items (3) collision.rs's bounds in whole centimetres (`face_cm`, `aim_box`, `bounds_cm()`, `holds_cm`,
   `WorldError::Bounds`; tie-test parts a, b, d, e and the refusal: 15 collision tests pass), (4) GROUND's words
