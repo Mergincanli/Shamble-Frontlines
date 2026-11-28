@@ -256,9 +256,11 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
     **FACING-SPAWN (a) picked with its reviewers** (engine-architect, rust-reviewer, netcode-architect). **The batch
     reworded** (`deps-4c-v2.diff`, 85 lines, `deps-4c-v2.sha256`): only the root comment changed (it names `sincos`
     for the spawns' facings), so only Cargo.toml's digest moves (fc436ec3... for 099d224b...); `git apply --check`
-    passes; `cargo metadata --offline --locked` exits 0; `dependency-check.md` marked to be rewritten; the two v2 files
-    stay on this machine until security-auditor's answer, as the first version's did (the advisor tool's caution; a
-    new seat remakes them from the scratch worktree by the same `diff -u` loop if they are lost). Running from
+    passes; `cargo metadata --offline --locked` exits 0; `dependency-check.md` marked to be rewritten. The two v2 files
+    are pushed before the answer (02:46): a patch in the notes is no manifest or lockfile, which is all DEP-HOLD names,
+    and the advisor agent's item 8 keeps the batch a patch so that pushes are never held; nothing applies it before
+    the answer (the first version's files were held back by the advisor tool's caution, which is not needed for a
+    patch). Running from
     02:44 Amsterdam: security-auditor on the reworded batch (with RR1's correction of its item 3), rust-reviewer's
     block 8 and engine-architect's block 6 ("no aim yet"; the aim area in the constructors).
 - **The sheet's revision 3** (from 02:14 Amsterdam): the record rule applied with its confirmations outstanding, the
