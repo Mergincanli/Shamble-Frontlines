@@ -823,6 +823,30 @@ the build goes on. A head that goes to the advisor agent needs a green run.
   slope (movement.ts:147-157); standing has no test on upward speed (movement.ts:195). **Next for step 1:** rust-
   reviewer's block 10 (the 0.55 in the slope-head window, the swept wall pass measured at 6.3 and 9.576 m/s, the two
   assumptions corrected), then the advisor agent on steps 1 to 7 with HEADROOM-FEET open.
+- **rust-reviewer's block 10 (DONE; `rr-body-proto-7.rs`, outputs `rr-body-proto-8-*.txt`, bit traces under
+  `.gate/rr7/`):** with the 0.55 in the slope-head window and the :281 test, the x 45 seams rise at most 0.0175 /
+  0.035 m at every speed, 13.27 m/s included (game-designer's prediction holds); block 5 still 69 of 69; the set-back's
+  speed removal and standing with no speed test change no printed result; with the old switches it reproduces block
+  9 byte for byte. **The swept wall pass is not "no change at his speeds"** (compared tick by tick on bits): bit-equal
+  in the open and on every face contact; at 6.3 m/s 4 of 341 block 6 runs differ, all one push case rounding the 3.10 m
+  ledge's corner, by up to 0.063 m; at 9.576 m/s the six roof jumps differ in path by up to 0.51 m with the same outcome,
+  and one landing grazing a corner by 4 micrometres. **The report says so, with these numbers** (his DEPART-4C (a)
+  took our own sweeps; this is how they differ from the sandbox's push-out at corners). At 13.27 m/s the sweep closes
+  all three holes (ramps from the side 306 of 306, against 264 with the push-out; the high-end case stops 0.40 m out
+  with or without G6's guard; the tick inside the beam gone); two bugs of its first sweep found and fixed (a start
+  exactly on a face read as no contact; a raised ramp swept at its low end lost the roof's edges), each to get a test
+  that plants it. The pull's clip is bit-equal to no clip on every block 5 and 6 run at 1, 2, 6.3 and 9.576 m/s (only
+  where a wall is in reach does it differ: game-designer's condition holds). HEADROOM-FEET measured both ways: (a) he
+  walks the 3.0 m window wall's whole top and an upper floor over a 1.5 m crate; (b) he is stopped 0.40 m before the
+  window stretch and before the crate, and dropped onto the stretch is put off the wall; on the test scene (b) changes
+  only the beam-over-step flicker. **Step 1's design:** the wall pass and the pull share one sweep (contacts placed
+  exactly on the face, no skin, one slide; ramps swept only at their sides and an exposed high end); the window with the
+  0.55; the set-back's speed removal; landing with no speed test; HEADROOM-FEET a flag in the movement rules. **Count:**
+  the movement about 292 / 430 (from 205 / 265 in F2), so step 1 about +87 / +165 over F2's 2.5D figure, about 3,350 in
+  all; steps 1 to 7 about 8,550 by the designs' count (F2: 8,295 to 8,395); at the measured rates about 18,550 to 23,100
+  written lines against his stop line of 18,700, and the early look (steps 1 to 5, about 7,080) at about 15,360 to
+  19,110: his rule for the line before the early look applies ("do not stop: tell me in two lines in your next report
+  and build on to the early look").
 
 ### I6. What the advisor agent is asked, for steps 1 to 7 (after the Testlines read is folded in)
 Its item 10's thirteen points stand as section H's table, with his answers on (1) BODY-SHAPE, (3) SWEEP-ROUTE and

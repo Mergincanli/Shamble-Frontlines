@@ -372,8 +372,8 @@ fn tick(world: &[Block], s: &mut S, _body: Body, wish: (f32, f32), speed: f32, j
 
 /// The walk's wall pass as a sweep (block 10): the move swept against the shapes that are walls for him at the
 /// tick's start (block 9's wall test), stopped at contact with no skin and the contact axis put exactly on the
-/// grown face (so that a face contact gives push-out's own bits), one slide; ramps whose width holds his centre at
-/// either end are left to the push-out and set-back after it. `slide_speed` removes the speed into the wall.
+/// grown face (so that a face contact gives push-out's own bits), one slide; a ramp whose footprint holds his centre
+/// at the start is left to the set-back after it. `slide_speed` removes the speed into the wall.
 fn sweep_walk(world: &[Block], s: &mut S, mut mx: f32, mut mz: f32, test_feet: f32, slide_speed: bool) {
     for _ in 0..2 {
         if mx == 0.0 && mz == 0.0 { break; }
@@ -384,10 +384,14 @@ fn sweep_walk(world: &[Block], s: &mut S, mut mx: f32, mut mz: f32, test_feet: f
             if h <= test_feet + TINY && !OWN_TOP.load(std::sync::atomic::Ordering::Relaxed) { continue; }
             let no_wall = h <= test_feet + STEP + 0.005 && headroom(world, h, s.x, s.z) && b.min[1] <= test_feet + TINY;
             if no_wall || at_slope_head(world, b, s.x, s.z, test_feet) { continue; }
-            if let Some((a, _)) = b.ramp {
-                let o = 2 - a;
-                let (q0, q1) = if a == 0 { (s.z, s.z + mz) } else { (s.x, s.x + mx) };
-                if (q0 > b.min[o] && q0 < b.max[o]) || (q1 > b.min[o] && q1 < b.max[o]) { continue; }
+            // A ramp met within its width is the set-back's (along the slope), except from beyond its high end; met from
+            // outside its width (its sides), the sweep stops him like any wall.
+            if let Some((ax, up)) = b.ramp {
+                let o = 2 - ax;
+                let (p, q) = if ax == 0 { (s.x, s.z) } else { (s.z, s.x) };
+                let within_width = q > b.min[o] && q < b.max[o];
+                let beyond_high = if up { p >= b.max[ax] } else { p <= b.min[ax] };
+                if within_width && !beyond_high { continue; }
             }
             if std::env::var("TRACE9").is_ok() && !slide_speed { println!("        sweep cand {i} from {:.4} by {mx:.4}: {:?}", s.x, sweep_rect0(b, s.x, s.z, mx, mz)); }
             if let Some((t, nx, nz)) = sweep_rect0(b, s.x, s.z, mx, mz) { if best.is_none_or(|bb| t < bb.0) { best = Some((t, nx, nz, i)); } }
@@ -1080,6 +1084,26 @@ fn block9(world: &[Block], body: Body, v0: f32) {
             println!("{what} at {sp}: ended x {:.4} feet {:.4}, steps {}, ticks inside {emb}, unjumped falls {}, flickers {}, pushed out {}", s.x, s.y, s.steps, s.falls_unjumped, s.flickers, s.wall_hits);
         }
     }
+    // H5. HEADROOM-FEET (game-designer-read block 7, N26 corrected): his metrics-room window wall at his Export's sizes
+    // (3.0 m high, 0.2 m thick, sill 0.9 m, opening 1.2 m: the wall over the window from 2.1 to 3.0 m), and a crate
+    // 1.5 m high under an upper floor (3.0 to 3.2 m). Switch: env HEADROOM_ON_OWN_TOP=1 is the sandbox's own test.
+    println!("# H5. HEADROOM-FEET (own top {})", if OWN_TOP.load(std::sync::atomic::Ordering::Relaxed) { "can be a wall: the sandbox" } else { "never a wall: the clause" });
+    let ww = vec![bx([50.0, 0.0, 0.0], [54.0, 3.0, 0.2]), bx([54.0, 0.0, 0.0], [55.5, 0.9, 0.2]), bx([54.0, 2.1, 0.0], [55.5, 3.0, 0.2]), bx([55.5, 0.0, 0.0], [60.0, 3.0, 0.2]),
+                  bx([60.0, 3.0, 2.0], [70.0, 3.2, 8.0]), bx([64.0, 0.0, 4.0], [65.0, 1.5, 5.0])];
+    for sp in [6.3_f32, 9.576] {
+        let mut s = start(51.0, 0.1, 3.0);
+        let mut emb = 0; let mut low = 3.0_f32;
+        for _ in 0..40 { tick(&ww, &mut s, body, (1.0, 0.0), sp, false, v0); emb += u32::from(embedded(&ww, &s, body)); if s.grounded { low = low.min(s.y); } if s.x >= 58.0 { break; } }
+        println!("along the window wall's top at {sp}: ended x {:.4} feet {:.4} (lowest standing {low:.2}), pushed out {}, unjumped falls {}, ticks inside {emb}", s.x, s.y, s.wall_hits, s.falls_unjumped);
+        let mut s = start(61.0, 4.5, 3.2);
+        for _ in 0..40 { tick(&ww, &mut s, body, (1.0, 0.0), sp, false, v0); if s.x >= 68.0 { break; } }
+        println!("on the upper floor over the crate at {sp}: ended x {:.4} feet {:.4}, pushed out {}", s.x, s.y, s.wall_hits);
+    }
+    let mut s = start(54.75, 0.1, 3.6);
+    s.grounded = false;
+    for _ in 0..40 { tick(&ww, &mut s, body, (0.0, 0.0), 0.0, false, v0); if s.grounded { break; } }
+    println!("dropped onto the wall's top over the window: ended x {:.4} z {:.4} feet {:.4}", s.x, s.z, s.y);
+
     // H4. G3: walking off the 0.55 step toward the 0.56 step 2 m away, and off the 3.05 ledge toward the 3.10 ledge,
     // over 30 phases of one tick's move.
     println!("# H4. walk-off catches (G3), 30 phases each");

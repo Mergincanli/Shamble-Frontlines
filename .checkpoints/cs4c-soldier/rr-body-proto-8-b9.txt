@@ -35,6 +35,12 @@ step with the beam 1 m in at 9.576: ended x 65.6000 feet 0.5500, steps 1, ticks 
 step under a beam over its edge at 13.27: ended x 69.6000 feet 0.0000, steps 0, ticks inside 0, unjumped falls 0, flickers 0, pushed out 37
 floating plank 0.3 to 0.5 m at 13.27: ended x 73.6000 feet 0.0000, steps 0, ticks inside 0, unjumped falls 0, flickers 0, pushed out 38
 step with the beam 1 m in at 13.27: ended x 65.6000 feet 0.5500, steps 1, ticks inside 1, unjumped falls 0, flickers 0, pushed out 35
+# H5. HEADROOM-FEET (own top never a wall: the clause)
+along the window wall's top at 6.3: ended x 58.1400 feet 3.0000 (lowest standing 3.00), pushed out 0, unjumped falls 0, ticks inside 0
+on the upper floor over the crate at 6.3: ended x 68.1400 feet 3.2000, pushed out 0
+along the window wall's top at 9.576: ended x 58.0224 feet 3.0000 (lowest standing 3.00), pushed out 0, unjumped falls 0, ticks inside 0
+on the upper floor over the crate at 9.576: ended x 68.0224 feet 3.2000, pushed out 0
+dropped onto the wall's top over the window: ended x 54.7500 z 0.1000 feet 3.0000
 # H4. walk-off catches (G3), 30 phases each
 0.55 step -> 0.56 step at 6.3: caught in 3 of 30 phases
 0.55 step -> 0.56 step at 9.576: caught in 30 of 30 phases
