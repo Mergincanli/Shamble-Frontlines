@@ -47,7 +47,24 @@
    and without it (3b); BODY-SHAPE's evidence is in the question file (04646ca3).
 
 ## Current step
-**Step S, the scene: the build** (by the sheet's section D, revision 2). The branch rule (condition 2): until he
+**4c-2, the soldier (steps 1 to 7): its plan with the advisor agent** (`advisor-steps1to7-brief.md`), built on top of
+4c-1's final head by his item 6 b. **4c-1 is closed:** final head **946fef73a07550840d55e12f45932451b2dccd5c**
+(pushed 14:35 Amsterdam; CI green: gate and smoke run 46150338098, toolchain run 46150338072), the advisor agent
+APPROVE for his Brave check and go (`advisor-final-4c1.md`, copied from `.gate/`), the zip sent to him just before
+14:55 (the clock read right after it; `shamble-v2-04c1-the-scene.zip`, 342,469 bytes, sha256 13c5f6ef...; built from the clean final head, its 12 files
+checked after unpacking, the page's 6 browser tests passing on the unpacked copy). The notes came back in 4c-2's
+first commit (a revert of 946fef73).
+The advisor agent's conditions, kept here: **merge** by merge commit only, 946fef73 as the expected head (96f6e6c9
+and d1f1288f must stay reachable); the pull request's own checks green on 946fef73; his go typed by him after the
+APPROVE, in the chat of the session that merges (nothing on GitHub counts); his Advisor's branch takes no push (a new
+commit is a new head: its review, then his go again). **The one-branch way:** until main holds 4c-1's merge, 4c-2 is
+counted, gated and reviewed against 946fef73; once merged, main comes in once, in this worktree, and 4c-2's pull
+request is not marked ready before that; a scene change he asks for after his Brave check goes into 4c-2's pull
+request, reviewed as scene code by graphics-engineer and art-director at least; he is told that if he holds back his
+go on 4c-1, the scene and step 0's doc edits land only inside 4c-2's pull request. Its Lows: the pull request's text
+says "in the builder chat" for his go (it is the chat of the session that merges: told to him for his Advisor, no
+push); this section was stale (refreshed here).
+Earlier (kept for the record): **Step S, the scene: the build** (by the sheet's section D, revision 2). The branch rule (condition 2): until he
 answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and prototypes only.
 - **The code is committed (bc7720f3, c1de41e5); `step-s-wip.patch` is stale and is not applied by anyone** (it was
   the build's saved state before bc7720f3; it goes with the notes at 4c-1's end). How the build went, kept for the
@@ -195,7 +212,11 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   `/home/user/Shamble-Frontlines/.gate/cs4b-2`. A session of another account works on its own branch from this
   branch's head and never pushes here (his Lanes rule). SEAT-OUT from him: stop at a whole point and report the last
   commit's id.
-- **State (14:31 Amsterdam, from the clock): the verifier PASS** (`verifier-4c1.md`: FAIL on the report's first
+- **State (14:55 Amsterdam, from the clock): 4c-1 closed, 4c-2 open.** 4c-1's final head 946fef73 (the advisor
+  agent APPROVE; CI green; the zip sent to him); the notes back (the revert commit); next: the advisor agent on steps 1
+  to 7 (`advisor-steps1to7-brief.md`: Q1 the plan, Q2 HEADROOM-FEET's default, Q3 the rung, Q4 the order, Q5 the
+  information lines), then step 1 by rust-reviewer's block 11 with block 12. His Brave check of 946fef73 and his go are
+  his, from Sunday 29 November, 12:00. Earlier state (14:31), kept: **the verifier PASS** (`verifier-4c1.md`: FAIL on the report's first
   draft for its words only, two Mediums and five Lows, each corrected; the re-check PASS with one Low more, corrected;
   every number it checked held, its own full local checks passing on 0645432f's code, 29 Chromium tests in 231 s).
   Its follow-up V-1 and one citation are in be276ef3 (docs). **Next, in order:** this notes commit (the last one of
