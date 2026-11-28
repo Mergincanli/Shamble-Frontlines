@@ -127,3 +127,141 @@ DONE
   the five: empty (base unchanged since approval); worktree status: only this notes file modified. Patch digest
   0edaf8f3... unchanged. Head copies (scratchpad v3/) + `patch -p1` of deps-4c-v2.diff rebuild exactly the five
   approved digests (fc436ec3, b7c6ee5d, c7432b03, 79b829a9, 22e2c5bf), 5 files, no sixth. `git apply --check` at head OK.
+- [x] 2 blocks read. engine-architect-read.md:1078-1081 (item 5 point 15) and :1097 (T-G: plant `use
+  content::map::MapDocument;` in a copy of room's non-test source); rust-reviewer-read.md:1089 (YES to point 15),
+  :886 and :918 (layering.rs in the commit that first calls exp/sincos, with the batch), :962 (row 32 = T-G). Q4
+  (:1101-1104): no manifest line changes, the five batch files stay byte for byte; F1, F2, item 3 and the scan stay in
+  that commit (rust-reviewer :883-890). Nothing in either block moves a batch file or drops a condition.
+- [x] 3 marking read. rules_scan.rs:695-760 `in_tests`: test-only = a file whose first 8 tokens are `#![cfg(test)]`, or
+  the item after the exact tokens `# [ cfg ( test ) ]` (past further attributes and `pub`/`pub(..)`) whose first
+  word is in TEST_ITEMS (:691-693: mod fn use impl struct enum const static type trait unsafe async extern), to its
+  first depth-0 `}` or `;`. Anything else (cfg(any(test,..)), cfg(not(test)), cfg(all(test,..)), cfg_attr(test,..),
+  `macro_rules!`, statements, fields) is read as shipped code: every non-exact spelling errs toward red (false reds
+  possible, e.g. cfg(all(test, unix)); no false pass). Over-marking needs a delimiter miscounted: tokenizer
+  rules_scan.rs:129-227 drops comments (nested), every string kind (r#, br, c), char and byte literals, lifetimes and
+  numbers, and reads `r#content` as `content` (:212-213). So a test-only item can extend over shipped code only through
+  a tokenizer error on a `{` inside a literal or comment: a plant should pin that.
+- [x] 3' tree. room/src: lib.rs (tests :304-305), queue.rs (:132); client-endpoint/src: 8 files, six with `#[cfg(test)]
+  mod tests`, and lib.rs:11-12 `#[cfg(test)] mod layout_ts;` whose file layout_ts.rs has no `#![cfg(test)]`: a test
+  module declared in another file is NOT marked by in_tests (per-file scan), so `content` there would be a false red
+  (the conservative side; the author then adds `#![cfg(test)]` at its top, which is truly test-only). No `#[path`,
+  `include!`, `include_str!`, `include_bytes!` in either src today; `content` appears there only in `///` comments
+  (dropped), and as part of `content_hash` (a different token).
+- [x] 3'' compiler. Cargo reference, Specifying Dependencies (doc.rust-lang.org/cargo/reference/specifying-dependencies.html,
+  read 2026-11-28): "Dev-dependencies are not used when compiling a package for building, but are used for compiling
+  tests, examples, and benchmarks", "not propagated to other packages"; renaming: a `package` key "in the
+  `[dependencies]` section of which package should be depended on" (`bar = { .., package = "foo" }`). So the batch's
+  dev line already keeps `content` out of a non-test build of room/endpoint (the compile fails); layering.rs is the
+  readable second guard. Sure: high for the doc's words; not built here.
+- [x] F3 (Low): routes a token scan of src/ cannot see. (a) a manifest edit: `content` moved to [dependencies],
+  `c = { package = "content", path = "../content" }` (then `use c::..`: no `content` token), `[dependencies.content]`,
+  `[target.'cfg(..)'.dependencies]`; dependency_rules.rs pins content's and sim's manifests only (its grep shows no
+  room/client-endpoint), so nothing tests room's and endpoint's tables. (b) code from outside the walked tree:
+  `#[path = "../x.rs"] mod x;` and `include!("..")` (the string's text is dropped, so the path is invisible). (c) sim's
+  re-exports: sim/src/time.rs:8 `pub use content::time::UNITS_PER_SECOND;` is sim's one, by design (ADR 0002 part 3);
+  a new `pub use content::..` in sim reaches room's shipped code as `sim::..`. (a) and (b) are in F2's reach and cheap;
+  (c) is sim's layering: a list in the same test is enough. Fix in the plants below.
+- [x] F3 corrected (advisor tool's point 2). dependency_rules.rs:176-187 walks every crate's manifest, for parry3d's
+  askers only; nothing there tests `content` in room's or the endpoint's tables. But engine-architect's block 4
+  (engine-architect-read.md:551-559) already gives layering.rs three halves: room's and the endpoint's
+  `[dependencies]` name no `content` (plant: the `content = { path = "../content" }` line), the src scan (the half
+  point 15 supersedes, :553), and sim's hand-on of content, today only `pub use content::time::UNITS_PER_SECOND`
+  (sim/src/time.rs:8; plant `pub use content::map::MapDocument`). Point 15 supersedes only the src half, so the other
+  two stand. F3 shrinks to: (a) the manifest half keys on the package, not the key: plants `c = { package = "content",
+  path = "../content" }`, `[dependencies.content]`, `[target.'cfg(unix)'.dependencies]` + content; (b) `#[path` and
+  `include!`/`include_str!`/`include_bytes!` refused in both src (none used today); (c) block 4's, nothing to add.
+- [x] F4 (Low): the marking over-marks, traced by hand (not run). in_tests (:742) checks the word after the mark,
+  not that the mark is in item position, and its walk breaks only on a depth-0 `}` or `;`, so a closing `)` at depth 0
+  (saturating_sub) runs on; and the tokenizer turns `r#type` into `type` (:212-213, traced: word "r", hashes 1, no
+  quote -> skip `#`, next round pushes `type`). Traces: `struct S { #[cfg(test)] r#type: u8, m: content::map::MapDocument }`
+  marks from `#` to the struct's `}`: `content` read as test (false pass). `fn f(#[cfg(test)] r#fn: u8) { content::x(); }`
+  runs past `)` and marks the whole function body. `fn f<#[cfg(test)] const N: usize>() { content::x(); }` (`<` not
+  counted) marks the whole function (whether rustc takes cfg on a const generic: not checked). Same shape: a struct
+  expression's field, a match arm `#[cfg(test)] r#type => ..`. Reach: small (the compiler already refuses a
+  dev-dependency in a non-test build, 3''), so Low; but "reused as is" does not hold the rule it states. Fix in
+  layering.rs's marking (or the shared one): a mark counts only in item position (file start, or after `;`, `}`,
+  `{`, or another attribute's `]`), raw identifiers stay distinct from keywords (e.g. the token `r#type`), and a
+  depth-0 closing `)`, `]` or `}` that the item did not open ends the marking unmarked.
+- [x] F5 (Low, existing code, not this batch): the same over-mark reaches content's panic scan (rules_scan.rs:765-769
+  uses in_tests): `fn f(#[cfg(test)] r#fn: u8) -> u8 { x.unwrap() }` in content would pass it. Clippy's guard in
+  content's lib.rs still refuses it where clippy runs (rules_scan.rs:678-680 says the toolchain job runs none). For
+  rust-reviewer, a STATUS follow-up unless the shared marking is fixed in this commit, which closes both.
+- [x] (3) batch comments. Room (deps-4c-v2.diff:65-66): "tests build a collision world from a map document"; block 7
+  has them build rules and spawns too (item 5.9): incomplete, not false; "never names `content`" is what the
+  non-test scan holds. True enough: no reword (a reword moves a digest). Endpoint (:78-80): its tests build its copy
+  of the world in step 2 (block 7 item 2, item 5.13: nothing beyond endpoint.rs:258 in step 1), so if the batch lands
+  in step 1 the endpoint's dev line is unused and the comment is ahead of its tests until step 2 (F6, Low). No
+  shipped effect (dev-deps stay out of builds; no `unused_crate_dependencies` lint in Cargo.toml:25-28). Accepted on one
+  condition: step 2's commit holds the endpoint's tests that use it; if step 2 leaves 4c-2, the endpoint's two lines
+  and comment come out in a new batch, back to me.
+
+## Answer (third)
+Verdict on the reworded layering.rs: REVISE (wording of point 15 and T-G; Lows, no blocker on the batch). The
+non-test reading meets F2 and its intent: the batch's comments say "the room's code ... never names `content`", and the
+room's own unit tests are not its shipped code; Cargo already keeps a dev-dependency out of a non-test build (Cargo
+reference, Specifying Dependencies), so the test is the readable second guard. What does not hold is "rules_scan.rs's
+marking reused" as it stands (F4). layering.rs lands in the batch's commit with all three halves (block 4's manifest
+and sim hand-on halves stand; point 15 replaces only the src half), its marking tightened, and these plants, run in
+layering.rs against the marking function it actually uses (shared or not):
+- Walk: every `.rs` under room's and client-endpoint's `src/`, recursively; asserts both lib.rs are found (no vacuous pass).
+- Rule: any non-test identifier token `content` (not only path heads). Controls: the real tree passes (room's tests
+  naming content); `#[cfg(test)] mod tests { use content::map::MapDocument; }` passes; `content_hash` passes; a file
+  whose first line is `#![cfg(test)]` naming content passes.
+- Red, once each: `use content::map::MapDocument;` in a copy of room's AND of an endpoint source (T-G);
+  `#[cfg(any(test, feature = "x"))]`, `#[cfg(not(test))]`, `#[cfg_attr(test, allow(unused))]` before that line;
+  `extern crate content as c;`, `use ::content as c;`, `use r#content::map::MapDocument;`; F4's three:
+  `struct S { #[cfg(test)] r#type: u8, m: content::map::MapDocument }`, `fn f(#[cfg(test)] r#fn: u8) { content::x(); }`,
+  `fn f<#[cfg(test)] const N: usize>() { content::x(); }`; delimiters in literals: `#[cfg(test)] mod tests { const A:
+  char = '{'; const B: &str = "{"; const C: &str = r#"{"#; /* { */ } use content::map::MapDocument;`; and
+  `#[path = "../x.rs"] mod x;`, `include!("../x.rs");`, `include_bytes!("x")`.
+- Manifest half (block 4) red: `content = { path = "../content" }`, `c = { package = "content", path = "../content" }`,
+  `[dependencies.content]`, `[target.'cfg(unix)'.dependencies]` with content; control: the batch's dev line.
+- Sim half (block 4) red: `pub use content::map::MapDocument` in a copy of sim's source; control: time.rs:8's one.
+Known conservative side (no plant): `#[cfg(all(test, unix))]` and `#[cfg(test)] mod layout_ts;`'s file without
+`#![cfg(test)]` (client-endpoint lib.rs:11-12) read as shipped: a false red, which the author fixes with `#![cfg(test)]`.
+
+Digests: at head bfae40ba the five batch files are the batch's base, so their raw sha256 do not match the approved
+digests, by design (the approved five are the patched results). Result: base unchanged since a4e93679 (`git diff
+--stat` empty), patch 0edaf8f3... unchanged, head + patch rebuilds exactly fc436ec3, b7c6ee5d, c7432b03, 79b829a9,
+22e2c5bf (five files, no sixth), `git apply --check` OK. The approval stands; no re-review of the batch.
+
+(3) Block 7 and block 14 move no batch file and drop no condition (Q4, rust-reviewer :883-890). They add: F6 (Low,
+endpoint dev line unused until step 2, accepted on step 2's commit using it); layering.rs's three halves and F4's
+tightened marking in the batch's commit; F5 (Low) to rust-reviewer for content's panic scan.
+
+Not checked: nothing built or run (the traces are by hand); whether rustc accepts cfg on a const generic; layering.rs
+itself (not written); the shared-marking placement; sim-wasm's and devtools' own naming of content (allowed).
+
+DONE
+
+## Amendment to the third answer (after the advisor tool's second read)
+- [x] Macro, traced by hand: `strip! { #[cfg(test)] mod leak { use content::map::MapDocument; } }` gives tokens
+  `strip ! { # [ cfg ( test ) ] mod leak { use content :: .. ; } }`; in_tests sees the exact mark followed by `mod`
+  and marks to leak's `}`: `content` read as test. A room macro whose matcher drops the attribute (e.g. `(#[$m:meta]
+  $($t:tt)*) => { $($t)* }`) ships `mod leak`. False pass (the compiler still refuses the dev-dependency: Low).
+- [x] F4's fix as first written does not close `fn f<#[allow(unused)] #[cfg(test)] const N: usize>() { content::x(); }`
+  (the mark follows an attribute's `]`, no raw identifier, the walk ends on the body's own `}`). Withdrawn as the fix.
+- [x] F4 fix, replaced: layering.rs uses the NARROW marking, not in_tests: test-only is only (i) a file whose first
+  tokens are `#![cfg(test)]`, or (ii) `#[cfg(test)]`, then optional further `#[..]` attributes, then the keyword `mod`,
+  an identifier and `{`, standing at the file's top level (brace, bracket and parenthesis depth 0; so never inside a
+  macro's delimiters, a struct, a parameter list or a generic list), marked to that module's closing `}`. Raw
+  identifiers stay distinct from keywords. Every test block in both crates already has shape (ii) at top level
+  (room lib.rs:304-305, queue.rs:132-133; client-endpoint block.rs:94, endpoint.rs:342, layout.rs:251, post.rs:51,
+  press.rs:82, schedule.rs:58); lib.rs:11-12's `mod layout_ts;` is a declaration, its file not marked.
+- [x] Ruling, `#[cfg(test)]` on a real item that is not a module (`fn`, `use`, `impl`, `const`): truly compiled out, but
+  under the narrow marking it is REFUSED (a false red on the safe side; none exists in either crate today, grep
+  above): the author moves it into the tests module. A red plant pins that choice: top-level `#[cfg(test)] use
+  content::map::MapDocument;` and `#[cfg(test)] fn h() { content::x(); }` are red.
+- [x] Plants added to the third answer's list (all red): the `strip!` macro above; `fn f<#[allow(unused)]
+  #[cfg(test)] const N: usize>() { content::x(); }`; the two top-level non-module `#[cfg(test)]` items above; and
+  `#[cfg(test)] mod tests { .. }` nested inside a non-test `mod m { .. }` is read as shipped (a false red, accepted:
+  none exists). Controls unchanged (the real tree, the top-level `#[cfg(test)] mod tests` with content, a `#![cfg(test)]`
+  file, `content_hash`). F5 (content's panic scan, rules_scan.rs) unchanged: the narrow marking is layering.rs's; the
+  shared in_tests is rust-reviewer's call.
+- Verdict, digests and (3) unchanged: REVISE on point 15's "reused" wording and T-G's single plant; the batch's
+  approval stands (head + patch rebuilds the five approved digests).
+- Not checked, added: my agent memory was neither read nor updated (the brief's write rule limits me to this file);
+  the threat-model line "the compiler keeps dev-dependencies out of shipped builds; layering.rs is the second guard"
+  is for the session to record if wanted.
+
+DONE

@@ -34,9 +34,28 @@ on layering.rs's non-test reading (its F2). The order may change on their answer
 - The room holds `rules`, `statics`, `spawns`, `query_counts` (engine-architect's block 7); `Room::new` takes them;
   sim-wasm's `local_constants` (B5 (c): the bundle's one movement document) and `CreateError`'s new variants;
   `LocalMatch::new` takes the three and loses `world`; the callers and test callers.
-- In the same commit (Q4 condition 2): F1's tightened `dependency_rules.rs`, F2's `layering.rs` (non-test tokens,
-  security-auditor's answer), the stricter libm scan in `rules_scan.rs`, the exact `maths-allowed.mjs` entries for what
-  the players' build prints, the exp and sincos vectors (PM-0004-22).
+- In the same commit (Q4 condition 2): F1's tightened `dependency_rules.rs`, F2's `layering.rs`, the stricter libm
+  scan in `rules_scan.rs`, the exact `maths-allowed.mjs` entries for what the players' build prints, the exp and
+  sincos vectors (PM-0004-22).
+- **layering.rs by security-auditor's third answer (REVISE on the wording, the batch's approval standing;
+  `security-auditor-deps-4c-v2.md`, "Third answer" and its amendment):** not rules_scan.rs's test-only marking, which
+  lets `content` through (raw names read as keywords; a closing `)` not ending the marked span), but a narrow one:
+  test-only is a file starting `#![cfg(test)]`, or a top-level `#[cfg(test)] [#[..]] mod NAME {..}`; a `#[cfg(test)]`
+  on a fn, use or impl is refused (a false red on the safe side); raw names stay distinct from keywords. Both crates'
+  `src/` walked recursively, both `lib.rs` found. Its plants, all red, run inside layering.rs against its own marking:
+  T-G's line in a copy of a room file and of an endpoint file; `cfg(any(test, ..))`, `cfg(not(test))`,
+  `cfg_attr(test, ..)`; `extern crate content as c;`, `use ::content as c;`, `use r#content::..`; the four leaks of its
+  trace (a `#[cfg(test)] r#type` field before a `content` field, a `#[cfg(test)] r#fn` parameter, a cfg on a const
+  generic, a macro that drops the attribute); a top-level `#[cfg(test)] use` or `fn`; `'{'`, `"{"`, `r#"{"#` and
+  `/* { */` inside a test module followed by T-G's line; `#[path]`, `include!`, `include_bytes!`; the manifest's
+  `c = { package = "content", .. }`, `[dependencies.content]` and a target-specific table; sim's
+  `pub use content::map::MapDocument`. Its controls, passing: the real tree, a top-level `#[cfg(test)] mod tests`
+  naming content, a `#![cfg(test)]` file, `content_hash`. Block 4's manifest half and sim half
+  (`engine-architect-read.md:551-559`) stand; point 15 replaces only the `src/` half.
+- Its F6 (Low, accepted): the client endpoint's dev-dependency on `content` stays unused, with a comment ahead of its
+  tests, until step 2, whose commit must use it (or the endpoint's two lines come out in a new batch back to it). Its
+  F5 (Low, for rust-reviewer): the same leak in content's existing panic scan in `rules_scan.rs`; rust-reviewer says
+  whether the narrow marking is shared there in this commit or it becomes a STATUS follow-up.
 - Tests: 11.7 rows 2 to 5, 32 (T-G) and 33 (B5) with their plants.
 
 ## C4. The soldier in the shared state (the hash moves: the pins re-made)
