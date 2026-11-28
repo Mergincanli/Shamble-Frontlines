@@ -150,6 +150,14 @@ fn askers(root: &Path, package: &str) -> Vec<String> {
     askers
 }
 
+/// The root manifest's dependency lines that name the maths routines' crate, as written.
+fn maths_lines(root: &str) -> Vec<String> {
+    table(root, "workspace.dependencies")
+        .into_iter()
+        .filter(|line| line.starts_with("libm"))
+        .collect()
+}
+
 /// The maths routines' line in the root, to the byte, and its one locked version (the batch's F1; security-auditor's
 /// answer of 2026-11-28 names them with the batch's five digests).
 const MATHS: &str = r#"libm = "=0.2.16""#;
@@ -202,12 +210,8 @@ fn the_simulation_depends_on_the_content_crate_the_collision_library_and_the_mat
     );
     // The maths routines' one line in the root, to the byte (no feature of its own: `default` and `arch`, as the
     // lockfile had them before the batch).
-    let maths: Vec<String> = table(&read("Cargo.toml"), "workspace.dependencies")
-        .into_iter()
-        .filter(|line| line.starts_with("libm"))
-        .collect();
     assert_eq!(
-        maths,
+        maths_lines(&read("Cargo.toml")),
         [MATHS],
         "the root Cargo.toml's libm line is the batch's (security-auditor's answer of 2026-11-28)"
     );
@@ -238,6 +242,13 @@ fn the_simulation_depends_on_the_content_crate_the_collision_library_and_the_mat
         askers(&root, "libm"),
         ["sim"],
         "only the simulation's manifest names the maths routines"
+    );
+    // These checks read a manifest's text as written: an escape in a name (`"libm"`) would read as TOML reads it
+    // and pass them, so no manifest of ours may hold a backslash outside its comments (security-auditor's L3 on C3).
+    assert!(
+        !names(&read("Cargo.toml"), "\\") && askers(&root, "\\").is_empty(),
+        "a manifest holds a backslash: {:?}",
+        askers(&root, "\\")
     );
     assert_eq!(
         locked(&lock, "spade"),
@@ -332,7 +343,23 @@ fn the_rule_reads_what_it_should_refuse() {
         "# The simulation alone calls libm.\n[dependencies]\nsim = { path = \"../sim\" }\n",
         "libm"
     ));
-    assert_ne!(MATHS.replace("=0.2.16", "0.2.16"), MATHS);
+    // The root's line is held to the byte: a loosened version, a feature, a second line each fail the compare.
+    let root_with = |line: &str| {
+        format!("[workspace.dependencies]\nparry3d = \"x\"\n{line}\n[profile.release]\n")
+    };
+    assert_eq!(maths_lines(&root_with(MATHS)), [MATHS]);
+    for planted in [
+        "libm = \"0.2.16\"",
+        "libm = { version = \"=0.2.16\", features = [\"unstable\"] }",
+        "libm = \"=0.2.16\"\nlibm-x = \"1\"",
+    ] {
+        assert_ne!(maths_lines(&root_with(planted)), [MATHS], "{planted}");
+    }
+    // An escape is seen as a backslash, whatever it spells.
+    assert!(names(
+        "[dependencies]\nm = { package = \"\\u006cibm\" }\n",
+        "\\"
+    ));
     assert_eq!(
         locked(
             "[[package]]\nname = \"libm\"\nversion = \"0.2.15\"\n\n[[package]]\nname = \"libm\"\nversion = \"0.2.16\"\n",

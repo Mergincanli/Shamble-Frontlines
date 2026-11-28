@@ -81,11 +81,13 @@ pub fn tokens(source: &str) -> Vec<Token> {
             }
             at = end;
         } else if c == '\'' || (c == 'b' && next == '\'') {
-            // A character (`'x'`, `'\n'`, `b'x'`) to its closing quote; a lifetime (`'a`) is left out.
+            // A character (`'x'`, `'\n'`, `'\''`, `b'x'`) to its closing quote; a lifetime (`'a`) is left out. An escape's
+            // closing quote is looked for after the escaped character, so `'\''` ends at its own last quote
+            // (security-auditor's M1).
             let open = if c == 'b' { at + 1 } else { at };
             let escaped = at_or(open + 1) == '\\';
             if escaped || at_or(open + 2) == '\'' {
-                let mut end = open + 2;
+                let mut end = if escaped { open + 3 } else { open + 2 };
                 while at_or(end) != '\'' && at_or(end) != '\0' {
                     end += 1;
                 }

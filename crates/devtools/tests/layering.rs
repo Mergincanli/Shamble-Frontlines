@@ -62,6 +62,15 @@ fn manifest_breaches(manifest: &str) -> Vec<String> {
         if line.is_empty() || line.starts_with('#') {
             continue;
         }
+        // An escape in a name (`"content"`) is read here as written, not as TOML reads it: none is taken
+        // (security-auditor's L3 on C3; no manifest of ours has one).
+        if line.contains('\\') {
+            found.push(format!(
+                "line {}: a backslash, which this check does not read as TOML does: {line}",
+                index + 1
+            ));
+            continue;
+        }
         if line.starts_with('[') {
             table = line.trim_matches(|c| c == '[' || c == ']').to_owned();
             if table.contains("content") {
@@ -116,13 +125,14 @@ fn source_breaches(file: &str, source: &str) -> Vec<String> {
     found
 }
 
-/// Each `pub use` and `pub extern crate` outside the tests that names `content`, as "file: its words".
+/// Each `pub use`, `pub extern crate` and `pub type` outside the tests that names `content`, as "file: its words" (a
+/// type alias hands a content type on as a re-export does: security-auditor's L4 on C3).
 fn handed_on(file: &str, source: &str) -> Vec<String> {
     let t = marking::tokens(source);
     let tests = marking::test_only(&t);
     let mut found = Vec::new();
     for (i, token) in t.iter().enumerate().skip(1) {
-        let starts = !token.raw && matches!(token.text.as_str(), "use" | "extern");
+        let starts = !token.raw && matches!(token.text.as_str(), "use" | "extern" | "type");
         if !starts || tests[i] || t[i - 1].text != "pub" || t[i - 1].raw {
             continue;
         }
@@ -184,7 +194,31 @@ fn raw_breaches(file: &str, source: &str) -> Vec<String> {
 
 #[test]
 fn the_room_the_endpoint_and_the_players_module_never_call_libm_s_routines() {
-    for krate in NEVER_CALLING {
+    // Every crate of ours but the simulation and the tools is walked, so a crate added later is held too
+    // (security-auditor's L4 on C3); the three that depend on the simulation today are among them.
+    let mut walked: Vec<String> = std::fs::read_dir(crates())
+        .expect("the crates folder")
+        .map(|entry| {
+            entry
+                .expect("an entry")
+                .file_name()
+                .to_string_lossy()
+                .into_owned()
+        })
+        .filter(|krate| {
+            crates().join(krate).join("Cargo.toml").is_file()
+                && krate != "sim"
+                && krate != "devtools"
+        })
+        .collect();
+    walked.sort_unstable();
+    assert!(
+        NEVER_CALLING
+            .iter()
+            .all(|krate| walked.iter().any(|name| name == krate)),
+        "{walked:?}"
+    );
+    for krate in &walked {
         let mut files = Vec::new();
         rust_files(&crates().join(krate).join("src"), Path::new(""), &mut files);
         assert!(
@@ -247,7 +281,11 @@ fn each_planted_naming_of_content_is_found_and_the_allowed_ones_pass() {
         );
     }
     #[rustfmt::skip]
-    let bites: [&str; 19] = [
+    let bites: [&str; 21] = [
+        // The escaped quote as a character (security-auditor's M1): written without the space rustfmt adds, it ends at
+        // its own last quote, so the `{` after it opens nothing, and a `}` after it in a macro closes nothing.
+        "#[cfg(test)] mod tests { const Q: [char; 2] = ['\\'','{']; }\nuse content::map::MapDocument;",
+        "strip! { const Q: [char; 2] = ['\\'','}']; #[cfg(test)] mod leak { use content::map::MapDocument; } }",
         "use content::map::MapDocument;",
         "#[cfg(any(test, feature = \"x\"))]\nuse content::map::MapDocument;",
         "#[cfg(not(test))]\nuse content::map::MapDocument;",
@@ -294,7 +332,9 @@ fn each_planted_naming_of_content_is_found_and_the_allowed_ones_pass() {
     }
     // The manifests: a normal, a renamed, a table and a per-target naming are seen; the batch's dev line passes.
     #[rustfmt::skip]
-    let manifests: [&str; 5] = [
+    let manifests: [&str; 6] = [
+        // An escaped name alone (no other word of it names content): only the backslash rule can see it.
+        "[dependencies]\nc = { package = \"\\u0063ontent\", workspace = true }\n",
         "[dependencies]\ncontent = { path = \"../content\" }\n",
         "[dependencies]\nc = { package = \"content\", path = \"../content\" }\n",
         "[dependencies.content]\nworkspace = true\n",
@@ -319,6 +359,15 @@ fn each_planted_naming_of_content_is_found_and_the_allowed_ones_pass() {
         handed_on(
             "x.rs",
             "pub(crate) use content::map::MapDocument;\npub extern crate content;"
+        )
+        .len(),
+        1
+    );
+    // A type alias hands a content type on as a re-export does; one the crate keeps to itself does not.
+    assert_eq!(
+        handed_on(
+            "x.rs",
+            "pub type Document = content::map::MapDocument;\ntype Inner = content::map::Spawn;"
         )
         .len(),
         1

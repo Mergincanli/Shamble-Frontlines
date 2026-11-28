@@ -711,7 +711,11 @@ const BITES: [(&str, &str); 43] = [
 /// (B7-1's bites): a routine in a function not allowed it, another routine of libm's, an import with a bare call,
 /// libm in a second file, a path that goes on, a function's address.
 #[rustfmt::skip]
-const LATER_BITES: [(&str, &str, &str); 37] = [
+const LATER_BITES: [(&str, &str, &str); 40] = [
+    // security-auditor's L1 on C3: another routine of the same family, a path from the crate root, a renamed crate.
+    ("fmath.rs", "fn exp_of(x: f64) -> f32 { libm::expf(x as f32) }", "are called as `libm::expf` in `exp_of`"),
+    ("fmath.rs", "fn facing_of(x: f64) -> f64 { ::libm::exp(x) }", "are called as `libm::exp` in `facing_of`"),
+    ("lib.rs", "extern crate libm as m;", "`libm`: the maths routines are named outside `fmath.rs`"),
     // The raw names (block 17's bites): in the other caller, in other files, imported, renamed, handed on, as a
     // function's address, through a glob import, in fmath.rs's own tests; and libm called back in a caller.
     ("fmath.rs", "fn facing_of(x: f64) -> f64 { exp_of(x) }", "`exp_of`: libm's routine as the simulation reaches it stands only in `fmath.rs`, in its own `fn` and in `share_per_tick`"),
@@ -922,7 +926,10 @@ fn the_content_crate_keeps_its_rules() {
 }
 
 #[rustfmt::skip]
-const CONTENT_BITES: [(&str, &str); 23] = [
+const CONTENT_BITES: [(&str, &str); 24] = [
+    // The escaped quote as a character, written without a space (security-auditor's M1): the tests module ends at its
+    // own brace, so the call after it is read as shipped.
+    ("#[cfg(test)] mod tests { const Q: [char; 2] = ['\\'','{']; }\nfn f(x: Option<u8>) -> u8 { x.unwrap() }", "2: `unwrap`"),
     // The narrow marking (support/marking.rs, change-set 4c's F5): `#[cfg(test)]` marks a top-level `mod NAME { .. }`
     // and nothing else, so a test-only `const` or `fn` outside a tests module is read as shipped (a false red on the
     // safe side: it moves into the tests module); and a raw name is no keyword, so a parameter `r#fn` under
