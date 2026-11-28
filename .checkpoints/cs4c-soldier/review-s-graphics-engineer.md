@@ -21,16 +21,17 @@
   (`scene.ts` `solidFaces`): a, b under tops 4, 5 and c, d beside them are right in every case; each face list is a
   proper cycle. The centroid test is valid because a box and a wedge are convex. The floor quads wind to +y (front
   from above). The slope is the sim's plane (`collision.rs:149-177`).
-- N2 (materials and backends, no finding): node materials only; colour is a uniform (three's RenderObject material key
-  reduces plain numbers to on/off, `node_modules/three/src/renderers/common/RenderObject.js:827-837`), so programs stay
-  6. Polygon offset reaches WebGPU as pipeline depth bias (`.../webgpu/utils/WebGPUPipelineUtils.js:238-242`) and is in
+- N2 (materials and backends, no finding): node materials only; one material per grey does not multiply the programs,
+  by measurement: the test scene's 23 solids take about ten greys and the WebGL 2 count stays 6 (render-counts.json);
+  WebGPU unverified (no adapter in the container). Polygon offset reaches WebGPU as pipeline depth bias (`.../webgpu/utils/WebGPUPipelineUtils.js:238-242`) and is in
   the pipeline key (`.../webgpu/WebGPUBackend.js:2500`): three offsets, three pipelines; on WebGL 2 it is plain state.
   Ground pushed 2, patches 1, grid 0: the order is right on both. Test-scene counts add up: 1 ground + 6 patches + 23
   solids + 1 grid + the output quad = 32 draws; 17x12 + 6x8 + 12 + 2 + 1 = 267 triangles; 113 + 49 = 162 lines.
 - F1 (Medium): `overview` never returns when the aspect is 0 or NaN, or so small that the fit needs a camera past its own
   far of 1e6 m. Measured with a copy on three's core camera, a capped loop (`.gate/ge-review/overview-aspect.mjs`):
-  aspect 0 and NaN hang on both the test-size and the largest map; aspect 0.001 hangs on the largest map (655 m).
-  `scene.ts:286` doubles `far` to Infinity and never fits. Failure case: `boot.ts:113` passes `window.innerWidth`; a
+  aspect 0 and NaN hang on both the test-size and the largest map (`scene.ts:286` doubles `far` to Infinity and never
+  fits); at aspect 0.001 the largest map (655 m) also hangs, because a doubling overshoots past the probe camera's far
+  of 1e6 m and no larger distance passes `projected.z < 1` again. The fix is the cap, not a larger far. Failure case: `boot.ts:113` passes `window.innerWidth`; a
   width of 0 (a page in a zero-size frame, or a window that reports 0 while minimised: not seen in Brave, unverified)
   makes `resize` (`three-picture.ts:100-102`) and every later `setContent` (`:77`) freeze the main thread for good.
   Fix: cap the doubling (64 steps) and leave the camera as it was when the aspect is not a positive finite number;
@@ -52,7 +53,15 @@
 - F4 (Low): the first frame after `setContent` creates two new WebGPU pipelines (polygon offset 0 and 2; the empty
   floor only had 1), synchronously inside `render` (`three-picture.ts:70-78`, then `draw`): a one-time hitch at match
   start. `await renderer.compileAsync(next, camera)` before the swap would move it off the frame. Not measured: the
-  container has no WebGPU adapter. The WebGL 2 path compiles nothing new (programs 6 before and after).
+  container has no WebGPU adapter. On WebGL 2 the program count is 6 before and after; whether programs are freed with
+  the empty floor and rebuilt is unverified.
+- F5 (Low): the enclosed-volume test (`scene.test.ts`, the second test) sums `a.(b x c)/6`, and a triangle whose plane
+  passes through the origin adds 0 to it. In its made map every solid has min y 0 and the ramps min z 0, so the floor
+  faces and the z = 0 faces of three ramps are not checked by the volume at all. Checked: a box with min at the origin
+  gives the same sum with its floor right, with its floor as one triangle drawn twice, and with no floor
+  (`node -e` script, this session). Failure case: a wrong floor triangulation that keeps the vertex count (36 or 24)
+  and winds outward passes every assertion. Fix with G-3's raised map: one map whose solids have no face on a
+  coordinate plane.
 - N3 (disposal, no finding): `disposeFloor` frees each geometry and material of a flat group once; the new floor is
   built before the old is freed, so a throw in the build keeps the old one; the counts show the empty floor freed
   (geometries 32, not 34). `stop` is unchanged from main (renderer.dispose only).
@@ -68,11 +77,15 @@ One Medium to fix in the fix pass, the rest Low.
    Cap the loop, skip framing on a non-positive or non-finite aspect, add a test at aspect 0.
 2. F2 Low: `scene.ts:68` with `three-picture.ts:51`, near 0.1 against a far of up to about 4 km: 0.3 to 1.4 m depth
    steps on the largest map; grid bleeds through low blocks. Follow-up for the first large map.
-3. F3 Low: 579 draws at the loader's caps (2.9 times ADR 0003's world share of 202, `docs/adr/0003-rendering.md:358`);
-   merging needs the inventory contract changed (`picture.ts:19-31`). Follow-up.
-4. F4 Low: two new WebGPU pipelines compile on the first frame after `setContent` (`three-picture.ts:70-78`);
-   `compileAsync` before the swap. Unmeasured; follow-up or defer.
-5. G-3 Low (concur): `scene.test.ts:149`, add a test on a map raised above 0.
+3. F3 Low: `scene.ts:215-217`, one mesh per solid: 579 draws at the loader's caps (2.9 times ADR 0003's world share of
+   202, `docs/adr/0003-rendering.md:358`); a full-size map with soldiers and a shadow pass passes the Low cap of 800.
+   Merging needs the inventory contract changed (`picture.ts:19-31`). Follow-up.
+4. F4 Low: two new WebGPU pipelines compile on the first frame after `setContent` (`three-picture.ts:70-78`): a
+   one-time hitch at match start; `compileAsync` before the swap. Unmeasured; follow-up or defer.
+5. F5 Low: `scene.test.ts`'s volume check cannot see faces on a coordinate plane (every floor in its made map): a
+   wrong floor triangulation with the right count passes. Fix with G-3's raised map.
+6. G-3 Low (concur): `scene.test.ts:149` checks y 0; a scene that drew the ground at 0 instead of `bounds.min[1]`
+   would pass every test and leave a raised map's solids floating above the drawn ground.
 Geometry, f32 corners, face orientation, normals, the two backends' polygon offset, the grid and disposal: correct.
 
 DONE
