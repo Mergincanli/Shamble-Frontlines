@@ -249,6 +249,47 @@ the points above are settled. Three things for him follow from its verdict.
   rule on 740), not the 1,420 said above; he hears one sentence before the count passes 1,420, and the build stops at
   1,665 unless his SIZE-4C answer sets another line.
 
+## Added at 02:40 Amsterdam (from the clock), after the body prototype's second run and three more reads
+(rust-reviewer's blocks 6 and 7, engine-architect's block 5, game-designer's block 5, netcode-architect's block 7, all
+in this folder.)
+
+### 11. FALL-STEP: if he walks off a block without jumping and meets a slightly higher block while falling, does he land on it? (new)
+- **Why it matters:** the movement's step-up in the air (what lets a jump catch a ledge) may also work on a fall that
+  began without a jump. If it does, walking off the yard's 0.55 m step lands him on the 0.56 m step 2 m away, at every
+  speed tried, and the yard meant that step as the step-up's limit. From the ground the 0.56 m step is still refused
+  (9 runs of 9), so the pass mark that says "the 0.55 m step gained, the 0.56 m step stopped" holds as worded.
+  game-designer's notes of his sandbox's code lean toward yes (the step-up works "in the air too"), but no note traces a
+  fall from one top onto another, so they do not settle it. The old game does land him on it (measured from his feet at
+  the start of the step, with his centre over the top). Every prototype pass so far assumed yes. **Needed before 4c's
+  movement step.**
+- **What it means for play** (game-designer's arithmetic): walking off a top, he lands on a slightly higher top up to
+  about 2 m away at a walk and about 4 m at a sprint; that top is never more than 0.555 m above the one he left, so he
+  gains no height a jump does not already give.
+- **Options:** (a) yes, as the old game does; (b) no, only a jump catches a block in the air: new to both games, and
+  the prototype's runs are made again under it; (c) he tries it in his sandbox, at a walk and at a sprint (walk off the
+  yard's 0.55 m step toward the 0.56 m step), or lets the sandbox's code be read again (the question already put to him
+  about reading his Testlines repository), and the game does what the sandbox does.
+- **Recommended: (c)**, and (a) if he would rather not try it: it is the old game's rule, and it gives no height a jump
+  does not.
+- Under every option the test of the 0.56 m step starts on the ground beside it (the yard's start point faces the
+  0.55 m step first): a test detail, no rule.
+
+### MOVE-RULES row 8: the head bump is his sandbox's own rule (a correction, no new question)
+- The prototype's second run first put a ceiling question to him, saying his sandbox has no rule for a jump that meets
+  a block overhead. That was wrong: game-designer's notes of the sandbox's code read "head bumps a floating block", and
+  row 8 already lists it. What the bump does exactly (the upward speed stopped or reversed, the feet put back) is not in
+  the notes: the build takes "the head stops at the block's underside and he falls back" unless the sandbox's code says
+  otherwise (read again if he allows it). Nothing hangs overhead in the test scene, so he cannot meet it there.
+
+### Settled tonight without him (for his information; no word of his changes)
+- **The floor** (engine-architect): the bottom of the map's bounds is solid ground; a soldier with nothing under him
+  stands on it, and a fall ends on it.
+- **A spawn's facing** (engine-architect, with rust-reviewer): the facing in degrees becomes the soldier's direction
+  once, when the match starts, through the pinned maths library, so a map keeps any facing it has today.
+  netcode-architect's confirmation that nothing on the wire changes is running.
+- **A step with no new command** (the advisor agent's ruling, confirmed by rust-reviewer and netcode-architect): he
+  keeps his held move and aim, as held buttons are kept today, and that is part of the match's saved state.
+
 ## One line, no question
 STEP12-GO is in the register already (`docs/DECISIONS.md:183`, since 4b-2's docs pass), so it is not written again.
 Only his go for 4b-2's merge, his word on merging and his design notes (and his message of 23:59, by BOARD-WORDS) go

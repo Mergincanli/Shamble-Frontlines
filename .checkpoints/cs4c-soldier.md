@@ -10,7 +10,7 @@
   `/home/user/Shamble-Frontlines` is never switched.
 - **Base:** origin/main dae6d107fdbe942567104bcf1c9a2cbc6b3a1e0f (pull request #79's merge commit), taken in by
   fast-forward from b7145273.
-- **Last update:** 2026-11-28 02:35 Amsterdam (from the clock; an earlier save said 01:08, a time written without
+- **Last update:** 2026-11-28 02:40 Amsterdam (from the clock; an earlier save said 01:08, a time written without
   reading the clock: it was 00:57; an edit at 02:04 wrote "02:06", also unread, corrected here)
 
 ## Steps done
@@ -240,6 +240,12 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
     from the maths side; the batch's root comment changes, so security-auditor answers once more. CEILING: block 6
     corrected, it is MOVE-RULES row 8's head bump (F18); open in the notes: the speed after the bump, the position fix,
     the shape tested, the headroom formula (F19).
+    game-designer's block 5 DONE (ESCALATE on one rule): **FALL-STEP** goes to him (the question file's question 11,
+    written at 02:40 Amsterdam): whether an unjumped fall steps up onto a slightly higher top met in the air; its notes
+    lean to yes but do not settle it; the old game does (legacy/shamble-game.js:2531-2540); options (a) yes, (b) no
+    (the prototype's runs again), (c) he tries it in the sandbox or lets it be read again; recommended (c), else (a);
+    PM-0004-30 holds as worded; the 0.56 m test starts on the ground beside the step. The head bump: the sandbox's own
+    rule (F18), what it does not in its notes. netcode-architect's block 8 running.
 - **The sheet's revision 3** (from 02:14 Amsterdam): the record rule applied with its confirmations outstanding, the
   recount F2 with each option's stop line, section G for steps 1 to 7 with his checklist as a draft, section H's table
   of item 10's thirteen points.
