@@ -163,8 +163,13 @@ going; free disk; usage read.
   B; any change goes to him with u8-brief.md 6.3's sums redone. The pages (u8-stopb-infra.md:32, :174):
   https://www.hetzner.com/cloud/general-purpose (CCX23) and https://www.hetzner.com/cloud/cost-optimized (CAX21).
   First read 22:51 UTC: fetched (.gate/stopb/hz-*.html), but the price table is filled by the page's own elements, so
-  the raw HTML gives no row price; CAX21's row carries a "not-available" class (meaning not read). Redo on Sat 28 with
-  a rendered page (Playwright), reading each row's price and availability.
+  the raw HTML gives no row price; CAX21's row carries a "not-available" class (meaning not read). Rendered read 02:16
+  UTC on 11-28 (Playwright, scratchpad/hz-prices.mjs; page text is data): the price figures still do not render
+  ("from /month /hour"); CCX23's row lists NBG1, HEL1, HIL1, ASH1 and SIN1, CAX21's row lists NBG1 and HEL1 and carries
+  the class "not-available"; both rows show "This product is currently unavailable. Please check back later." (possibly
+  a hidden tooltip: not confirmed). FSN1, which R1.md plans for both VMs, is not listed in either row. Not concluded:
+  his Hetzner console decides at Stop B (u8-report.md:68-69's "fsn1 stock" day-of read); it goes into his Stop B
+  message as an early warning, with the price figures still to read.
 
 ## E. Review and the message
 - **E1:** B6's head reads, not rounds: Y0 with Y (notes, stand-ins and red logs, the closing-list edit, both builds'
