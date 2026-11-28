@@ -25,6 +25,12 @@ const ENTRIES = [
     'his word that the chat may merge 4b-2 itself; the chat could not, its GitHub access being read-only, and his Advisor merged it'],
   ['mustafa-2026-11-27-design-notes.md', V6,
     'his design direction for the economy and base repair: resource points and repair bots, with decided and open lines and every number a placeholder until playtests, nothing of it built in Slice 1; and where it goes in the docs (LOOP_V2\'s new section 14 with his text, dated pointers at its lines on the open fields, one sentence in its header, one line in the ADR register)'],
+  // Joined on 2026-11-28 with his answers: his message of 23:59 by BOARD-WORDS (b), shown without its item 3; and his
+  // answers themselves, whole.
+  ['mustafa-2026-11-27-merge-route.md', V6,
+    'his merge route for change-set 4b-2 (MERGE-ROUTE (a): his Advisor opened pull request #79 from the chat\'s text and merged it by merge commit at head b7145273), and how change-set 4c starts: its plan sheet, the advisor agent\'s review, then the build, with the page\'s scene as its first building step'],
+  ['mustafa-2026-11-28-answers.md', V6,
+    'his answers to the thirteen questions before change-set 4c\'s steps (MOVE-RULES (a) as starting rules, with row 9 open; NO-SOURCE (b); RESUME-FLASH (b); TUNE-HOME (b); SIZE-4C (b), the soldier\'s stop line at 18,700; BOARD-WORDS (b); PASTE-BREAKS (a); DESIGN-CLASH (a), with his own pointer at LOOP_V2\'s silo line; STREET-GREY (b); BODY-SHAPE (3a); DEPART-4C (a) on his terms; FALL-STEP (c) by reading the sandbox, else (a); DIGEST-NOTE (a)), how the scene and the soldier share one branch, his yes to reading his Testlines repository, the no-aim-yet rule, the Chromium time until the CI Builder\'s return, and his rules while he is away'],
 ];
 
 const sha = (text) => createHash('sha256').update(text).digest('hex');
