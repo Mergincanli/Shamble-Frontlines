@@ -72,7 +72,7 @@ and an aim outside the map; one jump per command (3B-ONE-PER-TICK).
   inward off the grid, no refusal]. ADD `pub const fn bounds_cm(&self)`
   and `pub fn holds_cm(&self, aim: AimCm) -> bool`. Through this the room and the endpoint get the bounds as a `sim`
   type and never name `content` (4B-WORLD-ROOM, N11).
-- CHANGE `world.rs:33-51`: `PlayerCommand` gains `move_x: i8, move_y: i8, aim: AimCm`; `NONE` gains zeros; the doc
+- CHANGE `world.rs:33-51`: `PlayerCommand` gains `move_x: i8, move_y: i8, aim: AimCm` [step 1, by block 9.3]; `NONE` gains zeros; the doc
   (":33-34, ...join when a system reads them") says the move and the aim are read by the movement and the facing, and
   the view time joins with lag compensation (change-set 8). **The record (`world.rs:115`) is a choice with a hash
   consequence (N24):** (i) recommended, the record stays buttons and presses (a `PlayerRecord`, what the echo
@@ -104,7 +104,7 @@ and an aim outside the map; one jump per command (3B-ONE-PER-TICK).
   from the post and `aim` from its `Sent`; `view_time` stays `{view_tick, 0}` (change-set 8, the plan's choice 2).
   CHANGE `:56-79` `Readout` gains `aims_kept` (commands whose aim was kept: no usable ray, or none that met the world
   or the ground) [SUPERSEDED by block 7.4: `rays_refused` and `rays_missed`; an all-zero post counts in neither]: read by tests; whether the block shows it is engine-architect's layout.
-**Rust, `room`**
+**Rust, `room`** [MOVED to step 1 by block 9.3: the room's whole half, the fill, both checks, both counters and the doc]
 - CHANGE `lib.rs:45-68` `RoomCounters` gains `refused_move`, `refused_aim`; `refused()` (`:73-79`) adds both.
 - CHANGE `lib.rs:86-100, :105` `Room` holds the authority's `StaticWorld` (4B-WORLD-ROOM: the movement queries it here
   from step 1 on; step 2 needs only its bounds); `new(setup, content_hash, world)`. ADD an accessor for it (replaces
@@ -154,8 +154,8 @@ and an aim outside the map; one jump per command (3B-ONE-PER-TICK).
 | T2-3 | `sim/src/aim.rs` | a ray onto the step's top gives its point in cm; one that misses gives the ground crossing; one to the sky, one parallel to the ground, keep the last [SUPERSEDED by block 8.3: give no point]; a hit at 401 m is no hit; a point beyond the bounds is clamped to the bound's cm; the rounding of a half centimetre pinned (70) | the fallback plane at fire height (my old design); the reach 500 m; no clamp |
 | T2-4 | `collision.rs` | `bounds_cm` exact at the reach's edges (+-32,767; 0 to 65,535); `holds_cm` on each face true, 1 cm past false; bounds off the grid refused by name (30) [SUPERSEDED by block 7.3's tie test] | the bounds narrowed through `f32` before the cm (an off-by-one at a face) |
 | T2-5 | `endpoint.rs` | PM-0002-14's native half: each command's aim is the cast of the post handed in for that tick (posts alternate rays onto two shapes); repeats carry their own first aim; the first aim lies inside bounds that exclude the origin [SUPERSEDED by block 8.3's N-3: before any ray every command carries NONE]; a post without a usable ray keeps the aim and counts `aims_kept` [SUPERSEDED by block 7.4's Z1 and Z2]; a (-128, -128) post sends a move the room takes (90) | the previous post's ray cast; repeats cast again from the newest post; the first aim (0, 0, 0) unclamped |
-| T2-6 | `room/lib.rs` | moves (127, 0), (0, -127), (89, 89), (-89, -89) taken; (90, 90), (-128, 0), (127, 127) refused and counted; an aim on each of the six faces taken, 1 cm past each refused; a refused command never runs, and its sequence counts as missing when the next one runs (70) | `<` for `<=`; the aim held to the `i16` range instead of the bounds; `refused_aim` left out of `refused()` |
-| T2-7 | `room/tests/any_bytes.rs:139-143` | the generator's move and aim over their full ranges (the aim is `{1, 2, 3}` today; [block 8.3] (-32,768, 0, 0) is taken as no aim, any other x of -32,768 refused); its identities still hold (15) | as T2-6's third plant: the identity breaks |
+| T2-6 [MOVED to step 1 by block 9.3] | `room/lib.rs` | moves (127, 0), (0, -127), (89, 89), (-89, -89) taken; (90, 90), (-128, 0), (127, 127) refused and counted; an aim on each of the six faces taken, 1 cm past each refused; a refused command never runs, and its sequence counts as missing when the next one runs (70) | `<` for `<=`; the aim held to the `i16` range instead of the bounds; `refused_aim` left out of `refused()` |
+| T2-7 [MOVED to step 1 by block 9.3] | `room/tests/any_bytes.rs:139-143` | the generator's move and aim over their full ranges (the aim is `{1, 2, 3}` today; [block 8.3] (-32,768, 0, 0) is taken as no aim, any other x of -32,768 refused); its identities still hold (15) | as T2-6's third plant: the identity breaks |
 | T2-8 | `client-endpoint/tests/any_bytes.rs` | random posts with hostile rays (NaN, infinities, beyond 2^20, zero direction): no panic, every aim sent inside the bounds [block 8.3: or NONE] (25) | the clamp skipped on the ground fallback |
 | T2-9 | `sim-wasm/src/lib.rs` tests | the 13 numbers reach the endpoint and the room: a ray onto a shape is the aim of the room's next decoded command; `:240-259`'s echo test on 13 numbers (30) | the input call dropping the ray |
 | T2-10 | `sim-wasm/tests/step_alloc.rs` | rays every tick (hits, sky, NaN, beyond the bounds): 0 allocations over 18,000 ticks (15) | a `Vec` made in `aim_point` |
@@ -349,17 +349,17 @@ bin/make_recordings.rs:4-6), so a value he tunes later never moves an old record
   movement kind's (or the map kind's) field list changes (N25), which changes its header's content hash and nothing
   of its steps.
 - **`walk`, new (about 2,400 steps)**, seed `TESTSEEDwalk`, on `walk.content.json` (today's content frozen in step 6,
-  after the movement kind's fields are final). From the spawn, through the street corner and the yard
+  after the movement kind's fields are final). From the spawn [block 9.2, B9-N9: street_1, (-20, 0, -0.9), facing +x], through the street corner and the yard
   (content/maps/test-scene.json, N28): the eight directions and moves at other angles (the camera's yaw is already in
   the recorded move word), and one (-128, -128) the endpoint clamps; sprint until the stamina locks; the 1.5 m alley;
-  into a house wall (the slide); the cover wall (1.0 m) and a roof edge (2.6 m) by a jump (row 5); the 0.55 m step
-  gained and the 0.56 m stopped; the ledges 2.90 and 3.05 gained and 3.10 not (the step-up in the air at the arc's
+  into a house wall (the slide); the cover wall (1.0 m) and a roof edge (2.6 m) by a jump (row 5) [the roof edge SUPERSEDED by the sheet's I2: the route keeps off the roofs, his MOVE-RULES row 9 open; row 5 shown by the 1.0 m cover wall and the ledges]; the 0.55 m step
+  gained and the 0.56 m stopped [block 9, B9-N17: the 0.56 m step met from the floor, never off the 0.55 m step]; the ledges 2.90 and 3.05 gained and 3.10 not (the step-up in the air at the arc's
   top); the 0.2 m thin wall at a sprint (tunnelling); the gentle (14 degrees) and steep (26.6 degrees) ramps up and
   down, across the seam with their platforms; jumps by tap, by hold, by one command whose count moves by 255, and a
   press in the air; a ray every step onto the ground, walls, box tops, ramp faces, the sky and parallel to the
   ground, and a few hostile posts (a NaN, an infinity, a number beyond 2^20, a zero direction: the aim kept); repeated
   and skipped post numbers; jittered host times. No sights stretch (4d makes `walk` anew with them, plan 7, step 1).
-- **`lane-walk`, new (about 1,200 steps)**, on `lane-walk.content.json` (frozen with `walk`): from the spawn to the
+- **`lane-walk`, new (about 1,200 steps)**, on `lane-walk.content.json` (frozen with `walk`): from the spawn [block 9, B9-N9: street_1, at least 49 m before the lane] to the
   lane (z 18, beside the posts at z 20), then walking at constant speed up and down the 50 m lane (x 25 to 75), one
   straight move at a time, the aim held on the ground ahead: the paced replay's smoothness readings (6b; 4d's frame
   cap readings).
@@ -383,7 +383,7 @@ bin/make_recordings.rs:4-6), so a value he tunes later never moves an old record
   `replay.test.mjs:19` and `determinism.spec.ts:69` already iterate every `.rec`: `walk` and `lane-walk` are replayed
   in Node, in Chrome and in Firefox with no new spec (N14).
 - ADD (a test) `devtools/tests/walk_reaches.rs`: replays `walk` natively and reads the state at the end of each
-  stretch: on the 0.55 m step's top; short of the 0.56 m step; on the 3.05 m ledge; not on the 3.10 m one; never past
+  stretch: on the 0.55 m step's top; short of the 0.56 m step [met from the floor: B9-N17]; on the 3.05 m ledge; not on the 3.10 m one; never past
   the thin wall; the aim on a box top at its height in cm; and so on. So the recording provably queries the world.
 - **4B-RAY-WASM** (mine, round 2 of 4b-2): CHANGE `devtools/src/world_proofs.rs` `made()` (`:437-485`): three `path`
   lines, one committed ray of each of RR-1's three paths (a number just beyond `RAY_REACH`: no hit; a limit beyond it,
@@ -427,7 +427,7 @@ bin/make_recordings.rs:4-6), so a value he tunes later never moves an old record
 
 ### 3.6 His open questions, by option, for step 6
 - **MOVE-RULES:** the scripts' inputs are the same under every option; what `walk_reaches.rs` must find differs. (a):
-  the cover wall and a roof edge gained by a jump (row 5), staying on the ramps going down (row 4), the slide with the
+  the cover wall and a roof edge gained by a jump (row 5) [the roof edge SUPERSEDED by the sheet's I2: nothing asserted on a roof, his row 9 open; row 5 by the cover wall and the ledges], staying on the ramps going down (row 4), the slide with the
   speed lost (row 3), the round foot past an edge (row 2), the 0.4 m body through the alley (row 1). (c): the old
   rules (walls and houses endless: no roof, no cover top; small hops down a ramp; pushed out with the speed kept; the
   0.7 m body with 0.1 m spare in the alley). (b): row by row. The hashes are whatever the built rules give.
@@ -579,7 +579,7 @@ Facts only; the advisor agent rules on any reorder.
 | 2a `clamp_move`, `Post::from_numbers`, `Ray` | no | none | no |
 | 2b `sim::aim::aim_point`; the bounds on `StaticWorld` | no (`cast_ray` exists since 4b-2) | none (NO-SOURCE only if the 400 m reach is counted as a value) | the movement reads the same bounds (rust-reviewer's F11): an addition, not a rebuild |
 | 2c the endpoint's own world, its cast, `Sent.aim`, the clamped first aim | no | none | no |
-| 2d the room's two checks and counters | no | none | no |
+| 2d the room's two checks and counters [step 1, by block 9.3] | no | none | no |
 | 2e the world into the room and the endpoint (4B-WORLD-ROOM): `Room::new`, `Endpoint::new`, `LocalMatch::new` | no | none | **yes**: step 1 adds the movement's rules and the spawn to the same constructors and their callers (N12; rust-reviewer's F12): a second, small edit of the same sites |
 | 2f the 13-number input, the host, the guard, the replay readers (Rust, TypeScript, the e2e worker) | no | RESUME-FLASH (c) changes the host's two hide lines | no |
 | 2g `PlayerCommand` gains move and aim | no | none | record (i): no hash moves before step 1; record (ii): first-loop's hashes and vector made anew in step 2 and again in step 1 (one generator command each time) |
@@ -672,7 +672,7 @@ move and the aim are the soldier's, kept in its row.
   rows. rust-reviewer's B6-R (:568) withdraws 1.6's phrase "the move and aim of the record" (:246-247): agreed.
 
 **The restore test** (step 1, in world.rs's test module beside `write_state`, which is `#[cfg(test)]`, :190-198):
-- A test-only reader `read_shared(bytes, constants) -> World` that takes the shared bytes field by field in
+- A test-only reader `read_shared(bytes, constants) -> World` [SUPERSEDED by engine-architect's block 7 item 5.17: `read_shared(bytes, setup)`, no constant taken; the test lends the step the same three] that takes the shared bytes field by field in
   `visit_shared`'s order; the match constants (rules, static world, spawns) and the seed come from the same build and
   setup, never from the bytes. It is a test's tool, not change-set 7's reset (B7-N5).
 - It plants: on the test scene, one soldier; ticks 1 to 30 with move (127, 0) and an aim on a box top; then **ticks 31
@@ -980,7 +980,7 @@ DONE (block 8)
 
 ## Counts, one line per block (bottom-up, unmultiplied; plus or minus 30 %)
 - Block 1, step 2: 315 code / 630 tests = 945 (plan 385 / 530 = 915). [SUPERSEDED by block 7.5: about 340 / 675 =
-  1,015; step 1 gains about 10 / 100. Then by block 8.5: about 335 / 690 = 1,025; step 1 about 25 / 145.]
+  1,015; step 1 gains about 10 / 100. Then by block 8.5: about 335 / 690 = 1,025; step 1 about 25 / 145. Then by block 9.3: step 2 about 295 / 525 (J1 to J5 and the room's half to step 1); step 1 about +25 / +135 more.]
 - Block 2, step 3: mine 215 / 325 = 540; with engine-architect's layout about 320 / 340 (plan 320 / 340).
 - Block 3, step 6: mine 245 / 170 = 415 (plan 320 / 230 = 550, the rest being the other designs' marks).
 - Block 4, step 6b: 130 / 115 = 245 (plan 130 / 110); step 6c: 45 / 220 = 265 (plan 30 / 180).
@@ -988,3 +988,210 @@ DONE (block 8)
   reversed; (d1) about 25 / 40; (d2) a format version and every recording anew.
 
 DONE
+
+## Block 9. B4 (when and where the one soldier is made), the step that carries the wire's move and aim, F5's marks, engine-architect's block 7 (2026-11-28)
+Asked 2026-11-28 by the main session, on cs/4c-soldier at 87132345 (the Rust is main's dae6d107). Read only; this
+file is my only write. The sheet's section I holds where it differs from older text.
+
+### 9.0 Plan
+1. Read engine-architect-read block 7 (B4 :965-973, item 3 :1013-1031, T-B and T-D :1092-1094, its "not verified"
+   :1114-1125), rust-reviewer-read blocks 11 to 14 as they stand now (11.1 :812-825, 11.6 :892-921, 11.7 rows 22 to 33,
+   block 14 :1072-1112), game-designer-read block 9 (:361-393), the advisor agent's F5 and Q4 (advisor-steps1to7.md:55-60,
+   :136-158), the sheet's I2 (:709-723); today's code: sim world.rs, room lib.rs and queue.rs, room/tests/any_bytes.rs,
+   protocol messages.rs and codec.rs, client-endpoint endpoint.rs, sim-wasm lib.rs and local_match.rs, devtools
+   replay.rs, content/maps/test-scene.json's spawns. A notes line per finding.
+2. B4: when the soldier exists (World::new, the join, or the first command) against the record rule, the recordings
+   and a replay, and step 2's room and wire; the ruling, its tests and plants.
+3. Which step carries the wire's move and aim through the room, so step 2 moves no first-loop hash; what step 1's tests
+   drive.
+4. F5: mark :355 and :430 superseded in place by the sheet's I2 (inline, so no line number below them moves), and
+   :675-677 by engine-architect's item 5.17.
+5. engine-architect's block 7 against my record rule, the bounds' one home and "no aim yet": confirmed or disputed.
+6. DONE.
+
+### 9.1 Notes (one line per finding)
+- B9-N1 (the world steps before a join): `Room::step` steps the world every tick, slot taken or not (room/src/lib.rs:282), and writes a snapshot only once the slot is taken (:283-285). A soldier made in `World::new` exists, and stands, through every tick before the join.
+- B9-N2 (tick 1 is command-less): the join leaves in `LocalMatch::new` (local_match.rs:75-82); in the first step `build_input` sends nothing (endpoint.rs:221-229: false until joined and a first snapshot), the room takes the join before its step (local_match.rs:149-161; `joined_at = Some(0)`, room/src/lib.rs:159), runs tick 1 with `&[]` and sends tick 1's snapshot, and the endpoint's first command is for tick 2 (endpoint.rs:304-305). So every recording's tick 1 is command-less.
+- B9-N3 (no join in a recording): a recording holds posts and host times per step; the replay makes the match through `Sim::create`, whose `LocalMatch::new` sends the join itself (replay.rs:119-131, :147-158). Nothing records when a join is taken, so nothing the world reads may depend on it. True today: `joined_at` is the room's admission base (room/src/lib.rs:237-240), never the world's.
+- B9-N4 (tick 0 is seen by no recording): the replay hashes after each step (replay.rs:150-158), so a recording's first hash is tick 1's. The row as `World::new` writes it is seen only by world.rs's tick-0 known answer (world.rs:402-403), on the test bundle's map (`TEST_TEXT`, map.rs:412: one spawn, "a").
+- B9-N5 (the spawn order): the test scene's first spawn in the file, `street_1`, is also its lowest id (test-scene.json:420-428; the file then lists street_2 to street_4, yard_steps, yard_ledges, yard_wall, yard_lane, the last four not in text order). No recording on it can tell "lowest id" from "first in the file", and the test bundle's map holds one spawn. Only a made map can.
+- B9-N6 (the slot, twice): the join answer names slot 0 and team 0 by literal (room/src/lib.rs:161-162), and the field's doc says the slot "is the soldier's index in the simulation" (protocol/src/messages.rs:45-46). B4 (a) puts the soldier in slot 0 by a second literal in `World::new`: two homes for one number.
+- B9-N7 (an empty table): a loaded map holds at least one spawn (map.rs:29, :341-349); only a map built in code holds none, and B4 (a) then makes no soldier (engine-architect-read.md:969). The fold (rust-reviewer-read.md:813) writes "the row" and says nothing of a slot with no soldier.
+- B9-N8 (grounded at spawn): `World::new(setup, rules, spawns)` is lent no static world (engine-architect-read.md:1014-1015), so it cannot know what lies under the spawn. Whether the spawn writes `grounded` (11.2's flag bit 2) set or clear, and what tick 1 then does, is rust-reviewer's open point; not ruled here.
+- B9-N9 (every recording starts at street_1): through `Sim::create` the soldier starts at street_1, (-20, 0, -0.9), facing +x, so the yard's four spawns start no recording (yard_lane at (25, 0, 18) was placed for the lane): `lane-walk` walks at least 49 m (straight line; about 235 ticks at 6.3 m/s, more by a route round the houses at ground level) before its lane. A World-level test picks its start by the slice it lends `World::new` (`spawns: &[SpawnPoint]`, engine-architect-read.md:1014).
+- B9-N10 (the wire already carries move and aim): `Command` holds `move_x`, `move_y` and `aim` (protocol/src/messages.rs:112-130); the codec writes and reads them whole (codec.rs:207-213, :219-234); the room drops them at its fill (room/src/lib.rs:216-223: buttons and presses only); the endpoint writes move 0 and aim (0, 0, 0) (endpoint.rs:254-258).
+- B9-N11 (the gap in 11.6): rust-reviewer-read.md:913 has step 1's room fill the command from the wire (":219 ... (literals)") with "the fold with its NONE case and `holds_cm` (counted `refused_aim`)", and no length check of the move; its 11.1 2a (:815) says the move is "clamped by the room". Nothing in the room clamps (room/src/lib.rs:203-231), and my block 1.1 refuses (:112-114). As 11.6 stands, step 1's commit hands the wish any `i8` pair, of length up to 181 against 127: 1.42 times the walk or sprint speed for a client that sends (-128, -128).
+- B9-N12 (any_bytes): the room's rule-keeping client sends moves over the whole `i8` range (room/tests/any_bytes.rs:139-140) and the aim (1, 2, 3) cm (:143); 13 counters are summed (:242-256), and the ten past the first three must each pass 100 (:274). About 23 % of full-range pairs lie beyond 127 (1 - pi x 127^2 / 256^2 = 0.227, arithmetic), so the commit that brings the move's check also brings honest moves inside 127, a lie for each new check and the two new counters in that list.
+- B9-N13 (first-loop under either order): first-loop's posts carry the move word 0 and all-zero rays (N9), and step 1's endpoint writes move 0 (today's, endpoint.rs:254-255) and NONE (11.6's endpoint.rs:258 change, rust-reviewer-read.md:916). So the commands the room takes in first-loop are byte-identical whether the room starts copying move and aim in step 1 or in step 2. The hash condition does not pick the step; B9-N11 and B9-N12 do.
+- B9-N14 (which layer can carry a non-zero move in step 1): `Sim::input` takes six numbers (sim-wasm/src/lib.rs:166-169), `Post` has no move (client-endpoint/src/post.rs:17-24) and the replay refuses a move (replay.rs:81-84) until step 2. In step 1 only a test that encodes `Input` datagrams itself (as the room's tests and any_bytes do: room/src/lib.rs:308, any_bytes.rs:183) or one that hands `PlayerCommand`s to the world can carry one.
+- B9-N15 (one home for the length rule, and the two NONEs): sim depends on content and parry3d only (crates/sim/Cargo.toml); room and client-endpoint on protocol and sim (their Cargo.toml). So a rule that both the room's check and step 2's `clamp_move` call lives in sim, not in protocol. The two NONEs (sim's `AimCm::NONE`, rust-reviewer-read.md:898; protocol's `AimPoint::NONE`, :915) are tied nowhere; room/src/lib.rs:28 ties BUTTONS across the same two crates with `const _: () = assert!(...)`.
+- B9-N16 (the query counts): `authority_step` is lent `counts: &mut QueryCounts` every tick (engine-architect-read.md:1016-1017), and the room keeps it across ticks (:953-955): the one mutable value outside the state that the step touches tick after tick. The record rule holds only while the step writes it and never reads it: a branch on a count would be a value a later tick reads from outside the hash.
+- B9-N17 (FALL-STEP and walk's 0.56 m stretch): by the sheet's I4b (reread-sheet.md:781-784), a fall without a jump steps onto a top up to 0.555 m above the feet, so walking off the 0.55 m step toward the 0.56 m one 2 m away gains it about 1 time in 10 at 6.3 m/s and every time faster. My walk route (:355-356) and walk_reaches.rs's "short of the 0.56 m step" (:386) must meet the 0.56 m step from the floor, never off the 0.55 m step, or the reading depends on the phase.
+
+### 9.2 B4: YES to (a). The soldier exists from `World::new`, at the match's start, before any join and any command
+- **The record rule holds.** `World::new` writes the whole row from the spawn point and `Rules` (position, facing, a
+  full stamina, `held_move` (0, 0), `aim_cm` NONE, the flags); after that no tick reads a spawn value, and every rule it
+  reads is a borrowed constant. The room keeps the spawn table, which no tick of 4c reads again. A restore
+  (`read_shared(bytes, setup)`) never calls `World::new`, so it never spawns him again.
+- **The recordings and a replay.** His existence depends on nothing a recording lacks: not on the join (B9-N3), not on
+  when the first command arrives. The replay builds the same table from the frozen bundle through `Sim::create` and
+  puts slot 0 at its first point; tick 1 is command-less in every recording (B9-N2), so a recording's first hash is the
+  spawn after one held tick. first-loop is re-made in step 1's commit (11.8) with him at street_1, jumping and sprinting
+  in place; `walk` and `lane-walk` start there too (B9-N9).
+- **Step 2's room and wire.** No message makes a soldier, and nothing on the wire changes for him; the join stays as
+  it is (slot 0, team 0). The first command overwrites `held_move` and, if it carries a real aim, `aim_cm`. The first
+  snapshot after the join (tick 1's in local play) carries him (step 3's `OwnSoldier`), so the block's soldier count is
+  1 from tick 1's block.
+- **Not at the first command:** it would tie his spawn tick to the delivery of one datagram (a lost first command
+  delays it, so the same inputs over two loss patterns give two worlds), give a command a second meaning (a spawn
+  signal), and let a client choose when he appears by holding its commands back. Rejected.
+- **Not at the join (B4 (b)) now:** the join's tick would become a value the step reads, and no recording holds it
+  (B9-N3), so the format would need it, against B5's own constraint (no format change). It is change-set 5's spawning
+  phase (ADR 0004 part 17), where a join or a barracks respawn enters the step as a recorded input. game-designer reads
+  (a) as a build default, not a rule of his (game-designer-read.md:388-391).
+- **Failure modes, said:** a slot nobody holds has a soldier standing at its spawn (harmless with one slot; change-set
+  5 decides for 48); a second join is refused (`RoomFull`, room/src/lib.rs:152), so no second soldier is ever asked
+  for; 4c has no leave, so no despawn.
+- **Conditions:**
+  1. One home for the player's slot and team: one constant in sim, read by `World::new` and by the join answer in
+     place of its literals (room/src/lib.rs:161-162), narrowed the way `TICK_RATE` is (:31-34) (B9-N6). W-3 below is
+     the binding test; the constant is the recommendation.
+  2. The fold on a slot with no soldier takes the record (buttons and presses) as today and touches no row (B9-N7).
+  3. Grounded at spawn stays rust-reviewer's open point (B9-N8).
+- **Tests, each with its plant** (step 1):
+  - W-1 (world.rs tests, about 25 lines; tick 0, which no recording's hashes see, B9-N4): a fresh `World::new` on the
+    test bundle: row 0 occupied and alive, at the table's first point by bits, its facing by bits (90, +x), stamina full
+    by `Rules`, `held_move` (0, 0), `aim_cm` NONE, the generation `Soldiers::spawn` gives; rows 1 to 47 zero bytes; the
+    tick-0 known answer re-made by the second implementation (world.rs:403). Plants, each red at tick 0: `aim_cm`
+    (0, 0, 0) at spawn; stamina 0; the soldier in slot 1.
+  - W-2 (soldiers.rs tests, about 15 lines; B9-N5): a map built in code with three spawns written "c", "a", "b", each at
+    its own point: `spawn_points`' first is "a", and `World::new`'s soldier stands there. Plant: the table in file order
+    (he stands on "c").
+  - W-3 (room tests, about 25 lines; also item 2's proof that step 1's room carries the wire's move): a room on the
+    test bundle stepped 10 ticks before any join: he exists, and from tick 1 on his row's bytes are the same each tick
+    (he stands). Then the join: the answer's slot is the occupied row's slot. Then 30 commands, encoded as `Input`
+    datagrams, with move (127, 0) and NONE: that row moves along the move's axis by what the movement's own test gives
+    for 30 ticks, the other rows unchanged. Plants, each red: the room's fill with move (0, 0) (he does not move); the
+    soldier made at the join's tick (no row in the first 10 ticks); the join answer's slot 1.
+  - W-4 (world tests, about 15 lines; B9-N7): a map built in code with no spawn: `World::new` makes none; 30 commands
+    with move (127, 0) and a real aim: the record takes buttons and presses, all 48 rows stay zero bytes, no panic.
+    Plant: the fold writing slot 0's row with no soldier there (non-zero bytes in an empty row).
+  - Standing as before: first-loop re-made and `recordings.rs` green in step 1's commit (11.8); the restore test
+    (T-F).
+- **Count:** about +5 code (the slot constant, the fold's occupied test) and +80 tests (W-1 25, W-2 15, W-3 25, W-4
+  15), in step 1.
+
+### 9.3 Item 2: step 1 carries the wire's move and aim through the room, with both checks; step 2 is the client side
+- **Why step 1:** B9-N13 shows the hash condition holds in either order. What decides it is that no commit may hand the
+  wish a move the room has not judged (B9-N11): step 1's movement reads `held_move`, and 11.6's step-1 room already
+  fills the command from the wire, so the length check lands in step 1 with that fill. The other order (step 1's room
+  fills (0, 0) and NONE as constants; step 2 copies the wire and adds the checks) leaves step 1 with a world reading a
+  field the room fills with a constant, and makes step 2 touch the authority's fold, the one change a first-loop hash
+  could ride on. any_bytes changes with the checks (B9-N12), and 11.6 already changes it in step 1 for NONE (rust-reviewer-read.md:914).
+- **Step 1 holds the room's whole half** (block 1.1's room list, :107-117, now marked):
+  a. room/src/lib.rs:216-223: `PlayerCommand { buttons, presses, move_x, move_y, aim }` from the decoded command, the
+     aim as `AimCm` (NONE stays NONE).
+  b. `on_datagram`, per command, after the lead check (:212-215) and before the queue: a move with x^2 + y^2 > 127^2 is
+     dropped and counted `refused_move`; an aim that is not NONE and that the room's `statics.holds_cm` does not hold
+     is dropped and counted `refused_aim` (any other aim with x -32,768 lies outside every map's bounds, B8-N4, and
+     falls to the same test). A dropped command is refused again at each repeat and counted each time, as
+     `refused_ahead` is today; its sequence counts as missing when the next command runs.
+  c. `RoomCounters` gains both, and `refused()` (:73-79) adds both: an honest client causes neither (its endpoint
+     holds the move to 127 and sends NONE or a point clamped into the bounds).
+  d. The doc (:176-182): the move's length and the aim inside the map are now checked; still not checked, each with
+     what brings it: the aim's reach against a weapon (change-set 8), the view time (lag compensation), the rest as
+     written.
+  e. **The length rule's one home is sim** (B9-N15), beside `PlayerCommand` in world.rs: `MOVE_REACH = 127` and a
+     `const fn move_in_reach(x: i8, y: i8) -> bool` (integer squares in `i32`; (-128)^2 fits). The room calls it (the
+     crate denies plain arithmetic, room/src/lib.rs:8-16), step 2's `clamp_move` loops on it, and the wish's scale
+     (127 is length 1) reads `MOVE_REACH`.
+  f. **The two NONEs tied** beside room/src/lib.rs:28: `const _: () = assert!(AimPoint::NONE.x == AimCm::NONE.x &&
+     ...y... && ...z...)`. Plant: one of them at -32,767, and the build fails.
+  g. protocol: `AimPoint::NONE` and its sentence (11.6); messages.rs:117's "the vector's length is at most 1" gains
+     "a room refuses a longer one".
+  h. room/tests/any_bytes.rs: honest moves drawn inside 127 (through `sim::move_in_reach`; `clamp_move` is step 2's),
+     honest aims inside the test bundle's bounds or NONE; three lies added to its `match` (:156-182): a move beyond
+     127, an aim 1 cm past a face, (-32,768, 1, 0); `counted` (:242-256) gains `refused_move` and `refused_aim`, each
+     above 100 at the end (:274).
+- **Step 2 then touches neither crates/room/src nor sim's world.rs, movement.rs, body.rs or collision.rs.** It holds:
+  post.rs (`from_numbers`, `clamp_move` on `sim::move_in_reach`, `PostRay`); endpoint.rs (its static world's copy, the
+  cast through `sim::aim::aim_point`, `Sent.aim`, `rays_refused`, `rays_missed`); `Endpoint::new` gains the world
+  (`LocalMatch::new` clones the room's, engine-architect-read.md:1007); sim/src/aim.rs's `aim_point` (in sim so the
+  float scan reads it, N8; nothing the room or the world calls); sim-wasm's 13-number `input`; the TypeScript host,
+  guard and readers; devtools' two refusals. **Its evidence that no first-loop hash moved:** `git diff <step 1>..<step
+  2> -- crates/room/src crates/sim/src/world.rs crates/sim/src/movement.rs crates/sim/src/body.rs
+  crates/sim/src/collision.rs` empty, and `recordings.rs` green in step 2's commit with `git diff --stat <step 1>..<step
+  2> -- crates/devtools/recordings` empty (block 7.2's condition 4).
+- **What step 1's tests drive** (B9-N14):
+  1. The `World` directly: every movement rule, the facing and NONE, the restore (T-F), T-A to T-C, J1 to J5, W-1,
+     W-2 and W-4. The movement needs no room.
+  2. The `Room`, fed `Input` datagrams the test encodes, for the wire-to-command half: W-3 (the wire's move reaches the
+     soldier), T2-6 (the checks), N-1 (the fold and NONE), the starved-tick pin (7.2) and any_bytes. In step 1 this is
+     the only layer that carries a non-zero wire move.
+  3. The players' whole chain (`Sim::create`, `LocalMatch`, the room, the endpoint): only first-loop and sim-wasm's own
+     tests, with move 0 and NONE; T-D's jump as written. A non-zero move through the endpoint, the 13 numbers and a
+     replay starts in step 2 (T2-5, T2-9, T2-14, H3), and a recording full of moves in step 6 (`walk`).
+- **A plan delta under the advisor agent's F5** (step 1's room gains `refused_move`; 11.1 2a's "clamped" corrected; my
+  T2-6 and T2-7 move from step 2 to step 1; W-1 to W-4 are new). For rust-reviewer to add:
+  - 11.1 2a: "integer length at most 127, refused beyond it by the room (`refused_move`, `sim::move_in_reach`)", not
+    "clamped by the room". Whether the wish also caps a longer pair at length 1 for a world fed directly (H2, which
+    asserts a finite state and the bounds only) is rust-reviewer's.
+  - 11.6: sim world.rs ADD `MOVE_REACH` and `move_in_reach`, and 9.2's slot constant; room/src/lib.rs `refused_move`
+    and `refused_aim` in `RoomCounters` and `refused()`, the check in `on_datagram`, the doc (:176-182), the NONE tie
+    beside :28, the join answer reading the slot constant; protocol messages.rs:117's sentence; any_bytes.rs's
+    generator, lies and `counted`.
+  - 11.7: rows for T2-6 (moves (127, 0), (0, -127), (89, 89), (-89, -89) taken; (90, 90), (-128, 0), (127, 127)
+    refused and counted; an aim on each face taken, 1 cm past refused; a refused command never runs and its sequence
+    counts as missing; plants `<` for `<=`, the aim held to the `i16` range, `refused_aim` left out of `refused()`),
+    T2-7 (any_bytes; plant: an honest move drawn over the whole range, red at the counters' identity), and W-1 to W-4.
+- **The count, recounted** (unmultiplied, plus or minus 30 %): step 2 from block 8.5's 335 / 690, less J1 to J5's
+  10 / 80 (moved to step 1 by the advisor agent's Q4 condition 5, rust-reviewer's row 26) and less the room's 30 / 85
+  (block 1.3's room 30, T2-6's 70, T2-7's 15): about **295 / 525**. Step 1 gains the room's half less what 11.6 already
+  counts (the fill, the NONE case, `refused_aim`): about +20 / +55 (T2-6's move half and its missing-sequence case 45,
+  T2-7's move lie and counters 10); with 9.2's +5 / +80, about **+25 / +135**, so rust-reviewer's 1,560 / 2,075
+  (block 14) becomes about 1,585 / 2,210. The moved pieces leave the total as it was; the new lines are 9.2's tests
+  and the slot constant.
+
+### 9.4 Item 3: F5's marks, in place
+Each mark sits inside the line it changes, so no line above this block moved (other notes cite :162, :675-677 and
+:974-975). Marked: :355 and :430 (by the sheet's I2: the route and its reach list keep off the roofs); :356 and :386
+(B9-N17); :352 and :362 (B9-N9); :75, :107, :157, :158 and :582 (9.3: the room's half and its tests move to step 1);
+:675 (engine-architect's item 5.17); :983 (the count). Shown by `git diff` on this file: each of those lines changed
+one for one, and this block appended.
+
+### 9.5 Item 4: engine-architect's block 7 against my record rule, the bounds' one home and "no aim yet"
+- **The record rule: confirmed.** A1 and item 1 (`World { tick, player: PlayerRecord, soldiers, seed }`) are block 7.2's
+  (i): the record is buttons and presses (`PlayerRecord`, my :78), the move and the aim live in the row (`held_move`,
+  `aim_cm`, 8 bytes), and nothing else is in `World`. B1's reason (a `player: PlayerCommand` would keep the newest move
+  and aim unhashed) is the hole block 7.2 closed, now closed by the type; T-A is the structural guard my restore test
+  lacked. **One addition (B9-N16): `counts: &mut QueryCounts` must be write-only in the step.** Test Q-1 (sim tests,
+  about 15 lines): two worlds stepped with T-B's 300 commands, one lent fresh counts each tick, the other counts that
+  start at u32::MAX - 5 in every field: shared hashes equal at every tick, no panic (each count wraps). Plant: a branch
+  on a count in the step (a sweep skipped once a count passes 1,000): the hashes part. A text scan (every use of
+  `counts` in body.rs and movement.rs a `wrapping_add`) would be weaker. The room's own admission state (`joined_at`,
+  `last_run`, the queue) stays outside the world's state, as today: rebuilt by replaying the datagrams, never read by
+  the world (B9-N3).
+- **The restore: confirmed** as item 5.17 has it (marked at :675): `read_shared(bytes, setup)` takes no constant; the
+  test lends the step it runs on copy B the same rules, static world and query counts (T-F).
+- **The bounds' one home: confirmed.** The room's `statics` (item 2) is block 7.3's one build with both views; the
+  endpoint's copy from step 2 is `statics.clone()` in `LocalMatch::new`, the same bits by construction, with no second
+  build; T-E's plant (a clone every tick) guards where the clone happens. `Room::new` stays total on a world with no aim
+  box (item 3; its 6.2): my 7.3 (B).
+- **"No aim yet": confirmed.** Item 5.13 (client-endpoint: only endpoint.rs:258 in step 1) is 8.3's step-1 piece; B4
+  (a)'s `aim_cm` NONE at spawn is 8.3's row; the room's NONE case lands in step 1 with both checks (9.3), and 9.3 (f)
+  adds the tie between the two NONEs.
+- **T-B and T-D stand under 9.3.** T-B drives the `World`, which carries the move in step 1 whatever the room does (the
+  room's carry is W-3's and T2-6's to prove). T-D replays through `Sim::create`, whose posts carry no move until step 2
+  (sim-wasm/src/lib.rs:166-169, replay.rs:81-84), so a jump stays the one rule a step-1 replay can show the bundle
+  deciding. Its open item (engine-architect-read.md:1120-1122) is answered by 9.3.
+- **Disputed: nothing.** B4 (a) stands as its default, with 9.2's conditions. game-designer's Low on ids ranked as text
+  ("street_10" before "street_2", game-designer-read.md:373, :385) is a map-authoring note, not a netcode one.
+
+### 9.6 Not verified
+- Read only: nothing built or run. The 23 % (B9-N12) and the 49 m (B9-N9, a straight line, not a route) are
+  arithmetic. W-3's expected distance is whatever the movement's own tests give; I set no number.
+- That `const _: () = assert!(AimPoint::NONE.x == ...)` compiles with `AimPoint` not `Copy`: by the language's rules
+  for const items (a field read of a fresh constant value), not by a build.
+- rust-reviewer's 11.6 and 11.7 as rewritten by its block 14 were read at 87132345; a later rewrite was not.
+
+DONE (block 9)
