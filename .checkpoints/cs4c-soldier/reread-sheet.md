@@ -796,6 +796,20 @@ the build goes on. A head that goes to the advisor agent needs a green run.
   wording), the push's height test (feet less than 1.0 m apart) and the 1e-4 m/s rest speed.
 - **Next:** rust-reviewer's block 9 re-runs the prototype for body (3a) on G1 to G6 and the head bump, before the
   advisor agent is asked for steps 1 to 7.
+- **rust-reviewer's block 9 (DONE, `rr-body-proto-7.rs`):** block 5's cases 69 of 69 pass (the x 45 seams rise at
+  most 0.035 m at walk and sprint; at 13.27 m/s, above his 9.576 m/s sprint, 0.125 m or 0.035 m by the slope-head
+  window's reading); block 6's: landings 240 of 240, the snap 6 of 6, easing 72 of 72, off a ramp's side 24 of 24; the
+  sandbox's "already over it" clause leaves 0 ticks inside a block in 36 of 36 (its "from the tick's start" fix
+  withdrawn); the head bump puts the feet 0.20 m under a 2.0 m beam, then he falls back; G3 measured: the 0.56 m step
+  caught in 3 of 30 phases at 6.3 m/s, 30 of 30 faster; G5 holds. Not passing, all at 13.27 m/s: ramps met from the
+  side 264 of 306, and G6's guard still carries him 6.98 m; the pull (G1) puts him up to 5 cm inside a wall for 3 ticks
+  in 7 of 9 runs on a made map. **Step 1's design changes:** the tick in the sandbox's order (vertical first, then the
+  move); the Soldier row's pull as the remaining vector `pull: [f32; 2]`; the wall pass sweeps the body circle (it
+  closes every 13.27 m/s case and changes nothing at his speeds) and clips the pull; the slope-head rule, headroom, "no
+  step from below" and the guarded set-back added. Count: the 2.5D movement about 275 / 365 (from 205 / 265), step 1
+  for (3a) about +70 / +100. Open for game-designer (its block 7, asked): the slope-head window; whether a top at or
+  below the feet can be a wall by headroom; whether clipping the pull, the swept wall pass and G6's guard are rules
+  of his.
 
 ### I6. What the advisor agent is asked, for steps 1 to 7 (after the Testlines read is folded in)
 Its item 10's thirteen points stand as section H's table, with his answers on (1) BODY-SHAPE, (3) SWEEP-ROUTE and

@@ -294,3 +294,12 @@ DONE
 - N24 (block 1 of rust-reviewer-read.md, read now at :118-262, sections 1.4 to 1.6): 1.5 is the design written before BODY-SHAPE (3D sweeps, a capsule or cylinder); its step-up ("up, across, down", accepted if it got further than the plain slide: no "toward" test at all), its snap by step_up (item 9) and its steepest grade (item 10) are replaced by I2 ((3a), the 0.2 m snap, row 9 open with no limit). What still differs from the sandbox as written: (1) ORDER: 1.5 moves horizontally and steps up (items 6-7) before the vertical sweep (item 8), so a falling tick tests walls and the step-up from the tick's START height, the sandbox from its END (movement.ts:126-164): G3 applies to the written design as well as to the prototype. (2) The seam test (:173, "ramp to platform (x 45) crossed at sprint with no stop") should also bound the rise at the seam by the foot's width x the grade (0.04 / 0.08 m, G4), or it passes with the prototype's 0.18 m float. (3) The push's height test, "vertical spans overlapping (NO-SOURCE's height gap)" (:212-213): the sandbox's is the feet heights apart by less than 1.0 m (push.ts:43, ">= 1.0" no push), not an overlap of 1.8 m spans: Low, wording to fix. (4) The 1e-4 m/s rest speed (item 3) is a game tolerance the sandbox lacks (it eases forever): not felt, Low. Head stop (item 8, "rising into a ceiling stops vy") agrees with the sandbox (G7).
 
 DONE (block 6, with corrections)
+
+## Block 7. rust-reviewer's block 9 (body (3a) rebuilt to the sandbox's rules): three points left open for me (2026-11-28)
+### Plan
+1. Read rust-reviewer-read.md block 9 (its words on the three points and its other changes); read only .checkpoints/ files and git objects at be608cad.
+2. The slope-head window (yard.ts:258-284): what "across the body" is in the code, and the seam rise at 6.3 / 9.576 / 13.27 m/s by arithmetic.
+3. A top at or below his feet and the headroom rule (yard.ts:185-194, :309, :219): can it be a wall; what the sandbox does on a step under a beam.
+4. The pull clip, the swept wall pass, G6's guarded set-back: a rule of his or a fix of a case his sandbox's maps never meet.
+5. Answers, then DONE.
+### Notes
