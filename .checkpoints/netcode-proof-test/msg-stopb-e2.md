@@ -51,8 +51,12 @@ onto replan-units.md:61-62, to check against each block's real files before send
   commit's name through wasm-bindgen's build script and was voided before the fill. The day's dist compare stays the wall.
 - R1.md:321 still says "no reading exists yet" for the probe's window: one exists (u6c-r2-netcode.md:90-93); named
   here, not edited.
-- ds-selftest is skipped under alone 0 <TO FILL: its one-line meaning from adv-u8h-3-read.md>.
-- The count reading <TO FILL: U8 at 6,284, his stop; the fills outside it>.
+- If bring-up finds the tick core shared (`alone` 0), the DelayStream self-test stays skipped (r1.sh:38, R1.md:243-245):
+  its clock thread never runs on the tick core, but whether its numbers lean on the tick thread is not yet read; a
+  netcode follow-up after R1 (adv-u8h-3-read.md).
+- The count: your two notes add 2 lines to U8's files, so U8 stands at 6,284, your stop; the two test stand-ins were
+  rewritten in place at 0 net (if you count in-place lines, they need +2 from you); the fills (the page list at Y', the
+  commit and URL at X) sit outside the stop by your U8-FILLS (a).
 - The page host: HOST-LIMITS and HOST-SANDBOX <TO FILL: his answers, or still open>.
 - FSN1 (R1.md's plan for both machines) is not listed on Hetzner's pages for CCX23 or CAX21 today (CCX23: NBG1, HEL1,
   HIL1, ASH1, SIN1; CAX21: NBG1, HEL1): an early warning only; your console decides on the day.

@@ -106,6 +106,9 @@ going; free disk; usage read.
   outside the build's CARGO_HOME, so its self-update failed: first try's log). Two earlier tries stopped before any
   build (a shell quoting slip, then the self-update). Supporting line: six files equal U7's run 4; the wasm differs
   (2a97394b... against 901a6492...), U7's list being its snapshot tree's (B6: not a bar).
+  [Correction 02:5x UTC on 11-28, B6's YPH-3: the Wasm differed from run 4's because of STOPB-8's leak (build 1's
+  CARGO_HOME sat inside the worktree, so its Wasm carried Y0's name), not because of U7's snapshot tree; build 1' and
+  build 2' equal run 4 on all seven files.]
 - **STOPB-8 (High, B6's ruling 02:14 UTC on 11-28, advisor-stopb-plan.md "## Ruling on the dist difference"):** build 2
   at Y failed C1's bar; root cause stopb-dist-diff.md: wasm-bindgen-shared's build.rs wrote our commit's first 9 hex
   digits into the Wasm's `producers` because CARGO_HOME sat inside the worktree; RS's CARGO_HOME is outside any
@@ -141,6 +144,16 @@ going; free disk; usage read.
   build2p-dist.sha256: exit 0; `cmp` of Y''s committed non-comment lines (`git show 1ceecc32:...`) with
   build2p-dist.sha256: exit 0. Build 1' ran at Y (652e9513, before MAIN-70) and build 2' at Y' (after it): equal, so
   neither the commit nor #79 is a dist input. Free after 5,846 MiB. STOPB-8 resolved by the method, for B6's read.
+- **B6's Y' head read DONE 02:51 UTC (advisor-stopb-plan.md "## Y' head read", Status COMPLETE): APPROVE WITH
+  FINDINGS, three Lows; Y' 1ceecc32 stands as R1's code commit for X; STOPB-8 resolved by the method.** Its one
+  condition: CI on the save 232cc8c9 all four success (the main session sends the runs; a failure reopens the read
+  before X). Both build lists hash d577c9d7... (`git hash-object`). U7's run 4 is a third agreeing build, quoted as
+  supporting evidence, not one of C1's two bars. YPH-1 (Low): the build script prints no `git rev-parse HEAD` from
+  inside its worktree; a follow-up for the next build (the script's first log lines). YPH-2 (Low): build1p.log:15's
+  garbled summary, fixed in the script since (build2p.log:15 "11 unset above"); record only. YPH-3 (Low): the dated
+  correction above (lines 107-108's note). Its line 623 corrected in its own file. Next: X after his HOST answers.
+  **Condition met 02:59 UTC:** CI on 232cc8c9 all four success at attempt 1 (gate 46099627026, 46099631890; toolchain
+  jobs 140838881813 and 140838895873, about 11 and 10 minutes); B6 told. **Y' stands; STOPB-8 closed.**
 - **Y DONE (void, STOPB-8): 652e9513ce2c1369d8d6146e84109feadf021a55** (22:50): r1-dist.sha256 gains build 1's list byte for byte
   (cmp), numstat `7 0` against Y0, counted run .gate/stopb/y-counted.log PASS; pushed by the save f49a7ba.
 - **C1, the order** [C1]: Y0 -> build 1 at Y0 (worktree A, CARGO_HOME A) -> Y = Y0 plus r1-dist.sha256's seven lines

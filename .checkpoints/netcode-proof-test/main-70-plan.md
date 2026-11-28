@@ -131,6 +131,17 @@ the one conflict (main-68-plan.md:89-99).
 - Step 6 so far: main's CI on dae6d107 re-read, both success at attempt 1 (gate 46081134384 23:12:08-23:12:51, toolchain
   46081134408 23:12:08-23:22:01); the card 200 lines; DEP-HOLD's line alone prints nothing. Next: the card save pushes
   the merge; CI on the pushed head; the saver restarts; step 7.
+- Step 6, done: the save 8d1306fe pushed the merge (02:29:28); the saver restarted (bbyggedvd, 02:29:35); CI on
+  8d1306fe all four success at attempt 1 (gate push 46098323772 02:29:31-02:30:14, pull request 46098326092
+  02:29:33-02:30:55; toolchain push job 140834773863 02:29:33-02:40:22, pull request job 140834781212 02:29:35-02:42:20,
+  its steps 11-12 success, "6 files, 1105896 bytes", preview-site 330777 bytes listed; push steps 11-12 skipped).
+- Step 7, done: a new advisor agent (launch-main70-step7.md; the three job logs saved by the main session under
+  .gate/main-70/, gh only for search) ruled APPROVE at 02:53Z for 2d379d9c and 8d1306fe (advisor-main-70-head.md,
+  written by the main session word for word from its report: the advisor agent type has no Write or Edit tool and the
+  brief barred shell writes). Findings all Low: ADV-M70H-1 (the merge message's trailers stand; the next take-in's
+  plan names the merge-message form), ADV-M70H-2 (its file written by the main session), ADV-M70H-3 (its own slips).
+  Note for the next brief to that agent type: allow its notes by Bash with full paths, as main's advisor.md does in a
+  day session, or ask for the text in the report. **MAIN-70 CLOSED.**
 
 ## Order
 - MAIN-70 runs while the dist ruling waits (stopb-dist-diff.md): no build or counted run of mine runs during steps 1-6

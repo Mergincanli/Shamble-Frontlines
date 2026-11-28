@@ -176,7 +176,8 @@ Reading with Read, Grep and Glob; Bash only for single git commands; nothing run
   - redact-check.mjs:133-145, :239-248: the host-name reading flags a host name only when its labels hold four numeric
     labels in a row (an address); the npm tarball path is excused. A URL's file name with a date in it parses as a host
     name (for example `name-v1.5-Month-24-2025.pdf`), so the real URL must be scanned before Y0, not first at X.
-: STOPB-1 (High), the expected dist list must be in Y, not X (DONE)
+
+## The main finding first: STOPB-1 (High), the expected dist list must be in Y, not X (DONE)
 - **What fails:**
   - RS clones Y, never X: rs.yaml:121, :143-148 fetch COMMIT = /etc/npt/commit = Y into /opt/npt/clone.
   - r1.sh runs from that clone and reads `EXPECTED_DIST=/opt/npt/clone/spikes/netcode-proof/ops/runs/r1-dist.sha256`
@@ -621,7 +622,7 @@ single git commands.
   - So WBG_VERSION stays unset on RS, and `producers` reads plain "wasm-bindgen 0.2.130". This is reasoned from the
     code and rs.yaml, not run on RS.
   - Every list made so far carried a hash: build 1, build 2, and U7's run 4. None of them would equal RS's dist.
-    - **Correction (2026-11-28 03:0x UTC, at the Y' head read):** U7's run 4 carried no hash. Its Wasm is 901a6492…
+    - **Correction (2026-11-28 02:4x UTC, at the Y' head read):** U7's run 4 carried no hash. Its Wasm is 901a6492…
       (u7-report.md:141), the plain value build 1′ and build 2′ produce. I repeated stopb-dist-diff.md:32's "differs
       the same way" without checking it. Only build 1 and build 2, plus build 2's re-run and the third build at Y0,
       carried our commit's name.
@@ -717,4 +718,109 @@ gate's log. Then the verdict, with CI's state as read, the line-623 correction (
 Mustafa and the Status line. Nothing run or built; no GitHub writes.
 
 ### Notes (one line per check)
+- The line-623 correction is written under that line (dated 2026-11-28).
+- `git log -1 1ceecc32`: parent dbcf9691 (an autosave); subject "Stop B Y': R1's expected dist list, its Wasm line from
+  build 1' (wasm-bindgen's plain version, as RS builds it)".
+- `git diff --name-only dbcf9691 1ceecc32` → the list file alone.
+- `git diff --numstat` over spikes/netcode-proof: against Y 652e9513, `1 1` on r1-dist.sha256 alone; against Y0
+  87cb8677, `7 0` on it alone. `git diff 652e9513 1ceecc32 -- spikes/netcode-proof`: one hunk, the Wasm line
+  2a97394b… → 901a6492…, the other six lines as context.
+- `git show 1ceecc32:…/r1-dist.sha256`: the 4-line comment, then seven `<sha256>  ./<name>` lines.
+- `git grep -n -e 2a97394b -e 901a6492 1ceecc32 -- spikes/ docs/` prints only r1-dist.sha256:10 with 901a6492. So the
+  void value is gone from spikes/ and docs/ at Y′, and the command is shown running.
+- `git log --first-parent 652e9513..1ceecc32` holds MAIN-70's merge 2d379d9c ("Merge remote-tracking branch
+  'origin/main'") and checkpoint saves.
+- `git diff --name-only 652e9513 1ceecc32` lists root Cargo.*, crates/, content/, packages/ and docs/, plus notes. It has
+  no .claude/, CLAUDE.md, AGENTS.md, .github/ or tools/ path. Its only path under spikes/ is the list file.
+- `git worktree list`: .gate/stopb-a is detached at 652e9513 (Y) and .gate/stopb-b at 1ceecc32 (Y′). The trees match
+  the done lines. Both worktrees are still present, to be removed after X.
+- build1p.log (Grep):
+  - :1 the worktree .gate/stopb-a with its cargo base in the scratchpad (npt-dist-a);
+  - :3 "git rev-parse HEAD fails in the cargo base: ok";
+  - :4-14 eleven "unset: GIT_… (name only)" lines;
+  - :380 "fails in wasm-bindgen-shared's own folder (…/npt-dist-a/cargo/registry/src/index.crates.io-…/
+    wasm-bindgen-shared-0.2.130): ok";
+  - :538 a fresh wasm-bindgen 0.2.130 in that base;
+  - :571 "producers: wasm-bindgen 0.2.130";
+  - :582 exit 0.
+  - :15 is garbled ("GIT_ variables: unset above" with the names run on, no count). The script's :29 prints the count
+    now, as build2p.log:15 shows. The eleven "unset:" lines carry the fact.
+- build2p.log (Grep):
+  - :1 the worktree .gate/stopb-b with its cargo base npt-dist-b;
+  - :3 and :370 both git lines "ok";
+  - :15 "GIT_ variables: 11 unset above", with 11 "unset:" lines (Grep count);
+  - :561 "producers: wasm-bindgen 0.2.130";
+  - :572 exit 0.
+- stopb-distbuild.sh (Grep):
+  - :21 and :40 print STOP or "ok" on the two git tests, so both branches print. git's own message goes to /dev/null.
+  - :27-28 unset every GIT_ name before the build.
+  - :48-50 read the `producers` entry's version by its length byte, and stop unless it is exactly
+    "wasm-bindgen 0.2.130". A hash suffix would be printed and refused.
+- The lists: build1p-dist.sha256 and build2p-dist.sha256 (Read) hold the same seven lines. `git hash-object` gives both
+  d577c9d7…, so they are byte-equal. Each line equals Y′'s non-comment lines as `git show` printed them, read line by
+  line.
+- Against u7-report.md:134-141 (U7's run 4, measured hooks.js), read line by line: index.html 46febaac…, main.js
+  c9be4a16…, worker.js 4f060d18…, lib.js 4f374eaf…, hooks.js be1c4ce7…, npt_client_wasm.js b355d85c… and the Wasm
+  901a6492… are all seven equal.
+- yp-counted.log (Read):
+  - 02:44:12-25 at HEAD dbcf9691 (Y′'s parent), diff a8182b1e…, untracked empty.
+  - self 88 of 88; ops 104 of 104 and "315 ok, 0 failed"; redact 11 of 11, 464 items, 0 findings; refs 2241; exit 0.
+  - The diff hash is the main session's compare. In my seat the tie is Y′ = dbcf9691 plus the list file alone
+    (name-only).
+  - The ops step passing on a filled list shows C2's stand-in holds.
+- yp-gate.txt (Read): base dae6d10 (origin/main after MAIN-70); [1]-[4] and [5b]-[5d] PASS, [5a] skipped; "GATE PASS";
+  "gate exit 0".
+- CI on Y′'s save 232cc8c9: not read in this seat (no gh, by the brief). It was running when the brief was sent; the
+  main session is to send the four runs.
+
+### Rulings
+- **Y′ stands, and STOPB-8 is resolved by the method.**
+  - Both builds ran with every Q2 bar printed:
+    - the cargo base outside any repository;
+    - git failing in wasm-bindgen-shared-0.2.130's own folder;
+    - eleven GIT_ names unset;
+    - `producers` plain, by a read that would print and refuse a hash.
+  - The two lists are byte-equal (d577c9d7…), and they equal Y′'s committed non-comment lines.
+  - Y′ moves exactly one line against Y (`1 1`) and stays the list's file alone against Y0 (`7 0`).
+  - The void value 2a97394b is gone from spikes/ and docs/.
+  - Build 1′ ran on Y's tree (before MAIN-70) and build 2′ on Y′'s (after it). Their equality shows that neither the
+    commit nor #79's root files are dist inputs, which MAIN-70's own spikes/ bar said by path.
+- **U7's run 4: yes, a third agreeing build, for the report, as supporting evidence.**
+  - All seven of its hashes equal Y′'s (u7-report.md:134-141 against `git show 1ceecc32:…`, line by line).
+  - It was made by another builder, on another path and day, on U7's snapshot tree.
+  - Its own list lives only in that builder's worktree (summary.json 100b27d1…, u7-report.md:132-133), and its log was
+    not re-read here. So it is quoted, and it is not one of C1's two bars.
+  - It also shows that U7's builder had its cargo home outside any repository, the condition RS has.
+- **Q4 (e):** both triggers are cleared (the name list: no kit or CI path, nothing under spikes/ but the list). Y0
+  stands, and X takes in no kit file.
+
+### Findings (all Low; none blocks)
+- **YPH-1 (Low):** neither build log prints the worktree's own commit. That build 1′ ran at 652e9513 and build 2′ at
+  1ceecc32 rests on the done lines and on today's `git worktree list` (stopb-a 652e9513, stopb-b 1ceecc32, both
+  detached). Not in the logs. The next build script prints `git rev-parse HEAD` from inside the worktree at the top of
+  its log. A follow-up note; nothing to redo.
+- **YPH-2 (Low):** build1p.log:15's summary line is garbled (no count). The script already prints it right
+  (build2p.log:15), and the eleven "unset:" lines carry the fact. Noted only.
+- **YPH-3 (Low, wording):** stopb-plan.md :107-108 (Build 1's supporting line) says the Wasm differs from U7's run 4
+  "U7's list being its snapshot tree's". The cause was STOPB-8's leak, not the snapshot. The main session adds a dated
+  note there, as I did under my own line 623. I edit only this file.
+
+### Verdict on the pushed head (Y′ 1ceecc321eaf194d59568fdab56644d1e9eb4f05, under the save 232cc8c9b53bb4216e7cf97d7b9baeb25928e24f)
+**APPROVE WITH FINDINGS** (three Lows).
+- Y′ stands as R1's code commit for X.
+- CI on 232cc8c9 was not read in this seat. The verdict holds once the main session's message shows its four runs
+  success. A failure reopens this read before X.
+- X may follow on Y′, with C1's X bars (rs.yaml and lg.yaml `1 1`; R1.md net 0, its hunk inside :92-93), after his
+  answers on A2's host findings, as planned.
+
+### Decisions needed
+- None.
+
+### For Mustafa
+- Nothing to act on.
+- For Stop B's message, the one line ruled earlier: the expected list's Wasm carries wasm-bindgen's plain version, as
+  RS will build it; a first list carried our commit's name and was voided before the fill. Three builds now agree on
+  every file: build 1′, build 2′, and U7's run 4 by another builder.
+
+Status: COMPLETE 2026-11-28 02:51 UTC
 

@@ -27,6 +27,10 @@ Your Q4 (f): the head read of Y' with both new builds. Read by SHA only.
   kit file.
 - CI on Y''s save 232cc8c9: running at sending (02:5x UTC); the main session appends the four runs' lines here and
   tells you by message when they end. Write every other block meanwhile; your verdict line names CI's state as read.
+  APPENDED 02:59 UTC: all four success at attempt 1 (check_suite.completed 02:59:03): gate push 46099627026
+  (02:45:35-02:46:50) and pull request 46099631890 (02:45:39-02:46:47); toolchain push run 46099627427, job
+  140838881813 (02:45:38-02:56:33, steps 11-12 skipped), pull request run 46099631886, job 140838895873
+  (02:45:42-02:55:43, steps 11-12 success). Both toolchain jobs about 10-11 minutes against 25.
 - Build 2' as done: stopb-plan.md section C, "Build 2' DONE" (exit 0 02:45:57-02:47:25; both lists equal; producers
   plain; the two git lines "ok"; 11 GIT_ names unset).
 - One correction asked of you: advisor-stopb-plan.md:623 says every list so far carried a hash, "build 1, build 2, and
