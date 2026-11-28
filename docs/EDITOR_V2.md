@@ -44,7 +44,7 @@ Principle (Mustafa, 2026-11-05), a lean editor: §3, Decided 2026-11-05.
     assigned per team. (Mustafa's plan view and fairness panel work under 120° mirroring: §3, Decided 2026-11-05.)
   - **Objectives as data:** spawns, barracks and terminals, harvest fields (the centre and the safe ones), uplink sites,
     cache spawn points. (Mustafa's tool order (3) and (4), the heatmaps and the fairness panel, read the objectives:
-    §3, Decided 2026-11-05.)
+    §3, Decided 2026-11-05.) (2026-11-27: see §14)
   - **Validation panel:** bot reachability (every spawn to every goal), the 6 m gap rule, a symmetry check, and budgets
     (object count, draw calls when merged). (Mustafa's tool order (3) to (5), heatmaps, the fairness panel and
     sightline checks, bear on it: §3, Decided 2026-11-05.)

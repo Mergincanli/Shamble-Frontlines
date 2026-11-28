@@ -60,6 +60,7 @@ R2-INT-OQ4, R2-INT-OQ8, R2-ROOM-OQ4 and R4-LOS-OQ2. Mustafa's VISION-RULE, versi
 the entry of 2026-11-27, 13:57:21 UTC, his item 9, a to e; no code now), leaves two points open, in his words: "the
 exact eye height, which reaches the game through my Export, and which points of an enemy's body the line is tested
 against" (pointer of 2026-11-27, change-set 4b-2's docs pass; no ADR text rewritten).
+Mustafa's design notes of 2026-11-27 (`docs/DECISIONS.md`, 22:58:25 UTC) give LOOP_V2 a new §14; no ADR text rewritten.
 
 | Code or OQ | The question, in plain words | Decider | Where |
 |---|---|---|---|

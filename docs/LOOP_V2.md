@@ -2,7 +2,7 @@
 
 Written by Mustafa and the Advisor, October 2026. This replaces the loop in GAME_DESIGN.md §5–6 and parts of
 DESIGN_NOTES.md (listed in §12). It is written for readers with no other context, including Claude Code.
-Updated on 2026-11-04 with Mustafa's design walk: the lines dated 2026-11-04, and §13.
+Updated on 2026-11-04 with Mustafa's design walk: the lines dated 2026-11-04, and §13. Updated on 2026-11-27 with Mustafa's design notes on resource points and repair bots: §14, and the pointers dated 2026-11-27 that lead to it.
 
 **Status tags.** `[DECIDED]` Mustafa decided it. `[DEFAULT]` the Advisor proposed it and it stands unless Mustafa
 vetoes it. `[OPEN]` needs a decision before it gets built. `[LATER]` not in the greybox prototype. `[IDEA]` Mustafa's
@@ -13,7 +13,7 @@ idea, a sketch to iterate: not decided (tag added 2026-11-04).
 
 ## 1. The match in one paragraph
 Three teams, one per faction, fight on a three-base map. Money comes from harvesters working a contested field in the
-centre. Tech comes from rotating uplinks, where a carried tech cache is cashed out, and can be stolen. Tech lifts the
+centre. Tech comes from rotating uplinks, where a carried tech cache is cashed out, and can be stolen. Tech lifts the (2026-11-27: resource points replace open fields, see §14)
 whole team through tiers that unlock abilities, stronger units and vehicles. The team that reaches the points target
 first (or leads when time runs out) wins. Winning converts part of the match's tech into account progression.
 
@@ -30,9 +30,9 @@ first (or leads when time runs out) wins. Winning converts part of the match's t
 ## 3. Money (personal $)
 - `[DECIDED]` Everyone starts each match with $300.
 - `[DECIDED]` Harvesters gather from the field in the centre and deliver to their team's refinery. Every delivery pays
-  every player on the team (Renegade-style).
+  every player on the team (Renegade-style). (2026-11-27: resource points replace open fields, see §14)
 - `[DECIDED]` The centre field is rich but contested. A small, safe field near each base gives a trickle, so a team's
-  income never drops to zero.
+  income never drops to zero. (2026-11-27: resource points replace open fields, see §14)
 - `[DECIDED]` Harvesters can be killed to deny enemy income.
 - `[DECIDED]` A destroyed harvester is rebuilt with money from the whole team, split in equal shares across the
   current team. Nobody pays more than they have; the rest spreads over the others. The HUD shows each player's share
@@ -49,7 +49,7 @@ first (or leads when time runs out) wins. Winning converts part of the match's t
   4. Enemies steal the uplink by holding E for a few seconds. The countdown keeps running, now for the new owner.
   5. When the countdown ends, the owning team gets the tech. A new cache spawns somewhere else.
   - Uplink sites rotate. At full scale, two run at the same time.
-- `[DEFAULT]` Uplinks replace silos and tech boxes: one tech source, the exciting one.
+- `[DEFAULT]` Uplinks replace silos and tech boxes: one tech source, the exciting one. (2026-11-27: §14's resource silo is a different thing, a part of the harvester building with a small passive income; see §14)
 - `[DEFAULT]` Tech is a team total that climbs through tiers. Players never spend it, so no single player can drain
   the team's progress. A tier, once reached, is never lost. Tech stolen from a team slows its next tier.
 - `[DECIDED]` Class abilities are locked at the start and unlock when the team reaches Tech 1, which makes tech worth
@@ -148,12 +148,12 @@ first (or leads when time runs out) wins. Winning converts part of the match's t
 
 ## 9. The map: Octopon-3 (greybox first)
 - `[DECIDED]` A three-team map inspired by Red Alert 3's Battlebase Octopon: a contested harvest field in the centre,
-  verticality, and structures players can enter `[LATER]`.
+  verticality, and structures players can enter `[LATER]`. (2026-11-27: resource points replace open fields, see §14)
 - `[DEFAULT]` The layout:
   - Rotational symmetry at 120°, with each base on its own lobe.
-  - A raised centre plateau with ramps, where the harvest field sits.
+  - A raised centre plateau with ramps, where the harvest field sits. (2026-11-27: resource points replace open fields, see §14)
   - Uplink sites between each pair of bases, rotating, plus one in the centre.
-  - A safe, low-yield field near each base.
+  - A safe, low-yield field near each base. (2026-11-27: resource points replace open fields, see §14)
   - Drop-downs from the high ground for fast rotations.
 - `[DEFAULT]` **Greybox first:** plain blocks, with height read through brightness (higher is lighter). Played with
   bots before any art.
@@ -178,7 +178,7 @@ One change-set each, in this order, following CLAUDE.md's protocol (plan first, 
    - Three teams with factions as data; bots fight across all three; HUD and scoreboard for three.
    - $300 start, the Recruit, $100 T1 purchases at the terminal, spawning inside the barracks.
 2. **octopon-3-greybox:** the §9 layout as map data, plus aiming at height if ledges are walkable.
-3. **harvest-economy:** centre and safe fields, deliveries paying the team, harvester kills, team-funded rebuilds.
+3. **harvest-economy:** centre and safe fields, deliveries paying the team, harvester kills, team-funded rebuilds. (2026-11-27: resource points replace open fields, see §14)
 4. **bot-replan-storm:** the PERF-2 fix (§10), with sims before and after.
 5. **uplinks:**
    - Cache, carry, place, countdown, steal, rotation.
@@ -258,3 +258,42 @@ Added 2026-11-04. Mustafa's rules for the weapons a player holds in a match, in 
   to confirm: the class's own abilities stay.")
 - `[DECIDED]` Ammo: limited but generous, refilled at the barracks and at supply points (keeps an engineer or supply
   role possible later). (2026-11-04)
+
+## 14. Resource points and repair bots
+Added 2026-11-27. Mustafa's design direction for the economy and base repair, from his notes of 2026-11-27 (word for
+word in DECISIONS.md): "This is my design direction, not loose ideas. Numbers are placeholders until playtests." Where
+a line here differs from §1, §3, §9 or §11, this section wins. Nothing here is built in Slice 1.
+### Resource points
+- `[DECIDED]` Resource points sit symmetrically around the map. Teams capture them for their harvesters, RTS-style,
+  instead of open ore fields. (2026-11-27)
+- `[DECIDED]` Each team starts with a resource silo on its harvester building: a small passive income (about 1 to 2
+  credits a second, to tune). (2026-11-27)
+- `[DECIDED]` A support vehicle drives out and sets up the harvest station on a point. Players drive it and place it
+  themselves. (2026-11-27)
+- `[DECIDED]` The first station is free. Each next one costs more the further a team expands, so growing is an
+  investment and snowballing isn't free. (2026-11-27)
+- `[DECIDED]` Enemies can destroy a station and build their own on that point, which costs them too. (2026-11-27)
+- `[DECIDED]` Points run low but never hit zero: once depleted they still pay about 10 to 20% per run. (2026-11-27)
+- `[OPEN]` Depleted points: slowly refill (longer matches) or stay low (shorter matches). A dial for playtests.
+- `[OPEN]` If points or objectives move, spawn them in fair sets at equal distance from each base, so no team gets the
+  close one.
+- `[OPEN]` Should a station be free again when a team has none left?
+- `[OPEN]` Placeholder starting money: about 300. (§3's $300 stays the starting value until a playtest changes it.)
+### Repair bots
+- Why (Mustafa): in Renegade, a base under siege pulls half the team inside to repair, so they can't fight back.
+- `[DECIDED]` Built only at a dedicated repair station inside the base: the player holds E for 5 seconds. 300 credits
+  each. (2026-11-27)
+- `[DECIDED]` Each bot repairs at half a player's speed. Max 4 per building, so a full set equals 2 players
+  repairing. (2026-11-27)
+- `[DECIDED]` They sit against the walls inside buildings. Attackers must push inside to destroy them; they can't be
+  hit from outside. (2026-11-27)
+- `[OPEN]` Should bots pause for a few seconds after a big hit, so a small attack can still crack a base?
+- `[OPEN]` Engineer repair values for vehicles and buildings are still to design.
+### Player experience goal
+- Tearing down a team's station and putting up your own should feel dominant: bragging rights and banter after the
+  match. (Mustafa, 2026-11-27)
+### Open, noted by the Advisor (not Mustafa's words; his to answer before any of this is built)
+- `[OPEN]` The silo's income: paid to every player, like a delivery (§3), or one sum for the team?
+- `[OPEN]` Who pays for a station after the first, and for a repair bot: the player who places it, or the team in
+  shares, like a harvester rebuild (§3)?
+- `[OPEN]` Does the raised centre (§9) keep a richer point, or are all points equal?
