@@ -221,7 +221,17 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   `/home/user/Shamble-Frontlines/.gate/cs4b-2`. A session of another account works on its own branch from this
   branch's head and never pushes here (his Lanes rule). SEAT-OUT from him: stop at a whole point and report the last
   commit's id.
-- **State (15:09 Amsterdam, from the clock): the advisor agent APPROVES steps 1 to 7 with conditions**
+- **State (15:32 Amsterdam, from the clock): F1's written answer is engine-architect's block 7** (the room owns
+  rules, statics and spawns; `World` holds the tick, a `PlayerRecord`, the soldiers and the seed; 17 changes to
+  rust-reviewer's 11.6; B5, the bundle's one movement document, blocks step 1's code until confirmed; B4, slot 0's
+  soldier at the lowest-id spawn, a default). Q2's re-run is done (rust-reviewer's block 13: the test scene and every
+  recorded route the same under (a) and (b); question 13 corrected). **Running (three):** rust-reviewer's block 14
+  (confirms F1's Part A, the 17 changes and B5; rewrites 11.6), netcode-architect's block 9 (B4; which step carries the
+  wire's move and aim; F5's superseded marks at its :355 and :430), game-designer's block 9 (whether the first
+  soldier's spawn is a rule of his). **Next:** security-auditor on layering.rs's non-test wording (its F2); then step
+  1's build order (small commits; the batch in the commit that first calls exp and sincos; the pins re-made in every
+  commit that changes the hashed state), the advisor tool's check before the first code. Earlier state (15:09), kept:
+  **the advisor agent APPROVES steps 1 to 7 with conditions**
   (`advisor-steps1to7.md`): Q1 the plan, with F1 to F6 as conditions; Q2 HEADROOM-FEET's default **(b), his sandbox's
   rule** (its ruling), with test 15 per mode and a re-run of blocks 5, 6, 9, 10 and 12 under (b) before step 1's
   movement code; Q3 the rung at about 14,960; Q4 the plan's order on nine conditions; Q5 the information lines agreed.
