@@ -93,7 +93,8 @@ export function createThreePicture(): Picture {
     resize(width, height, devicePixelRatio): void {
       renderer?.setPixelRatio(Math.min(devicePixelRatio, MAX_PIXEL_RATIO));
       renderer?.setSize(width, height, false);
-      // A window of no width is held at one pixel, as one of no height is: the aspect stays a positive number.
+      // The aspect is worked out from at least one pixel each way, so that a window of no width keeps it a positive
+      // number (the canvas itself still takes the window's size).
       camera.aspect = Math.max(1, width) / Math.max(1, height);
       camera.updateProjectionMatrix();
       frame();
