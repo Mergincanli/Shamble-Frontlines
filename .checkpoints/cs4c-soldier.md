@@ -195,7 +195,22 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   `/home/user/Shamble-Frontlines/.gate/cs4b-2`. A session of another account works on its own branch from this
   branch's head and never pushes here (his Lanes rule). SEAT-OUT from him: stop at a whole point and report the last
   commit's id.
-- **State (14:03 Amsterdam, from the clock): 4c-1's docs pass is committed (9283d302**, docs-keeper's, its checks
+- **State (14:12 Amsterdam, from the clock): the report's draft (`report-draft-4c1.md`), the pull request's text
+  (`pr-text-4c1.md`) and the verifier's brief (`verifier-brief-4c1.md`) are written; the gate PASS with smoke at
+  9283d302 (`.gate/gate-4c1-docs.log`, symbols +0 -0); the verifier next.** The close's order, by the advisor tool's
+  check of 14:05: the verifier on the draft; then (a) one commit with the report in `docs/reports/2026-11-28-cs4c1-scene.md`
+  and STATUS's and ROADMAP's 4c-1 lines brought up to date (the docs checks, repo-map-check and the 12 b/c check run
+  again), main fetched by name first and taken in if it moved, the gate with smoke on that tree; (b) one commit that
+  only removes the notes (`.checkpoints/cs4c-soldier.md`, `.checkpoints/cs4c-soldier/`, `.checkpoints/cs4-walk/`), no
+  `[skip ci]`, pushed as the head; **then a freeze: no commit at all on the branch until the advisor agent's verdict**
+  (in-flight files in `.gate/` or the scratchpad; past 25 minutes, one line to him instead of a push); the zip built
+  while CI runs (3b's `make-zip.py` structure: the ids as arguments, SHA256SUMS, the unpack control, the browser spec
+  on the unpacked copy; Node 18 or newer as `serve.mjs` says; Windows steps; the readout's commit in step 1); then the
+  advisor agent; then he is told the head and the Brave steps. 4c-2's first commit brings the notes back (a revert of
+  (b), the guard permitting). For 4c-2: HEADROOM-FEET's switch default goes to the advisor agent explicitly; this chat
+  proposes (b), his sandbox's rule, until he answers (his MOVE-RULES (a)). His next chat update owes him two
+  corrections: the walk difference is 0.069 m (not "6 cm"), and question 13's sentence about his sandbox was wrong.
+  Earlier state (14:03), kept: **4c-1's docs pass is committed (9283d302**, docs-keeper's, its checks
   passing; STATUS's quotes of his item 12 b and c compared byte for byte with his saved message by
   `quote-check-12bc.mjs` in the scratchpad: both exact). CI green on 0645432f (gate, smoke, toolchain 9 min 3 s;
   Chromium 3.6 min). Question 13 corrected at 13:58 (game-designer's block 8: "the sandbox's maps never met it" was
