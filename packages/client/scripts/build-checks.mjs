@@ -198,8 +198,19 @@ export function sourceTexts(root, folders) {
   );
 }
 
-/** Text that only the development readout, its report and the tests' hook hold. */
-const DEV_MARKERS = ["Copy report", "__shambleReport", "ticks while hidden", "first page: report", "key-diagram"];
+/**
+ * Text that only the development readout, its report and the tests' hooks hold: the last two are the scene's hook
+ * and the development inventory's own sentence (render/inventory.ts, `INVENTORY_UNKNOWN`).
+ */
+const DEV_MARKERS = [
+  "Copy report",
+  "__shambleReport",
+  "ticks while hidden",
+  "first page: report",
+  "key-diagram",
+  "__shambleScene",
+  "the scene inventory met an object it does not know",
+];
 
 /**
  * The one chunk the build made from the Worker's own source module, by the name the build gave it. `chunks` is what

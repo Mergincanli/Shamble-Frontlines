@@ -1,6 +1,11 @@
 import * as THREE from "three/webgpu";
 import type { Picture, PictureInfo, RenderCounters } from "../picture.ts";
-import { buildEmptyScene } from "./empty-scene.ts";
+import { readInventory } from "./inventory.ts";
+import { buildEmptyScene, buildMapFloor, disposeFloor, overview } from "./scene.ts";
+
+// Written into the code by the build (vite.config.mjs, `define`): the literal `false` in a production build, which
+// cuts the development inventory out of it (the production scan checks that).
+declare const __SHAMBLE_DEVTOOLS__: boolean;
 
 /** The parts of three's two backends this file reads; its types do not name them. */
 interface Backend {
@@ -34,7 +39,18 @@ THREE.setConsoleFunction((type: "log" | "warn" | "error", message: string, ...re
  * waits for `renderer.init()` before the first frame and reports the backend that really runs.
  */
 export function createThreePicture(): Picture {
-  const { scene, camera } = buildEmptyScene();
+  const { scene, camera, floor: emptyFloor } = buildEmptyScene();
+  let floor = emptyFloor;
+  // The map's bounds as numbers, for the overview at each aspect: no reference to the document is kept.
+  let framed: { min: [number, number, number]; max: [number, number, number] } | null = null;
+  const frame = (): void => {
+    if (framed === null) return;
+    const view = overview(framed, camera.aspect, camera.fov);
+    camera.position.set(...view.position);
+    camera.lookAt(...view.target);
+    camera.far = Math.max(500, 4 * camera.position.distanceTo(new THREE.Vector3(...view.target)));
+    camera.updateProjectionMatrix();
+  };
   let renderer: THREE.WebGPURenderer | null = null;
   return {
     async start(canvas, options): Promise<PictureInfo> {
@@ -47,11 +63,24 @@ export function createThreePicture(): Picture {
         timestampQuery: renderer.hasFeature("timestamp-query"),
       };
     },
-    loop(frame): void {
-      void renderer?.setAnimationLoop(frame);
+    loop(onFrame): void {
+      void renderer?.setAnimationLoop(onFrame);
+    },
+    setContent(content): void {
+      const next = buildMapFloor(content.map);
+      scene.remove(floor);
+      disposeFloor(floor);
+      scene.add(next);
+      floor = next;
+      const { min, max } = content.map.bounds;
+      framed = { min: [min[0], min[1], min[2]], max: [max[0], max[1], max[2]] };
+      frame();
+    },
+    inventory() {
+      return __SHAMBLE_DEVTOOLS__ ? readInventory(floor) : null;
     },
     draw(): void {
-      // The empty scene has nothing a block moves yet; soldiers arrive with change-set 4.
+      // The scene has nothing a block moves yet; the soldier arrives later in change-set 4c.
       renderer?.render(scene, camera);
     },
     counters(): RenderCounters {
@@ -70,6 +99,7 @@ export function createThreePicture(): Picture {
       renderer?.setSize(width, height, false);
       camera.aspect = width / Math.max(1, height);
       camera.updateProjectionMatrix();
+      frame();
     },
     stop(): void {
       void renderer?.setAnimationLoop(null);

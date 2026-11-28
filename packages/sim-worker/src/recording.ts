@@ -3,13 +3,16 @@
 // build holds it. The format is `crates/devtools/src/recording.rs`'s, version 1, and this reader makes the same
 // checks in the same order: a count is judged against the bytes that are there before anything is read by it.
 
+import { LOCAL_MAP } from "./local-map.ts";
+
+/** The map a local match is played on (local-map.ts), named here too for the tests that read a recording. */
+export { LOCAL_MAP };
+
 export const STEP_BYTES = 68;
 export const MAX_STEPS = 108_000;
 const MAX_MAP_ID_BYTES = 64;
 const MAGIC = "SHMBLREC";
 const TEST_SEED_MARK = "TESTSEED";
-/** The map a local match is played on: `sim_wasm::LOCAL_MAP`'s value (the boundary test reads it from the Rust source). */
-export const LOCAL_MAP = "test-scene";
 
 export interface RecordedStep {
   readonly hostMs: number;

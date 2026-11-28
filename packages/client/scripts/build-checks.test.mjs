@@ -240,7 +240,10 @@ test("the glue stays in the Worker's chunk, and development code stays out of a 
   const file = (name, text) => ({ name, bytes: Buffer.from(text) });
   const worker = file("assets/worker-abc.js", "wasm.__wbindgen_malloc(1); imports.__wbg_Error_1 = 0;");
   const page = file("assets/index-abc.js", "boot()");
-  const dev = file("assets/report-abc.js", 'x("Copy report", window.__shambleReport, "ticks while hidden", "first page: report", "key-diagram")');
+  const dev = file(
+    "assets/report-abc.js",
+    'x("Copy report", window.__shambleReport, "ticks while hidden", "first page: report", "key-diagram", window.__shambleScene, "the scene inventory met an object it does not know")',
+  );
   const entry = worker.name;
   expect(bundleProblems([worker, page], true, entry)).toEqual([]);
   expect(bundleProblems([worker, page, dev], false, entry)).toEqual([]);
@@ -250,8 +253,8 @@ test("the glue stays in the Worker's chunk, and development code stays out of a 
   expect(bundleProblems([worker, file("assets/index-abc.js", "WebAssembly.validate(b)")], true, entry)).toEqual([
     "assets/index-abc.js: the page's code names WebAssembly",
   ]);
-  expect(bundleProblems([worker, page, dev], true, entry)).toHaveLength(5);
-  expect(bundleProblems([worker, page], false, entry)).toHaveLength(5);
+  expect(bundleProblems([worker, page, dev], true, entry)).toHaveLength(7);
+  expect(bundleProblems([worker, page], false, entry)).toHaveLength(7);
   // A page module whose file is named like the Worker's (a part of the page loaded later, split off from
   // app/worker-link.ts) is the page's all the same: the Worker's chunk is the one the build named, and no other.
   const lookalike = file("assets/worker-link-abc.js", "WebAssembly.instantiate(bytes); wasm.__wbindgen_start();");

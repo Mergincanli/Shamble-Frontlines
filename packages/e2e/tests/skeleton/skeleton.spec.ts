@@ -1,9 +1,19 @@
 // The first page in a real browser, on the built development page (playwright.config.ts says how to run it).
 import { readFileSync } from "node:fs";
+import path from "node:path";
 import { expect, test } from "@playwright/test";
-import { drawn, needsBuild, open, report, wasmCalls } from "./report.ts";
+import { drawn, needsBuild, open, report, scene, wasmCalls } from "./report.ts";
 
-const baseline = JSON.parse(readFileSync(new URL("./render-counts.json", import.meta.url), "utf8")) as Record<string, unknown>;
+const counts = JSON.parse(readFileSync(new URL("./render-counts.json", import.meta.url), "utf8")) as Record<string, Record<string, unknown>>;
+const baseline = counts["test-scene"] ?? {};
+
+/** The local match's map as the build put it beside the page: the content bundle's file, parsed. */
+function builtMap(): { id: string; shapes: { id: string; min: number[]; max: number[]; type: string }[]; regions: { id: string }[] } {
+  const bundle = JSON.parse(readFileSync(path.join(needsBuild(), "content.json"), "utf8")) as { files: { path: string; text: string }[] };
+  const file = bundle.files.find((entry) => entry.path === "maps/test-scene.json");
+  if (file === undefined) throw new Error("the built bundle holds no test scene");
+  return JSON.parse(file.text) as ReturnType<typeof builtMap>;
+}
 
 test.beforeAll(() => void needsBuild());
 
@@ -41,8 +51,35 @@ for (const [name, query] of [["the default backend", ""], ["the forced WebGL 2 f
     expect(page.workers()).toHaveLength(1);
     // Nothing was asked of any address but the small server's.
     expect(outside).toEqual([]);
-    // The empty scene's render counts are the committed ones for this backend.
-    if (baseline[backend] !== null) expect(data.counters).toEqual(baseline[backend]);
+    // The scene is the map the build put beside the page, as drawn: each shape and patch once, by its id and kind,
+    // at its own corners rounded to f32, the greys rising with the tops; and it came through boot's own handling of
+    // the Worker's messages (follow-up 4B-BOOT-CALLS: a boot that called the link alone would draw no map).
+    const map = builtMap();
+    const objects = await scene(page);
+    const solids = objects.filter((object) => object.kind === "box" || object.kind === "ramp");
+    expect(solids.map((object) => `${object.kind}:${object.id}`).sort()).toEqual(map.shapes.map((shape) => `${shape.type}:${shape.id}`).sort());
+    expect(objects.filter((object) => object.kind === "region").map((object) => object.id).sort()).toEqual(map.regions.map((region) => region.id).sort());
+    for (const shape of map.shapes) {
+      const drawnShape = solids.find((object) => object.id === shape.id);
+      const xs = new Set(drawnShape?.points.map((point) => point[0]));
+      expect([...xs].sort((a, b) => a - b), shape.id).toEqual([Math.fround(shape.min[0]!), Math.fround(shape.max[0]!)]);
+      expect(Math.max(...(drawnShape?.points.map((point) => point[1]) ?? [])), shape.id).toBe(Math.fround(shape.max[1]!));
+    }
+    const top = (id: string): number => map.shapes.find((shape) => shape.id === id)?.max[1] ?? 0;
+    // A higher top is never darker (one grey level spans about 4 cm of height, so the yard's 0.55 m and 0.56 m steps
+    // share one), and the tallest tops are the lightest.
+    for (const one of solids) for (const other of solids) if (top(one.id) > top(other.id)) expect(one.grey & 0xff).toBeGreaterThanOrEqual(other.grey & 0xff);
+    const tallest = Math.max(...map.shapes.map((shape) => shape.max[1]!));
+    for (const object of solids) if (top(object.id) === tallest) expect(object.grey & 0xff).toBe(Math.max(...solids.map((one) => one.grey & 0xff)));
+    expect(data.scene).toEqual({ map: map.id, boxes: 17, ramps: 6, regions: 6 });
+    expect(data.content).toEqual([
+      { path: "maps/test-scene.json", format: "shamble-map", version: 1 },
+      { path: "movement/soldier.json", format: "shamble-movement", version: 1 },
+    ]);
+    await expect(page.locator("#overlay pre")).toContainText("scene: test-scene · 17 boxes · 6 ramps · 6 regions");
+    // The test scene's render counts are the committed ones for this backend: a missed freeing of the empty floor
+    // leaves the geometries two higher.
+    if (baseline[backend] !== null && baseline[backend] !== undefined) expect(data.counters).toEqual(baseline[backend]);
   });
 }
 
@@ -105,7 +142,11 @@ for (const [name, body, said] of broken) {
     await expect(page.locator("#notice")).toHaveText(new RegExp(`^The match stopped: .*${said}`), { timeout: 20_000 });
     console.log(`a Worker that ${name}: the notice stood ${Date.now() - started} ms after the page was asked for`);
     await page.waitForFunction(() => "__shambleReport" in window);
-    expect((await report(page)).errors).toBe(1);
+    const data = await report(page);
+    expect(data.errors).toBe(1);
+    // The page let its copy of the content go unread, through boot's own handling of the Worker's error (follow-up
+    // 4B-BOOT-CALLS: a boot that called the link alone would still hold it), and the empty floor stays.
+    expect([data.content, data.scene]).toEqual(["none", null]);
     expect(thrown).toEqual([]);
   });
 }

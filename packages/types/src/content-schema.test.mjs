@@ -149,8 +149,7 @@ test("the generated types and the schemas name the same keys, the same corner le
     ["Spawn", map.spawns.items],
     ["Region", map.regions.items],
   ];
-  // A corner is a tuple of as many numbers as the schema's fixed length. (A member's kind, number or string or
-  // which word list it names, is not compared here: 4c's reader of the types reads it.)
+  // A corner is a tuple of as many numbers as the schema's fixed length. Each member's kind is compared too, below.
   const corners = (typed, schema, name) => {
     for (const [key, type] of Object.entries(typed)) {
       if (!type.startsWith("[")) continue;
@@ -178,4 +177,60 @@ test("the generated types and the schemas name the same keys, the same corner le
   // The words: a ramp's side and a region's ground.
   expect(words(declaration("Toward"))).toEqual(schemaForms[1].properties.rises_toward.enum);
   expect(words(declaration("Ground"))).toEqual(map.regions.items.properties.kind.enum);
+});
+
+/** What a schema's node says a member is (the id rule is a string by its own definition). */
+function schemaKind(node, root) {
+  if (node.$ref === "#/$defs/id") return root.$defs?.id?.type === "string" ? "string" : "unknown";
+  if ("const" in node) return "word";
+  if (Array.isArray(node.enum)) return "words";
+  if (node.type === "number") return "number";
+  if (node.type === "string") return "string";
+  if (node.type === "array" && (Array.isArray(node.prefixItems) ? node.prefixItems.every((item) => item.type === "number") : node.items?.type === "number")) return "tuple";
+  if (node.type === "array") return "list";
+  if (node.type === "object") return "object";
+  return "unknown";
+}
+/** What a generated type's member is, from its TypeScript type's text (a form's last member keeps the closing brace). */
+function typeKind(text) {
+  const type = text.replace(/\s*\}$/, "");
+  if (type === "number" || type === "string") return type;
+  if (/^"[^"]+"$/.test(type)) return "word";
+  if (type.startsWith("[")) return type.slice(1, -1).split(",").every((part) => part.trim() === "number") ? "tuple" : "unknown";
+  if (type.startsWith("Array<")) return "list";
+  if (type === "Toward" || type === "Ground") return "words";
+  if (type === "Bounds") return "object";
+  return "unknown";
+}
+/** Each member whose kind in the generated type is not its kind in the schema, in words. */
+const kindProblems = (typed, schema, root) =>
+  Object.entries(typed)
+    .map(([key, type]) => [key, type, typeKind(type), schemaKind(schema.properties[key] ?? {}, root)])
+    .filter(([, , typedKind, schemaKindOf]) => typedKind !== schemaKindOf || typedKind === "unknown")
+    .map(([key, type, , schemaKindOf]) => `${key}: ${type} against ${schemaKindOf}`);
+
+// Follow-up 4B-MEMBER-KINDS (engine-architect's round 2 of 4b-2): the page now reads these types (the map's reading,
+// packages/client/src/app/content.ts), so each member's kind is held to the schema's: a number to a number, a string
+// to a string or the id rule, a corner to an array of numbers, a word list to an `enum`, a list to an array.
+test("each member of the generated types is of the kind its schema says", () => {
+  const map = schemas.map.properties;
+  const pairs = [
+    ["Movement", schemas.movement, schemas.movement],
+    ["MapDocument", schemas.map, schemas.map],
+    ["Bounds", map.bounds, schemas.map],
+    ["Spawn", map.spawns.items, schemas.map],
+    ["Region", map.regions.items, schemas.map],
+  ];
+  for (const [name, schema, root] of pairs) expect(kindProblems(members(declaration(name)), schema, root), name).toEqual([]);
+  const [own, forms] = declaration("Shape").split(" & ");
+  forms
+    .replace(/^\(|\)$/g, "")
+    .split(" | ")
+    .forEach((form, at) => {
+      const typed = { ...members(own), ...members(form) };
+      expect(kindProblems(typed, map.shapes.items.oneOf[at], schemas.map), `Shape form ${at}`).toEqual([]);
+    });
+  // The compare bites: a spawn whose facing were a string would be told apart from the schema's number.
+  const planted = { ...members(declaration("Spawn")), facing_deg: "string" };
+  expect(kindProblems(planted, map.spawns.items, schemas.map)).toEqual(["facing_deg: string against number"]);
 });

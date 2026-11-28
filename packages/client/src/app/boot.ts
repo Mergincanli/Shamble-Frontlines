@@ -2,9 +2,9 @@ import SimWorker from "@shamble/sim-worker/worker?worker";
 import { FrameTimes } from "../harness/frame-times.ts";
 import { BUTTON_NAMES, KeyboardInput } from "../input/keyboard.ts";
 import { runHeader } from "../harness/run-header.ts";
-import type { ReportData } from "../overlay/report.ts";
+import type { ReportData, SceneRows } from "../overlay/report.ts";
 import { createPicture } from "../render/index.ts";
-import { fetchContent, PageContent, takeWorkerError, takeWorkerMessage } from "./content.ts";
+import { type ContentFile, fetchContent, PageContent, takeWorkerError, takeWorkerMessage } from "./content.ts";
 import { installErrorHook } from "./error-hook.ts";
 import { readFlags } from "./flags.ts";
 import { lostAndDoubled } from "./press-tally.ts";
@@ -58,7 +58,17 @@ export async function boot(): Promise<void> {
     fail(`The match did not start: ${fetched.problem}`);
     return;
   }
-  const content = new PageContent();
+  // What the page read of the content, once, on the Worker's `ready`: the map goes to the picture, and in development
+  // the files and the drawn scene's counts are kept for the readout (counted here once, never in a frame).
+  let delivered: { readonly files: readonly ContentFile[]; readonly scene: SceneRows } | null = null;
+  const content = new PageContent((read) => {
+    picture.setContent(read.picture);
+    if (__SHAMBLE_DEVTOOLS__) {
+      const drawn = picture.inventory() ?? [];
+      const count = (kind: string): number => drawn.filter((object) => object.kind === kind).length;
+      delivered = { files: read.files, scene: { map: read.picture.map.id, boxes: count("box"), ramps: count("ramp"), regions: count("region") } };
+    }
+  });
 
   // The clock both sides share.
   const clock = (): number => performance.timeOrigin + performance.now();
@@ -153,10 +163,13 @@ export async function boot(): Promise<void> {
       pauses: link.pauses,
       lastPause: link.lastPause,
       worker: link.stats,
+      content: delivered !== null ? delivered.files : content.holding ? "holding" : "none",
+      scene: delivered?.scene ?? null,
     });
     const overlay = new Overlay(document.body, () => formatReport(data()));
-    // The browser tests read the same numbers the readout shows.
+    // The browser tests read the same numbers the readout shows, and the scene as drawn.
     (window as unknown as { __shambleReport: () => ReportData }).__shambleReport = data;
+    (window as unknown as { __shambleScene: () => ReturnType<typeof picture.inventory> }).__shambleScene = () => picture.inventory();
     const diagram = new KeyDiagram(document.body, BUTTON_NAMES, new KeyLights());
     let next = 0;
     readout = (timeMs): void => {

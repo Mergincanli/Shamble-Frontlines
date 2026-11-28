@@ -32,11 +32,28 @@ export interface Report {
     maxTicksInOneWake: number;
     crossOriginIsolated: boolean;
   } | null;
+  content: "holding" | "none" | { path: string; format: string; version: number }[];
+  scene: { map: string; boxes: number; ramps: number; regions: number } | null;
 }
-type Hooked = { __shambleReport?(): Report };
+
+/** One drawn object, as the page's development inventory reads it back from what is drawn (picture.ts, `SceneObject`). */
+export interface SceneObject {
+  id: string;
+  kind: "ground" | "box" | "ramp" | "region";
+  points: [number, number, number][];
+  grey: number;
+}
+type Hooked = { __shambleReport?(): Report; __shambleScene?(): SceneObject[] | null };
 
 export const report = (page: Page): Promise<Report> =>
   page.evaluate(() => (window as unknown as Required<Hooked>).__shambleReport());
+
+/** The drawn scene, read back from what is drawn; never `null` on the development page. */
+export async function scene(page: Page): Promise<SceneObject[]> {
+  const objects = await page.evaluate(() => (window as unknown as Required<Hooked>).__shambleScene());
+  if (objects === null) throw new Error("the development page gave no inventory");
+  return objects;
+}
 
 /** Waits until the page has blocks and the Worker's own report. */
 export async function running(page: Page, blocks = 90): Promise<void> {

@@ -3,6 +3,33 @@
 // runs on. Only src/render/ implements it and only src/render/ imports three; the app, the overlay and the harness
 // reach the picture through this file alone. engine-architect reviews every change to it.
 
+import type { MapDocument } from "@shamble/types";
+
+/**
+ * What the picture draws the match on, read by the page from the content the game's loader took (app/content.ts).
+ * A record, so that the camera's values join as one more field with their first reader, and the method that takes
+ * it does not change.
+ */
+export interface PictureContent {
+  readonly map: MapDocument;
+}
+
+/**
+ * One drawn object, as the development inventory reads it back from what is drawn: its own geometry buffer, its name
+ * and its material's colour, never the map it was built from. Lane 1's test hook for "the scene equals the map":
+ * whoever owns src/render/ keeps it answering while that test stands. `grey` is the greybox's and is retired with it,
+ * by the change-set that replaces the look, which then changes this record and its test in the same pull request.
+ */
+export interface SceneObject {
+  /** The map's id of the shape or the patch of ground; `ground` for the floor under them. */
+  readonly id: string;
+  readonly kind: "ground" | "box" | "ramp" | "region";
+  /** The distinct corner points as drawn, x, y, z, in metres, sorted by x, then y, then z. */
+  readonly points: readonly (readonly [number, number, number])[];
+  /** The material's colour as authored, 0xRRGGBB. */
+  readonly grey: number;
+}
+
 /** The two names a backend can have (ADR 0003 part 4). */
 export type BackendName = "WebGPU" | "WebGL 2 fallback";
 
@@ -55,6 +82,13 @@ export interface Picture {
    * gives the last drawn frame's numbers.
    */
   loop(frame: (timeMs: number) => void): void;
+  /**
+   * Draws the match's map in place of what was drawn before, which is freed; called once per match, after the
+   * Worker's `ready`. The picture keeps no reference to the content it is given.
+   */
+  setContent(content: PictureContent): void;
+  /** The drawn scene, read back from what is drawn (`SceneObject`); in a production build always `null`. */
+  inventory(): readonly SceneObject[] | null;
   draw(frame: PictureFrame): void;
   counters(): RenderCounters;
   /** The canvas's size in CSS pixels and the display's own pixel ratio; how far it follows that ratio is the picture's call. */

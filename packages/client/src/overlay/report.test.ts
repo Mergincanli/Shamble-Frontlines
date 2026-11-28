@@ -41,6 +41,11 @@ const DATA: ReportData = {
   pauses: 1,
   lastPause: { hiddenMs: 61_234, ticksWhileHidden: 0 },
   worker: null,
+  content: [
+    { path: "maps/test-scene.json", format: "shamble-map", version: 1 },
+    { path: "movement/soldier.json", format: "shamble-movement", version: 1 },
+  ],
+  scene: { map: "test-scene", boxes: 17, ramps: 6, regions: 6 },
 };
 
 test("the readout names the backend, the ticks, the errors, the last pause and the commit", () => {
@@ -49,6 +54,8 @@ test("the readout names the backend, the ticks, the errors, the last pause and t
     "ticks: 900 at 30 a second · blocks: 900 of 44 bytes",
     "frames: 60.0 a second · frame time 16.67 ms (p99 17.20 ms)",
     "messages: sent 899 · received 900 · refused 0",
+    "content: maps/test-scene.json shamble-map 1 · movement/soldier.json shamble-movement 1",
+    "scene: test-scene · 17 boxes · 6 ramps · 6 regions",
     "presses: 12 made · 12 echoed · 0 lost · 0 doubled",
     "errors: 0",
     "last pause: 61.2 s hidden · ticks while hidden: 0 (a match that ran on: about 1837)",
@@ -64,12 +71,12 @@ test("the readout names the backend, the ticks, the errors, the last pause and t
   expect(readoutLines({ ...fallback, webgpuOffered: true })[0]).toBe(
     "backend: WebGL 2 fallback, because WebGPU did not start (ANGLE (SwiftShader))",
   );
-  expect(webgpu[6]).toBe("last pause: none yet");
-  expect(readoutLines({ ...DATA, errors: 2, lastError: "boom" })[5]).toBe("errors: 2 (last: boom)");
+  expect(webgpu[8]).toBe("last pause: none yet");
+  expect(readoutLines({ ...DATA, errors: 2, lastError: "boom" })[7]).toBe("errors: 2 (last: boom)");
   // A press is not called lost while its echo may still be on its way; afterwards it is, and one that came back
   // unmade is doubled, each with its own number.
   const presses = (echoed: number, lost: number | null, doubled: number | null) =>
-    readoutLines({ ...DATA, presses: { made: 12, echoed, lost, doubled } })[4];
+    readoutLines({ ...DATA, presses: { made: 12, echoed, lost, doubled } })[6];
   expect(presses(11, null, null)).toBe("presses: 12 made · 11 echoed · (counting)");
   expect(presses(10, 2, 0)).toBe("presses: 12 made · 10 echoed · 2 lost · 0 doubled");
   expect(presses(12, 1, 1)).toBe("presses: 12 made · 12 echoed · 1 lost · 1 doubled");
@@ -119,6 +126,34 @@ test("the report is plain text with one named value per line", () => {
   const counting = formatReport({ ...DATA, presses: { made: 1, echoed: 0, lost: null, doubled: null } });
   expect(counting).toContain("presses.lost: (counting)");
   expect(counting).toContain("presses.doubled: (counting)");
+});
+
+test("the content and the scene: each file with its own format and version, the copy's states in words, the scene's counts", () => {
+  const lines = (data: Partial<ReportData>): string[] => readoutLines({ ...DATA, ...data }).slice(4, 6);
+  expect(lines({})).toEqual([
+    "content: maps/test-scene.json shamble-map 1 · movement/soldier.json shamble-movement 1",
+    "scene: test-scene · 17 boxes · 6 ramps · 6 regions",
+  ]);
+  // Each file's version is its own, never the other file's.
+  const mixed = lines({ content: [{ path: "maps/test-scene.json", format: "shamble-map", version: 1 }, { path: "movement/soldier.json", format: "shamble-movement", version: 2 }] });
+  expect(mixed[0]).toBe("content: maps/test-scene.json shamble-map 1 · movement/soldier.json shamble-movement 2");
+  expect(lines({ content: "holding", scene: null })).toEqual(["content: waiting for the loader", "scene: empty"]);
+  expect(lines({ content: "none", scene: null })).toEqual(["content: not read, the match stopped first", "scene: empty"]);
+  // The copy report holds the same, one named value per line.
+  const report = formatReport(DATA).split("\n");
+  for (const expected of [
+    "content.maps/test-scene.json: shamble-map 1",
+    "content.movement/soldier.json: shamble-movement 1",
+    "scene.map: test-scene",
+    "scene.boxes: 17",
+    "scene.ramps: 6",
+    "scene.regions: 6",
+  ]) {
+    expect(report, expected).toContain(expected);
+  }
+  const empty = formatReport({ ...DATA, content: "none", scene: null }).split("\n");
+  expect(empty).toContain("content: none");
+  expect(empty).toContain("scene: (empty)");
 });
 
 test("a value that rounds to zero prints as zero, never with a minus sign", () => {

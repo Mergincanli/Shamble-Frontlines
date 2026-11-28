@@ -2,6 +2,24 @@ import type { WorkerStats } from "@shamble/sim-worker";
 import type { RunHeader } from "../harness/run-header.ts";
 import type { PictureInfo, RenderCounters } from "../picture.ts";
 
+/** A content file as the readout names it (the page's `ContentFile`; its shape is stated here: nothing of the app shell is imported). */
+export interface ContentFileRow {
+  readonly path: string;
+  readonly format: string;
+  readonly version: number;
+}
+
+/** The page's content: its copy still held for the loader's answer, let go unread (the match ended first), or read. */
+export type ContentRows = "holding" | "none" | readonly ContentFileRow[];
+
+/** The drawn scene, counted once when the map was drawn: the map's id and its blocks and patches of ground. */
+export interface SceneRows {
+  readonly map: string;
+  readonly boxes: number;
+  readonly ramps: number;
+  readonly regions: number;
+}
+
 /** Everything the readout and the copy report show. It never holds the match seed or the state hash. */
 export interface ReportData {
   readonly header: RunHeader;
@@ -50,6 +68,16 @@ export interface ReportData {
   /** The last pause while the tab was hidden, as the report shows it (the shape is stated here: nothing of the app shell is imported). */
   readonly lastPause: { readonly hiddenMs: number; readonly ticksWhileHidden: number } | null;
   readonly worker: WorkerStats | null;
+  readonly content: ContentRows;
+  /** `null` while the empty floor is drawn. */
+  readonly scene: SceneRows | null;
+}
+
+/** The content in words, for the readout. */
+function contentWords(content: ContentRows): string {
+  if (content === "holding") return "waiting for the loader";
+  if (content === "none") return "not read, the match stopped first";
+  return content.map(({ path, format, version }) => `${path} ${format} ${version}`).join(" · ");
 }
 
 /**
@@ -89,6 +117,10 @@ export function readoutLines(data: ReportData): string[] {
     `ticks: ${data.tick} at ${data.tickHz} a second · blocks: ${data.blocks} of ${data.blockBytes} bytes`,
     `frames: ${fixed(data.fps, 1)} a second · frame time ${ms(data.frameP50)} (p99 ${ms(data.frameP99)})`,
     `messages: sent ${data.messages.sent} · received ${data.messages.received} · refused ${data.messages.refused}`,
+    `content: ${contentWords(data.content)}`,
+    data.scene === null
+      ? "scene: empty"
+      : `scene: ${data.scene.map} · ${data.scene.boxes} boxes · ${data.scene.ramps} ramps · ${data.scene.regions} regions`,
     `presses: ${data.presses.made} made · ${data.presses.echoed} echoed · ${lostWords(data.presses.lost, data.presses.doubled)}`,
     `errors: ${data.errors}${data.lastError === "" ? "" : ` (last: ${data.lastError})`}`,
     pause === null
@@ -147,6 +179,17 @@ export function formatReport(data: ReportData): string {
     ["pauses", data.pauses],
     ["lastPauseHiddenMs", data.lastPause === null ? "(none)" : fixed(data.lastPause.hiddenMs, 0)],
     ["lastPauseTicksWhileHidden", data.lastPause === null ? "(none)" : data.lastPause.ticksWhileHidden],
+    ...(typeof data.content === "string"
+      ? [["content", data.content] as [string, string]]
+      : data.content.map(({ path, format, version }): [string, string] => [`content.${path}`, `${format} ${version}`])),
+    ...(data.scene === null
+      ? [["scene", "(empty)"] as [string, string]]
+      : [
+          ["scene.map", data.scene.map] as [string, string],
+          ["scene.boxes", data.scene.boxes] as [string, number],
+          ["scene.ramps", data.scene.ramps] as [string, number],
+          ["scene.regions", data.scene.regions] as [string, number],
+        ]),
     ...(data.worker === null
       ? [["worker", "(no report yet)"] as [string, string]]
       : Object.entries(data.worker).map(([name, value]): [string, string | number | boolean] => [

@@ -5,9 +5,11 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { expect, type Page, test } from "@playwright/test";
-import { needsBuild, report, running } from "./report.ts";
+import { needsBuild, report, running, scene } from "./report.ts";
 
-const baseline = JSON.parse(readFileSync(new URL("./render-counts.json", import.meta.url), "utf8")) as Record<string, unknown>;
+const counts = JSON.parse(readFileSync(new URL("./render-counts.json", import.meta.url), "utf8")) as Record<string, Record<string, unknown>>;
+/** The empty floor's counts: what a refused bundle leaves on screen. */
+const baseline = counts["empty"] ?? {};
 /** The built page's bundle: the content tool's output, as the build wrote it beside index.html. */
 const built = (): string => readFileSync(path.join(needsBuild(), "content.json"), "utf8");
 
@@ -81,9 +83,11 @@ for (const [name, make, said] of hostile) {
     expect(await notice.locator("*").count()).toBe(0);
     expect(await page.locator("img").count()).toBe(0);
     expect(dialogs).toEqual([]);
-    // The page itself carries on with its empty scene; only the match stopped.
+    // The page itself carries on with its empty floor, drawn alone; only the match stopped, and nothing was read.
     const data = await report(page);
     expect(data.errors).toBe(1);
+    expect([data.content, data.scene]).toEqual(["none", null]);
+    expect((await scene(page)).map((object) => [object.id, object.kind])).toEqual([["ground", "ground"]]);
     if (baseline[data.picture.backend] !== null && baseline[data.picture.backend] !== undefined) {
       await expect.poll(async () => (await report(page)).counters).toEqual(baseline[data.picture.backend]);
     }
