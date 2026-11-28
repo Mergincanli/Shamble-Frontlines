@@ -4,7 +4,7 @@ unrendered; Sat 28 Nov for "today"; "no file the run server installs"; For Musta
 early, nbg1's cost and what it voids, the terms link re-read by me); STANDINS a decision; the take-in count corrected
 (seven merges of main since Mon 23 Nov: `git log --first-parent --merges --since=2026-11-23`). Checked 12:1x: both raw
 links fetched (200) and equal to `git show 6e623788:` (rs a8acc63c, lg ee40b9d0); PR #40's description read back (only
-the two entries and the dated line changed). Sent once CI on 53346e55 is green (B6's read is conditional on it).
+the two entries and the dated line changed). CI on 53346e55 green, all four at attempt 1 (to 12:18:47): X stands.
 
 ---
 **Stop B: R1's run plan is ready for your review (R1 stays Thursday 3 December).**

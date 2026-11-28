@@ -47,7 +47,8 @@ Your E1 read of X, by SHA only.
   class words, and SEC-A2-3's zero-line rewording of the dropped reading. Not part of your X verdict; name anything in
   X's bytes that would block it.
 - CI on S 53346e55 (read 12:2x): gate push 46142960712 success; gate pull request 46142964475 success; toolchain pull
-  request 46142964471 success (12:05:44-12:14:50); toolchain push 46142960716 <running at 12:2x; its line when it ends>.
+  request 46142964471 success (12:05:44-12:14:50); toolchain push 46142960716 success (12:05:44-12:18:47). All four green at attempt 1: X stands by your
+  12:08 condition.
 Rule: X stands, or what is owed. Write your blocks into
 /home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/advisor-stopb-plan.md under a new heading "## X head
 read" (your plan first, then each block as it is done); end with "Decisions needed" and "For Mustafa", then the last
