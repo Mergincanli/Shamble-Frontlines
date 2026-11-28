@@ -221,8 +221,21 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   `/home/user/Shamble-Frontlines/.gate/cs4b-2`. A session of another account works on its own branch from this
   branch's head and never pushes here (his Lanes rule). SEAT-OUT from him: stop at a whole point and report the last
   commit's id.
-- **State (15:49 Amsterdam, from the clock; the container restarted before 15:48, the first clock read after it; the
-  worktree re-entered by its own `cd`): F1 closed** (engine-architect's block 7, confirmed by rust-reviewer's block 14; B5 (c) confirmed);
+- **State (16:32 Amsterdam, from the clock): step 1's C1 is committed and green, C2 is being built.** C1
+  (71e0f857: the soldier table, the aim's type, the vector helpers; no state change: the players' file a624ff32...
+  unchanged, the recordings unchanged): the full local checks and the gate with smoke passed before its commit; its
+  plants R1 and R2 caught, RC1 held; CI green (gate and smoke run 46159411516, toolchain run 46159411530, 10 min 49 s);
+  442 written lines against 946fef73. Rulings since: the advisor agent's delta verdict (D1 to D3 with G1 to G12),
+  G1's two yeses, rust-reviewer's per-commit table (block 16), the VERSION-RULE ruling (the movement kind to
+  version 2), game-designer's thirteen rows (block 10). **C2 in the worktree, not committed:** the thirteen rows in
+  the table by script (`add-rows-c2.mjs`), the converter's two new row forms (sandbox rows, the `measured.` place)
+  with its tests (17 pass), movement.rs at version 2 with 28 fields and its tests, the loader and the bundle taking
+  the newest version only, the schema's thirteen descriptions, the generated type and schema written again,
+  `soldier.json` written by the converter (28 values: 16 from his Export, 12 from his sandbox), the page at version 2
+  with its tests (182 pass), the fuzz's movement versions; still to do: the proofs' committed digests, the frozen
+  bundle's re-freeze and the recordings (their `.hashes` byte-identical), the plants, the full local checks. A slip:
+  one vitest run was started with `cd ... &&` in front (the worktree's own `cd` put back at once). Earlier state
+  (15:49), kept: **F1 closed** (engine-architect's block 7, confirmed by rust-reviewer's block 14; B5 (c) confirmed);
   **game-designer's block 9:** the lowest-id spawn is a build default, not his (the early look's step 1 names
   `street_1` as a stand-in); **security-auditor's third answer:** REVISE on layering.rs's wording only, the batch's
   approval standing (a narrow test-only marking with its plants, in `step1-build-order.md` C3; its F5 and F6, Lows);
