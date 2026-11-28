@@ -36,7 +36,7 @@ by option. Then DONE.
 - N10 (frozen content): first-loop.content.json (8,375 B) holds maps/test-scene.json and movement/soldier.json at movement version 1 with 15 fields (content/src/movement.rs:13-35); the reader refuses unknown and missing keys and there is no default (4B-FIRST-DEFAULT). Any field the movement kind gains (NO-SOURCE (a) or (b)) makes the frozen first-loop content unloadable, so first-loop must be frozen anew (`make_recordings --freeze first-loop`) in the same commit.
 - N11 (manifests): room and client-endpoint depend on protocol and sim only (their Cargo.toml); sim on content and parry3d; sim-wasm on all five. 4B-WORLD-ROOM wants `content` kept out of room's and endpoint's manifests, so the bounds and the world reach them as sim types (`StaticWorld`), never as `MapDocument`. Their tests still need a world: either a dev-dependency on content (a manifest change, the dependency hold) or a world made through sim (which already depends on content). Engine-architect's call; step 2 needs it settled.
 - N12 (constructors to change): `Room::new(setup, content_hash)` (room/lib.rs:105; callers room/lib.rs:314, :655, room/tests/any_bytes.rs:117, local_match.rs:66); `Endpoint::new(content_hash, first_sequence, pad)` (endpoint.rs:117; callers endpoint.rs:400, :620, client-endpoint/tests/any_bytes.rs:131, local_match.rs:67); `LocalMatch::new(.., world)` (local_match.rs:58; callers sim-wasm lib.rs:122, local_match.rs:213, :399, :413, sim-wasm/tests/step_alloc.rs:86); `LocalMatch::static_world()` read at sim-wasm lib.rs:406.
-- N13 (initial aim): an endpoint that starts its aim at (0, 0, 0) cm would be refused by the room on a map whose bounds exclude the origin (the loader allows any bounds inside the reach, map.rs:316-335): the first aim must be clamped into the bounds. A planted unclamped start on such a map turns refused_aim above 0.
+- N13 (initial aim; SUPERSEDED by block 8.3: the endpoint sends `AimCm::NONE` before its first ray and holds no aim): an endpoint that starts its aim at (0, 0, 0) cm would be refused by the room on a map whose bounds exclude the origin (the loader allows any bounds inside the reach, map.rs:316-335): the first aim must be clamped into the bounds. A planted unclamped start on such a map turns refused_aim above 0.
 - N14 (CI browsers): Firefox already runs `tests/replay/**` (playwright.config.ts:38-40, his FIREFOX-REPLAY), so every new `.rec` is replayed natively, in Node, in Chrome and in Firefox by today's specs, which iterate the folder (determinism.spec.ts:69; replay.test.mjs:19): his FEATURE-COMPARE condition (DECISIONS.md:536, "native, Chrome and Firefox are compared on the real thing") needs no new spec, only a recording whose steps query the world. A paced replay that draws the page cannot run in CI's Firefox (FF-DRAW): Chromium only.
 - N15 (CI time): the Chromium run uses 3.6 to 3.9 of its 5 minutes (4B-CHROMIUM-TIME); a paced replay is real time (lane-walk 1,200 ticks = 40 s a run; four runs = 160 s). It cannot fit before the CI Builder's split or new limit; a 300-tick slice four times is about 40 s and still near the limit.
 - N16 (CI cargo): CI runs `cargo test --workspace` twice in debug and `cargo test --release` on six crates (toolchain.yml:158-162): a 2,000,000-command run belongs in the release line, with a short debug count.
@@ -61,7 +61,7 @@ and an aim outside the map; one jump per command (3B-ONE-PER-TICK).
   `raycaster.far=400`, shamble-game.js:1120: a code number of the old game, like its 2 cm facing rule, not a value of
   his Export); `pub fn aim_point(world: &StaticWorld, origin: V3, direction: V3, last: AimCm) -> (AimCm, AimFrom)` with
   `enum AimFrom { Hit, Ground, Kept }`: the first hit within 400 m (`cast_ray`), else the crossing of the ground plane
-  y = 0 ahead of the origin, else `last`; then rounded to whole centimetres (`round`, on part 7's list) and clamped
+  y = 0 ahead of the origin [SUPERSEDED by block 8.2: the floor, `bounds_m`'s lower y], else `last`; then rounded to whole centimetres (`round`, on part 7's list) and clamped
   into the bounds in whole centimetres (integer compares). It lives in `sim`, not in the endpoint, so the rule scan
   (which reads only `sim` and `content`, N8) holds its float arithmetic: it decides a value that is replayed and,
   once the soldier faces it, hashed. Corrects my design 3.7 (fire-height plane, 500 m) to the old game's rule (N6).
@@ -96,9 +96,10 @@ and an aim outside the map; one jump per command (3B-ONE-PER-TICK).
   (0, +-127), (+-89, +-89)) stay as they are. (My design had it; 3b did not build it: post.rs holds none.)
 - CHANGE `endpoint.rs:81-88`: `Sent` gains `aim: AimCm`, the aim cast when the command was built, so every repeat
   carries the aim it first carried. CHANGE `:90-110`: `Endpoint` gains `world: StaticWorld` (its own copy) and
-  `aim: AimCm` (the last aim; at the start (0, 0, 0) clamped into the bounds, N13). CHANGE `:117` `new(content_hash,
+  `aim: AimCm` (the last aim; at the start (0, 0, 0) clamped into the bounds, N13) [SUPERSEDED by block 8.3: no aim
+  held; NONE when a post brings no new aim]. CHANGE `:117` `new(content_hash,
   first_sequence, pad_bytes, world: StaticWorld)`. CHANGE `:226-263` `build_input`: the newest command's aim is
-  `aim_point(&self.world, ray, self.aim)` when the post has a ray, else `self.aim`; the command takes `move_x/move_y`
+  `aim_point(&self.world, ray, self.aim)` when the post has a ray, else `self.aim` [SUPERSEDED by block 8.3: else `AimCm::NONE`]; the command takes `move_x/move_y`
   from the post and `aim` from its `Sent`; `view_time` stays `{view_tick, 0}` (change-set 8, the plan's choice 2).
   CHANGE `:56-79` `Readout` gains `aims_kept` (commands whose aim was kept: no usable ray, or none that met the world
   or the ground) [SUPERSEDED by block 7.4: `rays_refused` and `rays_missed`; an all-zero post counts in neither]: read by tests; whether the block shows it is engine-architect's layout.
@@ -151,7 +152,7 @@ and an aim outside the map; one jump per command (3B-ONE-PER-TICK).
 | T2-2 | `post.rs` | `from_numbers` takes any numbers; a NaN, an infinity in any one of the six ray numbers gives no ray [SUPERSEDED by block 7.4: a refused ray, counted]; spare move and held bits ignored (30) | the finite check on five of the six numbers |
 | T2-3 | `sim/src/aim.rs` | a ray onto the step's top gives its point in cm; one that misses gives the ground crossing; one to the sky, one parallel to the ground, keep the last; a hit at 401 m is no hit; a point beyond the bounds is clamped to the bound's cm; the rounding of a half centimetre pinned (70) | the fallback plane at fire height (my old design); the reach 500 m; no clamp |
 | T2-4 | `collision.rs` | `bounds_cm` exact at the reach's edges (+-32,767; 0 to 65,535); `holds_cm` on each face true, 1 cm past false; bounds off the grid refused by name (30) [SUPERSEDED by block 7.3's tie test] | the bounds narrowed through `f32` before the cm (an off-by-one at a face) |
-| T2-5 | `endpoint.rs` | PM-0002-14's native half: each command's aim is the cast of the post handed in for that tick (posts alternate rays onto two shapes); repeats carry their own first aim; the first aim lies inside bounds that exclude the origin; a post without a usable ray keeps the aim and counts `aims_kept` [SUPERSEDED by block 7.4's Z1 and Z2]; a (-128, -128) post sends a move the room takes (90) | the previous post's ray cast; repeats cast again from the newest post; the first aim (0, 0, 0) unclamped |
+| T2-5 | `endpoint.rs` | PM-0002-14's native half: each command's aim is the cast of the post handed in for that tick (posts alternate rays onto two shapes); repeats carry their own first aim; the first aim lies inside bounds that exclude the origin [SUPERSEDED by block 8.3's N-3: before any ray every command carries NONE]; a post without a usable ray keeps the aim and counts `aims_kept` [SUPERSEDED by block 7.4's Z1 and Z2]; a (-128, -128) post sends a move the room takes (90) | the previous post's ray cast; repeats cast again from the newest post; the first aim (0, 0, 0) unclamped |
 | T2-6 | `room/lib.rs` | moves (127, 0), (0, -127), (89, 89), (-89, -89) taken; (90, 90), (-128, 0), (127, 127) refused and counted; an aim on each of the six faces taken, 1 cm past each refused; a refused command never runs, and its sequence counts as missing when the next one runs (70) | `<` for `<=`; the aim held to the `i16` range instead of the bounds; `refused_aim` left out of `refused()` |
 | T2-7 | `room/tests/any_bytes.rs:139-143` | the generator's move and aim over their full ranges (the aim is `{1, 2, 3}` today); its identities still hold (15) | as T2-6's third plant: the identity breaks |
 | T2-8 | `client-endpoint/tests/any_bytes.rs` | random posts with hostile rays (NaN, infinities, beyond 2^20, zero direction): no panic, every aim sent inside the bounds (25) | the clamp skipped on the ground fallback |
@@ -339,7 +340,8 @@ bin/make_recordings.rs:4-6), so a value he tunes later never moves an old record
   soldier stands at the local match's spawn, jumps (Space held at steps 600 to 699: a jump at each landing; taps at
   uneven gaps, two in one tick and bursts of six: one jump per command on a recording, 3B-ONE-PER-TICK), and holds
   Shift with no move (the stamina rule); no wall is met. Its aim: the zero ray has no direction, so the endpoint keeps
-  its first aim [SUPERSEDED by block 7.4: the zero ray is no ray, not cast and not counted; the same aim] (step 2's clamped start) and the soldier turns toward it once. **Its hashes move from tick 1 in the
+  its first aim [SUPERSEDED by block 7.4: the zero ray is no ray, not cast and not counted; the same aim] (step 2's clamped start) and the soldier turns toward it once [SUPERSEDED by block 8.3: every command carries NONE,
+  and the soldier keeps his spawn facing]. **Its hashes move from tick 1 in the
   commit of step 1** (the soldier table enters the state), and in step 2's commit already if the record takes the
   move and aim (N24, choice ii): the recordings test (`tests/recordings.rs:29`) fails on any change of the state's
   bytes otherwise (rust-reviewer's F12 says the same). **Its frozen content is frozen anew** in the commit where the
@@ -647,7 +649,8 @@ move and the aim are the soldier's, kept in its row.
   the facing turns toward the held aim from his new position. A command-less tick is the tick of a command repeated
   with no new press. Nothing outside the world repeats a command: the room keeps passing `&[]` (B7-N1).
 - **At spawn** the held move is (0, 0) and the held aim is whatever FACING-SPAWN picks (item 10 (5), open), written
-  into the same field. The first command overwrites both.
+  into the same field [SUPERSEDED by block 8.3: the held aim is `AimCm::NONE`, and the facing keeps FACING-SPAWN's
+  facing while it is]. The first command overwrites both.
 - Failure mode, said so it is not decided silently: a client whose commands stop walks on at the held move until the
   next command or the room's end of the connection, as a held button does today. A starvation limit that stops him is
   a rule for change-set 7 or for the connection's timeout, not made here.
@@ -691,12 +694,14 @@ move and the aim are the soldier's, kept in its row.
 - Count: the reader 35, the world test 35, the room pin 30 (tests, all step 1's); the held move in the row 10 (code).
 
 **First-loop's hashes in step 2: NO, they do not move**, on four conditions, each written down:
-1. Step 1's room already hands each command's move and aim to the soldier from its first command (the
+1. [Reworded by block 8.3: step 1 already brings NONE, the room's fold, the facing's keep and the endpoint's one
+   line.] Step 1's room already hands each command's move and aim to the soldier from its first command (the
    `PlayerCommand` fields land with whichever of steps 1 and 2 is built first: rust-reviewer's 1.6 has step 1, my block
    1.1 step 2, block 6 row 2g either). If step 1's soldier kept a spawn aim until step 2, step 2 would move the hashes
    and would re-make first-loop in its own commit.
 2. The all-zero ray is no ray and keeps the aim (answer 3).
-3. The test scene's bounds hold the origin, so the clamped start aim is (0, 0, 0) cm, the same aim today's endpoint
+3. [No longer needed after block 8.3: no aim is clamped from the origin.] The test scene's bounds hold the origin,
+   so the clamped start aim is (0, 0, 0) cm, the same aim today's endpoint
    writes (B7-N6); and first-loop's move word is 0, which `clamp_move` leaves (0, 0).
 4. The proof: `crates/devtools/tests/recordings.rs` green in step 2's commit with no recording file re-made: `:24`
    (every committed file is what its script makes, the hashes included; `make_recordings --check` the same) and `:29`
@@ -734,7 +739,7 @@ stands). First-loop moves in step 1's commit, which re-makes it anyway (F12).
 - **Where the aim reads them:** only through `StaticWorld::clamp_cm(AimCm) -> AimCm` and `holds_cm(AimCm) -> bool`, on
   the aim's box. Their callers: (1) `sim::aim::aim_point`: the hit, the ground crossing and the kept aim all leave
   through `clamp_cm` (after `round` to whole centimetres and the saturating `as i32`, integer compares only);
-  (2) `Endpoint::new`: the first aim is `clamp_cm` of (0, 0, 0) (N13); (3) the room's per-command check (`holds_cm`,
+  (2) `Endpoint::new`: the first aim is `clamp_cm` of (0, 0, 0) (N13) [WITHDRAWN by block 8.3: no first aim]; (3) the room's per-command check (`holds_cm`,
   counted as `refused_aim`, block 1.1). **`clamp_move` reads no bounds**: it holds the move's length to 127, integers
   only (block 1.1, post.rs). The movement reads `bounds_m` only. The room and the endpoint never hold bounds of their
   own: they get the world as a `sim` type (4B-WORLD-ROOM, N11).
@@ -756,10 +761,11 @@ stands). First-loop moves in step 1's commit, which re-makes it anyway (F12).
   numbers equals 0.0 **by value** (`== 0.0`: a minus zero counts as zero; a NaN never equals 0.0, so a NaN among five
   zeros is not all-zero) gives `PostRay::None`; else **any number not finite** gives `PostRay::Refused`; else
   `PostRay::Ray(Ray)`. So block 1.1's `ray: Option<Ray>` (:86-91) becomes `ray: PostRay`, three ways.
-- **What the endpoint does:** `None`: the aim is kept (the last aim it sent; on the first post the clamped start),
+- **What the endpoint does** [the aim it sends SUPERSEDED by block 8.3: NONE for `None`, `Refused` and the missed
+  case; the counts stand]: `None`: the aim is kept (the last aim it sent; on the first post the clamped start),
   nothing counted. `Refused`: the aim is kept, `rays_refused` rises by 1. `Ray`: cast through `aim_point`; a hit or a
   ground crossing is the new aim; a finite ray that meets neither (the sky, parallel to the ground, a zero direction
-  with a non-zero origin) keeps the aim and `rays_missed` rises by 1. The endpoint's last aim is the client's
+  with a non-zero origin) keeps the aim and `rays_missed` rises by 1. [SUPERSEDED by block 8.3: the endpoint holds no aim.] The endpoint's last aim is the client's
   input-side state, not the simulation's: every replay rebuilds it from the recorded posts from step 0, and what a
   later tick reads of it is the soldier's held aim (7.2), which is hashed.
 - **Where the count lives:** `client_endpoint::Readout` (endpoint.rs:56-79) gains `rays_refused: u32` and
@@ -774,7 +780,8 @@ stands). First-loop moves in step 1's commit, which re-makes it anyway (F12).
 - **Why it matters under SIZE-4C (c):** the first part posts six zeros every frame until the page makes its ray
   (step 4, in the later part); under this rule each is no ray, so the soldier keeps the clamped start aim and both
   counts stay 0 (no false refusals in the readout). First-loop's recorded rays (all-zero bits, N9) are the same case.
-- **Test Z1, the all-zero ray** (endpoint.rs tests, about 25 lines), on a map whose bounds exclude the origin (x 10 to
+- **Test Z1, the all-zero ray** [its aim assertions SUPERSEDED by block 8.3's N-3; its counts and plants P1 and P3
+  stand] (endpoint.rs tests, about 25 lines), on a map whose bounds exclude the origin (x 10 to
   40): post 1 all-zero: the command's aim is the clamped start, not (0, 0, 0); post 2 a ray onto a box top: the aim is
   that top's point; posts 3 to 22 all-zero, six of them with a minus zero in each of the six places in turn: every
   command carries the **box top** (the last aim, not the start), and `rays_refused` and `rays_missed` stay 0. A cast of
@@ -794,7 +801,8 @@ stands). First-loop moves in step 1's commit, which re-makes it anyway (F12).
   T2-5's ray cases (about 20) are no longer counted there: about +35.
 
 ### 7.5 What block 7 supersedes, and the count
-Each older line also carries a "SUPERSEDED by block 7" mark in place; line numbers are as they stand after those marks.
+Each older line also carries a "SUPERSEDED by block 7" mark in place (grep it). The line numbers below are as they
+stood after block 7's marks; block 8's marks have since moved some of them down by one to three lines.
 | Older line | Was | Now |
 |---|---|---|
 | N24 (:50), block 1.1 (:76-79) | (i): "the soldier consumes move and aim" | 7.2: the soldier's row holds them (`held_move` 2 bytes, `aim_cm` 6, as rust-reviewer's B6-R); a command-less tick keeps both |
@@ -836,6 +844,101 @@ Asked 2026-11-28 on head 3ab59bd7 by the main session. Read only; this block is 
 - B8-N5 (the fold): with several commands in one tick, "the newest's aim" would drop a real aim that sits in an older command of the same tick (a lost datagram's repeat, run late) whenever the newest carries "no aim". The tick's commands must be folded oldest first: each real aim sets the held aim, and "no aim" leaves it as it is.
 - B8-N6 (OwnSoldier's list): my 2.1 gives OwnSoldier every field of the soldier's movement state "as step 1 makes it", the facing included. Block 7's `held_move` and `aim_cm` are row fields too, so they join it (8 bytes) whatever FACING-SPAWN gives. Under (a) the facing is the row's `[f32; 2]` from the first tick (its 5.3), already carried and already checked for finiteness by my S1.
 - B8-N7 (what the recordings cover): the test scene's eight spawns all face 90 (its N34), and the local match has one slot. So under (a) with whole quarter turns taken out first (its RR3), the recordings run only the quarter-turn path; `sincos`'s general path runs in no recording. Its identity across targets rests on PM-0004-22's vectors (its 5.3: at least 10,000 inputs, natively, in Node and in each browser engine).
+
+### 8.2 NA1, the ground crossing at the floor: YES
+- `aim_point`'s fallback crosses **the floor, `bounds_m`'s lower y** (block 7.3's one home, the ground of the GROUND
+  rule), not the plane y = 0. The rule: t = (floor - origin.y) / direction.y, taken only when direction.y < 0 and the
+  origin lies above the floor (t > 0), as before; then x and z are rounded to whole centimetres, and **the aim's y is
+  `bounds_cm`'s lower y itself** (the same face in whole centimetres), never a rounding of the f32 crossing, so the
+  ground aim sits on the floor to the bit; then `clamp_cm`. The first hit within 400 m still comes first: every shape
+  lies inside the bounds, so on a ray that goes down a hit always comes before the floor. The floor has no 400 m
+  limit, as the old game's plane had none (`intersectPlane`, N6).
+- It is the same rule as before on every map that exists (all start at y 0, B8-N1), so no recording and no hash moves.
+  The page draws the same face (step S, `bounds.min[1]`), so the cursor's floor point and the aim agree.
+- **T3** (sim/aim.rs tests, about 12 lines, part of T2-3): on a loaded map whose bounds start at y 2 (the loader takes
+  any whole centimetre from 0 up, map.rs:325), with no shape on the ray's path, a ray from (0, 22, -20) with direction
+  (0, -1, 1) ends at exactly (0, 200, 0) cm; the same ray from (0, 20, -20) on the test scene (floor 0) ends at
+  (0, 0, 0), unchanged from the old rule; a ray from below the floor keeps no point (`rays_missed`). **Plant:** the
+  plane at y 0. The raised map's ray then crosses 2 m farther, at z 2, and the clamp lifts only its y: (0, 200, 200),
+  red.
+- Whether `cast_ray` itself stops on the floor (4d's shots) is rust-reviewer's RR5, not this.
+
+### 8.3 NA2, the held aim at spawn and the endpoint's first aim: NO to both; "no aim yet" is a value of its own
+- **Not the spawn point** (B8-N2): it turns him to face his own spawn point once he walks 2 cm off it. **Not the
+  origin** (B8-N3): it turns every new soldier toward the map's origin on his first command, under every FACING-SPAWN
+  option. Both put a point where no aim was made.
+- **The rule: `AimCm::NONE` = (-32,768, 0, 0), "no aim yet"**, the one wire value no map can hold (B8-N4):
+  1. **The row** holds `aim_cm = NONE` from the spawn (block 7.2's 6 bytes, unchanged). **The facing keeps its spawn
+     facing while the held aim is NONE**, and turns toward a real held aim beyond 2 cm as before. One compare in
+     rust-reviewer's facing rule; FACING-SPAWN gives the facing, and NONE leaves it alone.
+  2. **The wire:** no bit and no byte changes. Protocol gains `AimPoint::NONE` and one sentence in the aim's doc
+     (messages.rs:132-134): x -32,768 with y 0 and z 0 means "no aim in this command". The codec is unchanged. The
+     room's per-command check takes NONE as "no aim" without asking the bounds; any other aim with x -32,768 lies
+     outside every map's bounds and is refused and counted as `refused_aim`. So "no aim" has one form.
+  3. **The endpoint** sends NONE for every post that brings no new aim: before its first ray, for an all-zero ray, for
+     a refused one, and for a finite ray that met nothing (block 7.4's `None`, `Refused` and the missed case; the counts
+     are as 7.4 has them). It holds **no aim of its own**: no first aim, no last aim. `Endpoint::new` takes no aim, so
+     my N13 and block 7.3 (2) go. A repeat still carries the aim its command first carried.
+  4. **The room's fold** (B8-N5): a tick's commands are applied oldest first. Each real aim sets the row's held aim;
+     NONE leaves it. A tick with no command keeps it (block 7.2).
+- Anti-cheat: a client can send NONE at any time. That only keeps its soldier's last aim, which an idle client gets
+  anyway: no new power.
+- **What it does to block 7.2's first-loop answer (still NO, the hashes do not move in step 2):** condition 1 now
+  reads "step 1 already brings NONE": `AimPoint::NONE`, the room's fold and its NONE case, the facing's keep, and
+  today's endpoint writing NONE where it writes (0, 0, 0) (endpoint.rs:258, one line). So first-loop is re-made in
+  step 1 with the soldier keeping his spawn facing, and step 2's endpoint (zero rays, so NONE) sends the same bytes.
+  Condition 3 (the test scene's bounds hold the origin) is no longer needed; conditions 2 and 4 stand.
+- **Tests, each with its plant:**
+  - N-1 (room tests, about 25 lines): on a map whose bounds exclude the origin, commands carrying NONE are never
+    refused; (-32,768, 1, 0) and (-32,768, 0, 5) are refused and counted. One tick with [aim A, NONE] leaves the row on
+    A; [NONE] alone leaves the earlier aim. Plants, each red: the newest command's aim taken alone ([A, NONE] loses A);
+    NONE sent through `holds_cm` (refused on every map); any x of -32,768 read as NONE (the two malformed aims taken).
+  - N-2 (sim tests, about 15 lines): a soldier spawned facing +x walks 30 ticks with move (0, 127) and no aim and still
+    faces +x; one command with a real aim then turns him toward it. Block 7.2's restore test runs with NONE in the row.
+    Plant: NONE read as the point (-327.68, 0, 0) (he turns toward -x on the first tick).
+  - N-3 (endpoint tests; block 7.4's Z1 rewritten): before any ray, every command carries NONE, and the room counts no
+    `refused_aim` on the map that excludes the origin. A ray onto a box top gives that point. The 20 all-zero posts
+    after it carry NONE, not the box top, and the room's row stays on the box top. Plant: the old first aim (the
+    origin clamped into the bounds): red at the first command.
+  - devtools/tests/aim_reach.rs gains one line: `AimPoint::NONE.x` is -(`AIM_REACH_CM` + 1), so no reach can hold it.
+    Plant: NONE at -32,767, which then fits the reach.
+
+### 8.4 NA3, FACING-SPAWN (a): YES, no change to OwnSoldier or the recordings because of it; (c) has no reason
+- **OwnSoldier (2.1):** under (a) the facing is the row's `[f32; 2]` from the first tick, carried as two `u32` bit
+  patterns. The decoder's finite check (S1) covers it as it covers the other floats. (a) changes nothing here. Its list
+  grows anyway by block 7's `held_move` and `aim_cm` (8 bytes, B8-N6, `MAX_SNAPSHOT_BYTES` with it), and NONE travels
+  in `aim_cm` as six plain bytes.
+- **The recordings:** nothing to change. The facing's bits are in the hashed state from tick 1, so any difference in
+  `sincos` across targets shows at tick 1 in the per-tick hashes and in the field diff (PM-0004-21). first-loop is
+  re-made in step 1 anyway; `walk` and `lane-walk` are made after the movement's fields are final. **What they do not
+  cover** (B8-N7): every spawn of the test scene faces 90, so only the quarter-turn path runs in a recording; the
+  general path's identity rests on PM-0004-22's vectors. That is enough for 4c. A recording on a non-quarter facing
+  would need a spawn added to the test scene, which is content: not proposed.
+- **(c): no reason to prefer it.** It puts a tag into the state, onto the wire (a tag byte, plus a codec refusal of an
+  unknown tag), into the block, into `Lines` and into change-set 7's reset. With NA2's rule a soldier who never aims (a
+  bot's slot, an idle player) would keep the degrees form for as long as he lives, so the two forms are permanent
+  rather than brief. And (c) only moves the sine and cosine into the step later (its 5.4). (a), as engine-architect
+  recommends.
+
+### 8.5 What block 8 supersedes, and the count
+Every older line it changes carries a "by block 8" mark in place (grep "by block 8"), so this list goes by name:
+- N13; block 1.1's ground plane y = 0 (in `aim_point`), the endpoint's `aim` field and its `else self.aim`; T2-5's
+  first aim; block 3.1's first-loop aim. Now: the floor (8.2), and NONE where no aim was made (8.3).
+- Block 7.2's spawn aim and its conditions 1 and 3; 7.3's reader (2); 7.4's "what the endpoint does" (the aim sent),
+  its sentence on the endpoint's last aim, and Z1's aim assertions. Block 7.2's NO on first-loop's hashes stands, with
+  condition 1 reworded.
+- For engine-architect (its layout, flagged, not decided): the owner section shows "the aim the endpoint sent", and
+  the row's pitch comes from the aim. Both must say what NONE shows: no aim point drawn, and a pitch of 0 while the aim
+  is NONE.
+- **Count:** NA1 adds about 2 code and T3's 12 tests (inside T2-3). NA2 adds about 15 code (`AimPoint::NONE` and its
+  doc 5, the room's fold and NONE case 10, the facing's keep 3, the endpoint's one line) and removes about 8 (the
+  endpoint's first and last aim, the first-aim clamp), so a net +10 or so. Its tests: N-1 25, N-2 15, the reach line 3,
+  N-3 in place of Z1's aim half: about +45. NA3: 0. Step 2 (the endpoint's -8, NA1's +2 / +12) goes from block 7.5's
+  340 / 675 to about **335 / 690**; step 1 (the NONE pieces, which land there: +15 / +43) from 10 / 100 to about
+  **25 / 145**, counted there once.
+
+DONE (block 8)
+
 ## For the sheet: overlaps and readings not yet listed (flagged, not resolved)
 1. The post's shape: 13 numbers with the move packed in one word (the plan, the recording's format) against
    engine-architect's design 3.6 (14: `move_x, move_z` as two numbers). I recommend 13 (block 1.1).
@@ -864,7 +967,7 @@ Asked 2026-11-28 on head 3ab59bd7 by the main session. Read only; this block is 
 
 ## Counts, one line per block (bottom-up, unmultiplied; plus or minus 30 %)
 - Block 1, step 2: 315 code / 630 tests = 945 (plan 385 / 530 = 915). [SUPERSEDED by block 7.5: about 340 / 675 =
-  1,015; step 1 gains about 10 / 100.]
+  1,015; step 1 gains about 10 / 100. Then by block 8.5: about 335 / 690 = 1,025; step 1 about 25 / 145.]
 - Block 2, step 3: mine 215 / 325 = 540; with engine-architect's layout about 320 / 340 (plan 320 / 340).
 - Block 3, step 6: mine 245 / 170 = 415 (plan 320 / 230 = 550, the rest being the other designs' marks).
 - Block 4, step 6b: 130 / 115 = 245 (plan 130 / 110); step 6c: 45 / 220 = 265 (plan 30 / 180).

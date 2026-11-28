@@ -227,6 +227,19 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
     game-designer). Follow-ups running from about 02:33 Amsterdam: rust-reviewer's block 7 (RR1 to RR5, FACING-SPAWN
     from the maths side, the CEILING correction), netcode-architect's block 8 (NA1 to NA3, G-2), game-designer's new
     block (the unjumped fall; the head bump from its notes).
+    rust-reviewer's block 7 DONE (scratch `rr-trig-*`; libm 0.2.16 built offline from the cargo cache under
+    `.gate/rr7/`, after the batch's APPROVE): **RR1 confirmed, Medium**: the scan refuses std's spellings only
+    (rules_scan.rs:52-62, :386), so `libm::expm1(`, `libm::sincos(`, `libm::sincosf(` and `libm::expf(` pass today, and
+    a grouped import with a bare call passes even std's names; security-auditor's planned bite "libm::expm1 still
+    refused" would be red, so its item 3 is corrected at its next answer; the fix (libm treated as the collision
+    library: one file, never imported, full-path calls only, one allowance per function and routine) lands in the
+    commit where exp first joins, about 25 / 40. RR2: `libm::sincos` in f64 then narrowed (0 of 90,000 off;
+    `sincosf` off on 49,125 by up to 19,437 ulp); K's bits pinned. RR3: quarter turns exact; the -0.0 trap (write
+    `0.0 - v`, add `+ 0.0`). RR4: four libm names in a wasm32 build (`libm::math::sincos`, `rem_pio2`,
+    `rem_pio2_large`, `exp`). RR5: the floor a plane beside the tree; `cast_ray` stays shape-only. FACING-SPAWN (a): yes
+    from the maths side; the batch's root comment changes, so security-auditor answers once more. CEILING: block 6
+    corrected, it is MOVE-RULES row 8's head bump (F18); open in the notes: the speed after the bump, the position fix,
+    the shape tested, the headroom formula (F19).
 - **The sheet's revision 3** (from 02:14 Amsterdam): the record rule applied with its confirmations outstanding, the
   recount F2 with each option's stop line, section G for steps 1 to 7 with his checklist as a draft, section H's table
   of item 10's thirteen points.
