@@ -363,8 +363,9 @@ pull requests (his SIZE-4C (b)), by lane 1 (the chat he calls Builder V6). Step 
 plain grey blocks, a higher top never darker, the street and grass in greys of their own (his STREET-GREY (b)), under
 an overview camera that frames the whole map (in a window of no width it leaves the camera as it was, where its
 first build froze the page); the readout's content and scene rows.
-Two review rounds; planted defects 45 of 45 caught, 3 controls held. Next: his Brave check (Sunday 29 November), and
-4c-2, the soldier, on the same branch (STATUS).
+Two review rounds; planted defects 45 of 45 caught, 3 controls held; the verifier PASS; report
+`docs/reports/2026-11-28-cs4c1-scene.md`. Next: his Brave check (Sunday 29 November), and 4c-2, the soldier, on the
+same branch (STATUS).
 
 **Change-set 4b-2 of the build plan, The world [2026-11-26 to 11-27, reviewed]** — cs4b-content, the second of 4b's
 two pull requests (his SIZE-4B (b)), by lane 1 (Builder V4, then the chat he calls Builder V6), steps 6 to 11: the
