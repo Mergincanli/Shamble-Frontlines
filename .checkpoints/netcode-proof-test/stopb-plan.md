@@ -161,7 +161,7 @@ going; free disk; usage read.
   URL. Bars [T]: `git diff --name-only Y0 Y -- spikes/netcode-proof` is the list's file alone, `--numstat` `7 0`;
   build 2's list equals Y's committed non-comment lines byte for byte; `git diff --name-only Y X --
   spikes/netcode-proof` is exactly rs.yaml, lg.yaml and R1.md, `--numstat` `1 1` for each cloud-init file and, for
-  R1.md, net 0 with its hunk inside :92-93 (`2 2`: the URL cannot join :92 under the wrap) [R2], hunks printed. A difference
+  R1.md, net 0 with its hunk inside :93-94 (`2 2`: the URL cannot join :93 under the wrap; :92-93 until Y0's note at :89, re-printed 06:3x UTC on 11-28) [R2], hunks printed. A difference
   goes to B6 before X with both lists. Y and X each pushed with CI green.
 - **C2, the tools** (read before the check, all matching rs.yaml's pins): rustup 1.29.3, rustc 1.99.1 (the spike's
   rust-toolchain.toml), wasm-bindgen 0.2.130 (build.mjs refuses otherwise), node v22.23.4, npm 10.9.9. Re-printed in
@@ -186,7 +186,7 @@ going; free disk; usage read.
 ## D. The fill: X
 - **D1, the pins** [C2]: named and fixed in Y0 (r1sh.test.mjs:448-449; browser.test.mjs:205-208); no test pins R1.md's
   URL placeholder (B6's grep).
-- **D2, X's content:** Y in rs.yaml:69 and lg.yaml:52, in place; R1.md:92-93's URL:
+- **D2, X's content:** Y in rs.yaml:69 and lg.yaml:52, in place (both re-printed 06:3x UTC on 11-28: the 40 zeros); R1.md:93-94's URL (:92-93 until Y0's note at :89):
   https://letsencrypt.org/documents/LE-SA-v1.8-July-06-2026.pdf (the production directory's meta.termsOfService,
   read 2026-11-27T22:07:10Z; the directory's address from the pinned instant-acme 0.8.5, types.rs:772,
   Cargo.lock:688-691). Bars: C1's; `git show X:` of rs.yaml and lg.yaml each hold Y (a printing grep); the counted run
