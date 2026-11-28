@@ -110,3 +110,20 @@ Item 3, corrected:
   Reached path (direct and rem_pio2 medium) has no arch override and no fma (cfg grep of the six files).
 
 DONE
+
+## Third answer (2026-11-28): F2's layering.rs reworded to read non-test tokens only
+
+### Plan
+1. Digests of the five files at the branch head (cs/4c-soldier) against dependency-check.md:30-34 and deps-4c-v2.sha256.
+2. Read engine-architect-read.md block 7 (item 5 point 15, T-G), rust-reviewer-read.md block 14.
+3. Read rules_scan.rs's test-only marking (~:695-718) and room's lib.rs tests (~:304-669): what counts as "test".
+4. Holes a test-only marking could let through; the plants each needs.
+5. Anything in blocks 7/14 that changes the batch commit's content. Answer, DONE.
+
+### Notes
+- [x] 1 digests at head bfae40ba. The five manifests in the worktree are the batch's BASE (unapplied): their own sha256
+  (root a854d5e3..., lock 56bd2d52..., sim 1b19f15a..., room 83aeccc1..., client-endpoint ccf21ea7...) are not the
+  approved digests, as expected; the approved digests are the patched results. `git diff --stat a4e93679 bfae40ba` on
+  the five: empty (base unchanged since approval); worktree status: only this notes file modified. Patch digest
+  0edaf8f3... unchanged. Head copies (scratchpad v3/) + `patch -p1` of deps-4c-v2.diff rebuild exactly the five
+  approved digests (fc436ec3, b7c6ee5d, c7432b03, 79b829a9, 22e2c5bf), 5 files, no sixth. `git apply --check` at head OK.

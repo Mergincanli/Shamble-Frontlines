@@ -378,3 +378,16 @@ DONE (block 8, with corrections)
 3. The old game starts the player at the map's single spawn field and respawns him within 4 m of it at random (shamble-game.js:521, :642, :1827, :1843): no MOVE-RULES row or answer carries it over.
 
 DONE
+
+### Corrections after the advisor tool's check (block 9)
+- N35 widened (searched for spawn / spawns / spawning / barracks / terminal / "starts at"): docs/DECISIONS.md (spawn only in the moving objectives' fair sets, :297, :349, and spawn protection, :4271, :4372: no word on where a soldier starts); ADR 0004 part 17 (docs/adr/0004-simulation-core.md:489-503: spawning is a simulation phase "as LOOP_V2 §2 and §5 state it: everyone spawns inside their own barracks, in front of the buy terminal"); the build plan (docs/reports/2026-11-17-build-plan-slice-1.md: its Walk card, :334-345, places no soldier; no "barracks", "terminal" or "buy" in the whole plan, and its one spawn word is "ids over random spawns" in a test line, :354); the 4c plan (.checkpoints/cs4-walk/plan.md: no spawn rule, its "starts" are about aiming). No line of his places the walk's soldier. "A stand-in until the barracks" is engine-architect's B4 claim; his approved plan does not say when the barracks spawn comes.
+- N36 trimmed: drop "the random spread could not be carried into the deterministic simulation anyway" (not my lane). :1843 is read as "at start or restart" (the function's name not shown); the respawn's spread is up to 4 m in x (the z term not shown).
+- N37's Low widened: the pick lands on the street only because "street" sorts before "yard"; no field marks a spawn as the players' start, so a map's ids decide it.
+- The early look's step 1 (reread-sheet.md:575-578) already says "the stand-in at a spawn of the test scene facing +x" without naming which: name it (street_1, in the street at (-20, 0, -0.9)) and call it a stand-in.
+
+### Answer (block 9, as corrected; by reading, nothing run)
+1. His sandbox has no spawn choice: the soldier is made once at the yard's origin (0, 0) (main.ts:180), facing a fixed yaw toward -x, -z (:290) until the cursor turns him.
+2. "The lowest-id spawn" is a build default, not a rule of his: no line of his places the walk's soldier (DECISIONS.md, LOOP_V2, VISION_V2, ADR 0004 part 17, the build plan, the 4c plan searched); his decided rule is the barracks (LOOP_V2:24), whose timing is B4's claim. He WILL see the start point in the early look: its step 1 should name street_1 and call it a stand-in. No question.
+3. The old game: the map's single spawn field at start or restart, a random spread of up to 4 m in x on respawn (shamble-game.js:521, :642, :1827, :1843); no MOVE-RULES row or answer carries it over.
+
+DONE (block 9, with corrections)

@@ -574,7 +574,9 @@ takes the chosen option's line, its two-thirds sentence and its rung before step
   numbered list with every expected result is written with the part's zip. Where a result hangs on an answer of his,
   the answer is named:
   1. Open the page as the zip's README says, without moving the mouse into the game yet. **Expected:** the scene, the
-     stand-in at a spawn of the test scene facing +x (every spawn there faces 90 degrees), the follow camera at his
+     stand-in at the test scene's spawn `street_1`, in the street at (-20, 0, -0.9), facing +x (every spawn there faces
+     90 degrees; the lowest-id spawn, a build default and a stand-in, not a rule of his: game-designer's block 9; his
+     sandbox starts him at the yard's centre, facing -x and -z), the follow camera at his
      Export's framing, no aim line and the readout's aim "none yet" ("no aim yet", section E), "errors: 0"; then the
      mouse into the game: the aim line appears and he turns toward it.
   2. Walk, then sprint until the stamina locks. **Expected:** the walk eases in and out; the sprint is faster, the bar
