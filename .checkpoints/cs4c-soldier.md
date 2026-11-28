@@ -221,7 +221,29 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   `/home/user/Shamble-Frontlines/.gate/cs4b-2`. A session of another account works on its own branch from this
   branch's head and never pushes here (his Lanes rule). SEAT-OUT from him: stop at a whole point and report the last
   commit's id.
-- **State (17:25 Amsterdam, from the clock): C3 built but for the vectors (waiting on rust-reviewer's block 17).**
+- **State (17:36 Amsterdam, from the clock): C3 is built whole; next its full local checks, its plants run, the
+  gate and its commit, then security-auditor on the commit (F9).** Saved as `c3-wip.patch` (tracked files) and
+  `c3-wip/` (the new files: fmath.rs, rules.rs, marking.rs, layering.rs, libm_ops.rs, libm_vectors.rs,
+  make_libm_vectors.py, libm-expected.txt; `libm-inputs.bin`, 1,077,304 bytes, is what `make_libm_vectors.py` writes,
+  sha256 0ee2be59...). **rust-reviewer's blocks 17 and 18, taken:** Q1 YES, `exp_of` and `sincos_of` in fmath.rs hand
+  on libm's own f64 results, `share_per_tick` and `facing_of` built on them; the scan's `MATHS_CALLS` moved onto them
+  and its raw-name rule (`RAW`: each name only in fmath.rs, its own fn and its one caller, test code included; 10 bites,
+  3 controls); layering refuses both names in room's, client-endpoint's and sim-wasm's `src/` (its plant: one call in a
+  copy of room's and of sim-wasm's lib.rs); `maths-allowed.mjs:9` reworded (Low); C3's players' file links no libm
+  routine (measured by rust-reviewer: release 0 names, dev 0 paths), so the maths list keeps its 2 entries in C3
+  (C4: about 14, B17-6, Medium). Q2 (rate) and Q3 (`ads` as a speed) YES. Q4: the share test's words give the domain
+  (every easing time in (0, 5], push strengths 0 or at least 1e-7 a second). **Q5, a departure rust-reviewer said YES
+  to (block 18):** no Python twin of libm in the repository (libm's sources carry Sun's notice, which a port would have
+  to carry; correct rounding is asked of sqrt only): `make_libm_vectors.py` writes the inputs (no platform maths: hex
+  and decimal literals, ldexp, single IEEE steps; his two values left out, the grids hold 0.164 s and 8 a second);
+  `libm_ops.rs` works one FNV-1a a routine through `exp_of` and `sincos_of` under a header naming `libm =0.2.16` and the
+  inputs' byte count and sha256, which `check` verifies first (its condition 2); the native test records the file only
+  with `SHAMBLE_WRITE_LIBM=1` (condition 1) and checks it otherwise; Node (`rules.test.mjs`) and each browser
+  (`wasm-rules.spec.ts`) check the same file through `wasm.rs`'s `libm_vectors`. Recorded: exp 33646 551ff1fa383a1f22,
+  sincos 101017 9e81faac70af97ff. Condition 3: B17-2's accuracy figures go into the report as measured, their method
+  in the notes (`rr17-ref.py`, `rr17-dump.rs`, `rr17-make-inputs.py`, copied from `.gate/rr17/`). The generator's
+  `--check` runs in local-checks.sh; CI's line is a request for the CI Builder (no CI file is written here). Clippy
+  `-D warnings` and fmt clean. Earlier state (17:25), kept: **C3 built but for the vectors (waiting on rust-reviewer's block 17).**
   Saved again as `c3-wip.patch` (tracked files) and `c3-wip/` (the four new files: fmath.rs, rules.rs, marking.rs, layering.rs; the
   new files' homes: `crates/sim/src/`, `crates/sim/tests/support/marking.rs`, `crates/devtools/tests/layering.rs`).
   Added since 17:14: **the libm rule** in `rules_scan.rs` (`MATHS`, `MATHS_FILE`, `MATHS_CALLS` with the two allowed

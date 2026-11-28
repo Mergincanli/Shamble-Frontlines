@@ -41,6 +41,7 @@ def cargo_test(package, *filters, lib=True):
     return ("cargo", "test", "-p", package, "--locked", *(["--lib"] if lib else []), *filters)
 
 SOLDIER_TESTS = cargo_test("sim", "soldiers::tests")
+SOLDIER_TESTS_ALL = cargo_test("sim")
 # C2's files and commands.
 READ = "crates/content/src/read.rs"
 MOVEMENT = "crates/content/src/movement.rs"
@@ -57,6 +58,18 @@ PAGE_TESTS = (*VITEST, "src/app/content.test.ts")
 CONVERTER_TESTS = (*VITEST, "scripts/testlines.test.mjs")
 CONVERTER_CHECK = ("node", f"{ROOT}/packages/client/scripts/testlines.mjs", "--check")
 SANDBOX_RULE = "a row with no place in his Export fills a field with its own value and names its place in his sandbox"
+# C3's files and commands.
+RULES = "crates/sim/src/rules.rs"
+FMATH = "crates/sim/src/fmath.rs"
+SCAN = "crates/sim/tests/rules_scan.rs"
+MARKING = "crates/sim/tests/support/marking.rs"
+LAYERING = "crates/devtools/tests/layering.rs"
+ROOT_MANIFEST = "Cargo.toml"
+RULES_TESTS = cargo_test("sim", "rules::tests")
+FMATH_TESTS = cargo_test("sim", "fmath::tests")
+SCAN_TESTS = ("cargo", "test", "-p", "sim", "--locked", "--test", "rules_scan")
+LAYERING_TESTS = ("cargo", "test", "-p", "devtools", "--locked", "--test", "layering")
+DEPENDENCY_TESTS = ("cargo", "test", "-p", "devtools", "--locked", "--test", "dependency_rules")
 
 # name, kind, what the defect is, the edits (file, text there once, its replacement), the command, the words its output must hold
 PLANTS = [
@@ -69,7 +82,7 @@ PLANTS = [
                  "        *row = Soldier {\n            generation: row.generation,\n            flags: OCCUPIED,\n            ..Soldier::EMPTY\n        };\n        true")],
      SOLDIER_TESTS, ["test soldiers::tests::a_stale_id_never_resolves ... FAILED"]),
     ("RC1", "control", "the clean tree: the soldier table's tests",
-     [], SOLDIER_TESTS, ["test result: ok. 5 passed"]),
+     [], SOLDIER_TESTS, ["test result: ok. 6 passed"]),
     # C2: content's thirteen fields at version 2 (the advisor agent's VERSION-RULE conditions; the build order's C2).
     ("V1", "defect", "the typed read takes versions from 1 again: a movement file at version 1 is read as version 2",
      [(READ, "        whole_in(node, &path, newest, newest).map_err(", "        whole_in(node, &path, 1, newest).map_err(")],
@@ -115,6 +128,45 @@ PLANTS = [
     ("T3", "defect", "the real content file: a sandbox value one hundredth away from his sandbox's",
      [(SOLDIER_FILE, '  "foot_radius_m": 0.15,', '  "foot_radius_m": 0.16,')],
      CONVERTER_CHECK, ["foot_radius_m is 0.16, and his sandbox has 0.15 (src/movement.ts:59-60, used :163, :194, :199)"]),
+    # C3: the rules, the facings, the spawn table, the libm rule, the shared marking and layering (11.7 rows 2, 3, 5,
+    # 32 and 35's order half; F1).
+    ("P1", "defect", "the stop's easing taken from the speed-up time",
+     [(RULES, "            ease_stop: share_per_tick(core::f64::consts::LN_10 / m.stop_time_to_10pct_s, DT_S),",
+              "            ease_stop: share_per_tick(core::f64::consts::LN_10 / m.speed_up_time_to_90pct_s, DT_S),")],
+     RULES_TESTS, ["test rules::tests::each_field_reaches_its_own_rules_and_no_other ... FAILED"]),
+    ("P2", "defect", "one refusal removed: a foot wider than the body plays",
+     [(RULES, "        if m.foot_radius_m > m.body_radius_m {", "        if m.foot_radius_m > m.body_radius_m && false {")],
+     RULES_TESTS, ["test rules::tests::what_no_rule_can_use_is_refused_by_name ... FAILED"]),
+    ("P3", "defect", "a quarter turn negated with -v: 90 degrees faces (1, -0)",
+     [(FMATH, "        1 => [cos, 0.0 - sin],", "        1 => [cos, -sin],")],
+     FMATH_TESTS, ["test fmath::tests::the_quarter_turns_are_exact_and_carry_no_minus_zero ... FAILED"]),
+    ("P4", "defect", "no quarter turns taken out: 90 degrees gives a cosine of 6.1e-17",
+     [(FMATH, "    let (quarter, turned) = if deg < 90.0 {", "    let (quarter, turned) = if deg < 1000.0 {")],
+     FMATH_TESTS, ["test fmath::tests::the_quarter_turns_are_exact_and_carry_no_minus_zero ... FAILED"]),
+    ("P5", "defect", "the spawn table in the file's order",
+     [(SOLDIERS, "    spawns.sort_by(|a, b| a.id.as_bytes().cmp(b.id.as_bytes()));\n", "")],
+     SOLDIER_TESTS_ALL, ["test soldiers::tests::the_spawn_table_is_ranked_by_id_in_byte_order ... FAILED"]),
+    ("P6", "defect", "the libm rule switched to a name list: the grouped import and a routine in another function pass",
+     [(SCAN, "    if text(at + 1) != \"::\" || !is_name(routine) || text(at + 3) != \"(\" {",
+             "    return [\"expm1\", \"expf\", \"sincosf\", \"atan2f\", \"sin\"].contains(&routine).then(|| \"are a routine on the list\".to_owned());\n    if text(at + 1) != \"::\" || !is_name(routine) || text(at + 3) != \"(\" {")],
+     SCAN_TESTS, ["test the_later_rules_find_each_planted_breach_once_and_pass_what_they_allow ... FAILED"]),
+    ("P7", "defect", "the marking takes a mark at any depth: a macro's or a nested module's mark hides content",
+     [(MARKING, "        let marked = depth == 0 && (0..MARK.len()).all(|k| plain(at + k, MARK[k]));",
+                "        let marked = (0..MARK.len()).all(|k| plain(at + k, MARK[k]));")],
+     LAYERING_TESTS, ["test each_planted_naming_of_content_is_found_and_the_allowed_ones_pass ... FAILED"]),
+    ("P8", "defect", "the layering rule reads path heads only: `extern crate content as c;` passes",
+     [(LAYERING, "        if name == \"content\" {", "        if name == \"content\" && next == \"::\" {")],
+     LAYERING_TESTS, ["test each_planted_naming_of_content_is_found_and_the_allowed_ones_pass ... FAILED"]),
+    ("P9", "defect", "the marking without the visibility allowance: content's pub(crate) tests module read as shipped",
+     [(MARKING, "            if plain(item, \"pub\") {", "            if plain(item, \"pub\") && false {")],
+     SCAN_TESTS, ["test the_content_crate_keeps_its_rules ... FAILED"]),
+    ("P10", "defect", "the root's libm line loosened from =0.2.16 to 0.2.16 (the lockfile still holds 0.2.16)",
+     [(ROOT_MANIFEST, "libm = \"=0.2.16\"", "libm = \"0.2.16\"")],
+     DEPENDENCY_TESTS, ["the root Cargo.toml's libm line is the batch's"]),
+    ("RC2", "control", "the clean tree: sim's unit tests", [], SOLDIER_TESTS_ALL, ["test result: ok. 46 passed"]),
+    ("RC3", "control", "the clean tree: the rule scan", [], SCAN_TESTS, ["test result: ok. 9 passed"]),
+    ("RC4", "control", "the clean tree: layering and the dependency rules", [], LAYERING_TESTS, ["test result: ok. 3 passed"]),
+    ("RC5", "control", "the clean tree: the dependency rules", [], DEPENDENCY_TESTS, ["test result: ok. 3 passed"]),
     ("VC1", "control", "the clean tree: the content crate's tests", [], CONTENT_TESTS, ["test result: ok. 46 passed"]),
     ("VC2", "control", "the clean tree: the page's content tests", [], PAGE_TESTS, ["Tests  ", " passed"]),
     ("VC3", "control", "the clean tree: the converter's tests", [], CONVERTER_TESTS, ["Tests  17 passed (17)"]),

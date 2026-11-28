@@ -19,6 +19,12 @@ mod marking;
 const NEVER_NAMING: [&str; 2] = ["room", "client-endpoint"];
 /// The one line of `content` their manifests may hold, in their tests' table: the batch's.
 const DEV_LINE: &str = "content = { path = \"../content\" }";
+/// The crates whose code never calls libm's routines as the simulation reaches them (rust-reviewer's block 17, Q1):
+/// only the simulation's own `fmath.rs` and the vectors (devtools) call `exp_of` and `sincos_of`, so a call from the
+/// room, the endpoint or the players' module is refused here, test code included (inside the simulation the rule
+/// scan holds it).
+const NEVER_CALLING: [&str; 3] = ["room", "client-endpoint", "sim-wasm"];
+const RAW_NAMES: [&str; 2] = ["exp_of", "sincos_of"];
 /// What the simulation hands on of `content` today (crates/sim/src/time.rs): one constant.
 const HANDED_ON: [&str; 1] = ["time.rs: pub use content :: time :: UNITS_PER_SECOND ;"];
 
@@ -160,6 +166,57 @@ fn the_room_and_the_endpoint_never_name_content_in_code_the_game_runs() {
             "crates/{krate}/src names content"
         );
     }
+}
+
+/// Each token `exp_of` or `sincos_of` (a raw one too), test code included, as "file:line: what".
+fn raw_breaches(file: &str, source: &str) -> Vec<String> {
+    marking::tokens(source)
+        .iter()
+        .filter(|token| RAW_NAMES.contains(&token.text.as_str()))
+        .map(|token| {
+            format!(
+                "{file}:{}: `{}` is libm's routine as the simulation reaches it: only fmath.rs and the vectors call it",
+                token.line, token.text
+            )
+        })
+        .collect()
+}
+
+#[test]
+fn the_room_the_endpoint_and_the_players_module_never_call_libm_s_routines() {
+    for krate in NEVER_CALLING {
+        let mut files = Vec::new();
+        rust_files(&crates().join(krate).join("src"), Path::new(""), &mut files);
+        assert!(
+            files.iter().any(|(name, _)| name == "lib.rs"),
+            "crates/{krate}/src: {files:?}"
+        );
+        let found: Vec<String> = files
+            .iter()
+            .flat_map(|(name, path)| raw_breaches(&format!("{krate}/src/{name}"), &read(path)))
+            .collect();
+        assert_eq!(
+            found,
+            Vec::<String>::new(),
+            "crates/{krate}/src calls libm's routines"
+        );
+    }
+    // Its plant: one call in a copy of a room source, and one in the players' module; a longer name passes.
+    for file in ["room/src/lib.rs", "sim-wasm/src/lib.rs"] {
+        let copy = read(&crates().join(file)) + "\nfn f() -> f64 { sim::fmath::exp_of(1.0) }\n";
+        assert_eq!(
+            raw_breaches(file, &copy).len(),
+            1,
+            "{file} with the planted call"
+        );
+    }
+    assert_eq!(
+        raw_breaches(
+            "control.rs",
+            "fn f(exp_offset: u32, my_sincos_of: u32) -> u32 { exp_offset }"
+        ),
+        Vec::<String>::new()
+    );
 }
 
 #[test]

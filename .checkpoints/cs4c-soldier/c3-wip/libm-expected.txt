@@ -1,0 +1,3 @@
+shamble-libm-vectors 1 libm =0.2.16 1077304 0ee2be59b56e571b7de333113116fce5160b7a3e0f828bb45f9d9da62ccdd052
+exp 33646 551ff1fa383a1f22
+sincos 101017 9e81faac70af97ff

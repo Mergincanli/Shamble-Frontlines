@@ -528,7 +528,10 @@ mod tests {
 
     /// The shares against the correctly rounded f32 of 1 - exp(-x), x the double the rule works out
     /// (`.checkpoints/cs4c-soldier/share-ref-c3.py`, Python decimal at 60 digits): the easing over its times to a
-    /// tenth from 0.01 to 5 s, the push over strengths from 0.5 to 100 a second, each within one f32 step.
+    /// tenth from 0.01 to 5 s, the push over strengths from 0.5 to 100 a second, each within one f32 step. That holds
+    /// for every easing time in (0, 5] and for a push strength of 0 or at least 1e-7 a second (rust-reviewer's block
+    /// 17, Q4, measured); below that, libm's exp gives 1 + x and the share falls on a coarser grid: the same bits on
+    /// every target, only less exact.
     #[test]
     fn the_shares_are_within_one_step_of_a_decimal_reference() {
         #[rustfmt::skip]

@@ -1287,4 +1287,40 @@ Clippy -D warnings is clean (B17-7). Not run:
 - the real build.mjs (its cargo line was run by hand, without the path remap flag, which does not change names);
 - libm's cost against std's (PM-0004-22's "reported" cost).
 
+### Corrections after the advisor tool's review (these supersede the lines named; the scratch files are in /home/user/Shamble-Frontlines/.gate/cs4b-2/.gate/rr17/)
+- [B17-4 corrected, measured] Four samples an octave left a gap above 8.86e-9. A dense sweep (dense.py: 200,000 log-uniform push strengths on [1e-9, 1e-6], through libm natively) gives 57,767 cases at or over 1 ulp. The largest failing strength is 2.79e-8 per second (|x| = 9.3e-10, just under 2^-30). The largest error per quarter decade: 1.007 ulp on 10^-7.75 to 10^-7.5, then at most 0.78 ulp from 10^-7.5 to 10^-6. Derived: libm's `1 + x` and `1 + (..)` (exp.rs:147, :153) put 1 - e^x on a 2^-53 grid (error up to 2^-54). The f32 ulp of a share under 2^-30 is 2^-54 or less, so misses run to |x| = 2^-30, a strength of 30 x 2^-30 = 2.79e-8; above 2^-29 the error is at most 0.25 + 0.5 ulp. **Q4's bound, with margin: a push strength of 0 or at least 1e-7 per second** (measured at most 0.78 ulp from 3.2e-8 up; 0 off on the k/100 grid).
+- [B17-10 withdrawn] The WIP's row 2 test (crates/sim/src/rules.rs:355-418, `each_field_reaches_its_own_rules_and_no_other`) moves each field alone by x 0.9 and asserts the exact set of rules that change. With ease_stop taken from the speed-up time, moving `stop_time_to_10pct_s` changes nothing and moving `speed_up_time_to_90pct_s` changes two rules: red with equal base times. Not a blocker.
+- [B17-12, measured] The 1,000 medium-band rests (seeded on (89.9999991, 90), all with high word 0x3ff921fb, so all on rem_pio2's medium path) were added to the sincos inputs and run again: 101,017 sincos inputs, native = wasm32 in Node at -O and at opt-level 0, byte-equal (0 of 33,648 + 202,034 outputs differ); the twin is bit-equal on 33,648 + 101,017; the off counts are unchanged (exp 1,788, 0.8148 ulp; sin 3,064, 0.7539; cos 3,093, 0.7178); narrowed, 0 of 202,034. Inputs: 269,184 + 808,136 = 1,077,320 bytes.
+- [B17-13] The rules module (devtools' test-only Wasm) is built by build.mjs:157-170 with `refuseSettings` and the bindings tool only. `twinProblems` with MATHS_ALLOWED reads the players' twins only (build.mjs:199). So the vectors' module may link libm's exp and sincos in C3 with no maths-list entry, as it already links `fmaf` for mul_add.
+- [B17-14] The twin uses `math.ldexp` (one rounding) for libm's `scalbn`. On the inputs' subnormal exp results (the seeded values in (-745.13, -708.40) and the edges) it is bit-equal to libm. libm's generic scalbn is not twinned step by step, so the generator's `--check` is trusted where CPython's floats are IEEE binary64 with no x87 (Linux x86-64 measured here).
+- **Answers amended:**
+  - **Q4: YES, on a stated domain:** every easing time in (0, 5], and a push strength of 0 or at least 1e-7 per second (B17-4 corrected), against the correctly rounded f32 of 1 - e^x at the code's own double x. Below 1e-7 the bits are still the same on every target, only less exact.
+  - **Q5: YES, as written above**, with these numbers: sincos 101,017 inputs, `sincos 101017 <digest>`, `libm-inputs.bin` 1,077,320 bytes, 0 of 235,682 outputs differ native against Node, narrowed 0 of 202,034.
+  - **The references (the coordinator's point):**
+    - Row 3 uses the route's reference for every case: sin and cos of the double `rest x K`, at 45, 120, 240 and the largest double under 360 (a688d313, 3f800000, confirmed from libm's own output).
+    - The true angle's agreement is reported as a measured number, not a pass mark: 0 of 90,000 off on the 0.001 grid (B7-2), off at the edge under 360, and not measured on the seeded set.
+    - Row 4's "correctly rounded" becomes "bits equal to the twin's on every target; the f64 rounding against decimal reported (1,788 / 3,064 / 3,093 off, at most 0.8148 ulp)".
+    - RR3 and the vectors' edges are unchanged.
+  - **Q1's scan wording, the last sentence:** "Outside `src/` only the vectors call them (crates/devtools); devtools' `layering.rs`, created in this commit, refuses the two names in room's, client-endpoint's and sim-wasm's `src/`". **The bite lands in C3, not C4**: one `sim::fmath::exp_of(` planted in a copy of a room file, red, and a control, devtools' own call, outside the walked crates. layering.rs must walk sim-wasm's `src/` for it.
+  - **Blockers for C3's commit, revised:** (1) `cargo fmt` (B17-7); (2) the raw-name rule in the scan and the layering bite, with Q1; (3) row 2's 1 ulp wording on Q4's domain. Item 1 of the first list is withdrawn (B17-10).
+  - Clippy and fmt ran on a snapshot of the main session's C3 work in progress, copied at about 16:20 (B17-7), not on a commit.
+- Count delta amended: Q1's layering bite moves from C4 to C3 (0 / +10 in C3). Otherwise unchanged.
+
+DONE
+
+## Block 18. Q5's departure: recorded digests in place of the Python twin (2026-11-28)
+### Plan
+1. Weigh what the twin adds against PM-0004-22's mark. 2. YES or NO, with conditions. 3. DONE.
+
+### Notes
+- [B18-1] PM-0004-22 (docs/adr/0004-simulation-core.md:1143) asks of a libm function bit-identical outputs (`to_bits`) natively, in Node and in each browser engine. It asks a correctly rounded reference of `sqrt` only. For each function it asks the largest ulp error against a higher-precision reference **reported**, not held in a file. Recorded digests, written natively and checked on every target, meet that mark.
+- [B18-2] What the twin catches that recorded digests do not: a defect that every target shares at the moment of recording (bits that all targets agree on but that are not libm 0.2.16's published algorithm), and an expected file whose origin is only "a native run". Neither is part of the mark. A later libm change or toolchain change that moves bits is caught by the recorded digests anyway. The license point is sound: fdlibm's notice would have to travel with a port.
+
+### Answer
+**YES**, on three conditions (each cheap):
+1. **The write mode never runs by default.** Only the env var writes `libm-expected.txt` (as SHAMBLE_WRITE_VERDICTS does); CI's and local-checks.sh's runs only check. The file's header names `libm =0.2.16` and the inputs' byte count and sha256. A bump or new inputs therefore re-records in a diff a reviewer sees.
+2. **`libm_ops.rs::check` itself verifies the inputs' byte count and sha256 against that header** (devtools has `sha256.rs`). Then CI catches a changed input file even while the generator's `--check` runs in local-checks.sh only, pending the CI Builder. Its plant: one input byte changed, red with the header named.
+3. **The accuracy numbers stay reproducible.** The report cites B17-2's method and figures as measured: decimal at 60 digits against the code's own doubles, exp 1,788 off at most 0.8148 ulp, sin 3,064 at 0.7539, cos 3,093 at 0.7178, narrowed 0 of 202,034. The script is `.gate/rr17/ref.py`, gitignored. If the report must outlive the checkpoint folder, `make_libm_vectors.py` may carry a `--report` mode with the decimal reference only, which is our own code and no libm port.
+- Plants, as planned: one output's bit flipped on wasm32 only (Node and the browsers red, native green); one digest line changed (native red); plus condition 2's.
+
 DONE

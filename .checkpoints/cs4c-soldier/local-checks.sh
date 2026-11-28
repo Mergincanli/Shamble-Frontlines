@@ -22,6 +22,8 @@ cargo test --release -p content --locked
 cargo build --locked --target wasm32-unknown-unknown -p sim -p protocol -p room -p client-endpoint -p sim-wasm
 step "the two vector generators' checks, and the tools crate for wasm32 on its own line"
 python3 -I -B crates/devtools/vectors/make_chacha8_vectors.py --check; python3 -I -B crates/devtools/vectors/make_f32_vectors.py --check
+# Beyond CI's line (a request for the CI Builder, change-set 4c's C3): the maths routines' inputs.
+python3 -I -B crates/devtools/vectors/make_libm_vectors.py --check
 cargo build --locked --target wasm32-unknown-unknown -p devtools --lib
 node packages/client/scripts/legacy-extract.mjs --check
 step "each package's own tests"; for p in client sim-worker types net; do (cd packages/$p && if [ "$p" = sim-worker ]; then node ../../node_modules/vitest/vitest.mjs run --dir src; else node ../../node_modules/vitest/vitest.mjs run; fi); done

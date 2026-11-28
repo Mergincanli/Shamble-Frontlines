@@ -1,9 +1,11 @@
 //! The simulation's float helpers and its two maths routines (ADR 0004 part 7: "transcendental maths only via
-//! pinned libm"). This is the one file of the simulation that names `libm`, and only by full paths, each in its own
-//! function: the exponential in `share_per_tick`, the sine and cosine (one routine, `sincos`) in `facing_of`. The rule
-//! scan holds it to that (`tests/rules_scan.rs`). Both routines are pure Rust, with no fused multiply-add, on every
-//! target; they run while a match's constants are worked out, never in a tick, and their results are pinned by the
-//! vectors (PM-0004-22).
+//! pinned libm"). This is the one file of the simulation that names `libm`, and only by full paths, each in a function
+//! of its own that hands on the routine's own result: the exponential in `exp_of`, the sine and cosine (one routine,
+//! `sincos`) in `sincos_of`. Each of those has one caller here, `share_per_tick` and `facing_of`, and outside the
+//! simulation the vectors call them (PM-0004-22: libm's own bits compared natively, in Node and in each browser);
+//! the rule scan holds that (`tests/rules_scan.rs`), and devtools' `tests/layering.rs` keeps the room, the endpoint
+//! and the players' module off them. Both routines are pure Rust, with no fused multiply-add, on every target; they
+//! run while a match's constants are worked out, never in a tick.
 
 /// Degrees to radians: pi over 180 as a double, the same bits as `f64::to_radians`'s own constant (pinned by a test).
 pub const DEG_TO_RAD: f64 = core::f64::consts::PI / 180.0;
@@ -34,18 +36,33 @@ pub fn clamp_f32(x: f32, low: f32, high: f32) -> f32 {
     }
 }
 
+/// libm 0.2.16's exponential, its own result: called by `share_per_tick` and, outside the simulation, by the vectors
+/// (PM-0004-22) only.
+#[must_use]
+pub fn exp_of(x: f64) -> f64 {
+    libm::exp(x)
+}
+
+/// libm 0.2.16's sine and cosine in one routine, its own results: called by `facing_of` and, outside the simulation,
+/// by the vectors only.
+#[must_use]
+pub fn sincos_of(x: f64) -> (f64, f64) {
+    libm::sincos(x)
+}
+
 /// The share of a gap that an exponential approach at `rate_per_s` closes in one step of `dt_s` seconds:
 /// 1 - exp(-rate x dt), worked out in f64 and narrowed once. The easing's rate is ln 10 over its time to a tenth of
-/// the gap; the push's is its strength as the content writes it.
+/// the gap; the push's is its strength as the content writes it (a strength of 0 gives exactly 0).
 #[must_use]
 pub fn share_per_tick(rate_per_s: f64, dt_s: f64) -> f32 {
-    (1.0 - libm::exp(-(rate_per_s * dt_s))) as f32
+    (1.0 - exp_of(-(rate_per_s * dt_s))) as f32
 }
 
 /// The direction a heading in degrees faces, as (x, z): 0 degrees faces +z, 90 faces +x. The whole quarter turns are
 /// taken out first, by comparisons, so 0, 90, 180 and 270 come out exact; what is left of the angle, exact too, goes
 /// through `sincos` in f64 once and is narrowed once. A turn negates with `0.0 - v`, never `-v`, and the rest is
-/// canonicalised with `+ 0.0`: a minus zero would be another bit pattern in the hashed state.
+/// canonicalised with `+ 0.0`: a minus zero would be another bit pattern in the hashed state. Its domain is the
+/// content's, [0, 360) (map.rs refuses other headings): outside it the rest leaves [0, 90).
 #[must_use]
 pub fn facing_of(deg: f64) -> [f32; 2] {
     let (quarter, turned) = if deg < 90.0 {
@@ -58,7 +75,7 @@ pub fn facing_of(deg: f64) -> [f32; 2] {
         (3, 270.0)
     };
     let rest = (deg - turned) + 0.0;
-    let (sin, cos) = libm::sincos(rest * DEG_TO_RAD);
+    let (sin, cos) = sincos_of(rest * DEG_TO_RAD);
     let (sin, cos) = (sin as f32, cos as f32);
     match quarter {
         0 => [sin, cos],
