@@ -266,6 +266,26 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   re-exports. (13) the tests of rows 22, 25, 27, 28, 31, 33, 34, 35, 36, 37, 38 (bar the direct feed), 39; world.rs's
   known answers re-made by a second implementation written for it in the notes (no committed script exists: earlier
   change-sets' agents wrote theirs in notes), `world-known-answers-c4.py`, FNV-1a 64 over the canonical bytes.
+- **State (19:45 Amsterdam, from the clock): security-auditor on C4's commit fb2030ed (`security-auditor-c4.md`):
+  APPROVE, two Lows, no Critical, High or Medium.** It built both twins itself from the commit (byte for byte the ones
+  in `target/`: release 6fd915ed..., dev a024fe70...; the evidence file named an earlier pair of 17:56, the same result):
+  release 4 refusals, dev 29, 21 unique paths, the list against them exact, 0 refusals with the whole list, none
+  outside `libm::math`; the six entries under a parent grant nothing (removed, still 0 refusals); the header's claim
+  checked in libm 0.2.16's source; rem_pio2_large's why matches the source (66 and 690 words, the 64-bit assertion,
+  reachable only for |x| >= 2^20 pi/2); the build-check test's carve-out exactly the pair, the rules read no list, the
+  condition-1 block present; the room's order of checks, the NONE tie, `JOIN_SLOT`, `handed` under cfg(test) at its
+  three places; the bounds; sim-wasm's order and messages; no dependency, CI or storage file in the commit. Its runs:
+  room, sim and sim-wasm tests passed. **L-1 (Low):** the module entries `support::float_traits` and
+  `support::int_traits` lift every function of their modules, but their whys named only the printed ones. **L-2
+  (Low):** medium's band starts at 0x3ff921fb00000000 = 1.570796012878418 rad, 89.99998201 degrees (checked here by
+  script), not "about 89.9999991": about 20 times wider; the vectors still cover it (the edge and the double below it,
+  and the 1,000 seeded rests inside the band). **The fix (ruling 8 (d): its own commit before C5), after this notes
+  commit:** both whys in maths-allowed.mjs (L-1: the other functions named, fma refused by the fused rule; L-2: the
+  edge corrected, block 17's figure named as corrected). Its checks: the client's tests 182 of 182, the production
+  build's check clean (`.gate/build-production-c4-fix.log`), the libm generator's `--check` (L5's condition 2), the gate
+  PASS (`.gate/gate-c4-fix.log`). The full local checks not run again for a change to two strings of the list's
+  reasons (no code path reads a why but the test's length check). CI on fb2030ed: the toolchain run still going; the
+  push of these commits waits for it.
 - **State (19:34 Amsterdam, from the clock): C4 = fb2030ed69db48c20c733f145fab26ec06b51ba3, pushed; CI: gate and
   smoke green (run 46176393621), toolchain running (46176393620, started 18:32:15 UTC); security-auditor reading the
   commit (`security-auditor-c4.md`; brief in the scratchpad, `c4-security-brief-final.txt`); board posted (200).
