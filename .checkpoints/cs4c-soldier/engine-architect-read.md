@@ -564,6 +564,30 @@ repeated. "Today" is main dae6d107 with 4c-1's scene in.
   block 2.
 - B4 DONE.
 
+### Plan (block 5: the advisor agent's item 10, points 4 and 5; advisor-reread-4c.md:39; sheet lines 228-232)
+Started 2026-11-28 on branch cs/4c-soldier at 3ab59bd7. Read only; this file is the only one I write.
+1. Read map.rs (the module doc, :33-66, `check` :316-405), schema.rs's bounds words, aim_reach.rs, step S's
+   scene.ts (:190-239) and scene.test.ts, the test scene, StaticWorld::build, rust-reviewer-read (F5, F11, F16, 1.4,
+   1.6 to 1.8), netcode-architect-read 1.1 and 2.1, the dependency batch (deps-4c.diff, dependency-check.md,
+   security-auditor-deps-4c.md), ADR 0004 part 7 and PM-0004-22, maths-allowed.mjs and BANNED_MATHS, EDITOR_V2
+   section 3, MOVE-RULES row 8, the old game's ground, libm 0.2.16's sine and cosine (the cargo cache, read only).
+2. GROUND: reconcile the three statements (and any other that names a floor), say where a finding lies and its
+   severity, then the rule, where it is written, its tests with their plants, and the count.
+3. FACING-SPAWN: (a), (b), (c) each with its count and what it touches; (b) as a question for Mustafa; the
+   recommendation; questions to rust-reviewer and netcode-architect.
+4. A notes line after each finding; the block; B5 DONE; "Not verified" extended.
+
+- N27. "The floor" in today's code: map.rs:39 (an aim point's height "in centimetres above the floor at 0"), schema.rs:146-147 ("y from the floor at 0 up to `AIM_HEIGHT_MAX_CM`"), devtools tests/aim_reach.rs:45 ("below the floor"): each calls y 0 the floor. map.rs:325 and :330 refuse `bounds.min[1]` only below 0, so the bounds' bottom may be any whole centimetre from 0 up. No committed or generated map starts above 0: test-scene.json bounds min [-32, 0, -24]; map.rs TEST_TEXT (:412) and the tests' TEXT (:420) min y 0; content_proofs.rs:393-395 always 0.
+- N28. Step S (bc7720f3) draws the ground, every region and the grid at `bounds.min[1]` (scene.ts:197, :210-211, :231-235) and frames the overview at it (:263-265). scene.test.ts:21 uses the test scene's bounds (min y 0) and the grid test asserts the literal 0 (:149): no test tells "the bounds' bottom" from "y 0", so a planted `floorY = 0` would pass them all (read, not run).
+- N29. netcode-architect-read.md:62-63: the aim falls back to "the crossing of the ground plane y = 0 ahead of the origin", then clamps into the bounds. The old game's own ground is that plane: `groundPlane` at 0 (shamble-game.js:1110) and `SIM.groundY: 0`, which stops the simulation's ray beside the statics (shamble-core.js:1507, :1516). On a map whose bounds start at h > 0 the fallback crosses y 0 below the drawn floor, h / tan(pitch) farther along than the floor point the cursor shows, and the clamp then lifts only its y: a wrong aim point on such a map. No such map exists.
+- N30. The collision world has no floor today: `StaticWorld::build` reads `map.shapes` only (collision.rs:209-255); rust-reviewer-read F11 and 1.4 item 2 hold the bounds as solid in the sweep beside the tree. MOVE-RULES row 8 (question-2026-11-28-before-4c.md:30-31) names the sides only ("the map's edge is the map's own bounds"); no line of LOOP_V2 or VISION_V2 names where a fall ends (grep "fall", "pit": LOOP_V2.md:157 "Drop-downs from the high ground" only).
+- N31. libm 0.2.16 in the cargo cache (read, not built): `pub fn sincos(x: f64) -> (f64, f64)` (src/math/sincos.rs:19); sin.rs, cos.rs, sincos.rs, k_sin.rs, k_cos.rs, rem_pio2.rs hold no `select_implementation`, `fma` or `mul_add`; rem_pio2.rs:56 holds the one x87 guard (32-bit x86 without SSE2, no target of ours). For a tiny argument it returns `(x, 1.0)` (sincos.rs:27-38), so 0 degrees gives (0, 1) exactly.
+- N32. Quarter turns are not exact through radians (measured here with Python 3's `math` on glibc, not with the libm crate): with K = pi / 180 (f64 bits 3f91df46a2529d39), cos(90 K) = 6.123233995736766e-17, sin(180 K) = 1.2246467991473532e-16, cos(270 K) = -1.8369701987210297e-16, each still non-zero in f32. So a spawn facing 90 becomes (1, 6.1e-17), not (1, 0), unless whole quarter turns are taken out first: deg - 90 q is exact for q = 1, 2, 3 (deg lies within a factor 2 of 90 q: Sterbenz's lemma), and a quarter turn of a direction is a swap and a sign.
+- N33. The batch's root comment (deps-4c.diff, the Cargo.toml hunk) names one routine: "the exponential, once per match, for the movement's easing shares (change-set 4c)". dependency-check.md: "If any of these five files differs when the batch is applied (main moved them, or the comments are reworded), the digests below no longer match and the batch goes to security-auditor again." security-auditor-deps-4c.md item 3: one scan allowance per named call site (file and function), bites for the same call elsewhere.
+- N34. EDITOR_V2.md:37-38 ([DEFAULT]): rotation snaps "to the grid and to 15° / 45° / 90°"; :43-44 ([DEFAULT]) and :71-76 ([DECIDED], his B.1 of 2026-11-03): three-team mirroring, "the others follow at 120°". A spawn facing 90 mirrored at 120° faces 210 and 330: no quarter turn. EDITOR_V2 says nothing else on how a spawn faces. The test scene's 8 spawns all face 90.
+- N35. Pointer only, not 4c's: the same 120° mirror cannot keep a box axis-aligned (map.rs:4-5, "all axis-aligned: no angle enters the static world"); the map kind and the editor's mirroring meet at editor slice 6 (EDITOR_V2.md:108).
+- N36. ADR 0004:275 "a degree value becomes radians by one multiply with a pinned constant"; :283 "Transcendental maths only through the pure-Rust `libm` crate, pinned; no std `sin`, `cos` ..."; :286 "No sim value is computed in TypeScript." map.rs:63-64 asks for no sine or cosine "of the standard library": libm's is the ADR's own route.
+
 ## Not verified
 - Nothing was built or run for this read but one import of three/webgpu in plain Node (N7). Every count is the
   designs' estimate (plus or minus 30 %).

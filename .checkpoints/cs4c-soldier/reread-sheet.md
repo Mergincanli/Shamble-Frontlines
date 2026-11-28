@@ -102,7 +102,16 @@ needs it; if his answers come after step S's code, step 0 still lands before any
   - **The method for BOARD-WORDS (b), written before it runs (F-S0-1):** `decisions-4c.mjs` quotes whole messages only; under
     (b) the saved file is the message less its item 3, with a header line saying item 3 is left out and why; the header
     gives the shown text's digest, which the check verifies; and the whole message's digest is recorded beside it, so
-    that it can be checked against the transcript. Written into the script before it is run.
+    that it can be checked against the transcript. Written into the script before it is run. **Written and tested
+    (revision 3, 2026-11-28):** `chat-words.mjs` gained the mode `less` (the message as `words` finds it, the one line
+    that starts with a given start left out, here "3. "; the header gives the whole message's bytes and sha256, the
+    left-out line's number and why, and the shown text's bytes and sha256); `decisions-4c.mjs`'s `saved` reads that
+    header, checks the shown text against its own digest and the line count, and the entry's bracket says "without its
+    line 5 of 8, left out because it names his board (the whole message, 1613 bytes with sha256 475c9061..., is in the
+    chat's transcript)". Tested in the scratchpad only, nothing of the message in the repository: `words` still makes
+    the saved design notes byte for byte (7,797 bytes); `less` gives his message of 23:59 whole at 1,613 bytes, shown
+    at 1,284 bytes with items 1, 2, 4, 5 and 6, and no "board" in the shown text; a scratch copy of the register took
+    all four entries newest first, `check` passed on each, and a planted one-byte change in the quoted text failed it.
 - **Its landing (condition 8):** step 0 waits for PASTE-BREAKS, BOARD-WORDS and DESIGN-CLASH, lands before any other docs
   commit of 4c, and the pull request that carries it is not marked ready before it (its evidence: F-S0-5's check and
   `decisions-4c.mjs check`). **Risk tier 1, needs-mustafa (condition 9):** LOOP_V2 and the register are decision docs,

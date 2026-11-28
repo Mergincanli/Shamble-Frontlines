@@ -603,6 +603,99 @@ Facts only; the advisor agent rules on any reorder.
   ("while one waits for him, this chat can only write notes, because it has a single branch"): it can be built, not
   pushed.
 
+## Block 7. Three written answers the advisor agent's verdict asks for (advisor-reread-4c.md items 6 and 11)
+Asked 2026-11-28 on head 3ab59bd7: (1) the record rule, (2) one home for the bounds, (3) the zero ray. Read only;
+this block is my only write. rust-reviewer answers (1) from its side at the same time; I did not wait for it.
+
+### 7.0 Plan
+1. Re-read the ruling (advisor-reread-4c.md :30-31, :40), my block 1.1 (:73-83, :84-102), block 6 (:579), N24, N30,
+   rust-reviewer-read 1.1 (:71-73) and 1.6 (:240-247), world.rs (:33-51, :112-117, :143-191), room/lib.rs (:262-300),
+   map.rs (:9-14, :33-52, :244-250, :316-335, :645-646), collision.rs (:94-108, :212-250), endpoint.rs (:56-88),
+   worker.ts (:53-54). A notes line per finding.
+2. Answer 1: yes or no; a command-less tick under (i); the bytes; the restore test and the room pin with their plants;
+   first-loop's hashes in step 2, with the conditions.
+3. Answer 2: yes or no; the derivation; the readers; the tie test and its plants.
+4. Answer 3: yes or no; the definition; the layer; the two tests and their plants; where the count lives.
+5. What this supersedes in blocks 1, 3 and "For the sheet", by line; the count's change. Then DONE.
+
+### 7.1 Notes (one line per finding)
+- B7-N1 (the record today): `World.player` is the whole `PlayerCommand` (buttons, presses), hashed as bytes 4 to 21 of the shared state (world.rs:18, :115, :185-187); `authority_step` keeps it when a tick has no command (:143-151). The room hands `&[]` to the world on a tick whose queue gives nothing due (room/lib.rs:262-282) and runs a late command in a later tick (`late`, :273-275); the echo reads the record (:286-296). So a starved tick reaches the world as a command-less tick, and nothing outside the world repeats a command today.
+- B7-N2 (my (i) left a gap): block 1.1 (:75-81) said the soldier "consumes" move and aim and never said what a tick with no command does; N24 (:50) the same. With nothing kept, a command-less tick would stop him, a rule change nobody chose. The ruling closes it; my answer below keeps the held move and aim in the soldier's row.
+- B7-N3 (the row's fields): rust-reviewer-read 1.1 (:71-73) gives the Soldier `aim: V3` and `facing: [f32; 2]` and no held move; its 1.6 (:246-247) has `visit_shared` write "the move and aim of the record", which contradicts its F17 (:29) taking (i). The move is the one new field.
+- B7-N4 (no signed method): `StateSink` has `u16`, `u32`, `bytes`, `secret` (world.rs:57-67) and no `i8`; the path form `i8::to_le_bytes(x)` is what the rule scan needs (world.rs:91-92). rust-reviewer adds `f32` in step 1 (F12), which the `aim: V3` field uses.
+- B7-N5 (no reader of the bytes): `write_state` is `#[cfg(test)]` (world.rs:188-195) and nothing reads canonical bytes back. A restore test needs a test-only reader; change-set 7's reset is the real one and is not built here.
+- B7-N6 (first-loop's aim): first-loop runs on the test scene (N10) whose bounds hold the origin (x -32..80, y 0..20, z -24..24; N28), so the clamped start aim is (0, 0, 0) cm, exactly what today's endpoint writes (endpoint.rs:251-263). Its rays are all-zero bits (N9).
+- B7-N7 (the grid trap): `on_grid` rounds `value * 100` and keeps it only if it divides back to the same double (map.rs:244-250); 0.55 x 100 is not 55 to the last bit (map.rs:645-646), so a plain `ceil` on a lower face at 0.55 gives 56. `on_grid` is private to content today (`fn`, no `pub`).
+- B7-N8 (the far corner): block 4.3's map is built in code from 0 to 2,000 m on x and z: on the grid, but past the aim's reach (327.67 m, map.rs:33-40). My block 1.1's "off the grid refused" would not refuse it; a reach check in `build` would. `build` checks shape corners for finiteness and thickness (collision.rs:227-232), the bounds not at all.
+- B7-N9 (the guard's layer): a page message the guard refuses becomes a Worker error that ends the match (worker.ts:53-54). So a non-finite ray from the real page never reaches `Sim::input`; the endpoint's count serves the callers without the guard: the replays (replay.rs:150, recording.ts:160, determinism.spec.ts:26-27), H3, and the endpoint's own tests.
+- B7-N10 (the counts' home): `Readout` (endpoint.rs:56-79) is the endpoint's counts for the block and the tests, "Each count wraps"; nothing in it is simulation state.
+
+### 7.2 Answer 1, the record rule: YES, (i) with the held move and aim in the soldier's hashed row
+The invariant holds as ruled: every value a later tick reads is in the hashed state. Under (i) the record stays the
+player's buttons and presses (bytes 4 to 21 of the shared state, unchanged; the echo and the press base read it); the
+move and the aim are the soldier's, kept in its row.
+- **A tick with commands** (k of them for the slot, oldest first, after the room's checks): the newest one's buttons
+  and presses become the record, as today; its move and aim are written into the soldier's row before the movement
+  runs. The movement then runs **once** for the tick (3B-ONE-PER-TICK): the press base is the record before the tick
+  against the newest's counters.
+- **A tick with no command for the slot** (the room hands the world `&[]`, room/lib.rs:282): the record holds (held
+  buttons stay held, the counters do not move, so no new press: no jump; Space held still jumps at a landing, J3);
+  **the row's held move and aim hold**. The movement runs once from the held move (he walks on with the same wish), and
+  the facing turns toward the held aim from his new position. A command-less tick is the tick of a command repeated
+  with no new press. Nothing outside the world repeats a command: the room keeps passing `&[]` (B7-N1).
+- **At spawn** the held move is (0, 0) and the held aim is whatever FACING-SPAWN picks (item 10 (5), open), written
+  into the same field. The first command overwrites both.
+- Failure mode, said so it is not decided silently: a client whose commands stop walks on at the held move until the
+  next command or the room's end of the connection, as a held button does today. A starvation limit that stops him is
+  a rule for change-set 7 or for the connection's timeout, not made here.
+
+**The bytes** (rust-reviewer's Soldier, its read 1.1 :71-73, owns the row's order; these two follow `facing`):
+- `held_move: [i8; 2]`, new: move_x then move_y as the room took them (length within 127), **2 bytes**, written as
+  `sink.bytes::<2>("soldier.held_move", &[i8::to_le_bytes(move_x)[0], i8::to_le_bytes(move_y)[0]])`: the two's
+  complement bits, the path form the rule scan needs (world.rs:91-92), no new sink method (B7-N4).
+- `aim: V3`, the field the ruling names (rust-reviewer's): written at take as `f32::from(x_cm) / 100.0` per axis
+  (`i16` and `u16` to `f32` are exact, one correctly rounded division, the same bits on both targets; never a minus
+  zero, since 0 converts to +0.0), **12 bytes** through `StateSink::f32` (bits, little-endian, rust-reviewer's F12).
+  So 14 bytes of each row hold them. **Flagged option, not my answer:** hold the command's integers instead (`AimCm`,
+  x `i16`, y `u16`, z `i16`: 6 bytes, so 8 bytes in all) and divide where the facing reads them: one canonical form, no
+  float to restore, exactly what the room judged; rust-reviewer's call, either width meets the invariant.
+- The record never takes move or aim: `visit_shared` writes the tick, the record (22 bytes as today), then the soldier
+  rows. That settles rust-reviewer-read 1.6 (:246-247) against its F17 (:29) in (i)'s favour, if it agrees.
+
+**The restore test** (step 1, in world.rs's test module beside `write_state`, which is `#[cfg(test)]`, :188-195):
+- A test-only reader `read_shared(bytes, constants) -> World` that takes the shared bytes field by field in
+  `visit_shared`'s order; the match constants (rules, static world, spawns) and the seed come from the same build and
+  setup, never from the bytes. It is a test's tool, not change-set 7's reset (B7-N5).
+- It plants: on the test scene, one soldier; ticks 1 to 30 with move (127, 0) and an aim on a box top; then **ticks 31
+  to 60 with no command** (`authority_step(&[])`). Copy A runs straight; copy B is rebuilt from A's shared bytes after
+  tick 30 and runs the same command-less ticks.
+- It must catch: A's and B's shared bytes equal at every tick 31 to 60; the soldier's position at tick 60 advanced by
+  30 ticks of the held move (he did not stop); his facing at tick 60 the turn toward the held aim from where he stands
+  (not the tick-30 facing); no jump. Plants, each red: (P1) `held_move` left out of `visit_shared` (`held_move: _`):
+  B stops at tick 31, bytes differ; (P2) the held aim left out: B's facing differs from tick 31; (P3) a command-less tick
+  that zeroes the move (the narrow record with nothing kept): A stops, the "advanced by 30 ticks" check is red.
+- **The room's pin** (room tests): a room on the test scene, commands 1 to 30 with move (127, 0), then the datagrams
+  for ticks 31 to 33 dropped so the queue gives nothing due at ticks 31 to 33, then the repeat brings them late. At
+  ticks 31 to 33 the world is handed **no** command (a test-only count of the slice length at room/lib.rs:282, beside
+  `commands_run`) and the soldier walks on; when the late commands run, `late` counts them and the newest's move is
+  taken. Plant: the room re-feeds `last_run`'s command on a starved tick (the slice length becomes 1: red). Without
+  this pin, P3 together with that re-feed would look right in play while the held move lived outside the state, and the
+  world-only test would stay green on a correct world.
+- Count: the reader 35, the world test 35, the room pin 30 (tests, all step 1's); the held move in the row 10 (code).
+
+**First-loop's hashes in step 2: NO, they do not move**, on four conditions, each written down:
+1. Step 1's room already hands each command's move and aim to the soldier (rust-reviewer's 1.6 puts the
+   `PlayerCommand` fields in step 1; my block 1.1 had them in step 2: step 1 it is). If step 1's soldier kept a spawn
+   aim until step 2, step 2 would move the hashes and would re-make first-loop in its own commit.
+2. The all-zero ray is no ray and keeps the aim (answer 3).
+3. The test scene's bounds hold the origin, so the clamped start aim is (0, 0, 0) cm, the same aim today's endpoint
+   writes (B7-N6); and first-loop's move word is 0, which `clamp_move` leaves (0, 0).
+4. The proof: `crates/devtools/tests/recordings.rs` green in step 2's commit with no recording file re-made: `:24`
+   (every committed file is what its script makes, the hashes included; `make_recordings --check` the same) and `:29`
+   (every recording replays to its hashes).
+So the commands the room runs in first-loop are byte-identical before and after step 2. In the other order (step 2
+before step 1, item 7's conditions) no soldier exists, nothing reads move or aim, and nothing moves (block 6 row 2g
+stands). First-loop moves in step 1's commit, which re-makes it anyway (F12).
 ## For the sheet: overlaps and readings not yet listed (flagged, not resolved)
 1. The post's shape: 13 numbers with the move packed in one word (the plan, the recording's format) against
    engine-architect's design 3.6 (14: `move_x, move_z` as two numbers). I recommend 13 (block 1.1).
