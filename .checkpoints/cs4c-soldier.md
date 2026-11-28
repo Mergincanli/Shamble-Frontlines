@@ -195,7 +195,17 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   `/home/user/Shamble-Frontlines/.gate/cs4b-2`. A session of another account works on its own branch from this
   branch's head and never pushes here (his Lanes rule). SEAT-OUT from him: stop at a whole point and report the last
   commit's id.
-- **State (14:12 Amsterdam, from the clock): the report's draft (`report-draft-4c1.md`), the pull request's text
+- **State (14:31 Amsterdam, from the clock): the verifier PASS** (`verifier-4c1.md`: FAIL on the report's first
+  draft for its words only, two Mediums and five Lows, each corrected; the re-check PASS with one Low more, corrected;
+  every number it checked held, its own full local checks passing on 0645432f's code, 29 Chromium tests in 231 s).
+  Its follow-up V-1 and one citation are in be276ef3 (docs). **Next, in order:** this notes commit (the last one of
+  4c-1); then (a) the report in `docs/reports/2026-11-28-cs4c1-scene.md` naming this commit as where the notes stand
+  whole, with STATUS's row and ROADMAP's entry brought up to date, the checks run again and the gate with smoke; main
+  fetched again (dae6d107 at 14:16, unmoved); then (b) the removal only, no `[skip ci]`, pushed as the final head;
+  then the freeze until the advisor agent's verdict (`advisor-final-4c1-brief.md`, the head's id and its CI runs in
+  the request); the zip built meanwhile from the final head's clean tree (`make-zip-4c1.py`, read out with `git show`
+  into `.gate/`); then the zip to him, the final head's full id and the Brave steps, and the board. Earlier state
+  (14:12), kept: the report's draft (`report-draft-4c1.md`), the pull request's text
   (`pr-text-4c1.md`) and the verifier's brief (`verifier-brief-4c1.md`) are written; the gate PASS with smoke at
   9283d302 (`.gate/gate-4c1-docs.log`, symbols +0 -0); the verifier next.** The close's order, by the advisor tool's
   check of 14:05: the verifier on the draft; then (a) one commit with the report in `docs/reports/2026-11-28-cs4c1-scene.md`

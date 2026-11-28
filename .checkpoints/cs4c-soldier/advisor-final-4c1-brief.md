@@ -1,6 +1,6 @@
 # advisor agent: change-set 4c-1 "The page's scene" on its final head, for Mustafa's Brave check and go
 
-DRAFT until the verifier's PASS: the marks [after] are filled by the main session first.
+Written after the verifier's PASS; the final head's id and its CI runs come with the request.
 
 Asked by Builder V6 (the main session), 2026-11-28. The worktree is `/home/user/Shamble-Frontlines/.gate/cs4b-2`
 (local branch `cs/4c-soldier`, pushed as `claude/ecstatic-wozniak-5cbdzs`). **The final head: [after]** (it only
@@ -19,7 +19,8 @@ Risk tier 1, needs-mustafa: his Brave check, and step 0 writes into decision doc
 changed (graphics-engineer and test-engineer, both APPROVE; five Low gaps to STATUS); every finding in
 `review-s-round.md`. **No reviewer read 0645432f** (one comment reworded on graphics-engineer's round 2 note): please
 read it (`git diff 2b2f44c23a9ebf1fa4d5aaa9bd46c9ca72352a9b 0645432f648457b0e03e2f4d4280eb3389e1da65`). The docs
-pass (9283d302) is docs-keeper's; the verifier checked its rows against the sources [after].
+pass (9283d302) is docs-keeper's; the verifier checked its rows against the sources (PASS), and be276ef3 adds the
+verifier's follow-up V-1 and corrects one citation (the main session's).
 
 **Named questions for your ruling (APPROVE, REVISE with what, or ESCALATE to Mustafa with why):**
 - **Q1.** The final head as a whole: APPROVE for his Brave check and his go, or not.
@@ -28,16 +29,18 @@ pass (9283d302) is docs-keeper's; the verifier checked its rows against the sour
   goes into 4c-2's pull request (his item 6 d). Anything in the final head that this would break, or that his
   Advisor's own branch at that head would not carry?
 
-**Evidence on the final code** (0645432f; the docs at 9283d302): the full local checks passed on the fix pass's files
-(12:29 UTC; the verifier's own run [after]); the gate PASS with smoke at 9283d302 (`.gate/gate-4c1-docs.log`,
+**Evidence on the final code** (0645432f; the docs at 9283d302 and be276ef3): the full local checks passed on the fix
+pass's files (12:29 UTC) and again in the verifier's own run on 0645432f's code (`.gate/verifier-local-checks-4c1.log`); the gate PASS with smoke at 9283d302 (`.gate/gate-4c1-docs.log`,
 symbols +0 -0); CI green on 2b2f44c2 (runs 46145018063, 46145018054) and 0645432f (runs 46146007607, 46146007608);
 the plants' whole run on 2b2f44c2, 45 caught of 45, 3 controls held of 3 (`plants-4c.txt`); the count 1,565 of the
 hold 1,665; his words by `decisions-4c.mjs check`, `section14-4c.mjs check`, `loop-check-4c.mjs` and
-`quote-check-12bc.mjs`; the verifier [after]. The final head's CI runs [after] (the main session reads them; you get
-this brief only once they are green).
+`quote-check-12bc.mjs`; the verifier PASS (`verifier-4c1.md`: FAIL on the report's first draft for its words only,
+two Mediums and five Lows, each corrected; its re-check PASS with one Low more, corrected). The final head's CI runs
+come with the request (the main session reads them; you get this brief only once they are green).
 
-**The notes** are out of the final head (`.claude/CHECKPOINTS.md` §9); read them at the notes commit [after] with
-`git show <that commit>:.checkpoints/cs4c-soldier.md` (the card) and the same for each notes file the report names.
+**The notes** are out of the final head (`.claude/CHECKPOINTS.md` §9); read them at the final head's parent (the
+report's commit, whose notes equal the last notes commit's) with `git show <that commit>:.checkpoints/cs4c-soldier.md`
+(the card) and the same for each notes file the report names.
 
 **Rules for you.** Read-only: no source, doc or note edits, and no commit (the final head must not move after your
 read); your verdict file goes to `/home/user/Shamble-Frontlines/.gate/cs4b-2/.gate/advisor-final-4c1.md`

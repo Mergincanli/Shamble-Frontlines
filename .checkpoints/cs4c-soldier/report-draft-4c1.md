@@ -59,9 +59,10 @@ needs-mustafa.
 - **Beyond the plan's symbol table** (engine-architect's table 1.10): from step S, the exported types `Floor` and
   `FloorKind` (`render/scene.ts`) and `ContentFileRow` and `SceneRows` (`overlay/report.ts`), the browser specs'
   `SceneObject` type and `scene()` (`e2e/tests/skeleton/report.ts`), and `LOCAL_MAP` in a module of its own
-  (`sim-worker/src/local-map.ts`; the plan had it only re-exported); from the fix pass, `frameCamera`, `VIEW_MARGIN`
-  and the `Overview` type (exported; the overview's answer may now be `null`), `MOST_DOUBLINGS` (a module constant),
-  `KINDS` and `isKind` in the inventory, `MAP_FORMS`, `MAP_TOWARDS` and `MAP_GROUNDS` (exported),
+  (`sim-worker/src/local-map.ts`; the plan had it only re-exported), the private `objects` in `app/content.ts`, and
+  `KINDS` in the inventory (typed in the fix pass); from the fix pass, `frameCamera`, `VIEW_MARGIN` and the `Overview`
+  type (exported; the overview's answer may now be `null`), `MOST_DOUBLINGS` (a module constant), `isKind` in the
+  inventory, `MAP_FORMS`, `MAP_TOWARDS` and `MAP_GROUNDS` (exported),
   `PageContent.refused` and the readout's "refused" row. The gate's symbol counts are the legacy files' (+0 -0;
   GATE PASS with smoke at 9283d302, `.gate/gate-4c1-docs.log`); nothing under `legacy/` changes.
 

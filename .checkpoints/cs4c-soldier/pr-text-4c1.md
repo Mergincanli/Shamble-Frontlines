@@ -1,7 +1,6 @@
 # The pull request of 4c-1, for his Advisor to open (this chat cannot open one)
 
-DRAFT, written while the close runs (2026-11-28). The marks [after] are filled in when their step ends. **Base:**
-`main`. **Head:** a branch of his Advisor's own, pointed at exactly the scene's final head (his item 6 c), whose full
+Written 2026-11-28 after the verifier's PASS; the head's full id comes in the builder chat. **Base:** `main`. **Head:** a branch of his Advisor's own, pointed at exactly the scene's final head (his item 6 c), whose full
 id comes in the builder chat and on the board with the advisor agent's verdict. Not `claude/ecstatic-wozniak-5cbdzs`:
 that branch moves on with 4c-2 (his item 6 b).
 
@@ -14,8 +13,9 @@ he calls Builder V6 on `claude/ecstatic-wozniak-5cbdzs`, which stands in for `cs
 **needs-mustafa**: his Brave check, and step 0 writes into decision docs. No CI, kit or gate file; nothing under
 `crates/` or `content/` changes, so the players' file is the same.
 
-**The report:** `docs/reports/2026-11-28-cs4c1-scene.md`. **The head this text speaks of:** [after: the full id], the
-commit that takes the notes out (the one before it holds them).
+**The report:** `docs/reports/2026-11-28-cs4c1-scene.md`. **The head this text speaks of:** the commit that takes the
+notes out (the one before it holds them and the report); its full id comes in the builder chat and on the board with
+the advisor agent's verdict (fill it in here when opening the pull request).
 
 ### What it is
 - **Step 0, his words** (by script, never typed): his five messages of 27 and 28 November in `docs/DECISIONS.md`,
@@ -31,15 +31,16 @@ commit that takes the notes out (the one before it holds them).
 - **The review's fix:** in a window of no width the first build's camera search never ended and froze the page; it
   now tries at most 20 distances and otherwise leaves the camera as it was.
 
-### Evidence, in short [after]
+### Evidence, in short
 - Written lines: 1,565 (the hold 1,665).
 - Planted defects: 45 caught of 45, 3 controls held of 3, every file put back (on 2b2f44c2).
 - Reviews: round 1 by six reviewers (one Medium found by four of them; one Medium of test-engineer's; two of
   art-director's, AD-1 fixed in his checklist and AD-4 deferred to 4c-2's step 4; the rest Low; each fixed or deferred
   to STATUS with its owner), one fix pass; round 2 by graphics-engineer and test-engineer,
-  both APPROVE. The verifier [after]. The advisor agent on the final head [after].
-- CI on the last code commit 0645432f: gate, smoke and toolchain green (runs 46146007607 and 46146007608). [after:
-  the final head's runs.]
+  both APPROVE. The verifier: PASS (after one correction of the report's words; every number it checked held). The
+  advisor agent's verdict on the final head: in the builder chat.
+- CI on the last code commit 0645432f: gate, smoke and toolchain green (runs 46146007607 and 46146007608). The final
+  head's runs: in the builder chat.
 - The picture on the WebGL 2 fallback: 32 draw calls, 267 triangles, 162 lines. Nothing was seen on WebGPU or a real
   GPU here: his Brave check is the first look.
 
