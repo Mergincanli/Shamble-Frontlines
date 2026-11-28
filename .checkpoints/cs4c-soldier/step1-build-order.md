@@ -33,6 +33,17 @@ the wire into the hashed row without the room having checked it** (G2's rule).
 - The first recording's frozen bundle re-frozen (`make_recordings --freeze first-loop`) and the recordings re-made:
   **their `.hashes` files byte-identical** (G5: no state changed), their headers naming the new bundle; `recordings.rs`
   green.
+- **The version rule** (the advisor agent's VERSION-RULE ruling, `advisor-version-rule.md`, conditions 1 to 9): the
+  movement kind goes to `VERSION = 2` ("the one version the typed read takes"), `TEST_TEXT` at version 2 with all 28
+  fields; `read.rs`'s `header` takes the newest version only (`whole_in(node, &path, newest, newest)`, its doc saying
+  older versions are migrated before the typed read, ADR 0005's CD-4), maps staying at 1; `bundle.rs:167` the same
+  exact rule; the page's `content.ts:236` checks `version !== kind.newest`; `testlines.mjs:42`'s HEADER at version 2
+  with a test tying it to `movement.rs`'s VERSION; every literal version 1 of the movement kind moved to 2 (its F16
+  list: `testlines.test.mjs`, `content.test.ts`, `report.test.ts` with its mixed case kept a mix, `skeleton.spec.ts`);
+  the schema's const 2. Tests and plants: version 2 read and 1, 3, 0, 1.5 and -1 refused as `WrongVersion { newest:
+  2 }` (plant: the lower bound of 1 put back); the page refusing a movement file at version 1 (plant: the old range);
+  the converter's tie (plant: HEADER's version 1). 4c-2's Brave checklist expects "shamble-movement 2" on the readout;
+  4c-2's report lists the departure from CD-4 (no 1-to-2 migration step) for his call; 4B-FIRST-DEFAULT stays open.
 
 ## C3. The dependency batch, exp and sincos, the rules and the spawns, called only by sim's tests (no state change)
 - The batch `deps-4c-v2.diff` applied, its five digests checked first (`dependency-check.md`; security-auditor's
