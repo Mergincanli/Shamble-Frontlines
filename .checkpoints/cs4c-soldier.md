@@ -10,7 +10,7 @@
   `/home/user/Shamble-Frontlines` is never switched.
 - **Base:** origin/main dae6d107fdbe942567104bcf1c9a2cbc6b3a1e0f (pull request #79's merge commit), taken in by
   fast-forward from b7145273.
-- **Last update:** 2026-11-28 01:44 Amsterdam (from the clock; an earlier save said 01:08, a time written without
+- **Last update:** 2026-11-28 01:59 Amsterdam (from the clock; an earlier save said 01:08, a time written without
   reading the clock: it was 00:57)
 
 ## Steps done
@@ -87,11 +87,21 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   (`PLAYWRIGHT_BROWSERS_PATH=/home/user/Shamble-Frontlines/.gate/cs4b-2/.gate/pw-1194 node tools/gate.mjs`: the gate's
   Playwright asks for build 1194's headless shell, which `.gate/pw-1194` links to this machine's 1243). CI on bc7720f3:
   gate and smoke green; the toolchain run started 00:47:49 UTC. Notes are held local until it ends (a push cancels it).
-- **Running now:** the full local checks on that tree (all steps green up to the browser tests, which run now).
-- **Next, tonight:** the plants run for step S (`plants-4c.py`, 28 planted defects and 3 controls; anchors checked:
-  0 wrong), once the local checks end; then step S waits for his SIZE-4C answer (its reviews) and STREET-GREY; step 0
-  for PASTE-BREAKS, BOARD-WORDS and DESIGN-CLASH (its checks are written: `section14-4c.mjs` now tied to the cut text's
-  digest, `loop-check-4c.mjs` byte for byte against main's two design docs saved beside it).
+- **The full local checks on bc7720f3's tree: ALL LOCAL CHECKS PASSED** (`.gate/local-checks-4c.log`; the browser run
+  29 of 29 in 217 s). **CI on bc7720f3: gate, smoke and toolchain green** (runs 46089793885 and 46089793887; the
+  toolchain 11 min 2 s).
+- **The plants run on acd7d4f** (`plants-4c.txt`): 27 of 28 caught at first; the miss (the +z ramp's face list on a
+  -z ramp) was no defect (the same faces under other names). Its replacement (the +x list) passed the scene test
+  without a volume check (a one-off run: 8 of 8 passed), so the test now holds each solid's enclosed volume
+  (**c1de41e5**, a test-only code commit, gate PASS); the face plants re-run: 3 of 3 caught. So 28 of 28 caught, 3 of 3
+  controls held, every file put back.
+- **Pushed: d6a9fd49** (about 01:59 Amsterdam). Its head was a `[skip ci]` notes commit, so the commit after it (this card,
+  without `[skip ci]`) carries CI onto the head that holds c1de41e5's test.
+- **Step S stands, built and proven, waiting for him:** his SIZE-4C answer (whether 4c-1 is its own pull request, so
+  its six reviewers, the verifier and his Brave check, or the reviews on 4c's final diff), and STREET-GREY (before
+  4c-1 merges). Step 0 waits for PASTE-BREAKS, BOARD-WORDS and DESIGN-CLASH (its checks are written:
+  `section14-4c.mjs` tied to the cut text's digest, `loop-check-4c.mjs` byte for byte against main's two design docs
+  saved beside it). Only notes and prototypes go on the branch until SIZE-4C is answered (condition 2).
 
 ## Next steps
 1. **The plan sheet** `.checkpoints/cs4c-soldier/reread-sheet.md`, revision 1, against main dae6d107: step 0 (the first
