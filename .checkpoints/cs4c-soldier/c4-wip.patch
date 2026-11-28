@@ -7556,10 +7556,10 @@ index 3c46fd1c..f489d74f 100644
          black_box(world.shared_hash());
          last = black_box(world.state_hash());
 diff --git a/packages/client/scripts/build-checks.test.mjs b/packages/client/scripts/build-checks.test.mjs
-index 012c0e0f..240d904e 100644
+index 012c0e0f..7b158822 100644
 --- a/packages/client/scripts/build-checks.test.mjs
 +++ b/packages/client/scripts/build-checks.test.mjs
-@@ -760,15 +760,42 @@ describe("the built-file check", () => {
+@@ -760,15 +760,65 @@ describe("the built-file check", () => {
      expect(libmProblems([SQRTF_LEGACY, BUILTINS_ROUND, "roundf", ...NOT_MATHS], allowed)).toEqual([]);
      const beside = ["_RNvNtNtCs8f6xQ2mK1pZ_4libm4math6sqrtf26sqrtf2", SQRT_GENERIC, "_RNvNtNtNtCs4WfqS6F5PNm_17compiler_builtins4math9libm_math6roundf6roundf", "round", ACOSF];
      expect(libmProblems(beside, allowed)).toHaveLength(5);
@@ -7567,7 +7567,8 @@ index 012c0e0f..240d904e 100644
 -    // its reason.
 +    // Today's list holds the two routines the content loader brings and the 21 paths the build check prints for
 +    // libm's exp and sincos and what they call (change-set 4c's C4), and whatever joins it is a whole routine with its
-+    // reason. No libm entry is a bare module (`libm::math` and the like): each names a routine's own path. No entry
++    // reason. No libm entry is a bare prefix (`libm::math` and the like): each is a path the build printed, a routine's
++    // or, for a trait's methods, its module's. No entry
 +    // names a fused multiply-add, and none names a banned function, but for two: libm's own exp and sincos, by the
 +    // pinned crate's path, whose steps are the banned C names `exp` and `sincos` (each twice, the module and the
 +    // routine). Exactly those two, and nothing else of the banned list in them; the C functions of those names stay
@@ -7585,11 +7586,33 @@ index 012c0e0f..240d904e 100644
      }
 -    expect(MATHS_ALLOWED.map(({ routine }) => routine)).toEqual(["C::round", "C::__multi3"]);
 +    expect([...own.keys()].every((routine) => MATHS_ALLOWED.some((entry) => entry.routine === routine))).toBe(true);
-+    // With today's whole list, a twin that holds the C functions exp and sincos (and sin, cos, expf) is refused for
-+    // each of them by the banned rule, and the list lifts none of it.
++    // The banned rule reads no list: with today's whole list, a twin that holds the C functions exp and sincos (and sin,
++    // cos, expf) is refused for each of them.
 +    const plain = ["exp", "sincos", "sin", "cos", "expf"];
 +    const planted = twin({ bodies: [fn(), fn(), ...plain.map(() => fn())], names: [OURS, CORE, ...plain] });
 +    expect(twinProblems(planted, "the release twin", MATHS_ALLOWED)).toEqual(plain.map((name) => `the release twin: ${banned(name)}`));
++    // With today's whole list, libm's other routines of the banned names, and a sibling inside exp's and sincos's own
++    // modules, are each refused by libm's rule: the two entries lift exp and sincos alone. The two themselves, by the
++    // names the build prints, meet neither rule, and without their two entries libm's rule refuses them (the advisor
++    // agent's condition 1 of 2026-11-28, advisor-c4-maths-test.md).
++    const LIBM = "_RNvNtNtCs8f6xQ2mK1pZ_4libm4math";
++    const siblings = {
++      "4expf4expf": "expf::expf",
++      "4exp24exp2": "exp2::exp2",
++      "5expm15expm1": "expm1::expm1",
++      "3sin3sin": "sin::sin",
++      "3cos3cos": "cos::cos",
++      "7sincosf7sincosf": "sincosf::sincosf",
++      "3exp4expf": "exp::expf",
++      "6sincos3sin": "sincos::sin",
++    };
++    const outside = (name, routine) => `${name}: ${routine} is a maths routine outside the allow-list (packages/client/scripts/maths-allowed.mjs)`;
++    const names = Object.keys(siblings).map((tail) => LIBM + tail);
++    expect(libmProblems(names, MATHS_ALLOWED)).toEqual(Object.values(siblings).map((path, k) => outside(names[k], `libm::math::${path}`)));
++    const theTwo = [`${LIBM}3exp3exp`, `${LIBM}6sincos6sincos`];
++    expect(libmProblems(theTwo, MATHS_ALLOWED)).toEqual([]);
++    expect(libmProblems(theTwo, MATHS_ALLOWED.filter(({ routine }) => !own.has(routine)))).toHaveLength(2);
++    expect(bannedMathsProblems(theTwo)).toEqual([]);
 +    expect(new Set(MATHS_ALLOWED.map(({ routine }) => routine)).size).toBe(MATHS_ALLOWED.length);
 +    // prettier-ignore
 +    expect(MATHS_ALLOWED.map(({ routine }) => routine)).toEqual([
@@ -7607,10 +7630,10 @@ index 012c0e0f..240d904e 100644
  
    test("a function of a crate the players' file is built without is refused: its own, and the standard library's as it used it", () => {
 diff --git a/packages/client/scripts/maths-allowed.mjs b/packages/client/scripts/maths-allowed.mjs
-index 9a390936..34f4c1f1 100644
+index 9a390936..f4a1b0cc 100644
 --- a/packages/client/scripts/maths-allowed.mjs
 +++ b/packages/client/scripts/maths-allowed.mjs
-@@ -4,22 +4,126 @@
+@@ -4,22 +4,131 @@
  // reason its result is the same bits on every target; a fused multiply-add and the functions of BANNED_MATHS are
  // refused whatever this list says.
  //
@@ -7627,8 +7650,13 @@ index 9a390936..34f4c1f1 100644
 +// players' constructor calls from change-set 4c's C4 on, while a match is set up (the rules' easing and push shares,
 +// and a facing for each spawn), never per tick. They are exactly the paths the build check printed for that build, in
 +// both twins (the release twin's four, which the dev-profile twin prints too, and the dev-profile twin's other 17:
-+// the routines the release twin inlines, and their helpers), each its own entry, none a prefix that covers another
-+// routine (the advisor agent's condition of 2026-11-28): libm 0.2.16's exp and sincos and what they call, no other.
++// the routines the release twin inlines, and their helpers), each its own entry, none a covering prefix beyond what the
++// build printed (the advisor agent's condition of 2026-11-28): three are module paths (support::env,
++// support::float_traits, support::int_traits), because the check reads a trait's method by its module alone, and so
++// cover every function of those modules; six entries sit below another and are listed because the build printed them
++// (rem_pio2::rem_pio2::medium, rem_pio2_large::rem_pio2_large::floor and the four support::float_traits::Float::*).
++// libm 0.2.16's exp and sincos and what they call, no other; a libm version other than the pinned one brings this list
++// back to review.
 +// The static collision world links none (its tree's build and its rays are additions, subtractions, multiplications,
 +// divisions and comparisons; rust-reviewer's read of 2026-11-27). Each entry names a routine by its path as the build
 +// check prints it, and covers the steps below it: { routine: "libm::math::sqrt", why: "..." } covers
@@ -7651,7 +7679,7 @@ index 9a390936..34f4c1f1 100644
    {
      routine: "C::round",
 -    why: "f64::round, rounding to a whole number with halves away from zero. Called when a bundle loads, never per tick: the map's grid check (crates/content/src/map.rs, on_grid: a coordinate times its steps per metre, rounded, must divide back to the same double), once per box corner. The operation is exact (IEEE 754 roundToIntegralTiesToAway): every double that is not a NaN has one answer, the sign of zero included, so any correct routine gives the same bits, natively, in every browser and on a server. The toolchain's routine here is one f64.add of x and 0.5 - 2^-54 with x's sign (f64.copysign), then a cut to a whole number by integer bit masks: no multiply, no fused multiply-add, no vector instruction, and WebAssembly's f64.add rounds to nearest on every engine. A NaN's bits are not promised; no NaN reaches it (on_grid's value is a finite parsed number, its scale 100 or 1,000). rust-reviewer, 2026-11-27: the twin's own body in Node 22 (V8) and native x86_64 f64::round gave the same bits on 4,006,064 inputs, none off an exact reference.",
-+    why: "f64::round, rounding to a whole number with halves away from zero. Called when a bundle loads, never per tick: the map's grid check (crates/content/src/map.rs, on_grid: a coordinate times its steps per metre, rounded, must divide back to the same double), once per box corner; and from change-set 4c's C4 also while a match is set up: the static world's bounds in whole centimetres (crates/sim/src/collision.rs, face_cm: on_grid once for each of the bounds' six faces, and once more for a face off the grid, which only a document built in code has), never per tick. The operation is exact (IEEE 754 roundToIntegralTiesToAway): every double that is not a NaN has one answer, the sign of zero included, so any correct routine gives the same bits, natively, in every browser and on a server. The toolchain's routine here is one f64.add of x and 0.5 - 2^-54 with x's sign (f64.copysign), then a cut to a whole number by integer bit masks: no multiply, no fused multiply-add, no vector instruction, and WebAssembly's f64.add rounds to nearest on every engine. A NaN's bits are not promised; no NaN reaches it (on_grid's value is a finite parsed number, its scale 100 or 1,000; face_cm's is a face of bounds that StaticWorld::build has first held finite as an f32, refusing the map otherwise). rust-reviewer, 2026-11-27: the twin's own body in Node 22 (V8) and native x86_64 f64::round gave the same bits on 4,006,064 inputs, none off an exact reference.",
++    why: "f64::round, rounding to a whole number with halves away from zero. Called when a bundle loads, never per tick: the map's grid check (crates/content/src/map.rs, on_grid: a coordinate times its steps per metre, rounded, must divide back to the same double), once per box corner; and from change-set 4c's C4 also while a match is set up: the static world's bounds in whole centimetres (crates/sim/src/collision.rs, face_cm: on_grid once for each of the bounds' six faces, and, for a face off the grid, which only a document built in code has, face_cm's own rounding once more), never per tick. The operation is exact (IEEE 754 roundToIntegralTiesToAway): every double that is not a NaN has one answer, the sign of zero included, so any correct routine gives the same bits, natively, in every browser and on a server. The toolchain's routine here is one f64.add of x and 0.5 - 2^-54 with x's sign (f64.copysign), then a cut to a whole number by integer bit masks: no multiply, no fused multiply-add, no vector instruction, and WebAssembly's f64.add rounds to nearest on every engine. A NaN's bits are not promised; no NaN reaches it (on_grid's value is a finite parsed number, its scale 100 or 1,000; face_cm's is a face of bounds that StaticWorld::build has first held finite as an f32, refusing the map otherwise). rust-reviewer, 2026-11-27: the twin's own body in Node 22 (V8) and native x86_64 f64::round gave the same bits on 4,006,064 inputs, none off an exact reference.",
    },
    {
      routine: "C::__multi3",
