@@ -389,6 +389,7 @@ fn sweep_walk(world: &[Block], s: &mut S, mut mx: f32, mut mz: f32, test_feet: f
                 let (q0, q1) = if a == 0 { (s.z, s.z + mz) } else { (s.x, s.x + mx) };
                 if (q0 > b.min[o] && q0 < b.max[o]) || (q1 > b.min[o] && q1 < b.max[o]) { continue; }
             }
+            if std::env::var("TRACE9").is_ok() && !slide_speed { println!("        sweep cand {i} from {:.4} by {mx:.4}: {:?}", s.x, sweep_rect0(b, s.x, s.z, mx, mz)); }
             if let Some((t, nx, nz)) = sweep_rect0(b, s.x, s.z, mx, mz) { if best.is_none_or(|bb| t < bb.0) { best = Some((t, nx, nz, i)); } }
         }
         match best {
@@ -407,12 +408,12 @@ fn sweep_walk(world: &[Block], s: &mut S, mut mx: f32, mut mz: f32, test_feet: f
     }
 }
 
-/// Block 6's swept circle against a footprint with no skin: touching (within 1e-6) and moving along or away is no hit.
+/// Block 6's swept circle against a footprint with no skin: touching (within 0.1 mm, so push-out's own spot counts) and moving along or away is no hit.
 fn sweep_rect0(b: &Block, px: f32, pz: f32, dx: f32, dz: f32) -> Option<(f32, f32, f32)> {
     let (qx, qz) = nearest(b, px, pz);
     let (ex, ez) = (px - qx, pz - qz);
     let d0 = (ex * ex + ez * ez).sqrt();
-    if d0 <= R + TINY {
+    if d0 <= R + 1e-4 {
         if d0 > 0.0 {
             // On a face, the face's own normal (axis-aligned), so the slide is exact; at a corner, the radial one.
             let (nx, nz) = if ex == 0.0 { (0.0, ez.signum()) } else if ez == 0.0 { (ex.signum(), 0.0) } else { (ex / d0, ez / d0) };
@@ -428,7 +429,7 @@ fn sweep_rect0(b: &Block, px: f32, pz: f32, dx: f32, dz: f32) -> Option<(f32, f3
         if d[k] == 0.0 { if p[k] < lo[k] || p[k] > hi[k] { return None; } continue; }
         let (mut a, mut c) = ((lo[k] - p[k]) / d[k], (hi[k] - p[k]) / d[k]);
         if a > c { std::mem::swap(&mut a, &mut c); }
-        if a > t0 { t0 = a; axis = k; }
+        if a > t0 || (axis == 2 && a >= t0) { t0 = a; axis = k; }
         if c < t1 { t1 = c; }
         if t0 > t1 { return None; }
     }
