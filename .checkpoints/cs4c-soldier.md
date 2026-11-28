@@ -10,7 +10,7 @@
   `/home/user/Shamble-Frontlines` is never switched.
 - **Base:** origin/main dae6d107fdbe942567104bcf1c9a2cbc6b3a1e0f (pull request #79's merge commit), taken in by
   fast-forward from b7145273.
-- **Last update:** 2026-11-28 02:49 Amsterdam (from the clock; an earlier save said 01:08, a time written without
+- **Last update:** 2026-11-28 02:55 Amsterdam (from the clock; an earlier save said 01:08, a time written without
   reading the clock: it was 00:57; an edit at 02:04 wrote "02:06", also unread, corrected here)
 
 ## Steps done
@@ -131,7 +131,15 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   said to him before it moves: the overview camera (only under SIZE-4C (a)), then the readout's per-file headers.
 
 ## Open findings
-- None yet for 4c.
+- **For step S (4c-1):** G-3 (Low, engine-architect's block 5): no test tells the bounds' bottom from y 0
+  (scene.test.ts:149 checks the literal 0); it rides the next code commit with no push of its own, and step S's
+  review round addresses or defers it (`review-briefs-step-s.md`).
+- **For steps 1 to 7 (each placed in the sheet):** G-1 (Low): map.rs:39, schema.rs:146-147 and aim_reach.rs:45 call
+  y 0 "the floor", in step 1's commit; RR1 (Medium): the sim's scan refuses std's spellings only, fixed by the
+  stricter libm rule in the commit that applies the batch; the two model holes every body shares (the in-air step's
+  "toward" from the tick's start; a top crossed inside one tick counts as landed), one condition each, rust-reviewer's
+  claim that neither is a rule of his to be confirmed by game-designer at the step's review; the head bump's details
+  (not in the notes); FALL-STEP (his).
 - Carried from 4b-2 (STATUS "Follow-ups"), placed by the sheet: 4B-QUERY-RECORDING, 4B-RAY-WASM, 4B-RAY-COUNTS,
   4B-WORLD-ROOM, 4B-LIMIT-IMPORT, 4B-TYPES-READER, 4B-MEMBER-KINDS; the advisor agent's acceptance of
   security-auditor's two developer-machine risks, recorded as a dated note.
@@ -258,7 +266,8 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
     reworded** (`deps-4c-v2.diff`, 85 lines, `deps-4c-v2.sha256`): only the root comment changed (it names `sincos`
     for the spawns' facings), so only Cargo.toml's digest moves (fc436ec3... for 099d224b...); `git apply --check`
     passes; `cargo metadata --offline --locked` exits 0; `dependency-check.md` marked to be rewritten. The two v2 files
-    are pushed before the answer (02:46): a patch in the notes is no manifest or lockfile, which is all DEP-HOLD names,
+    are pushed before the answer (8b3c689b, between 02:44 and 02:48 Amsterdam: no clock was read at that push; an
+    earlier save wrote "02:46" here unread): a patch in the notes is no manifest or lockfile, which is all DEP-HOLD names,
     and the advisor agent's item 8 keeps the batch a patch so that pushes are never held; nothing applies it before
     the answer (the first version's files were held back by the advisor tool's caution, which is not needed for a
     patch). rust-reviewer's block 8 DONE: YES to "no aim yet" = (-32,768, 0, 0): the row's `aim_cm: AimCm` (i16, u16,

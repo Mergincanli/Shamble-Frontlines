@@ -284,11 +284,48 @@ in this folder.)
 ### Settled tonight without him (for his information; no word of his changes)
 - **The floor** (engine-architect): the bottom of the map's bounds is solid ground; a soldier with nothing under him
   stands on it, and a fall ends on it.
-- **A spawn's facing** (engine-architect, with rust-reviewer): the facing in degrees becomes the soldier's direction
-  once, when the match starts, through the pinned maths library, so a map keeps any facing it has today.
-  netcode-architect's confirmation that nothing on the wire changes is running.
+- **A spawn's facing** (engine-architect, rust-reviewer and netcode-architect): the facing in degrees becomes the
+  soldier's direction once, when the match starts, through the pinned maths library, so a map keeps any facing it has
+  today; nothing on the wire or in the recordings changes.
 - **A step with no new command** (the advisor agent's ruling, confirmed by rust-reviewer and netcode-architect): he
   keeps his held move and aim, as held buttons are kept today, and that is part of the match's saved state.
+- **Before his first aim** (netcode-architect, with rust-reviewer's and engine-architect's yes), **something he sees,
+  so he may veto it:** a new soldier keeps the way his spawn faces until the mouse first points into the game; until
+  then the page draws no aim line and the readout's aim says "none yet". The two other ways tried would turn every new
+  soldier toward the map's origin point (0, 0, 0), or back toward his spawn point as he walks.
+
+## Added at 02:54 Amsterdam (from the clock): SIZE-4C restated with tonight's recount, and one note to decide
+### SIZE-4C, restated (where this block and the text above differ, this block holds)
+- **The new numbers** (the plan sheet's section F2, from tonight's reads): the scene as built is 1,288 written lines,
+  under its hold of 1,665. Steps 1 to 7 come to about 8,295 to 8,395 lines by the designs' count (the plan said
+  7,315), so about 18,000 to 22,670 written lines at the rates measured in 4a to 4b-2 (above I said about 15,900 to
+  19,750). The first build he can play, the early look after the camera panel (steps 1 to 5), comes at about 14,800
+  to 18,700 written lines.
+- **(a) one pull request:** about 19,290 to 23,960 written lines in all, against a stop line by the plan's rule of
+  about 20,330 to 20,550: likely to stop before the end.
+- **(b) two:** the scene alone (1,288 lines), then the soldier, about 18,000 to 22,670 written lines. **A new part of
+  the question:** the soldier's stop line, the plan's 16,450 (set on the old count: even the low estimate passes it,
+  so the chat would stop and ask him at 16,450, perhaps before the early look) or about 18,700 (the plan's rule on
+  tonight's recount: the early look is then most likely reached before any stop; the two-thirds sentence at about
+  12,500).
+- **(c) three:** the scene alone; then the simulation, the command path and the recordings (nothing new on screen),
+  about 10,640 to 14,690 written lines against a line of about 11,040 to 12,240; then the page he plays, about 6,410 to
+  9,150 against about 6,650 to 7,630.
+- **Recommended: still (b), with the soldier's line at about 18,700.** He sees the scene first in a small pull
+  request, and then plays the soldier in one pull request with the early look inside it, most likely before any stop.
+  (c) stays the choice if smaller pull requests matter more to him than playing early.
+
+### 12. DIGEST-NOTE: may one notes commit stay as it is? (new)
+- **Why it matters:** the notes commit bfe447a3 on this branch names the whole length of his message of 23:59 (1,613
+  bytes) and the first 8 characters of its digest. An automated security review found that a digest and a length of a
+  whole message, next to a published copy with one line left out, would let a reader check a guess of that line. The
+  method was changed at once (the whole message's digest and length go into no file of the repository), but that one
+  commit stays in the branch's history and reaches main with the scene's merge. Nothing of the message's text is in the
+  repository; the left-out line is 328 bytes of his own words, which no one can guess exactly, so the 8 characters let
+  no one recover it.
+- **Options:** (a) leave it; (b) rewrite the branch's history before the scene's pull request merges, which needs his
+  word (his Never list forbids a rewrite or a force-push otherwise).
+- **Recommended: (a).**
 
 ## One line, no question
 STEP12-GO is in the register already (`docs/DECISIONS.md:183`, since 4b-2's docs pass), so it is not written again.

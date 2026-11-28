@@ -327,7 +327,8 @@ The read holds every symbol with today's file:line and each test with its plante
 - **Step 2, the command path** (block 1; 315 / 630 against the plan's 385 / 530): the aim's maths in `sim::aim` (so
   the simulation's float scan covers it); the old game's rule corrected: the aim falls back to the ground plane
   beyond a 400 m reach (not the design's 500 m and fire-height plane); the map's bounds added to `StaticWorld` in
-  whole centimetres; the host zeroes the move when the tab hides; the first aim clamped into the bounds; the replay
+  whole centimetres; the host zeroes the move when the tab hides; the first aim clamped into the bounds (withdrawn by
+  netcode-architect's block 8: there is no first aim, the soldier holds "no aim yet" from spawn, section E); the replay
   readers' refusals of a move and an aim go (replay.rs:81-91, recording.ts:141-142); `clamp_move` steps both parts on
   a tie. **The post: 13 numbers with the move packed in one word** (the plan's 6.2 (2) and the recording's format;
   engine-architect's design 3.6 had 14, and its read now follows the 13).
@@ -383,14 +384,17 @@ The clash above (whether the world keeps the command's move and aim) is ruled by
   aim; the aim held as the command's integers, `aim_cm: AimCm` (6 bytes), so 8 bytes of each row hold move and aim; the
   restore test plants 30 command-less ticks and rebuilds a world from the shared bytes, and must catch the held move or
   aim left out of the hashed bytes and a command-less tick that zeroes the move; a room test pins that a tick with no
-  command due hands the world none; step 2 moves no first-loop hash on four named conditions (its block 7). rust-
+  command due hands the world none; step 2 moves no first-loop hash on four named conditions (its block 7; block 8
+  replaces them: step 2 moves none only if "no aim yet" lands whole in step 1, and the condition that the bounds
+  contain the map's origin is gone, since there is no (0, 0, 0) first aim). rust-
   reviewer YES (its block 6, section 3): F17 stands and 1.6's "move and aim of the record" is withdrawn; the row also
   holds the body's own carry-over that the next tick reads (`pull: u16` under BODY-SHAPE (3a), `stepped: u16` under
   (3b), none under (2)); `visit_shared` writes the tick, the record's buttons and presses, then the 48 rows in slot
   order. The bounds' one home: netcode-architect YES, with the loader's own grid rule (content's `on_grid`, made
   public) and its earlier "off the grid is refused" withdrawn; a tie test with four planted defects. The zero ray
   (under SIZE-4C (c)): netcode-architect YES (all-zero judged by value; a non-finite number refused and counted in
-  `rays_refused`), tests Z1 and Z2. Their counts: step 2 to about 340 / 675; step 1 about +10 / +100.
+  `rays_refused`), tests Z1 and Z2. Their counts: step 2 to about 340 / 675; step 1 about +10 / +100 (block 7's;
+  block 8 makes them step 2 about 335 / 690 and step 1 about +25 / +145, as F2 counts them).
 
 ### The held aim at spawn, "no aim yet" (revision 3.2; netcode-architect's block 8, with rust-reviewer's yes in its block 8 and engine-architect's in its block 6)
 - **The rule:** the one aim value no map can hold, (-32,768, 0, 0) in whole centimetres, means "no aim yet". The
@@ -409,6 +413,15 @@ The clash above (whether the world keeps the command's move and aim) is ruled by
 - **Where it lands:** whole in step 1 (the row's NONE from spawn, the room's fold, the facing's keep, endpoint.rs:258
   writing NONE in place of (0, 0, 0)): then step 2 moves no first-loop hash; otherwise every hash moves again in step 2.
 - **A world with no aim area** (engine-architect, block 6): no constructor change; one room test with a planted panic.
+
+### Step 1's commit order for the dependency batch (revision 3.2; security-auditor's second answer, the advisor tool's point)
+The batch's commit must also hold the scan's stricter libm rule, the maths list's entries for the libm paths the
+players' real build prints, the exp and sincos vectors, F1's tightened test and `layering.rs`
+(`dependency-check.md`). The list's entries and the vectors exist only once `sim` calls both routines, so the batch
+cannot land ahead of that code: it lands in the commit that first calls exp (the easing shares at match setup) and
+sincos (the spawns' facings), with their vectors and the scan rule, and that same commit re-makes world.rs's known
+answers and first-loop if it changes the hashed state (the advisor agent's item 7, condition 4: CI green at each
+commit). Nothing that holds the batch is built before it (DEP-HOLD).
 
 ## F. Sizes, the ladder and the stop lines
 - By the designs' count: steps 1 to 7, 7,315; step S about 740 (engine-architect's recount; 630 before); together
@@ -517,9 +530,9 @@ takes the chosen option's line, its two-thirds sentence and its rung before step
   - **Step 2, the command path:** deterministic tests: the post's 13 numbers with the move in one word; the endpoint's
     cast on its own copy of the world; the room's refusals counted (a move longer than 1, an aim outside the map); one
     jump per command (3B-ONE-PER-TICK; J1 to J5 counted once); the record rule's command-less tick and restore; the
-    bounds' one home with its tie test; the host zeroing the move when the tab hides; the first aim clamped into the
-    bounds; under (c) the zero ray, both ways. Read by netcode-architect, security-auditor (message handling),
-    rust-reviewer.
+    bounds' one home with its tie test; the host zeroing the move when the tab hides; "no aim yet" (N-1 to N-3 and
+    S-1 to S-3; there is no first aim to clamp); under (c) the zero ray, both ways. Read by netcode-architect,
+    security-auditor (message handling, and a client that sends the "no aim yet" value), rust-reviewer.
   - **Step 3, the snapshot's soldier and the block:** the layout's sizes pinned (header 12 bytes, the owner's section
     20, 48 rows of 40: 1,988 bytes) and `layout_hash` re-pinned; the blend's tests (B1, the allowance's estimator; the
     first frame after a pause: no jump, no step back); the ring of three blocks with `dueAt`; the pool of 16
@@ -558,8 +571,10 @@ takes the chosen option's line, its two-thirds sentence and its rung before step
 - **His main check of steps 1 to 7 (the plan's section 17: about 35 minutes, Brave then Firefox), a draft;** the
   numbered list with every expected result is written with the part's zip. Where a result hangs on an answer of his,
   the answer is named:
-  1. Open the page as the zip's README says. **Expected:** the scene, the stand-in at a spawn of the test scene facing
-     +x (every spawn there faces 90 degrees), the follow camera at his Export's framing, "errors: 0".
+  1. Open the page as the zip's README says, without moving the mouse into the game yet. **Expected:** the scene, the
+     stand-in at a spawn of the test scene facing +x (every spawn there faces 90 degrees), the follow camera at his
+     Export's framing, no aim line and the readout's aim "none yet" ("no aim yet", section E), "errors: 0"; then the
+     mouse into the game: the aim line appears and he turns toward it.
   2. Walk, then sprint until the stamina locks. **Expected:** the walk eases in and out; the sprint is faster, the bar
      shows and drains, and at empty the sprint stops and stays locked until the bar is back at its share.
   3. Jump, and hold the jump key. **Expected:** one jump per press, its top at his reach (3.071 m); held, by MOVE-RULES.
@@ -617,7 +632,7 @@ part's stop line, its two-thirds sentence and its rungs on the card before step 
 | Point | State |
 |---|---|
 | (1) BODY-SHAPE with him on the corrected rows | asked (the question file, 5597b00d and 04646ca3); his |
-| (2) the body prototype with numbers | blocks 5 and 6 of rust-reviewer's read DONE: (3a), (3b) and (2) (the last with a one-line wall fix) pass the steps, ledges, ramps up, down and from the side, seams, roofs, edges, the thin wall, landings (240 each), the snap (6 each, margin 0.094 m), easing from rest (72 each) and the push's 16 cases; two model holes shared by every body, each one condition and no rule of his; not run: the sandbox itself, its set-back and headroom formulas, the far corner, a push on a ramp, four or more soldiers. Open: FALL-STEP, his (the question file's question 11, from game-designer's block 5: whether an unjumped fall steps up onto a slightly higher top; every pass so far assumed yes, so (b) would mean the runs again); the head bump is the sandbox's own rule (MOVE-RULES row 8; game-designer-cs4.md:29), its details not in the notes (rust-reviewer's block 7, B7-C) |
+| (2) the body prototype with numbers | blocks 5 and 6 of rust-reviewer's read DONE: (3a), (3b) and (2) (the last with a one-line wall fix) pass the steps, ledges, ramps up, down and from the side, seams, roofs, edges, the thin wall, landings (240 each), the snap (6 each, margin 0.094 m), easing from rest (72 each) and the push's 16 cases; two model holes shared by every body, each one condition and, by rust-reviewer's claim, no rule of his (game-designer's yes at the step's review); not run: the sandbox itself, its set-back along the slope (the wall rule's push-out stood in for it) and headroom formulas, the far corner, a push on a ramp, four or more soldiers; not confirmed: that the sweep's corner path ran; the ceiling ran for its cost only. Open: FALL-STEP, his (the question file's question 11, from game-designer's block 5: whether an unjumped fall steps up onto a slightly higher top; every pass so far assumed yes, so (b) would mean the runs again); the head bump is the sandbox's own rule (MOVE-RULES row 8; game-designer-cs4.md:29), its details not in the notes (rust-reviewer's block 7, B7-C) |
 | (3) SWEEP-ROUTE | asked (DEPART-4C); his |
 | (4) GROUND | ruled by engine-architect (block 5): the bounds' bottom is solid ground; its words in step 1's commit, tests T1 to T3; three findings (G-1 Low and G-3 Low on wording and step S's test; G-2 Medium if built as written, the aim's fallback plane, netcode-architect's NA1, running) |
 | (5) FACING-SPAWN | **picked with its reviewers: (a)**, one `libm::sincos` per spawn at the match's start, in f64 then narrowed, quarter turns exact, no -0.0 (engine-architect's block 5; rust-reviewer's block 7, RR1 to RR5; netcode-architect's block 8, NA3: nothing on the wire or in the recordings changes); nothing to him; the batch reworded for it (`deps-4c-v2.diff`), security-auditor answering on it; the held aim at spawn by "no aim yet" (section E) |

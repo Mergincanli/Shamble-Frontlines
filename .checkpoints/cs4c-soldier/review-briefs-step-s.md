@@ -26,6 +26,9 @@ line after each finding, the verdict, then DONE) and returns at most 12 lines._
   (`plants-4c.txt`); the render counts 32 / 267 / 162 / 32 / 3 / 6, the same with the map drawn in before and after the
   first frame (`counts-order-4c.mjs`); allocation 85 bytes a frame against main's 100 (the sampling profiler's noise);
   the before and after pictures `.gate/scene-before-4c.png`, `.gate/scene-after-4c.png` (not committed).
+- **Known Low, for the round to address or defer:** G-3 (engine-architect's read, block 5): no test tells the bounds'
+  bottom from y 0; `packages/client/src/render/scene.test.ts:149` checks the literal 0, while the scene draws the
+  ground at `bounds.min[1]` (every map so far starts at 0). The fix is one test on a map raised above 0.
 - **Rules:** read-only; write only your review file. Severity on the one scale (Critical, High, Medium, Low), each
   finding with file:line and a failure case. Shell: git and gh always start their own command, with no other program in
   front of them; every file a command writes spelled out with its full path; `git checkout` and `git restore` are
