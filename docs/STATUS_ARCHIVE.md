@@ -2325,7 +2325,7 @@ _Last updated: 2026-11-27 (change-set 4b-2's docs pass, by lane 1's docs-keeper,
     only if it ever flakes.
   - 4B-SERVE-LINKS (security-auditor, round 2, its L2-3; outside 4b-2's diff, from change-set 3a; about 1 line):
     `packages/client/serve.test.mjs` still skips its two link tests wherever a link cannot be made, CI included.
-  - Met by 4c-1 (engine-architect's review of step S, `.checkpoints/cs4c-soldier/review-s-engine-architect.md` lines 29, 31, 41 and 50 to 51), closed when 4c-1 merges: 4B-TYPES-READER, met for the keys (`readMap` gives `Outcome<MapDocument>` from typed literals, `packages/client/src/app/content.ts:163`), 4B-MEMBER-KINDS (each member's kind compared, `packages/types/src/content-schema.test.mjs:152`) and 4B-BOOT-CALLS (the plants E1 and E3 caught, `.checkpoints/cs4c-soldier/plants-4c.txt` lines 25 and 28) [verified 2026-11-28 at 0645432f].
+  - Met by 4c-1 (engine-architect's review of step S, `.checkpoints/cs4c-soldier/review-s-engine-architect.md` lines 29, 31, 41 and 50 to 51), closed when 4c-1 merges: 4B-TYPES-READER, met for the keys (`readMap` gives `Outcome<MapDocument>` from typed literals, `packages/client/src/app/content.ts:163`), 4B-MEMBER-KINDS (each member's kind compared, `packages/types/src/content-schema.test.mjs:209` and `:215`) and 4B-BOOT-CALLS (the plants E1 and E3 caught, `.checkpoints/cs4c-soldier/plants-4c.txt` lines 25 and 28) [verified 2026-11-28 at 0645432f].
 - **From change-set 4c-1, "The page's scene"** (lane 1, the chat he calls Builder V6; branch `claude/ecstatic-wozniak-5cbdzs`
   standing in for `cs/4c-soldier`; his Advisor opens the pull request from a branch of its own at the scene's final head,
   his item 6 c; risk tier 1, needs-mustafa; step 0 and step S; reviewed in two rounds, six reviewers, then
@@ -2357,6 +2357,9 @@ _Last updated: 2026-11-27 (change-set 4b-2's docs pass, by lane 1's docs-keeper,
     is reached by no test; TE2-4, the grid test checks its lines' count and ends, not where they stand; TE2-5, the
     overview's aim height is never checked on the raised map (`scene.ts:274`) [the lines verified 2026-11-28 at
     0645432f].
+  - V-1 (the verifier, Low, found while checking the report's first draft; no change-set named): the street's and the
+    grass's greys are tested as different, not for which is darker: with the two swapped (the street lighter) all 11
+    scene tests still pass; the code's street 0x40 under the grass's 0x50 matches his Brave check's step 3.
 
 ## Decisions pending: the rest
 _The advisor agent's rulings (not Mustafa's), the five carry-forwards, and the old ADR and design lines, moved from
