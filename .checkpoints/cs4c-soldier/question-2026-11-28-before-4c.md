@@ -160,6 +160,52 @@ the advisor agent's review of the plan sheet: first the page's scene with the ma
   as outlines in the grid's grey, with no fill.
 - **Default: (b).** Unless he says otherwise, the scene is built with (b); it stays inside his "neutral greys".
 
+## Corrected at 01:12 Amsterdam (from the clock), after game-designer's read of his sandbox's code (`game-designer-read.md`)
+game-designer read the sandbox's code itself (his Testlines repository, commit be608cad, the commit his Export names;
+fetched read-only by its public address, outside the one repository this session has attached: told to him). Three
+things this file said were wrong, and they are corrected here; where this block and the text above differ, this block
+holds.
+### MOVE-RULES, row 2 corrected
+- **What his sandbox really does:** a flat-bottomed body 0.4 m in radius meets the step; he rises as soon as the step's
+  top is at most the step height (and 5 mm) above his feet; **a short pull then carries him onto the top** (up to
+  0.265 m over 5 ticks, about 0.17 s); he then **stands on a small flat circle of 0.15 m round his centre**, so he
+  holds a little past an edge (0.15 m). On a ramp he stands at the slope's height under his centre.
+- Above I said "the body's round foot rests on it" (it is a flat circle) and "the sandbox's pull onto the block is left
+  out" (that holds only for a body that stands on its full width): both withdrawn. Which body the game takes is the new
+  question BODY-SHAPE below.
+### MOVE-RULES, a new row 9: steep slopes
+- **His sandbox:** he walks up any slope a tick's step allows (about 260 % at walking speed), so in the street corner he
+  walks up the houses' roofs (89 % and 95 %) once he has gained their 2.6 m edge. **The old game:** it looks 0.7 m ahead
+  and refuses anything steeper than about 63 to 79 %. (The steepest slope he walked in the sandbox was its stair, 64 %.)
+- This row joins MOVE-RULES' options: under (a) he walks the roofs as in the sandbox; under (c) the old game's rule; or
+  he names a limit of his own (a grade, a new number). Above, "the steepest slope he can walk" was listed under
+  NO-SOURCE: the sandbox has no such number, so it moves here.
+### NO-SOURCE, its list corrected
+- **The body's height is in his Export already:** measured at 1.8 m (`measured.soldier_height_m`) and as the hit
+  cylinder's height (`constants.shot_geometry.hit_cylinder_height_m`, 1.8 m). It leaves this list: the game takes it
+  from his Export.
+- **Numbers the sandbox keeps in its code that were missing above:** the foot's radius (0.15 m); the pull's three
+  numbers (0.5 of the way a tick, done under 0.03 m, up to 0.9 of the foot); the snap down (he falls from anything over
+  0.2 m; a snap of the full step height would put him on the ground at once from a 0.55 m block); the 5 mm step
+  allowance (recommended: none in the game, his numbers exactly); and two speed gates of the soft push (0.2 and
+  0.1 m/s).
+- **The soft push's four limits, with the sandbox's values** (for option (b)'s starting values): no push between two
+  soldiers whose feet differ by 1.0 m or more; a head-on push turns sideways by 0.7 of itself; a push never undoes more
+  than half of his own step forward; at most 0.25 m a tick (7.5 m/s at 30 steps a second). His Export is at 30 steps a
+  second, the game's rate, so these carry over as they are.
+- The options and the recommendation stand: (b), each number a row marked "not from your Export".
+### BODY-SHAPE: which body does the soldier have when he meets steps, edges and ramps? (new; the full text follows)
+- **Why it matters:** the plan told him "a vertical capsule" (a round bottom), and rust-reviewer's prototype shows that
+  body cannot gain the 0.55 m step and be stopped by the 0.56 m one (the yard's test) under any rule it tried.
+- **Options:** (1) the capsule, as the plan said: fails the step test; (2) an upright cylinder of 0.4 m with a flat
+  foot: passes the step test 9 of 9 and 9 of 9, but he can stand 0.4 m out over an edge and floats 0.10 to 0.20 m over
+  the yard's ramps; (3a) his sandbox's own body, the 0.4 m body for walls and steps, the 0.15 m foot and the pull:
+  exactly what he played; (3b) the same without the pull, standing on his whole body on a step he has just taken until
+  his foot reaches it.
+- **Recommended: (3a)**, if rust-reviewer's prototype, run again with the foot and the pull, passes every run (the two
+  steps, the 3.05 and 3.10 m ledges, the ramps); the run is going on now, and its result comes with the next update.
+  Fallback (2), with its overhang and float said to him before his Brave check.
+
 ## One line, no question
 STEP12-GO is in the register already (`docs/DECISIONS.md:183`, since 4b-2's docs pass), so it is not written again.
 Only his go for 4b-2's merge, his word on merging and his design notes (and his message of 23:59, by BOARD-WORDS) go
