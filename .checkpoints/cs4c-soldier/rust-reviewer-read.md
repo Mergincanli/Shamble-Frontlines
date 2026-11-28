@@ -1181,3 +1181,13 @@ DONE
 | C5 | collision.rs `bounds_m`, `floor_y()`, `candidates`; `body.rs` (the sweep and every rule of 11.3, `QueryCounts`); `movement.rs` (`step_soldier` 2a to 2i with the wish's cap, `push_pass`); `authority_step(&mut self, &Rules, &StaticWorld, &mut QueryCounts, commands)` in 11.1's order; room: `rules: Rules` owned and `query_counts`, `Room::new` taking `Rules` by value, `Room::query_counts()`, :282 lending the three; `LocalMatch::new` taking `Rules` by value; pins re-made | 6 to 21, 23, 24, 26, 28's box top, 29, 30, 36's moving half, 38's direct-feed case, 40; 22's facing halves (S-1 to S-3 under the movement) |
 
 DONE
+
+## Block 17. C3's exp and sincos: the vectors' form (Q1), the rate signature (Q2), ads (Q3), the shares' 1 ulp domain (Q4), the vector files (Q5) (2026-11-28)
+### Plan
+1. Measure with rr7's two libm 0.2.16 rlibs (scratch under .gate/rr17/): `libm::exp` and `libm::sincos` f64 bits over the proposed inputs natively and in wasm32 under Node; Python decimal for the correctly rounded f64 (count off, largest ulp) and for Q4's shares (easing T in (0, 5], push strength in [0, 100] swept toward 0).
+2. Q5's file form from that count: make_f32_vectors.py's pins (computed or recorded); edges from libm's own branch constants; the four call sites and wasm-rules.spec.ts:11's list.
+3. Q1: F1 and the `pub mod`; the cost (rem_pio2_large on a raw sincos); the scan rule's wording, bites, controls; the gap outside sim's src; one scratch build of the players' twins (release and dev) from a git-archive copy with the batch and the drafts in Q1's form, `twinProblems` plus a positive control; clippy once on that copy.
+4. Q2 (strength 0), Q3 (what the multiplier multiplies), row 2's plant on distinct values.
+5. Answers, count delta, DONE.
+
+### Notes

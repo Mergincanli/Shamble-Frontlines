@@ -221,7 +221,27 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   `/home/user/Shamble-Frontlines/.gate/cs4b-2`. A session of another account works on its own branch from this
   branch's head and never pushes here (his Lanes rule). SEAT-OUT from him: stop at a whole point and report the last
   commit's id.
-- **State (17:00 Amsterdam, from the clock): C2 is committed and pushed, CI running on it.** The code commit follows
+- **State (17:14 Amsterdam, from the clock): C2 is green in CI; C3 is being built in the worktree.** C2 =
+  **14538bd74c029f3beab4bbb05006be8e8889a38a** (notes 411d8e96 before it): gate and smoke run 46162913451, toolchain run
+  46162913429 (finished 16:13:28 UTC, 12 min 2 s). C3 so far (saved as `cs4c-soldier/c3-wip.patch` for the tracked
+  files and `cs4c-soldier/c3-wip/` for the new ones, on the head this notes commit makes): the batch applied
+  (`git apply` of `deps-4c-v2.diff`, its digest 0edaf8f3... checked; the five files then equal the approved five
+  digests exactly); `fmath.rs` (the three helpers, `share_per_tick` by a rate, `facing_of` with the quarter turns,
+  `DEG_TO_RAD`; tests: the helpers' signed zeros, the constant's bits, the quarter turns by bits, and 45, 120, 240 and
+  the largest double under 360 against the route's correctly rounded reference, `facing-ref-c3.py`); `rules.rs`
+  (`Rules`, `Rules::take` with its eight refusals, `HeadroomFeet` with `HEADROOM_FEET` = `SandboxTest`,
+  `with_headroom_feet` under `cfg(test)`; tests: each of the 28 fields reaching its own rules and no other, each
+  refusal by name with each limit playing, the shares within one f32 step of `share-ref-c3.py`'s decimal reference,
+  the stamina's units); `soldiers.rs`'s `SpawnPoint` and `spawn_points` (ranked by id in byte order; W-2's order half
+  tested); collision.rs's `narrow` as `pub(crate)`; F1 in `dependency_rules.rs` (sim's three exact lines, the root's
+  libm line to the byte, one locked libm version, only `sim` names libm, with plants). sim's 46 unit tests pass and
+  the dependency rules' 3. **Open:** rust-reviewer's block 17 (running: the vectors' form, whether the two libm
+  allowances may sit on two functions returning the routines' own f64 results, the rate signature, `ads` as a speed,
+  the shares' accuracy domain, the vectors' files), sent a finding of mine too: at the largest double under 360 the
+  route gives x a688d313 where the true angle's correctly rounded x is a68efa35 (the constant's rounding outweighs a
+  sine of 1e-15). Still to build: the libm scan rule, `tests/support/marking.rs` with layering.rs and the content
+  panic scan switched to it, the vectors (after block 17), the plants, the checks; then security-auditor on C3's
+  commit (F9). Earlier state (17:00), kept: **C2 is committed and pushed, CI running on it.** The code commit follows
   this notes commit (no `[skip ci]` on it, so CI runs on the head). Its proof, on the very tree committed (`git diff
   --binary` compared byte for byte with `c2-wip.patch` after the plants, the checks and the gate): the plants' whole
   run again with V1b (`plants-4c2.txt`: 15 of 15 caught, 5 of 5 held, every file put back); the full local checks

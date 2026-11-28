@@ -1,0 +1,423 @@
+diff --git a/Cargo.lock b/Cargo.lock
+index 72096735..02d2f952 100644
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -57,6 +57,7 @@ checksum = "4e7648175b45a9a48536d676f68d918270699102aa8dab5496df06904c914600"
+ name = "client-endpoint"
+ version = "0.0.0"
+ dependencies = [
++ "content",
+  "protocol",
+  "sim",
+ ]
+@@ -271,6 +272,7 @@ dependencies = [
+ name = "room"
+ version = "0.0.0"
+ dependencies = [
++ "content",
+  "protocol",
+  "sim",
+ ]
+@@ -335,6 +337,7 @@ name = "sim"
+ version = "0.0.0"
+ dependencies = [
+  "content",
++ "libm",
+  "parry3d",
+ ]
+ 
+diff --git a/Cargo.toml b/Cargo.toml
+index 539634c6..fdf4853f 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -20,6 +20,12 @@ wasm-bindgen = "=0.2.130"
+ # (crates/sim/src/collision.rs). Each bump is its own change-set: the source audit behind the built-file check
+ # (packages/client/scripts/build-checks.mjs) is per version.
+ parry3d = { version = "=0.31.1", default-features = false, features = ["dim3", "f32", "alloc", "enhanced-determinism"] }
++# The maths routines the simulation calls itself (ADR 0004 part 7: transcendental maths only through pinned libm):
++# the exponential for the movement's easing shares and the sine and cosine (one routine, `sincos`) for the spawns'
++# facings, each worked out once per match (change-set 4c). Already in the lockfile, at this version, through the
++# collision library's vector maths; each routine it brings is on the built-file check's reviewed list with its
++# vectors (packages/client/scripts/maths-allowed.mjs).
++libm = "=0.2.16"
+ 
+ # Every crate opts in with `[lints] workspace = true` (ADR 0002 parts 4 and 7).
+ [workspace.lints.rust]
+diff --git a/crates/client-endpoint/Cargo.toml b/crates/client-endpoint/Cargo.toml
+index b536dd6b..7a62b19b 100644
+--- a/crates/client-endpoint/Cargo.toml
++++ b/crates/client-endpoint/Cargo.toml
+@@ -10,5 +10,11 @@ publish.workspace = true
+ protocol = { path = "../protocol" }
+ sim = { path = "../sim" }
+ 
++# The endpoint's own tests build its copy of the collision world (the aim's cast) from a map document (a content
++# type); the endpoint's code takes the world from the constructor, and never names `content` (devtools'
++# tests/layering.rs holds that).
++[dev-dependencies]
++content = { path = "../content" }
++
+ [lints]
+ workspace = true
+diff --git a/crates/devtools/tests/dependency_rules.rs b/crates/devtools/tests/dependency_rules.rs
+index d7eebb0d..9439ebb4 100644
+--- a/crates/devtools/tests/dependency_rules.rs
++++ b/crates/devtools/tests/dependency_rules.rs
+@@ -5,10 +5,12 @@
+ //! would be in the simulation's tree too. The rule names direct dependencies only, so the manifest's text is the
+ //! whole input: no cargo call, and nothing that needs a package to be on disk.
+ //!
+-//! `sim` depends on `content` and on the collision library alone (ADR 0002 part 3; ADR 0004 part 10), and the
+-//! library's line and three locked versions are the ones Mustafa said yes to: a change to any of them fails here
+-//! by name, so it reaches him before it reaches a build (security-auditor's finding on the batch: the feature
+-//! compare stays silent when `std` is turned on in every build alike, and a version bump trips nothing).
++//! `sim` depends on `content`, on the collision library and on the pinned maths routines alone (ADR 0002 part 3; ADR
++//! 0004 parts 7 and 10), and the library's line and three locked versions are the ones Mustafa said yes to: a change
++//! to any of them fails here by name, so it reaches him before it reaches a build (security-auditor's finding on the
++//! batch: the feature compare stays silent when `std` is turned on in every build alike, and a version bump trips
++//! nothing). The maths routines' crate, `libm`, is held the same way (change-set 4c's dependency batch, F1): the
++//! root's one line to the byte, one locked version, and the simulation the only crate of ours that names it.
+ //!
+ //! The content crate's rule is stricter than "no normal dependency": its manifest has three tables, `[package]`,
+ //! `[dev-dependencies]` and `[lints]`, and the second holds exactly one line, the type writer
+@@ -112,14 +114,37 @@ fn locked(lock: &str, name: &str) -> Vec<String> {
+         .collect()
+ }
+ 
+-/// Whether a manifest asks for the collision library: its name on any line that is not a comment (a dependency's
+-/// line in any table, or a table of its own).
+-fn names_library(manifest: &str) -> bool {
++/// Whether a manifest asks for a package: its name on any line that is not a comment (a dependency's line in any
++/// table, a table of its own, or a `package = ".."` that renames it).
++fn names(manifest: &str, package: &str) -> bool {
+     manifest
+         .lines()
+-        .any(|line| !line.trim_start().starts_with('#') && line.contains("parry3d"))
++        .any(|line| !line.trim_start().starts_with('#') && line.contains(package))
+ }
+ 
++/// The crates of ours whose manifests name a package, by folder name, in the folder's order.
++fn askers(root: &Path, package: &str) -> Vec<String> {
++    let mut askers = Vec::new();
++    let mut crates: Vec<String> = std::fs::read_dir(root.join("crates"))
++        .expect("the crates folder")
++        .map(|entry| entry.expect("an entry").file_name().to_string_lossy().into_owned())
++        .collect();
++    crates.sort_unstable();
++    for krate in crates {
++        if root.join("crates").join(&krate).join("Cargo.toml").is_file()
++            && names(&manifest_of(&krate), package)
++        {
++            askers.push(krate);
++        }
++    }
++    askers
++}
++
++/// The maths routines' line in the root, to the byte, and its one locked version (the batch's F1; security-auditor's
++/// answer of 2026-11-28 names them with the batch's five digests).
++const MATHS: &str = r#"libm = "=0.2.16""#;
++const MATHS_LOCKED: &str = "0.2.16";
++
+ /// What a failure says: whose decision the pinned text is.
+ const HIS_YES: &str = "pinned by Mustafa's FEATURE-COMPARE (a) of 2026-11-26 (docs/DECISIONS.md, 14:09:13 UTC): \"a change of parry3d's version or of the two packages' versions needs a new yes from me; the library's std stays off\". Ask him before this changes";
+ const LIBRARY: &str = r#"parry3d = { version = "=0.31.1", default-features = false, features = ["dim3", "f32", "alloc", "enhanced-determinism"] }"#;
+@@ -130,7 +155,7 @@ const PINNED: [(&str, &str); 3] = [
+ ];
+ 
+ #[test]
+-fn the_simulation_depends_on_the_content_crate_and_the_collision_library_alone() {
++fn the_simulation_depends_on_the_content_crate_the_collision_library_and_the_maths_routines_alone() {
+     let manifest = manifest_of("sim");
+     let (tables, _) = tables_and_package_keys(&manifest);
+     assert_eq!(
+@@ -138,13 +163,16 @@ fn the_simulation_depends_on_the_content_crate_and_the_collision_library_alone()
+         ["package", "dependencies", "lints"],
+         "crates/sim/Cargo.toml has a table this rule does not allow"
+     );
++    // Three exact lines: a renamed dependency (`m = { package = "libm" }`) or a feature of the simulation's own is
++    // another line, and fails here.
+     assert_eq!(
+         table(&manifest, "dependencies"),
+         [
+             "content = { path = \"../content\" }",
++            "libm = { workspace = true }",
+             "parry3d = { workspace = true }"
+         ],
+-        "the simulation's dependencies are the content crate and the collision library, and nothing else"
++        "the simulation's dependencies are the content crate, the maths routines and the collision library, and nothing else"
+     );
+     // The library's one line in the root: its version to the digit, default features off (so no `std`), four features.
+     let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+@@ -161,6 +189,17 @@ fn the_simulation_depends_on_the_content_crate_and_the_collision_library_alone()
+         [LIBRARY],
+         "the root Cargo.toml's parry3d line: {HIS_YES}"
+     );
++    // The maths routines' one line in the root, to the byte (no feature of its own: `default` and `arch`, as the
++    // lockfile had them before the batch).
++    let maths: Vec<String> = table(&read("Cargo.toml"), "workspace.dependencies")
++        .into_iter()
++        .filter(|line| line.starts_with("libm"))
++        .collect();
++    assert_eq!(
++        maths,
++        [MATHS],
++        "the root Cargo.toml's libm line is the batch's (security-auditor's answer of 2026-11-28)"
++    );
+     let lock = read("Cargo.lock");
+     for (name, version) in PINNED {
+         assert_eq!(
+@@ -169,29 +208,26 @@ fn the_simulation_depends_on_the_content_crate_and_the_collision_library_alone()
+             "Cargo.lock's {name}: {HIS_YES}"
+         );
+     }
++    assert_eq!(
++        locked(&lock, "libm"),
++        [MATHS_LOCKED],
++        "Cargo.lock holds libm at another version, or at two: the maths routines are pinned at one"
++    );
+     // The library has one asker. Another crate naming it could turn a feature on for every build beside the
+     // root's pinned line (cargo joins the features of all who ask), and the simulation would link what it never
+     // chose. One such feature, `spade`, compiles the library's one use of `rstar` and with it `heapless` 0.8.0,
+     // which has nine advisories (2026-11-18): with `spade` off nothing reaches either, and the lockfile shows it.
+-    let mut askers = Vec::new();
+-    for entry in std::fs::read_dir(root.join("crates")).expect("the crates folder") {
+-        let krate = entry.expect("an entry").file_name();
+-        let krate = krate.to_string_lossy().into_owned();
+-        if root
+-            .join("crates")
+-            .join(&krate)
+-            .join("Cargo.toml")
+-            .is_file()
+-            && names_library(&manifest_of(&krate))
+-        {
+-            askers.push(krate);
+-        }
+-    }
++    // The maths routines too: only the simulation names them, so no other crate of ours calls them on its own.
+     assert_eq!(
+-        askers,
++        askers(&root, "parry3d"),
+         ["sim"],
+         "only the simulation's manifest names the collision library"
+     );
++    assert_eq!(
++        askers(&root, "libm"),
++        ["sim"],
++        "only the simulation's manifest names the maths routines"
++    );
+     assert_eq!(
+         locked(&lock, "spade"),
+         Vec::<String>::new(),
+@@ -257,11 +293,36 @@ fn the_rule_reads_what_it_should_refuse() {
+         "[dev-dependencies.parry3d]\nworkspace = true\n",
+         "[target.'cfg(unix)'.dependencies]\n  parry3d = \"=0.31.1\"\n",
+     ] {
+-        assert!(names_library(asking), "{asking}");
++        assert!(names(asking, "parry3d"), "{asking}");
+     }
+-    assert!(!names_library(
+-        "# The simulation holds parry3d; this crate does not.\n[dependencies]\nsim = { path = \"../sim\" }\n"
++    assert!(!names(
++        "# The simulation holds parry3d; this crate does not.\n[dependencies]\nsim = { path = \"../sim\" }\n",
++        "parry3d"
+     ));
++    // The maths routines' half (F1): a renamed libm and a feature of the simulation's own are other lines of its
++    // table; a second asker is seen in each spelling, a rename's `package` included; a moved version is seen.
++    let renamed = "[package]\nname = \"sim\"\n[dependencies]\ncontent = { path = \"../content\" }\nm = { package = \"libm\", workspace = true }\nparry3d = { workspace = true }\n[lints]\n";
++    assert_eq!(
++        table(renamed, "dependencies"),
++        [
++            "content = { path = \"../content\" }",
++            "m = { package = \"libm\", workspace = true }",
++            "parry3d = { workspace = true }"
++        ]
++    );
++    for asking in [
++        "[dependencies]\nlibm = { workspace = true }\n",
++        "[dependencies]\nmaths = { package = \"libm\", version = \"=0.2.16\" }\n",
++        "[dev-dependencies.libm]\nworkspace = true\n",
++    ] {
++        assert!(names(asking, "libm"), "{asking}");
++    }
++    assert!(!names("# The simulation alone calls libm.\n[dependencies]\nsim = { path = \"../sim\" }\n", "libm"));
++    assert_ne!(MATHS.replace("=0.2.16", "0.2.16"), MATHS);
++    assert_eq!(
++        locked("[[package]]\nname = \"libm\"\nversion = \"0.2.15\"\n\n[[package]]\nname = \"libm\"\nversion = \"0.2.16\"\n", "libm"),
++        ["0.2.15", "0.2.16"]
++    );
+     assert_eq!(
+         locked(
+             "[[package]]\nname = \"spade\"\nversion = \"2.15.0\"\n",
+diff --git a/crates/room/Cargo.toml b/crates/room/Cargo.toml
+index 1ac16d19..0b7d11a7 100644
+--- a/crates/room/Cargo.toml
++++ b/crates/room/Cargo.toml
+@@ -10,5 +10,10 @@ publish.workspace = true
+ protocol = { path = "../protocol" }
+ sim = { path = "../sim" }
+ 
++# The room's own tests build a collision world from a map document (a content type); the room's code takes the world
++# from the constructor that loads the content, and never names `content` (devtools' tests/layering.rs holds that).
++[dev-dependencies]
++content = { path = "../content" }
++
+ [lints]
+ workspace = true
+diff --git a/crates/sim/Cargo.toml b/crates/sim/Cargo.toml
+index 8dd09590..118687ff 100644
+--- a/crates/sim/Cargo.toml
++++ b/crates/sim/Cargo.toml
+@@ -5,10 +5,12 @@ edition.workspace = true
+ rust-version.workspace = true
+ publish.workspace = true
+ 
+-# The content the simulation runs on (ADR 0002 part 3: `sim` depends on `content`), and the collision library, which
+-# only crates/sim/src/collision.rs names (ADR 0004 part 10); its version and features are set once, in the root.
++# The content the simulation runs on (ADR 0002 part 3: `sim` depends on `content`), the collision library, which
++# only crates/sim/src/collision.rs names (ADR 0004 part 10), and the pinned maths routines (ADR 0004 part 7); their
++# versions and features are set once, in the root.
+ [dependencies]
+ content = { path = "../content" }
++libm = { workspace = true }
+ parry3d = { workspace = true }
+ 
+ [lints]
+diff --git a/crates/sim/src/collision.rs b/crates/sim/src/collision.rs
+index 109c3de6..60197bed 100644
+--- a/crates/sim/src/collision.rs
++++ b/crates/sim/src/collision.rs
+@@ -99,8 +99,9 @@ pub struct StaticWorld {
+ }
+ 
+ /// A corner as the simulation holds it: narrowed once, here, and a zero without its sign (a file cannot hold a
+-/// minus zero, a document built in code can, and the sign would reach the tree's bytes).
+-fn narrow(corner: [f64; 3]) -> [f32; 3] {
++/// minus zero, a document built in code can, and the sign would reach the tree's bytes). A spawn's point is
++/// narrowed by the same rule (`soldiers::spawn_points`).
++pub(crate) fn narrow(corner: [f64; 3]) -> [f32; 3] {
+     corner.map(|value| {
+         let value = value as f32;
+         if value == 0.0 { 0.0 } else { value }
+diff --git a/crates/sim/src/lib.rs b/crates/sim/src/lib.rs
+index 14318e7a..d480ef0c 100644
+--- a/crates/sim/src/lib.rs
++++ b/crates/sim/src/lib.rs
+@@ -17,8 +17,10 @@ compile_error!(
+ 
+ pub mod aim;
+ pub mod collision;
++pub mod fmath;
+ pub mod ids;
+ pub mod rng;
++pub mod rules;
+ pub mod soldiers;
+ pub mod state_hash;
+ pub mod time;
+diff --git a/crates/sim/src/soldiers.rs b/crates/sim/src/soldiers.rs
+index 697b123f..219a5739 100644
+--- a/crates/sim/src/soldiers.rs
++++ b/crates/sim/src/soldiers.rs
+@@ -3,7 +3,11 @@
+ //! step 1). Every slot is reached through `get` and `get_mut`, so a slot from anywhere, a command's included, never
+ //! panics.
+ 
++use content::map::{MapDocument, Spawn};
++
+ use crate::aim::AimCm;
++use crate::collision::narrow;
++use crate::fmath::facing_of;
+ use crate::ids::SoldierId;
+ use crate::vec::V3;
+ 
+@@ -163,6 +167,33 @@ impl<const N: usize> Default for Soldiers<N> {
+     }
+ }
+ 
++/// Where a soldier can start: a map's spawn as the simulation holds it, its point narrowed once (as a shape's corners
++/// are) and its heading as a direction (x, z).
++#[derive(Debug, Clone, Copy, PartialEq)]
++pub struct SpawnPoint {
++    pub at: V3,
++    pub facing: [f32; 2],
++}
++
++/// A map's spawns as the match's spawn table, built once when a match starts (allocating, never in a tick): ranked by
++/// id in byte order, as the shapes are (`collision.rs`), so "street_10" comes before "street_2". The first is where
++/// the first soldier stands: a build default until the barracks, not a rule of his (game-designer's N37).
++#[must_use]
++pub fn spawn_points(map: &MapDocument) -> Vec<SpawnPoint> {
++    let mut spawns: Vec<&Spawn> = map.spawns.iter().collect();
++    spawns.sort_by(|a, b| a.id.as_bytes().cmp(b.id.as_bytes()));
++    spawns
++        .into_iter()
++        .map(|spawn| {
++            let [x, y, z] = narrow(spawn.at);
++            SpawnPoint {
++                at: V3::new(x, y, z),
++                facing: facing_of(spawn.facing_deg),
++            }
++        })
++        .collect()
++}
++
+ #[cfg(test)]
+ mod tests {
+     use super::*;
+@@ -295,4 +326,56 @@ mod tests {
+         assert_eq!(again, first);
+         assert!(table.resolve(first).is_some());
+     }
++
++    /// A map built in code with the spawns it is given, in that order (it never passed the loader).
++    fn map_with(spawns: &[(&str, [f64; 3], f64)]) -> MapDocument {
++        MapDocument {
++            id: "spawns".to_owned(),
++            bounds: content::map::Bounds {
++                min: [-50.0, 0.0, -50.0],
++                max: [50.0, 20.0, 50.0],
++            },
++            spawns: spawns
++                .iter()
++                .map(|(id, at, facing_deg)| Spawn {
++                    id: (*id).to_owned(),
++                    at: *at,
++                    facing_deg: *facing_deg,
++                })
++                .collect(),
++            shapes: Vec::new(),
++            regions: Vec::new(),
++        }
++    }
++
++    /// The spawn table is ranked by id in byte order, whatever the file's order (W-2's order half, block 15): "c",
++    /// "a", "b" give "a" first; "street_10" comes before "street_2" (no number-aware order). Each point is narrowed as
++    /// a shape's corner is (a minus zero loses its sign), and each heading is `facing_of`'s.
++    #[test]
++    fn the_spawn_table_is_ranked_by_id_in_byte_order() {
++        let ids = |map: &MapDocument| -> Vec<[u32; 3]> {
++            spawn_points(map)
++                .iter()
++                .map(|point| point.at.to_array().map(f32::to_bits))
++                .collect()
++        };
++        let map = map_with(&[
++            ("c", [3.0, 0.0, 0.0], 0.0),
++            ("a", [1.0, 0.0, 0.0], 90.0),
++            ("b", [2.0, 0.0, 0.0], 180.0),
++        ]);
++        let order: Vec<f32> = spawn_points(&map).iter().map(|point| point.at.to_array()[0]).collect();
++        assert_eq!(order, [1.0, 2.0, 3.0]);
++        assert_eq!(
++            spawn_points(&map).iter().map(|point| point.facing).collect::<Vec<_>>(),
++            [facing_of(90.0), facing_of(180.0), facing_of(0.0)]
++        );
++        let streets = map_with(&[("street_2", [2.0, 0.0, 0.0], 0.0), ("street_10", [10.0, 0.0, 0.0], 0.0)]);
++        let first = spawn_points(&streets)[0].at.to_array()[0];
++        assert_eq!(first, 10.0);
++        // A point is narrowed once, and a minus zero (which only a map built in code can hold) loses its sign.
++        let signed = map_with(&[("z", [-0.0, 0.1, -0.0], 0.0)]);
++        assert_eq!(ids(&signed), [[0, 0.1_f32.to_bits(), 0]]);
++        assert!(spawn_points(&map_with(&[])).is_empty());
++    }
+ }
