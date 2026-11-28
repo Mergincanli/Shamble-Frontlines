@@ -462,7 +462,7 @@ and c1de41e5's 11), about 1.74 times its recount of 740: under the 1,420 he hear
 | 6b | 130 / 110 = 240 | 130 / 115 = **245** | netcode-architect-read block 4 |
 | 6c | 30 / 180 = 210 | 45 / 220 = **265** | netcode-architect-read block 4 |
 | 7 | 0 / 410 = 410 | **410** (no read counted it again) | the plan |
-| **All** | **7,315** | **about 8,295 to 8,395** (13 to 15 % above the plan; revision 3.2) | |
+| **All** | **7,315** | **about 8,295 to 8,395** (13 to 15 % above the plan; revision 3.2) **Superseded: about 8,550 after rust-reviewer's block 10 (I4b); step 1's symbols and sweeps of E1 are superseded by blocks 5 to 10 and its block 11 (the consolidated table, asked)** | |
 Not in these numbers: (3a)'s five more NO-SOURCE fields than body (2) (about 50 to 75 lines); RESUME-FLASH beyond (a)
 ((b) about +30; (c) about 5 changed and two tests reversed; (d1) about +65; (d2) a new recording format and every
 recording made anew); whatever game-designer's answer on an unjumped fall adds. The two sweep forms are both carried

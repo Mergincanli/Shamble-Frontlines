@@ -10,7 +10,7 @@
   `/home/user/Shamble-Frontlines` is never switched.
 - **Base:** origin/main dae6d107fdbe942567104bcf1c9a2cbc6b3a1e0f (pull request #79's merge commit), taken in by
   fast-forward from b7145273.
-- **Last update:** 2026-11-28 13:21 Amsterdam (from the clock; an earlier save said 01:08, a time written without
+- **Last update:** 2026-11-28 13:50 Amsterdam (from the clock; an earlier save said 01:08, a time written without
   reading the clock: it was 00:57; an edit at 02:04 wrote "02:06", also unread, corrected here)
 
 ## Steps done
@@ -147,9 +147,11 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
 ## Key numbers
 - Step S as built: 1,288 written lines (bc7720f3 1,277, c1de41e5 11; `count-4c.mjs` at 3ab59bd7 against dae6d107),
   about 1.74 times its recount of 740.
-- Steps 1 to 7 recounted (the sheet's F2, revision 3.2 with every block of tonight): about 8,295 to 8,395 by the
-  designs' count (the plan 7,315); by the plan's rule (2.25 times) a stop line of about 18,660 to 18,890; each
-  SIZE-4C option's line, two thirds and rung are in F2.
+- Steps 1 to 7 recounted: **about 8,550 by the designs' count** (the sheet's I4b, after rust-reviewer's block 10;
+  F2's 8,295 to 8,395 is superseded), about 18,550 to 23,100 written lines at the measured rates; **his stop line for
+  4c-2: 18,700** (SIZE-4C (b)), two thirds about 12,470; the early look (steps 1 to 5, about 7,080 by the designs'
+  count) at about 15,360 to 19,110 written lines.
+- 4c-1 as built: 1,564 written lines with the fix pass (the hold 1,665; he was told when it passed 1,420).
 - Measured written lines against the designs' count: 4a 2.4 times, 4b-1 2.17, 4b-2 2.7.
 - 4c by the designs' count: 7,315 (steps 1 to 7, the plan's section 6) and about 630 for the scene with the map's
   reading (230 / 260 by 4b's sheet, and 60 to 80 more with as many in tests) = about 7,950. At the measured rates:
@@ -190,8 +192,19 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   `/home/user/Shamble-Frontlines/.gate/cs4b-2`. A session of another account works on its own branch from this
   branch's head and never pushes here (his Lanes rule). SEAT-OUT from him: stop at a whole point and report the last
   commit's id.
-- **State (13:21 Amsterdam, from the clock): step S's fix pass, in the worktree, not yet committed** (saved as
-  `fix-s-wip.patch` at 18454538; a new seat applies it with `git apply` on the branch's head if the worktree is lost).
+- **State (13:50 Amsterdam, from the clock): 4c-1's code is done and reviewed.** The fix pass is committed (2b2f44c2,
+  CI green: gate, smoke, toolchain 9 min 53 s) with one comment reworded (0645432f, CI running); `fix-s-wip.patch` is
+  stale (its code is in 2b2f44c2). The review: two rounds, round 2 APPROVE from graphics-engineer and test-engineer
+  (`review-s-round.md`); the plant run on 2b2f44c2 caught 45 of 45 with 3 of 3 controls (`plants-4c.txt`). Running:
+  docs-keeper's docs pass (ROADMAP, STATUS, REPO_MAP, and his line 16 pointer moved by `place-4c.mjs fix-16`). **Next
+  for 4c-1, in order:** STATUS's quotes of his item 12 b and c compared byte for byte with his saved message; the
+  verifier on everything (it retakes the after picture); the report with the pull request's title and text; the notes
+  out of the head in the final commit; a green CI run on that head; the advisor agent on it; the zip built from a
+  clean tree at that head and sent to him at once (SendUserFile); then he is told the final head's full id and the
+  Brave steps (`zip-readme-4c1.md`). **For 4c-2:** HEADROOM-FEET is his (question 13); game-designer rules again on
+  the swept wall pass with block 10's numbers (question 14 if it is his); rust-reviewer writes step 1's consolidated
+  symbol table (block 11); then the advisor agent on steps 1 to 7. Earlier state (13:21), kept: step S's fix pass was
+  then in the worktree (saved as `fix-s-wip.patch` at 18454538).
   Step 0 landed (af789ef3 and the next commit). The review round is complete (`review-s-round.md`: six reviews, the
   Medium found four times and TE-1 fixed with the Lows; four Lows and AD-4 deferred). Type checks and the unit tests
   pass on the fix (the page's 176, the Worker's 53); the full local checks run (`.gate/local-checks-fix-s.log`); then
@@ -213,10 +226,9 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   Low: `tests/layering.rs` lands in the same commit), both written in `dependency-check.md`. No saver runs: the main
   session commits and pushes the notes by hand, at least every 25 minutes, and holds notes pushes while a code head's
   toolchain run is going.
-- **Next:** wait for his answers (the question file's twelve with FALL-STEP, and the two asks in the chat); meanwhile
-  only notes and prototypes (condition 2). The advisor agent's item 10 stands as far as it goes without him (the
-  sheet's revision 3.2, section H's table); it is asked to approve steps 1 to 7 only once his answers on BODY-SHAPE,
-  SWEEP-ROUTE (DEPART-4C) and the slope (MOVE-RULES row 9) are in, with FALL-STEP.
+- **Next:** his answers are in (2026-11-28, 12:10), but for HEADROOM-FEET (question 13, asked while he is away). Finish
+  4c-1 by the State line above, then 4c-2 on top of 4c-1's final head (his item 6). The earlier "Next" (waiting for
+  his twelve answers) is done.
 
 ## Running work
 - Design reads against main dae6d107 (at most three agents at a time), each writing only its own file in
