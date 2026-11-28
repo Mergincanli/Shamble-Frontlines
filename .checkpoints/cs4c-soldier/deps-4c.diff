@@ -1,0 +1,84 @@
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -20,6 +20,11 @@
+ # (crates/sim/src/collision.rs). Each bump is its own change-set: the source audit behind the built-file check
+ # (packages/client/scripts/build-checks.mjs) is per version.
+ parry3d = { version = "=0.31.1", default-features = false, features = ["dim3", "f32", "alloc", "enhanced-determinism"] }
++# The maths routines the simulation calls itself (ADR 0004 part 7: transcendental maths only through pinned libm):
++# the exponential, once per match, for the movement's easing shares (change-set 4c). Already in the lockfile, at this
++# version, through the collision library's vector maths; each routine it brings is on the built-file check's reviewed
++# list with its vectors (packages/client/scripts/maths-allowed.mjs).
++libm = "=0.2.16"
+ 
+ # Every crate opts in with `[lints] workspace = true` (ADR 0002 parts 4 and 7).
+ [workspace.lints.rust]
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -57,6 +57,7 @@
+ name = "client-endpoint"
+ version = "0.0.0"
+ dependencies = [
++ "content",
+  "protocol",
+  "sim",
+ ]
+@@ -271,6 +272,7 @@
+ name = "room"
+ version = "0.0.0"
+ dependencies = [
++ "content",
+  "protocol",
+  "sim",
+ ]
+@@ -335,6 +337,7 @@
+ version = "0.0.0"
+ dependencies = [
+  "content",
++ "libm",
+  "parry3d",
+ ]
+ 
+--- a/crates/sim/Cargo.toml
++++ b/crates/sim/Cargo.toml
+@@ -5,10 +5,12 @@
+ rust-version.workspace = true
+ publish.workspace = true
+ 
+-# The content the simulation runs on (ADR 0002 part 3: `sim` depends on `content`), and the collision library, which
+-# only crates/sim/src/collision.rs names (ADR 0004 part 10); its version and features are set once, in the root.
++# The content the simulation runs on (ADR 0002 part 3: `sim` depends on `content`), the collision library, which
++# only crates/sim/src/collision.rs names (ADR 0004 part 10), and the pinned maths routines (ADR 0004 part 7); their
++# versions and features are set once, in the root.
+ [dependencies]
+ content = { path = "../content" }
++libm = { workspace = true }
+ parry3d = { workspace = true }
+ 
+ [lints]
+--- a/crates/room/Cargo.toml
++++ b/crates/room/Cargo.toml
+@@ -10,5 +10,10 @@
+ protocol = { path = "../protocol" }
+ sim = { path = "../sim" }
+ 
++# The room's own tests build a collision world from a map document (a content type); the room's code takes the world
++# from the constructor that loads the content, and never names `content` (devtools' tests/layering.rs holds that).
++[dev-dependencies]
++content = { path = "../content" }
++
+ [lints]
+ workspace = true
+--- a/crates/client-endpoint/Cargo.toml
++++ b/crates/client-endpoint/Cargo.toml
+@@ -10,5 +10,11 @@
+ protocol = { path = "../protocol" }
+ sim = { path = "../sim" }
+ 
++# The endpoint's own tests build its copy of the collision world (the aim's cast) from a map document (a content
++# type); the endpoint's code takes the world from the constructor, and never names `content` (devtools'
++# tests/layering.rs holds that).
++[dev-dependencies]
++content = { path = "../content" }
++
+ [lints]
+ workspace = true
