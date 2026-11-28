@@ -1,0 +1,161 @@
+start socket_tests.rs sha256 ca17a9f6f6be0322... == fixed state
+start socket.rs sha256 7ad7cb22e4316c9f... == fixed state
+start stats.rs sha256 27dfd3266a0647b2... == fixed state
+start run.sh sha256 f4a73a5b2b558a50... == fixed state
+=== clean: the fixed code, release
+       df /home/user: 14.2 GB free
+       release binary npt_net-f72f21a42e60b4c9 newer than the touch: True; lists 172 tests (before: None); ignored lists the self-test: True
+       binary sha256 c236b449d13deb2d...
+       listed the_task_poller_takes_lateness_where_the_task_runs: True
+       listed the_fate_log_and_the_histogram_agree: True
+       listed the_verdict_line_is_per_direction_and_inclusive: True
+       listed nearest_rank_and_loss_band_on_fixed_inputs: True
+       listed the_exact_excess_on_fixed_samples: True
+       listed the_cross_check_reads_delay_plus_lateness: True
+       listed a_held_lock_makes_both_directions_late: True
+RUN clean-3s (3 s, plain): exit 0; prints 39; 
+       slack now 1 ns, at start 1 ns, set 1, error None; policy SCHED_OTHER 0: the run condition accepts [1] ns at both reads (not SCHED_FIFO or SCHED_RR)
+       panic at -: (no panic)
+       up: E with L0 = 0, the judged form (U3D-L0): 13518 ns vs bar 10000 ns: would MISS (reported, not judged here)
+       down: E with L0 = 0, the judged form (U3D-L0): 8040 ns vs bar 10000 ns: would PASS (reported, not judged here)
+RUN chrt-after (6 s, chrt_after): exit 0; prints 39; release tid 1356; before: pid 1356's current scheduling policy: SCHED_OTHER; pid 1356's current scheduling priority: 0; chrt rc 0; after: pid 1356's current scheduling policy: SCHED_FIFO; pid 1356's current scheduling priority: 1; slack read from outside 0
+       slack now 0 ns, at start 1 ns, set 1, error None; policy SCHED_FIFO 1: the run condition accepts [0, 1] ns at both reads (a real-time policy: a kernel with ed4fb6d7ef68 reports 0)
+       panic at -: (no panic)
+       up: E with L0 = 0, the judged form (U3D-L0): 36256 ns vs bar 10000 ns: would MISS (reported, not judged here)
+       down: E with L0 = 0, the judged form (U3D-L0): 19827 ns vs bar 10000 ns: would MISS (reported, not judged here)
+RUN chrt-born (3 s, born): exit 0; prints 39; 
+       slack now 0 ns, at start 0 ns, set 1, error None; policy SCHED_FIFO 1: the run condition accepts [0, 1] ns at both reads (a real-time policy: a kernel with ed4fb6d7ef68 reports 0)
+       panic at -: (no panic)
+       up: E with L0 = 0, the judged form (U3D-L0): 15315 ns vs bar 10000 ns: would MISS (reported, not judged here)
+       down: E with L0 = 0, the judged form (U3D-L0): 5479 ns vs bar 10000 ns: would PASS (reported, not judged here)
+ENV \xff: exit 101 after 0.06 s; INVALID: NPT_L2_SELFTEST_SECS="\xFF" is not UTF-8, so not a whole number of seconds in 1-600; the run is INVALID, not a lateness verdict; self-test prints 1
+ENV unset: exit still running (killed at timeout) after 3.01 s; no INVALID; self-test prints 0
+ENV 0: exit 101 after 0.06 s; INVALID: NPT_L2_SELFTEST_SECS="0" is not a whole number of seconds in 1-600 (the fate log reserves about 1.12 MB per second); the run is INVALID, not a lateness; self-test prints 1
+ENV 601: exit 101 after 0.05 s; INVALID: NPT_L2_SELFTEST_SECS="601" is not a whole number of seconds in 1-600 (the fate log reserves about 1.12 MB per second); the run is INVALID, not a latene; self-test prints 1
+ENV abc: exit 101 after 0.05 s; INVALID: NPT_L2_SELFTEST_SECS="abc" is not a whole number of seconds in 1-600 (the fate log reserves about 1.12 MB per second); the run is INVALID, not a latene; self-test prints 1
+end: every file == fixed state (clean)
+start socket_tests.rs sha256 ca17a9f6f6be0322... == fixed state
+start socket.rs sha256 7ad7cb22e4316c9f... == fixed state
+start stats.rs sha256 27dfd3266a0647b2... == fixed state
+start run.sh sha256 f4a73a5b2b558a50... == fixed state
+=== F1-R: item 1 reverted (start-only slack assert, 0 under RT) + chrt -f -p 1 after start (chrt_after)
+       df /home/user: 14.2 GB free
+       release binary npt_net-f72f21a42e60b4c9 newer than the touch: True; lists 172 tests (before: None); ignored lists the self-test: True
+       ran 1; exit 101; prints before the panic 39; release tid 1558; before: pid 1558's current scheduling policy: SCHED_OTHER; pid 1558's current scheduling priority: 0; chrt rc 0; after: pid 1558's current scheduling policy: SCHED_FIFO; pid 1558's current scheduling priority: 1; slack read from outside 0
+       slack now 0 ns, at start 1 ns, set 1, error None; policy SCHED_FIFO 1: the run condition accepts [0, 1] ns at both reads (a real-time policy: a kernel with ed4fb6d7ef68 reports 0)
+       panic at crates/net/src/l2/socket_tests.rs:1688:5: assertion `left == right` failed: the slack read back at start under SCHED_FIFO 1: the run is INVALID, not a lateness verdict | left: 1 | right: 0 | stack backtrace:
+       restored, sha256 == fixed state: {'socket_tests.rs': True}
+RESULT F1-R: BITES
+=== F1-P: release thread raises its slack to 50,000 after the start read (now != 1) (self)
+       df /home/user: 14.2 GB free
+       release binary npt_net-f72f21a42e60b4c9 newer than the touch: True; lists 172 tests (before: 172); ignored lists the self-test: True
+       ran 1; exit 101; prints before the panic 39; 
+       slack now 50000 ns, at start 1 ns, set 1, error None; policy SCHED_OTHER 0: the run condition accepts [1] ns at both reads (not SCHED_FIFO or SCHED_RR)
+       panic at crates/net/src/l2/socket_tests.rs:1688:5: the slack read back 1 ns at start and 50000 ns now under SCHED_OTHER 0, outside [1]: the run is INVALID, not a lateness verdict | stack backtrace: | 0: __rustc::rust_begin_unwind | 1: core::panicking::panic_fmt
+       restored, sha256 == fixed state: {'socket.rs': True}
+RESULT F1-P: BITES
+=== F2-A: one DOWN entry left in the fate log after the pre-touch's drain (S5b, my form) (self)
+       df /home/user: 14.2 GB free
+       release binary npt_net-f72f21a42e60b4c9 newer than the touch: True; lists 172 tests (before: 172); ignored lists the self-test: True
+       ran 1; exit 101; prints before the panic 39; 
+       slack now 1 ns, at start 1 ns, set 1, error None; policy SCHED_OTHER 0: the run condition accepts [1] ns at both reads (not SCHED_FIFO or SCHED_RR)
+       panic at crates/net/src/l2/socket_tests.rs:1677:9: assertion `left == right` failed: down: the fate log holds 30001 fates of the 30000 sent: the run is INVALID, not a lateness verdict | left: 30001 | right: 30000 | stack backtrace:
+       restored, sha256 == fixed state: {'socket_tests.rs': True}
+RESULT F2-A: BITES
+=== F2-R: item 2 reverted (fate_log_full after the loop, no fates == n) + the same DOWN entry (self)
+       df /home/user: 14.2 GB free
+       release binary npt_net-f72f21a42e60b4c9 newer than the touch: True; lists 172 tests (before: 172); ignored lists the self-test: True
+       ran 1; exit 0; prints before the panic 39; 
+       slack now 1 ns, at start 1 ns, set 1, error None; policy SCHED_OTHER 0: the run condition accepts [1] ns at both reads (not SCHED_FIFO or SCHED_RR)
+       panic at -: (no panic)
+       restored, sha256 == fixed state: {'socket_tests.rs': True}
+RESULT F2-R: PASSED (informative)
+=== F3-P: pre-touch stops at half the capacity (self)
+       df /home/user: 14.2 GB free
+       release binary npt_net-f72f21a42e60b4c9 newer than the touch: True; lists 172 tests (before: 172); ignored lists the self-test: True
+       ran 1; exit 101; prints before the panic 39; 
+       slack now 1 ns, at start 1 ns, set 1, error None; policy SCHED_OTHER 0: the run condition accepts [1] ns at both reads (not SCHED_FIFO or SCHED_RR)
+       panic at crates/net/src/l2/socket_tests.rs:1642:5: assertion `left == right` failed: the fate log pre-touched with 30500 of its 61000 entries: the run is INVALID, not a lateness verdict | left: 30500 | right: 61000 | stack backtrace:
+       restored, sha256 == fixed state: {'socket_tests.rs': True}
+RESULT F3-P: BITES
+=== F4-R: item 4 reverted (Err(_) => 100) + NPT_L2_SELFTEST_SECS=\xff (env)
+       df /home/user: 14.2 GB free
+       release binary npt_net-f72f21a42e60b4c9 newer than the touch: True; lists 172 tests (before: 172); ignored lists the self-test: True
+       \xff: exit still running (killed at timeout) after 5.01 s; no INVALID; self-test prints 0
+       restored, sha256 == fixed state: {'socket_tests.rs': True}
+RESULT F4-R: INVALID (informative)
+end: every file == fixed state (bites)
+start socket_tests.rs sha256 ca17a9f6f6be0322... == fixed state
+start socket.rs sha256 7ad7cb22e4316c9f... == fixed state
+start stats.rs sha256 27dfd3266a0647b2... == fixed state
+start run.sh sha256 f4a73a5b2b558a50... == fixed state
+=== F5-X1: agree() always says disagree (unit)
+       df /home/user: 14.2 GB free
+       debug test binary newer than the touch: True; ran 1; compiled; test result: FAILED. 0 passed; 1 failed
+       panic at crates/net/src/l2/socket_tests.rs:1241:5: assertion `left == right` failed: E MISS and p99.9 FAIL | left: "disagree" | right: "agree" | stack backtrace:
+       restored, sha256 == fixed state: {'socket_tests.rs': True}
+RESULT F5-X1: BITES
+=== F5-X2: loss share over the Delivered (n128) instead of every fate (unit)
+       df /home/user: 14.2 GB free
+       debug test binary newer than the touch: True; ran 1; compiled; test result: FAILED. 0 passed; 1 failed
+       panic at crates/net/src/l2/socket_tests.rs:1256:5: assertion `left == right` failed: 106 lost of 10,106 fates is 1.049 %, inside 0.95-1.05 % (over the 10,000 Delivered it would be 1.06 %) | left: (10000, 10106, 106, false) | right: (10000, 10106, 106, true) | stack backtrace:
+       restored, sha256 == fixed state: {'socket_tests.rs': True}
+RESULT F5-X2: BITES
+=== F6-R: samples() reverted to the old panic on an early fate (unit)
+       df /home/user: 14.2 GB free
+       debug test binary newer than the touch: True; ran 1; compiled; test result: FAILED. 0 passed; 1 failed
+       panic at crates/net/src/l2/socket_tests.rs:749:43: a fate released before it arrived: Fate { ordinal: 0, dir: 1, kind: Delivered, overtaken: false, index: 0, t_in_ns: 5000000, due_ns: 4000000, out_ns: 4000000, len: 40, errno: 0 } | stack backtrace: | 0: __rustc::rust_begin_unwind | at /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/std/src/panicking.rs:679:5
+       restored, sha256 == fixed state: {'socket_tests.rs': True}
+RESULT F6-R: BITES
+=== F6-P: an early fate dropped, not counted (unit)
+       df /home/user: 14.1 GB free
+       debug test binary newer than the touch: True; ran 1; compiled; test result: FAILED. 0 passed; 1 failed
+       panic at crates/net/src/l2/socket_tests.rs:1244:5: assertion `left == right` failed: down: the one fate released before it arrived is counted | left: 0 | right: 1 | stack backtrace:
+       restored, sha256 == fixed state: {'socket_tests.rs': True}
+RESULT F6-P: BITES
+=== F6-S: delays under 25 ms read as early (self-test) (self)
+       df /home/user: 14.1 GB free
+       release binary npt_net-f72f21a42e60b4c9 newer than the touch: True; lists 172 tests (before: None); ignored lists the self-test: True
+       ran 1; exit 101; prints before the panic 39; 
+       slack now 1 ns, at start 1 ns, set 1, error None; policy SCHED_OTHER 0: the run condition accepts [1] ns at both reads (not SCHED_FIFO or SCHED_RR)
+       panic at crates/net/src/l2/socket_tests.rs:1667:9: assertion `left == right` failed: up: Delivered fates released before they arrived: the run is INVALID, not a lateness verdict | left: 14519 | right: 0 | stack backtrace:
+       restored, sha256 == fixed state: {'socket_tests.rs': True}
+RESULT F6-S: BITES
+end: every file == fixed state (bites)
+start socket_tests.rs sha256 ca17a9f6f6be0322... == fixed state
+start socket.rs sha256 7ad7cb22e4316c9f... == fixed state
+start stats.rs sha256 27dfd3266a0647b2... == fixed state
+start run.sh sha256 f4a73a5b2b558a50... == fixed state
+=== SH-fixed: run.sh check mode (fixed)
+       df /home/user: 14.1 GB free
+       run.sh exit 0; non-.rs files under crates older than T0: 0 of 43; .rs older than T0: 0 of 62; new records ['selftest-20261109T034712Z.txt']
+       record exits: ['exit_status 0', 'exit_status 0']; moved to u3d-fix-review-runsh-SH-fixed-selftest-20261109T034712Z.txt
+       results/u3d-timing now holds ['run.sh']
+=== SH-R: run.sh check mode (item 6 reverted: -name *.rs)
+       df /home/user: 14.1 GB free
+       run.sh exit 0; non-.rs files under crates older than T0: 43 of 43; .rs older than T0: 0 of 62; new records ['selftest-20261109T034730Z.txt']
+       record exits: ['exit_status 0', 'exit_status 0']; moved to u3d-fix-review-runsh-SH-R-selftest-20261109T034730Z.txt
+       results/u3d-timing now holds ['run.sh']
+       restored, sha256 == fixed state: {'run.sh': True}
+end: every file == fixed state (runsh)
+start socket_tests.rs sha256 ca17a9f6f6be0322... == fixed state
+start socket.rs sha256 7ad7cb22e4316c9f... == fixed state
+start stats.rs sha256 27dfd3266a0647b2... == fixed state
+start run.sh sha256 f4a73a5b2b558a50... == fixed state
+=== F2-S4: fate log capacity n (cap = n): my review's S4 (self)
+       df /home/user: 14.1 GB free
+       release binary npt_net-f72f21a42e60b4c9 newer than the touch: True; lists 172 tests (before: None); ignored lists the self-test: True
+       ran 1; exit 101; prints before the panic 39; 
+       slack now 1 ns, at start 1 ns, set 1, error None; policy SCHED_OTHER 0: the run condition accepts [1] ns at both reads (not SCHED_FIFO or SCHED_RR)
+       panic at crates/net/src/l2/socket_tests.rs:1647:5: assertion `left == right` failed: the fate log filled: the run is INVALID, not a lateness verdict | left: 30000 | right: 0 | stack backtrace:
+       restored, sha256 == fixed state: {'socket_tests.rs': True}
+RESULT F2-S4: BITES
+=== F2-S5: the pre-touch's drain removed (log full from the start): my review's S5 (self)
+       df /home/user: 14.1 GB free
+       release binary npt_net-f72f21a42e60b4c9 newer than the touch: True; lists 172 tests (before: 172); ignored lists the self-test: True
+       ran 1; exit 101; prints before the panic 39; 
+       slack now 1 ns, at start 1 ns, set 1, error None; policy SCHED_OTHER 0: the run condition accepts [1] ns at both reads (not SCHED_FIFO or SCHED_RR)
+       panic at crates/net/src/l2/socket_tests.rs:1646:5: assertion `left == right` failed: the fate log filled: the run is INVALID, not a lateness verdict | left: 60000 | right: 0 | stack backtrace:
+       restored, sha256 == fixed state: {'socket_tests.rs': True}
+RESULT F2-S5: BITES
+end: every file == fixed state (bites2)

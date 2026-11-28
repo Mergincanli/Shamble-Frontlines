@@ -1,0 +1,630 @@
+[
+  {
+    "mark": "PM-0001-2",
+    "title": "The load is the stress scene",
+    "verdict": "NOT-RUN",
+    "why": [
+      "SS runs: 0 of 3 valid runs",
+      "ES runs: 0 of 3 valid runs",
+      "SS N=24 (PM-0001-10's scale step): 0 of 3 valid runs",
+      "SS N=36 (PM-0001-10's scale step): 0 of 3 valid runs",
+      "bite PM-0001-2/fire-stops: no run yet"
+    ],
+    "parts": [
+      {
+        "name": "SS runs",
+        "verdict": "NOT-RUN",
+        "why": [
+          "SS runs: 0 of 3 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "ES runs",
+        "verdict": "NOT-RUN",
+        "why": [
+          "ES runs: 0 of 3 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "SS N=24 (PM-0001-10's scale step)",
+        "verdict": "NOT-RUN",
+        "why": [
+          "SS N=24 (PM-0001-10's scale step): 0 of 3 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "SS N=36 (PM-0001-10's scale step)",
+        "verdict": "NOT-RUN",
+        "why": [
+          "SS N=36 (PM-0001-10's scale step): 0 of 3 valid runs"
+        ],
+        "runs": []
+      }
+    ],
+    "bites": [
+      {
+        "id": "PM-0001-2/fire-stops",
+        "status": "not_run",
+        "runs": []
+      }
+    ]
+  },
+  {
+    "mark": "PM-0001-21",
+    "title": "Forged commands and lag switches change nothing",
+    "verdict": "NOT-RUN",
+    "why": [
+      "forged, option A: 0 of 3 valid runs",
+      "forged, option B: 0 of 3 valid runs",
+      "clamp, option A: 0 of 3 valid runs",
+      "clamp, option B: 0 of 3 valid runs",
+      "fast-clock, option A: 0 of 3 valid runs",
+      "fast-clock, option B: 0 of 3 valid runs",
+      "lag-switch, option A: 0 of 3 valid runs",
+      "lag-switch, option B: 0 of 3 valid runs"
+    ],
+    "parts": [
+      {
+        "name": "forged, option A",
+        "verdict": "NOT-RUN",
+        "why": [
+          "forged, option A: 0 of 3 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "forged, option B",
+        "verdict": "NOT-RUN",
+        "why": [
+          "forged, option B: 0 of 3 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "clamp, option A",
+        "verdict": "NOT-RUN",
+        "why": [
+          "clamp, option A: 0 of 3 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "clamp, option B",
+        "verdict": "NOT-RUN",
+        "why": [
+          "clamp, option B: 0 of 3 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "fast-clock, option A",
+        "verdict": "NOT-RUN",
+        "why": [
+          "fast-clock, option A: 0 of 3 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "fast-clock, option B",
+        "verdict": "NOT-RUN",
+        "why": [
+          "fast-clock, option B: 0 of 3 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "lag-switch, option A",
+        "verdict": "NOT-RUN",
+        "why": [
+          "lag-switch, option A: 0 of 3 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "lag-switch, option B",
+        "verdict": "NOT-RUN",
+        "why": [
+          "lag-switch, option B: 0 of 3 valid runs"
+        ],
+        "runs": []
+      }
+    ],
+    "bites": [
+      {
+        "id": "PM-0001-21/no-lead-bound",
+        "status": "shown",
+        "runs": [
+          {
+            "run": "bite-no-lead-bound",
+            "valid": true,
+            "gaps": [
+              "a gap in the record: run bite-no-lead-bound: params.twin names no twin run"
+            ],
+            "checks": [
+              {
+                "name": "forged: 1,000 commands of every kind",
+                "outcome": "pass",
+                "value": "1513",
+                "needs": ">= 1000"
+              },
+              {
+                "name": "forged: every kind of part 5's set sent (11 kinds)",
+                "outcome": "pass",
+                "value": "11",
+                "needs": ">= 11"
+              },
+              {
+                "name": "forged: every forged command rejected and counted",
+                "outcome": "fail",
+                "value": "1523",
+                "needs": "== 0"
+              },
+              {
+                "name": "forged: 0 effect beyond the valid part (state hash equals the valid-parts twin's on every tick)",
+                "outcome": "gap",
+                "needs": "",
+                "note": "run bite-no-lead-bound: params.twin names no twin run"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "PM-0001-21/no-newer-tick",
+        "status": "shown",
+        "runs": [
+          {
+            "run": "bite-no-newer-tick",
+            "valid": true,
+            "gaps": [
+              "a gap in the record: run bite-no-newer-tick: params.twin names no twin run"
+            ],
+            "checks": [
+              {
+                "name": "forged: 1,000 commands of every kind",
+                "outcome": "pass",
+                "value": "1515",
+                "needs": ">= 1000"
+              },
+              {
+                "name": "forged: every kind of part 5's set sent (11 kinds)",
+                "outcome": "pass",
+                "value": "11",
+                "needs": ">= 11"
+              },
+              {
+                "name": "forged: every forged command rejected and counted",
+                "outcome": "fail",
+                "value": "1523",
+                "needs": "== 0"
+              },
+              {
+                "name": "forged: 0 effect beyond the valid part (state hash equals the valid-parts twin's on every tick)",
+                "outcome": "gap",
+                "needs": "",
+                "note": "run bite-no-newer-tick: params.twin names no twin run"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "PM-0001-21/no-seq-forward",
+        "status": "shown",
+        "runs": [
+          {
+            "run": "bite-no-seq-forward",
+            "valid": true,
+            "gaps": [
+              "a gap in the record: run bite-no-seq-forward: params.twin names no twin run"
+            ],
+            "checks": [
+              {
+                "name": "forged: 1,000 commands of every kind",
+                "outcome": "pass",
+                "value": "1511",
+                "needs": ">= 1000"
+              },
+              {
+                "name": "forged: every kind of part 5's set sent (11 kinds)",
+                "outcome": "pass",
+                "value": "11",
+                "needs": ">= 11"
+              },
+              {
+                "name": "forged: every forged command rejected and counted",
+                "outcome": "fail",
+                "value": "1523",
+                "needs": "== 0"
+              },
+              {
+                "name": "forged: 0 effect beyond the valid part (state hash equals the valid-parts twin's on every tick)",
+                "outcome": "gap",
+                "needs": "",
+                "note": "run bite-no-seq-forward: params.twin names no twin run"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "PM-0001-21/no-move-length",
+        "status": "shown",
+        "runs": [
+          {
+            "run": "bite-no-move-length",
+            "valid": true,
+            "gaps": [
+              "a gap in the record: run bite-no-move-length: params.twin names no twin run"
+            ],
+            "checks": [
+              {
+                "name": "forged: 1,000 commands of every kind",
+                "outcome": "pass",
+                "value": "1508",
+                "needs": ">= 1000"
+              },
+              {
+                "name": "forged: every kind of part 5's set sent (11 kinds)",
+                "outcome": "pass",
+                "value": "11",
+                "needs": ">= 11"
+              },
+              {
+                "name": "forged: every forged command rejected and counted",
+                "outcome": "fail",
+                "value": "1523",
+                "needs": "== 0"
+              },
+              {
+                "name": "forged: 0 effect beyond the valid part (state hash equals the valid-parts twin's on every tick)",
+                "outcome": "gap",
+                "needs": "",
+                "note": "run bite-no-move-length: params.twin names no twin run"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "PM-0001-21/no-press-edge",
+        "status": "shown",
+        "runs": [
+          {
+            "run": "bite-no-press-edge",
+            "valid": true,
+            "gaps": [
+              "a gap in the record: run bite-no-press-edge: params.twin names no twin run"
+            ],
+            "checks": [
+              {
+                "name": "forged: 1,000 commands of every kind",
+                "outcome": "pass",
+                "value": "1518",
+                "needs": ">= 1000"
+              },
+              {
+                "name": "forged: every kind of part 5's set sent (11 kinds)",
+                "outcome": "pass",
+                "value": "11",
+                "needs": ">= 11"
+              },
+              {
+                "name": "forged: every forged command rejected and counted",
+                "outcome": "fail",
+                "value": "1523",
+                "needs": "== 0"
+              },
+              {
+                "name": "forged: 0 effect beyond the valid part (state hash equals the valid-parts twin's on every tick)",
+                "outcome": "gap",
+                "needs": "",
+                "note": "run bite-no-press-edge: params.twin names no twin run"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "PM-0001-21/no-aim-bounds",
+        "status": "shown",
+        "runs": [
+          {
+            "run": "bite-no-aim-bounds",
+            "valid": true,
+            "gaps": [
+              "a gap in the record: run bite-no-aim-bounds: params.twin names no twin run"
+            ],
+            "checks": [
+              {
+                "name": "forged: 1,000 commands of every kind",
+                "outcome": "pass",
+                "value": "1512",
+                "needs": ">= 1000"
+              },
+              {
+                "name": "forged: every kind of part 5's set sent (11 kinds)",
+                "outcome": "pass",
+                "value": "11",
+                "needs": ">= 11"
+              },
+              {
+                "name": "forged: every forged command rejected and counted",
+                "outcome": "fail",
+                "value": "1523",
+                "needs": "== 0"
+              },
+              {
+                "name": "forged: 0 effect beyond the valid part (state hash equals the valid-parts twin's on every tick)",
+                "outcome": "gap",
+                "needs": "",
+                "note": "run bite-no-aim-bounds: params.twin names no twin run"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "PM-0001-21/no-cooldown",
+        "status": "shown",
+        "runs": [
+          {
+            "run": "bite-no-cooldown",
+            "valid": true,
+            "gaps": [
+              "a gap in the record: run bite-no-cooldown: params.twin names no twin run"
+            ],
+            "checks": [
+              {
+                "name": "forged: 1,000 commands of every kind",
+                "outcome": "pass",
+                "value": "1511",
+                "needs": ">= 1000"
+              },
+              {
+                "name": "forged: every kind of part 5's set sent (11 kinds)",
+                "outcome": "pass",
+                "value": "11",
+                "needs": ">= 11"
+              },
+              {
+                "name": "forged: every forged command rejected and counted",
+                "outcome": "fail",
+                "value": "1325",
+                "needs": "== 0"
+              },
+              {
+                "name": "forged: 0 effect beyond the valid part (state hash equals the valid-parts twin's on every tick)",
+                "outcome": "gap",
+                "needs": "",
+                "note": "run bite-no-cooldown: params.twin names no twin run"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "PM-0001-21/no-ack-sent",
+        "status": "shown",
+        "runs": [
+          {
+            "run": "bite-no-ack-sent",
+            "valid": true,
+            "gaps": [
+              "a gap in the record: run bite-no-ack-sent: params.twin names no twin run"
+            ],
+            "checks": [
+              {
+                "name": "forged: 1,000 commands of every kind",
+                "outcome": "pass",
+                "value": "1515",
+                "needs": ">= 1000"
+              },
+              {
+                "name": "forged: every kind of part 5's set sent (11 kinds)",
+                "outcome": "pass",
+                "value": "11",
+                "needs": ">= 11"
+              },
+              {
+                "name": "forged: every forged command rejected and counted",
+                "outcome": "fail",
+                "value": "1523",
+                "needs": "== 0"
+              },
+              {
+                "name": "forged: 0 effect beyond the valid part (state hash equals the valid-parts twin's on every tick)",
+                "outcome": "gap",
+                "needs": "",
+                "note": "run bite-no-ack-sent: params.twin names no twin run"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "PM-0001-21/no-trailing",
+        "status": "shown",
+        "runs": [
+          {
+            "run": "bite-no-trailing",
+            "valid": true,
+            "gaps": [
+              "a gap in the record: run bite-no-trailing: params.twin names no twin run"
+            ],
+            "checks": [
+              {
+                "name": "forged: 1,000 commands of every kind",
+                "outcome": "pass",
+                "value": "1512",
+                "needs": ">= 1000"
+              },
+              {
+                "name": "forged: every kind of part 5's set sent (11 kinds)",
+                "outcome": "pass",
+                "value": "11",
+                "needs": ">= 11"
+              },
+              {
+                "name": "forged: every forged command rejected and counted",
+                "outcome": "fail",
+                "value": "1523",
+                "needs": "== 0"
+              },
+              {
+                "name": "forged: 0 effect beyond the valid part (state hash equals the valid-parts twin's on every tick)",
+                "outcome": "gap",
+                "needs": "",
+                "note": "run bite-no-trailing: params.twin names no twin run"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "PM-0001-21/no-catchup-cap",
+        "status": "shown",
+        "runs": [
+          {
+            "run": "bite-no-catchup-cap",
+            "valid": true,
+            "gaps": [
+              "a gap in the record: run bite-no-catchup-cap: params.twin names no twin run"
+            ],
+            "checks": [
+              {
+                "name": "forged: 1,000 commands of every kind",
+                "outcome": "pass",
+                "value": "1517",
+                "needs": ">= 1000"
+              },
+              {
+                "name": "forged: every kind of part 5's set sent (11 kinds)",
+                "outcome": "pass",
+                "value": "11",
+                "needs": ">= 11"
+              },
+              {
+                "name": "forged: every forged command rejected and counted",
+                "outcome": "fail",
+                "value": "1656",
+                "needs": "== 0"
+              },
+              {
+                "name": "forged: 0 effect beyond the valid part (state hash equals the valid-parts twin's on every tick)",
+                "outcome": "gap",
+                "needs": "",
+                "note": "run bite-no-catchup-cap: params.twin names no twin run"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "PM-0001-21/no-channel",
+        "status": "shown",
+        "runs": [
+          {
+            "run": "bite-no-channel",
+            "valid": true,
+            "gaps": [
+              "a gap in the record: run bite-no-channel: params.twin names no twin run"
+            ],
+            "checks": [
+              {
+                "name": "forged: 1,000 commands of every kind",
+                "outcome": "pass",
+                "value": "1505",
+                "needs": ">= 1000"
+              },
+              {
+                "name": "forged: every kind of part 5's set sent (11 kinds)",
+                "outcome": "pass",
+                "value": "11",
+                "needs": ">= 11"
+              },
+              {
+                "name": "forged: every forged command rejected and counted",
+                "outcome": "fail",
+                "value": "1523",
+                "needs": "== 0"
+              },
+              {
+                "name": "forged: 0 effect beyond the valid part (state hash equals the valid-parts twin's on every tick)",
+                "outcome": "gap",
+                "needs": "",
+                "note": "run bite-no-channel: params.twin names no twin run"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "PM-0001-21/not-older-than",
+        "status": "shown",
+        "runs": [
+          {
+            "run": "bite-not-older-than",
+            "valid": true,
+            "checks": [
+              {
+                "name": "fast clock: 10 runs of 60 s",
+                "outcome": "pass",
+                "value": "10",
+                "needs": ">= 10"
+              },
+              {
+                "name": "fast clock: at most the server's ticks plus the lead bound of commands",
+                "outcome": "fail",
+                "value": "168",
+                "needs": "<= 0"
+              },
+              {
+                "name": "fast clock: moves no further than the honest client plus that many ticks of movement",
+                "outcome": "fail",
+                "value": "33600000",
+                "needs": "<= 0"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "PM-0001-21/refuse-not-clamp",
+        "status": "shown",
+        "runs": [
+          {
+            "run": "bite-refuse-not-clamp",
+            "valid": true,
+            "gaps": [
+              "a gap in the record: run bite-refuse-not-clamp: params.twin names no twin run"
+            ],
+            "checks": [
+              {
+                "name": "clamp: 1,000 points beyond reach per weapon kind the sim has",
+                "outcome": "pass",
+                "value": "18297",
+                "needs": ">= 1000"
+              },
+              {
+                "name": "clamp: never refused or counted",
+                "outcome": "fail",
+                "value": "18007",
+                "needs": "== 0"
+              },
+              {
+                "name": "clamp: state hash equals the twin's whose points sit at the reach",
+                "outcome": "gap",
+                "needs": "",
+                "note": "run bite-refuse-not-clamp: params.twin names no twin run"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

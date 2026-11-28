@@ -1,0 +1,39 @@
+{
+  "lines": 662,
+  "sha256": "cffbe0651f20d2ac7ea92a58e094a23184d6f063087bfa6cde800beca5e0a472",
+  "map": [
+    "Header, title and binding order (rulings recorded): 1, 3-6; section 0 items 3-4 at 19-23",
+    "ADV-CBB-1 (route W only, one launch per commit step; the main session commits each step, runs insert part 1 before step 1 and part 3 plus the built check before step 3): 43-58; follow-on route-W wording at 133-135, 227-229, 283-284, 312, 328-333, 342-344, 355, 399, 418, 420",
+    "ADV-CBB-2 (SIZE-CHECK excludes spikes/netcode-proof/results, runs after each commit including the fix pass, total taken at the last code commit): 345-353; report 569-571; advisor's reading 625-626",
+    "ADV-CBB-3 (section 10): 597-626. Header 599-601; stop rules quoted 603-607 (each line equals paste :120-124, checked with grep -nxF); size line quoted 609-611 (joined, it equals paste :89); his other words 613-614; the advisor's reading 616-626",
+    "ADV-CBB-4 (two judge calls named, as the set was judged; exactly one why line): 460-462, 466-469; report 574-576",
+    "ADV-CBB-5 (B-2's changed answers named; any other changed answer stops): 297-299, 406-407, 580-583; stop 632",
+    "ADV-CBB-6 (exact 2129 / 552 / 1530 / 2253; L reported, not a bar): 313-321, 548-549; report 576-577",
+    "ADV-CBB-7 (risk tier 1, PR #40): 35-36",
+    "B-1 ruled yes: 227-229, 638-642. B-2 in commit 3 with condition 5: 72-74, 87, 285-299, 403, 643-651. B-3 confirmed (93509dfd7fd1): 652-654. Order as written: 655",
+    "TE-CBB-1 (three scripts shown to FAIL first, outputs kept; the compare script checks the earlier verdicts' full sha256 first): built check 144-147; compare 463-465 and 474-478, rejudge.txt 479-481; set check 524-527; report 574; stop 630-631",
+    "TE-CBB-2 (each gap's own note phrase on both figures; shadowing pair split; wrong-length case on tick.s.snap_link_lost_count; plants CB-P16 to -18): 239-249, 271-278, 386-391",
+    "TE-CBB-3 (bite summary-line comparison written out: strip the run name, new phrase and wall time; whole-as-lost hashes -48, incomplete +48; link-lost-overstated no field): 550-557; stop 629",
+    "TE-CBB-4 (expected test counts: +7/+9, +6/+6, +1/+1, 0/0; final 552/632; TE-CBB-2's and -8's cases are asserts inside existing tests, so +6/+6 stands): 334-339, 392-394; report 571-572; stop 630",
+    "TE-CBB-5 (exactly one why line per file, placed): 467-469, 477-478",
+    "TE-CBB-6 (exact values; nine P0 and five P2 run names in order): 313-321",
+    "TE-CBB-7: (a) 164-172 plus plants CB-P12/-13 at 378-381; (b) 262-263 plus CB-P14/-15 at 382-385; (c) 266-267 plus CB-P8 at 371-372; (d) 410-412; (e) 219-222",
+    "TE-CBB-8 (whole hash at a tick with no room record: B 0, no gap): 268-270",
+    "TE-CBB-9 (the planted-bug rule as a conjunction): 622-624",
+    "TE-CBB-10 (CB-P5 names the assert that fires and the value it reports): 365-367",
+    "TE-CBB-11: deferred in writing, 656-660 (B-3 kept as confirmed; no judge call on old logs, because case 1 of the gaps fixture shows the same reading)",
+    "TE-CBB-12 (the read line names the changed fixture answer): 580-583",
+    "Word diff against the old blob (e83ae52, sha256 ba6bdeb0): 540 to 662 lines, numstat +241 -119, 46 hunks, about 378 words removed and 2,353 added; the full summary is in the notes file"
+  ],
+  "size": "Section 4 (lines 349-352), after the revision's test additions: commit 1 about 285-400, commit 2 about 255-355, commit 3 about 100 (60, plus about 40 for B-2's four files, which now count), commit 4 about 10-20. Total about 650-875 (middle about 760), against the plan's 650 (range 545-755) and the 1,050 stop. The committed verdicts and runs.txt under results/ are excluded as evidence. The growth over the old 620-800 comes from TE-CBB-2, -7 and -8 (gap-note asserts, the independent l1 count, the clean-run L comparison, one more converse case).",
+  "not_applied": [
+    "Tool deviation: this seat has no Edit tool, so the brief was rewritten whole with the Write tool three times (no sed, no shell writes). Each rewrite was checked by hashing every line outside the intended change: equal both times (2fbaa010..., then 9b0d5c85...).",
+    "The old text was not copied to .gate/c62hb-brief/old.md. The word diff was taken with git against e83ae52, whose blob is the old sha256 ba6bdeb0 (checked). The task allowed the copy route but did not require it.",
+    "The session's background saver committed the final brief in autosave 09cca21 (blob cffbe065...). This seat ran no git write.",
+    "TE-CBB-11 deferred in writing (brief 656-660), not applied: B-3 stays as the advisor confirmed, and no old-logs judge call was added.",
+    "Section 11's 'The plan's total holds (section 4)' left as written, as the 'nothing else changes' rule asks. The new estimate's top (875) is above the plan's range top (755) but under the 1,050 stop; the main session may want that sentence reread.",
+    "Citation fix: the advisor cited 'paste :106' for the measured-scope line, but it is paste :105, which the brief cites.",
+    "The B1 judge figure 2253 MiB (and 2129, 552, 1530) was recomputed by hand from c-u4r-runs.mjs:152-153 and :176, not by running the runner. 1530 is a rounding edge case: 1529.502 rounds to 1530."
+  ],
+  "summary": "I revised the C62H-BOUND build brief: it went from 540 lines (ba6bdeb0) to 662 lines (sha256 cffbe0651f20d2ac7ea92a58e094a23184d6f063087bfa6cde800beca5e0a472), with no line over 120 characters. It applies the advisor's conditions 1-7 and records its rulings: B-1 yes, B-2 in commit 3 with condition 5, B-3 confirmed as 93509dfd7fd1, and the order stands. It also applies the test-engineer's conditions 1-5: TE-CBB-1 to -10 and -12 are carried into the brief, and TE-CBB-11 is deferred in writing.\n\n- **Route:** W only, with one agent launch per commit step. The main session commits each step and runs the insert script's part 1 before step 1, and part 3 plus the built check before step 3.\n- **SIZE-CHECK:** results/ is excluded, the count also runs after the fix pass, and the total is taken at the last code commit.\n- **Section 10:** quotes the post's three stop rules and its size line word for word. A check confirmed that brief lines 603-607 equal paste lines 120-124 exactly, and that lines 609-611 joined equal paste line 89. The advisor's reading follows, including the planted-bug rule written as a conjunction.\n- **Test-engineer conditions:** each of the three evidence scripts must first be shown to fail on a planted input, and the compare script checks the earlier verdicts' full sha256 first. Each gap case must show its own note text, with the gap pair that hid each other now separated. The bite-run summary comparison is written out, the expected test counts are stated (final 552/632), and seven new planted bugs (CB-P12 to -18) are added.\n\nNo frozen text, figure meaning or step changed. Two deviations: this seat had no Edit tool, so the brief was rewritten whole with Write and checked by hashing the unchanged lines. The word diff was taken against e83ae52 (the old blob) instead of a copy under .gate/. The background saver committed the final brief as autosave 09cca21; this seat made no commit. The item-to-lines map and the word-diff summary are in /home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/c62h-bound-brief-rev-notes.md; the brief is /home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/c62h-bound-brief.md."
+}

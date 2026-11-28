@@ -1,0 +1,112 @@
+{
+ "verdict": "FAIL",
+ "notes_file": "/home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/u4f-brief-r3-check-te.md",
+ "findings": [
+  {
+   "id": "TE3-1",
+   "severity": "High",
+   "where": "u4f-brief.md 2.2 :268-269 (the bots' rule kept 'unchanged', the pass marks), 2.10 f5 :478, 5.3 p5/p6 :779-780; sources bots/src/lib.rs:14-18; spikes/netcode-proof/results/u4r/0f066338dd8d/P3/runs.txt:18-20; marks.json:4710-4737; SERIES.md:63",
+   "summary": "-20 at P3 cannot pass as briefed, under either option. 2.2 keeps the honest bots' rule: a command only at a step whose newest tick moved (bots/src/lib.rs:14-18 says it outright: 'A skipped tick runs option B's repeat'). U4r's committed P3 runs (the brawl, lead 7) gave 700,948 commands and 178,595 steps without one per run, 20.3 %. That is about 14,600 commands per client over about 18,300 ticks, with stamps rising strictly (0 duplicates). So by count about 20 % of player-ticks have no command stamped for them. Under NA-14's reading by stamp (and under option B's repeat), `tick.s.input_missing` then reads about 20 %, against -20's 'missing inputs at most 0.1 %'. P0 is unaffected: 0 steps skipped (results/u4r/051995db9cea/P0/runs.txt:22). Secondly, the same P3 runs counted 1,112 of 700,948 commands late (0.16 %, whole run) at the arithmetic lead of 7, against -20's 99.9 % on time. Yet f5 caps the settled lead at U4R-Q14's 7 and allows 1 % late, ten times -20's bar. p5 reports the missing share with no bar, and p6 does not report it at all. So the first reading against 0.1 % would be the judged set itself.",
+   "fix": "Change 2.2 (or ask it in U4F-Q7/Q11). For controller runs, and for -20's suite in any case, the honest client gives a command at every client step once it holds a snapshot, stamped the previous stamp + 1 unless the controller holds (to lower the lead) or skips (to raise it). Keep the 'only when the newest moved' rule for `with_lead` runs only. The other route, a reading of SERIES.md:63 that skips ticks the client never stamped, would change what a bar's series computes: it would go to Mustafa under `<<P15>>` before it is built. Add a client test: on a seeded P3 trace, at least 99.9 % of ticks carry a stamped command and at most 0.1 % arrive after their tick. Restate f5: at most 0.1 % late at P3 (the bar the controller serves) and carry 74's 1 % elsewhere; replace 'at most U4R-Q14's lead' with 2.2's own bound (the lead bound less a margin). In 5.3, p5 and p6 read -20's two share checks by name (on time at least 99.9 %, missing at most 0.1 %), and a miss goes to the advisor before the set."
+  },
+  {
+   "id": "TE3-2",
+   "severity": "High",
+   "where": "u4f-brief.md 2.4 item 6 :305-310; 2.12 row 1 :551; 2.6 :359-360 (SA-3); 2.10 f33 :506, f16 :489; sources sim/src/world.rs:1411-1419, :1446-1451; room/src/input.rs:81-89; marks.json:4958-4969",
+   "summary": "2.4 item 6 counts a forged item 'rejected and counted' only when a refusal names it with its own kind 'and no copy of it ran (checked against the tick's TickInput)', by (slot, seq). That fails two kinds. Kind 7: the command always runs, and the sim refuses only its press inside the step and records (slot, seq, kind) (world.rs:1411-1419, :1446-1451). Kind 3: the forged item is a resent copy, with other content, of an honest command that already ran under the same (slot, seq); a backward sequence is by definition one already received. As worded, every kind-3 and kind-7 item counts unrejected, and -21's 'every forged command rejected and counted' fails on a correct build. 2.12's first row also files kind 3 under 'the twin never makes the refused command (its sequence index skipped)'. That removes the honest original, which ran in the forged run, so the twin figure mismatches. And 2.6's SA-3 rule ('the forger forges the command it stores, so every redundant copy carries the same forgery') cannot make a kind 3 at all: the first copy is kept as the original and later equal copies are repeats.",
+   "fix": "State per kind what 'rejected and counted' means. Kinds 1, 2, 4, 5, 6 and 10: a refusal of that kind for (slot, seq), and no command of that (slot, seq) in any TickInput. Kind 3: a kind-3 refusal for (slot, seq), and no command with the forged content in any TickInput (the honest original's run is expected). Kind 7: the sim's (slot, seq, kind 7) report and the refused press not applied; the command itself runs. Say that kind 3 is forged as a resent copy, with changed content, of a command the room already holds, and that SA-3 does not apply to it. Give kind 3 its own 2.12 row: the twin sends the honest copy (the forged datagram with the copy's content restored), nothing skipped. Add a kind-3 case to f33 (the original ran, the forgery counted rejected) and a kind-7 case (the command ran, the press refused, counted rejected); f16's kind-3 pair then proves the row."
+  },
+  {
+   "id": "TE3-3",
+   "severity": "Medium",
+   "where": "u4f-brief.md 5.3 p7-p12 :781-786; 11 D12 :1296; sources marks.json:4934-4945, :4980-4991, :5014-5025, :5050-5061, :9096-9103; judge/src/eval.rs:1475-1478",
+   "summary": "On 5.3's 20-80 s runs, -21's count checks (1,000 per kind, 1,000 clamp points, 10 episodes, 100 bursts) and -47's '1,000 connects' are plain checks that fail by length, on clean and bitten runs alike. So D12's bar 'every other check passing' cannot hold. The judge marks a bite shown when any plain check of its part fails, so a short bitten run reads 'shown' from a count check alone, whether or not the planted defect bit. The same goes for p7's 'the forged check fails', p8's 'the clamp check' and p10/p11's '-47's check': each is met by those count checks. p12's -20 run would also fail the missing check without the bite (TE3-1). As worded, these short runs cannot fail.",
+   "fix": "For each of p7 to p13, name the one check that must fail, read from runs[i].checks by name, never from the bite's status. p7: 'forged: every forged command rejected and counted'. p8: 'clamp: never refused or counted'. p9: 'fast clock: at most the server's ticks plus the lead bound of commands'. p10 and p11: the p99 offset check. p12: 'at least 99.9 % of commands reach the server before their tick runs'. List the count checks expected to fail by length on every short run. Require the same named check to pass on the clean partner run (p1, p2, p3, p5 or p6; add a clean clock run, which 5.3 lacks). Put each bar in c-u4f-r2.mjs's expect line, as c-u4r-r2.mjs:88 and :91 do, and rewrite D12's pass bar to match."
+  },
+  {
+   "id": "TE3-4",
+   "severity": "Medium",
+   "where": "u4f-brief.md 2.6 :356-360, :365-368; 2.12 :551-552 (twins by U4F-Q13); U4F-Q11 (v) (b) :1197-1198; sources proto/src/input.rs:19-21, :155-159; client/src/lib.rs:467-469",
+   "summary": "npt-proto's Input encoder enforces two rules the brief never states. First, one Input's commands have consecutive sequences (an older command's sequence is not sent). Second, each older command's tick is 0 to 255 ticks at or below its newer neighbour's. An Input that breaks either does not encode. Today the endpoint then silently drops the whole Input; after carry 80 (c) it drops one command and counts it. The rules bite in four places. A twin with a skipped or left-out sequence (both U4F-Q13 options), whenever an older command is still unacknowledged. A kind-2 forgery with an older tick. A kind-1 command once a newer honest command follows it. U4F-Q11 (v) (b)'s fast clock: a command one tick past the bound followed by one held at the bound gives a step of -1. At P0, acks come back within a step, so an Input mostly holds one command (U4r's P0 runs: 0 steps skipped). But the fast clock sends 45 commands a second against 30 acks a second, so it meets the rule even at P0, and every case meets it at P2 (U4F-Q11 (ii) (b)). Where it bites, one run sends a datagram where the other sends none, which breaks plan §4.10's 'datagrams the honest script sends anyway, at the same instants'.",
+   "fix": "In 2.6, state the two codec rules and, per kind and per twin row, how each datagram stays encodable: kind 2 forged at an equal tick only (or as the only command of its Input); kind 1's later copies dropped and counted through carry 80 (c)'s path, with the twin matching; the fast clock's past-bound command followed only by stamps at or above it; the twins' encodability shown at the suites' profile. Have f15 and f16 assert that every forged and twin Input encodes (`unencodable_commands` 0 except where a row names it). Or ask it as a new U4F-Q."
+  },
+  {
+   "id": "TE3-5",
+   "severity": "Medium",
+   "where": "u4f-brief.md 2.10 f16 :489 ('equal fate logs on every flow'); 2.12 :553; plan §4.10 :377-379, :389-390; sources l1/src/lib.rs:353-362, :385, :1146; :1125-1138, :1188",
+   "summary": "L1's fate log writes each datagram's size into its canonical form (l1/src/lib.rs:353-362, :1146). The twins' client datagrams differ in size by design: header only for kinds 8 and 9 (plan :377-379); an ack-only or shorter Input where the twin never made the refused command (kinds 1-6 and 10); another message for kind 11. So fate_log_sha256 differs between a forged run and its twin on a correct build, and f16 fails as worded. The fates themselves (loss, delay, reorder) are drawn per flow index, independent of size (:1125-1138, :1188), so per-entry equality without the size is what can hold.",
+   "fix": "Define f16's comparison: per flow, each entry's outcome, arrival, index and send time equal, with sizes reported but excluded. Never use fate_log_sha256 for -21's twins; it stays for same-run identity (D11, r8). Route the reading of plan §4.10's 'fate logs equal on every flow' to the advisor, as a U4F-Q line or a 9.1 row."
+  },
+  {
+   "id": "TE3-6",
+   "severity": "Medium",
+   "where": "u4f-brief.md 2.6 :368; 5.3 :768; 5.1 :745; sources marks.json:5014-5025 (count of at least 10 per run, window all), :5144 (-21's notes: no run length)",
+   "summary": "'fast clock: 10 runs of 60 s' needs at least 10 fast_clock events in each run. 2.6 gives one client and '10 episodes of 60 s' but no schedule. 5.3 says 70 s holds 'one whole 60 s episode and its settling', while the judged runs are a 10 s warm-up plus 600 s measured. If each episode needs settling, at most 8 or 9 fit, and the check fails on a correct build. -21's notes also name no run length (unlike -20's and -22's '10 minutes'), so 5.1's '(marks.json's notes)' does not back 10 minutes for -21.",
+   "fix": "State the episode schedule: first start, spacing, any settling, and whether episodes run back to back on one continuous 1.5x clock or on several fast-clock clients. Show the arithmetic that 10 complete episodes fit the judged run, or set the fast-clock suite's measured length (for example 700 s plus settling), recorded in the header, with 5.5's time and disk updated. Have f19 or f28 assert the per-run episode count at the judged settings, and correct 5.1's cite for -21."
+  },
+  {
+   "id": "TE3-7",
+   "severity": "Medium",
+   "where": "u4f-brief.md 2.10 f16 :489, f18 :491, f28 :501, f29 :502; sources check.mjs:2052-2057 (cargo test --workspace, debug profile, both builds); lab/src/scenario.rs:2842-2843",
+   "summary": "f16 (24 forged-and-twin pairs, 48 runs), f18, f28 (as worded, each suite at 5.3's lengths: 48 clients, 30 s; the fast clock 80 s) and f29 (1,000 connects, about 21 rounds, 52 s or more) are lab tests in check.mjs's test step. That step runs in the debug profile, in both builds, twice per end check, and the brief gives none of these tests a client count, a length or a time budget. The lab's existing short tests use 16 clients for 6 s plus 4 s (scenario.rs:2842-2843). Release SS runs go at 55-70 ticks/s and debug is far slower, so the step could take hours. f28 also merges a cargo test with 5.3's release-built r2 extension, which the main session runs after the merge.",
+   "fix": "For each lab test, give its settings (clients, warm-up, measured, in P2_SHORT's form) at the smallest scale that still proves the claim, for example f16 at 16 clients and a few seconds per kind. Keep 5.3's lengths for c-u4f-r2.mjs only, and make f28 the contract checker's run on a short lab scenario. Have the builder report the test step's wall time per build, with a stop to the advisor above a stated limit."
+  },
+  {
+   "id": "TE3-8",
+   "severity": "Medium",
+   "where": "u4f-brief.md 5.5 :827-856; U4F-Q2 :1060-1073; sources .checkpoints/netcode-proof-test.md:4196-4209; u3c-held-1/advisor-plan-review-full.json:37, :89; .claude/CHECKPOINTS.md §11 :236-238",
+   "summary": "5.5 budgets only the logs. U4f's build grows the shared target and .gate/u4f/: both builds' test binaries for four crates, the release and wasm builds, and the builder's D7 and D8 runs. During U3C-HELD-1's builds, free space fell from 6,455 MiB (after the P2 pack) to 4,950 MiB (before the B1 pack), about 1,500 MiB, against 1,418 MiB above the floor now. §11 forbids packing while a build runs, and the builder may not clean, so a floor stop mid-build has no remedy until the lane pauses. The advisor's U3C-HELD-1 ruling put the u4r-P3 pack 'before U4f's counted run'; 5.5 and U4F-Q2 (a) put it at the sets.",
+   "fix": "Add a build-phase row to 5.5: the shared target's growth, measured by the builder after its first build and written on the card. At launch, before the builder starts and with no build running, pack u4r-P3-0f066338dd8d by 8.1 and part-clean the shared target (W1-TARGET item 3, `<<P27>>`), with D2's readings before and after. Add that step to U4F-Q2's option (a)."
+  },
+  {
+   "id": "TE3-9",
+   "severity": "Medium",
+   "where": "u4f-brief.md 0.5 :156-157; 12 item 3 :1314-1315, :1338; source advisor-u4df.md:313, :462 (N/u4f-r3/te_anchors.py: the start found 2 times)",
+   "summary": "P24's start anchor 'Write files with the' occurs twice in df-ruling: at :313, inside a quoted rule, and at :462. The drafter's stamps_anchors.py matches once only because its anchor is 'Write files with the\\n', with the line break, which the brief's words do not say. A fill script built from section 12's words would fail its found-once assert (a safe stop) or, taking the first find, copy a 2,249-word span from :313. The brief's 'every start anchor below is found once' does not hold as written. The other 35 anchors check out.",
+   "fix": "Make P24's anchor unique in the brief's own words, for example 'word for word: \"Write files with the' (found once, at :462), or state the line break. Re-run the anchor count and note it in 0.5."
+  },
+  {
+   "id": "TE3-10",
+   "severity": "Low",
+   "where": "u4f-brief.md 5.5 :844; source .checkpoints/netcode-proof-test.md:4196-4209",
+   "summary": "5.5 counts u4r-P3's 519 MiB as room, but that is the folder's size. Packing keeps the archive on disk (§11: the archives stay), and the two packs so far freed about 73 % of their folders (P2: 572 of 779 MiB; B1: 603 of 820 MiB). So u4r-P3 frees about 380 MiB.",
+   "fix": "Use net figures in 5.5's room arithmetic (each folder less its archive, at the two packs' ratio), and state the total room after the planned packs and cleans against the 3,596 to 3,667 MiB."
+  },
+  {
+   "id": "TE3-11",
+   "severity": "Low",
+   "where": "u4f-brief.md 2.10 f1 :474, f5 :478, f8 :481, f32 :505; sources room/Cargo.toml:17-21, client/Cargo.toml:17-22; bots/src/lib.rs:114; lab/src/scenario.rs:94-95",
+   "summary": "The 'property tests' and 'seeded traces' name no generator, seeds or case count. npt-room and npt-client have no random-number dependency, and a manifest change is a stop (section 1 item 5). So a builder may stop, or write too few cases for the property tests to be able to fail.",
+   "fix": "Say 'a seeded generator written in the test (the project's splitmix64 step, bots/src/lib.rs:114), no dependency', with each property test's seeds and case count, for example f8: 10,000 random triples and every arrival order of each."
+  },
+  {
+   "id": "TE3-12",
+   "severity": "Low",
+   "where": "u4f-brief.md 11 D3 :1287; section 4 :674-677; history.md:2187 (`<<P17>>`)",
+   "summary": "D3's command is a shell `grep -rhoE` over a .gate folder, while the brief's own rule is to read and search with the Read, Grep and Glob tools. A shell grep may ask for approval, against his command-forms rule.",
+   "fix": "Word D3 as a Grep tool call (the pattern, the folder, content output with -o), or name it as a call that may ask."
+  },
+  {
+   "id": "TE3-13",
+   "severity": "Low",
+   "where": "u4f-brief.md 2.4 item 2 :289-297; 2.10 f12 :485",
+   "summary": "The repeat filter covers three cases: a backward sequence with equal content (a repeat), one with other content inside the window (kind 3), and one older than the window (`seq_outside_window`). It leaves out a fourth: a sequence inside the window under which no command was ever received (a gap, from a hostile skip or an honest command after a long loss). Such a sequence matches neither branch, so a builder could count it as kind 3, i.e. as forged.",
+   "fix": "Add the fourth case: a sequence not after the newest, inside the window, with no command kept under it, is dropped and counted under the non-forged counter, never as kind 3. Add it to f12."
+  },
+  {
+   "id": "TE3-14",
+   "severity": "Low",
+   "where": "u4f-brief.md 7 items 3-4 :919-922; 2.10 f9 :482, f26 :499, f27 :500; 11 D14 :1298",
+   "summary": "f9 ('fails with the sort removed'), f26 ('each half failing under its plant'), f27 ('failing under its plant') and D14 are proved only by plants. The return list asks for each bite's failing test by name (item 4), but not for these plants' outcomes. So the report could list them as met with no failing run shown.",
+   "fix": "Add to the return list: each plant of f9, f26, f27 and D14, with its file:line, the test failing by name with the plant in place, the restore and its sha256."
+  },
+  {
+   "id": "TE3-15",
+   "severity": "Low",
+   "where": "u4f-brief.md :1148 (U4F-Q8's why); source history.md:2125 (`<<P15>>`); N/u4f-r3/te_words.py",
+   "summary": "'names a new bar or a change to one' retypes eight of Mustafa's words (history :2125) outside a placeholder, against 0.5's rule that his words appear only as placeholders. brief_check.py missed it because the comma differs.",
+   "fix": "Reword it, for example 'his 13:35 rule (`<<P15>>`) covers it', and run the 7-word check with punctuation ignored."
+  }
+ ],
+ "summary": "My verdict is REVISE (FAIL in this schema). Rev 3 fixes all 24 of my night findings, but two High defects would make judged marks fail on a correct build. Full notes: /home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/u4f-brief-r3-check-te.md.\n\nWhat holds:\n- **TE-1 is fixed.** Re-sent honest copies go through a repeat filter before any counted check (the whole-datagram ack check aside) and are counted `commands_repeat`, never as forged. This checks out against room/src/input.rs:80-125. The other 23 are fixed, or open as U4F-Q questions with tests behind them.\n- **Counts add up.** Tests +102 in the measured build and +117 in the bites build; 61 negative cases; 65 judged runs (36 measured, 12 twins, 17 bites), matching plan §9. The memory figures (4,801 / 1,927 / 6,426 MiB) and the disk total (3,596 to 3,667 MiB) re-derive.\n- **Recheck rows:** I walked 19 at the head and all hold, including C62H-BOUND's judge figures (figures.rs:538-689), PM-0001-17's checks (marks.json:3972-4005) and the l2 delay test (delay.rs:538, delay_tests.rs:2274).\n- **Placeholders:** all 14 file stamps match, and 35 of the 36 anchors are found once.\n- **Judge calls** follow JDG-ONLY-1's interim rule and ADV-CBH-1's lesson.\n- **The 13:35 rule** is carried whole. Rev 2 had only :2127; rev 3 adds :2125.\n- **No scope creep** found.\n\nThe two Highs:\n- **TE3-1: -20 cannot pass at P3.** The brief keeps the bots' rule of commanding only when the newest tick moved. U4r's committed P3 results show 20.3 % of client steps with no command, so about 20 % of ticks get no command stamped for them, against -20's 0.1 % limit on missing inputs. f5 also allows ten times -20's late-command bar.\n- **TE3-2: -21's forged check would fail for kinds 3 and 7.** The rule \"no copy of it ran\" breaks for both: a kind-7 command always runs (only its press is refused), and a kind-3 item is a resent copy of an honest command that already ran. The kind-3 twin row also removes a command that ran in the forged run.\n\nSeven Mediums:\n- **TE3-3:** the short bitten runs' pass bars are met by count checks failing on length alone, so they cannot fail.\n- **TE3-4:** the Input codec's two rules (consecutive sequences; older ticks 0 to 255 below the newer) are never stated, and the fast clock, some forgeries and the twins break them.\n- **TE3-5:** f16's \"equal fate logs\" compares datagram sizes, which differ between a run and its twin by design.\n- **TE3-6:** ten 60 s fast-clock episodes may not fit a 10-minute run, and no schedule is given.\n- **TE3-7:** several 48-client lab tests have no scale or time budget in the debug test step.\n- **TE3-8:** the build's own disk use is unbudgeted against 1,418 MiB of room.\n- **TE3-9:** P24's anchor is found twice.\n\nSix Lows: TE3-10 to TE3-15.\n\nI built and ran nothing. The two read-only scripts I added are N/u4f-r3/te_anchors.py and N/u4f-r3/te_words.py."
+}

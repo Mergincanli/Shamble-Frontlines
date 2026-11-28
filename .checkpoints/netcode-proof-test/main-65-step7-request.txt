@@ -1,0 +1,39 @@
+You are the project's advisor for MAIN-65's step 7, the check of the pushed head. First read your rules from main:
+`git show origin/main:.claude/agents/advisor.md` (run from /home/user/Shamble-Frontlines), and follow them. Read only,
+effort xhigh. Your one output file: /home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/advisor-main-65-head.md.
+Write files with the Write and Edit tools only (no sed, no shell redirect, no python writes; never `cargo fmt` writing files: apply rustfmt's diff by Edit); an agent with no Edit tool rewrites its notes file whole with Write.
+Write your plan first and a notes line after each check, so a usage cut loses nothing. Never `cd` into a worktree; no
+`git -C`; one simple command per Bash call; run no cargo, test of the spike, light run or plant; change no file but your
+own.
+
+What MAIN-65 is (plain words): main's PR #65 (change-set 3a) taken into the netcode branch claude/netcode-proof-test-
+plan-hcky5g (PR #40) under Mustafa's MAIN-52 rule, by the plan main-65-plan.md and your own plan check
+advisor-main-65.md (APPROVE WITH CONDITIONS M65-1 to M65-5; its section 3 gives the bars and fallbacks, its section 4
+(d) this check's terms). The form is MAIN-64's head check, advisor-main-64-head.md. All in .checkpoints/netcode-proof-test/.
+
+The SHAs (read each by SHA, not by the branch name):
+- H0 473f5c1fc5431a68c0a4d3cc621cd20bbeb9cf3f (step 1's save; equal to the remote when the merge began).
+- The merge 39a0d040507298401a5ac843055760746b1b267e (parents H0 and main 28254a73ab226379373e380eeee64336e58ef916).
+- The pushed head 82bd69428512e679b789797d674ef04bd4743715 (step 6's card save on the merge). CI on it: gate run
+  45509875991 and toolchain run 45509875989 from the push, gate run 45509881420 and toolchain run 45509881180 from the
+  pull request (the main session records their results on the card before your launch).
+- The record: the card's MAIN-65 line, and .gate/main-65/ (light-base.log, light.log, step5-outputs.txt).
+
+Check, each with its evidence:
+1. The merge as M65-1 to M65-5 bind it: no save between step 2 and step 6 (the branch's commits between H0 and the
+   pushed head are the merge and the card save only); the numbers and checks of section 3, read again by SHA.
+2. Every commit after the merge touches only spikes/, .checkpoints/ and docs/design/ (`git log --format=%H 39a0d04..HEAD`
+   and each one's `git show --stat --format= <sha>`).
+3. CI on 82bd694: gate, smoke and toolchain green from the push and the pull request; toolchain's test, Test Files and
+   Playwright lines compared with main's run 45503161333, job 138831415745.
+4. In the main folder, only if `git diff --quiet 39a0d04 HEAD -- . ':(exclude)spikes/' ':(exclude).checkpoints/'
+   ':(exclude)docs/design/'` exits 0: `node tools/gate.mjs --no-smoke`, `node .claude/scripts/repo-map-check.mjs` and
+   `node --test .claude/scripts/checkpoint.test.mjs`, each alone. If it exits 1, run none and say so: the main session
+   runs them in a worktree.
+5. U6c is not part of this check (its M4b read is its own agent). Note: the main folder holds U6c's applied, uncommitted
+   files under spikes/netcode-proof/ (12 modified, 12 new and untracked); they change no commit. Run item 4's three
+   reruns first, right after your plan, and say when they are done: U6c's counted run (M5) must not start while they
+   run, since it holds timing-sensitive tests.
+
+Give APPROVE, APPROVE WITH FINDINGS or REVISE, each finding on CLAUDE.md's scale. End the file with DONE on its own
+line. Your final reply goes to the main session: the verdict, the findings one line each, and "For Mustafa". Plain words.

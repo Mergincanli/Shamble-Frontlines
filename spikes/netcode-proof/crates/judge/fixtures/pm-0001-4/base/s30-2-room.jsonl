@@ -1,0 +1,10 @@
+{"k":"header","schema":1,"run":"s30-2","set":"r2-vs2","role":"measured","marks":["PM-0001-2","PM-0001-4"],"machine":{"role":"RS","name":"RS","plan":"CCX23","arch":"x86_64","cpu":"fixture","vcpus":4,"mem_mb":16384,"location":"fsn1","kernel":"fixture","address":"203.0.113.10","threads_per_core":1,"smt":[[0],[1],[2],[3]],"clock_res_ns":1},"build":{"commit":"0000000000000000000000000000000000000000","binary_sha256":"0000000000000000000000000000000000000000000000000000000000000000","features":[],"profile":"release"},"bite":null,"layer":"L2","profile":"P2","seed":2,"tick_hz":30,"clients":48,"scene":"SS","process":"room","slot":1,"date":"2026-11-20","params":{"sim":"stress","soak":"S30"}}
+{"k":"event","ev":"affinity","ph":"warmup","f":{"when":"start","cpu":3,"alone":true,"sibling_free":true}}
+{"k":"tick","t":1,"ph":"warmup","v":{"work_ns":12000000,"overrun":0,"dropped_ns":0}}
+{"k":"tick","t":2,"ph":"measured","v":{"work_ns":9150000,"overrun":0,"dropped_ns":0,"soldiers_count":48,"smallest_team_count":16,"snapshot_clients_count":48,"big_vehicles_count":15,"very_large_units_count":4,"projectiles_count":300},"s":{"everyone_in_view":[1,1]}}
+{"k":"tick","t":3,"ph":"measured","v":{"work_ns":9250000,"overrun":0,"dropped_ns":0,"soldiers_count":48,"smallest_team_count":16,"snapshot_clients_count":48,"big_vehicles_count":15,"very_large_units_count":4,"projectiles_count":300},"s":{"everyone_in_view":[1,1]}}
+{"k":"tick","t":4,"ph":"measured","v":{"work_ns":16670000,"overrun":0,"dropped_ns":0,"soldiers_count":48,"smallest_team_count":16,"snapshot_clients_count":48,"big_vehicles_count":15,"very_large_units_count":4,"projectiles_count":300},"s":{"everyone_in_view":[1,1]}}
+{"k":"second","sec":0,"ph":"measured","v":{"steal_permille":4,"shots_count":690,"portal_changes_count":1}}
+{"k":"second","sec":1,"ph":"measured","v":{"steal_permille":4,"shots_count":710,"portal_changes_count":1}}
+{"k":"event","ev":"affinity","ph":"after","f":{"when":"end","cpu":3,"alone":true,"sibling_free":true}}
+{"k":"footer","records":9,"ended":"clean"}

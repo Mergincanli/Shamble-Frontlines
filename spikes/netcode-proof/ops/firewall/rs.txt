@@ -1,0 +1,13 @@
+# fw-rs: the Hetzner firewall object for RS (u8-brief.md rev 1.1 section 1 Block 2; replan-units.md:153-155).
+# Inbound rules only: once applied, Hetzner drops every other inbound packet. Applied in the create form and by the
+# label selector role=rs (plan.md:876-884). The test runs on IPv4 (plan.md:956): no IPv6 source, no ICMP echo, no TCP 80.
+# Placeholders are text. <HOME_IPV4> (his home address: the laptop and the PC share it, PM-0006-12) is typed only in
+# the Hetzner console, never in a file (plan.md:1190-1192). <LG_IPV4> is the kept address npt-lg under FIXED-IP (a)
+# (plan.md:932), typed in the console at Stop B.
+# If U6c's -3 probe uses a port outside the two game ranges, U6c's brief names it and this list gains it.
+#
+# direction protocol port         sources
+in          udp      30001-30032  <HOME_IPV4>/32 <LG_IPV4>/32
+in          tcp      31000-31032  <HOME_IPV4>/32 <LG_IPV4>/32
+in          tcp      9100         <LG_IPV4>/32
+in          tcp      22           <HOME_IPV4>/32

@@ -1,0 +1,16 @@
+# npt-lab's clock and hash-map bans (u4-build-plan.md §4.11; the advisor's Q9 (a) and U4D2-Q10 rulings): the probe runs
+# on simulated time, and the `hash` subcommand's comparer and native legs take no order from a hash map and read no
+# clock (check.mjs's `wasm` step times its calls itself). The clock ban is npt-server's, as its clippy.toml words it;
+# the two type bans are npt-sim's. The workspace sets disallowed_types and disallowed_methods to deny.
+disallowed-types = [
+    { path = "std::collections::HashMap", reason = "hash-map ban (GLOSSARY §7): iteration order is not deterministic" },
+    { path = "std::collections::HashSet", reason = "hash-map ban (GLOSSARY §7): iteration order is not deterministic" },
+    { path = "std::time::Instant", reason = "the clock ban: time is passed in" },
+    { path = "std::time::SystemTime", reason = "the clock ban: time is passed in" },
+    { path = "tokio::time::Instant", reason = "the clock ban: time is passed in", allow-invalid = true },
+]
+disallowed-methods = [
+    { path = "std::time::Instant::now", reason = "the clock ban" },
+    { path = "std::time::SystemTime::now", reason = "the clock ban" },
+    { path = "tokio::time::Instant::now", reason = "the clock ban", allow-invalid = true },
+]

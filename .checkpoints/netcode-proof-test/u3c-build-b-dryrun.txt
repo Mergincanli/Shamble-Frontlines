@@ -1,0 +1,48 @@
+# siocoutq-root-check DRY RUN (no iptables call) at 20261107T203459Z
+# kernel 6.18.44-fc-v310, CONFIG_HZ 250
+# sysctl tcp_congestion_control=bbr tcp_recovery=1 tcp_early_retrans=3 tcp_sack=1 tcp_frto=2 tcp_rto_min_us=200000 tcp_thin_linear_timeouts=0
+# spike commit ebe82b20340cd5e2fbc4e0cd03374a1e9745df1f (with uncommitted changes)
+INFO kernel=6.18.44-fc-v310 port=47613 client_port=37876 congestion=cubic congestion_set=ok srtt_us=Some(8) siocoutq=0 notsent=Some(0) rto_us=Some(204000) total_retrans=Some(0) notsent_offset=144 rtt_offset=68
+RULE R0 pass
+READY
+# sent GO
+SAMPLE phase=write k=1 t_us=687 written=200 siocoutq=0 siocoutq_again=0 delivered=200 notsent=0 wqueue=0 unacked_pkts=0 total_retrans=0 rto_us=204000 rtt_us=13 backoff=0 ca_state=0
+SAMPLE phase=write k=2 t_us=5594 written=400 siocoutq=0 siocoutq_again=0 delivered=400 notsent=0 wqueue=0 unacked_pkts=0 total_retrans=0 rto_us=204000 rtt_us=17 backoff=0 ca_state=0
+SAMPLE phase=write k=3 t_us=10543 written=600 siocoutq=0 siocoutq_again=0 delivered=600 notsent=0 wqueue=0 unacked_pkts=0 total_retrans=0 rto_us=204000 rtt_us=19 backoff=0 ca_state=0
+SAMPLE phase=write k=4 t_us=15545 written=800 siocoutq=0 siocoutq_again=0 delivered=800 notsent=0 wqueue=0 unacked_pkts=0 total_retrans=0 rto_us=204000 rtt_us=22 backoff=0 ca_state=0
+SAMPLE phase=write k=5 t_us=20539 written=1000 siocoutq=0 siocoutq_again=0 delivered=1000 notsent=0 wqueue=0 unacked_pkts=0 total_retrans=0 rto_us=204000 rtt_us=24 backoff=0 ca_state=0
+SAMPLE phase=write k=6 t_us=25525 written=1200 siocoutq=0 siocoutq_again=0 delivered=1200 notsent=0 wqueue=0 unacked_pkts=0 total_retrans=0 rto_us=204000 rtt_us=26 backoff=0 ca_state=0
+SAMPLE phase=write k=7 t_us=30526 written=1400 siocoutq=0 siocoutq_again=0 delivered=1400 notsent=0 wqueue=0 unacked_pkts=0 total_retrans=0 rto_us=204000 rtt_us=29 backoff=0 ca_state=0
+SAMPLE phase=write k=8 t_us=35571 written=1600 siocoutq=0 siocoutq_again=0 delivered=1600 notsent=0 wqueue=0 unacked_pkts=0 total_retrans=0 rto_us=204000 rtt_us=30 backoff=0 ca_state=0
+SAMPLE phase=write k=9 t_us=40550 written=1800 siocoutq=0 siocoutq_again=0 delivered=1800 notsent=0 wqueue=0 unacked_pkts=0 total_retrans=0 rto_us=204000 rtt_us=32 backoff=0 ca_state=0
+SAMPLE phase=write k=10 t_us=45537 written=2000 siocoutq=0 siocoutq_again=0 delivered=2000 notsent=0 wqueue=0 unacked_pkts=0 total_retrans=0 rto_us=204000 rtt_us=33 backoff=0 ca_state=0
+SAMPLE phase=write k=11 t_us=50529 written=2200 siocoutq=0 siocoutq_again=0 delivered=2200 notsent=0 wqueue=0 unacked_pkts=0 total_retrans=0 rto_us=204000 rtt_us=35 backoff=0 ca_state=0
+SAMPLE phase=write k=12 t_us=55526 written=2400 siocoutq=0 siocoutq_again=0 delivered=2400 notsent=0 wqueue=0 unacked_pkts=0 total_retrans=0 rto_us=204000 rtt_us=36 backoff=0 ca_state=0
+SAMPLE phase=write k=13 t_us=60527 written=2600 siocoutq=0 siocoutq_again=0 delivered=2600 notsent=0 wqueue=0 unacked_pkts=0 total_retrans=0 rto_us=204000 rtt_us=38 backoff=0 ca_state=0
+SAMPLE phase=write k=14 t_us=65516 written=2800 siocoutq=0 siocoutq_again=0 delivered=2800 notsent=0 wqueue=0 unacked_pkts=0 total_retrans=0 rto_us=204000 rtt_us=39 backoff=0 ca_state=0
+SAMPLE phase=write k=15 t_us=70529 written=3000 siocoutq=0 siocoutq_again=0 delivered=3000 notsent=0 wqueue=0 unacked_pkts=0 total_retrans=0 rto_us=204000 rtt_us=39 backoff=0 ca_state=0
+SAMPLE phase=write k=16 t_us=75522 written=3200 siocoutq=0 siocoutq_again=0 delivered=3200 notsent=0 wqueue=0 unacked_pkts=0 total_retrans=0 rto_us=204000 rtt_us=42 backoff=0 ca_state=0
+SAMPLE phase=write k=17 t_us=80532 written=3400 siocoutq=0 siocoutq_again=0 delivered=3400 notsent=0 wqueue=0 unacked_pkts=0 total_retrans=0 rto_us=204000 rtt_us=43 backoff=0 ca_state=0
+SAMPLE phase=write k=18 t_us=85509 written=3600 siocoutq=0 siocoutq_again=0 delivered=3600 notsent=0 wqueue=0 unacked_pkts=0 total_retrans=0 rto_us=204000 rtt_us=44 backoff=0 ca_state=0
+SAMPLE phase=write k=19 t_us=90531 written=3800 siocoutq=0 siocoutq_again=0 delivered=3800 notsent=0 wqueue=0 unacked_pkts=0 total_retrans=0 rto_us=204000 rtt_us=43 backoff=0 ca_state=0
+SAMPLE phase=write k=20 t_us=95536 written=4000 siocoutq=0 siocoutq_again=0 delivered=4000 notsent=0 wqueue=0 unacked_pkts=0 total_retrans=0 rto_us=204000 rtt_us=43 backoff=0 ca_state=0
+SAMPLE phase=hold k=1 t_us=200243 written=4000 siocoutq=0 siocoutq_again=0 delivered=4000 notsent=0 wqueue=0 unacked_pkts=0 total_retrans=0 rto_us=204000 rtt_us=43 backoff=0 ca_state=0
+SAMPLE phase=hold k=2 t_us=300306 written=4000 siocoutq=0 siocoutq_again=0 delivered=4000 notsent=0 wqueue=0 unacked_pkts=0 total_retrans=0 rto_us=204000 rtt_us=43 backoff=0 ca_state=0
+SAMPLE phase=hold k=3 t_us=400309 written=4000 siocoutq=0 siocoutq_again=0 delivered=4000 notsent=0 wqueue=0 unacked_pkts=0 total_retrans=0 rto_us=204000 rtt_us=43 backoff=0 ca_state=0
+SAMPLE phase=hold k=4 t_us=500266 written=4000 siocoutq=0 siocoutq_again=0 delivered=4000 notsent=0 wqueue=0 unacked_pkts=0 total_retrans=0 rto_us=204000 rtt_us=43 backoff=0 ca_state=0
+SAMPLE phase=hold k=5 t_us=600263 written=4000 siocoutq=0 siocoutq_again=0 delivered=4000 notsent=0 wqueue=0 unacked_pkts=0 total_retrans=0 rto_us=204000 rtt_us=43 backoff=0 ca_state=0
+SAMPLE phase=hold k=6 t_us=700281 written=4000 siocoutq=0 siocoutq_again=0 delivered=4000 notsent=0 wqueue=0 unacked_pkts=0 total_retrans=0 rto_us=204000 rtt_us=43 backoff=0 ca_state=0
+SAMPLE phase=hold k=7 t_us=800281 written=4000 siocoutq=0 siocoutq_again=0 delivered=4000 notsent=0 wqueue=0 unacked_pkts=0 total_retrans=0 rto_us=204000 rtt_us=43 backoff=0 ca_state=0
+SAMPLE phase=hold k=8 t_us=900251 written=4000 siocoutq=0 siocoutq_again=0 delivered=4000 notsent=0 wqueue=0 unacked_pkts=0 total_retrans=0 rto_us=204000 rtt_us=43 backoff=0 ca_state=0
+SAMPLE phase=hold k=9 t_us=1000328 written=4000 siocoutq=0 siocoutq_again=0 delivered=4000 notsent=0 wqueue=0 unacked_pkts=0 total_retrans=0 rto_us=204000 rtt_us=43 backoff=0 ca_state=0
+HOLD-END
+# sent RELEASED
+SAMPLE phase=release k=1 t_us=1000752 written=4000 siocoutq=0 siocoutq_again=0 delivered=4000 notsent=0 wqueue=0 unacked_pkts=0 total_retrans=0 rto_us=204000 rtt_us=43 backoff=0 ca_state=0
+RULE R1 fail (20 findings; first: R1 write 1: SIOCOUTQ 0 then 0, not 200)
+RULE R2 fail (9 findings; first: R2 hold 1: SIOCOUTQ 0 then 0, not 4000)
+RULE R3 fail (1 findings; first: R3: tcpi_total_retrans 0 at GO, Some(0) at the hold's end: no retransmission, so no ACK was dropped)
+RULE R4 pass
+INFO release_ms=0 last_write_us=95106
+VERDICT FAIL 30 findings
+# dry run: verdict FAIL, R1 fail, R3 fail: the rule fails without the drop, as it must
+# log: /home/user/Shamble-Frontlines/.claude/worktrees/wf_87550c07-bbd-2/spikes/netcode-proof/results/u3c-kernel-check/siocoutq-root-check-dry-20261107T203459Z.txt

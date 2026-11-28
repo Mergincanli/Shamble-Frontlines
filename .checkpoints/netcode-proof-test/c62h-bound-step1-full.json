@@ -1,0 +1,150 @@
+{
+  "status": "done",
+  "stop_reason": "",
+  "staged_files": [
+    "spikes/netcode-proof/crates/l1/src/lib.rs",
+    "spikes/netcode-proof/crates/l1/src/tests.rs",
+    "spikes/netcode-proof/crates/lab/src/scenario.rs",
+    "spikes/netcode-proof/crates/lab/src/logs.rs",
+    "spikes/netcode-proof/marks/SERIES.md"
+  ],
+  "numstat": [
+    {
+      "file": "spikes/netcode-proof/crates/l1/src/lib.rs",
+      "added": 33,
+      "deleted": 0
+    },
+    {
+      "file": "spikes/netcode-proof/crates/l1/src/tests.rs",
+      "added": 98,
+      "deleted": 0
+    },
+    {
+      "file": "spikes/netcode-proof/crates/lab/src/logs.rs",
+      "added": 47,
+      "deleted": 7
+    },
+    {
+      "file": "spikes/netcode-proof/crates/lab/src/scenario.rs",
+      "added": 303,
+      "deleted": 8
+    },
+    {
+      "file": "spikes/netcode-proof/marks/SERIES.md",
+      "added": 2,
+      "deleted": 1
+    }
+  ],
+  "size_total": 499,
+  "check_log": "/home/user/Shamble-Frontlines/.gate/u4r/c62h-bound/step1-check.log",
+  "check_exit": 0,
+  "check_summary": "PASS fmt 0.7 s; PASS clippy 27.9 s (measured build and bites build both linted); PASS clippy-wasm32 8.4 s; PASS doc 12.9 s; PASS test 634.6 s \"measured build: 545 tests passed, 0 failed, 0 reported a skip; bites build: 625 tests passed, 0 failed, 0 reported a skip\"; PASS deps 4.1 s; PASS wasm 54.3 s (27000 ticks compared, 0 mismatching, both comparisons; hash-map bite caught); PASS refs 0.8 s; PASS marks 5.3 s (81 marks read and checked); PASS self 1.9 s (78 of 78); PASS redact 0.9 s (10 of 10; 296 items, 0 findings). check.mjs: \"check: all 11 steps pass\". Runner: \"=== 10:58:53 UTC exit 0: node check.mjs\", \"--- end 10:58:53 UTC, exit 0\".",
+  "diff_hash_line": "diff 0b41121e5cb1b5692b7f0a6ea3eb223e8fed5fa7d9b0df4c85f635b372c3267f; untracked e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "untracked_hash_line": "untracked e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 (the hash of empty input: no untracked file in spikes/netcode-proof)",
+  "counts": {
+    "measured": 545,
+    "bites": 625
+  },
+  "new_tests_measured": [
+    "tests::c62hb_server_datagrams_since_counts_down_datagrams_by_fate (npt-l1)",
+    "scenario::tests::c62hb_join_one_datagram_too_many",
+    "scenario::tests::c62hb_join_one_datagram_too_few",
+    "scenario::tests::c62hb_join_groups_with_a_null_server_hash",
+    "scenario::tests::c62hb_join_groups_with_no_session",
+    "scenario::tests::c62hb_join_ok_counts_lost_and_burst",
+    "scenario::tests::c62hb_p2_short_every_measured_lost_tick_is_explained"
+  ],
+  "new_tests_bites": [
+    "tests::c62hb_server_datagrams_since_counts_down_datagrams_by_fate (npt-l1)",
+    "scenario::tests::c62hb_join_one_datagram_too_many",
+    "scenario::tests::c62hb_join_one_datagram_too_few",
+    "scenario::tests::c62hb_join_groups_with_a_null_server_hash",
+    "scenario::tests::c62hb_join_groups_with_no_session",
+    "scenario::tests::c62hb_join_ok_counts_lost_and_burst",
+    "scenario::tests::c62hb_p2_short_every_measured_lost_tick_is_explained",
+    "scenario::tests::c62hb_p2_short_bite_whole_as_lost_gives_16_unexplained",
+    "scenario::tests::c62hb_p2_short_bite_link_lost_overstated_gives_16_whole_despite_loss"
+  ],
+  "plants": [
+    {
+      "id": "CB-P1",
+      "home": "tests::c62hb_server_datagrams_since_counts_down_datagrams_by_fate",
+      "log": "/home/user/Shamble-Frontlines/.gate/u4r/c62h-bound/plant-CB-P1.log",
+      "result": "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 16 filtered out (left DatagramCounts { sent: 180, lost: 5, burst: 60 }, right { sent: 90, lost: 5, burst: 30 }: sent above the independent count)",
+      "sha_equal_after_restore": true
+    },
+    {
+      "id": "CB-P2",
+      "home": "scenario::tests::c62hb_join_one_datagram_too_many and c62hb_join_one_datagram_too_few",
+      "log": "/home/user/Shamble-Frontlines/.gate/u4r/c62h-bound/plant-CB-P2.log",
+      "result": "test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 59 filtered out (each left Ok(0), right its Err: Ok where Err)",
+      "sha_equal_after_restore": true
+    },
+    {
+      "id": "CB-P3",
+      "home": "scenario::tests::c62hb_join_groups_with_a_null_server_hash",
+      "log": "/home/user/Shamble-Frontlines/.gate/u4r/c62h-bound/plant-CB-P3.log",
+      "result": "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 60 filtered out (left Ok(0), right Err(\"2 snapshot groups with no server hash\"))",
+      "sha_equal_after_restore": true
+    },
+    {
+      "id": "CB-P4",
+      "home": "scenario::tests::c62hb_join_groups_with_no_session",
+      "log": "/home/user/Shamble-Frontlines/.gate/u4r/c62h-bound/plant-CB-P4.log",
+      "result": "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 60 filtered out (left Ok(0), right Err(\"2 snapshot groups for a slot with no session\"))",
+      "sha_equal_after_restore": true
+    },
+    {
+      "id": "CB-P5",
+      "home": "scenario::tests::c62hb_p2_short_every_measured_lost_tick_is_explained",
+      "log": "/home/user/Shamble-Frontlines/.gate/u4r/c62h-bound/plant-CB-P5.log",
+      "result": "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 60 filtered out (panicked at its sum assert: \"the measured link-lost sum is 0\")",
+      "sha_equal_after_restore": true
+    },
+    {
+      "id": "CB-P6",
+      "home": "scenario::tests::c62hb_p2_short_every_measured_lost_tick_is_explained",
+      "log": "/home/user/Shamble-Frontlines/.gate/u4r/c62h-bound/plant-CB-P6.log",
+      "result": "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 60 filtered out (join assert: left (28, 29), right (0, 0): unexplained 28, whole despite loss 29)",
+      "sha_equal_after_restore": true
+    },
+    {
+      "id": "CB-P7",
+      "home": "scenario::tests::c62hb_p2_short_every_measured_lost_tick_is_explained",
+      "log": "/home/user/Shamble-Frontlines/.gate/u4r/c62h-bound/plant-CB-P7.log",
+      "result": "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 60 filtered out (panicked \"E2 is 0\"; its print E1 29, E2 0, N 0)",
+      "sha_equal_after_restore": true
+    },
+    {
+      "id": "CB-P12",
+      "home": "tests::c62hb_server_datagrams_since_counts_down_datagrams_by_fate",
+      "log": "/home/user/Shamble-Frontlines/.gate/u4r/c62h-bound/plant-CB-P12.log",
+      "result": "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 16 filtered out (left { sent: 202, lost: 5, burst: 40 } against { 90, 5, 30 }: sent above)",
+      "sha_equal_after_restore": true
+    },
+    {
+      "id": "CB-P13",
+      "home": "tests::c62hb_server_datagrams_since_counts_down_datagrams_by_fate",
+      "log": "/home/user/Shamble-Frontlines/.gate/u4r/c62h-bound/plant-CB-P13.log",
+      "result": "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 16 filtered out (left { sent: 120, lost: 5, burst: 30 } against { 90, 5, 30 }: sent above)",
+      "sha_equal_after_restore": true
+    }
+  ],
+  "points_for_main_session": [
+    "How I read the summary line (scenario.rs:1058, phrase at :1709): Summary.link_lost adds up c.lost + c.burst (the same value link_lost() returns), and link_burst adds up c.burst, so the burst losses B are part of the total L in 'lost by the link L (in bursts B)'. Section 3.1 item 5 names the fields but not whether L includes bursts. On P2 and P3 B is 0, so either reading prints the same; on B1 they would differ. The advisor may want to confirm.",
+    "Size: 499 changed lines against the plan's 285-400 for step 1, still under the 1,050 stop. Most of it is scenario.rs (+303 -8): the join helper c62hb_join (:2859), the 5 join tests (:2795-2839) and the 3 short P2 tests (:2904-2990). If steps 2-4 come in at their planned 255-355, about 100 and 10-20, the lane ends near 865-975: under 1,050, but with less room than the brief's 650-875.",
+    "logs.rs:520-523 adds #[allow(clippy::too_many_arguments, reason = ...)] on room_tick, which the brief does not mention. room_tick now takes 8 inputs and clippy runs with warnings as errors. The form copies mirror.rs:353-356.",
+    "link_lost (scenario.rs:610-631) runs the no-session check first, then compares c.sent with groups. With no session, groups is 0 by that point, which gives the brief's '(no session: other than 0)'. Each join test feeds inputs that pass every check but its own, so each of CB-P2/P3/P4 reads Ok where Err, as section 4 expects.",
+    "Asserts I added beyond the brief, none weaker than what it asks: the l1 test also checks that the independent count's sent is 90 (tests.rs:436); the join Ok test adds two Ok(0) cases (scenario.rs:2837-2838); the link-lost-overstated bite test also checks that the fate log equals the clean run's (scenario.rs:2982).",
+    "check.mjs prints no per-test lines, so step1-check.log has no test names. The new tests' names come from the runner's own output of cargo test --locked --workspace c62hb (step1-new-measured.log) and the same command with --all-features (step1-new-bites.log). Those are check.mjs's test-step flags.",
+    "The clean short P2 run (seed 1, 16 clients, 6 s + 4 s): measured incomplete 29 = E1 0 + E2 29 + N 0. The test-side join gives 0 unexplained and 0 whole despite loss; S 1920, L 29, B 0; fate log ca5edd4bde19b9bd, the same in both builds. E1 (the room sent nothing) is never above 0 on this short run, so the short test does not show E1 being used.",
+    "The lab's N against the judge's figure A cannot be compared in step 1, since the judge figure comes in step 2; nothing was seen. N equalled the test-side join's unexplained count on every run: 0 on the clean runs, 16 on whole-as-lost.",
+    "Hash check for the commit: from the worktree's spikes/netcode-proof, git diff --cached HEAD -- . | sha256sum gives 0b41121e..., the check header's hash. After commit 1, git diff HEAD^ HEAD -- . | sha256sum must give the same. No unstaged change and no untracked file are left.",
+    "The pre-check's run_leg (precheck.rs:438) sends through Server::send without the join. The brief puts the join only in run's per-slot loop, and that is how it is built.",
+    "All plant runs used the measured build (every step-1 home test runs in both builds) and the -x lock. Logs are under /home/user/Shamble-Frontlines/.gate/u4r/c62h-bound/. Notes and the State block are in /home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/c62h-bound-build.md under '## Launch 1 (step 1)'."
+  ],
+  "deviations": [
+    "One lint allow the brief does not mention: #[allow(clippy::too_many_arguments, reason = \"the tick's inputs, each from its own source\")] on Logs::room_tick (logs.rs:520-523). It is needed because the new link_lost parameter makes 8 inputs, past clippy's limit of 7 under warnings-as-errors.",
+    "No other deviation from section 3.1 items 1-11. Points 1 and 5 above name one reading (L includes the burst losses) and a few asserts added beyond the brief; neither changes what the brief asks for."
+  ]
+}

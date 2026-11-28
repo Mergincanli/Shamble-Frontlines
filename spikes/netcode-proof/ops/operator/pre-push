@@ -1,0 +1,38 @@
+#!/bin/sh
+# pre-push: redact-check on every pushed commit, from a fixed copy outside every worktree (plan.md:1201, :1334;
+# u8-brief.md rev 1.1 Block 8). Git for Windows runs hooks through its own sh. Installed at Stop B: this file into the
+# laptop clone's .git/hooks/pre-push; ops/operator/redact-check.mjs copied to ~/npt-operator/redact-check.mjs; the
+# kept VM addresses, one per line, in ~/npt-operator/vms.txt. EXPECTED is that copy's SHA-256, recorded at Stop B
+# (ops/tests/operator.test.mjs keeps it equal to ops/operator/redact-check.mjs). It refuses the push on a finding, a
+# missing copy or a hash mismatch, and (SEC-SB-7) any remote ref but refs/heads/claude/npt-results: it reads git's
+# ref lines first and passes them on to redact-check.
+set -euf
+COPY="$HOME/npt-operator/redact-check.mjs"
+VMS="$HOME/npt-operator/vms.txt"
+EXPECTED=2609bc87c9248558f8334731a07b0ce82479ced427f18d70af1ee7e130519d31
+ONLY=refs/heads/claude/npt-results
+
+LINES=$(cat)
+for REF in $(printf '%s\n' "$LINES" | awk 'NF { print $3 }'); do
+  if [ "$REF" != "$ONLY" ]; then
+    echo "pre-push: the remote ref $REF is not $ONLY: push refused" >&2
+    exit 1
+  fi
+done
+if [ ! -f "$COPY" ]; then
+  echo "pre-push: no fixed redact-check copy at $COPY: push refused" >&2
+  exit 1
+fi
+GOT=$(sha256sum "$COPY" | cut -d' ' -f1)
+if [ "$GOT" != "$EXPECTED" ]; then
+  echo "pre-push: the fixed copy's SHA-256 is not Stop B's ($GOT): push refused" >&2
+  exit 1
+fi
+set -- --pre-push
+if [ -f "$VMS" ]; then
+  set -- --vms "$VMS" --pre-push
+fi
+if ! printf '%s\n' "$LINES" | node "$COPY" "$@"; then
+  echo "pre-push: redact-check refused this push (findings above)" >&2
+  exit 1
+fi

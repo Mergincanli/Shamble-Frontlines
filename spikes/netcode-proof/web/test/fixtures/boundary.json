@@ -1,0 +1,18 @@
+{
+  "about": "The Wasm boundary's golden vectors (advisor-u7-brief.md C5): every integer little-endian. Inbox record: channel u8 (0 Datagram, 1 Control, 2 FullState), arrival ns u64, length u32, bytes. Outbox record: channel u8 (0 or 1), length u32, bytes. Read by web/test/boundary.test.mjs (the page's packing and the fake core's) and by R3's Rust test (include_str!). arrival_ns is a decimal string: u64 does not fit JSON's safe integers.",
+  "inbox": {
+    "hex": "0001000000010000000400000002aabbcc01cb04fb711f01000005000000030008010202efcdab8967452301060000000200000003ff",
+    "records": [
+      { "channel": 0, "arrival_ns": "4294967297", "bytes_hex": "02aabbcc" },
+      { "channel": 1, "arrival_ns": "1234567890123", "bytes_hex": "0300080102" },
+      { "channel": 2, "arrival_ns": "81985529216486895", "bytes_hex": "0200000003ff" }
+    ]
+  },
+  "outbox": {
+    "hex": "0005000000010506070801070000000500070a0b0c0d",
+    "records": [
+      { "channel": 0, "bytes_hex": "0105060708" },
+      { "channel": 1, "bytes_hex": "0500070a0b0c0d" }
+    ]
+  }
+}

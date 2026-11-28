@@ -1,0 +1,98 @@
+{
+  "verdict": "APPROVE WITH CONDITIONS",
+  "summary": "APPROVE WITH CONDITIONS. The brief carries Mustafa's words, the frozen texts and every ruling correctly. I found no High. Four Mediums are gaps in the proof, each cheap to close in the brief before the build.\n\n**What I checked myself** (read only; my scripts ran in memory and wrote no file):\n- Every hash the brief names matches the file on disk: texts v3, the freeze file, the paste, both runners, peak.py, the set runner, and the three marks files at the lane base.\n- All 8 frozen blocks, parsed with the freeze script's own pattern, give freeze.txt's hashes.\n- I re-ran the brief's insert method in memory. It gives exactly the four expected hashes at brief :101, :109, :116 and :121:\n  - marks.json c1935a5b: as JSON, exactly two checks and one planted bug added, nothing else changed;\n  - SERIES.md 89295b57 after part 1, 6898e119 after part 3;\n  - README.md f3c3c804: 16 lines, none over 120, the sentence's 73 words.\n- His words at :10-16 are quoted correctly. The stop rules at :509-517 hold every rule of the post he said yes to, plus the advisor's two additions to the planted-bug rule: the run must be valid, and the lab's own count must equal the judge's.\n- The expected P2 and P3 numbers equal the old results files, and no crate or marks file has changed since those sets.\n- The raw P0 folder's verdict files are byte-equal to the committed ones (e926b812, b472784f).\n- B-1 and B-2 match the code and the fixtures. README.md:6 (\"changes only together with npt-judge and its fixtures\") supports B-2 in this lane.\n- The judge exits 0 whatever its verdict, so the runner script will not cut the second re-judge call.\n- The lab runs in simulated time, so no test depends on timing.\n\n**Claim · proof · gap:**\n1. \"The frozen texts go in unchanged.\" Proof: the insert and built-check scripts; I reproduced their expected hashes. Gap: the built check is never shown to fail (TE-CBB-1).\n2. \"A changed judge gives the same answers on a set it was not changed for.\" Proof: a strict comparison of the parsed verdict files, removing exactly the new planted bug's entry. Gaps: the comparison script is never shown to report a difference (TE-CBB-1); its new-line rule says \"at most one\" where it should say exactly one per file (TE-CBB-5).\n3. \"Each gap in the frozen row makes the run INVALID on both figures.\" Proof: an eight-case fixture. Gap: it does not show which gap fired, and two of the gaps hide each other (TE-CBB-2).\n4. \"Each planted bug reads 48 on its own check only, and the other numbers equal seed 1's.\" Proof: the set-check script and the expected lines. Gaps: the bite summary-line comparison cannot hold as written (TE-CBB-3); the set-check script is never shown to fail (TE-CBB-1).\n5. \"The lab's planted-bug tests run in every bites build.\" Proof: none; the brief records test counts but expects none (TE-CBB-4).\n6. \"Each planted bug of the build bites its home test.\" Proof: CB-P1 to CB-P11, each with its home test and expected values. Gaps: several branches have no planted bug (TE-CBB-7), and CB-P5 names two failing checks where only the first can show (TE-CBB-10).\n7. \"The lab's tally adds up: room sent nothing + link lost a datagram + neither = measured incomplete, and 'neither' equals the judge's count.\" Proof: the short P2 test, and each judged run's expected lines and stop rules. That holds, provided the tests are seen to run (TE-CBB-4).\n8. \"The lane changes no simulated behaviour.\" Proof: det-u4, the recording regenerated equal, and the P2/P3 summary lines equal the old ones. That holds.\n\nNotes: /home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/c62h-bound-brief-test.md",
+  "findings": [
+    {
+      "id": "TE-CBB-1",
+      "severity": "Medium",
+      "where": "c62h-bound-brief.md:126-135 (c62h_bound_built_check.py), :398-404 (c62h_bound_rejudge_compare.py), :446-448 (c62h_bound_set_check.py); the precedent u4r-brief.md:1675-1680 (U4R-Q11: 'nothing shows it can fail')",
+      "what": "These three new scripts are the only proof of three things: the freeze (his 'Record the sha256 of each exact text now', history.md:2172), his same-answers condition (history.md:2174), and every expected line and stop rule of the judged runs. Nothing in the brief shows any of them can print FAIL or a difference. A script that compares the new file with itself, or strips too much, would print SAME ANSWERS or PASS whatever the input. The compare script also never checks that it read the committed earlier files (sha256 e926b812..., b472784f..., named only at :386-387).",
+      "fix": "Before each script's real use, run it once on an input that must fail, and keep the output beside the real one:\n- the built check on the lane-base marks/SERIES/README (must FAIL every block and hash);\n- the compare script on the earlier verdict.json against an in-memory copy with one -17 L1 P0 check value changed (must print that difference), and against a copy holding the new bite entry twice (must refuse);\n- the set check on results/u4r/fc411116c1f1/P2 (no new phrase, no new checks: must FAIL those lines) and on an in-memory bite verdict with a non-empty gaps list (must FAIL the bite rule).\nThe compare script also checks the two earlier files' sha256 before it compares."
+    },
+    {
+      "id": "TE-CBB-2",
+      "severity": "Medium",
+      "where": "c62h-bound-brief.md:247-251 (c62hb_eight_gaps_read_on_both_figures), :221-229; frozen row series-row-snap_lost_unexplained_count (texts v3:83)",
+      "what": "Each case asserts only that the run is INVALID and both checks read Outcome::Gap, never which gap fired. Two gaps hide each other. A log with no tick.s.snap_link_lost_count also has room tick records without it, so 'no room log gives the series' and 'a room tick record without it' fire on the same input: delete either one's code and the test stays green. Gap 4 covers four lists (hs.server_hash, hs.decoded_hash, snap_link_lost_count, snap_incomplete) with one unnamed case, so the new list's length check may go untested. The frozen row's eight gaps are then not each proven.",
+      "fix": "Each case asserts, on both figures, a note substring that only its own gap gives. Build case 1 so that only it can fire (for example, a room log with no tick records, or assert its exact text). The wrong-length case uses tick.s.snap_link_lost_count, since short-lists already pins the inherited hs.server_hash length gap. Add a planted bug per case or one per shadowed pair, beside CB-P9."
+    },
+    {
+      "id": "TE-CBB-3",
+      "severity": "Medium",
+      "where": "c62h-bound-brief.md:470-473 (bite-whole-as-lost: \"s1's line with ...\"; bite-link-lost-overstated: \"s1's line whole\"); scenario.rs:1621-1624 (the line starts with s.meta.run); results/u4r/93509dfd7fd1/P0/runs.txt:37 against :42",
+      "what": "The bite runs' summary-line expected lines cannot hold as written: the first field of every summary line is the run name (l1-p2-s1 against bite-whole-as-lost). The P0 precedent differs from s1 in exactly four fields: name, client hashes, measured incomplete and wall time. A literal check by c62h_bound_set_check.py would raise a false FAIL. A hand-loosened one is a comparison nobody wrote down. It fails safe, since the FAIL goes to the advisor, but as written it is an expected line that cannot hold.",
+      "fix": "Write the comparison out: strip the run name, the new phrase and the wall time. whole-as-lost must then differ from this set's s1 in exactly two fields (client hashes s1's minus 48, measured incomplete s1's plus 48). link-lost-overstated must differ in none. The new phrase's S, L, B, E1 and E2 equal s1's, with 'neither' 48 and 0 respectively. Any other differing field goes to the advisor (:474)."
+    },
+    {
+      "id": "TE-CBB-4",
+      "severity": "Medium",
+      "where": "c62h-bound-brief.md:299 (\"Record the measured and bites test counts and their change from LANE_BASE's 538 and 616\"), :333 (\"The lab tests' bites (16 and 16) run in every check.mjs's bites step\"); check.mjs:2052-2059 (cargo test --workspace, then --all-features)",
+      "what": "The counts are recorded but nothing is expected of them. A new test that never compiles or runs, for example a misplaced cfg(feature = \"bites\") on the two lab planted-bug tests or on the l1 test, is invisible, though :333 claims those tests run. A test that does not run cannot fail.",
+      "fix": "Expected test-count changes by step, from the brief's own list:\n- commit 1: measured +7, bites +9 (the l1 test, 5 join tests and the short P2 test in both builds; the two planted-bug tests in bites only);\n- commit 2: +6/+6 (the six engine.rs fixtures);\n- commit 3: +1/+1 with B-2, else 0;\n- commit 4: 0;\n- final: 552/632 (551/631 without B-2).\nA different count stops for the advisor. Pass or fail stays the runner's own summary. The report lists each new test name from the runner's output, in the build it runs in."
+    },
+    {
+      "id": "TE-CBB-5",
+      "severity": "Low",
+      "where": "c62h-bound-brief.md:399-401 (\"(ii) at most one -17 why line\"); eval.rs:1696, :1704-1708; results/u4r/93509dfd7fd1/P0/verdict-bites.json (-17's why holds no bite line today)",
+      "what": "-17 stays NOT-RUN in both files, so the new judge adds 'bite PM-0001-17/link-lost-overstated: no run yet' to each file. In verdict-bites.json it is a new line, since all three existing -17 bites ran there. 'At most one' would let a missing line pass as the same answers.",
+      "fix": "Exactly one such line in each file, after whole-as-lost's in verdict.json and last in -17's why list in verdict-bites.json. Any other count is a difference."
+    },
+    {
+      "id": "TE-CBB-6",
+      "severity": "Low",
+      "where": "c62h-bound-brief.md:284-291 (the dry print); advisor-c62h-bound-full.json C6 ('its dry plan lists exactly 5 runs (l1-p2-s1 to s3, bite-whole-as-lost, bite-link-lost-overstated)'); c-u4r-runs.mjs:247 (the peak printed by toFixed(0))",
+      "what": "The asserts include 'about 552 MiB' and 'about 1,530 MiB', which cannot be asserted. They do not check C6's run names.",
+      "fix": "Assert exact values: P2 bites judge 552 and P3 judge 1530, as the runner prints them. Assert the five P2 run names in order and the nine P0 run names in order."
+    },
+    {
+      "id": "TE-CBB-7",
+      "severity": "Low",
+      "where": "c62h-bound-brief.md:152-156, :312-331 (CB-P1 to CB-P11), :242, :167-173, :174-175; l1/src/lib.rs:1082-1104 (B1 = P2's 2 % loss plus bursts)",
+      "what": "Several claimed behaviours have no planted bug, or a test that cannot fail:\n(a) In l1, CB-P1 plants only the direction filter. Nothing plants the dropped carries == Datagram filter or an ignored `from`. B1 also loses about 2 % at random, so the test's 'exact' counts must come from an independent count, not from the function's own output. The canonical-bytes-equal assert cannot fail: &self on a plain Vec.\n(b) Figure A's E1 branch and E2 branch have no plant each.\n(c) CB-P8 covers figure A's window only, not B's.\n(d) The run-level Err wiring has no test: an `.unwrap_or(0)` at the call site would pass every planned test.\n(e) 'L from the counts' is checked only in the judged P2 run.",
+      "fix": "(a) The l1 test window holds down acks and down stream pieces (said so). Its expected numbers are derived from for_each_canonical's bytes (dir 1, code 0, kind 1/2). Add plants for the dropped carries filter and the dropped `from`.\n(b) The E1 fixture has a null hash and link loss 0; the E2 fixture has a non-null hash and link loss 1. Plant 'drop E1' and 'drop E2': A 1 each.\n(c) If the window filter sits in the shared reader, CB-P8 expects A 1 and B 1.\n(d) Name the call site's Err handling in the rust-reviewer's read.\n(e) The short link-lost-overstated test asserts Summary's L equals the clean short run's L."
+    },
+    {
+      "id": "TE-CBB-8",
+      "severity": "Low",
+      "where": "c62h-bound-brief.md:233-235, :246; frozen block series-row-snap_whole_despite_link_loss_count (texts v3:89: 'A client hash at a tick the room log has no record of is not read here')",
+      "what": "The frozen row states this, and the brief's code item says so, but no fixture pins it. An implementation that raised a gap or counted there would pass every planned test.",
+      "fix": "Add a case to c62hb_the_converse_and_the_sentinel: a measured whole hash at a tick with no room record gives B 0 and no gap."
+    },
+    {
+      "id": "TE-CBB-9",
+      "severity": "Low",
+      "where": "c62h-bound-brief.md:513-514; advisor-c62h-bound-r2-full.json te_rulings TE-cond-6",
+      "what": "'... and no gap, on a valid run' can be read as the trigger's condition rather than as part of the required reading. Read that way, an INVALID planted-bug run would go to the advisor, not to Mustafa, which narrows TE-cond-6 as the advisor strengthened it.",
+      "fix": "Write it as the advisor's conjunction: stop and tell Mustafa unless the run is valid, its own figure reads exactly 48 (fail), the other new figure and decoded_hash_mismatch_count read 0 (pass), its gaps list is empty, and the lab's 'neither' equals the judge's figure A."
+    },
+    {
+      "id": "TE-CBB-10",
+      "severity": "Low",
+      "where": "c62h-bound-brief.md:320-321 (CB-P5: 'fails, sum 0 and unexplained above 0')",
+      "what": "A Rust test stops at its first failing assert, so only one of the two expected values can show.",
+      "fix": "Name the assert that must fire (the measured link-lost sum above 0) and the value it reports (0)."
+    },
+    {
+      "id": "TE-CBB-11",
+      "severity": "Low",
+      "where": "c62h-bound-brief.md:377-385 and :537-538 (B-3); advisor-merged-head-full.json MH-L1; design bites[3].expected ('Old P2 and P3 logs re-judged under the new marks.json read INVALID')",
+      "what": "Two points.\n- The brief settles which kept P0 set to re-judge by reading the records. Both folders are on disk, and each re-judge is two more judge calls with no runs (peaks about 3.9 and 4.6 GiB).\n- The design's claim that old P2 and P3 logs read INVALID under the new marks.json has no step in the brief.",
+      "fix": "Re-judge both P0 folders, each compared with its own committed verdicts. That removes the reading and gives two sets the judge was not changed for. Or keep B-3 as recommended. For the old-logs claim: either drop it, or add one judge call on .gate/netcode-proof-test/runs/u4r-P2-fc411116c1f1 that expects -17 L1 P2 INVALID with 'no room log gives tick.s.snap_link_lost_count'."
+    },
+    {
+      "id": "TE-CBB-12",
+      "severity": "Low",
+      "where": "c62h-bound-brief.md:257-268 (B-2), :491-493 (the 13:35 read line); history.md:2127 (his 13:35 rule)",
+      "what": "B-2 changes an existing judge test's answer: hashed-and-incomplete goes from INVALID to FAIL, with its coverage gap still found beside the failure. That is correct for a part the judge was changed for, but the report line as planned would not show it.",
+      "fix": "The marks.json and judge read line in the report names this one changed fixture answer and why, beside the P0 SAME ANSWERS line."
+    }
+  ],
+  "conditions": [
+    "Close TE-CBB-1 before the build: each of the three evidence scripts (the built check, the re-judge compare, the set check) is shown once to FAIL on a planted input, with that output kept; the compare script checks the earlier files' sha256 (e926b812..., b472784f...) first.",
+    "Close TE-CBB-2: each gap case asserts its own note text on both figures, the shadowing gap pair is split, and the wrong-length case uses tick.s.snap_link_lost_count.",
+    "Close TE-CBB-3: the bite runs' summary-line comparison names what it strips (the run name, the new phrase, the wall time) and the exact fields that may differ (whole-as-lost: client hashes -48 and incomplete +48; link-lost-overstated: none).",
+    "Close TE-CBB-4: the expected test-count changes per step (+7/+9, +6/+6, +1/+1 with B-2, 0; final 552/632, or 551/631 without B-2); a different count stops for the advisor.",
+    "Carry TE-CBB-5 to -12 into the brief, or defer each in writing with its reason; none needs Mustafa, since none changes a frozen text or what a figure computes.",
+    "Unchanged: B-1, B-2 and B-3 are the advisor's rulings before the build; nothing in this read changes a frozen text."
+  ]
+}

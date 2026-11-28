@@ -1,0 +1,194 @@
+# U8's merge into the lane: the plan (M0-M9), written 2026-11-25 20:2x UTC by the main session
+Form: U4f's M1-M9 (advisor-u4f-r1.md:325-358) with U8's terms. Inside it, before the commit: C1 of the U7 brief check
+(advisor-u7-brief.md:118-119, "Before U8 merges ... the log must read (a verdict, never a read error)"), the `ops` step
+(u8-brief.md:333-335, :524) and the merged-state run (u8-build.md:594, :628). Allowed now: MAIN-66's check, Q1 yes after
+step 6 (advisor-main-66.md; CI green on 69d9b5f at 19:42). No agent before the 23:50 window; there the advisor
+(a3de649cd25e474df, "I read each pushed head", advisor-u8-stopb.md:224) reads the pushed head. The merge into the lane
+needs no go of his (as U4r's and U4f's); PR #40 keeps its own go.
+
+## Facts (read 20:1x UTC, HEAD beed8b1 = origin, clean)
+- wip/u8-build.patch: sha256 09cb4a07928cf2a48c8516df18d68fd45e0b22a6666e04b65610934a9a72e660, 43 files, all under
+  spikes/netcode-proof/ops/. None is a manifest or lockfile (ops/browser's package.json and package-lock.json are on the
+  branch since the DEP-HOLD save and stay as they are); none is marks.json or under crates/judge (D10).
+- U8's base 096808b. Since then the lane changed, under ops/, only ops/operator/redact-check.test.mjs (not one of the 43);
+  outside ops/, U6b, U6c, 0b and MAIN-66 changed crates (server and super main.rs among them: test 7 reads them).
+- `git apply --check` exit 0 on beed8b1 (20:1x), all 43 "Checking patch" lines, no error.
+- U8's tests need ops/browser/node_modules (browser.test.mjs:136-152 runs the scripts, which import webdriverio). The
+  installed copy is in agent-abf71d95fc07b3522 (U8's first build worktree; `npm ci --ignore-scripts`, u8-build.md:155),
+  linked for the run as the builder did, removed after. git does not ignore that path; redact-check skips node_modules
+  (redact-check.mjs:277); refs and test 4 read `git ls-files` only.
+- C1's input: U7's T5 (ii) run 3 (clean), leg 6-mds: `.claude/worktrees/agent-a9873cdba07a3219e/.gate/u7/t5ii/
+  2026-11-25T19-53-08-358Z/6-mds/result.json`, its `pages[0]` (records, nptClockResNs, nptDropped, version, status).
+  PM-0001-36 (marks.json:7324) has the part "ML* (rough, reported)" (suite mds, machine.name ML*, min 1): the name
+  legHeader writes (config.mjs:148). Its other parts (ML, MAC-b) stay unmet: any verdict is the bar, no read error.
+- The judge: .gate/shared-target/debug/npt-judge (built 19:33 by MAIN-66's 5d on 6a4de15; crates/judge unchanged since);
+  flags --marks, --logs, --out, --only (crates/judge/src/main.rs:35-42). r1.sh:797 treats a non-zero exit as a read
+  failure.
+- check.mjs has 11 STEPS (check.mjs:2614-2649), pinned by check.test.mjs:2785.
+
+## The advisor tool's six fixes (20:2x UTC), folded in below
+1. `git apply --index`: the 43 paths are staged, so `refs` and browser.test.mjs:109's `git ls-files` see the new
+   files; M6's undo is `git apply -R --index`.
+2. webdriverio for every later whole run: a real install in the main folder by U8's one install form
+   (`npm_config_ignore_scripts=true npm ci --ignore-scripts` in ops/browser: u8-brief.md:28; a real folder, so the
+   root .gitignore's `node_modules/` covers it; npm ci checks each package against the lock's sha512 and never writes
+   the lock). No link. When the folder is absent the `ops` step fails with one line naming that install; U7's
+   builder's new-base message carries the same line for its worktree, and NB2's whole run is in the main folder.
+3. C1: `pages[0]` read (flat: 14 records, nptClockResNs 100000, nptDropped 0, version "Chromium 153", no timed_out);
+   the script makes RECORDS first (save() makes no folder) and passes only the fields legHeader and legLog read. The
+   judge exits 0 whatever the verdicts and 1 on a read error with an "npt-judge: " line (main.rs:99-123), so the bar is
+   a PM-0001-36 entry with the ML* part counting 1 and no "npt-judge: " line. It runs through main-run.sh as `cargo
+   run -q --locked -p npt-judge --` (the lane lock; the binary built from this tree).
+4. Q1 (advisor-main-66.md:125-140) lifts only MAIN-66's hold; U8's own ruling and M3's apply check govern U8's
+   steps, and the `ops` step is the approved brief's (u8-brief.md:333-335, :524: "merge, then the `ops` step").
+5. The order (changed 23:2x, the advisor tool): U8 last, after the 0b amendment, U7's builder's new base (by 00:20
+   UTC) and MAIN-67 (main moved at 20:50 by a CI change: M0 stops on it). U7's tree (wip/u7-build-rs.patch) changes
+   check.mjs and check.test.mjs too, so the builder's new base does not carry U8, and the `ops` step's two edits meet
+   U7's at U7's merge (its apply check). A choice inside the plan (choice 14).
+6. The card carries this plan's pointer and a resume line, saved before M0; each step gets a "done" line here.
+- Also: HEAD = origin re-checked after the saver stops; M3 compares modes too; ops' count is derived, not pinned
+  (the glob also takes redact-check.test.mjs, the one ops file the lane changed: 11 top-level tests at 096808b and
+  now, so 100 is expected and a difference is named); u8-report.md drafted before M0; the report says C1's log is a
+  form test (a container loopback leg stamped R1, eu-path and ML*, kept only under .gate/), from U7's T-builder tree
+  (7e2d6f3 plus its unsaved R-half, run 3's t5-dist). M5's command is U6c's form: `bash main-run.sh <log> cat
+  /proc/loadavg :: env CARGO_INCREMENTAL=0 node check.mjs :: cat /proc/loadavg` (u6c-merge/m5-check.log, 20.4 min).
+
+## Changes before M0 (2026-11-26 00:3x UTC, the advisor tool's second read; they win over the steps below)
+- M0's main is now 07d673b (MAIN-67 merged it at 07cc9b7, pushed e23c783); M0 also waits for CI on e23c783 green
+  (gate done; toolchain was still running at 00:3x) and PR #40 mergeable.
+- The `ops` step waits until after U7's merge (u8-brief.md:524, "merge, then the `ops` step"): U7's tree changes the
+  same pin (check.test.mjs:2785 gains "web" in wip/u7-build-rs.patch), so M4b tonight would break U7's apply check.
+  M5 tonight is `node check.mjs` (the 11 steps) plus `node --test 'ops/**/*.test.mjs'` and `bash
+  ops/tests/wrappers.test.sh` in the same main-run.sh call. No install tonight: ops/browser/node_modules linked from
+  agent-abf71d95fc07b3522 as U8's builder did, removed before M7. Choice 15 for the day message.
+- M5's bars: a light base run at H0 first (as MAIN-67's), then refs = N0 + 43 (all 43 of U8's files are new), marks,
+  self and redact items as counted then (redact's item count rises by U8's text files); test, ops 100 pass expected.
+- The part-clean runs before M0 (free 7,207 MiB at 00:26, under 8,192), in the card's Tools form character for
+  character; if the guard asks or refuses, stop with nothing staged and one line for him.
+- A "done" line goes here after each step.
+- DONE 00:3x: the part-clean, in the card's form (no ask): "Removed 6564 files, 7.3GiB total"; the lock and CACHEDIR.TAG
+  there, no debug folder; free 7,207 to 14,039 MiB. M5 will build cold.
+- DONE 00:3x: MAIN-67's step 6 (CI on e23c783 all green: gate 45728829441 and 45728836685, toolchain 45728829428 and
+  45728836660); M0's checks (no agent runs, no cargo or rustc, main still 07d673b, branch = origin and clean, free 14,039
+  MiB); M1 (the patch 09cb4a07...e660); ops/browser's package.json 8370495d... and package-lock.json a0efce8e... equal in
+  agent-abf71d95fc07b3522. Next: the saver stopped, H0, the base run, then M3.
+- DONE 00:34-00:36: the saver by981ffzh stopped (its terminated autosave pushed by 37badaf; pgrep exit 1); H0
+  37badafbf72ae6dadb99155fd370e4ffcd983798 (= origin, clean); the no-save window opens. Base run (u8-merge/light-base.log,
+  lock 00:34:40): refs 1932 (N0), marks 81 unchanged, self 78 of 78, redact 11 of 11, 378 items, 0 findings. M2/M3/M4:
+  `git apply --check --index` exit 0, `git apply --index` exit 0; `git status --short`: the 43 paths, all A; `diff -rq`
+  of U8's worktree ops/ against the main folder's: only ops/operator/redact-check.test.mjs differs (the lane's change
+  since 096808b, not U8's). Next: M4c (the link), C1, M5 (refs bar 1975).
+- DONE 00:35: M4c, the link (`ln -s` to agent-abf71d95fc07b3522's ops/browser/node_modules; package files equal). C1:
+  u8-c1.mjs wrote .gate/npt-browser/records/mds-chrome-wt-a0-2026-11-26T00-35-28-859Z.jsonl through U8's save() (14
+  page lines; log sha256 b16358f2...7781; wasm sha256 dbdc8629...80d4) and copied it alone to .gate/u8-merge/c1-logs/;
+  the judge through main-run.sh (c1-judge.log, lock 00:35:34): exit 0, no "npt-judge: " line; c1-verdicts.json:
+  PM-0001-36 NOT-RUN (the ML and MAC-b parts: 0 of 1 valid runs), its "ML* (rough, reported)" part PASS. The bar (a
+  verdict, never a read error) is met. Note: while the link exists, main-run.sh's untracked hash prints "sha256sum:
+  ops/browser/node_modules: Is a directory" (a header line only). Next: M5 in the background.
+- STOPPED AT M5, 00:56 (M6 applied, nothing committed): check.mjs all 11 steps PASS (test 861/958, refs 1975 = N0 + 43,
+  marks 81, self 78/78, redact 11/11 with 421 items, 0 findings), but `node --test 'ops/**/*.test.mjs'` 99 of 100: test
+  71, r1sh.test.mjs:226-227, "item 8: room_settings writes only fields the settings types accept, every U6a field,
+  `bite` only in a bite room": "U6a's merged Settings: 26 fields and the bites build's `bite`", 40 !== 27 (the merged
+  Settings has 13 more fields from U6b and U6c: the alignment test 7 exists to catch). wrappers.test.sh not run (the
+  runner stops at the first failure). M6: `git apply -R --index` exit 0, the link removed (unlink), spikes/ equal to H0
+  (`git diff --quiet H0 -- spikes/` exit 0). C1's result stands (independent of the merge). Next: the advisor's ruling
+  in the 04:50 window (with MAIN-67's step 7), then U8's builder (ac59cce3e5d002441) fixes r1.sh's room_settings and the
+  pin, then this merge again from M0.
+- RESTART FROM M0, 05:1x (advisor-u8-m5-ruling.md section 2 (a)-(f)): M1 now binds wip/u8-build.patch sha256
+  3e1cd5b53d4c224020233f8e7edc3a1ec3b795edc729dd257101fff0742ea531 (377,866 B, 43 files, base 03d9ff3: U8's M5 fix,
+  u8-fix-m5.md); M5 runs `node --test 'ops/**/*.test.mjs'` (101 expected) and `bash ops/tests/wrappers.test.sh` first,
+  then `env CARGO_INCREMENTAL=0 node check.mjs`; C1 stands; the rest of the steps as above. Done lines follow below.
+- DONE 05:2x (restart): the part-clean in the card's form (no ask): "Removed 5660 files, 6.7GiB total"; the lock and
+  CACHEDIR.TAG there, no debug folder; free 7,823 to 14,021 MiB (M5 builds cold). M0: no agent runs, no cargo or rustc
+  (pgrep empty), the lane lock free (flock -n), main still 07d673b; the saver bzb64iuso stopped by TaskStop. M1: the
+  patch's sha256 3e1cd5b5...a531 (= the restart line). Next: this line saved (it pushes the saver's terminated autosave),
+  H0, the base light run, then M3.
+- DONE 05:17-05:2x (restart): saved and pushed 9aa6dde; H0 9aa6dde118ed3a9f9887589eb9016300fedc0079 (= origin, clean);
+  the no-save window opens. Base run (u8-merge/light-base-r.log, 05:18): refs 1939 (N0), marks 81 unchanged, self 78 of
+  78, redact 11 of 11, 378 items, 0 findings. M3/M4: `git apply --check --index` exit 0, `git apply --index` exit 0;
+  `git status --short`: the 43 paths, all A; `diff -rq` of U8's fix worktree (agent-ac59cce3e5d002441, 03d9ff3) ops/
+  against the main folder's: exit 0, no difference. M4c: package.json 8370495d... and package-lock.json a0efce8e...
+  equal in agent-abf71d95fc07b3522; its node_modules linked (`ln -s`). Next: M5 in the background (refs bar 1982 = N0 +
+  43; ops 101; wrappers 315 ok; then check.mjs's 11 steps).
+- DONE 05:19-05:41 (restart): M5 (background shell blq9lev0j; .gate/u8-merge/m5-check-r.log, exit 0): ops 101 of 101,
+  wrappers "315 ok, 0 failed", check.mjs all 11 PASS (test 861/958, 0 failed, 0 skipped; wasm 27,000 ticks, 0
+  mismatching; refs 1982 = N0 + 43; marks 81 unchanged; self 78/78; redact 11/11, 421 items, 0 findings). Free after the
+  cold build: 7,843 MiB.
+- DONE 05:4x (restart): M7: unlink (the install kept); gate --no-smoke GATE PASS; "repo map OK: 207 entries cover 110
+  required paths"; `git status --short`: the 43 A paths, notes only (the card, this plan, u8-report.md, and the new
+  launch-0950.md, light-takein-recipe.md, msg-2026-11-27.md). Next: M8 (u8-build.md's merge section, the commit), M9.
+- DONE 05:4x (restart): M8: u8-build.md's merge section and u8-report.md's M5 and M7 lines written; `git rm` of
+  wip/u8-build.patch; `git add` of the two notes; staged exactly the 43 A, the D and the two M; the commit
+  05c63a8a993653bacd44da30c1a46a702dfaf97c (46 files; under spikes/ 43 files, 6,189 insertions = U8's count); pushed by
+  the card save that carries this line. Next: M9.
+- M9 (restart) 05:43-: pushed 6913070 (carries 05c63a8; its message has no skip marker; the workflows have no path
+  filter); the saver restarted as b2bls6lah; PR #40 subscribed again (its rules event re-sent); CI on 6913070 running:
+  push gate 45763469323 and toolchain 45763469324, pull request gate 45763476998 and toolchain 45763476991. All four
+  green closes M9; then the advisor's head read at 09:50 (launch-0950.md B). The rules event arrived 05:44 (read
+  05:47 by ReadNotifications); no steward or babysit skill in the tree.
+- DONE 05:5x: M3's mode bar (not run in either attempt until now): `git ls-files -s spikes/netcode-proof/ops` all 100644;
+  `find` in agent-ac59cce3e5d002441's ops/ finds no executable file: equal. Installs set their modes (lg.yaml:121-125,
+  rs.yaml:152-154). The part-clean in the card's form: "Removed 5369 files, 6.6GiB total"; lock and CACHEDIR.TAG there,
+  no debug; free 7,843 to 14,013 MiB. The automated security review of 05c63a8 (two Medium, ops/operator/settings.json:
+  SR-1 the hooksPath denies are literal-case while git config keys are not, :33-36; SR-2 no `Bash(git * -c *)` beside
+  PowerShell's :56): to the head read (launch-0950.md B), no hand fix.
+- DONE 05:4x-06:0x: M9's CI on 6913070 all green: push gate 45763469323 and toolchain 45763469324, pull request gate
+  45763476998 and toolchain 45763476991, each completed with success. U8's merge is done; its last bar is the
+  advisor's head read in the 09:50 window (launch-0950.md B).
+- (was) RUNNING since 00:35:4x: M5 (background shell b5xy9vavj; .gate/u8-merge/m5-check.log; fmt and clippy PASS by 00:37);
+  u8-report.md drafted (its M5_RESULT and M7_RESULT to fill). If the chat was compacted meanwhile: read the log's end;
+  all PASS and the ops lines 0 fail: go on to M7 (gate, repo map, the link removed), then M8 and M9; a FAIL: M6.
+
+## Steps
+- **M0, preconditions:** no agent or workflow running; the lane lock free; HEAD = origin, clean; `git fetch origin
+  main`: main still c1da1bd (a code, CI or rules move stops here: MAIN-52, plan first; a docs-only move is noted, nothing
+  more); free disk at least 8,192 MiB. Stop the saver bu59it97m by TaskStop (its output ends "watch stopped"); H0 = HEAD.
+  The no-save window runs from here to M8's push: a Stop hook gets one line, no save.
+- **M1:** the patch's sha256 is 09cb4a07…e660.
+- **M2:** `git diff --quiet 096808b H0 --` the 43 paths: exit 0.
+- **M3 and M4:** `git apply --check --index`, then `git apply --index`. `git status --short` lists exactly the 43
+  paths, staged; each is cmp-equal to its copy in U8's worktree (agent-ac59cce3e5d002441, the C9 tree the snapshot was
+  taken from), with the same mode (`stat -c %a`).
+- **M4b, the `ops` step, test first:** check.test.mjs:2785's list gains "ops" at the end (Edit); `node --test
+  check.test.mjs` fails on that assert; then check.mjs's STEPS gains `ops` after `redact` (Edit, about 10 lines):
+  `node --test 'ops/**/*.test.mjs'` (the glob form: u8-build.md:46), then `bash ops/tests/wrappers.test.sh`, both in
+  HERE, failing if either fails, summarised with nodeCounts and the wrappers' last line; then the self tests pass.
+- **M4c:** the install (fix 2): package.json 8370495d… and package-lock.json a0efce8e… checked first; then
+  `npm_config_ignore_scripts=true npm ci --ignore-scripts --prefix spikes/netcode-proof/ops/browser`; its "added N
+  packages" line kept; both files' sha256 unchanged after; `git status --short` unchanged (the folder is ignored). An
+  install that fails stops here (M6's undo), to the advisor.
+- **C1:** `node .checkpoints/netcode-proof-test/u8-c1.mjs` (Write, in the notes folder): it imports `save` from the
+  applied ops/browser/lib.mjs and `logDate` and `ROOMS` from config.mjs; reads leg 6-mds's `pages[0]`; calls
+  `save(run, leg, state, summary)` with run = { run: "R1", date: logDate(new Date()), commit: H0, wasm_sha256: the
+  sha256 of the t5-dist's npt_client_wasm_bg.wasm the leg loaded }, leg = { suite: "mds", browser: "chrome", transport:
+  "wt", nn: ROOMS.mds.nn, attempt: 0, slot: 0 } (mds36.mjs:31's form) and a summary naming the check; then copies that
+  one .jsonl into a fresh .gate/u8-merge/c1-logs/ and prints both paths and the log's sha256. Then `bash main-run.sh
+  .gate/u8-merge/c1-judge.log cargo run -q --locked -p npt-judge -- --marks marks/marks.json --logs
+  <M>/.gate/u8-merge/c1-logs --out <M>/.gate/u8-merge/c1-verdicts.json --only PM-0001-36`. Bar (fix 3): a
+  PM-0001-36 entry with a verdict, its "ML* (rough, reported)" part counting 1 log, and no "npt-judge: " line. A read
+  error is M6.
+- **M5:** one counted `node check.mjs` run through main-run.sh (lane lock, incremental off): all 12 steps pass. Counts
+  recorded against MAIN-66's 5d (refs 1921 plus the new tracked files; marks 81, rows unchanged; self 78 of 78; redact 11
+  of 11, items 378 plus U8's; ops 100 pass, 0 fail and wrappers 315 ok, 0 failed, as C9's end): test 7's merged-state
+  run is inside it (it reads the post-U6c server and super main.rs).
+- **M6:** a failing test or bar is never retried unnamed. It stops the merge: `git apply -R --index` of the patch,
+  the two check files restored by Edit and sha256-checked, the saver restarted; the failure and its log go to the
+  advisor in the 23:50 window. Nothing is committed. The install stays (ignored, the cleared lock).
+- **M7:** `node tools/gate.mjs --no-smoke` PASS and `node .claude/scripts/repo-map-check.mjs` OK; `git status --short`
+  shows the 43 paths, the two check files and the notes only.
+- **M8, one commit** (`git add` of exactly those paths; `git rm` of wip/u8-build.patch, WIP-CLEAN), pushed by a
+  checkpoint save with the card updated: the 43 files; check.mjs and check.test.mjs; u8-build.md's merge section;
+  u8-report.md (files, tests and plants, size, carries by number, the dependency record: u8-brief.md:524), with the C1
+  line, the D10 line ("no marks.json or judge change"), and what stays open at its merge (the card's U8 item: F28,
+  U6b's null certificate pair, ds-selftest's place in C1's run list, U6c's names, Stop B's laptop reads, `sudo -l` on
+  RS, SEC-SB-9's rest, NC-R3-1).
+- **M9, after the push:** the saver restarted; CI on the pushed head (gate with gate and smoke, toolchain; push and
+  pull request); the advisor's read of the pushed head at 23:50 with: the policy-name INVALID (plan.md:1256), C9 on
+  096808b, test 7's merged-state run, C1's result, NC-R3-1, the open items, and the 05:2x clean incident
+  (u7-block0b.md:40).
+
+## Risks
+- Test 7 fails on U6c's or U6b's names (the alignments were built against briefs): M6, to the advisor.
+- The judge refuses the saved log (C1's purpose): M6; U8 does not merge until the advisor rules.
+- The lane: M5 takes it about 20-45 minutes; U7's builder waits for the amended base in the 23:50 window, so the lane is
+  free until then. If M5 is not done by 23:30, it stops at M6's form and moves after the window.

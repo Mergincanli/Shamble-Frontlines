@@ -1,0 +1,144 @@
+{
+  "verdict": "APPROVE WITH FINDINGS",
+  "summary": "The build is proven. I found seven Low findings and nothing at Medium or above, so none of them calls for a push on its own. I ran no cargo, build or test; everything I checked myself was a read-only python3 -I script in the scratchpad.\n\nWhat I checked myself:\n- **marks.json.** The built file holds the frozen check-objects block exactly at lines 3983-4004 and the frozen bite-object block at 4035-4038, byte for byte. Each block's sha256 equals the freeze's. Parsed as JSON, the built file equals LANE_BASE's with exactly those two checks and that bite added. sha256 before 9fb5be57..., after c1935a5b....\n- **SERIES.md and README.md.** SERIES.md (6898e119...) holds the four frozen rows as whole lines, at :291, :292, :322 and :378, with the headers (38) and (19). README.md (f3c3c804...) gains only the sentence's 73 words, removes nothing, and no refilled line passes 120 columns.\n- **The two figures against the frozen rows.** Both compute what their rows say:\n  - A counts the measured lost (slot, tick) pairs where the server hash is non-null and the link record is 0.\n  - B counts the measured whole hashes where the link record is 1 or more. The sentinel is left out, and a tick with no room record is skipped.\n  - The eight gaps come in the row's order, after slot_hashes' own refusals.\n- **The planted bugs.** I read all 18 plant logs. Each failed its home test (CB-P2 both) at the cause section 4 names. The files' sha256 recorded before the plants equal the committed blobs, so every plant was restored.\n- **Test counts.** 545/625, then 551/631, then 552/632, then 552/632, as the brief expects. Every new test is named in the test runner's own output, in each build it runs in.\n- **B-2.** My own scan of every L1 -17 fixture case agrees with launch 3: only hashed-and-incomplete (A 1) and none-compared (A 6) read above 0. lost-group reads A 0 only with its own room log. The only lines removed from the judge tests are the import, one doc line and the hashed-and-incomplete entry.\n- **The four main-session scripts.** They check what brief sections 2, 7 and 8.3-8.4 say, and each one can fail:\n  - the insert script writes only when every hash matches, and refuses a second run;\n  - the built check's shown-to-fail run gave 12 PASS and 13 FAIL;\n  - the re-judge comparison's self-test passed 4 of 4;\n  - the set check's dry run on fc411116c1f1 failed all 29 lines that name the new phrase or the new checks.\n- **The set check on real lines.** I ran the set check's phrase regex and its bite-line comparison on the short P2 test's real summary lines. The whole-as-lost line differs in exactly the two allowed fields, a planted third field fails, and the link-lost-overstated line differs in no field.\n\nNot verified by a test:\n- The call site's error path (a join error fails the run) is shown by reading only; that read is the rust-reviewer's.\n- The judge first reads real lab-format room logs in the P2 set. If it misreads them, the result is safe: the run reads INVALID, or the lab's N differs from the judge's A (a stop for Mustafa). The bite runs must read 48 either way.",
+  "findings": [
+    {
+      "id": "TE-CBH-1",
+      "severity": "Low",
+      "where": "/home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/c62h_bound_set_check.py:104-119 (bite_rule)",
+      "what": "The planted-bug stop rule reads only three named checks on a bite run: its own figure, the other new figure and decoded_hash_mismatch_count. It never asserts that these are all the checks the run carries.",
+      "why": "Mustafa's words are 'with every other check passing'. Today a P2 bite run carries exactly those three (eval.rs:1452-1458 filters checks by the matched part; -17's other checks are on L1 P0 and every S30), so nothing is missed now. A later marks change adding a check to L1 P2 would go unread by the stop rule.",
+      "fix": "In bite_rule, add `and sorted(run_checks(r)) == sorted([own, other, mm])` to the condition (or require every check other than `own` to read pass), and print the check names in the detail.",
+      "fix_lines_estimate": 2,
+      "touches_frozen_text_or_figure_computation": false
+    },
+    {
+      "id": "TE-CBH-2",
+      "severity": "Low",
+      "where": "/home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/c62h_bound_set_check.py:215-250 (the bite-line comparison with l1-p2-s1) and :128-139 (--self-test)",
+      "what": "The bite-line comparisons (TE-CBB-3: whole-as-lost differs in exactly two fields, link-lost-overstated in none) are never shown to fail on content in the script's own record. The dry run on fc411116c1f1 fails them only because the lines are missing, and the self-test plants only a gap.",
+      "why": "These lines decide an advisor stop ('a bite run's line differs from s1's in a field section 8.4 does not allow'). I ran the same logic, copied, on the short P2 test's real lines (scratchpad bitecmp.py): it accepts the two allowed fields and fails a planted third field. So the evidence holds today, but the record does not carry it.",
+      "fix": "Add two in-memory cases to --self-test: s1's line with one more field changed beside the two whole-as-lost fields must FAIL, and s1's line with one field changed must FAIL as link-lost-overstated. Factor the comparison into a function to do it. Re-run the shown-to-fail log.",
+      "fix_lines_estimate": 20,
+      "touches_frozen_text_or_figure_computation": false
+    },
+    {
+      "id": "TE-CBH-3",
+      "severity": "Low",
+      "where": "/home/user/Shamble-Frontlines/.claude/worktrees/c62h-bound/spikes/netcode-proof/crates/judge/tests/engine.rs:1680-1682",
+      "what": "c62hb_eight_gaps_read_on_both_figures asserts that each note holds its own phrase. It checks 'and no other gap's phrase' (brief 3.2 item 1, TE-CBB-2) only for case 1 against phrase 0.",
+      "why": "A reader that joined several gaps into one note would still pass for seven of the eight cases. Not reachable with today's code (bound returns the first gap only), but the test does not pin it.",
+      "fix": "Replace the `i != 1 || ...` assert with `assert_eq!(phrases.iter().filter(|p| note.contains(*p)).count(), 1, \"{note}\")`.",
+      "fix_lines_estimate": 2,
+      "touches_frozen_text_or_figure_computation": false
+    },
+    {
+      "id": "TE-CBH-4",
+      "severity": "Low",
+      "where": "/home/user/Shamble-Frontlines/.claude/worktrees/c62h-bound/spikes/netcode-proof/crates/judge/src/figures.rs:595-599 and :633-640; brief c62h-bound-brief.md:275-276",
+      "what": "bound()'s own 'a list that does not hold the run's clients entries' checks on the hs.server_hash, hs.decoded_hash and tick.s.snap_incomplete lists are not covered by any test. Only the link list's length is planted (CB-P18). The brief's parenthetical 'the short-lists fixture already pins hs.server_hash's length gap' pins decoded()'s phrase ('not the run's 48 clients'). bound() reads that fixture as gap 1 first, so bound's own length check is never reached there.",
+      "why": "Dropping those three branches would fail no test. On the real -17 mark no wrong verdict is reachable: decoded_hash_mismatch_count gaps the same run on every L1 part.",
+      "fix": "Add two edits to the eight-gaps loop (hs.server_hash lists one entry short on every room tick; one measured snap_incomplete list one short), each expecting the length phrase. Or say in the report that these branches are covered by decoded() only.",
+      "fix_lines_estimate": 6,
+      "touches_frozen_text_or_figure_computation": false
+    },
+    {
+      "id": "TE-CBH-5",
+      "severity": "Low",
+      "where": "/home/user/Shamble-Frontlines/.claude/worktrees/c62h-bound/spikes/netcode-proof/ops/runs/c-u4r-runs.mjs:14-15",
+      "what": "The instruction for stopping a set still says 'In a set with bites (P0), ending the measured judge call's group starts the bite-runs call at once'. P2 now has bites too (launch 4 flagged it).",
+      "why": "A session stopping the P2 set by hand could miss the second judge call. 'Kill the script only when no npt-lab or npt-judge call is left' still protects it.",
+      "fix": "'(P0)' becomes '(P0 and P2)' and the bullet is refilled at 120. This changes the runner's sha256, so the sets' recorded sha256 must follow.",
+      "fix_lines_estimate": 4,
+      "touches_frozen_text_or_figure_computation": false
+    },
+    {
+      "id": "TE-CBH-6",
+      "severity": "Low",
+      "where": "/home/user/Shamble-Frontlines/.claude/worktrees/c62h-bound/spikes/netcode-proof/crates/judge/tests/fixtures.rs:390-391; /home/user/Shamble-Frontlines/.claude/worktrees/c62h-bound/spikes/netcode-proof/crates/judge/fixtures/README.md:23",
+      "what": "1. The doc line 'Each case is INVALID (both at once: the next test).' is terse: 'both at once' refers back to 'never both' and reads as 'both INVALID at once'. 2. README row :23's '(... the link's explanation, E2)' uses the design's code E2, which that README never defines (only logs.rs:181-185's Counts doc does).",
+      "why": "Wording only; both follow the brief's own instruction (3.3 item 2's 'lost-group: the link lost it, E2').",
+      "fix": "1. Write '(the case with both at once, hashed-and-incomplete, FAILs since C62H-BOUND: the next test)'. 2. Drop ', E2' or write 'the link's explanation (C62H-BOUND's E2: logs.rs Counts)'.",
+      "fix_lines_estimate": 3,
+      "touches_frozen_text_or_figure_computation": false
+    },
+    {
+      "id": "TE-CBH-7",
+      "severity": "Low",
+      "where": "/home/user/Shamble-Frontlines/.claude/worktrees/c62h-bound/spikes/netcode-proof/crates/judge/src/figures.rs:613-616 and :643-648",
+      "what": "'an entry below 0' is applied to link lists only. A negative tick.s.snap_incomplete entry gets the row's seventh phrase ('a snap_incomplete entry other than 0 or 1', LINK_GAPS[6]) rather than its fifth ('an entry below 0'), which comes first in the row's order (launch 2's point).",
+      "why": "Only the note text differs, on a malformed log the lab never writes. The figure's outcome (Gap on both checks, run INVALID) and its value are the same, so this is no change to what either figure computes and does not go to Mustafa. Under the brief's 'first gap in the row's order' rule, a literal reading would pick the fifth phrase.",
+      "fix": "Optional: in the snap_incomplete loop, send `v < 0` to gap(4, ...) before the match. Otherwise keep the reading and have the advisor confirm it.",
+      "fix_lines_estimate": 2,
+      "touches_frozen_text_or_figure_computation": false
+    }
+  ],
+  "points": [
+    {
+      "point": "Launch 3: before B-2's edits only base's test failed, and lost-group and hashed-and-incomplete read INVALID by gap 1, not the brief's 'FAIL (A 1)' (step3-readings-before.log, step3-readings-after.log).",
+      "reading": "Within B-2's ruling; not a stop for the advisor. The stop (ADV-CBB-5, condition 5) is for an answer that changes outside B-2's named cases, and none did (my own scan agrees). The brief's 'FAIL (A 1)' is these cases' reading once base's room log carries the series, and launch 3 reproduced it (lost-group's client on base's new room log: FAIL A 1, which is why lost-group needs its own room log; hashed-and-incomplete after the edits: FAIL A 1). lost-group's assertion was never reached before the edits because the loop panicked at base first. The report should give the before-edit readings as recorded. They also show the real marks.json reading old-form logs INVALID by gap 1, which backs TE-CBB-11 (ii)."
+    },
+    {
+      "point": "fixtures.rs:390-391, the one doc-comment line beyond the brief",
+      "reading": "Accepted. Without it the comment would still claim the 'never both' case it no longer lists. It changes no assertion and its line counts in SIZE-CHECK. Wording nit in TE-CBH-6."
+    },
+    {
+      "point": "fixtures/README.md:23's 'E2' gloss",
+      "reading": "Accepted: it follows the brief's own instruction. Undefined in that README: Low, TE-CBH-6."
+    },
+    {
+      "point": "B-2's changed answers and the new test pm_0001_17_hashed_and_incomplete_fails_with_its_coverage_gap_beside",
+      "reading": "Proven and able to fail. It asserts FAIL, the why line '(0 unexplained) = 1, needs == 0' and the coverage gap in the run's gaps (eval.rs:1226-1227 keeps gaps beside a fail). The unchanged NOT-RUN/valid test for base and lost-group implicitly pins A 0 on lost-group's room log: A 1 would make the part FAIL."
+    },
+    {
+      "point": "Plants CB-P1 to CB-P18",
+      "reading": "All 18 bit as section 4 says, each naming its home test at the named cause. Step 2's eight plants were run again on the final code after the Vec-to-BTreeSet change (the *-2.log files). Every pre-plant sha256 equals the committed blob. The notes' clock times for CB-P5 to CB-P7 and staging ('11:0x', '11:1x') disagree with the logs (10:44-10:46, check started 10:46:22). The report should quote the logs' times."
+    },
+    {
+      "point": "Test counts 538/616 to 552/632",
+      "reading": "As expected at every step (+7/+9, +6/+6, +1/+1, 0/0), from the test runner's own summary lines. The 16 new test names appear in the runner's output in each build they run in."
+    },
+    {
+      "point": "Tests that cannot fail",
+      "reading": "Accepted as statements; none is load-bearing. The l1 test's canonical-bytes assert is labelled as one ('&self'). The short P2 test's 'none below 0' cannot fail (u32 written as i64). Its E1 + E2 + N = incomplete_measured holds by construction (the tally's match covers every Res::Lost) and stays as a regression guard."
+    },
+    {
+      "point": "Timing dependence and flakes",
+      "reading": "None found. The short P2 runs are seeded simulations with no wall-clock assert; both builds give fate log ca5edd4bde19b9bd. Scratch folders carry the process id (scenario.rs:1834), so the two builds and parallel tests cannot collide."
+    },
+    {
+      "point": "Missing negative cases",
+      "reading": "There is no test that drives run() into a join error. The pure join has 5 tests and 3 plants; the call site (scenario.rs:1045-1055, map_err then ?) is shown by reading only, which is the rust-reviewer's read (TE-CBB-7 (d)), and the report should say so. The lab's E1 branch is never above 0 on a real run (short P2: E1 0); P3 s1 should show it (section 8.4 already says how to report it if not). The judge's E1 is covered by c62hb_each_explanation_alone_reads_0 and CB-P14."
+    },
+    {
+      "point": "Launch 1's asserts beyond the brief (sent 90, two Ok(0) join cases, the bite run's fate log equal to the clean run's); launch 2's gap order (slot_hashes refusals and 'room logs disagree on clients' before the eight) and phrases without backticks",
+      "reading": "Accepted. Each is stronger than the brief, or is the brief's own quoted phrase. The refusals placed ahead are structural gaps the brief keeps ('its own refusals stand'), and the outcome is the Gap the row requires."
+    },
+    {
+      "point": "Launch 4: dry print, CB-P11, extra harness asserts, and two read-only node -e calls outside the runner",
+      "reading": "The dry print passed 22 of 22 asserts. CB-P11 fails 5 asserts with P0 at 7 bites, as section 4 expects. The extra asserts strengthen the proof. The two direct node -e calls wrote nothing and are not evidence; the recorded run went through u4r-run.sh with its sha256 in sources.txt first. The stale '(P0)' at the runner's :14-15 is TE-CBH-5."
+    },
+    {
+      "point": "The main session's four scripts against brief sections 2, 7 and 8.3-8.4",
+      "reading": "They check what the brief says, and each can fail:\n- c62h_bound_insert.py: every write is hash-gated and a second run refuses; the part 1 and part 3 logs reproduce all four expected hashes.\n- c62h_bound_built_check.py: the negative run gave 12 PASS and 13 FAIL, the b01d3ac0c427 run 25 PASS and 0 FAIL; it checks whole-line row matches, the whitespace-collapsed sentence, the file hashes and the word diff.\n- c62h_bound_rejudge_compare.py: diffs() is a full structural compare, so it can only err toward a false DIFFERENT, never a false SAME. The two expected additions match the verdict format (parts with no runs list no checks). Self-test case 1 compares expected() with itself, so it only shows there is no false positive.\n- c62h_bound_set_check.py: it covers every 8.4 line. Its PHRASE regex matches the real summary format (checked on the short test's lines). Its gaps checks matter, because a run can be valid with gaps beside a fail. Gaps: TE-CBH-1 and TE-CBH-2."
+    },
+    {
+      "point": "The judge's first read of real lab-format logs",
+      "reading": "No test runs npt-judge on an npt-lab room log carrying the new series: the short test has 16 clients, and the -17 L1 P2 part selects 48. The first real read is the P2 set. A misread fails safe: the run reads INVALID (an advisor stop), or the lab's N differs from the judge's A (a stop for Mustafa). The bite runs must still read 48. Every real room tick record carries hs.server_hash (logs.rs:594, set_hashes always inserts) and the series (logs.rs:642-649), so gaps 2 and 3 should not fire."
+    },
+    {
+      "point": "Summary L includes B (launch 1's reading)",
+      "reading": "The netcode-architect's call. On the test side, the bite test pins L to the counts (it would be 45, not 29, from the written values), and the set check's 'B 0' bar on P2 reads the same either way."
+    }
+  ],
+  "notes_file": "/home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/c62h-bound-review-test.md",
+  "read_line": {
+    "marks_lines_read": "Built marks.json (42b9646): PM-0001-17 whole at :3845-4047. Check snap_lost_unexplained_count at :3983-3993, check snap_whole_despite_link_loss_count at :3994-4004 (together byte-equal to the frozen check-objects block, sha256 cea24dd8...), bite PM-0001-17/link-lost-overstated at :4035-4038 (byte-equal to bite-object, sha256 d5945f92...). Parsed, the built file equals LANE_BASE's plus exactly these three objects.",
+    "judge_lines_read": "figures.rs :200-536 (slot_hashes, decoded, coverage: context), :538-698 (Bound, LINK_GAPS, bound, snap_lost_unexplained_count, snap_whole_despite_link_loss_count), :805-830 (the two FIGURES entries). engine.rs :1-10 (imports), :1296-1340 (hash_log, SERVER), :1555-1700 (bound_mark, BoundTick, bound_run, bound_out, ab, UNEXPLAINED and the six c62hb tests). eval.rs :1176-1233 and :1440-1484 (context). B-2: fixtures.rs :13-40, :200-300, :380-440 (the INVALID list and the new test at :425-437); fixtures/README.md :19-35; fixtures/pm-0001-17/base/p2-room.jsonl and p2-client.jsonl; lost-group/p2-room.jsonl (new, 7 lines; differs from base only at slot 1, tick 2); every -17 case's file list.",
+    "marks_sha_before": "9fb5be578b27d4c378a890d297c5ba636af0ac239bb6d50eae157ed44884a3c5",
+    "marks_sha_after": "c1935a5b996fb0aaff82b0b3c1c604255e1534f6ca7e8d2e55a9f472cd3b22a9",
+    "diff_stat_at_close": "(cd .claude/worktrees/c62h-bound && git diff --stat 044fab188419e8859dbca699d851563c44c078c9..42b964618eed741f65ac04c1e5a06da0a82524d0 -- spikes/netcode-proof/marks/marks.json spikes/netcode-proof/crates/judge):\n .../netcode-proof/crates/judge/fixtures/README.md  |   6 +-\n .../judge/fixtures/pm-0001-17/base/p2-room.jsonl   |   6 +-\n .../fixtures/pm-0001-17/lost-group/p2-room.jsonl   |   7 +\n spikes/netcode-proof/crates/judge/src/figures.rs   | 172 +++++++++++++++++++++\n spikes/netcode-proof/crates/judge/tests/engine.rs  | 150 +++++++++++++++++-\n .../netcode-proof/crates/judge/tests/fixtures.rs   |  21 ++-\n spikes/netcode-proof/marks/marks.json              |  26 ++++\n 7 files changed, 376 insertions(+), 12 deletions(-)\n(HEAD 42b9646, worktree clean)",
+    "b2_changed_answers": "- hashed-and-incomplete: INVALID becomes FAIL on -17's L1 P2 part, with A (snap_lost_unexplained_count) at 1 and B at 0. The run stays valid and its coverage gap 'slot 1, tick 2: a client hash and tick.s.snap_incomplete 1 at once' is kept in its gaps, beside the failure.\n- base: answer unchanged (NOT-RUN, the run valid, 0 mismatches, 6 compared). Its room log gains tick.s.snap_link_lost_count, 48 zeros on each of its 3 ticks.\n- lost-group: answer unchanged (NOT-RUN, the run valid, 0 mismatches, 5 compared, 1 incomplete). Its new room log has slot 1's entry at tick 2 set to 1, so the link explains the lost tick.\n- none-compared: still FAIL by the empty comparison, now with A at 6 beside it. No edit.\n- Before any edit, the real marks.json read base, lost-group and hashed-and-incomplete INVALID by gap 1 (no room log gives the series), and none-compared FAIL with gap 1 beside. Only base's test failed.",
+    "no_other_assertion_moved": "Confirmed. The only lines removed from the judge tests are:\n- engine.rs:4, the import (BiteStatus becomes {BiteStatus, RunOut});\n- fixtures.rs:390, the doc line (re-worded);\n- the 4-line hashed-and-incomplete entry in pm_0001_17_every_server_hash_is_resolved_on_the_client_side's INVALID list (B-2's ruled edit).\njudge src/main.rs, eval.rs and marks.rs, and tests/cli.rs, are untouched. The 43 old engine tests and 19 old fixture tests pass unchanged (step2-judge-final.log, step3-judge-after.log). My own scan of every L1 -17 fixture case under the built files finds A 0 and B 0 on every case except hashed-and-incomplete (1) and none-compared (6); short-lists gaps and was INVALID before and after."
+  }
+}

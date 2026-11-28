@@ -1,0 +1,14 @@
+# C62H-BOUND freeze: the exact texts Mustafa said yes to (C62H-BOUND-YES (a), 2026-11-15 20:50 Amsterdam,
+# history.md:2163-2175), by c62h_bound_freeze.py. Any change to one of these texts after his yes goes back to
+# him before the judged runs. Before the runs, a script shows the built marks.json, SERIES.md and README.md
+# hold exactly these texts.
+c62h-bound-paste.md (as posted) cfac7502b4a4ba9ea058e31fa7bc16fa324b3fa62a88ecdc5117e2614a57469a
+c62h-bound-texts-v3.md 3f21c9b7e5d5116db7cae7c0d8d9a4011d2ab9797c75b907f00554f0996844eb
+check-objects cea24dd84ae74e3b0561cfa3ed3a3b368f718b387e8fb9b03a7bbc3c5a6d96d3
+bite-object d5945f921eec79e0e7b1a5ef7de1fdbc7b752bd18cafcecf10f7be370d68fa06
+series-row-snap_lost_unexplained_count 572790938361fc3265947ca761c037d415706d0f53b5dee56c88895cf88c3fc6
+series-row-snap_whole_despite_link_loss_count f9822480578dd5ef1d53bd96094bf3af03e71ef557166d0236433c733ea5d7d8
+series-row-tick.s.snap_link_lost_count cc1b3c7454349c167f72c3b79812f266fcec35017e8f68551acbde95258c5d8e
+series-row-tick.s.snap_incomplete 8086ff4d074d08477cb037094af63a478982c92622c3ad911788f310cb70bf42
+readme-sentence 02bd0368f996ffb119d898c9e4b99995e7934d42c69a669627883f9d9cb4dca3
+plain-words 4bf0fcbf116bd4528a4630f492805af5a218b68c6d353a41d06e22dce51fed56

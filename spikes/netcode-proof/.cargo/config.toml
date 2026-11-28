@@ -1,0 +1,4 @@
+# Builds go under the repository's gitignored .gate/ (plan §4.1). Cargo reads this file only when it runs from this
+# folder (or below); from the repository root pass --target-dir .gate/netcode-proof-test/target instead.
+[build]
+target-dir = "../../.gate/netcode-proof-test/target"

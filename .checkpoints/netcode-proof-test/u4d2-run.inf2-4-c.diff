@@ -1,0 +1,11 @@
+--- .checkpoints/netcode-proof-test/u4d2-run.sh
++++ .checkpoints/netcode-proof-test/u4d2-run.inf2-4-c.sh
+@@ -50,7 +50,7 @@
+ mkdir -p "$(dirname "$log")"
+ cd "$S" || exit 1
+ exec 9>"$LOCK" || { echo "STOP: cannot open the lane lock $LOCK"; exit 5; }
+-flock "$mode" 9 || { echo "STOP: cannot take the lane lock $LOCK"; exit 5; }
++flock "$mode" 99 || { echo "STOP: cannot take the lane lock $LOCK"; exit 5; }
+ i=0
+ while pgrep -x cargo >/dev/null || pgrep -x rustc >/dev/null; do
+   i=$((i + 1))

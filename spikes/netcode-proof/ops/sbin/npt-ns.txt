@@ -1,0 +1,4 @@
+# The authoritative name servers of the zone shamblefrontlines.com (plan.md:950-951), fixed here in the root-owned
+# clone; npt-cert asks every one of them (Q-U8-4). Re-read at Stop B against Cloudflare's dashboard for the zone.
+cora.ns.cloudflare.com
+steven.ns.cloudflare.com

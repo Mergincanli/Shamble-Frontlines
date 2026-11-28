@@ -1,0 +1,102 @@
+# E2: Stop B's message to him (0.6, SENT 12:2x UTC on 11-28 as the chat reply, saved 3120790; one screen; read from Sun 29 Nov 12:00)
+Status: 0.5 after the advisor tool's read of 0.4 (12:1x): the date risk under the headline; the price re-read owed and
+unrendered; Sat 28 Nov for "today"; "no file the run server installs"; For Mustafa split (the create-form look offered
+early, nbg1's cost and what it voids, the terms link re-read by me); STANDINS a decision; the take-in count corrected
+(seven merges of main since Mon 23 Nov: `git log --first-parent --merges --since=2026-11-23`). Checked 12:1x: both raw
+links fetched (200) and equal to `git show 6e623788:` (rs a8acc63c, lg ee40b9d0); PR #40's description read back (only
+the two entries and the dated line changed). CI on 53346e55 green, all four at attempt 1 (to 12:18:47): X stands.
+0.6 after the advisor tool's last read (12:2x): STANDINS dropped as a decision (settled: his stop counts net,
+u8-f1-brief.md:13-14; UM-4's three were counted 0 net, um4-report.md:30-31; the in-place opt-out stood in
+msg-2026-11-28.md For Mustafa 4 and he did not take it); "not confirmed" in the risk line; that message's open action
+(the Builder 2 paste, its For Mustafa 1) carried; its two asks were answered at 11:43; B6's block ends COMPLETE 12:08.
+
+---
+**Stop B: R1's run plan is ready for your review (R1 stays Thursday 3 December).**
+One risk to that date: Hetzner's public pages list no FSN1, R1's location, for either server type, and mark CAX21, the
+load machine's type, "not available" (not confirmed: the same pages rendered no prices; your create form decides:
+For Mustafa 2).
+R1's path is built and merged (U6a, U6b, U6c, U7, U8, with U8-F1 and UM-4). Stop B's fills are in: your two security
+notes, the browser build's expected file hashes, and X: the run commit in both cloud-init files and Let's Encrypt's
+terms link in R1.md. Main was taken in seven times this week, last on Sat 28 Nov; PR #40 holds no kit, CI or
+dependency change against main.
+
+**1. The pieces still on my lane** (estimate from the re-plan; likely = 3.3 times, the growth of the last four units):
+| Piece | Estimate | Likely | Needed by |
+|---|---|---|---|
+| U4k, U4's kept server rows | 540-1,280 | 1,782-4,224 | R2, R3, R5 |
+| U6d, room work | 1,800 | 5,940 (just under the 6,000 stop) | R2, R3 |
+| U6e, control, metrics, rooms | 1,575-1,825 | 5,198-6,023 (its top end passes 6,000) | R2, R3, R5 |
+At R1.md's cadence of about 1.5 days a unit (:269; the last five merged about one a day), the three take Fri 4 to about
+Tue 8, with R1's report and the three run plans beside them. R1.md's run dates hold: R2 Sat 12, R3 Sun 13, R5 Mon 14,
+Tue 15 spare, the close Fri 18 (:274-282). The lane ends about three days before R2, so a cut, a 6,000 stop or a plan
+waiting on you spends that first, then Tue 15.
+
+**2. Pieces Netcode Builder 2 could build alone** (your 19:14 item 2; its MOVED and U6j merged 11-26, 48efc9c5):
+- B3, -30's container runner (from U6e): fence ops/runs/, one new c-*.mjs file (the container's run scripts live
+  there: plan.md:410); planned 225 lines (150-300), about 740 at 3.3x; waits for nothing (J1, which its counted run
+  needs, came with U6j: replan-marks.md:50). Needed by R3.
+- H3, npt-super's rest (from U6e: several rooms per VM and the room kill): fence crates/super/ (653 lines today) plus
+  one change in crates/server/ first: -27's built figure reads room ticks in phase `after` (figures.rs:1691-1692),
+  which the room never writes (tick_loop.rs:555-559). Planned 300 at most, about 990. R5 only: with CUT-A it moves.
+- Not alone: U6d, U4k and U6e's other parts change crates/room/, crates/proto/ or crates/server/ together.
+With CUT-A: B3 alone. Without it: B3, and H3 once its server change lands on my lane.
+
+**3. One line each:**
+- The expected page list's Wasm carries wasm-bindgen's plain version, as the run server builds it; a first list
+  carried our commit's name (through wasm-bindgen's build script) and was voided before the fill.
+- Stale words, named here and not edited before R1 (a spike change now would void X): R1.md:267-275 counts MOVED and
+  U6j as mine (both merged 11-26 through Builder 2); R1.md:323 says no reading of the probe's window exists (one does:
+  u6c-r2-netcode.md:90-93); npt-host.service:6-8 and cloudinit.test.mjs:215 say the page host's remaining sandbox
+  settings come at U6c's merge.
+- If bring-up finds the tick core shared (`alone` 0), the DelayStream self-test is skipped (r1.sh:38, R1.md:242-246):
+  its clock thread never runs on the tick core; whether its numbers lean on the tick thread is a follow-up after R1.
+- The count: your two notes add 2 lines to U8's files, so U8 stands at 6,284, your stop; the fills sit outside it, as
+  you ruled; Y0's two test lines rewritten in place count 0 net, like UM-4's three (your stop is counted net; the
+  opt-out in the day message of Sat 28 Nov covers them too).
+- The page host, as you answered on Sat 28 Nov: the connection limits go to the security baseline; the five sandbox
+  settings to R8, at the latest the baseline; the R1 security reading is dropped. Both stay open in PR #40's closing
+  list with those takers and go into R1's report as its known limits; npm ci stays as merged (45); no file the run
+  server installs changed for them.
+- The prices: R1.md's step 8 owes a re-read of hetzner.com's two price pages; three reads (Fri 27 Nov 22:51, Sat 28
+  02:16 and 12:10 UTC) gave no price figure, so the create form's price is the one to compare with R1.md's.
+
+**Decisions needed** (your B.2 and B.3: what each cut saves in lines and days, and my lean; none decided yet)
+- **CUT-A (your (a)): move R5 to Slice 6?** R5 is the 48-player run plus the 8-room soak (Mon 14 Dec); its eight
+  marks (-27, PM-0006-13, -14, -16, -21 to -24) would be reported as MOVED, never as PASS.
+  - Saves: about 1.5 days (the run day, its plan and its report), EUR 3.34 planned (cap 3.60), and at least about
+    1,650-2,475 likely lines: U4k's "before R5" part (660-1,485), H3 (about 990), plus R5-only parts of U6e (the
+    metrics exporter, the soak's log checks, the stall injection) that the estimates do not split.
+  - Options: yes (R1-R3 close the test; Mon 14 joins Tue 15 as spare); no (R5 stays; Tue 15 the one spare day).
+  - **Lean: yes:** R1-R3 prove the netcode; R5's evidence is hosting cost, which Slice 6 measures on the real server.
+- **CUT-B (your (b)): one reviewer per piece, and security only on parts that face the internet during a run?**
+  - Saves: a round has three seats today (netcode, test and security; U6c had two rounds); under CUT-B one, two where
+    clients' bytes arrive: 2 to 4 fewer reviewer runs a piece. Usage only: a round's seats run as one batch, so no
+    days and no lines. The advisor's head read stays.
+  - Options: yes; no (three seats a round stay).
+  - **Lean: yes,** security kept where clients' bytes reach the run server's open ports (rs.yaml:43-49): U6d's join
+    change (finding SA-F1-1 still open), U4k's ack fix and, if R5 stays, the metrics exporter.
+- **CUT-C (your (c)): a stop per piece at twice its estimate (U4k 1,080-2,560, U6d 3,600, U6e 3,150-3,650) in place
+  of 6,000 lines?**
+  - Saves: lines only where you then cut. At 3.3 times every piece reaches its line before it is done, so each adds a
+    stop for your word.
+  - Options: yes; no (6,000 stays, and each piece's size is reported against its estimate at its merge).
+  - **Lean: no.**
+
+**For Mustafa**
+1. Review R1's run plan (spikes/netcode-proof/ops/runs/R1.md): its cap EUR 0.80 (planned 0.62) and its delete-by
+   times on Thu 3 Dec, LG about 13:20 and RS 13:30 Amsterdam.
+2. When you read this, if you can: open Hetzner's create form (it creates nothing; R1.md:62-63) and check that CCX23
+   and CAX21 are both offered in `fsn1`. If not, `nbg1` is your choice: it changes r1.sh's location and R1.md's `fsn1`
+   (:63, :114, :135), so a new Y and X and two new Cloud config links for your OK (about an hour of my time, no money),
+   and your fixed addresses made in nbg1. An early answer lands that before Tuesday. If no location offers CAX21,
+   R1.md has no stand-in for the load machine: tell me, and it comes back to you as its own question.
+3. At Stop B (Tue 1 Dec, before any VM): R1.md's "Once" list (:57-94, about 75 minutes). Its step 7: approve
+   settings.json and PROMPT-R1.md, OK the plan, its cap and delete-bys, and first read Let's Encrypt's terms:
+   https://letsencrypt.org/documents/LE-SA-v1.8-July-06-2026.pdf (I re-read the link on Tuesday; if it changed, you
+   get a new X with only that link).
+4. The Cloud config for R1's day, at X 6e623788c7d4badfb36c2d17fabec1b8280c5e0e:
+   https://raw.githubusercontent.com/Mergincanli/Shamble-Frontlines/6e623788c7d4badfb36c2d17fabec1b8280c5e0e/spikes/netcode-proof/ops/cloud-init/rs.yaml
+   https://raw.githubusercontent.com/Mergincanli/Shamble-Frontlines/6e623788c7d4badfb36c2d17fabec1b8280c5e0e/spikes/netcode-proof/ops/cloud-init/lg.yaml
+5. Answer CUT-A, CUT-B and CUT-C. The day you do, I hand Builder 2 its pieces (section 2).
+6. If not done yet: paste the L1 to L4 and T-6 to T-9 blocks into Builder 2's chat (the day message of Sat 28 Nov).
+7. Nothing to check in Brave.

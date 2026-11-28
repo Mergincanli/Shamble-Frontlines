@@ -1,0 +1,48 @@
+# U3c skeptic round: rust-reviewer notes
+
+Scope: git diff 2c68bf9..989118e -- spikes/ ; plan.md rev 3.3 U3c text; u3c-plan.md rev 2 [C1]-[C16].
+Focus: npt-tcpinfo unsafe blocks + SAFETY; DelayStream state machine (wakers, Pending, poll_shutdown bound,
+pump lifetime, locks across awaits, clock thread heap + waker table); panics on peer input; overflow;
+allocation per datagram/record; cfg(test) knobs never in shipped code.
+Build dir: CARGO_TARGET_DIR=/home/user/Shamble-Frontlines/.gate/u3c-review-target
+
+## Plan
+1. Read u3c-plan.md conditions, advisor notes (skim).
+2. tcpinfo crate: linux.rs, lib.rs, stub.rs, tests.rs, Cargo.toml.
+3. delay.rs, delay_clock.rs, delay_names.rs, ws_frame.rs, tls_test.rs.
+4. ws_gate.rs, ws_config.rs, tcp_kernel.rs, tcp_model.rs + fixes.rs.
+5. Cargo.toml features / cfg(test) reach; build + clippy + tests.
+6. wt_tests diff.
+
+## Findings (a line per finding as found)
+- tcpinfo/src/linux.rs read: both unsafe blocks one op each, SAFETY comments present; libc gnu tcp_info tcpi_rtt @68 matches uapi (libc gnu/mod.rs:248-276); TIOCOUTQ generic 0x5411 (arch/generic/mod.rs:35). No finding yet.
+- tcpinfo unsafe #2 (ioctl) guarded by SO_DOMAIN/SO_TYPE/SO_PROTOCOL reads with len==4 check (linux.rs:153-197); one op per block; sound. getsockopt TCP_INFO into [u8; sizeof tcp_info], rtt read via get() after len check (linux.rs:217-231): sound, no panic.
+- ws_frame Scanner: header buf index bounded (need<=14), record len >=1 per boundary (no zero-length up record -> no false EOF), request cap closes at len>=max_head; no alloc. OK.
+- F1 (low/medium) add_burst overflow: delay.rs:708 burst_ends.push(s.saturating_add(len_ns)) then due() delay.rs:434 `x + self.origin` overflows when start_ns+len_ns > u64::MAX (model.add_burst accepts any len>0, tcp_model.rs add_burst). npt-net release has no overflow-checks (Cargo.toml only sim/proto) -> wraps to a past due -> clock fires at once, pump re-arms same past due -> spin. Debug: panic in pump/add_burst under lock.
+- F2 (low) current() wakes pump + reader/writer while holding the Conn lock (delay.rs:750-755), contrary to wakers() doc 'call after the lock is released' (delay.rs:507); woken task on another worker blocks on the mutex.
+- F3 (low) Pump::poll holds the std Mutex<Conn> across S's poll_write/poll_flush/poll_read/poll_shutdown (delay.rs:1200-1335): rustls encrypt + syscalls under the lock; tungstenite's task blocks a runtime worker meanwhile and adds to measured lateness. Not an await, no deadlock (lock order conn->clock only; clock thread wakes outside its lock).
+- F4 (nit) Pump re-copies the front record into scratch on every attempt (delay.rs:1228-1233) incl. after Pending.
+- F5 (nit) poll_read with buf.remaining()==0 and released data returns Pending (delay.rs:1033, 1078-1082); tungstenite never does it.
+- F6 (low) header_numbers -> clock.slack_now() blocks the caller up to 1 s on a Condvar (delay_clock.rs:154-175, delay.rs:890); pub fn, U6 calls it from async code.
+- (resumed 2026-11-08 after the disk-full stop; F1-F6 re-checked against the code at 989118e: still hold)
+- F1 confirmed: tcp_model.rs:2190-2201 add_burst accepts any len_ns>0; delay.rs:708 saturates to u64::MAX on the model axis; delay.rs:434 `x + self.origin` then overflows (u64::MAX + origin). add_burst(now, u64::MAX) ("forever") is enough. wrap's own profile path cannot overflow (end - origin + origin = end). Rank medium (spin in release: clock thread + pump at 100 %, the burst end never passes since step_to filters x <= t).
+- F7 (low) per-connection fixed memory: Conn holds 4 Lateness (late, late_run x2), each 2 x Box<[u64; 8,440]> (stats.rs:11-15, :62-68) = 135,040 B; 540 KB per DelayStream, allocated at wrap before any WebSocket byte, plus parse (8,219 B) and scratch (16 KB). 512 peers = ~290 MB; 1,000-connection test allocates it 1,000 times. Bounded per connection, but the count of connections is the client's: U6's accept cap must state it.
+- tcpinfo re-check: 3 unsafe blocks, not 2 (srtt_us getsockopt :148; int_option getsockopt :192 inside a closure covered by the fn's allow; ioctl :235). Each one op + SAFETY. BorrowedFd lifetime makes the SO_* -> ioctl sequence TOCTOU-free (fd can't be closed/reused while borrowed). Sound.
+- ws_frame re-check: Header buf index <= need-1 <= 13 (need<=14); Payload take bounded by input; no alloc; server scanner never errors (check() false); OK.
+- delay_clock: schedule/table in sync (remove old (d,s,key) on replace; pop -> table.remove); no lost wake (wait_until set under lock; notify when due < wait_until; thread re-checks before waiting); Duration::from_nanos(due-now) safe (all due<=now popped first). Lock order conn -> clock state -> (clock thread) info; nothing takes conn under clock lock. OK.
+- Pump lifetime: dropped flag + pump_waker wake -> Ready -> Pump::drop releases key; reschedule refuses after dropped/pump_done; no entry can leak after Pump::drop (every reschedule caller checks pump_done under the same lock). OK.
+- F1 REPRODUCED (scratch copy .gate/u3c-review-f1, a test appended there only; target .gate/u3c-review-target): DelayStream over a duplex at quiet P2, add_burst(now+1 ms, len). Control len 10 s: Ok, 0 pump polls in the next 200 ms. len u64::MAX, debug: PANIC "attempt to add with overflow" at delay.rs:434:55 (due), the burst already pushed, so every later current()/poll then panics in its caller. len u64::MAX with [profile.dev.package.npt-net] overflow-checks=false (= release, Cargo.toml:91-95 covers sim/proto only): Ok, then 3,870 pump polls in 200 ms on an idle connection, pump never ends (busy spin of clock thread + pump). Rank MEDIUM. Fix: refuse start_ns.checked_add(len_ns) == None in DelayStream::add_burst (clock axis), and saturating_add in due(); a test with u64::MAX.
+- Kernel citations in tcpinfo's SAFETY comments checked against v6.8 sources (raw.githubusercontent.com torvalds/linux v6.8, scratchpad copies): tcp.c:624-625 EINVAL on listen, :627-628, :630 write_seq-snd_una, :632-640 NSD, :646 *karg=answ, :3842 tcpi_rtt=srtt_us>>3, :4067 len=min(len,sizeof info); socket.c:553-567 sockfd_lookup_light ENOTSOCK, :1222, :1341, :2364-2365, :2397-2399; sock.c:1609 lv=sizeof(int), :1999-2001 len=min, :4191-4199 put_user(int), :4207-4224 sk_ioctl. ALL MATCH.
+- F8 (nit) srtt_us doc (linux.rs:124-129, # Errors) says a non-TCP socket answers ENOPROTOOPT/EOPNOTSUPP; an MPTCP socket answers SOL_TCP TCP_INFO from its first subflow (v6.8 net/mptcp/sockopt.c:1337, :1344), so srtt_us reads it while unacked_and_unsent refuses it (SO_PROTOCOL = 262). Sound either way (the subflow's tcp_getsockopt copies min(len)); doc + asymmetry only.
+- F9 (nit) Pump trusts S's n <= rem: Ready(Ok(n)) with n > rem would underflow `len - front_done` / panic in drain (delay.rs:1235-1238). S is the server's TLS stream (trusted, AsyncWrite contract), so nit: clamp n.min(rem).
+- F10 (nit) move_up shifts the parse buffer per record (copy_within, delay.rs:479) and every pending bound (:483-485): O(records x buffer) per read; <= 527 B after the head, so ~23 KB memmove per 527 B read of 6-byte frames; bounded, cheap. A start index would avoid it.
+- Allocation per record: none in steady state (VecDeques amortized up to the 64 KB budget; scratch reused; clock B-tree nodes reused; logs cfg(test)). OK.
+- cfg(test) reach: every knob (Logs, Snapshot, Life, Step, bite_check_off, set_shutdown_wait, Scanner::off/set_off, TickWriter bite/queue, TcpModel loss_from/unsent/sent_log) is #[cfg(test)], no feature gate; npt-net features are only wt-wtransport / wt-wtq. OK.
+- Ran (CARGO_TARGET_DIR=.gate/u3c-review-target, toolchain 1.99.1): clippy -p npt-net -p npt-tcpinfo --all-targets -D warnings, without and with --all-features: clean. cargo fmt --all --check: clean. cargo test -p npt-tcpinfo: 8 passed. cargo test -p npt-net --lib (l2::delay, l2::ws_frame, ws_gate, ws_config, tcp_kernel): 38 passed, 1 ignored (lateness_evidence_run), 18.4 s. Restriction lints (arithmetic_side_effects, indexing_slicing) over the new files: every hit checked; only F1 (delay.rs:433-434) can overflow.
+- Fixes.rs gate equivalence: old `outstanding + SNAP <= scale*N*SNAP && owed==0 && free>=SNAP` == may_write(.., SNAP, scale*N); non-adaptive n=u64::MAX saturates to true. Same decisions; PINNED_RECOMMENDED unchanged. OK.
+- F11 (low) the gate's four inputs are read in four separate locks, each with its own step of the model (srtt_ns delay.rs:766, outstanding_bytes :771, owed_bytes :782 (no step), free_bytes :777); mechanism test (c) reads them that way (delay_tests.rs:1715-1723), and U6's WsServer will. N comes from the srtt of the first read, outstanding from a later one: a sample landing in between can pair a larger N with a later outstanding. Microseconds apart, so rare; fix: one gate_inputs() under one lock after one step (as snapshot() does for the tests, W2), used by (c) and U6.
+- F7 correction: parse is max(8,192, 527) = 8,192 B (not 8,219). Per connection ~565 KB (540,160 B of histograms + 8,192 + 16,384).
+- Severity summary: F1 medium (reproduced); F3 low (lock across S's I/O, a lateness contributor beside C10, not re-ruled); F2, F6, F7, F11 low; F4, F5, F8, F9, F10 nit. No high. tcpinfo unsafe: sound, citations verified. Parser: no panic, bounded. cfg(test) knobs: none reach shipped code.
+- Verdict: APPROVE_WITH_FINDINGS (F1 is a real overflow on an API input, but its caller arrives at U6; fix it before U6 wires add_burst to a trigger).
+- Scratch left for the main session's cleanup (not deleted by me; Mustafa's cleanup rule): .gate/u3c-review-target (2.0 GB), .gate/u3c-review-f1 (2.1 MB, the F1 repro copy), .gate/u3c-review-f1.tar (1.7 MB), .gate/u3c-review-net-tests.txt.
+DONE

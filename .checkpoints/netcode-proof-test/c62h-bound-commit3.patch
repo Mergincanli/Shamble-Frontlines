@@ -1,0 +1,249 @@
+From b01d3ac0c42701002a2239ad0a89a841f56464a1 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Mon, 16 Nov 2026 14:23:16 +0000
+Subject: [PATCH] C62H-BOUND 3/4: PM-0001-17's two checks and one planted bug,
+ SERIES.md and README.md, word for word from texts v3
+
+The approved build brief (.checkpoints/netcode-proof-test/c62h-bound-brief.md, sha256 7936074c..., section 3.3;
+Mustafa's C62H-BOUND-YES (a), 2026-11-15 20:50 Amsterdam). The frozen texts went in by the main session's
+c62h_bound_insert.py --part 3, never retyped: marks.json c1935a5b... (-17's two checks on L1 P2, P3 and B1, and the
+PM-0001-17/link-lost-overstated bite), SERIES.md 6898e119... (the (36) to (38) header, the two figure rows, the
+tick.s.snap_incomplete row), README.md f3c3c804... (the sentence; lines 67-77 refilled); the built check passed 25 of
+25 on them. B-2 (ruled in), route W's launch 3: base/p2-room.jsonl's tick records carry the new series (0 on every
+slot), a new lost-group/p2-room.jsonl (the link lost slot 1's tick 2: E2), fixtures.rs moves hashed-and-incomplete
+from INVALID to a new FAIL test (A 1, its coverage gap kept beside the failure), the fixtures README's three rows say
+so. base and lost-group read as before this lane; none-compared stays FAIL (now A 6); no other existing judge test's
+answer moved.
+
+Evidence (.gate/u4r/c62h-bound/): check.mjs whole on the staged content, all 11 steps PASS (step3-check.log; measured
+552, bites 632: +1 / +1 as the brief expects); the judge's tests and readings before and after B-2's edits
+(step3-judge-before.log, step3-judge-after.log, step3-readings-*.log); SIZE-CHECK from LANE_BASE 044fab1: 920 lines
+(this step 99, B-2's four files 40 of them).
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_0173vVo6igCNyQYBWPvhH36A
+---
+ .../crates/judge/fixtures/README.md           |  6 ++---
+ .../fixtures/pm-0001-17/base/p2-room.jsonl    |  6 ++---
+ .../pm-0001-17/lost-group/p2-room.jsonl       |  7 +++++
+ .../crates/judge/tests/fixtures.rs            | 21 +++++++++++----
+ spikes/netcode-proof/marks/README.md          | 27 +++++++++++--------
+ spikes/netcode-proof/marks/SERIES.md          |  6 +++--
+ spikes/netcode-proof/marks/marks.json         | 26 ++++++++++++++++++
+ 7 files changed, 75 insertions(+), 24 deletions(-)
+ create mode 100644 spikes/netcode-proof/crates/judge/fixtures/pm-0001-17/lost-group/p2-room.jsonl
+
+diff --git a/spikes/netcode-proof/crates/judge/fixtures/README.md b/spikes/netcode-proof/crates/judge/fixtures/README.md
+index efbfb95..54c04bb 100644
+--- a/spikes/netcode-proof/crates/judge/fixtures/README.md
++++ b/spikes/netcode-proof/crates/judge/fixtures/README.md
+@@ -19,8 +19,8 @@ each case with the real `marks/marks.json` and checks the verdict and its reason
+ | PM-0001-4 | `measured-bites-build` | C4: run 1's room log comes from a bites build, naming no bite | INVALID |
+ | PM-0001-4 | `measured-names-bite` | C4: run 2 is a measured run that names the B-S bite | INVALID |
+ | PM-0001-4 | `bite-measured-build` | C4: the B-S bite run's room comes from the measured build (no log of it lists `bites`) | INVALID |
+-| PM-0001-17 | `base` | one L1 P2 run in the stress scene (its precondition held): every client hash equals the server's at its tick (6 compared); every `hs` and `snap_incomplete` list holds the header's 48 entries (slots 2 to 47 not connected: `null` in both logs); the other parts and the bites not run | NOT-RUN, the part's run valid, 0 mismatches |
+-| PM-0001-17 | `lost-group` | slot 1's tick 2 incomplete (`null`, `snap_incomplete` 1): not compared, not a mismatch (5 compared) | NOT-RUN, the part's run valid, 0 mismatches |
++| PM-0001-17 | `base` | one L1 P2 run in the stress scene (its precondition held): every client hash equals the server's at its tick (6 compared); every `hs` and `snap_incomplete` list holds the header's 48 entries (slots 2 to 47 not connected: `null` in both logs); the room log's `tick.s.snap_link_lost_count` 0 on every slot (C62H-BOUND); the other parts and the bites not run | NOT-RUN, the part's run valid, 0 mismatches |
++| PM-0001-17 | `lost-group` | slot 1's tick 2 incomplete (`null`, `snap_incomplete` 1): not compared, not a mismatch (5 compared); its own room log has the link losing a snapshot datagram of it (`tick.s.snap_link_lost_count` 1 there: the link's explanation, E2), so it is explained | NOT-RUN, the part's run valid, 0 mismatches |
+ | PM-0001-17 | `differ` | slot 1's tick 2 hash differs from the server's | FAIL |
+ | PM-0001-17 | `refused-group` | slot 1's tick 2 is the sentinel 0 (a refused group) | FAIL |
+ | PM-0001-17 | `orphan` | slot 0 logs a hash at tick 65,539, which the server never logged (a wrong tick rebuild) | FAIL |
+@@ -29,7 +29,7 @@ each case with the real `marks/marks.json` and checks the verdict and its reason
+ | PM-0001-17 | `sparse` | one client hash of six, the rest `null` with `snap_incomplete` 0: the span misses the room's measured ticks | INVALID |
+ | PM-0001-17 | `sampled` | the client log has no tick 2 record: a server hash inside the span that no client log resolves | INVALID |
+ | PM-0001-17 | `slot-unlogged` | slot 1 `null` everywhere with `snap_incomplete` 0, while the room logged its hashes | INVALID |
+-| PM-0001-17 | `hashed-and-incomplete` | slot 1's tick 2 has a hash and `snap_incomplete` 1 at once | INVALID |
++| PM-0001-17 | `hashed-and-incomplete` | slot 1's tick 2 has a hash and `snap_incomplete` 1 at once: filed lost though the room sent it a snapshot and the link lost none of it (`snap_lost_unexplained_count` 1), the coverage gap listed beside the failure (INVALID before C62H-BOUND) | FAIL |
+ | PM-0001-17 | `short-lists` | 2-entry lists under the header's 48 clients | INVALID |
+ | PM-0001-17 | `l1-aarch64-claim` | the L1 client (role C) says aarch64 and logs a hash at tick 9, which the server never logged; an x86-64 replay agrees elsewhere: its only mismatch is that orphan, which counts on every machine (FX-5 (c)); this row does not show the Arm rule's LG key (TE2-1: carry 64 (a)) | FAIL |
+ | PM-0001-17 | `lg-cross-arch` | an L2 P2 run (run `l2-p2-1`: RS's room on x86_64, LG's bots on aarch64, a `replay` log on x86_64; 2 clients): slot 1's tick 2 differs on LG and the x86-64 re-decode equals the server's | the L2 P2 part's run valid, 0 mismatches, aarch64-only 1 |
+diff --git a/spikes/netcode-proof/crates/judge/fixtures/pm-0001-17/base/p2-room.jsonl b/spikes/netcode-proof/crates/judge/fixtures/pm-0001-17/base/p2-room.jsonl
+index 95b841b..7c5fc3c 100644
+--- a/spikes/netcode-proof/crates/judge/fixtures/pm-0001-17/base/p2-room.jsonl
++++ b/spikes/netcode-proof/crates/judge/fixtures/pm-0001-17/base/p2-room.jsonl
+@@ -1,7 +1,7 @@
+ {"k":"header","schema":1,"run":"p2-1","set":"u4r-17","role":"measured","marks":["PM-0001-17"],"machine":{"role":"C","name":"C","plan":"container","arch":"x86_64","cpu":"fixture","vcpus":4,"mem_mb":16384,"location":"fixture","kernel":"fixture","address":"","threads_per_core":1,"smt":[[0],[1],[2],[3]],"clock_res_ns":1},"build":{"commit":"0000000000000000000000000000000000000000","binary_sha256":"0000000000000000000000000000000000000000000000000000000000000000","features":[],"profile":"release"},"bite":null,"layer":"L1","profile":"P2","seed":1,"tick_hz":30,"clients":48,"scene":"SS","process":"room","slot":0,"date":"2026-11-10","params":{}}
+-{"k":"tick","t":1,"ph":"measured","v":{"soldiers_count":48,"smallest_team_count":16,"snapshot_clients_count":48,"big_vehicles_count":15,"very_large_units_count":4,"projectiles_count":300},"s":{"everyone_in_view":[1,1]},"hs":{"server_hash":["0000000000000101","0000000000000102",null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]}}
+-{"k":"tick","t":2,"ph":"measured","v":{"soldiers_count":48,"smallest_team_count":16,"snapshot_clients_count":48,"big_vehicles_count":15,"very_large_units_count":4,"projectiles_count":300},"s":{"everyone_in_view":[1,1]},"hs":{"server_hash":["0000000000000201","0000000000000202",null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]}}
+-{"k":"tick","t":3,"ph":"measured","v":{"soldiers_count":48,"smallest_team_count":16,"snapshot_clients_count":48,"big_vehicles_count":15,"very_large_units_count":4,"projectiles_count":300},"s":{"everyone_in_view":[1,1]},"hs":{"server_hash":["0000000000000301","0000000000000302",null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]}}
++{"k":"tick","t":1,"ph":"measured","v":{"soldiers_count":48,"smallest_team_count":16,"snapshot_clients_count":48,"big_vehicles_count":15,"very_large_units_count":4,"projectiles_count":300},"s":{"everyone_in_view":[1,1],"snap_link_lost_count":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},"hs":{"server_hash":["0000000000000101","0000000000000102",null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]}}
++{"k":"tick","t":2,"ph":"measured","v":{"soldiers_count":48,"smallest_team_count":16,"snapshot_clients_count":48,"big_vehicles_count":15,"very_large_units_count":4,"projectiles_count":300},"s":{"everyone_in_view":[1,1],"snap_link_lost_count":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},"hs":{"server_hash":["0000000000000201","0000000000000202",null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]}}
++{"k":"tick","t":3,"ph":"measured","v":{"soldiers_count":48,"smallest_team_count":16,"snapshot_clients_count":48,"big_vehicles_count":15,"very_large_units_count":4,"projectiles_count":300},"s":{"everyone_in_view":[1,1],"snap_link_lost_count":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},"hs":{"server_hash":["0000000000000301","0000000000000302",null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]}}
+ {"k":"second","sec":0,"ph":"measured","v":{"shots_count":700,"portal_changes_count":1}}
+ {"k":"second","sec":1,"ph":"measured","v":{"shots_count":700,"portal_changes_count":1}}
+ {"k":"footer","records":6,"ended":"clean"}
+diff --git a/spikes/netcode-proof/crates/judge/fixtures/pm-0001-17/lost-group/p2-room.jsonl b/spikes/netcode-proof/crates/judge/fixtures/pm-0001-17/lost-group/p2-room.jsonl
+new file mode 100644
+index 0000000..34bfe8e
+--- /dev/null
++++ b/spikes/netcode-proof/crates/judge/fixtures/pm-0001-17/lost-group/p2-room.jsonl
+@@ -0,0 +1,7 @@
++{"k":"header","schema":1,"run":"p2-1","set":"u4r-17","role":"measured","marks":["PM-0001-17"],"machine":{"role":"C","name":"C","plan":"container","arch":"x86_64","cpu":"fixture","vcpus":4,"mem_mb":16384,"location":"fixture","kernel":"fixture","address":"","threads_per_core":1,"smt":[[0],[1],[2],[3]],"clock_res_ns":1},"build":{"commit":"0000000000000000000000000000000000000000","binary_sha256":"0000000000000000000000000000000000000000000000000000000000000000","features":[],"profile":"release"},"bite":null,"layer":"L1","profile":"P2","seed":1,"tick_hz":30,"clients":48,"scene":"SS","process":"room","slot":0,"date":"2026-11-10","params":{}}
++{"k":"tick","t":1,"ph":"measured","v":{"soldiers_count":48,"smallest_team_count":16,"snapshot_clients_count":48,"big_vehicles_count":15,"very_large_units_count":4,"projectiles_count":300},"s":{"everyone_in_view":[1,1],"snap_link_lost_count":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},"hs":{"server_hash":["0000000000000101","0000000000000102",null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]}}
++{"k":"tick","t":2,"ph":"measured","v":{"soldiers_count":48,"smallest_team_count":16,"snapshot_clients_count":48,"big_vehicles_count":15,"very_large_units_count":4,"projectiles_count":300},"s":{"everyone_in_view":[1,1],"snap_link_lost_count":[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},"hs":{"server_hash":["0000000000000201","0000000000000202",null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]}}
++{"k":"tick","t":3,"ph":"measured","v":{"soldiers_count":48,"smallest_team_count":16,"snapshot_clients_count":48,"big_vehicles_count":15,"very_large_units_count":4,"projectiles_count":300},"s":{"everyone_in_view":[1,1],"snap_link_lost_count":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},"hs":{"server_hash":["0000000000000301","0000000000000302",null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]}}
++{"k":"second","sec":0,"ph":"measured","v":{"shots_count":700,"portal_changes_count":1}}
++{"k":"second","sec":1,"ph":"measured","v":{"shots_count":700,"portal_changes_count":1}}
++{"k":"footer","records":6,"ended":"clean"}
+diff --git a/spikes/netcode-proof/crates/judge/tests/fixtures.rs b/spikes/netcode-proof/crates/judge/tests/fixtures.rs
+index 8ae391f..5518d24 100644
+--- a/spikes/netcode-proof/crates/judge/tests/fixtures.rs
++++ b/spikes/netcode-proof/crates/judge/tests/fixtures.rs
+@@ -387,7 +387,8 @@ fn pm_0001_17_the_arm_rule_holds_on_lg_only() {
+ /// README §1's `null` rule, checked (the advisor's FX-10 on U4j; the test-engineer's probe S and R2): every `hs` and
+ /// `tick.s.snap_incomplete` list holds the run's `clients` entries; a (slot, tick) is resolved by a client hash or by
+ /// `snap_incomplete` 1, never both; every tick inside a slot's resolved span at which the room logged that slot's
+-/// hash is resolved, and the span covers the room's measured ticks for the slot. Each case is INVALID.
++/// hash is resolved, and the span covers the room's measured ticks for the slot. Each case is INVALID (both at once:
++/// the next test).
+ #[test]
+ fn pm_0001_17_every_server_hash_is_resolved_on_the_client_side() {
+     let mut wrong = Vec::new();
+@@ -404,10 +405,6 @@ fn pm_0001_17_every_server_hash_is_resolved_on_the_client_side() {
+             "slot-unlogged",
+             "slot 1: the room logged its hash at measured ticks 1 to 3, and no client log resolves any tick of it",
+         ),
+-        (
+-            "hashed-and-incomplete",
+-            "slot 1, tick 2: a client hash and tick.s.snap_incomplete 1 at once",
+-        ),
+         (
+             "short-lists",
+             "hs.server_hash lists hold 2 entries, not the run's 48 clients",
+@@ -425,6 +422,20 @@ fn pm_0001_17_every_server_hash_is_resolved_on_the_client_side() {
+     assert!(wrong.is_empty(), "{wrong:#?}");
+ }
+ 
++/// C62H-BOUND (B-2): slot 1's tick 2 is filed lost while the room sent it a snapshot and the link lost none of it, so
++/// `snap_lost_unexplained_count` reads 1 and the part FAILs (INVALID before), the coverage gap listed beside it.
++#[test]
++fn pm_0001_17_hashed_and_incomplete_fails_with_its_coverage_gap_beside() {
++    let v = verdict("PM-0001-17", "hashed-and-incomplete");
++    let p = part_of(&v, "L1 P2");
++    assert_eq!(p.verdict, VerdictKind::Fail, "{:?}", p.why);
++    let why = "(0 unexplained) = 1, needs == 0";
++    assert!(p.why.iter().any(|w| w.contains(why)), "{:?}", p.why);
++    let gap = "slot 1, tick 2: a client hash and tick.s.snap_incomplete 1 at once";
++    let gaps = &part_run(&v, "L1 P2").gaps;
++    assert!(gaps.iter().any(|g| g.contains(gap)), "{gaps:?}");
++}
++
+ /// C4's cases (the advisor's U2 ruling): a measured run built with the bites, a measured run naming a bite, and a bite
+ /// run from a measured build are INVALID; the fourth, a twin from the wrong build, is PM-0001-21's `twin-bites-build`.
+ #[test]
+diff --git a/spikes/netcode-proof/marks/README.md b/spikes/netcode-proof/marks/README.md
+index 5add8be..7125d0a 100644
+--- a/spikes/netcode-proof/marks/README.md
++++ b/spikes/netcode-proof/marks/README.md
+@@ -64,17 +64,22 @@ header; tick, second and event records follow in time order. Every record has a
+     `npt_sim::ACK_RING_TICKS` ticks old), or at the stop (on L1 the runner may decide it there). A group of a tick older
+     than one the client has already decoded (L1's reorder step delivers such groups) is decoded and hashed under its own
+     tick like any other, or, if the client drops it as stale, it is never acknowledged, the drop is counted, and that
+-    tick is lost (`null`, `tick.s.snap_incomplete` 1), never the sentinel. That covers the ticks from the client's first
+-    snapshot on: a snapshot group or full state whose header names a tick before the client's first snapshot and at
+-    least `npt_sim::ACK_RING_TICKS` ticks behind the newest tick it holds names a tick it was never sent (a bad header),
+-    so the client files the sentinel under that tick once while it remembers that tick (the last
+-    `npt_sim::ACK_RING_TICKS` such ticks; a repeat past them is one hash met twice, written once), never acknowledged,
+-    and `decoded_hash_mismatch_count` counts it as a client hash at a tick the server never logged (the advisor's U4e
+-    round-1 ruling, R1, and round-2 ruling, Q2). Every tick from a client's first snapshot to the end of its log is
+-    resolved for that client: a hash, or `null` with `tick.s.snap_incomplete` 1 (a tick none of whose groups arrived
+-    counts too, known from a later header's tick); every client is admitted, and its first snapshot resolved, in the
+-    warm-up (a client admitted later is -19's join, built with U6); after the measured phase the clients keep logging
+-    until every measured tick is resolved, and a tick still in flight at the stop is not written;
++    tick is lost (`null`, `tick.s.snap_incomplete` 1), never the sentinel. On L1's P2, P3 and B1 a measured tick filed
++    lost must have a reason in the room's or the link's record, never the client's own: the room sent that client
++    nothing then (`hs.server_hash` `null`), or npt-l1 lost a snapshot datagram of it (`tick.s.snap_link_lost_count`, the
++    room log); a stale drop is no reason there, since L1 delivers every snapshot datagram well inside the ring
++    (PM-0001-17's `snap_lost_unexplained_count`; `snap_whole_despite_link_loss_count` checks the record the other way).
++    That covers the ticks from the client's first snapshot on: a snapshot group or full state whose header names a tick
++    before the client's first snapshot and at least `npt_sim::ACK_RING_TICKS` ticks behind the newest tick it holds
++    names a tick it was never sent (a bad header), so the client files the sentinel under that tick once while it
++    remembers that tick (the last `npt_sim::ACK_RING_TICKS` such ticks; a repeat past them is one hash met twice,
++    written once), never acknowledged, and `decoded_hash_mismatch_count` counts it as a client hash at a tick the server
++    never logged (the advisor's U4e round-1 ruling, R1, and round-2 ruling, Q2). Every tick from a client's first
++    snapshot to the end of its log is resolved for that client: a hash, or `null` with `tick.s.snap_incomplete` 1 (a
++    tick none of whose groups arrived counts too, known from a later header's tick); every client is admitted, and its
++    first snapshot resolved, in the warm-up (a client admitted later is -19's join, built with U6); after the measured
++    phase the clients keep logging until every measured tick is resolved, and a tick still in flight at the stop is not
++    written;
+   - `replay_hash` (only in a `replay` log on x86_64, the x86-64 re-decode of an L2 client's logged bytes, R-8): the
+     same as `decoded_hash`, decoded again natively, for the Arm rule.
+ - **Events the judge reads for validity** (§4): `admit` (`session`, `in_roster`), `control` (`source`: `socket` or
+diff --git a/spikes/netcode-proof/marks/SERIES.md b/spikes/netcode-proof/marks/SERIES.md
+index eab7706..69a6db7 100644
+--- a/spikes/netcode-proof/marks/SERIES.md
++++ b/spikes/netcode-proof/marks/SERIES.md
+@@ -255,7 +255,7 @@ row; the script fails otherwise). Marks: `-n` = PM-0001-n, `0004-67` = PM-0004-6
+ | `header.params.ws_bots_count` | count | npt-load | bots on WebSocket in the soak | 0006-22 |
+ | `header.params.wt_dangerous_config` | flag | npt-lab | wtransport's dangerous-configuration feature on | -35 |
+ 
+-## Figures (36): computations npt-judge carries in code
++## Figures (38): computations npt-judge carries in code
+ 
+ | Name | Unit | Written by (crate) | Meaning: formula and inputs | Draft words it implements | Marks |
+ |---|---|---|---|---|---|
+@@ -288,6 +288,8 @@ row; the script fails otherwise). Marks: `-n` = PM-0001-n, `0004-67` = PM-0004-6
+ | `rtt_agreement_p99_ns` | ns | npt-judge | p99 over the measured seconds of |second.v.app_rtt_ns (browser) - second.v.quinn_rtt_ns (room, that session)|, joined by second on the client's server-clock estimate | PM-0001-33 'p99 of the absolute difference between app-level RTT and quinn's rtt(), sampled every second' | -33 |
+ | `rule_cap_set_by_rule` | 0/1 | npt-judge | 1 if header.params.rewind_cap_ticks_count = ceil(p99 of event.shot.honest_rewind_ns in the picked option's P2 test-cap runs / (10^9 / tick_hz)) | PM-0001-49 'the honest rewind's measured p99 at P2, rounded up to a whole number of ticks' | -49 |
+ | `session_memory_growth_count` | count | npt-judge | the same rule on halves of the measured window, over second.s.session_buffered_bytes, out_queue_count and event_queue_count | PM-0001-24 'memory per session flat over 10 minutes (PM-0001-15's rule)' | -24 |
++| `snap_lost_unexplained_count` | count | npt-judge | over the run's client logs (process `client`), measured tick records only: the (slot, tick) pairs with `tick.s.snap_incomplete` 1 whose room-log record at that tick gives that slot a non-null `hs.server_hash` (the room sent it a snapshot or a full state) and `tick.s.snap_link_lost_count` 0 (the link lost none of the snapshot datagrams the room sent it then). Explained, so not counted: `hs.server_hash` null (the room sent that client nothing: a full state not yet acknowledged, budget short, an encoder refusal, a kick) or `tick.s.snap_link_lost_count` 1 or more (npt-l1's fate log lost one by its loss draw or in a burst). Nothing else explains a tick filed lost: not a stale drop (L1 delivers every snapshot datagram well inside the 32-tick ring), not a full-state tick, not a tick whose datagrams all arrived. 0 incomplete is a real 0. Gaps: no room log gives `tick.s.snap_link_lost_count`, a room tick record without it, a room tick record without `hs.server_hash`, a list that does not hold the run's `clients` entries, an entry below 0, a measured client tick record without `tick.s.snap_incomplete`, a `snap_incomplete` entry other than 0 or 1, a measured incomplete tick the room log has no record of. Inputs: `tick.s.snap_incomplete`, `hs.server_hash`, `tick.s.snap_link_lost_count` | PM-0001-17 '100 % of decoded snapshots': no decoded snapshot escapes the comparison by being filed lost (C62H-BOUND (a), 2026-11-15) | -17 |
++| `snap_whole_despite_link_loss_count` | count | npt-judge | over the run's client logs (process `client`), measured tick records only: the (slot, tick) pairs with a whole `hs.decoded_hash` (not null, not the sentinel 0) whose room-log record at that tick gives that slot `tick.s.snap_link_lost_count` 1 or more. No client can complete such a tick, so each one counted is a record that overstates the link's loss. A client hash at a tick the room log has no record of is not read here (`decoded_hash_mismatch_count` counts it). Gaps as `snap_lost_unexplained_count`'s. Inputs: `hs.decoded_hash`, `tick.s.snap_link_lost_count` | PM-0001-17, the link record's own check (C62H-BOUND (a), 2026-11-15) | -17 |
+ | `sync_cost_ratio` | fraction (exact) | npt-judge | U = mean(tick.v.server_only_ns) / (header.clients x mean(tick.s.relevant_count)); per N = 48 run: max over N in {24, 36} of U(run) / mean of U over that N's part. Inputs: the mark's three parts | PM-0001-10 'at N = 48 at most 1.1 x the same figure at N = 24 and at N = 36' | -10 |
+ | `sync_unit_cost` | fraction (exact) | npt-judge | U per run, as above (ns per client-entity, a decimal) | PM-0001-10, reported | -10 |
+ | `throw_desync_count` | count | npt-judge | throws with event.throw.desync = 1; on L2 only those whose x86-64 replay (process replay) also desyncs | PM-0001-54 '0 desyncs of client-side flight against the server over 1,000 throws, per projectile kind' | -54 |
+@@ -317,7 +319,7 @@ row; the script fails otherwise). Marks: `-n` = PM-0001-n, `0004-67` = PM-0004-6
+ | `hs.server_hash` | 16 hex digits or null, per client slot | npt-room (the encoder's mirror, §4.6) | at tick t: the server's hash (`npt_proto::client_hash`) of what it meant that client to hold after decoding t; never 0; written only in the room's log (process `room`); null where it sent that client nothing for t | -17, -19, -58 (figures) |
+ | `hs.decoded_hash` | 16 hex digits or null, per client slot | npt-client (L1, through npt-lab's client log), npt-bots (L2), web (browser) | only in the clients' logs, process `client` on L1 and `bots` on L2, at the tick t the client rebuilt: its hash of the state it holds for t (its held floats re-gridded); the sentinel 0 for a tick with a received group it could not decode; null for none (a group lost, none refused) | -17, -19, -58 (figures) |
+ | `hs.replay_hash` | 16 hex digits or null, per client slot | npt-lab (`replay`, process replay: the x86-64 re-decode of an L2 client's logged bytes, R-8) | only in a `replay` log on x86_64: the same as `decoded_hash`, decoded again natively; read for the Arm rule | -17, -19 (figures) |
+-| `tick.s.snap_incomplete` | flag | npt-client (L1, through npt-lab's client log), npt-bots (L2) | one per client slot (the run's `clients` entries, each 0 or 1), at the tick it resolves: 1 when a group of that tick was lost and none refused, or the client dropped one as stale (README §1's `decoded_hash`), so the client logs no hash for it (§4.6), a tick none of whose groups arrived included (known from a later header's tick); with `hs.decoded_hash` it decides README §1's coverage rule (`decoded_hash_mismatch_count`) | -17, -58, -19 (the coverage rule; -17 reports it) |
++| `tick.s.snap_incomplete` | flag | npt-client (L1, through npt-lab's client log), npt-bots (L2) | one per client slot (the run's `clients` entries, each 0 or 1), at the tick it resolves: 1 when a group of that tick was lost and none refused, or the client dropped one as stale (README §1's `decoded_hash`), so the client logs no hash for it (§4.6), a tick none of whose groups arrived included (known from a later header's tick); with `hs.decoded_hash` it decides README §1's coverage rule (`decoded_hash_mismatch_count`); on L1 P2, P3 and B1 each measured 1 must be explained by the room's or the link's record (`snap_lost_unexplained_count`) | -17 (the coverage rule, its L1 P0 check and its report; snap_lost_unexplained_count), -58, -19 (the coverage rule) |
+ | `event.burst_eviction.evicted` | flag | npt-room | per client per burst (fields `slot`, `burst`): 1 when the client's last acknowledged baseline had left the AckRing (ages 0 to 31) at the first tick after the burst, else 0; shows whether -18's no-fallback bite could bite (§4.5) | -18 (recorded) |
+ | `event.clamp_report.x_um`, `.y_um`, `.z_um` | µm | npt-room (from npt-sim's `reports()`) | per clamp report (fields `slot`, `seq`): the aim point the sim clamped to the weapon's reach, its grid cm x 10,000; read from `reports()`, never from the hashed event list; the clamp twin sends exactly these points (§4.10, the advisor's condition 1) | -21 (the clamp twin's input) |
+ | `event.burst_heal.burst` | identifier (0 to 9) | npt-bots (L2), npt-lab (L1) | the burst's index in the run, beside `slot` on each heal record | -18 |
+diff --git a/spikes/netcode-proof/marks/marks.json b/spikes/netcode-proof/marks/marks.json
+index e8709b7..f9aab0d 100644
+--- a/spikes/netcode-proof/marks/marks.json
++++ b/spikes/netcode-proof/marks/marks.json
+@@ -3979,6 +3979,28 @@
+           "parts": [
+             "L1 P0"
+           ]
++        },
++        {
++          "name": "L1 P2, P3 and B1: every measured client-tick left incomplete is one the room sent that client nothing for, or one the link lost a snapshot datagram of (0 unexplained)",
++          "figure": "snap_lost_unexplained_count",
++          "op": "==",
++          "value": 0,
++          "parts": [
++            "L1 P2",
++            "L1 P3",
++            "L1 B1"
++          ]
++        },
++        {
++          "name": "L1 P2, P3 and B1: no measured client-tick filed whole is one the link lost a snapshot datagram of (0; the link's record is not overstated)",
++          "figure": "snap_whole_despite_link_loss_count",
++          "op": "==",
++          "value": 0,
++          "parts": [
++            "L1 P2",
++            "L1 P3",
++            "L1 B1"
++          ]
+         }
+       ],
+       "report": [
+@@ -4009,6 +4031,10 @@
+         {
+           "id": "PM-0001-17/whole-as-lost",
+           "what": "a client writer that files a tick it decoded whole as lost: null and incomplete 1"
++        },
++        {
++          "id": "PM-0001-17/link-lost-overstated",
++          "what": "a lab record of the link's losses that counts a delivered snapshot datagram as lost: on each client, its first measured tick whose datagrams all arrived"
+         }
+       ],
+       "stand_in": false,
+-- 
+2.43.0
+

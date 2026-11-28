@@ -1,0 +1,120 @@
+Spec for u4s-cond-edit.py on u4-build-plan.md: the advisor's U4s ruling, condition 1 (a)-(d) (advisor-u4.md:305-312).
+
+@@@ 1a-4.1-sim (carry 30, npt-sim half)
+<<<
+| npt-sim | `World::predict`, `World::load_movers`, `World::ray_cast`; `Scene::estimate`, `Scene::course`, `Scene::targets` beside `Scene::stress` | ADR 0004:166-178; ADR 0001:258-260; ADR 0001:1470-1482 |
+===
+| npt-sim | `World::predict`, `World::load_movers`, `World::ray_cast`; `Scene::estimate`, `Scene::course`, `Scene::targets` beside `Scene::stress` | ADR 0004:166-178; ADR 0001:258-260; ADR 0001:1470-1482 |
+| npt-sim | `EntityKind::ALL` and `EntityKind::layout`; `grid::Field::integer`; `full_state_ack_ticks_at`; `HitHistory::for_ms` in place of `HitHistory::new`; bites builds only: `grid::Config::floor_rounding`, `OWN_COPY_SNAP_BITES` and `own_copy_snap_with_bite`. Removed: bites-only `grid::Config::BITES` and `grid::Config::with_bite` (the advisor's U4s ruling, condition 1 (a)) | u4s-carries.md carry 30: arch F2 (one home for the per-kind field order; one type for a layout's fields); rust 1 (each derived constant is `<name>_at(TICK_HZ)`); netcode F6, A5; arch F1 |
+>>>
+
+@@@ 1a-4.1-client (carry 30, npt-client half)
+<<<
+| npt-client | a dependency on npt-link, for `Channel` | as above |
+===
+| npt-client | a dependency on npt-link, for `Channel`; bites builds only, `BITES` and `grid_with_bite` (the advisor's U4s ruling, condition 1 (a)) | as above; u4s-carries.md carry 30: arch F1 |
+>>>
+
+@@@ 1b-4.2 (NF-D4: drop "non-finite components")
+<<<
+  list, so the clamp reports and every refusal counter (the cooldown, ammunition and reload edges, non-finite
+  components, Rewinds outside the ring, a full pool) stay outside `state_hash` and outside that list: they live in
+  `reports()`, and the room logs them. Any per-soldier input state the sim keeps holds what the server accepted, never
+  what the client claimed, so a refused part changes nothing on the ticks after it either (the press counters are the
+  case to watch: D-10 runs past the next accepted press).
+===
+  list, so the clamp reports and every refusal counter (the cooldown, ammunition and reload edges, Rewinds outside the
+  ring, a full pool) stay outside `state_hash` and outside that list (the advisor's U4s ruling, condition 1 (b)): they
+  live in `reports()`, and the room logs them. Any per-soldier input state the sim keeps holds what the server accepted,
+  never what the client claimed, so a refused part changes nothing on the ticks after it either (the press counters
+  are the case to watch: D-10 runs past the next accepted press).
+>>>
+
+@@@ 1a-4.3 (carry 32, the FullState line)
+<<<
+  - the FullState acknowledgement bound: `ticks_for_ms(2_000)` (60 at 30 Hz, 120 at 60 Hz);
+===
+  - the FullState acknowledgement bound: `full_state_ack_ticks_at(TICK_HZ)`, which is `ticks_for_ms(2_000)` (60 at
+    30 Hz, 120 at 60 Hz); `TICK_HZ` is asserted in 1 to 1,000 (the advisor's U4s ruling, condition 1 (a));
+>>>
+
+@@@ 1a-4.14-17 (carry 31, -17/client-rounding's home)
+<<<
+| -17/client-rounding | npt-client's call into `grid` (floor in place of nearest) | decoded hash | any -17 profile | the floor variant differs on about half of all position values |
+===
+| -17/client-rounding | npt-client's call into `grid` (floor in place of nearest); the id lives in npt-client (`npt_client::BITES`, `grid_with_bite`), the grid holding only the defect (the advisor's U4s ruling, condition 1 (a)) | decoded hash | any -17 profile | the floor variant differs on about half of all position values |
+>>>
+
+@@@ 1a-4.14-41 (carry 31, -41/server-quant-differs's home)
+<<<
+| -41/server-quant-differs | the authority step's own-copy snap with another rounding than `grid`'s (Q23) | untraced corrections | CO | the snapped copy differs from the sent one |
+===
+| -41/server-quant-differs | the authority step's own-copy snap with another rounding than `grid`'s (Q23); the id lives at npt-sim's own-copy snap side (`OWN_COPY_SNAP_BITES`, `own_copy_snap_with_bite`), the grid holding only the defect (the advisor's U4s ruling, condition 1 (a)) | untraced corrections | CO | the snapped copy differs from the sent one |
+>>>
+
+@@@ 1a-4.15-fields (carry 33: move is 2 B)
+<<<
+  `TickInput`: per soldier one `Command` (slot 1 B, tick 4, sequence 2, buttons 2, press counters 4, move 4, aim in cm 12, view tick 4 and fraction 1) and its
+===
+  `TickInput`: per soldier one `Command` (slot 1 B, tick 4, sequence 2, buttons 2, press counters 4, move 2 (the advisor's U4s ruling, condition 1 (a)), aim in cm 12, view tick 4 and fraction 1) and its
+>>>
+
+@@@ 1a-4.15-size (carry 33: 39 B a command, about 1,872 B a tick of commands)
+<<<
+- **Size:** about 41 B per command; 48 commands a tick, about 1,973 B a tick, about 17.8 MB per 9,000 ticks and 53 MB
+  for three (my arithmetic; U4d states the measured size). Fed to Wasm as 32-bit words: about 4.4 million calls each.
+===
+- **Size:** 39 B per command (move is 2 B), so about 1,872 B a tick of commands for 48 soldiers before spawns and the
+  tick's own header (the advisor's U4s ruling, condition 1 (a)); about 17.8 MB per 9,000 ticks and 53 MB for three (my
+  arithmetic; U4d states the measured size). Fed to Wasm as 32-bit words: about 4.4 million calls each.
+>>>
+
+@@@ 1a-U4a-a4 (carries 31 and 5: -57 through Quant's own bite choice)
+<<<
+  - a4 the packed widths at their range ends (bites pos-4cm, yaw-12bit, pitch-8bit, set through the grid config:
+    -57's sites).
+===
+  - a4 the packed widths at their range ends (bites pos-4cm, yaw-12bit, pitch-8bit: -57's sites, set through `Quant`'s
+    own bite choice in npt-proto, as integer coarsening, not through the grid config; the ids in npt-proto's own list)
+    (the advisor's U4s ruling, condition 1 (a)).
+>>>
+
+@@@ 1b-U4d-D4 (NF-D4: the ruling's new D-4, word for word)
+<<<
+  - D-4 a non-finite command component is refused and counted; a debug assert each tick.
+===
+  - D-4 every value that enters the sim from outside is finite by type: `Command`, `Rewind` and `TickInput`, its spawn,
+    teleport and attribute fields included, hold integers only, so nothing is refused or counted; a debug and test
+    assertion each tick that the World holds no non-finite value (every float read by `to_bits`, as the hash reads
+    it), shown by a planted `0.0 / 0.0` in one phase that trips it at its tick (a scratch plant, §7.2); and an overflow
+    test: recorded commands with `move_xy` at -128 and 127 and `aim` at `i32::MIN` and `i32::MAX` step in a debug
+    build (overflow checks on) without a panic (carry 15). The words are the ruling's new D-4; carry 15 is
+    u4s-carries.md's (the advisor's U4s ruling, condition 1 (b)).
+>>>
+
+@@@ 1d-Lanes (condition 3's freeze joins the wave-1 bullet)
+<<<
+  server/clippy.toml; U4j crates/judge, crates/log and marks/. No file is shared. U4c's L-c8 judged re-run waits for
+  U4j's merge.
+===
+  server/clippy.toml; U4j crates/judge, crates/log and marks/. No file is shared. U4c's L-c8 judged re-run waits for
+  U4j's merge.
+  - **Freeze the seam's shapes for wave 1.** Through wave 1, U4d keeps unchanged every existing field, variant and
+    width of `Command`, `Rewind`, `CoverVariant`, `EntityKind` and `EntityRecord` (FIELDS 12), and the five grid
+    fields as built at f080551. It may add items (World, carry 17's button constants, `TickInput`'s new fields),
+    complete `layout()` within FIELDS (carry 12), and drop `InputReports::non_finite` (NF-D4). A change to an
+    existing item waits for U4d's merge and goes to the main session, as carry 1 already says for the grid. Why: U4a
+    builds its codec and field tables against these types at the same time, so a silent change breaks the second
+    merge. The words are the ruling's condition 3; the carries are u4s-carries.md's
+    (the advisor's U4s ruling, condition 1 (d)).
+>>>
+
+@@@ 1c-7.2 (who builds: matches Lanes)
+<<<
+- Each sub-unit: one builder (general-purpose, opus, effort xhigh) in an isolated worktree, or the main session for
+  U4s, U4b and U4j; the bites planted by a scratch script under §7.1; merged by the main session, one at a time.
+===
+- Each sub-unit: one builder (general-purpose, opus, effort xhigh) in an isolated worktree, or, for U4s, U4b and U4j,
+  the main session or one builder in a free lane (the advisor's U4s ruling, condition 1 (c)); the bites planted by a
+  scratch script under §7.1; merged by the main session, one at a time.
+>>>

@@ -1,0 +1,23 @@
+{
+  "title": "U4e round 2 (on what changed: the fix pass FX-1 to FX-13 after the advisor's round-1 ruling)",
+  "out": ".checkpoints/netcode-proof-test/u4e-r2-packet.md",
+  "heads": [
+    "Base: round 1's reviewed tree, the read copy `.gate/u4e-r1` (97bb9d3 with round 1's snapshot patch applied: wip/u4e.patch at db49108, kept as .gate/u4e/u4e-r1-snapshot.patch).",
+    "U4e's copy after the fix pass: `.claude/worktrees/wf_0fa6595a-3e2-1` (branch worktree-wf_0fa6595a-3e2-1 at 97bb9d3; uncommitted). The same change as a patch on 97bb9d3: `.checkpoints/netcode-proof-test/wip/u4e.patch` (committed at 4300944). Its 23 files' sha256: `.gate/u4e/fx-hashes-end.sha256`.",
+    "The diffs below compare round 1's tree with the fixed copy, per crate (sources, then tests). The fix pass's runs are under `.gate/u4e/` as fx-*.log (fx-counted1.log and fx-counted2.log: its two counted check.mjs runs; fx-t5print.log: its printed lines).",
+    "Plan citations: the plan u4-build-plan.md changed at 85c08df (the advisor's U4d2 brief check, L2), which moved every line after §4.11. Plan cites in u4e-brief.md, advisor-u4e-r1.md and earlier rulings read at 686a583c: `git show 1e8c188:.checkpoints/netcode-proof-test/u4-build-plan.md`."
+  ],
+  "diffs": [
+    {"label": "npt-room's sources (crates/room/src)", "a": ".gate/u4e-r1/spikes/netcode-proof/crates/room/src", "b": ".claude/worktrees/wf_0fa6595a-3e2-1/spikes/netcode-proof/crates/room/src"},
+    {"label": "npt-server's library (crates/server/src)", "a": ".gate/u4e-r1/spikes/netcode-proof/crates/server/src", "b": ".claude/worktrees/wf_0fa6595a-3e2-1/spikes/netcode-proof/crates/server/src"},
+    {"label": "npt-client's sources (crates/client/src)", "a": ".gate/u4e-r1/spikes/netcode-proof/crates/client/src", "b": ".claude/worktrees/wf_0fa6595a-3e2-1/spikes/netcode-proof/crates/client/src"},
+    {"label": "npt-room's tests (crates/room/tests)", "a": ".gate/u4e-r1/spikes/netcode-proof/crates/room/tests", "b": ".claude/worktrees/wf_0fa6595a-3e2-1/spikes/netcode-proof/crates/room/tests"},
+    {"label": "npt-server's tests (crates/server/tests)", "a": ".gate/u4e-r1/spikes/netcode-proof/crates/server/tests", "b": ".claude/worktrees/wf_0fa6595a-3e2-1/spikes/netcode-proof/crates/server/tests"},
+    {"label": "npt-client's tests (crates/client/tests)", "a": ".gate/u4e-r1/spikes/netcode-proof/crates/client/tests", "b": ".claude/worktrees/wf_0fa6595a-3e2-1/spikes/netcode-proof/crates/client/tests"}
+  ],
+  "docs": [
+    {"label": "The advisor's round-1 ruling, R1 to R8: the findings' routes, the fix pass's scope and bounds, round 2's seats (advisor-u4e-r1.md)", "path": ".checkpoints/netcode-proof-test/advisor-u4e-r1.md", "lines": [57, 437]},
+    {"label": "The advisor's round-1 ruling, T1: marks/README.md §1's case-3 sentence, which the client's rule must match (advisor-u4e-r1.md)", "path": ".checkpoints/netcode-proof-test/advisor-u4e-r1.md", "heading": "^### T1\\. "}
+  ],
+  "carries": {"path": ".checkpoints/netcode-proof-test/u4s-carries.md", "include": "^(21|22|23|24|25|26|27|39|50|51|53|54|55|56|57|61|68)\\. \\*\\*|U4e"}
+}

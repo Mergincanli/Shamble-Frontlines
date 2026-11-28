@@ -1,0 +1,20 @@
+#!/bin/bash -p
+# npt-userdata [head]: the VM's stored user data, from a fixed path, for §7.3 step 7's check (plan.md:891-893); with
+# `head`, the two clones' commits (the root-owned clone read as root, which owns it; the build clone read as
+# npt-build, which owns it, so root never runs git in a tree another user writes). Root-owned, 0755.
+if [ "${NPT_ENV_CLEARED:-}" != 1 ]; then
+  exec /usr/bin/env -i NPT_ENV_CLEARED=1 PATH=/usr/sbin:/usr/bin:/sbin:/bin LC_ALL=C /bin/bash -p /usr/local/sbin/npt-userdata "$@"
+fi
+set -euo pipefail
+set -f
+umask 022
+
+die() { printf 'npt-userdata: %s\n' "$*" >&2; exit 2; }
+if [ "$#" -eq 0 ]; then
+  exec /usr/bin/cat /var/lib/cloud/instance/user-data.txt
+fi
+[ "$#" -eq 1 ] && [ "$1" = head ] || die "usage: npt-userdata [head]"
+printf 'clone %s\n' "$(HOME=/root GIT_CONFIG_NOSYSTEM=1 git -C /opt/npt/clone rev-parse HEAD)"
+printf 'build %s\n' "$(/usr/bin/setpriv --reuid=npt-build --regid=npt-build --clear-groups --no-new-privs \
+  --bounding-set=-all --inh-caps=-all --ambient-caps=-all --reset-env \
+  /usr/bin/env GIT_CONFIG_NOSYSTEM=1 git -C /home/npt-build/clone rev-parse HEAD)"

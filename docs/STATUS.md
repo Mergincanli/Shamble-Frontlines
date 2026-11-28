@@ -30,7 +30,7 @@ _Last updated: 2026-11-27 (change-set 4b-2's docs pass, by lane 1's docs-keeper,
 ## In flight (one line per PR)
 | PR | Work | Branch | State | Waiting on |
 |---|---|---|---|---|
-| #40 | the netcode proof test (SPIKE_PLAN item 1; a throwaway spike, `spikes/netcode-proof/`) | `claude/netcode-proof-test-plan-hcky5g` | draft; U1-U3 done; U4: U4d2 merged, U4r's build on its fourth builder copy; main 4d21c1a merged in (7685b2b) (its checkpoint at d0d1cfd, read 2026-11-14 01:05 UTC) | its units, runs and report; his OK of each run's plan and cost cap |
+| #40 | the netcode proof test (SPIKE_PLAN item 1; a throwaway spike, `spikes/netcode-proof/`) | `claude/netcode-proof-test-plan-hcky5g` | draft; U1-U3 done; U4: U4r merged (71ee13d), its judged runs closed, and BRAWL-1 merged (b30314a); C62H-BOUND approved by Mustafa, its build next; main 53272a1 merged in (its checkpoint, 2026-11-15) | its units, runs and report; his OK of each run's plan and cost cap |
 | none yet | change-set 4b-2, "The world" (the second of 4b's two pull requests, his SIZE-4B (b)), by lane 1 (Builder V4, then the chat he calls Builder V6): steps 6 to 11; step 12 moved to 4c by his STEP12-GO (a) (the list: REPO_MAP, ROADMAP); report `docs/reports/2026-11-27-cs4b2-world.md` | `claude/ecstatic-wozniak-5cbdzs` (stands in for `cs/4b-content`) | risk tier 1, no browser check; built (steps 6 to 11) and reviewed (two rounds); the verifier PASS (its report); the advisor agent's verdict on the final head comes in the builder chat | his go for the head the advisor agent approves; his Advisor opens the pull request |
 
 ## Next

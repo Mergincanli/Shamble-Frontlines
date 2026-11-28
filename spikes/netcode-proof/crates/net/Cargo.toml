@@ -1,0 +1,41 @@
+[package]
+name = "npt-net"
+description = "Native transport adapters (both WebTransport crates, WebSocket) and L2 under the real socket"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+# One WebTransport crate per feature, swappable behind npt-link (PM-0001-35), pinned in the workspace.
+wt-wtransport = ["dep:wtransport"]
+wt-wtq = ["dep:web-transport-quinn"]
+# U6b: the runs carry one WebTransport crate, web-transport-quinn (the re-plan), so it is the default; `bites` marks the
+# planted defects (plan §4.7), on only in bites builds.
+default = ["wt-wtq"]
+bites = []
+
+[dependencies]
+npt-link.workspace = true
+# npt-l1's Profile and ReorderStep, so both layers read one definition (Mustafa's U3-Q7, 2026-11-06).
+npt-l1.workspace = true
+rand_chacha.workspace = true
+rand_core.workspace = true
+# L2's ImpairSocket implements quinn's socket trait under either crate's endpoint (U3, R5-TEST-OQ2).
+quinn.workspace = true
+tokio.workspace = true
+tokio-tungstenite.workspace = true
+# The plain WebSocket path's srtt and outstanding bytes (TCP_INFO, SIOCOUTQ) for fix 1's gate (U3c 1.8, R20 (a)): the
+# only crate that depends on it (check.mjs's deps step).
+npt-tcpinfo.workspace = true
+# The WebSocket server's TLS (U3c): DelayStream sits above it, tokio-tungstenite above DelayStream (U3-Q4 (b)).
+tokio-rustls.workspace = true
+# wtransport's `quinn` feature (no new dependency, so Cargo.lock is unchanged) opens
+# IncomingSessionFuture::with_quic_incoming: the session accepted from our own quinn endpoint over ImpairSocket (M8).
+wtransport = { workspace = true, optional = true, features = ["quinn"] }
+web-transport-quinn = { workspace = true, optional = true, features = ["ring"] }
+# tokio-tungstenite's own Sink and Stream: the loopback tests' since 2026-11-08, U6's WsServer's from U6b on.
+futures-util.workspace = true

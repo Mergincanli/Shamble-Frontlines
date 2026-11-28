@@ -1,0 +1,40 @@
+{
+  "draft_file": "/home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/c62h-bound-report-draft.md",
+  "lines": 538,
+  "items_covered": [
+    "Order item 4: the report written as a section of u4r-report.md beside the replaced lines (:997, :1008); each brief-section-9 item marked PASS or FAIL; the advisor's 'Still unbounded' list whole (section 16)",
+    "Order item 5: H3 (where the first call's failure is kept: merge.log:51-52, c62h-bound-build.md:428-435, the merge-stop ruling; test.log deleted by design); H4's sentence exactly as given; H6 (967 of 1,050, +904 -63, at 42b9646 / 561bf42, the main session's scripts named as not lane code and not counted); 967 against the plan (650, 545-755) and the brief's estimate (650-875), above both tops, under the 1,050 stop",
+    "Order item 6: C1 (both counted calls: merge.log FAIL by test name; merge-2.log PASS whole, every pass-bar item); C2 not triggered; C3 U3C-HELD-1 (Medium, taker, order, never a looser bound, planted bug); C4 CHECK-NFF-1 (Low); C5 the set check's sha256 in full with its shown-to-fail runs; C6 P2's two judge calls met; C7 the pre-flight as H2 replaced it, PROCEED (S 5,760, L 111, B 0, E1 0, E2 111, N 0; A 0, B 0, mismatches 0; NOT-RUN 1 of 3), ADV-CBH-1 (Medium) and ADV-CBH-2 fixed before it ran; C8 the brief unchanged with its full sha256",
+    "Order item 7: the ten deferred Lows (TE-CBH-3 to -7 with TE-CBH-5 = NA-CBB-1, NA-CBB-2 done by the pre-flight, NA-CBB-3 as the one-line note, RR-CB-1, RR-CB-2) with id, file:line from the review JSONs and taker; TE-CBH-1 and -2 fixed in the main session's script",
+    "Order item 8: the P0 re-judge's verdicts beside the earlier ones (e5ed24e2 / 13b6b107 beside e926b812 / b472784f, full hashes), SAME ANSWERS, named as the kept set's two judge calls with no new runs; B-2's changed fixture answers with their whys and no other assertion moved; B-3 (93509dfd7fd1, both P0 folders unpacked, 051995db9cea on disk); deferred item (ii) shown by the gaps fixture; the marks.json and judge read line (his 13:35 rule) with lines read, sha256 before/after, diff --stat",
+    "Order item 9: the P3 ruling (P3 and P2 count; s1 and s3 under carry 58; E1 201 and 5 wholly the unacknowledged forced full states; 228 = 201 + 27 and 6 = 5 + 1, the refined reading without the old phrase, ADV-CBP3-2); P3's bursts B 0 read by the advisor, not the set check (ADV-CBP3-5); condition 2 shown on a real run; npt-judge d8b8c91e and npt-lab 98c3967e equal across caches; no pack needed (6,057 / 5,307 against 5,500 / 5,100); the four runner and peak.py sha256s",
+    "Conditions P1-P7 reflected (P1 counting, P2 the (c) replacement, P3 every carry, P4 notes' section 8, P5 folders unpacked, P6 spike tree unchanged since ddd38ba, P7 carry 58's capacity side open)",
+    "Section 9: the four commits (worktree and cherry-pick SHAs, pushed head ddd38ba) and no fix pass",
+    "Section 9: SIZE-CHECK per step (499, 322, 99, 47) against the per-commit plan, total 967 at the last code commit, per file, B-2's four files named as counted, results/ evidence and main-session scripts not counted",
+    "Section 9: each step's check.mjs counts (545/625, 551/631, 552/632, 552/632) with each new test's name",
+    "Section 9: each plant CB-P1 to CB-P18 bitten, with logs' times",
+    "Section 9: the merge step's logs",
+    "Section 9: the advisor's head check (H1-H6)",
+    "Section 9: the built check's output (12/13 shown to fail; 25/25 three times; the three after hashes; the freeze re-checked)",
+    "Section 9: the three shown-to-fail runs (built check, compare self-test 4/4, set check 12 PASS / 29 FAIL plus SELF-TEST PASS)",
+    "Section 9: both sets' expected lines, each PASS",
+    "Section 9: P2's and P3's S / L / B and E1 / E2 / N per run, bite runs included",
+    "Section 9: the kept logs packed (u4r-P2-ab10f058a828, free 5,883 to 6,455 MiB)",
+    "Section 9: the runners' and peak.py's sha256s",
+    "Section 9: (c)'s report lines replaced only after both sets passed and the P3 ruling (7526ffe), B1's lines unchanged",
+    "Section 9: the kept P0 set line",
+    "Section 9: ends with Decisions needed (C62HB-Q4 (b): question, why, options, recommendation) and For Mustafa (numbered)",
+    "Section 10: the stop rules, Mustafa's three, his size line, his other two, and the advisor's list, each with its evidence: none met except the advisor's check.mjs-step stop, handled as written",
+    "Also: the plain-words story; U3C-HELD-1 and CHECK-NFF-1; the merge step's timed hash beside the rust-reviewer's baseline; what was not verified; process notes (12:44-14:22 worker restart, 14:52-15:36 wait, 17:09-20:36 unanswered approval and restart with his 21:50 rule by line, slips 15-17, launch 4's read-only calls outside the runner, the corrected plant times); Mustafa's words only by history.md line reference"
+  ],
+  "gaps": [
+    "Takers per deferred Low: the record gives one shared taker for all ten ('the next npt-judge or npt-lab change, U4f, U4g or JDG-ONLY-1', card :3762-3765). No ruling or review names a taker per finding, so the draft uses the shared one.",
+    "C62HB-Q4 (b): no ruling recommends an option for (b) itself. The draft's recommendation (fold it into U4g, which takes -58 per advisor-c62h-review-full.md:90) is the drafter's. The design's option text names only the L1 P3 wrap runs as needing a re-run; whether -58's L1 P0 wrap runs would also need one is not recorded anywhere I found.",
+    "The advisor's the_c_lines cites history.md:2133 for Mustafa's (c) words. Line 2133 is where his 16:35 message starts; the words themselves are at :2146. The draft cites :2143-2146.",
+    "There is no run log for c62h_bound_c_lines.py under .gate/. The evidence for the (c) replacement is the card's line (21:58, 76680d3a to 777ee782) and commit 7526ffe's diff stat for u4r-report.md (+3 -2).",
+    "Free space before P3: the notes and the ruling give 5,307 MiB; pre-P3-c62h.log's df reads 5,563,871,232 B (5,306.1 MiB) and its header says 5306 MiB. The draft uses the recorded 5,307.",
+    "CI on ddd38ba is the main session's relay; I did not re-read the check runs.",
+    "I did not check PR #54's current state. The draft's For Mustafa item 4 only says it comes to him separately for his go.",
+    "The u4r-report.md line numbers in the draft (:997, :1008, :1035, :1167) hold only if the section is inserted after them, for example at the file's end."
+  ]
+}

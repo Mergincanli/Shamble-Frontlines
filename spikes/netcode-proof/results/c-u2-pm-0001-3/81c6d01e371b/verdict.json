@@ -1,0 +1,3683 @@
+[
+  {
+    "mark": "PM-0001-3",
+    "title": "The network profiles are what they say",
+    "verdict": "NOT-RUN",
+    "why": [
+      "L2 P1: 0 of 1 valid runs",
+      "L2 P2: 0 of 1 valid runs",
+      "L2 P3: 0 of 1 valid runs",
+      "L2 P4: 0 of 1 valid runs",
+      "L2 B1: 0 of 1 valid runs",
+      "L2 P0 (the real path, recorded): 0 of 1 valid runs",
+      "MP at P2: 0 of 1 valid runs",
+      "bite PM-0001-3/not-net-of-base: no run yet"
+    ],
+    "parts": [
+      {
+        "name": "L1 P1",
+        "verdict": "PASS",
+        "why": [],
+        "runs": [
+          {
+            "run": "l1-p1-s1",
+            "valid": true,
+            "checks": [
+              {
+                "name": "P1 up: 1,000,000 packets",
+                "outcome": "pass",
+                "value": "1000000",
+                "needs": ">= 1000000"
+              },
+              {
+                "name": "P1 up: loss within 5 % of the profile's, low",
+                "outcome": "pass",
+                "value": "0.009981",
+                "needs": ">= 0.0095"
+              },
+              {
+                "name": "P1 up: loss within 5 % of the profile's, high",
+                "outcome": "pass",
+                "value": "0.009981",
+                "needs": "<= 0.0105"
+              },
+              {
+                "name": "P1 up: mean one-way delay within 5 %, low",
+                "outcome": "pass",
+                "value": "25018896.257514",
+                "needs": ">= 23750000"
+              },
+              {
+                "name": "P1 up: mean one-way delay within 5 %, high",
+                "outcome": "pass",
+                "value": "25018896.257514",
+                "needs": "<= 26250000"
+              },
+              {
+                "name": "P1 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "20010155",
+                "needs": ">= 19750000"
+              },
+              {
+                "name": "P1 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "20010155",
+                "needs": "<= 20250000"
+              },
+              {
+                "name": "P1 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "29991298",
+                "needs": ">= 29750000"
+              },
+              {
+                "name": "P1 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "29991298",
+                "needs": "<= 30250000"
+              },
+              {
+                "name": "P1 up: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, low",
+                "outcome": "pass",
+                "value": "29015097",
+                "needs": ">= 28750000"
+              },
+              {
+                "name": "P1 up: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, high",
+                "outcome": "pass",
+                "value": "29015097",
+                "needs": "<= 29250000"
+              },
+              {
+                "name": "P1 down: 1,000,000 packets",
+                "outcome": "pass",
+                "value": "1000000",
+                "needs": ">= 1000000"
+              },
+              {
+                "name": "P1 down: loss within 5 % of the profile's, low",
+                "outcome": "pass",
+                "value": "0.010244",
+                "needs": ">= 0.0095"
+              },
+              {
+                "name": "P1 down: loss within 5 % of the profile's, high",
+                "outcome": "pass",
+                "value": "0.010244",
+                "needs": "<= 0.0105"
+              },
+              {
+                "name": "P1 down: mean one-way delay within 5 %, low",
+                "outcome": "pass",
+                "value": "25022790.071426",
+                "needs": ">= 23750000"
+              },
+              {
+                "name": "P1 down: mean one-way delay within 5 %, high",
+                "outcome": "pass",
+                "value": "25022790.071426",
+                "needs": "<= 26250000"
+              },
+              {
+                "name": "P1 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "20010276",
+                "needs": ">= 19750000"
+              },
+              {
+                "name": "P1 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "20010276",
+                "needs": "<= 20250000"
+              },
+              {
+                "name": "P1 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "29991520",
+                "needs": ">= 29750000"
+              },
+              {
+                "name": "P1 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "29991520",
+                "needs": "<= 30250000"
+              },
+              {
+                "name": "P1 down: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, low",
+                "outcome": "pass",
+                "value": "29009676",
+                "needs": ">= 28750000"
+              },
+              {
+                "name": "P1 down: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, high",
+                "outcome": "pass",
+                "value": "29009676",
+                "needs": "<= 29250000"
+              },
+              {
+                "name": "P1: round trip mean within 5 %, low",
+                "outcome": "pass",
+                "value": "50048918.508996",
+                "needs": ">= 47500000"
+              },
+              {
+                "name": "P1: round trip mean within 5 %, high",
+                "outcome": "pass",
+                "value": "50048918.508996",
+                "needs": "<= 52500000"
+              },
+              {
+                "name": "P1 L1: the same seed and profile give an identical packet-fate log",
+                "outcome": "pass",
+                "value": "1",
+                "needs": "== 1"
+              }
+            ]
+          },
+          {
+            "run": "l1-p1-s2",
+            "valid": true,
+            "checks": [
+              {
+                "name": "P1 up: 1,000,000 packets",
+                "outcome": "pass",
+                "value": "1000000",
+                "needs": ">= 1000000"
+              },
+              {
+                "name": "P1 up: loss within 5 % of the profile's, low",
+                "outcome": "pass",
+                "value": "0.009911",
+                "needs": ">= 0.0095"
+              },
+              {
+                "name": "P1 up: loss within 5 % of the profile's, high",
+                "outcome": "pass",
+                "value": "0.009911",
+                "needs": "<= 0.0105"
+              },
+              {
+                "name": "P1 up: mean one-way delay within 5 %, low",
+                "outcome": "pass",
+                "value": "25014238.21392",
+                "needs": ">= 23750000"
+              },
+              {
+                "name": "P1 up: mean one-way delay within 5 %, high",
+                "outcome": "pass",
+                "value": "25014238.21392",
+                "needs": "<= 26250000"
+              },
+              {
+                "name": "P1 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "20010892",
+                "needs": ">= 19750000"
+              },
+              {
+                "name": "P1 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "20010892",
+                "needs": "<= 20250000"
+              },
+              {
+                "name": "P1 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "29991344",
+                "needs": ">= 29750000"
+              },
+              {
+                "name": "P1 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "29991344",
+                "needs": "<= 30250000"
+              },
+              {
+                "name": "P1 up: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, low",
+                "outcome": "pass",
+                "value": "29012994",
+                "needs": ">= 28750000"
+              },
+              {
+                "name": "P1 up: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, high",
+                "outcome": "pass",
+                "value": "29012994",
+                "needs": "<= 29250000"
+              },
+              {
+                "name": "P1 down: 1,000,000 packets",
+                "outcome": "pass",
+                "value": "1000000",
+                "needs": ">= 1000000"
+              },
+              {
+                "name": "P1 down: loss within 5 % of the profile's, low",
+                "outcome": "pass",
+                "value": "0.010019",
+                "needs": ">= 0.0095"
+              },
+              {
+                "name": "P1 down: loss within 5 % of the profile's, high",
+                "outcome": "pass",
+                "value": "0.010019",
+                "needs": "<= 0.0105"
+              },
+              {
+                "name": "P1 down: mean one-way delay within 5 %, low",
+                "outcome": "pass",
+                "value": "25018871.22967",
+                "needs": ">= 23750000"
+              },
+              {
+                "name": "P1 down: mean one-way delay within 5 %, high",
+                "outcome": "pass",
+                "value": "25018871.22967",
+                "needs": "<= 26250000"
+              },
+              {
+                "name": "P1 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "20009937",
+                "needs": ">= 19750000"
+              },
+              {
+                "name": "P1 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "20009937",
+                "needs": "<= 20250000"
+              },
+              {
+                "name": "P1 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "29991370",
+                "needs": ">= 29750000"
+              },
+              {
+                "name": "P1 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "29991370",
+                "needs": "<= 30250000"
+              },
+              {
+                "name": "P1 down: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, low",
+                "outcome": "pass",
+                "value": "29012313",
+                "needs": ">= 28750000"
+              },
+              {
+                "name": "P1 down: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, high",
+                "outcome": "pass",
+                "value": "29012313",
+                "needs": "<= 29250000"
+              },
+              {
+                "name": "P1: round trip mean within 5 %, low",
+                "outcome": "pass",
+                "value": "50034197.075568",
+                "needs": ">= 47500000"
+              },
+              {
+                "name": "P1: round trip mean within 5 %, high",
+                "outcome": "pass",
+                "value": "50034197.075568",
+                "needs": "<= 52500000"
+              },
+              {
+                "name": "P1 L1: the same seed and profile give an identical packet-fate log",
+                "outcome": "pass",
+                "value": "1",
+                "needs": "== 1"
+              }
+            ]
+          },
+          {
+            "run": "l1-p1-s3",
+            "valid": true,
+            "checks": [
+              {
+                "name": "P1 up: 1,000,000 packets",
+                "outcome": "pass",
+                "value": "1000000",
+                "needs": ">= 1000000"
+              },
+              {
+                "name": "P1 up: loss within 5 % of the profile's, low",
+                "outcome": "pass",
+                "value": "0.010007",
+                "needs": ">= 0.0095"
+              },
+              {
+                "name": "P1 up: loss within 5 % of the profile's, high",
+                "outcome": "pass",
+                "value": "0.010007",
+                "needs": "<= 0.0105"
+              },
+              {
+                "name": "P1 up: mean one-way delay within 5 %, low",
+                "outcome": "pass",
+                "value": "25020843.139725",
+                "needs": ">= 23750000"
+              },
+              {
+                "name": "P1 up: mean one-way delay within 5 %, high",
+                "outcome": "pass",
+                "value": "25020843.139725",
+                "needs": "<= 26250000"
+              },
+              {
+                "name": "P1 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "20010692",
+                "needs": ">= 19750000"
+              },
+              {
+                "name": "P1 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "20010692",
+                "needs": "<= 20250000"
+              },
+              {
+                "name": "P1 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "29990237",
+                "needs": ">= 29750000"
+              },
+              {
+                "name": "P1 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "29990237",
+                "needs": "<= 30250000"
+              },
+              {
+                "name": "P1 up: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, low",
+                "outcome": "pass",
+                "value": "29014898",
+                "needs": ">= 28750000"
+              },
+              {
+                "name": "P1 up: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, high",
+                "outcome": "pass",
+                "value": "29014898",
+                "needs": "<= 29250000"
+              },
+              {
+                "name": "P1 down: 1,000,000 packets",
+                "outcome": "pass",
+                "value": "1000000",
+                "needs": ">= 1000000"
+              },
+              {
+                "name": "P1 down: loss within 5 % of the profile's, low",
+                "outcome": "pass",
+                "value": "0.010051",
+                "needs": ">= 0.0095"
+              },
+              {
+                "name": "P1 down: loss within 5 % of the profile's, high",
+                "outcome": "pass",
+                "value": "0.010051",
+                "needs": "<= 0.0105"
+              },
+              {
+                "name": "P1 down: mean one-way delay within 5 %, low",
+                "outcome": "pass",
+                "value": "25021238.794816",
+                "needs": ">= 23750000"
+              },
+              {
+                "name": "P1 down: mean one-way delay within 5 %, high",
+                "outcome": "pass",
+                "value": "25021238.794816",
+                "needs": "<= 26250000"
+              },
+              {
+                "name": "P1 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "20010023",
+                "needs": ">= 19750000"
+              },
+              {
+                "name": "P1 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "20010023",
+                "needs": "<= 20250000"
+              },
+              {
+                "name": "P1 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "29990979",
+                "needs": ">= 29750000"
+              },
+              {
+                "name": "P1 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "29990979",
+                "needs": "<= 30250000"
+              },
+              {
+                "name": "P1 down: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, low",
+                "outcome": "pass",
+                "value": "29010726",
+                "needs": ">= 28750000"
+              },
+              {
+                "name": "P1 down: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, high",
+                "outcome": "pass",
+                "value": "29010726",
+                "needs": "<= 29250000"
+              },
+              {
+                "name": "P1: round trip mean within 5 %, low",
+                "outcome": "pass",
+                "value": "50033915.615949",
+                "needs": ">= 47500000"
+              },
+              {
+                "name": "P1: round trip mean within 5 %, high",
+                "outcome": "pass",
+                "value": "50033915.615949",
+                "needs": "<= 52500000"
+              },
+              {
+                "name": "P1 L1: the same seed and profile give an identical packet-fate log",
+                "outcome": "pass",
+                "value": "1",
+                "needs": "== 1"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "L2 P1",
+        "verdict": "NOT-RUN",
+        "why": [
+          "L2 P1: 0 of 1 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "L1 P2",
+        "verdict": "PASS",
+        "why": [],
+        "runs": [
+          {
+            "run": "l1-p2-s1",
+            "valid": true,
+            "checks": [
+              {
+                "name": "P2 up: 1,000,000 packets",
+                "outcome": "pass",
+                "value": "1000000",
+                "needs": ">= 1000000"
+              },
+              {
+                "name": "P2 up: loss within 5 % of the profile's, low",
+                "outcome": "pass",
+                "value": "0.020191",
+                "needs": ">= 0.019"
+              },
+              {
+                "name": "P2 up: loss within 5 % of the profile's, high",
+                "outcome": "pass",
+                "value": "0.020191",
+                "needs": "<= 0.021"
+              },
+              {
+                "name": "P2 up: mean one-way delay within 5 %, low",
+                "outcome": "pass",
+                "value": "50038109.376284",
+                "needs": ">= 47500000"
+              },
+              {
+                "name": "P2 up: mean one-way delay within 5 %, high",
+                "outcome": "pass",
+                "value": "50038109.376284",
+                "needs": "<= 52500000"
+              },
+              {
+                "name": "P2 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "40020299",
+                "needs": ">= 39500000"
+              },
+              {
+                "name": "P2 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "40020299",
+                "needs": "<= 40500000"
+              },
+              {
+                "name": "P2 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "59981998",
+                "needs": ">= 59500000"
+              },
+              {
+                "name": "P2 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "59981998",
+                "needs": "<= 60500000"
+              },
+              {
+                "name": "P2 up: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, low",
+                "outcome": "pass",
+                "value": "58029785",
+                "needs": ">= 57500000"
+              },
+              {
+                "name": "P2 up: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, high",
+                "outcome": "pass",
+                "value": "58029785",
+                "needs": "<= 58500000"
+              },
+              {
+                "name": "P2 down: 1,000,000 packets",
+                "outcome": "pass",
+                "value": "1000000",
+                "needs": ">= 1000000"
+              },
+              {
+                "name": "P2 down: loss within 5 % of the profile's, low",
+                "outcome": "pass",
+                "value": "0.020175",
+                "needs": ">= 0.019"
+              },
+              {
+                "name": "P2 down: loss within 5 % of the profile's, high",
+                "outcome": "pass",
+                "value": "0.020175",
+                "needs": "<= 0.021"
+              },
+              {
+                "name": "P2 down: mean one-way delay within 5 %, low",
+                "outcome": "pass",
+                "value": "50045151.803153",
+                "needs": ">= 47500000"
+              },
+              {
+                "name": "P2 down: mean one-way delay within 5 %, high",
+                "outcome": "pass",
+                "value": "50045151.803153",
+                "needs": "<= 52500000"
+              },
+              {
+                "name": "P2 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "40020553",
+                "needs": ">= 39500000"
+              },
+              {
+                "name": "P2 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "40020553",
+                "needs": "<= 40500000"
+              },
+              {
+                "name": "P2 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "59981624",
+                "needs": ">= 59500000"
+              },
+              {
+                "name": "P2 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "59981624",
+                "needs": "<= 60500000"
+              },
+              {
+                "name": "P2 down: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, low",
+                "outcome": "pass",
+                "value": "58018041",
+                "needs": ">= 57500000"
+              },
+              {
+                "name": "P2 down: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, high",
+                "outcome": "pass",
+                "value": "58018041",
+                "needs": "<= 58500000"
+              },
+              {
+                "name": "P2: round trip mean within 5 %, low",
+                "outcome": "pass",
+                "value": "100074285.634308",
+                "needs": ">= 95000000"
+              },
+              {
+                "name": "P2: round trip mean within 5 %, high",
+                "outcome": "pass",
+                "value": "100074285.634308",
+                "needs": "<= 105000000"
+              },
+              {
+                "name": "P2 L1: the same seed and profile give an identical packet-fate log",
+                "outcome": "pass",
+                "value": "1",
+                "needs": "== 1"
+              }
+            ]
+          },
+          {
+            "run": "l1-p2-s2",
+            "valid": true,
+            "checks": [
+              {
+                "name": "P2 up: 1,000,000 packets",
+                "outcome": "pass",
+                "value": "1000000",
+                "needs": ">= 1000000"
+              },
+              {
+                "name": "P2 up: loss within 5 % of the profile's, low",
+                "outcome": "pass",
+                "value": "0.019873",
+                "needs": ">= 0.019"
+              },
+              {
+                "name": "P2 up: loss within 5 % of the profile's, high",
+                "outcome": "pass",
+                "value": "0.019873",
+                "needs": "<= 0.021"
+              },
+              {
+                "name": "P2 up: mean one-way delay within 5 %, low",
+                "outcome": "pass",
+                "value": "50027778.179015",
+                "needs": ">= 47500000"
+              },
+              {
+                "name": "P2 up: mean one-way delay within 5 %, high",
+                "outcome": "pass",
+                "value": "50027778.179015",
+                "needs": "<= 52500000"
+              },
+              {
+                "name": "P2 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "40021784",
+                "needs": ">= 39500000"
+              },
+              {
+                "name": "P2 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "40021784",
+                "needs": "<= 40500000"
+              },
+              {
+                "name": "P2 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "59981455",
+                "needs": ">= 59500000"
+              },
+              {
+                "name": "P2 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "59981455",
+                "needs": "<= 60500000"
+              },
+              {
+                "name": "P2 up: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, low",
+                "outcome": "pass",
+                "value": "58025520",
+                "needs": ">= 57500000"
+              },
+              {
+                "name": "P2 up: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, high",
+                "outcome": "pass",
+                "value": "58025520",
+                "needs": "<= 58500000"
+              },
+              {
+                "name": "P2 down: 1,000,000 packets",
+                "outcome": "pass",
+                "value": "1000000",
+                "needs": ">= 1000000"
+              },
+              {
+                "name": "P2 down: loss within 5 % of the profile's, low",
+                "outcome": "pass",
+                "value": "0.019899",
+                "needs": ">= 0.019"
+              },
+              {
+                "name": "P2 down: loss within 5 % of the profile's, high",
+                "outcome": "pass",
+                "value": "0.019899",
+                "needs": "<= 0.021"
+              },
+              {
+                "name": "P2 down: mean one-way delay within 5 %, low",
+                "outcome": "pass",
+                "value": "50036265.513915",
+                "needs": ">= 47500000"
+              },
+              {
+                "name": "P2 down: mean one-way delay within 5 %, high",
+                "outcome": "pass",
+                "value": "50036265.513915",
+                "needs": "<= 52500000"
+              },
+              {
+                "name": "P2 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "40019874",
+                "needs": ">= 39500000"
+              },
+              {
+                "name": "P2 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "40019874",
+                "needs": "<= 40500000"
+              },
+              {
+                "name": "P2 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "59981787",
+                "needs": ">= 59500000"
+              },
+              {
+                "name": "P2 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "59981787",
+                "needs": "<= 60500000"
+              },
+              {
+                "name": "P2 down: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, low",
+                "outcome": "pass",
+                "value": "58023232",
+                "needs": ">= 57500000"
+              },
+              {
+                "name": "P2 down: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, high",
+                "outcome": "pass",
+                "value": "58023232",
+                "needs": "<= 58500000"
+              },
+              {
+                "name": "P2: round trip mean within 5 %, low",
+                "outcome": "pass",
+                "value": "100056696.969226",
+                "needs": ">= 95000000"
+              },
+              {
+                "name": "P2: round trip mean within 5 %, high",
+                "outcome": "pass",
+                "value": "100056696.969226",
+                "needs": "<= 105000000"
+              },
+              {
+                "name": "P2 L1: the same seed and profile give an identical packet-fate log",
+                "outcome": "pass",
+                "value": "1",
+                "needs": "== 1"
+              }
+            ]
+          },
+          {
+            "run": "l1-p2-s3",
+            "valid": true,
+            "checks": [
+              {
+                "name": "P2 up: 1,000,000 packets",
+                "outcome": "pass",
+                "value": "1000000",
+                "needs": ">= 1000000"
+              },
+              {
+                "name": "P2 up: loss within 5 % of the profile's, low",
+                "outcome": "pass",
+                "value": "0.020055",
+                "needs": ">= 0.019"
+              },
+              {
+                "name": "P2 up: loss within 5 % of the profile's, high",
+                "outcome": "pass",
+                "value": "0.020055",
+                "needs": "<= 0.021"
+              },
+              {
+                "name": "P2 up: mean one-way delay within 5 %, low",
+                "outcome": "pass",
+                "value": "50040568.560894",
+                "needs": ">= 47500000"
+              },
+              {
+                "name": "P2 up: mean one-way delay within 5 %, high",
+                "outcome": "pass",
+                "value": "50040568.560894",
+                "needs": "<= 52500000"
+              },
+              {
+                "name": "P2 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "40021384",
+                "needs": ">= 39500000"
+              },
+              {
+                "name": "P2 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "40021384",
+                "needs": "<= 40500000"
+              },
+              {
+                "name": "P2 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "59979710",
+                "needs": ">= 59500000"
+              },
+              {
+                "name": "P2 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "59979710",
+                "needs": "<= 60500000"
+              },
+              {
+                "name": "P2 up: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, low",
+                "outcome": "pass",
+                "value": "58029159",
+                "needs": ">= 57500000"
+              },
+              {
+                "name": "P2 up: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, high",
+                "outcome": "pass",
+                "value": "58029159",
+                "needs": "<= 58500000"
+              },
+              {
+                "name": "P2 down: 1,000,000 packets",
+                "outcome": "pass",
+                "value": "1000000",
+                "needs": ">= 1000000"
+              },
+              {
+                "name": "P2 down: loss within 5 % of the profile's, low",
+                "outcome": "pass",
+                "value": "0.020007",
+                "needs": ">= 0.019"
+              },
+              {
+                "name": "P2 down: loss within 5 % of the profile's, high",
+                "outcome": "pass",
+                "value": "0.020007",
+                "needs": "<= 0.021"
+              },
+              {
+                "name": "P2 down: mean one-way delay within 5 %, low",
+                "outcome": "pass",
+                "value": "50041565.024565",
+                "needs": ">= 47500000"
+              },
+              {
+                "name": "P2 down: mean one-way delay within 5 %, high",
+                "outcome": "pass",
+                "value": "50041565.024565",
+                "needs": "<= 52500000"
+              },
+              {
+                "name": "P2 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "40020026",
+                "needs": ">= 39500000"
+              },
+              {
+                "name": "P2 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "40020026",
+                "needs": "<= 40500000"
+              },
+              {
+                "name": "P2 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "59981082",
+                "needs": ">= 59500000"
+              },
+              {
+                "name": "P2 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "59981082",
+                "needs": "<= 60500000"
+              },
+              {
+                "name": "P2 down: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, low",
+                "outcome": "pass",
+                "value": "58021275",
+                "needs": ">= 57500000"
+              },
+              {
+                "name": "P2 down: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, high",
+                "outcome": "pass",
+                "value": "58021275",
+                "needs": "<= 58500000"
+              },
+              {
+                "name": "P2: round trip mean within 5 %, low",
+                "outcome": "pass",
+                "value": "100073928.967606",
+                "needs": ">= 95000000"
+              },
+              {
+                "name": "P2: round trip mean within 5 %, high",
+                "outcome": "pass",
+                "value": "100073928.967606",
+                "needs": "<= 105000000"
+              },
+              {
+                "name": "P2 L1: the same seed and profile give an identical packet-fate log",
+                "outcome": "pass",
+                "value": "1",
+                "needs": "== 1"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "L2 P2",
+        "verdict": "NOT-RUN",
+        "why": [
+          "L2 P2: 0 of 1 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "L1 P3",
+        "verdict": "PASS",
+        "why": [],
+        "runs": [
+          {
+            "run": "l1-p3-s1",
+            "valid": true,
+            "checks": [
+              {
+                "name": "P3 up: 1,000,000 packets",
+                "outcome": "pass",
+                "value": "1000000",
+                "needs": ">= 1000000"
+              },
+              {
+                "name": "P3 up: loss within 5 % of the profile's, low",
+                "outcome": "pass",
+                "value": "0.049986",
+                "needs": ">= 0.0475"
+              },
+              {
+                "name": "P3 up: loss within 5 % of the profile's, high",
+                "outcome": "pass",
+                "value": "0.049986",
+                "needs": "<= 0.0525"
+              },
+              {
+                "name": "P3 up: mean one-way delay within 5 %, low",
+                "outcome": "pass",
+                "value": "75055116.818257",
+                "needs": ">= 71250000"
+              },
+              {
+                "name": "P3 up: mean one-way delay within 5 %, high",
+                "outcome": "pass",
+                "value": "75055116.818257",
+                "needs": "<= 78750000"
+              },
+              {
+                "name": "P3 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "60030052",
+                "needs": ">= 59250000"
+              },
+              {
+                "name": "P3 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "60030052",
+                "needs": "<= 60750000"
+              },
+              {
+                "name": "P3 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "89972160",
+                "needs": ">= 89250000"
+              },
+              {
+                "name": "P3 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "89972160",
+                "needs": "<= 90750000"
+              },
+              {
+                "name": "P3 up: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, low",
+                "outcome": "pass",
+                "value": "87044619",
+                "needs": ">= 86250000"
+              },
+              {
+                "name": "P3 up: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, high",
+                "outcome": "pass",
+                "value": "87044619",
+                "needs": "<= 87750000"
+              },
+              {
+                "name": "P3 down: 1,000,000 packets",
+                "outcome": "pass",
+                "value": "1000000",
+                "needs": ">= 1000000"
+              },
+              {
+                "name": "P3 down: loss within 5 % of the profile's, low",
+                "outcome": "pass",
+                "value": "0.050036",
+                "needs": ">= 0.0475"
+              },
+              {
+                "name": "P3 down: loss within 5 % of the profile's, high",
+                "outcome": "pass",
+                "value": "0.050036",
+                "needs": "<= 0.0525"
+              },
+              {
+                "name": "P3 down: mean one-way delay within 5 %, low",
+                "outcome": "pass",
+                "value": "75064959.019082",
+                "needs": ">= 71250000"
+              },
+              {
+                "name": "P3 down: mean one-way delay within 5 %, high",
+                "outcome": "pass",
+                "value": "75064959.019082",
+                "needs": "<= 78750000"
+              },
+              {
+                "name": "P3 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "60031099",
+                "needs": ">= 59250000"
+              },
+              {
+                "name": "P3 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "60031099",
+                "needs": "<= 60750000"
+              },
+              {
+                "name": "P3 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "89971554",
+                "needs": ">= 89250000"
+              },
+              {
+                "name": "P3 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "89971554",
+                "needs": "<= 90750000"
+              },
+              {
+                "name": "P3 down: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, low",
+                "outcome": "pass",
+                "value": "87022874",
+                "needs": ">= 86250000"
+              },
+              {
+                "name": "P3 down: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, high",
+                "outcome": "pass",
+                "value": "87022874",
+                "needs": "<= 87750000"
+              },
+              {
+                "name": "P3: round trip mean within 5 %, low",
+                "outcome": "pass",
+                "value": "150077111.792173",
+                "needs": ">= 142500000"
+              },
+              {
+                "name": "P3: round trip mean within 5 %, high",
+                "outcome": "pass",
+                "value": "150077111.792173",
+                "needs": "<= 157500000"
+              },
+              {
+                "name": "P3 L1: the same seed and profile give an identical packet-fate log",
+                "outcome": "pass",
+                "value": "1",
+                "needs": "== 1"
+              }
+            ]
+          },
+          {
+            "run": "l1-p3-s2",
+            "valid": true,
+            "checks": [
+              {
+                "name": "P3 up: 1,000,000 packets",
+                "outcome": "pass",
+                "value": "1000000",
+                "needs": ">= 1000000"
+              },
+              {
+                "name": "P3 up: loss within 5 % of the profile's, low",
+                "outcome": "pass",
+                "value": "0.049964",
+                "needs": ">= 0.0475"
+              },
+              {
+                "name": "P3 up: loss within 5 % of the profile's, high",
+                "outcome": "pass",
+                "value": "0.049964",
+                "needs": "<= 0.0525"
+              },
+              {
+                "name": "P3 up: mean one-way delay within 5 %, low",
+                "outcome": "pass",
+                "value": "75039055.88471",
+                "needs": ">= 71250000"
+              },
+              {
+                "name": "P3 up: mean one-way delay within 5 %, high",
+                "outcome": "pass",
+                "value": "75039055.88471",
+                "needs": "<= 78750000"
+              },
+              {
+                "name": "P3 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "60032522",
+                "needs": ">= 59250000"
+              },
+              {
+                "name": "P3 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "60032522",
+                "needs": "<= 60750000"
+              },
+              {
+                "name": "P3 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "89971394",
+                "needs": ">= 89250000"
+              },
+              {
+                "name": "P3 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "89971394",
+                "needs": "<= 90750000"
+              },
+              {
+                "name": "P3 up: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, low",
+                "outcome": "pass",
+                "value": "87037312",
+                "needs": ">= 86250000"
+              },
+              {
+                "name": "P3 up: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, high",
+                "outcome": "pass",
+                "value": "87037312",
+                "needs": "<= 87750000"
+              },
+              {
+                "name": "P3 down: 1,000,000 packets",
+                "outcome": "pass",
+                "value": "1000000",
+                "needs": ">= 1000000"
+              },
+              {
+                "name": "P3 down: loss within 5 % of the profile's, low",
+                "outcome": "pass",
+                "value": "0.05025",
+                "needs": ">= 0.0475"
+              },
+              {
+                "name": "P3 down: loss within 5 % of the profile's, high",
+                "outcome": "pass",
+                "value": "0.05025",
+                "needs": "<= 0.0525"
+              },
+              {
+                "name": "P3 down: mean one-way delay within 5 %, low",
+                "outcome": "pass",
+                "value": "75054155.1589",
+                "needs": ">= 71250000"
+              },
+              {
+                "name": "P3 down: mean one-way delay within 5 %, high",
+                "outcome": "pass",
+                "value": "75054155.1589",
+                "needs": "<= 78750000"
+              },
+              {
+                "name": "P3 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "60029857",
+                "needs": ">= 59250000"
+              },
+              {
+                "name": "P3 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "60029857",
+                "needs": "<= 60750000"
+              },
+              {
+                "name": "P3 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "89972003",
+                "needs": ">= 89250000"
+              },
+              {
+                "name": "P3 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "89972003",
+                "needs": "<= 90750000"
+              },
+              {
+                "name": "P3 down: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, low",
+                "outcome": "pass",
+                "value": "87036083",
+                "needs": ">= 86250000"
+              },
+              {
+                "name": "P3 down: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, high",
+                "outcome": "pass",
+                "value": "87036083",
+                "needs": "<= 87750000"
+              },
+              {
+                "name": "P3: round trip mean within 5 %, low",
+                "outcome": "pass",
+                "value": "150092387.966126",
+                "needs": ">= 142500000"
+              },
+              {
+                "name": "P3: round trip mean within 5 %, high",
+                "outcome": "pass",
+                "value": "150092387.966126",
+                "needs": "<= 157500000"
+              },
+              {
+                "name": "P3 L1: the same seed and profile give an identical packet-fate log",
+                "outcome": "pass",
+                "value": "1",
+                "needs": "== 1"
+              }
+            ]
+          },
+          {
+            "run": "l1-p3-s3",
+            "valid": true,
+            "checks": [
+              {
+                "name": "P3 up: 1,000,000 packets",
+                "outcome": "pass",
+                "value": "1000000",
+                "needs": ">= 1000000"
+              },
+              {
+                "name": "P3 up: loss within 5 % of the profile's, low",
+                "outcome": "pass",
+                "value": "0.050076",
+                "needs": ">= 0.0475"
+              },
+              {
+                "name": "P3 up: loss within 5 % of the profile's, high",
+                "outcome": "pass",
+                "value": "0.050076",
+                "needs": "<= 0.0525"
+              },
+              {
+                "name": "P3 up: mean one-way delay within 5 %, low",
+                "outcome": "pass",
+                "value": "75062191.420556",
+                "needs": ">= 71250000"
+              },
+              {
+                "name": "P3 up: mean one-way delay within 5 %, high",
+                "outcome": "pass",
+                "value": "75062191.420556",
+                "needs": "<= 78750000"
+              },
+              {
+                "name": "P3 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "60032077",
+                "needs": ">= 59250000"
+              },
+              {
+                "name": "P3 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "60032077",
+                "needs": "<= 60750000"
+              },
+              {
+                "name": "P3 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "89969120",
+                "needs": ">= 89250000"
+              },
+              {
+                "name": "P3 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "89969120",
+                "needs": "<= 90750000"
+              },
+              {
+                "name": "P3 up: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, low",
+                "outcome": "pass",
+                "value": "87044292",
+                "needs": ">= 86250000"
+              },
+              {
+                "name": "P3 up: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, high",
+                "outcome": "pass",
+                "value": "87044292",
+                "needs": "<= 87750000"
+              },
+              {
+                "name": "P3 down: 1,000,000 packets",
+                "outcome": "pass",
+                "value": "1000000",
+                "needs": ">= 1000000"
+              },
+              {
+                "name": "P3 down: loss within 5 % of the profile's, low",
+                "outcome": "pass",
+                "value": "0.049797",
+                "needs": ">= 0.0475"
+              },
+              {
+                "name": "P3 down: loss within 5 % of the profile's, high",
+                "outcome": "pass",
+                "value": "0.049797",
+                "needs": "<= 0.0525"
+              },
+              {
+                "name": "P3 down: mean one-way delay within 5 %, low",
+                "outcome": "pass",
+                "value": "75060417.418939",
+                "needs": ">= 71250000"
+              },
+              {
+                "name": "P3 down: mean one-way delay within 5 %, high",
+                "outcome": "pass",
+                "value": "75060417.418939",
+                "needs": "<= 78750000"
+              },
+              {
+                "name": "P3 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "60030253",
+                "needs": ">= 59250000"
+              },
+              {
+                "name": "P3 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "60030253",
+                "needs": "<= 60750000"
+              },
+              {
+                "name": "P3 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "89971382",
+                "needs": ">= 89250000"
+              },
+              {
+                "name": "P3 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "89971382",
+                "needs": "<= 90750000"
+              },
+              {
+                "name": "P3 down: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, low",
+                "outcome": "pass",
+                "value": "87031534",
+                "needs": ">= 86250000"
+              },
+              {
+                "name": "P3 down: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, high",
+                "outcome": "pass",
+                "value": "87031534",
+                "needs": "<= 87750000"
+              },
+              {
+                "name": "P3: round trip mean within 5 %, low",
+                "outcome": "pass",
+                "value": "150105194.862261",
+                "needs": ">= 142500000"
+              },
+              {
+                "name": "P3: round trip mean within 5 %, high",
+                "outcome": "pass",
+                "value": "150105194.862261",
+                "needs": "<= 157500000"
+              },
+              {
+                "name": "P3 L1: the same seed and profile give an identical packet-fate log",
+                "outcome": "pass",
+                "value": "1",
+                "needs": "== 1"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "L2 P3",
+        "verdict": "NOT-RUN",
+        "why": [
+          "L2 P3: 0 of 1 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "L1 P4",
+        "verdict": "PASS",
+        "why": [],
+        "runs": [
+          {
+            "run": "l1-p4-s1",
+            "valid": true,
+            "checks": [
+              {
+                "name": "P4 up: 1,000,000 packets",
+                "outcome": "pass",
+                "value": "1000000",
+                "needs": ">= 1000000"
+              },
+              {
+                "name": "P4 up: loss within 5 % of the profile's, low",
+                "outcome": "pass",
+                "value": "0.049986",
+                "needs": ">= 0.0475"
+              },
+              {
+                "name": "P4 up: loss within 5 % of the profile's, high",
+                "outcome": "pass",
+                "value": "0.049986",
+                "needs": "<= 0.0525"
+              },
+              {
+                "name": "P4 up: mean one-way delay within 5 %, low",
+                "outcome": "pass",
+                "value": "100073332.33434",
+                "needs": ">= 95000000"
+              },
+              {
+                "name": "P4 up: mean one-way delay within 5 %, high",
+                "outcome": "pass",
+                "value": "100073332.33434",
+                "needs": "<= 105000000"
+              },
+              {
+                "name": "P4 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "80040070",
+                "needs": ">= 79000000"
+              },
+              {
+                "name": "P4 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "80040070",
+                "needs": "<= 81000000"
+              },
+              {
+                "name": "P4 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "119962670",
+                "needs": ">= 119000000"
+              },
+              {
+                "name": "P4 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "119962670",
+                "needs": "<= 121000000"
+              },
+              {
+                "name": "P4 up: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, low",
+                "outcome": "pass",
+                "value": "116059337",
+                "needs": ">= 115000000"
+              },
+              {
+                "name": "P4 up: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, high",
+                "outcome": "pass",
+                "value": "116059337",
+                "needs": "<= 117000000"
+              },
+              {
+                "name": "P4 down: 1,000,000 packets",
+                "outcome": "pass",
+                "value": "1000000",
+                "needs": ">= 1000000"
+              },
+              {
+                "name": "P4 down: loss within 5 % of the profile's, low",
+                "outcome": "pass",
+                "value": "0.050036",
+                "needs": ">= 0.0475"
+              },
+              {
+                "name": "P4 down: loss within 5 % of the profile's, high",
+                "outcome": "pass",
+                "value": "0.050036",
+                "needs": "<= 0.0525"
+              },
+              {
+                "name": "P4 down: mean one-way delay within 5 %, low",
+                "outcome": "pass",
+                "value": "100086450.234228",
+                "needs": ">= 95000000"
+              },
+              {
+                "name": "P4 down: mean one-way delay within 5 %, high",
+                "outcome": "pass",
+                "value": "100086450.234228",
+                "needs": "<= 105000000"
+              },
+              {
+                "name": "P4 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "80041466",
+                "needs": ">= 79000000"
+              },
+              {
+                "name": "P4 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "80041466",
+                "needs": "<= 81000000"
+              },
+              {
+                "name": "P4 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "119961839",
+                "needs": ">= 119000000"
+              },
+              {
+                "name": "P4 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "119961839",
+                "needs": "<= 121000000"
+              },
+              {
+                "name": "P4 down: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, low",
+                "outcome": "pass",
+                "value": "116030360",
+                "needs": ">= 115000000"
+              },
+              {
+                "name": "P4 down: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, high",
+                "outcome": "pass",
+                "value": "116030360",
+                "needs": "<= 117000000"
+              },
+              {
+                "name": "P4: round trip mean within 5 %, low",
+                "outcome": "pass",
+                "value": "200130218.627927",
+                "needs": ">= 190000000"
+              },
+              {
+                "name": "P4: round trip mean within 5 %, high",
+                "outcome": "pass",
+                "value": "200130218.627927",
+                "needs": "<= 210000000"
+              },
+              {
+                "name": "P4 L1: the same seed and profile give an identical packet-fate log",
+                "outcome": "pass",
+                "value": "1",
+                "needs": "== 1"
+              }
+            ]
+          },
+          {
+            "run": "l1-p4-s2",
+            "valid": true,
+            "checks": [
+              {
+                "name": "P4 up: 1,000,000 packets",
+                "outcome": "pass",
+                "value": "1000000",
+                "needs": ">= 1000000"
+              },
+              {
+                "name": "P4 up: loss within 5 % of the profile's, low",
+                "outcome": "pass",
+                "value": "0.049964",
+                "needs": ">= 0.0475"
+              },
+              {
+                "name": "P4 up: loss within 5 % of the profile's, high",
+                "outcome": "pass",
+                "value": "0.049964",
+                "needs": "<= 0.0525"
+              },
+              {
+                "name": "P4 up: mean one-way delay within 5 %, low",
+                "outcome": "pass",
+                "value": "100051913.897108",
+                "needs": ">= 95000000"
+              },
+              {
+                "name": "P4 up: mean one-way delay within 5 %, high",
+                "outcome": "pass",
+                "value": "100051913.897108",
+                "needs": "<= 105000000"
+              },
+              {
+                "name": "P4 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "80043363",
+                "needs": ">= 79000000"
+              },
+              {
+                "name": "P4 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "80043363",
+                "needs": "<= 81000000"
+              },
+              {
+                "name": "P4 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "119961565",
+                "needs": ">= 119000000"
+              },
+              {
+                "name": "P4 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "119961565",
+                "needs": "<= 121000000"
+              },
+              {
+                "name": "P4 up: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, low",
+                "outcome": "pass",
+                "value": "116049749",
+                "needs": ">= 115000000"
+              },
+              {
+                "name": "P4 up: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, high",
+                "outcome": "pass",
+                "value": "116049749",
+                "needs": "<= 117000000"
+              },
+              {
+                "name": "P4 down: 1,000,000 packets",
+                "outcome": "pass",
+                "value": "1000000",
+                "needs": ">= 1000000"
+              },
+              {
+                "name": "P4 down: loss within 5 % of the profile's, low",
+                "outcome": "pass",
+                "value": "0.05025",
+                "needs": ">= 0.0475"
+              },
+              {
+                "name": "P4 down: loss within 5 % of the profile's, high",
+                "outcome": "pass",
+                "value": "0.05025",
+                "needs": "<= 0.0525"
+              },
+              {
+                "name": "P4 down: mean one-way delay within 5 %, low",
+                "outcome": "pass",
+                "value": "100072048.982593",
+                "needs": ">= 95000000"
+              },
+              {
+                "name": "P4 down: mean one-way delay within 5 %, high",
+                "outcome": "pass",
+                "value": "100072048.982593",
+                "needs": "<= 105000000"
+              },
+              {
+                "name": "P4 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "80039809",
+                "needs": ">= 79000000"
+              },
+              {
+                "name": "P4 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "80039809",
+                "needs": "<= 81000000"
+              },
+              {
+                "name": "P4 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "119962174",
+                "needs": ">= 119000000"
+              },
+              {
+                "name": "P4 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "119962174",
+                "needs": "<= 121000000"
+              },
+              {
+                "name": "P4 down: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, low",
+                "outcome": "pass",
+                "value": "116047659",
+                "needs": ">= 115000000"
+              },
+              {
+                "name": "P4 down: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, high",
+                "outcome": "pass",
+                "value": "116047659",
+                "needs": "<= 117000000"
+              },
+              {
+                "name": "P4: round trip mean within 5 %, low",
+                "outcome": "pass",
+                "value": "200119833.926894",
+                "needs": ">= 190000000"
+              },
+              {
+                "name": "P4: round trip mean within 5 %, high",
+                "outcome": "pass",
+                "value": "200119833.926894",
+                "needs": "<= 210000000"
+              },
+              {
+                "name": "P4 L1: the same seed and profile give an identical packet-fate log",
+                "outcome": "pass",
+                "value": "1",
+                "needs": "== 1"
+              }
+            ]
+          },
+          {
+            "run": "l1-p4-s3",
+            "valid": true,
+            "checks": [
+              {
+                "name": "P4 up: 1,000,000 packets",
+                "outcome": "pass",
+                "value": "1000000",
+                "needs": ">= 1000000"
+              },
+              {
+                "name": "P4 up: loss within 5 % of the profile's, low",
+                "outcome": "pass",
+                "value": "0.050076",
+                "needs": ">= 0.0475"
+              },
+              {
+                "name": "P4 up: loss within 5 % of the profile's, high",
+                "outcome": "pass",
+                "value": "0.050076",
+                "needs": "<= 0.0525"
+              },
+              {
+                "name": "P4 up: mean one-way delay within 5 %, low",
+                "outcome": "pass",
+                "value": "100082762.615407",
+                "needs": ">= 95000000"
+              },
+              {
+                "name": "P4 up: mean one-way delay within 5 %, high",
+                "outcome": "pass",
+                "value": "100082762.615407",
+                "needs": "<= 105000000"
+              },
+              {
+                "name": "P4 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "80042769",
+                "needs": ">= 79000000"
+              },
+              {
+                "name": "P4 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "80042769",
+                "needs": "<= 81000000"
+              },
+              {
+                "name": "P4 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "119958326",
+                "needs": ">= 119000000"
+              },
+              {
+                "name": "P4 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "119958326",
+                "needs": "<= 121000000"
+              },
+              {
+                "name": "P4 up: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, low",
+                "outcome": "pass",
+                "value": "116058989",
+                "needs": ">= 115000000"
+              },
+              {
+                "name": "P4 up: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, high",
+                "outcome": "pass",
+                "value": "116058989",
+                "needs": "<= 117000000"
+              },
+              {
+                "name": "P4 down: 1,000,000 packets",
+                "outcome": "pass",
+                "value": "1000000",
+                "needs": ">= 1000000"
+              },
+              {
+                "name": "P4 down: loss within 5 % of the profile's, low",
+                "outcome": "pass",
+                "value": "0.049797",
+                "needs": ">= 0.0475"
+              },
+              {
+                "name": "P4 down: loss within 5 % of the profile's, high",
+                "outcome": "pass",
+                "value": "0.049797",
+                "needs": "<= 0.0525"
+              },
+              {
+                "name": "P4 down: mean one-way delay within 5 %, low",
+                "outcome": "pass",
+                "value": "100080395.103277",
+                "needs": ">= 95000000"
+              },
+              {
+                "name": "P4 down: mean one-way delay within 5 %, high",
+                "outcome": "pass",
+                "value": "100080395.103277",
+                "needs": "<= 105000000"
+              },
+              {
+                "name": "P4 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "80040338",
+                "needs": ">= 79000000"
+              },
+              {
+                "name": "P4 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "80040338",
+                "needs": "<= 81000000"
+              },
+              {
+                "name": "P4 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "119961617",
+                "needs": ">= 119000000"
+              },
+              {
+                "name": "P4 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "119961617",
+                "needs": "<= 121000000"
+              },
+              {
+                "name": "P4 down: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, low",
+                "outcome": "pass",
+                "value": "116041862",
+                "needs": ">= 115000000"
+              },
+              {
+                "name": "P4 down: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, high",
+                "outcome": "pass",
+                "value": "116041862",
+                "needs": "<= 117000000"
+              },
+              {
+                "name": "P4: round trip mean within 5 %, low",
+                "outcome": "pass",
+                "value": "200134298.401264",
+                "needs": ">= 190000000"
+              },
+              {
+                "name": "P4: round trip mean within 5 %, high",
+                "outcome": "pass",
+                "value": "200134298.401264",
+                "needs": "<= 210000000"
+              },
+              {
+                "name": "P4 L1: the same seed and profile give an identical packet-fate log",
+                "outcome": "pass",
+                "value": "1",
+                "needs": "== 1"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "L2 P4",
+        "verdict": "NOT-RUN",
+        "why": [
+          "L2 P4: 0 of 1 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "L1 B1",
+        "verdict": "PASS",
+        "why": [],
+        "runs": [
+          {
+            "run": "l1-b1-s1",
+            "valid": true,
+            "checks": [
+              {
+                "name": "B1 up: 1,000,000 packets",
+                "outcome": "pass",
+                "value": "1000000",
+                "needs": ">= 1000000"
+              },
+              {
+                "name": "B1 up: loss within 5 % of the profile's (outside the burst), low",
+                "outcome": "pass",
+                "value": "0.020209",
+                "needs": ">= 0.019"
+              },
+              {
+                "name": "B1 up: loss within 5 % of the profile's (outside the burst), high",
+                "outcome": "pass",
+                "value": "0.020209",
+                "needs": "<= 0.021"
+              },
+              {
+                "name": "B1 up: mean one-way delay within 5 %, low",
+                "outcome": "pass",
+                "value": "50037095.280702",
+                "needs": ">= 47500000"
+              },
+              {
+                "name": "B1 up: mean one-way delay within 5 %, high",
+                "outcome": "pass",
+                "value": "50037095.280702",
+                "needs": "<= 52500000"
+              },
+              {
+                "name": "B1 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "40020284",
+                "needs": ">= 39500000"
+              },
+              {
+                "name": "B1 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "40020284",
+                "needs": "<= 40500000"
+              },
+              {
+                "name": "B1 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "59981825",
+                "needs": ">= 59500000"
+              },
+              {
+                "name": "B1 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "59981825",
+                "needs": "<= 60500000"
+              },
+              {
+                "name": "B1 up: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, low",
+                "outcome": "pass",
+                "value": "58028353",
+                "needs": ">= 57500000"
+              },
+              {
+                "name": "B1 up: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, high",
+                "outcome": "pass",
+                "value": "58028353",
+                "needs": "<= 58500000"
+              },
+              {
+                "name": "B1 up: every packet inside the 1 s burst lost",
+                "outcome": "pass",
+                "value": "1",
+                "needs": "== 1"
+              },
+              {
+                "name": "B1 down: 1,000,000 packets",
+                "outcome": "pass",
+                "value": "1000000",
+                "needs": ">= 1000000"
+              },
+              {
+                "name": "B1 down: loss within 5 % of the profile's (outside the burst), low",
+                "outcome": "pass",
+                "value": "0.020162",
+                "needs": ">= 0.019"
+              },
+              {
+                "name": "B1 down: loss within 5 % of the profile's (outside the burst), high",
+                "outcome": "pass",
+                "value": "0.020162",
+                "needs": "<= 0.021"
+              },
+              {
+                "name": "B1 down: mean one-way delay within 5 %, low",
+                "outcome": "pass",
+                "value": "50045657.202512",
+                "needs": ">= 47500000"
+              },
+              {
+                "name": "B1 down: mean one-way delay within 5 %, high",
+                "outcome": "pass",
+                "value": "50045657.202512",
+                "needs": "<= 52500000"
+              },
+              {
+                "name": "B1 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "40020675",
+                "needs": ">= 39500000"
+              },
+              {
+                "name": "B1 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "40020675",
+                "needs": "<= 40500000"
+              },
+              {
+                "name": "B1 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "59981666",
+                "needs": ">= 59500000"
+              },
+              {
+                "name": "B1 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "59981666",
+                "needs": "<= 60500000"
+              },
+              {
+                "name": "B1 down: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, low",
+                "outcome": "pass",
+                "value": "58017705",
+                "needs": ">= 57500000"
+              },
+              {
+                "name": "B1 down: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, high",
+                "outcome": "pass",
+                "value": "58017705",
+                "needs": "<= 58500000"
+              },
+              {
+                "name": "B1 down: every packet inside the 1 s burst lost",
+                "outcome": "pass",
+                "value": "1",
+                "needs": "== 1"
+              },
+              {
+                "name": "B1: round trip mean within 5 %, low",
+                "outcome": "pass",
+                "value": "100073668.190638",
+                "needs": ">= 95000000"
+              },
+              {
+                "name": "B1: round trip mean within 5 %, high",
+                "outcome": "pass",
+                "value": "100073668.190638",
+                "needs": "<= 105000000"
+              },
+              {
+                "name": "B1 L1: the same seed and profile give an identical packet-fate log",
+                "outcome": "pass",
+                "value": "1",
+                "needs": "== 1"
+              }
+            ]
+          },
+          {
+            "run": "l1-b1-s2",
+            "valid": true,
+            "checks": [
+              {
+                "name": "B1 up: 1,000,000 packets",
+                "outcome": "pass",
+                "value": "1000000",
+                "needs": ">= 1000000"
+              },
+              {
+                "name": "B1 up: loss within 5 % of the profile's (outside the burst), low",
+                "outcome": "pass",
+                "value": "0.01989",
+                "needs": ">= 0.019"
+              },
+              {
+                "name": "B1 up: loss within 5 % of the profile's (outside the burst), high",
+                "outcome": "pass",
+                "value": "0.01989",
+                "needs": "<= 0.021"
+              },
+              {
+                "name": "B1 up: mean one-way delay within 5 %, low",
+                "outcome": "pass",
+                "value": "50028306.795406",
+                "needs": ">= 47500000"
+              },
+              {
+                "name": "B1 up: mean one-way delay within 5 %, high",
+                "outcome": "pass",
+                "value": "50028306.795406",
+                "needs": "<= 52500000"
+              },
+              {
+                "name": "B1 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "40021612",
+                "needs": ">= 39500000"
+              },
+              {
+                "name": "B1 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "40021612",
+                "needs": "<= 40500000"
+              },
+              {
+                "name": "B1 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "59981347",
+                "needs": ">= 59500000"
+              },
+              {
+                "name": "B1 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "59981347",
+                "needs": "<= 60500000"
+              },
+              {
+                "name": "B1 up: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, low",
+                "outcome": "pass",
+                "value": "58026609",
+                "needs": ">= 57500000"
+              },
+              {
+                "name": "B1 up: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, high",
+                "outcome": "pass",
+                "value": "58026609",
+                "needs": "<= 58500000"
+              },
+              {
+                "name": "B1 up: every packet inside the 1 s burst lost",
+                "outcome": "pass",
+                "value": "1",
+                "needs": "== 1"
+              },
+              {
+                "name": "B1 down: 1,000,000 packets",
+                "outcome": "pass",
+                "value": "1000000",
+                "needs": ">= 1000000"
+              },
+              {
+                "name": "B1 down: loss within 5 % of the profile's (outside the burst), low",
+                "outcome": "pass",
+                "value": "0.019902",
+                "needs": ">= 0.019"
+              },
+              {
+                "name": "B1 down: loss within 5 % of the profile's (outside the burst), high",
+                "outcome": "pass",
+                "value": "0.019902",
+                "needs": "<= 0.021"
+              },
+              {
+                "name": "B1 down: mean one-way delay within 5 %, low",
+                "outcome": "pass",
+                "value": "50034660.333124",
+                "needs": ">= 47500000"
+              },
+              {
+                "name": "B1 down: mean one-way delay within 5 %, high",
+                "outcome": "pass",
+                "value": "50034660.333124",
+                "needs": "<= 52500000"
+              },
+              {
+                "name": "B1 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "40019913",
+                "needs": ">= 39500000"
+              },
+              {
+                "name": "B1 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "40019913",
+                "needs": "<= 40500000"
+              },
+              {
+                "name": "B1 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "59981835",
+                "needs": ">= 59500000"
+              },
+              {
+                "name": "B1 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "59981835",
+                "needs": "<= 60500000"
+              },
+              {
+                "name": "B1 down: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, low",
+                "outcome": "pass",
+                "value": "58021954",
+                "needs": ">= 57500000"
+              },
+              {
+                "name": "B1 down: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, high",
+                "outcome": "pass",
+                "value": "58021954",
+                "needs": "<= 58500000"
+              },
+              {
+                "name": "B1 down: every packet inside the 1 s burst lost",
+                "outcome": "pass",
+                "value": "1",
+                "needs": "== 1"
+              },
+              {
+                "name": "B1: round trip mean within 5 %, low",
+                "outcome": "pass",
+                "value": "100053166.880399",
+                "needs": ">= 95000000"
+              },
+              {
+                "name": "B1: round trip mean within 5 %, high",
+                "outcome": "pass",
+                "value": "100053166.880399",
+                "needs": "<= 105000000"
+              },
+              {
+                "name": "B1 L1: the same seed and profile give an identical packet-fate log",
+                "outcome": "pass",
+                "value": "1",
+                "needs": "== 1"
+              }
+            ]
+          },
+          {
+            "run": "l1-b1-s3",
+            "valid": true,
+            "checks": [
+              {
+                "name": "B1 up: 1,000,000 packets",
+                "outcome": "pass",
+                "value": "1000000",
+                "needs": ">= 1000000"
+              },
+              {
+                "name": "B1 up: loss within 5 % of the profile's (outside the burst), low",
+                "outcome": "pass",
+                "value": "0.020049",
+                "needs": ">= 0.019"
+              },
+              {
+                "name": "B1 up: loss within 5 % of the profile's (outside the burst), high",
+                "outcome": "pass",
+                "value": "0.020049",
+                "needs": "<= 0.021"
+              },
+              {
+                "name": "B1 up: mean one-way delay within 5 %, low",
+                "outcome": "pass",
+                "value": "50040185.312603",
+                "needs": ">= 47500000"
+              },
+              {
+                "name": "B1 up: mean one-way delay within 5 %, high",
+                "outcome": "pass",
+                "value": "50040185.312603",
+                "needs": "<= 52500000"
+              },
+              {
+                "name": "B1 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "40021804",
+                "needs": ">= 39500000"
+              },
+              {
+                "name": "B1 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "40021804",
+                "needs": "<= 40500000"
+              },
+              {
+                "name": "B1 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "59979662",
+                "needs": ">= 59500000"
+              },
+              {
+                "name": "B1 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "59979662",
+                "needs": "<= 60500000"
+              },
+              {
+                "name": "B1 up: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, low",
+                "outcome": "pass",
+                "value": "58029315",
+                "needs": ">= 57500000"
+              },
+              {
+                "name": "B1 up: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, high",
+                "outcome": "pass",
+                "value": "58029315",
+                "needs": "<= 58500000"
+              },
+              {
+                "name": "B1 up: every packet inside the 1 s burst lost",
+                "outcome": "pass",
+                "value": "1",
+                "needs": "== 1"
+              },
+              {
+                "name": "B1 down: 1,000,000 packets",
+                "outcome": "pass",
+                "value": "1000000",
+                "needs": ">= 1000000"
+              },
+              {
+                "name": "B1 down: loss within 5 % of the profile's (outside the burst), low",
+                "outcome": "pass",
+                "value": "0.02002",
+                "needs": ">= 0.019"
+              },
+              {
+                "name": "B1 down: loss within 5 % of the profile's (outside the burst), high",
+                "outcome": "pass",
+                "value": "0.02002",
+                "needs": "<= 0.021"
+              },
+              {
+                "name": "B1 down: mean one-way delay within 5 %, low",
+                "outcome": "pass",
+                "value": "50040478.961838",
+                "needs": ">= 47500000"
+              },
+              {
+                "name": "B1 down: mean one-way delay within 5 %, high",
+                "outcome": "pass",
+                "value": "50040478.961838",
+                "needs": "<= 52500000"
+              },
+              {
+                "name": "B1 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "40020046",
+                "needs": ">= 39500000"
+              },
+              {
+                "name": "B1 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "40020046",
+                "needs": "<= 40500000"
+              },
+              {
+                "name": "B1 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "59981125",
+                "needs": ">= 59500000"
+              },
+              {
+                "name": "B1 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "59981125",
+                "needs": "<= 60500000"
+              },
+              {
+                "name": "B1 down: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, low",
+                "outcome": "pass",
+                "value": "58020720",
+                "needs": ">= 57500000"
+              },
+              {
+                "name": "B1 down: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, high",
+                "outcome": "pass",
+                "value": "58020720",
+                "needs": "<= 58500000"
+              },
+              {
+                "name": "B1 down: every packet inside the 1 s burst lost",
+                "outcome": "pass",
+                "value": "1",
+                "needs": "== 1"
+              },
+              {
+                "name": "B1: round trip mean within 5 %, low",
+                "outcome": "pass",
+                "value": "100072360.417188",
+                "needs": ">= 95000000"
+              },
+              {
+                "name": "B1: round trip mean within 5 %, high",
+                "outcome": "pass",
+                "value": "100072360.417188",
+                "needs": "<= 105000000"
+              },
+              {
+                "name": "B1 L1: the same seed and profile give an identical packet-fate log",
+                "outcome": "pass",
+                "value": "1",
+                "needs": "== 1"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "L2 B1",
+        "verdict": "NOT-RUN",
+        "why": [
+          "L2 B1: 0 of 1 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "L2 P0 (the real path, recorded)",
+        "verdict": "NOT-RUN",
+        "why": [
+          "L2 P0 (the real path, recorded): 0 of 1 valid runs"
+        ],
+        "runs": []
+      },
+      {
+        "name": "MP at P2",
+        "verdict": "NOT-RUN",
+        "why": [
+          "MP at P2: 0 of 1 valid runs"
+        ],
+        "runs": []
+      }
+    ],
+    "bites": [
+      {
+        "id": "PM-0001-3/rtt-each-way",
+        "status": "shown",
+        "runs": [
+          {
+            "run": "bite-rtt-each-way",
+            "valid": true,
+            "checks": [
+              {
+                "name": "P2 up: 1,000,000 packets",
+                "outcome": "pass",
+                "value": "1000000",
+                "needs": ">= 1000000"
+              },
+              {
+                "name": "P2 up: loss within 5 % of the profile's, low",
+                "outcome": "pass",
+                "value": "0.020191",
+                "needs": ">= 0.019"
+              },
+              {
+                "name": "P2 up: loss within 5 % of the profile's, high",
+                "outcome": "pass",
+                "value": "0.020191",
+                "needs": "<= 0.021"
+              },
+              {
+                "name": "P2 up: mean one-way delay within 5 %, low",
+                "outcome": "pass",
+                "value": "100038109.376284",
+                "needs": ">= 47500000"
+              },
+              {
+                "name": "P2 up: mean one-way delay within 5 %, high",
+                "outcome": "fail",
+                "value": "100038109.376284",
+                "needs": "<= 52500000"
+              },
+              {
+                "name": "P2 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "90020299",
+                "needs": ">= 39500000"
+              },
+              {
+                "name": "P2 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
+                "outcome": "fail",
+                "value": "90020299",
+                "needs": "<= 40500000"
+              },
+              {
+                "name": "P2 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "109981998",
+                "needs": ">= 59500000"
+              },
+              {
+                "name": "P2 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
+                "outcome": "fail",
+                "value": "109981998",
+                "needs": "<= 60500000"
+              },
+              {
+                "name": "P2 up: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, low",
+                "outcome": "pass",
+                "value": "108029785",
+                "needs": ">= 57500000"
+              },
+              {
+                "name": "P2 up: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, high",
+                "outcome": "fail",
+                "value": "108029785",
+                "needs": "<= 58500000"
+              },
+              {
+                "name": "P2 down: 1,000,000 packets",
+                "outcome": "pass",
+                "value": "1000000",
+                "needs": ">= 1000000"
+              },
+              {
+                "name": "P2 down: loss within 5 % of the profile's, low",
+                "outcome": "pass",
+                "value": "0.020175",
+                "needs": ">= 0.019"
+              },
+              {
+                "name": "P2 down: loss within 5 % of the profile's, high",
+                "outcome": "pass",
+                "value": "0.020175",
+                "needs": "<= 0.021"
+              },
+              {
+                "name": "P2 down: mean one-way delay within 5 %, low",
+                "outcome": "pass",
+                "value": "100045151.803153",
+                "needs": ">= 47500000"
+              },
+              {
+                "name": "P2 down: mean one-way delay within 5 %, high",
+                "outcome": "fail",
+                "value": "100045151.803153",
+                "needs": "<= 52500000"
+              },
+              {
+                "name": "P2 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "90020553",
+                "needs": ">= 39500000"
+              },
+              {
+                "name": "P2 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
+                "outcome": "fail",
+                "value": "90020553",
+                "needs": "<= 40500000"
+              },
+              {
+                "name": "P2 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "109981624",
+                "needs": ">= 59500000"
+              },
+              {
+                "name": "P2 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
+                "outcome": "fail",
+                "value": "109981624",
+                "needs": "<= 60500000"
+              },
+              {
+                "name": "P2 down: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, low",
+                "outcome": "pass",
+                "value": "108018041",
+                "needs": ">= 57500000"
+              },
+              {
+                "name": "P2 down: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, high",
+                "outcome": "fail",
+                "value": "108018041",
+                "needs": "<= 58500000"
+              },
+              {
+                "name": "P2: round trip mean within 5 %, low",
+                "outcome": "pass",
+                "value": "200079725.321988",
+                "needs": ">= 95000000"
+              },
+              {
+                "name": "P2: round trip mean within 5 %, high",
+                "outcome": "fail",
+                "value": "200079725.321988",
+                "needs": "<= 105000000"
+              },
+              {
+                "name": "P2 L1: the same seed and profile give an identical packet-fate log",
+                "outcome": "pass",
+                "value": "1",
+                "needs": "== 1"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "PM-0001-3/loss-per-round-trip",
+        "status": "shown",
+        "runs": [
+          {
+            "run": "bite-loss-per-round-trip",
+            "valid": true,
+            "checks": [
+              {
+                "name": "P2 up: 1,000,000 packets",
+                "outcome": "pass",
+                "value": "1000000",
+                "needs": ">= 1000000"
+              },
+              {
+                "name": "P2 up: loss within 5 % of the profile's, low",
+                "outcome": "fail",
+                "value": "0.010123",
+                "needs": ">= 0.019"
+              },
+              {
+                "name": "P2 up: loss within 5 % of the profile's, high",
+                "outcome": "pass",
+                "value": "0.010123",
+                "needs": "<= 0.021"
+              },
+              {
+                "name": "P2 up: mean one-way delay within 5 %, low",
+                "outcome": "pass",
+                "value": "50038185.564877",
+                "needs": ">= 47500000"
+              },
+              {
+                "name": "P2 up: mean one-way delay within 5 %, high",
+                "outcome": "pass",
+                "value": "50038185.564877",
+                "needs": "<= 52500000"
+              },
+              {
+                "name": "P2 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "40020299",
+                "needs": ">= 39500000"
+              },
+              {
+                "name": "P2 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "40020299",
+                "needs": "<= 40500000"
+              },
+              {
+                "name": "P2 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "59981825",
+                "needs": ">= 59500000"
+              },
+              {
+                "name": "P2 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "59981825",
+                "needs": "<= 60500000"
+              },
+              {
+                "name": "P2 up: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, low",
+                "outcome": "pass",
+                "value": "58030179",
+                "needs": ">= 57500000"
+              },
+              {
+                "name": "P2 up: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, high",
+                "outcome": "pass",
+                "value": "58030179",
+                "needs": "<= 58500000"
+              },
+              {
+                "name": "P2 down: 1,000,000 packets",
+                "outcome": "pass",
+                "value": "1000000",
+                "needs": ">= 1000000"
+              },
+              {
+                "name": "P2 down: loss within 5 % of the profile's, low",
+                "outcome": "fail",
+                "value": "0.010146",
+                "needs": ">= 0.019"
+              },
+              {
+                "name": "P2 down: loss within 5 % of the profile's, high",
+                "outcome": "pass",
+                "value": "0.010146",
+                "needs": "<= 0.021"
+              },
+              {
+                "name": "P2 down: mean one-way delay within 5 %, low",
+                "outcome": "pass",
+                "value": "50044460.378137",
+                "needs": ">= 47500000"
+              },
+              {
+                "name": "P2 down: mean one-way delay within 5 %, high",
+                "outcome": "pass",
+                "value": "50044460.378137",
+                "needs": "<= 52500000"
+              },
+              {
+                "name": "P2 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "40020553",
+                "needs": ">= 39500000"
+              },
+              {
+                "name": "P2 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "40020553",
+                "needs": "<= 40500000"
+              },
+              {
+                "name": "P2 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "59981757",
+                "needs": ">= 59500000"
+              },
+              {
+                "name": "P2 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "59981757",
+                "needs": "<= 60500000"
+              },
+              {
+                "name": "P2 down: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, low",
+                "outcome": "pass",
+                "value": "58018041",
+                "needs": ">= 57500000"
+              },
+              {
+                "name": "P2 down: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, high",
+                "outcome": "pass",
+                "value": "58018041",
+                "needs": "<= 58500000"
+              },
+              {
+                "name": "P2: round trip mean within 5 %, low",
+                "outcome": "pass",
+                "value": "100074150.355704",
+                "needs": ">= 95000000"
+              },
+              {
+                "name": "P2: round trip mean within 5 %, high",
+                "outcome": "pass",
+                "value": "100074150.355704",
+                "needs": "<= 105000000"
+              },
+              {
+                "name": "P2 L1: the same seed and profile give an identical packet-fate log",
+                "outcome": "pass",
+                "value": "1",
+                "needs": "== 1"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "PM-0001-3/normal-jitter",
+        "status": "shown",
+        "runs": [
+          {
+            "run": "bite-normal-jitter",
+            "valid": true,
+            "checks": [
+              {
+                "name": "P2 up: 1,000,000 packets",
+                "outcome": "pass",
+                "value": "1000000",
+                "needs": ">= 1000000"
+              },
+              {
+                "name": "P2 up: loss within 5 % of the profile's, low",
+                "outcome": "pass",
+                "value": "0.020191",
+                "needs": ">= 0.019"
+              },
+              {
+                "name": "P2 up: loss within 5 % of the profile's, high",
+                "outcome": "pass",
+                "value": "0.020191",
+                "needs": "<= 0.021"
+              },
+              {
+                "name": "P2 up: mean one-way delay within 5 %, low",
+                "outcome": "pass",
+                "value": "50023681.761841",
+                "needs": ">= 47500000"
+              },
+              {
+                "name": "P2 up: mean one-way delay within 5 %, high",
+                "outcome": "pass",
+                "value": "50023681.761841",
+                "needs": "<= 52500000"
+              },
+              {
+                "name": "P2 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "40320703",
+                "needs": ">= 39500000"
+              },
+              {
+                "name": "P2 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "40320703",
+                "needs": "<= 40500000"
+              },
+              {
+                "name": "P2 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "59760541",
+                "needs": ">= 59500000"
+              },
+              {
+                "name": "P2 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "59760541",
+                "needs": "<= 60500000"
+              },
+              {
+                "name": "P2 up: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, low",
+                "outcome": "fail",
+                "value": "54199527",
+                "needs": ">= 57500000"
+              },
+              {
+                "name": "P2 up: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, high",
+                "outcome": "pass",
+                "value": "54199527",
+                "needs": "<= 58500000"
+              },
+              {
+                "name": "P2 down: 1,000,000 packets",
+                "outcome": "pass",
+                "value": "1000000",
+                "needs": ">= 1000000"
+              },
+              {
+                "name": "P2 down: loss within 5 % of the profile's, low",
+                "outcome": "pass",
+                "value": "0.020175",
+                "needs": ">= 0.019"
+              },
+              {
+                "name": "P2 down: loss within 5 % of the profile's, high",
+                "outcome": "pass",
+                "value": "0.020175",
+                "needs": "<= 0.021"
+              },
+              {
+                "name": "P2 down: mean one-way delay within 5 %, low",
+                "outcome": "pass",
+                "value": "50017431.613495",
+                "needs": ">= 47500000"
+              },
+              {
+                "name": "P2 down: mean one-way delay within 5 %, high",
+                "outcome": "pass",
+                "value": "50017431.613495",
+                "needs": "<= 52500000"
+              },
+              {
+                "name": "P2 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "40249911",
+                "needs": ">= 39500000"
+              },
+              {
+                "name": "P2 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "40249911",
+                "needs": "<= 40500000"
+              },
+              {
+                "name": "P2 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "59708423",
+                "needs": ">= 59500000"
+              },
+              {
+                "name": "P2 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "59708423",
+                "needs": "<= 60500000"
+              },
+              {
+                "name": "P2 down: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, low",
+                "outcome": "fail",
+                "value": "54182866",
+                "needs": ">= 57500000"
+              },
+              {
+                "name": "P2 down: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, high",
+                "outcome": "pass",
+                "value": "54182866",
+                "needs": "<= 58500000"
+              },
+              {
+                "name": "P2: round trip mean within 5 %, low",
+                "outcome": "pass",
+                "value": "100030390.661745",
+                "needs": ">= 95000000"
+              },
+              {
+                "name": "P2: round trip mean within 5 %, high",
+                "outcome": "pass",
+                "value": "100030390.661745",
+                "needs": "<= 105000000"
+              },
+              {
+                "name": "P2 L1: the same seed and profile give an identical packet-fate log",
+                "outcome": "pass",
+                "value": "1",
+                "needs": "== 1"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "PM-0001-3/clock-seed",
+        "status": "shown",
+        "runs": [
+          {
+            "run": "bite-clock-seed",
+            "valid": true,
+            "checks": [
+              {
+                "name": "P2 up: 1,000,000 packets",
+                "outcome": "pass",
+                "value": "1000000",
+                "needs": ">= 1000000"
+              },
+              {
+                "name": "P2 up: loss within 5 % of the profile's, low",
+                "outcome": "pass",
+                "value": "0.020187",
+                "needs": ">= 0.019"
+              },
+              {
+                "name": "P2 up: loss within 5 % of the profile's, high",
+                "outcome": "pass",
+                "value": "0.020187",
+                "needs": "<= 0.021"
+              },
+              {
+                "name": "P2 up: mean one-way delay within 5 %, low",
+                "outcome": "pass",
+                "value": "50035782.585892",
+                "needs": ">= 47500000"
+              },
+              {
+                "name": "P2 up: mean one-way delay within 5 %, high",
+                "outcome": "pass",
+                "value": "50035782.585892",
+                "needs": "<= 52500000"
+              },
+              {
+                "name": "P2 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "40020536",
+                "needs": ">= 39500000"
+              },
+              {
+                "name": "P2 up: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "40020536",
+                "needs": "<= 40500000"
+              },
+              {
+                "name": "P2 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "59981307",
+                "needs": ">= 59500000"
+              },
+              {
+                "name": "P2 up: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "59981307",
+                "needs": "<= 60500000"
+              },
+              {
+                "name": "P2 up: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, low",
+                "outcome": "pass",
+                "value": "58026169",
+                "needs": ">= 57500000"
+              },
+              {
+                "name": "P2 up: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, high",
+                "outcome": "pass",
+                "value": "58026169",
+                "needs": "<= 58500000"
+              },
+              {
+                "name": "P2 down: 1,000,000 packets",
+                "outcome": "pass",
+                "value": "1000000",
+                "needs": ">= 1000000"
+              },
+              {
+                "name": "P2 down: loss within 5 % of the profile's, low",
+                "outcome": "pass",
+                "value": "0.020133",
+                "needs": ">= 0.019"
+              },
+              {
+                "name": "P2 down: loss within 5 % of the profile's, high",
+                "outcome": "pass",
+                "value": "0.020133",
+                "needs": "<= 0.021"
+              },
+              {
+                "name": "P2 down: mean one-way delay within 5 %, low",
+                "outcome": "pass",
+                "value": "50040893.382414",
+                "needs": ">= 47500000"
+              },
+              {
+                "name": "P2 down: mean one-way delay within 5 %, high",
+                "outcome": "pass",
+                "value": "50040893.382414",
+                "needs": "<= 52500000"
+              },
+              {
+                "name": "P2 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "40020857",
+                "needs": ">= 39500000"
+              },
+              {
+                "name": "P2 down: jitter's lower end (0.1st percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "40020857",
+                "needs": "<= 40500000"
+              },
+              {
+                "name": "P2 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, low",
+                "outcome": "pass",
+                "value": "59980853",
+                "needs": ">= 59500000"
+              },
+              {
+                "name": "P2 down: jitter's upper end (99.9th percentile) within 5 % of the half jitter, high",
+                "outcome": "pass",
+                "value": "59980853",
+                "needs": "<= 60500000"
+              },
+              {
+                "name": "P2 down: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, low",
+                "outcome": "pass",
+                "value": "58023974",
+                "needs": ">= 57500000"
+              },
+              {
+                "name": "P2 down: uniform shape, p90 within 5 % of the half jitter of d + 0.8a, high",
+                "outcome": "pass",
+                "value": "58023974",
+                "needs": "<= 58500000"
+              },
+              {
+                "name": "P2: round trip mean within 5 %, low",
+                "outcome": "pass",
+                "value": "100063301.080337",
+                "needs": ">= 95000000"
+              },
+              {
+                "name": "P2: round trip mean within 5 %, high",
+                "outcome": "pass",
+                "value": "100063301.080337",
+                "needs": "<= 105000000"
+              },
+              {
+                "name": "P2 L1: the same seed and profile give an identical packet-fate log",
+                "outcome": "fail",
+                "value": "0",
+                "needs": "== 1"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "PM-0001-3/not-net-of-base",
+        "status": "not_run",
+        "runs": []
+      }
+    ],
+    "report": [
+      {
+        "name": "L2: the path's base RTT (median of 10 s of pings)",
+        "part": "L1 P1",
+        "run": "l1-p1-s1",
+        "value": "not available: run l1-p1-s1: no values for header.params.base_rtt_ns"
+      },
+      {
+        "name": "L2: the path's base RTT (median of 10 s of pings)",
+        "part": "L1 P1",
+        "run": "l1-p1-s2",
+        "value": "not available: run l1-p1-s2: no values for header.params.base_rtt_ns"
+      },
+      {
+        "name": "L2: the path's base RTT (median of 10 s of pings)",
+        "part": "L1 P1",
+        "run": "l1-p1-s3",
+        "value": "not available: run l1-p1-s3: no values for header.params.base_rtt_ns"
+      },
+      {
+        "name": "measured reorder share",
+        "part": "L1 P1",
+        "run": "l1-p1-s1",
+        "value": "872"
+      },
+      {
+        "name": "measured reorder share",
+        "part": "L1 P1",
+        "run": "l1-p1-s2",
+        "value": "872"
+      },
+      {
+        "name": "measured reorder share",
+        "part": "L1 P1",
+        "run": "l1-p1-s3",
+        "value": "872"
+      },
+      {
+        "name": "up: one-way delay, min",
+        "part": "L1 P1",
+        "run": "l1-p1-s1",
+        "value": "20000031"
+      },
+      {
+        "name": "up: one-way delay, min",
+        "part": "L1 P1",
+        "run": "l1-p1-s2",
+        "value": "20000005"
+      },
+      {
+        "name": "up: one-way delay, min",
+        "part": "L1 P1",
+        "run": "l1-p1-s3",
+        "value": "20000018"
+      },
+      {
+        "name": "up: one-way delay, max",
+        "part": "L1 P1",
+        "run": "l1-p1-s1",
+        "value": "30099607"
+      },
+      {
+        "name": "up: one-way delay, max",
+        "part": "L1 P1",
+        "run": "l1-p1-s2",
+        "value": "30097745"
+      },
+      {
+        "name": "up: one-way delay, max",
+        "part": "L1 P1",
+        "run": "l1-p1-s3",
+        "value": "30095865"
+      },
+      {
+        "name": "down: one-way delay, min",
+        "part": "L1 P1",
+        "run": "l1-p1-s1",
+        "value": "20000028"
+      },
+      {
+        "name": "down: one-way delay, min",
+        "part": "L1 P1",
+        "run": "l1-p1-s2",
+        "value": "20000005"
+      },
+      {
+        "name": "down: one-way delay, min",
+        "part": "L1 P1",
+        "run": "l1-p1-s3",
+        "value": "20000002"
+      },
+      {
+        "name": "down: one-way delay, max",
+        "part": "L1 P1",
+        "run": "l1-p1-s1",
+        "value": "30099334"
+      },
+      {
+        "name": "down: one-way delay, max",
+        "part": "L1 P1",
+        "run": "l1-p1-s2",
+        "value": "30098054"
+      },
+      {
+        "name": "down: one-way delay, max",
+        "part": "L1 P1",
+        "run": "l1-p1-s3",
+        "value": "30099828"
+      },
+      {
+        "name": "L2: the path's base RTT (median of 10 s of pings)",
+        "part": "L1 P2",
+        "run": "l1-p2-s1",
+        "value": "not available: run l1-p2-s1: no values for header.params.base_rtt_ns"
+      },
+      {
+        "name": "L2: the path's base RTT (median of 10 s of pings)",
+        "part": "L1 P2",
+        "run": "l1-p2-s2",
+        "value": "not available: run l1-p2-s2: no values for header.params.base_rtt_ns"
+      },
+      {
+        "name": "L2: the path's base RTT (median of 10 s of pings)",
+        "part": "L1 P2",
+        "run": "l1-p2-s3",
+        "value": "not available: run l1-p2-s3: no values for header.params.base_rtt_ns"
+      },
+      {
+        "name": "measured reorder share",
+        "part": "L1 P2",
+        "run": "l1-p2-s1",
+        "value": "910"
+      },
+      {
+        "name": "measured reorder share",
+        "part": "L1 P2",
+        "run": "l1-p2-s2",
+        "value": "910"
+      },
+      {
+        "name": "measured reorder share",
+        "part": "L1 P2",
+        "run": "l1-p2-s3",
+        "value": "909"
+      },
+      {
+        "name": "up: one-way delay, min",
+        "part": "L1 P2",
+        "run": "l1-p2-s1",
+        "value": "40000063"
+      },
+      {
+        "name": "up: one-way delay, min",
+        "part": "L1 P2",
+        "run": "l1-p2-s2",
+        "value": "40000011"
+      },
+      {
+        "name": "up: one-way delay, min",
+        "part": "L1 P2",
+        "run": "l1-p2-s3",
+        "value": "40000036"
+      },
+      {
+        "name": "up: one-way delay, max",
+        "part": "L1 P2",
+        "run": "l1-p2-s1",
+        "value": "60099212"
+      },
+      {
+        "name": "up: one-way delay, max",
+        "part": "L1 P2",
+        "run": "l1-p2-s2",
+        "value": "60095489"
+      },
+      {
+        "name": "up: one-way delay, max",
+        "part": "L1 P2",
+        "run": "l1-p2-s3",
+        "value": "60091728"
+      },
+      {
+        "name": "down: one-way delay, min",
+        "part": "L1 P2",
+        "run": "l1-p2-s1",
+        "value": "40000057"
+      },
+      {
+        "name": "down: one-way delay, min",
+        "part": "L1 P2",
+        "run": "l1-p2-s2",
+        "value": "40000010"
+      },
+      {
+        "name": "down: one-way delay, min",
+        "part": "L1 P2",
+        "run": "l1-p2-s3",
+        "value": "40000004"
+      },
+      {
+        "name": "down: one-way delay, max",
+        "part": "L1 P2",
+        "run": "l1-p2-s1",
+        "value": "60098666"
+      },
+      {
+        "name": "down: one-way delay, max",
+        "part": "L1 P2",
+        "run": "l1-p2-s2",
+        "value": "60096107"
+      },
+      {
+        "name": "down: one-way delay, max",
+        "part": "L1 P2",
+        "run": "l1-p2-s3",
+        "value": "60099655"
+      },
+      {
+        "name": "L2: the path's base RTT (median of 10 s of pings)",
+        "part": "L1 P3",
+        "run": "l1-p3-s1",
+        "value": "not available: run l1-p3-s1: no values for header.params.base_rtt_ns"
+      },
+      {
+        "name": "L2: the path's base RTT (median of 10 s of pings)",
+        "part": "L1 P3",
+        "run": "l1-p3-s2",
+        "value": "not available: run l1-p3-s2: no values for header.params.base_rtt_ns"
+      },
+      {
+        "name": "L2: the path's base RTT (median of 10 s of pings)",
+        "part": "L1 P3",
+        "run": "l1-p3-s3",
+        "value": "not available: run l1-p3-s3: no values for header.params.base_rtt_ns"
+      },
+      {
+        "name": "measured reorder share",
+        "part": "L1 P3",
+        "run": "l1-p3-s1",
+        "value": "925"
+      },
+      {
+        "name": "measured reorder share",
+        "part": "L1 P3",
+        "run": "l1-p3-s2",
+        "value": "925"
+      },
+      {
+        "name": "measured reorder share",
+        "part": "L1 P3",
+        "run": "l1-p3-s3",
+        "value": "925"
+      },
+      {
+        "name": "up: one-way delay, min",
+        "part": "L1 P3",
+        "run": "l1-p3-s1",
+        "value": "60000095"
+      },
+      {
+        "name": "up: one-way delay, min",
+        "part": "L1 P3",
+        "run": "l1-p3-s2",
+        "value": "60000017"
+      },
+      {
+        "name": "up: one-way delay, min",
+        "part": "L1 P3",
+        "run": "l1-p3-s3",
+        "value": "60000054"
+      },
+      {
+        "name": "up: one-way delay, max",
+        "part": "L1 P3",
+        "run": "l1-p3-s1",
+        "value": "90098817"
+      },
+      {
+        "name": "up: one-way delay, max",
+        "part": "L1 P3",
+        "run": "l1-p3-s2",
+        "value": "90093233"
+      },
+      {
+        "name": "up: one-way delay, max",
+        "part": "L1 P3",
+        "run": "l1-p3-s3",
+        "value": "90087592"
+      },
+      {
+        "name": "down: one-way delay, min",
+        "part": "L1 P3",
+        "run": "l1-p3-s1",
+        "value": "60000086"
+      },
+      {
+        "name": "down: one-way delay, min",
+        "part": "L1 P3",
+        "run": "l1-p3-s2",
+        "value": "60000015"
+      },
+      {
+        "name": "down: one-way delay, min",
+        "part": "L1 P3",
+        "run": "l1-p3-s3",
+        "value": "60000006"
+      },
+      {
+        "name": "down: one-way delay, max",
+        "part": "L1 P3",
+        "run": "l1-p3-s1",
+        "value": "90097998"
+      },
+      {
+        "name": "down: one-way delay, max",
+        "part": "L1 P3",
+        "run": "l1-p3-s2",
+        "value": "90094160"
+      },
+      {
+        "name": "down: one-way delay, max",
+        "part": "L1 P3",
+        "run": "l1-p3-s3",
+        "value": "90099482"
+      },
+      {
+        "name": "L2: the path's base RTT (median of 10 s of pings)",
+        "part": "L1 P4",
+        "run": "l1-p4-s1",
+        "value": "not available: run l1-p4-s1: no values for header.params.base_rtt_ns"
+      },
+      {
+        "name": "L2: the path's base RTT (median of 10 s of pings)",
+        "part": "L1 P4",
+        "run": "l1-p4-s2",
+        "value": "not available: run l1-p4-s2: no values for header.params.base_rtt_ns"
+      },
+      {
+        "name": "L2: the path's base RTT (median of 10 s of pings)",
+        "part": "L1 P4",
+        "run": "l1-p4-s3",
+        "value": "not available: run l1-p4-s3: no values for header.params.base_rtt_ns"
+      },
+      {
+        "name": "measured reorder share",
+        "part": "L1 P4",
+        "run": "l1-p4-s1",
+        "value": "935"
+      },
+      {
+        "name": "measured reorder share",
+        "part": "L1 P4",
+        "run": "l1-p4-s2",
+        "value": "935"
+      },
+      {
+        "name": "measured reorder share",
+        "part": "L1 P4",
+        "run": "l1-p4-s3",
+        "value": "935"
+      },
+      {
+        "name": "up: one-way delay, min",
+        "part": "L1 P4",
+        "run": "l1-p4-s1",
+        "value": "80000127"
+      },
+      {
+        "name": "up: one-way delay, min",
+        "part": "L1 P4",
+        "run": "l1-p4-s2",
+        "value": "80000023"
+      },
+      {
+        "name": "up: one-way delay, min",
+        "part": "L1 P4",
+        "run": "l1-p4-s3",
+        "value": "80000072"
+      },
+      {
+        "name": "up: one-way delay, max",
+        "part": "L1 P4",
+        "run": "l1-p4-s1",
+        "value": "120098422"
+      },
+      {
+        "name": "up: one-way delay, max",
+        "part": "L1 P4",
+        "run": "l1-p4-s2",
+        "value": "120090977"
+      },
+      {
+        "name": "up: one-way delay, max",
+        "part": "L1 P4",
+        "run": "l1-p4-s3",
+        "value": "120083455"
+      },
+      {
+        "name": "down: one-way delay, min",
+        "part": "L1 P4",
+        "run": "l1-p4-s1",
+        "value": "80000115"
+      },
+      {
+        "name": "down: one-way delay, min",
+        "part": "L1 P4",
+        "run": "l1-p4-s2",
+        "value": "80000020"
+      },
+      {
+        "name": "down: one-way delay, min",
+        "part": "L1 P4",
+        "run": "l1-p4-s3",
+        "value": "80000009"
+      },
+      {
+        "name": "down: one-way delay, max",
+        "part": "L1 P4",
+        "run": "l1-p4-s1",
+        "value": "120097330"
+      },
+      {
+        "name": "down: one-way delay, max",
+        "part": "L1 P4",
+        "run": "l1-p4-s2",
+        "value": "120092213"
+      },
+      {
+        "name": "down: one-way delay, max",
+        "part": "L1 P4",
+        "run": "l1-p4-s3",
+        "value": "120099309"
+      },
+      {
+        "name": "L2: the path's base RTT (median of 10 s of pings)",
+        "part": "L1 B1",
+        "run": "l1-b1-s1",
+        "value": "not available: run l1-b1-s1: no values for header.params.base_rtt_ns"
+      },
+      {
+        "name": "L2: the path's base RTT (median of 10 s of pings)",
+        "part": "L1 B1",
+        "run": "l1-b1-s2",
+        "value": "not available: run l1-b1-s2: no values for header.params.base_rtt_ns"
+      },
+      {
+        "name": "L2: the path's base RTT (median of 10 s of pings)",
+        "part": "L1 B1",
+        "run": "l1-b1-s3",
+        "value": "not available: run l1-b1-s3: no values for header.params.base_rtt_ns"
+      },
+      {
+        "name": "measured reorder share",
+        "part": "L1 B1",
+        "run": "l1-b1-s1",
+        "value": "910"
+      },
+      {
+        "name": "measured reorder share",
+        "part": "L1 B1",
+        "run": "l1-b1-s2",
+        "value": "910"
+      },
+      {
+        "name": "measured reorder share",
+        "part": "L1 B1",
+        "run": "l1-b1-s3",
+        "value": "909"
+      },
+      {
+        "name": "up: one-way delay, min",
+        "part": "L1 B1",
+        "run": "l1-b1-s1",
+        "value": "40000063"
+      },
+      {
+        "name": "up: one-way delay, min",
+        "part": "L1 B1",
+        "run": "l1-b1-s2",
+        "value": "40000011"
+      },
+      {
+        "name": "up: one-way delay, min",
+        "part": "L1 B1",
+        "run": "l1-b1-s3",
+        "value": "40000036"
+      },
+      {
+        "name": "up: one-way delay, max",
+        "part": "L1 B1",
+        "run": "l1-b1-s1",
+        "value": "60099007"
+      },
+      {
+        "name": "up: one-way delay, max",
+        "part": "L1 B1",
+        "run": "l1-b1-s2",
+        "value": "60095489"
+      },
+      {
+        "name": "up: one-way delay, max",
+        "part": "L1 B1",
+        "run": "l1-b1-s3",
+        "value": "60091728"
+      },
+      {
+        "name": "down: one-way delay, min",
+        "part": "L1 B1",
+        "run": "l1-b1-s1",
+        "value": "40000057"
+      },
+      {
+        "name": "down: one-way delay, min",
+        "part": "L1 B1",
+        "run": "l1-b1-s2",
+        "value": "40000010"
+      },
+      {
+        "name": "down: one-way delay, min",
+        "part": "L1 B1",
+        "run": "l1-b1-s3",
+        "value": "40000004"
+      },
+      {
+        "name": "down: one-way delay, max",
+        "part": "L1 B1",
+        "run": "l1-b1-s1",
+        "value": "60098666"
+      },
+      {
+        "name": "down: one-way delay, max",
+        "part": "L1 B1",
+        "run": "l1-b1-s2",
+        "value": "60096107"
+      },
+      {
+        "name": "down: one-way delay, max",
+        "part": "L1 B1",
+        "run": "l1-b1-s3",
+        "value": "60099655"
+      }
+    ]
+  }
+]

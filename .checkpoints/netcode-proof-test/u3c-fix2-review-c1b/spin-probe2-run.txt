@@ -1,0 +1,39 @@
+FIXED run 1: SPINPROBE polls during the 1.5 s hold: 118
+FIXED run 1: test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 161 filtered out; finished in 1.51s
+FIXED run 2: SPINPROBE polls during the 1.5 s hold: 122
+FIXED run 2: test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 161 filtered out; finished in 1.51s
+FIXED run 3: SPINPROBE polls during the 1.5 s hold: 121
+FIXED run 3: test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 161 filtered out; finished in 1.51s
+R1-SPIN run 1: SPINPROBE polls during the 1.5 s hold: 177315
+R1-SPIN run 1: test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 161 filtered out; finished in 1.51s
+R1-SPIN run 2: SPINPROBE polls during the 1.5 s hold: 168794
+R1-SPIN run 2: test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 161 filtered out; finished in 1.51s
+R1-SPIN run 3: SPINPROBE polls during the 1.5 s hold: 182725
+R1-SPIN run 3: test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 161 filtered out; finished in 1.51s
+PROBE2 FIXED run 1: PROBE2 slow 30 ms gap 20 ms: releases (model us) [102465, 122656]; S write returns (model us) [132786, 162998]; B written 40342 us after its release (B's kind 1, woken false)
+PROBE2 FIXED run 1: PROBE2 slow 2 ms gap 1 ms: releases (model us) [100122, 101263]; S write returns (model us) [102481, 104682]; B written 3419 us after its release (B's kind 1, woken false)
+PROBE2 FIXED run 1: PROBE2 slow 0 ms gap 0 ms: releases (model us) [100161, 100209]; S write returns (model us) [100416, 100422]; B written 213 us after its release (B's kind 0, woken false)
+PROBE2 FIXED run 1: test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 162 filtered out; finished in 0.38s
+PROBE2 FIXED run 2: PROBE2 slow 30 ms gap 20 ms: releases (model us) [102309, 122482]; S write returns (model us) [132721, 162977]; B written 40495 us after its release (B's kind 1, woken false)
+PROBE2 FIXED run 2: PROBE2 slow 2 ms gap 1 ms: releases (model us) [100202, 101342]; S write returns (model us) [102499, 104661]; B written 3319 us after its release (B's kind 1, woken false)
+PROBE2 FIXED run 2: PROBE2 slow 0 ms gap 0 ms: releases (model us) [100257, 100312]; S write returns (model us) [100477, 100483]; B written 170 us after its release (B's kind 0, woken false)
+PROBE2 FIXED run 2: test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 162 filtered out; finished in 0.38s
+PROBE2 FIXED run 3: PROBE2 slow 30 ms gap 20 ms: releases (model us) [102416, 122608]; S write returns (model us) [132719, 162944]; B written 40335 us after its release (B's kind 1, woken false)
+PROBE2 FIXED run 3: PROBE2 slow 2 ms gap 1 ms: releases (model us) [100140, 101227]; S write returns (model us) [102413, 104752]; B written 3525 us after its release (B's kind 1, woken false)
+PROBE2 FIXED run 3: PROBE2 slow 0 ms gap 0 ms: releases (model us) [100158, 100208]; S write returns (model us) [100444, 100450]; B written 242 us after its release (B's kind 0, woken false)
+PROBE2 FIXED run 3: test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 162 filtered out; finished in 0.38s
+PROBE2 R1-OFF run 1: PROBE2 slow 30 ms gap 20 ms: releases (model us) [102411, 122608]; S write returns (model us) [132980, 253144]; B written 130536 us after its release (B's kind 1, woken false)
+PROBE2 R1-OFF run 1: PROBE2 slow 2 ms gap 1 ms: releases (model us) [100243, 101418]; S write returns (model us) [102806, 203841]; B written 102422 us after its release (B's kind 1, woken false)
+PROBE2 R1-OFF run 1: PROBE2 slow 0 ms gap 0 ms: releases (model us) [100168, 100228]; S write returns (model us) [100481, 100487]; B written 258 us after its release (B's kind 0, woken false)
+PROBE2 R1-OFF run 1: test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 162 filtered out; finished in 0.57s
+PROBE2 R1-OFF run 2: PROBE2 slow 30 ms gap 20 ms: releases (model us) [102392, 122571]; S write returns (model us) [133025, 253036]; B written 130464 us after its release (B's kind 1, woken false)
+PROBE2 R1-OFF run 2: PROBE2 slow 2 ms gap 1 ms: releases (model us) [100156, 101307]; S write returns (model us) [102525, 203602]; B written 102295 us after its release (B's kind 1, woken false)
+PROBE2 R1-OFF run 2: PROBE2 slow 0 ms gap 0 ms: releases (model us) [100226, 100282]; S write returns (model us) [100472, 100481]; B written 198 us after its release (B's kind 0, woken false)
+PROBE2 R1-OFF run 2: test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 162 filtered out; finished in 0.57s
+PROBE2 R1-OFF run 3: PROBE2 slow 30 ms gap 20 ms: releases (model us) [102455, 122652]; S write returns (model us) [132855, 253015]; B written 130363 us after its release (B's kind 1, woken false)
+PROBE2 R1-OFF run 3: PROBE2 slow 2 ms gap 1 ms: releases (model us) [100160, 101297]; S write returns (model us) [102570, 203705]; B written 102407 us after its release (B's kind 1, woken false)
+PROBE2 R1-OFF run 3: PROBE2 slow 0 ms gap 0 ms: releases (model us) [100158, 100272]; S write returns (model us) [100567, 100574]; B written 302 us after its release (B's kind 0, woken true)
+PROBE2 R1-OFF run 3: test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 162 filtered out; finished in 0.57s
+REPEAT a_down_record_released_in_a_pump_pass_is_written_or_owed_a_wake: 10/10 passed
+REPEAT an_acknowledgement_an_application_task_steps_that_reopens_the_up_room_wakes_the_pump: 10/10 passed
+REPEAT a_pump_that_panics_gives_the_reader_an_error_never_a_clean_eof: 10/10 passed

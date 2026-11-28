@@ -1,0 +1,3495 @@
+diff --git a/spikes/netcode-proof/Cargo.lock b/spikes/netcode-proof/Cargo.lock
+index 05f46f3..1cf2b3d 100644
+--- a/spikes/netcode-proof/Cargo.lock
++++ b/spikes/netcode-proof/Cargo.lock
+@@ -772,6 +772,10 @@ dependencies = [
+  "minimal-lexical",
+ ]
+ 
++[[package]]
++name = "npt-alloc"
++version = "0.0.0"
++
+ [[package]]
+ name = "npt-bots"
+ version = "0.0.0"
+@@ -883,6 +887,7 @@ dependencies = [
+ name = "npt-proto"
+ version = "0.0.0"
+ dependencies = [
++ "npt-alloc",
+  "npt-link",
+  "npt-sim",
+  "rand_chacha",
+@@ -915,6 +920,7 @@ name = "npt-sim"
+ version = "0.0.0"
+ dependencies = [
+  "libm",
++ "npt-alloc",
+  "rand_chacha",
+  "rand_core",
+ ]
+diff --git a/spikes/netcode-proof/Cargo.toml b/spikes/netcode-proof/Cargo.toml
+index e8cf11b..6c620b6 100644
+--- a/spikes/netcode-proof/Cargo.toml
++++ b/spikes/netcode-proof/Cargo.toml
+@@ -21,7 +21,11 @@ members = [
+     "crates/lab",
+     "crates/tcpinfo",
+     "crates/hash-wasm",
++    "crates/alloc",
+ ]
++# U5: cargo-fuzz's crate (PM-0001-34), built on a dated nightly: a workspace of its own, kept out of this one, with its
++# own lock (fuzz/Cargo.toml's [workspace]; both locks hold every shared package at one version and checksum).
++exclude = ["fuzz"]
+ 
+ [workspace.package]
+ version = "0.0.0"
+@@ -42,6 +46,8 @@ npt-client = { path = "crates/client" }
+ npt-bots = { path = "crates/bots" }
+ npt-log = { path = "crates/log" }
+ npt-tcpinfo = { path = "crates/tcpinfo" }
++# U5: the counting allocator (U5-Q3); at U5 only the fuzz crate's and a dev dependency (npt-sim's, npt-proto's tests).
++npt-alloc = { path = "crates/alloc" }
+ # External crates, exact versions (more join as the units need them, each reviewed: plan §4.8).
+ serde = { version = "=1.0.229", features = ["derive"] }
+ serde_json = "=1.0.154"
+@@ -76,25 +82,28 @@ futures-util = { version = "=0.3.34", default-features = false, features = ["sin
+ 
+ [workspace.lints.rust]
+ # forbid, the compiler backstop (u3c review C2R-1): in a crate that inherits these lints no #[allow] can relax it
+-# (rustc refuses one, a macro-built one too, with E0453), so unsafe code there does not compile. Three crates are ADR
+-# 0002:264-265's exceptions ("an exception needs a written invariant, a test and an #[allow] with its reason") and
+-# carry their own [lints] tables instead, every other lint as here: npt-client-wasm allows unsafe_code for the whole
++# (rustc refuses one, a macro-built one too, with E0453), so unsafe code there does not compile. Four crates are ADR
++# 0002:269's exceptions ("an exception needs a written invariant, a test and an #[allow] with its reason") and carry
++# their own [lints] tables instead, every other lint as here: npt-client-wasm allows unsafe_code for the whole
+ # crate, for wasm-bindgen's generated code (U7); npt-tcpinfo denies it, and its two pub functions in src/linux.rs,
+ # srtt_us and unacked_and_unsent (getsockopt SOL_SOCKET, then getsockopt TCP_INFO or ioctl SIOCOUTQ, on a TCP socket
+ # only), each carry one #[allow(unsafe_code, reason = "...")] (U3c, R20 (a)); npt-hash-wasm denies it, and its seven
+ # exports in src/lib.rs (begin, feed, step, hash_lo, hash_hi, dump_len and dump_word, integers only), each carry one
+-# #[allow(unsafe_code, reason = "...")] for their #[unsafe(no_mangle)], its only unsafe (U4d2). check.mjs's deps step
+-# checks that this line is forbid; that every other member inherits these lints and sets no unsafe_code (nor
+-# unsafe-code); that the three exceptions' tables equal these key for key but for unsafe_code (allow, deny, deny), a
+-# lint given in any form its reader does not read being refused (a lint's own [lints.<tool>.<lint>] table; a quoted,
+-# dotted, hyphenated or uppercase name); that no manifest has a cargo-features or rustflags key; that, as its scan reads
+-# the crates' files, no other crate relaxes the lint or has unsafe code, npt-tcpinfo relaxes it only by those two
+-# allows and has unsafe code only inside them, and npt-hash-wasm relaxes it only by one allow on each listed export,
+-# whose #[unsafe(no_mangle)] is its only unsafe, with u32 or i32 parameters and results; that no #[path] or include!
+-# literal, manifest target path or symbolic link compiles a file outside its crate; and that the environment and
+-# cargo configs it reads pass no lint-lowering rustflags and set no clippy or fmt alias, other rustc, workspace
+-# wrapper, config include or test runner, and that the environment sets neither RUSTC_BOOTSTRAP nor cargo's channel
+-# override (__CARGO_TEST_CHANNEL_OVERRIDE_DO_NOT_USE_THIS). That scan guards against
++# #[allow(unsafe_code, reason = "...")] for their #[unsafe(no_mangle)], its only unsafe (U4d2); npt-alloc denies it,
++# and its one `unsafe impl GlobalAlloc` over `System` in src/lib.rs carries one #[allow(unsafe_code, reason = "...")]
++# (U5, the advisor's U5-Q3 ruling). The fuzz crate (fuzz/, excluded above) holds these lints in its own tables, key for
++# key (U5-Q7). check.mjs's deps step checks that this line is forbid; that every other member inherits these lints and
++# sets no unsafe_code (nor unsafe-code); that the four exceptions' tables equal these key for key but for unsafe_code
++# (allow, deny, deny, deny), and the fuzz crate's equal them, a lint given in any form its reader does not read being
++# refused (a lint's own [lints.<tool>.<lint>] table; a quoted, dotted, hyphenated or uppercase name); that no manifest
++# has a cargo-features or rustflags key; that, as its scan reads the crates' files and the fuzz crate's, no other crate
++# relaxes the lint or has unsafe code, npt-tcpinfo relaxes it only by those two allows and has unsafe code only inside
++# them, npt-alloc relaxes it only by its one allow and has unsafe code only inside that impl, and npt-hash-wasm relaxes
++# it only by one allow on each listed export, whose #[unsafe(no_mangle)] is its only unsafe, with u32 or i32 parameters
++# and results; that no #[path] or include! literal, manifest target path or symbolic link compiles a file outside its
++# crate; and that the environment and cargo configs it reads pass no lint-lowering rustflags and set no clippy or fmt
++# alias, other rustc, workspace wrapper, config include or test runner, and that the environment sets neither
++# RUSTC_BOOTSTRAP nor cargo's channel override (__CARGO_TEST_CHANNEL_OVERRIDE_DO_NOT_USE_THIS). That scan guards against
+ # an accidental relaxation; review is the wall against a deliberate one. What it does not check is listed above
+ # DEPS_CHECKED in check.mjs (among them a cargo config's [env], a build script's output, a RUSTC_WRAPPER program and
+ # which toolchain runs).
+diff --git a/spikes/netcode-proof/check.mjs b/spikes/netcode-proof/check.mjs
+index fb09487..bb7daed 100644
+--- a/spikes/netcode-proof/check.mjs
++++ b/spikes/netcode-proof/check.mjs
+@@ -12,7 +12,8 @@
+ // npt-room's float-free sources, §4.11, and each bite id in one crate's sources, §4.14; U4a's two: npt-proto's
+ // clippy.toml against npt-sim's, §2, and npt-link's Channel alone in npt-proto and npt-client; and U4d2's: npt-sim's
+ // resolved features in each build that runs it, the build flags with rustc's read-back of them, and npt-hash-wasm's
+-// rules, the spike's third unsafe exception, §5 U4d2); wasm (the determinism check, plan.md §4.5 and u4-build-plan.md
++// rules, the spike's third unsafe exception, §5 U4d2; and U5's: npt-alloc's, the fourth, and the fuzz crate's files,
++// lint tables and lock against the workspace's); wasm (the determinism check, plan.md §4.5 and u4-build-plan.md
+ // §5 U4d2: release builds of npt-lab for x86-64 and npt-hash-wasm for wasm32, measured and bites; the recordings
+ // manifest regenerated and checked; npt-lab's two native legs and the Node loader's Wasm leg over its recordings,
+ // compared tick by tick, with the field diff at a first mismatch; PM-0004-21's cross-target vectors; and its two
+@@ -172,6 +173,17 @@ export function dependencyProblems(meta) {
+       if (d.name === "npt-link" && d.rename) problems.push(`${p.name} renames its npt-link dependency to ${d.rename}`);
+     }
+   }
++  // npt-alloc (U5; the advisor's U5-Q3 ruling, terms 2 and 4): std only, so it has no dependency in any kind, and at U5
++  // no member ships it: dev dependencies (and the fuzz crate, outside the workspace) use it; a normal dependency is U6's
++  // change, with its own read.
++  for (const n of meta.resolve.nodes) {
++    const name = byId.get(n.id).name;
++    for (const d of n.deps) {
++      const dep = byId.get(d.pkg).name;
++      if (name === "npt-alloc") problems.push(`npt-alloc depends on ${dep}`);
++      else if (dep === "npt-alloc" && isShipped(d)) problems.push(`${name} ships npt-alloc: at U5 only a dev dependency may use it`);
++    }
++  }
+   // Nothing depends on npt-lab, in any kind.
+   for (const n of meta.resolve.nodes) {
+     for (const d of n.deps) {
+@@ -182,24 +194,30 @@ export function dependencyProblems(meta) {
+ }
+ 
+ /**
+- * The crates that may relax `unsafe_code`, by folder: ADR 0002:264-265's exceptions ("an exception needs a written
++ * The crates that may relax `unsafe_code`, by folder: ADR 0002:269's exceptions ("an exception needs a written
+  * invariant, a test and an #[allow] with its reason"), named in the workspace Cargo.toml. The workspace forbids the
+- * lint, so these three carry their own [lints] tables in place of `workspace = true` (EXCEPTION_LEVELS):
++ * lint, so these four carry their own [lints] tables in place of `workspace = true` (EXCEPTION_LEVELS):
+  * npt-client-wasm allows it for the whole crate (wasm-bindgen's generated code), so its files are not scanned for it;
+  * npt-tcpinfo denies it, which its two #[allow]s can relax (forbid could not), only through the attributes
+  * TCPINFO_UNSAFE_FNS allows, and has `unsafe` only inside those functions; npt-hash-wasm, the third (U4d2; the
+  * advisor's condition 7), denies it too, and relaxes it only by one #[allow] on each of its listed exports
+- * (HASH_WASM_EXPORTS, the Node loader's list), whose `#[unsafe(no_mangle)]` is its only `unsafe`.
++ * (HASH_WASM_EXPORTS, the Node loader's list), whose `#[unsafe(no_mangle)]` is its only `unsafe`; npt-alloc, the fourth
++ * (U5; the advisor's U5-Q3 ruling), denies it too, and relaxes it only by one #[allow] on its one `unsafe impl
++ * GlobalAlloc` (ALLOC_UNSAFE_FILE), inside which all its `unsafe` lies. The fuzz crate (fuzz/, outside the workspace)
++ * is none of them: it holds the workspace's lints itself, forbid included (fuzzLintProblems), and its files are scanned
++ * as an ordinary crate's are; the two exports libfuzzer-sys's `fuzz_target!` expands into it are a dependency's macro
++ * case beside the four (the advisor's SEC-U5D-1 ruling), held by fuzzProblems and fuzzLockProblems.
+  */
+ export const UNSAFE_EXCEPTIONS = {
+   "crates/client-wasm/": "npt-client-wasm",
+   "crates/tcpinfo/": "npt-tcpinfo",
+   "crates/hash-wasm/": "npt-hash-wasm",
++  "crates/alloc/": "npt-alloc",
+ };
+ /** The unsafe_code level each exception's own [lints.rust] gives, its other lints being the workspace's (review C2R-1). */
+-const EXCEPTION_LEVELS = { "crates/client-wasm/": "allow", "crates/tcpinfo/": "deny", "crates/hash-wasm/": "deny" };
++const EXCEPTION_LEVELS = { "crates/client-wasm/": "allow", "crates/tcpinfo/": "deny", "crates/hash-wasm/": "deny", "crates/alloc/": "deny" };
+ /**
+- * Why a deny-level exception (npt-tcpinfo, npt-hash-wasm) may have no build script and may name `include` only as a
++ * Why a deny-level exception (npt-tcpinfo, npt-hash-wasm, npt-alloc) may have no build script and may name `include` only as a
+  * macro call (the advisor's U4d2 round-1 ruling, FX-6: SEC-U4D2-4, C2R-2's known limit): code a build script writes,
+  * brought in by an `include!` the scan cannot see by its name (`use std::include as inc;`), would sit inside a listed
+  * function's allow, where rustc compiles unsafe code the scan never reads.
+@@ -236,6 +254,55 @@ export const TCPINFO_UNSAFE_FNS = ["srtt_us", "unacked_and_unsent"];
+ const TCPINFO_ROOT = "crates/tcpinfo/src/lib.rs";
+ const TCPINFO_CLIPPY_LINTS = ["undocumented_unsafe_blocks", "multiple_unsafe_ops_per_block"];
+ const TCPINFO_CLIPPY_NAMES = /\b(?:undocumented_unsafe_blocks|multiple_unsafe_ops_per_block|restriction)\b/g;
++/**
++ * npt-alloc's crate root and its one file with unsafe code (U5; the advisor's U5-Q3 ruling, term 1): its only relaxing
++ * attribute sits directly on the one item ALLOC_IMPL reads, in this file, every `unsafe` lies inside that impl, and its
++ * crate-level deny holds the same two clippy lints as npt-tcpinfo's (TCPINFO_CLIPPY_LINTS), named nowhere else.
++ */
++export const ALLOC_UNSAFE_FILE = "crates/alloc/src/lib.rs";
++/** The item npt-alloc's allow may sit on, as the mask reads its head: `unsafe impl GlobalAlloc for <type> {`. */
++const ALLOC_IMPL = /^unsafe\s+impl\s+GlobalAlloc\s+for\s+[A-Za-z_]\w*\s*\{/;
++/** The fuzz crate's folder and manifest (U5; u5-brief.md Block 0; U5-Q7 term 1): read as a crate under crates/ is. */
++export const FUZZ_DIR = "fuzz/";
++export const FUZZ_MANIFEST = "fuzz/Cargo.toml";
++/** Where its target files live, one `fuzz_target!` each (the advisor's SEC-U5D-1 ruling): fuzz/fuzz_targets/<name>.rs. */
++const FUZZ_TARGET_FILE = /^fuzz\/fuzz_targets\/[^/]+\.rs$/;
++/**
++ * The names the fuzz crate may not write (the advisor's SEC-U5D-1 ruling; security-u5-deps.md:109-119): libfuzzer-sys
++ * 0.4.13's two other macros, which expand `#[export_name] pub unsafe fn` into the calling crate; the three attributes
++ * that export or place a symbol; `extern` (a block, an ABI or a crate); and `macro_use`, which imports a crate's
++ * macros by no name the scan sees. Each is refused wherever the mask has it, as a whole word.
++ */
++const FUZZ_REFUSED = /\b(?:fuzz_mutator|fuzz_crossover|no_mangle|export_name|link_section|extern|macro_use)\b/g;
++/**
++ * Why (the advisor's SEC-U5D-1 ruling): the fuzz crate's only exported or unsafe-adjacent code is the two functions
++ * libfuzzer-sys 0.4.13's `fuzz_target!` expands per target (LLVMFuzzerInitialize, rust_fuzzer_test_input), as the
++ * dependency read cleared them (security-u5-deps.md:96-115); rustc does not lint another crate's macro, so its forbid
++ * cannot see a second one.
++ */
++const FUZZ_WHY =
++  "the fuzz crate exports only the two functions one fuzz_target! per target expands, as the read cleared them " +
++  "(security-u5-deps.md:96-115), and rustc's forbid does not see another crate's macro (SEC-U5D-1)";
++/**
++ * The fuzz lock's packages that the workspace lock does not hold, each as the dependency read cleared it
++ * (security-u5-deps.md:49-59, dependency-check.md; the advisor's SEC-U5D-1 ruling): its own crate, libfuzzer-sys and
++ * arbitrary, version, source and full checksum copied from fuzz/Cargo.lock. Any other new package, a second entry of
++ * either, or derive_arbitrary (a proc macro, which arbitrary's `derive` feature would bring) is a dependency no read has
++ * seen.
++ */
++export const FUZZ_LOCK_ONLY = {
++  "npt-fuzz": { version: "0.0.0", source: null, checksum: null },
++  "libfuzzer-sys": {
++    version: "0.4.13",
++    source: "registry+https://github.com/rust-lang/crates.io-index",
++    checksum: "a9fd2f41a1cba099f79a0b6b6c35656cf7c03351a7bae8ff0f28f25270f929d2",
++  },
++  arbitrary: {
++    version: "1.5.0",
++    source: "registry+https://github.com/rust-lang/crates.io-index",
++    checksum: "3bc62ac97cc33321f50863d514c3bc38a453947a8f9e781137e47c7401020aed",
++  },
++};
+ 
+ /**
+  * An attribute that relaxes unsafe_code: allow, expect or warn naming it in its list, alone or among other lints, raw
+@@ -257,15 +324,15 @@ const UNSAFE_CODE_NAME = /\bunsafe[-_]code\b/i;
+  * the unsafe_code lint denies that edition 2024 lets go without the keyword (`#[no_mangle]`, `#[export_name]` and
+  * `#[link_section]` need `#[unsafe(...)]` there; rustc 1.99.1 compiles a macro-built `#[allow($l)]` over
+  * `global_asm!("")` with no `unsafe` in sight). Found in code, they are unsafe code whatever relaxed the lint: an
+- * attribute this scan cannot read (one built by a macro), rustflags or `--cap-lints`. In every crate but the three
++ * attribute this scan cannot read (one built by a macro), rustflags or `--cap-lints`. In every crate but the four
+  * exceptions the compiler refuses them first (the workspace's forbid: E0453 on any allow, a macro-built one included);
+- * this scan is the second layer there, and inside npt-tcpinfo and npt-hash-wasm the only one.
++ * this scan is the second layer there, and inside npt-tcpinfo, npt-hash-wasm and npt-alloc the only one.
+  */
+ const UNSAFE_CODE = /(?<!r#)\bunsafe\b|\bglobal_asm\b/g;
+ /** The one form npt-tcpinfo may use: `allow(unsafe_code, reason = "...")` and nothing else in the attribute. */
+ const PLACED_ALLOW = /^\s*allow\s*\(\s*unsafe_code\s*,\s*reason\s*=\s*"((?:[^"\\]|\\[\s\S])*)"\s*,?\s*\)\s*$/;
+ /**
+- * Whether an attribute body is PLACED_ALLOW with a reason that says something (ADR 0002:264-265: "an #[allow] with its
++ * Whether an attribute body is PLACED_ALLOW with a reason that says something (ADR 0002:269: "an #[allow] with its
+  * reason"): a letter or a digit once escapes and line continuations are taken out, so `reason = ""` or `"\n"` fails.
+  */
+ const isPlacedAllow = (body) =>
+@@ -280,8 +347,8 @@ const isPlacedAllow = (body) =>
+  * blank the code after it.
+  * Known limit (review C2R-1): this is not rustc's lexer. A first line `#!...` (a shebang, which rustc drops from any
+  * source file) or a `\u{...}` escape with underscores past six characters puts it out of step, so text rustc compiles
+- * can read here as a comment or a literal. Outside the three exception crates the workspace's forbid makes rustc refuse
+- * unsafe code this misses; inside npt-tcpinfo and npt-hash-wasm (deny, not forbid) nothing but review does.
++ * can read here as a comment or a literal. Outside the four exception crates the workspace's forbid makes rustc refuse
++ * unsafe code this misses; inside npt-tcpinfo, npt-hash-wasm and npt-alloc (deny, not forbid) nothing but review does.
+  */
+ export function lexRust(src) {
+   const blank = (s) => s.replace(/[^\n]/g, " ");
+@@ -355,16 +422,32 @@ function rustAttributes(mask) {
+  * message), `fn` its name when it is a `pub fn`, else null.
+  */
+ function itemAfter(mask, at, attrs) {
++  const rest = mask.slice(itemStart(mask, at, attrs));
++  const item = rest.split("\n", 1)[0].trim() || "(nothing)";
++  return { item, fn: rest.match(/^pub\s+fn\s+([A-Za-z_]\w*)\s*[<(]/)?.[1] ?? null };
++}
++
++/** Where the item an outer attribute ending at `at` sits on begins in the mask, whitespace and outer attributes skipped. */
++function itemStart(mask, at, attrs) {
+   let j = at;
+   for (;;) {
+     while (j < mask.length && /\s/.test(mask[j])) j++;
+     const next = attrs.find((a) => a.start === j && !a.inner);
+-    if (!next) break;
++    if (!next) return j;
+     j = next.end;
+   }
+-  const rest = mask.slice(j);
+-  const item = rest.split("\n", 1)[0].trim() || "(nothing)";
+-  return { item, fn: rest.match(/^pub\s+fn\s+([A-Za-z_]\w*)\s*[<(]/)?.[1] ?? null };
++}
++
++/** The end (one past its `}`) of the block whose `{` is at `open` in the mask. */
++function blockEnd(mask, open) {
++  let depth = 0;
++  let j = open;
++  do {
++    if (mask[j] === "{") depth++;
++    else if (mask[j] === "}") depth--;
++    j++;
++  } while (depth > 0 && j < mask.length);
++  return j;
+ }
+ 
+ const lineAt = (text, offset) => text.slice(0, offset).split("\n").length;
+@@ -483,32 +566,127 @@ function tcpinfoProblems(f, code, mask, attrs, sites, state) {
+         TCPINFO_UNSAFE_FILE,
+     );
+   }
+-  // The crate-level deny: an inner attribute outside every brace (so it is the file's own, the crate root's when the
+-  // file is lib.rs), its body deny(...) or forbid(...) naming both lints, a raw identifier allowed.
+-  const rootDeny =
+-    f === TCPINFO_ROOT
+-      ? attrs.find((a) => {
+-          if (!a.inner) return false;
+-          const before = mask.slice(0, a.start);
+-          if ((before.match(/\{/g)?.length ?? 0) !== (before.match(/\}/g)?.length ?? 0)) return false;
+-          const body = mask.slice(a.bodyStart, a.bodyEnd);
+-          return (
+-            /^\s*(?:deny|forbid)\s*\(/.test(body) &&
+-            TCPINFO_CLIPPY_LINTS.every((l) => new RegExp(`\\bclippy\\s*::\\s*(?:r#)?${l}\\b`).test(body))
+-          );
+-        })
+-      : undefined;
++  const rootDeny = f === TCPINFO_ROOT ? crateRootDeny(mask, attrs) : undefined;
+   if (rootDeny) state.rootDeny = true;
++  problems.push(...clippyNameProblems(f, mask, rootDeny, TCPINFO_ROOT));
++  return problems;
++}
++
++/**
++ * A crate root's deny of the two clippy unsafe lints (TCPINFO_CLIPPY_LINTS), as npt-tcpinfo's and npt-alloc's lib.rs
++ * hold it: an inner attribute outside every brace (so it is the file's own, the crate root's when the file is lib.rs),
++ * its body deny(...) or forbid(...) naming both lints, a raw identifier allowed; undefined when there is none.
++ */
++function crateRootDeny(mask, attrs) {
++  return attrs.find((a) => {
++    if (!a.inner) return false;
++    const before = mask.slice(0, a.start);
++    if ((before.match(/\{/g)?.length ?? 0) !== (before.match(/\}/g)?.length ?? 0)) return false;
++    const body = mask.slice(a.bodyStart, a.bodyEnd);
++    return (
++      /^\s*(?:deny|forbid)\s*\(/.test(body) &&
++      TCPINFO_CLIPPY_LINTS.every((l) => new RegExp(`\\bclippy\\s*::\\s*(?:r#)?${l}\\b`).test(body))
++    );
++  });
++}
++
++/** Each place in a file of a deny-level exception that names the two clippy lints or their group outside `root`'s deny. */
++function clippyNameProblems(f, mask, rootDeny, root) {
++  const problems = [];
+   for (const m of mask.matchAll(TCPINFO_CLIPPY_NAMES)) {
+     if (rootDeny && m.index >= rootDeny.start && m.index < rootDeny.end) continue;
+     problems.push(
+-      `${f}:${lineAt(mask, m.index)} names clippy's ${m[0]} outside ${TCPINFO_ROOT}'s crate-level deny (relaxing it ` +
++      `${f}:${lineAt(mask, m.index)} names clippy's ${m[0]} outside ${root}'s crate-level deny (relaxing it ` +
+         "would let an unsafe block go without its SAFETY comment or hold more than one unsafe operation)",
+     );
+   }
+   return problems;
+ }
+ 
++/**
++ * npt-alloc's rules (the spike's fourth unsafe exception: the advisor's U5-Q3 ruling, term 1), each broken one
++ * reported with its line, in tcpinfoProblems' pattern:
++ * - every relaxing of unsafe_code in the crate is an outer `#[allow(unsafe_code, reason = "...")]` in ALLOC_UNSAFE_FILE
++ *   sitting directly on `unsafe impl GlobalAlloc for <type> {` (ALLOC_IMPL; other outer attributes may sit between),
++ *   its reason not empty; anything else (an inner attribute, cfg_attr, expect or warn, an allow on a function, a module
++ *   or any other item, a mention in a string or a macro's text, `unsafe_code` named in code outside an attribute) is a
++ *   problem; `state.allocSites` counts the placed allows (one, checked by the caller);
++ * - every `unsafe` (and `global_asm!`) lies inside such an impl, from its `unsafe` to its closing brace: the impl's own,
++ *   its `unsafe fn` methods and their one-operation blocks;
++ * - the two clippy lints of TCPINFO_CLIPPY_LINTS, and their group, are named only in ALLOC_UNSAFE_FILE's crate-level
++ *   deny, which must deny both: `state.allocRootDeny` records that it does.
++ */
++function allocProblems(f, code, mask, attrs, state) {
++  const problems = [];
++  const where = `the one \`unsafe impl GlobalAlloc for <type>\` in ${ALLOC_UNSAFE_FILE}`;
++  const inAttribute = (i) => attrs.some((a) => i >= a.start && i < a.end);
++  const impls = [];
++  let inAttributes = 0;
++  for (const a of attrs) {
++    if (!mask.slice(a.bodyStart, a.bodyEnd).match(RELAX_UNSAFE)) continue;
++    const body = code.slice(a.bodyStart, a.bodyEnd);
++    inAttributes += body.match(RELAX_UNSAFE)?.length ?? 0;
++    const at = a.inner ? -1 : itemStart(mask, a.end, attrs);
++    const head = at < 0 ? null : mask.slice(at).match(ALLOC_IMPL);
++    if (f === ALLOC_UNSAFE_FILE && head && isPlacedAllow(body)) {
++      state.allocSites += 1;
++      impls.push([at, blockEnd(mask, at + head[0].length - 1)]);
++    } else {
++      const on = a.inner ? "its whole module or crate (#!)" : `\`${itemAfter(mask, a.end, attrs).item}\``;
++      problems.push(`${f}:${lineAt(code, a.start)} relaxes unsafe_code on ${on}; npt-alloc may only put #[allow(unsafe_code, reason = "...")] directly on ${where}`);
++    }
++  }
++  const all = code.match(RELAX_UNSAFE)?.length ?? 0;
++  if (all > inAttributes) problems.push(`${f} names an unsafe_code relaxing outside an attribute (a string or a macro's text)`);
++  for (const m of mask.matchAll(/\bunsafe_code\b/g)) {
++    if (!inAttribute(m.index)) {
++      problems.push(`${f}:${lineAt(mask, m.index)} names unsafe_code outside an attribute (a macro can build the attribute from it)`);
++    }
++  }
++  for (const m of mask.matchAll(UNSAFE_CODE)) {
++    if (impls.some(([s, e]) => m.index >= s && m.index < e)) continue;
++    problems.push(`${f}:${lineAt(mask, m.index)} has \`${m[0]}\` outside ${where}`);
++  }
++  const rootDeny = f === ALLOC_UNSAFE_FILE ? crateRootDeny(mask, attrs) : undefined;
++  if (rootDeny) state.allocRootDeny = true;
++  problems.push(...clippyNameProblems(f, mask, rootDeny, ALLOC_UNSAFE_FILE));
++  return problems;
++}
++
++/**
++ * The fuzz crate's own rules for one of its .rs files (the advisor's SEC-U5D-1 ruling; SEC-U5D-3), beside the scan an
++ * ordinary crate's file gets (no relaxing, no unsafe, every #[path] and include! inside it), each broken one reported
++ * with its line, as the mask reads the code:
++ * - none of FUZZ_REFUSED's names: libfuzzer-sys's fuzz_mutator! and fuzz_crossover!, a hand-written no_mangle,
++ *   export_name or link_section, `extern`, `macro_use`;
++ * - `libfuzzer_sys` named only as the path `libfuzzer_sys::fuzz_target`, never renamed (`as`): no glob or group
++ *   import, no other item of the crate, no `extern crate`;
++ * - each target file (fuzz/fuzz_targets/<name>.rs: one per [[bin]]) calls `fuzz_target!` exactly once, and no other
++ *   file names it, so each binary holds the two exports once.
++ */
++function fuzzProblems(f, mask) {
++  const problems = [];
++  for (const m of mask.matchAll(FUZZ_REFUSED)) {
++    problems.push(`${f}:${lineAt(mask, m.index)} names \`${m[0]}\`, which the fuzz crate may not: ${FUZZ_WHY}`);
++  }
++  for (const m of mask.matchAll(/\blibfuzzer_sys\b/g)) {
++    if (/^libfuzzer_sys\s*::\s*fuzz_target\b(?!\s*as\b)/.test(mask.slice(m.index))) continue;
++    problems.push(
++      `${f}:${lineAt(mask, m.index)} names libfuzzer_sys other than as the path libfuzzer_sys::fuzz_target (a glob, a ` +
++        `group, a rename, another item or extern crate): ${FUZZ_WHY}`,
++    );
++  }
++  const calls = [...mask.matchAll(/\bfuzz_target\s*!/g)];
++  if (FUZZ_TARGET_FILE.test(f) && calls.length !== 1) {
++    problems.push(`${f} calls fuzz_target! ${calls.length} times, not once: ${FUZZ_WHY}`);
++  } else if (!FUZZ_TARGET_FILE.test(f)) {
++    for (const m of calls) {
++      problems.push(`${f}:${lineAt(mask, m.index)} calls fuzz_target! outside fuzz/fuzz_targets/<name>.rs: ${FUZZ_WHY}`);
++    }
++  }
++  return problems;
++}
++
+ /**
+  * The item an outer attribute ending at `at` sits on, other outer attributes skipped, read for npt-hash-wasm's exports:
+  * `item` its first line as written (from `code`), `export` its name when it is `pub extern "C" fn <name>(` with the
+@@ -516,13 +694,7 @@ function tcpinfoProblems(f, code, mask, attrs, sites, state) {
+  * is read from `code`.
+  */
+ function exportAfter(code, mask, at, attrs) {
+-  let j = at;
+-  for (;;) {
+-    while (j < mask.length && /\s/.test(mask[j])) j++;
+-    const next = attrs.find((a) => a.start === j && !a.inner);
+-    if (!next) break;
+-    j = next.end;
+-  }
++  const j = itemStart(mask, at, attrs);
+   const item = code.slice(j).split("\n", 1)[0].trim() || "(nothing)";
+   const name = code.slice(j).match(/^pub\s+extern\s+"C"\s+fn\s+([A-Za-z_]\w*)\s*\(/)?.[1] ?? null;
+   return { item, export: name && HASH_WASM_EXPORTS.includes(name) ? name : null };
+@@ -632,12 +804,19 @@ function inheritsWorkspaceLints(text) {
+ }
+ 
+ /**
+- * Every place under crates/ that breaks the unsafe_code rule, as a sentence; empty when none does (u3c-plan.md 1.8 (a)
+- * and (d)). `files` are paths relative to the spike's folder (crates/<crate>/...): its .rs files and crate manifests.
+- * What is caught, as lexRust reads the code (its known limit is there):
+- * - outside the three exception crates, any `allow`, `expect` or `warn` of unsafe_code in a .rs file, comments included
++ * Every place under crates/ and fuzz/ that breaks the unsafe_code rule, as a sentence; empty when none does (u3c-plan.md
++ * 1.8 (a) and (d); U5-Q7 term 1). `files` are paths relative to the spike's folder (crates/<crate>/... and fuzz/...):
++ * their .rs files and manifests. fuzz/ is read as a crate under crates/ is. What is caught, as lexRust reads the code
++ * (its known limit is there):
++ * - outside the four exception crates, any `allow`, `expect` or `warn` of unsafe_code in a .rs file, comments included
+  *   (and a comment or literal inside the attribute's list), and any `unsafe` or `global_asm!` in code;
+- * - a manifest other than the three exceptions' that names unsafe_code outside its comments (UNSAFE_CODE_NAME:
++ * - in npt-alloc, any relaxing but the one placed allow on its `unsafe impl GlobalAlloc`, `unsafe` outside that impl,
++ *   the two clippy lints named outside lib.rs's crate-level deny or that deny missing (allocProblems), and no allow or
++ *   two;
++ * - in the fuzz crate, fuzzProblems' rules (no libfuzzer_sys macro but one `fuzz_target!` per target file, no
++ *   hand-written export, `extern` or `macro_use`), and a build.rs or a `build` key; its lint tables are
++ *   fuzzLintProblems', its lock fuzzLockProblems';
++ * - a manifest other than the four exceptions' and the fuzz crate's that names unsafe_code outside its comments (UNSAFE_CODE_NAME:
+  *   `unsafe-code` too) or does not inherit the workspace lints, as read outside its strings and comments
+  *   (inheritsWorkspaceLints; the exceptions' own tables are exceptionLintProblems');
+  * - in npt-tcpinfo, any relaxing but the two placed allows, `unsafe` outside their two functions, the two clippy lints
+@@ -645,7 +824,7 @@ function inheritsWorkspaceLints(text) {
+  * - in npt-hash-wasm, any relaxing but one placed allow on each listed export, any `unsafe` but a listed export's
+  *   `#[unsafe(no_mangle)]`, a listed export whose parameters or result are not u32 or i32 (hashWasmProblems), and a
+  *   listed export with no allow or two;
+- * - in npt-tcpinfo and npt-hash-wasm (EXCEPTION_LEVELS' deny), a build.rs at the crate's root, a `build` key in its
++ * - in npt-tcpinfo, npt-hash-wasm and npt-alloc (EXCEPTION_LEVELS' deny), a build.rs at the crate's root, a `build` key in its
+  *   manifest, and `include` named other than as an include!, include_str! or include_bytes! call (the advisor's U4d2
+  *   round-1 ruling, FX-6: SEC-U4D2-4); layoutProblems refuses a custom-build target there too;
+  * - in every crate, a #[path] or include! whose literal names anything but a .rs file inside the crate's folder
+@@ -659,10 +838,10 @@ export function unsafeProblems(files, read) {
+   const problems = [];
+   const sites = new Map();
+   const hashSites = new Map();
+-  const state = { rootDeny: false };
++  const state = { rootDeny: false, allocSites: 0, allocRootDeny: false };
+   const others = exceptionNames();
+   for (const f of files) {
+-    const crate = f.match(/^crates\/[^/]+\//)?.[0];
++    const crate = f.match(/^crates\/[^/]+\//)?.[0] ?? (f.startsWith(FUZZ_DIR) ? FUZZ_DIR : undefined);
+     if (!crate) continue;
+     const text = read(f);
+     if (f.endsWith(".rs")) {
+@@ -677,6 +856,11 @@ export function unsafeProblems(files, read) {
+       }
+       if (crate === "crates/tcpinfo/") problems.push(...tcpinfoProblems(f, code, mask, attrs, sites, state));
+       if (crate === "crates/hash-wasm/") problems.push(...hashWasmProblems(f, code, mask, attrs, hashSites));
++      if (crate === "crates/alloc/") problems.push(...allocProblems(f, code, mask, attrs, state));
++      if (crate === FUZZ_DIR) {
++        problems.push(...fuzzProblems(f, mask));
++        if (f === `${FUZZ_DIR}build.rs`) problems.push(`${f} is a build script in the fuzz crate, which may have none (U5-Q7 term 1): ${FUZZ_WHY}`);
++      }
+       if (EXCEPTION_LEVELS[crate] === "deny") {
+         const name = UNSAFE_EXCEPTIONS[crate];
+         if (f === `${crate}build.rs`) problems.push(`${f} is a build script in ${name}, which may have none: ${DENY_EXCEPTION_WHY}`);
+@@ -705,6 +889,11 @@ export function unsafeProblems(files, read) {
+       if (tomlValues(tomlScan(text), "build").length) {
+         problems.push(`${f} has a key \`build\`: a build script in ${UNSAFE_EXCEPTIONS[crate]}, which may have none: ${DENY_EXCEPTION_WHY}`);
+       }
++    } else if (crate === FUZZ_DIR) {
++      // Its lint tables are fuzzLintProblems'; a build script is refused in either form, as in a deny-level exception.
++      if (f === FUZZ_MANIFEST && tomlValues(tomlScan(text), "build").length) {
++        problems.push(`${f} has a key \`build\`: a build script in the fuzz crate, which may have none (U5-Q7 term 1): ${FUZZ_WHY}`);
++      }
+     } else if (f === `${crate}Cargo.toml` && !(crate in UNSAFE_EXCEPTIONS)) {
+       // The name is looked for outside comments, strings included (a quoted key is the lint to cargo; a string that
+       // names it fails closed), in tomlScan's `clean`: a `#` inside a string is no comment there (review C2c N2's
+@@ -724,6 +913,12 @@ export function unsafeProblems(files, read) {
+     const n = hashSites.get(fn) ?? 0;
+     if (n !== 1) problems.push(`npt-hash-wasm's export ${fn} has ${n} #[allow(unsafe_code, reason = ...)] attributes, not 1`);
+   }
++  if (state.allocSites !== 1) {
++    problems.push(`npt-alloc's unsafe impl GlobalAlloc has ${state.allocSites} #[allow(unsafe_code, reason = ...)] attributes, not 1`);
++  }
++  if (!state.allocRootDeny) {
++    problems.push(`${ALLOC_UNSAFE_FILE} does not deny clippy::${TCPINFO_CLIPPY_LINTS.join(" and clippy::")} at the crate root`);
++  }
+   return problems;
+ }
+ 
+@@ -731,13 +926,14 @@ export function unsafeProblems(files, read) {
+  * The spike's crate files the unsafe_code scan reads, under `cratesDir` (the spike's crates/): every .rs file and crate
+  * manifest, as crates/<crate>/..., in every folder (a `target` or dot folder too: `mod target;` or a #[path] into one
+  * compiles it); and every symbolic link there, which the deps step refuses: rustc follows one, so a link can compile
+- * another crate's file under this crate's name, and whether a walk follows it depends on Node's version.
++ * another crate's file under this crate's name, and whether a walk follows it depends on Node's version. `prefix`
++ * names the folder in the paths given: "crates", or "fuzz" for the fuzz crate's folder, read the same way (U5-Q7 term 1).
+  */
+-export function crateFiles(cratesDir) {
++export function crateFiles(cratesDir, prefix = "crates") {
+   const files = [];
+   const links = [];
+   for (const e of readdirSync(cratesDir, { recursive: true, withFileTypes: true })) {
+-    const f = `crates/${relative(cratesDir, join(e.parentPath, e.name)).split(sep).join("/")}`;
++    const f = `${prefix}/${relative(cratesDir, join(e.parentPath, e.name)).split(sep).join("/")}`;
+     if (e.isSymbolicLink()) links.push(f);
+     else if (e.isFile() && (f.endsWith(".rs") || f.endsWith("/Cargo.toml"))) files.push(f);
+   }
+@@ -1213,11 +1409,11 @@ export function workspaceLintProblems(text) {
+ }
+ 
+ /**
+- * The three exceptions' own lint tables (review C2R-1; replacing u3c-plan.md 1.8 (a)'s "keep [lints] workspace = true"
++ * The four exceptions' own lint tables (review C2R-1; replacing u3c-plan.md 1.8 (a)'s "keep [lints] workspace = true"
+  * for npt-tcpinfo, the advisor's ruling of 2026-11-08): each crate's `[lints.<tool>]` tables hold exactly the
+  * workspace's `[workspace.lints.<tool>]` keys and values, every tool and key, but unsafe_code, which is
+- * EXCEPTION_LEVELS' level: "deny" for npt-tcpinfo (its two #[allow]s need a level they can relax) and for
+- * npt-hash-wasm (its seven, U4d2), "allow" for npt-client-wasm. Key for key as cargo reads the manifest: any lint given in a form lintTables does not read (a lint's
++ * EXCEPTION_LEVELS' level: "deny" for npt-tcpinfo (its two #[allow]s need a level they can relax), for
++ * npt-hash-wasm (its seven, U4d2) and for npt-alloc (its one, U5), "allow" for npt-client-wasm. Key for key as cargo reads the manifest: any lint given in a form lintTables does not read (a lint's
+  * own sub-table, a quoted, dotted, hyphenated or uppercase name, a dotted key or an inline table elsewhere) is reported
+  * with them (review C2b F1: a `[lints.clippy.iter-over-hash-type]` table with level "allow" had relaxed the clippy
+  * deny unseen). So leaving the workspace's lints costs them nothing else. `read(path)` reads a file under the spike.
+@@ -1235,24 +1431,99 @@ export function exceptionLintProblems(workspaceText, read) {
+       continue;
+     }
+     const own = lintTables(text, "", f);
+-    problems.push(...own.problems);
+-    for (const tool of new Set([...ws.tables.keys(), ...own.tables.keys()])) {
+-      const want = ws.tables.get(tool) ?? new Map();
+-      const got = own.tables.get(tool) ?? new Map();
+-      for (const key of new Set([...want.keys(), ...got.keys()])) {
+-        if (tool === "rust" && key === "unsafe_code") continue;
+-        const lint = `[lints.${tool}] ${key}`;
+-        if (!got.has(key)) problems.push(`${f} has no ${lint}: the workspace's is ${want.get(key)}`);
+-        else if (!want.has(key)) problems.push(`${f} sets ${lint} = ${got.get(key)}, which the workspace does not`);
+-        else if (got.get(key) !== want.get(key)) problems.push(`${f} sets ${lint} = ${got.get(key)}, not the workspace's ${want.get(key)}`);
+-      }
+-    }
++    problems.push(...own.problems, ...tableDifferences(f, ws.tables, own.tables, true));
+     const ownLevel = own.tables.get("rust")?.get("unsafe_code");
+     if (ownLevel !== `"${level}"`) problems.push(`${f} sets [lints.rust] unsafe_code = ${ownLevel ?? "nothing"}, not "${level}"`);
+   }
+   return problems;
+ }
+ 
++/** Every key where `f`'s own lint tables differ from the workspace's, unsafe_code left out when `skipUnsafe` is set. */
++function tableDifferences(f, wsTables, ownTables, skipUnsafe) {
++  const problems = [];
++  for (const tool of new Set([...wsTables.keys(), ...ownTables.keys()])) {
++    const want = wsTables.get(tool) ?? new Map();
++    const got = ownTables.get(tool) ?? new Map();
++    for (const key of new Set([...want.keys(), ...got.keys()])) {
++      if (skipUnsafe && tool === "rust" && key === "unsafe_code") continue;
++      const lint = `[lints.${tool}] ${key}`;
++      if (!got.has(key)) problems.push(`${f} has no ${lint}: the workspace's is ${want.get(key)}`);
++      else if (!want.has(key)) problems.push(`${f} sets ${lint} = ${got.get(key)}, which the workspace does not`);
++      else if (got.get(key) !== want.get(key)) problems.push(`${f} sets ${lint} = ${got.get(key)}, not the workspace's ${want.get(key)}`);
++    }
++  }
++  return problems;
++}
++
++/**
++ * The fuzz crate's lint tables (U5-Q7 term 1): outside the workspace, its `[lints.<tool>]` tables hold exactly the
++ * workspace's `[workspace.lints.<tool>]` keys and values, unsafe_code's forbid included, read as exceptionLintProblems
++ * reads an exception's (a lint in a form lintTables does not read is reported).
++ */
++export function fuzzLintProblems(workspaceText, fuzzText) {
++  const ws = lintTables(workspaceText, "workspace.", "Cargo.toml");
++  const own = lintTables(fuzzText, "", FUZZ_MANIFEST);
++  return [...own.problems, ...tableDifferences(FUZZ_MANIFEST, ws.tables, own.tables, false)];
++}
++
++/**
++ * A Cargo.lock's packages as cargo writes them, each `[[package]]` table's name, version, source and checksum (null
++ * when it has none: a path package). Not a TOML parser: a package whose name or version it cannot read is returned
++ * with null there, which fuzzLockProblems reports.
++ */
++export function lockPackages(text) {
++  return text
++    .split(/^\[\[package\]\][ \t\r]*$/m)
++    .slice(1)
++    .map((block) => {
++      const field = (k) => block.match(new RegExp(`^${k} = "([^"\\\\]*)"[ \\t\\r]*$`, "m"))?.[1] ?? null;
++      return { name: field("name"), version: field("version"), source: field("source"), checksum: field("checksum") };
++    });
++}
++
++/**
++ * The fuzz lock against the workspace lock (ADV-U5B-3; the advisor's SEC-U5D-1 ruling): every package of the fuzz lock
++ * that the workspace lock also names is there at the same version, source and checksum; FUZZ_LOCK_ONLY's three are
++ * each there exactly once, as the read cleared them; no derive_arbitrary; and no other package the workspace lock lacks.
++ */
++export function fuzzLockProblems(workspaceLock, fuzzLock) {
++  const problems = [];
++  const ws = lockPackages(workspaceLock);
++  const fz = lockPackages(fuzzLock);
++  const shown = (p) => `${p.name} ${p.version} (source ${p.source ?? "none"}, checksum ${p.checksum ?? "none"})`;
++  for (const [name, pin] of Object.entries(FUZZ_LOCK_ONLY)) {
++    const held = fz.filter((p) => p.name === name);
++    const want = shown({ name, ...pin });
++    if (held.length !== 1) problems.push(`fuzz/Cargo.lock holds ${held.length} ${name} entries, not 1: the read cleared ${want}`);
++    for (const p of held) {
++      if (p.version !== pin.version || p.source !== pin.source || p.checksum !== pin.checksum) {
++        problems.push(`fuzz/Cargo.lock holds ${shown(p)}, not ${want} as the read cleared it`);
++      }
++    }
++  }
++  for (const p of fz) {
++    if (p.name === null || p.version === null) {
++      problems.push("fuzz/Cargo.lock has a [[package]] whose name or version this check cannot read");
++      continue;
++    }
++    if (p.name in FUZZ_LOCK_ONLY) continue;
++    if (p.name === "derive_arbitrary") {
++      problems.push(`fuzz/Cargo.lock holds ${shown(p)}: a proc macro (arbitrary's derive feature) no read has seen`);
++      continue;
++    }
++    const same = ws.find((w) => w.name === p.name && w.version === p.version);
++    const named = ws.filter((w) => w.name === p.name);
++    if (same && (same.source !== p.source || same.checksum !== p.checksum)) {
++      problems.push(`fuzz/Cargo.lock holds ${shown(p)}, Cargo.lock ${shown(same)}: one package, one source and checksum`);
++    } else if (!same && named.length) {
++      problems.push(`fuzz/Cargo.lock holds ${shown(p)}, Cargo.lock ${named.map((w) => w.version).join(" and ")}: every package both locks hold has one version`);
++    } else if (!same) {
++      problems.push(`fuzz/Cargo.lock holds ${shown(p)}, which Cargo.lock does not and the read did not clear (FUZZ_LOCK_ONLY)`);
++    }
++  }
++  return problems;
++}
++
+ /**
+  * Where the crates' code comes from, read from `cargo metadata` (u3c review F-E and S5 (c)): every workspace member's
+  * manifest is crates/<folder>/Cargo.toml (the unsafe_code scan reads crates/ only), and every target it builds (lib,
+@@ -2068,11 +2339,11 @@ export function testBothBuilds(runner = run) {
+  *
+  * The static unsafe scan guards against an accidental relaxation; review, and U5's audit, are the wall against a
+  * deliberate one. Between them stands the compiler: under the workspace's forbid, rustc refuses unsafe code and any
+- * allow of the lint (E0453, a macro-built allow included) in every crate but the three exceptions, whatever the scan
++ * allow of the lint (E0453, a macro-built allow included) in every crate but the four exceptions, whatever the scan
+  * misreads. Known limits, which the step does not report:
+  * - lexRust is not rustc's lexer (a shebang line; a `\u{...}` escape with underscores past six characters: review
+  *   C2R-1), and pathProblems reads a #[path] or include! literal with its escapes undecoded and include! by its name
+- *   only (C2R-2). The compiler covers both in the crates under the forbid; inside npt-tcpinfo and npt-hash-wasm only
++ *   only (C2R-2). The compiler covers both in the crates under the forbid; inside npt-tcpinfo, npt-hash-wasm and npt-alloc only
+  *   review does.
+  * - The build-flag scan and rustc's read-back read the rustflags sources above, not a build script's
+  *   `cargo::rustc-flags` or a RUSTC_WRAPPER's own flags. No source may hold a flag (buildInputProblems: the advisor's
+@@ -2093,7 +2364,9 @@ export function testBothBuilds(runner = run) {
+  *   __CARGO_TEST_CHANNEL_OVERRIDE_DO_NOT_USE_THIS (C2c N3). Any other way to unlock them on a stable toolchain (another
+  *   variable, a patched or rebuilt cargo or rustc) is out of the scan's reach.
+  * - Unsafe code a dependency's macro expands into a crate is not linted by rustc (another crate's code); the
+- *   dependencies are U5's audit.
++ *   dependencies are U5's audit. The one such case the spike has, libfuzzer-sys 0.4.13's `fuzz_target!` (two
++ *   `#[no_mangle]` exports per fuzz target, read in security-u5-deps.md:96-115; the advisor's SEC-U5D-1 ruling), is held
++ *   by name: fuzzProblems allows only that macro, once per target file, and fuzzLockProblems only that version.
+  * - Too wide, not too narrow: the runner refusal covers every target triple, so a wasm32 test runner
+  *   (wasm-bindgen-test's `[target.wasm32-unknown-unknown] runner`) would be refused too, though the test step runs host
+  *   tests only (review C2b's note). The wasm step's Wasm legs need none: they are a Node script (crates/hash-wasm's
+@@ -2103,16 +2376,22 @@ const DEPS_CHECKED =
+   "held: no leaf crate reaches a transport or runtime; npt-client has no npt-net; npt-super and npt-host keep off the " +
+   "sim, room, proto (and client) crates; npt-judge ships npt-log and serde only; npt-tcpinfo ships libc only and only " +
+   "npt-net uses it; npt-net has no direct libc; npt-sim ships libm, rand_chacha and rand_core only; npt-hash-wasm " +
+-  "ships npt-sim only; nothing depends on npt-lab or npt-hash-wasm; the workspace forbids unsafe_code and " +
+-  "every member inherits its lints but npt-client-wasm (allow), npt-tcpinfo (deny) and npt-hash-wasm (deny), whose own " +
+-  "lint tables are the workspace's otherwise, key for key, with no lint given in a form the reader does not read (a " +
++  "ships npt-sim only; nothing depends on npt-lab or npt-hash-wasm; npt-alloc has no dependency and no member ships " +
++  "it; the workspace forbids unsafe_code and " +
++  "every member inherits its lints but npt-client-wasm (allow), npt-tcpinfo (deny), npt-hash-wasm (deny) and npt-alloc " +
++  "(deny), whose own lint tables are the workspace's otherwise, key for key, and the fuzz crate holds them in its own, " +
++  "key for key, forbid included, with no lint given in a form the reader does not read (a " +
+   "lint's own table, a quoted, dotted, hyphenated or uppercase name); no manifest has a cargo-features or rustflags " +
+-  "key; as the scan reads crates/ (lexRust), no other crate relaxes unsafe_code or has unsafe code, " +
++  "key; as the scan reads crates/ and fuzz/ (lexRust), no other crate relaxes unsafe_code or has unsafe code, " +
+   "npt-tcpinfo relaxes it only by the #[allow] on srtt_us and unacked_and_unsent, has unsafe code only inside " +
+   "them, and keeps lib.rs's deny of the two clippy unsafe lints, and npt-hash-wasm relaxes it only by one #[allow] on " +
+   "each of its seven listed exports, whose #[unsafe(no_mangle)] is its only unsafe code, each taking and giving u32 " +
+-  "or i32 only; neither npt-tcpinfo nor npt-hash-wasm has a build script or names `include` but directly before `!` " +
+-  "and an opening bracket; no attribute holds a metavariable; " +
++  "or i32 only, and npt-alloc relaxes it only by the #[allow] on its one unsafe impl GlobalAlloc, has unsafe code only " +
++  "inside it, and keeps lib.rs's deny of the two clippy unsafe lints; the fuzz crate calls fuzz_target! once in each " +
++  "fuzz_targets/ file and nowhere else, names libfuzzer_sys only as libfuzzer_sys::fuzz_target, and names no " +
++  "fuzz_mutator, fuzz_crossover, no_mangle, export_name, link_section, extern or macro_use; none of npt-tcpinfo, " +
++  "npt-hash-wasm, npt-alloc and the fuzz crate has a build script, and none of the first three names `include` but " +
++  "directly before `!` and an opening bracket; no attribute holds a metavariable; " +
+   "the environment and the cargo configs read pass no " +
+   "lint-lowering rustflags and set no clippy or fmt alias, no other rustc or workspace wrapper, no linker, no profile, " +
+   "no config include and " +
+@@ -2123,12 +2402,14 @@ const DEPS_CHECKED =
+   "and every package's below it, are one set in the npt-server, npt-lab and npt-hash-wasm (wasm32) builds, measured " +
+   "with measured and bites with bites, each holding npt-sim's own dependencies; every member lives in " +
+   "crates/ and builds only .rs files in its own folder, in edition 2024, none " +
+-  "a proc-macro, and every path dependency is a member; no symbolic link under crates/; every #[path] and include! " +
++  "a proc-macro, and every path dependency is a member; no symbolic link under crates/ or fuzz/; every #[path] and include! " +
+   "literal names a .rs file in its own crate; TICK_HZ is set from a literal once, in npt-sim; each derived tick " +
+   "constant is its own function at TICK_HZ in npt-sim and a path to it elsewhere, and no other *_TICKS or *CATCHUP* " +
+   "constant is set from a literal; npt-room's sources hold no float; no bite id is in two crates' sources; " +
+   "npt-proto's clippy.toml is npt-sim's below its header; npt-proto's and npt-client's sources name only Channel " +
+-  "from npt_link, which neither manifest renames";
++  "from npt_link, which neither manifest renames; every package fuzz/Cargo.lock shares with Cargo.lock has one " +
++  "version, source and checksum, and its others are npt-fuzz, libfuzzer-sys 0.4.13 and arbitrary 1.5.0, once each, " +
++  "as the read cleared them, with no derive_arbitrary";
+ 
+ /** `cargo metadata` for the spike in `here`, with every feature, parsed: { ok, meta }, or the failed run. */
+ function cargoMetadata(here) {
+@@ -2148,11 +2429,28 @@ export function depsStep(here = HERE, env = process.env, metadata = cargoMetadat
+   if (!r.ok) return r;
+   const { meta } = r;
+   const { files, links } = crateFiles(join(here, "crates"));
++  // The fuzz crate's folder, read as crates/ is (U5-Q7 term 1), when the spike has one.
++  if (existsSync(join(here, FUZZ_DIR))) {
++    const fuzz = crateFiles(join(here, FUZZ_DIR), FUZZ_DIR.slice(0, -1));
++    files.push(...fuzz.files);
++    links.push(...fuzz.links);
++  }
+   const configs = cargoConfigFiles(here, env);
+   const read = (f) => readFileSync(join(here, f), "utf8");
+   const workspace = read("Cargo.toml");
+   const manifests = [{ path: "Cargo.toml", text: workspace }];
+   for (const f of files) if (f.endsWith("/Cargo.toml")) manifests.push({ path: f, text: read(f) });
++  const fuzzChecks = [];
++  if (files.includes(FUZZ_MANIFEST)) {
++    fuzzChecks.push(...fuzzLintProblems(workspace, read(FUZZ_MANIFEST)));
++    let locks = null;
++    try {
++      locks = [read("Cargo.lock"), read("fuzz/Cargo.lock")];
++    } catch {
++      fuzzChecks.push("Cargo.lock or fuzz/Cargo.lock cannot be read: the two locks are compared whenever fuzz/Cargo.toml exists");
++    }
++    if (locks) fuzzChecks.push(...fuzzLockProblems(...locks));
++  }
+   const sources = rustflagSources(env, configs);
+   const readBack = readBackCheck(sources, runner, here);
+   const features = simFeatureCheck(meta, runner, here);
+@@ -2160,6 +2458,7 @@ export function depsStep(here = HERE, env = process.env, metadata = cargoMetadat
+     ...dependencyProblems(meta),
+     ...workspaceLintProblems(workspace),
+     ...exceptionLintProblems(workspace, read),
++    ...fuzzChecks,
+     ...manifestKeyProblems(manifests),
+     ...layoutProblems(meta),
+     ...links.map((l) => `${l} is a symbolic link: the scan does not follow it, and rustc would`),
+diff --git a/spikes/netcode-proof/check.test.mjs b/spikes/netcode-proof/check.test.mjs
+index 87f01fc..4c7b45e 100644
+--- a/spikes/netcode-proof/check.test.mjs
++++ b/spikes/netcode-proof/check.test.mjs
+@@ -17,6 +17,8 @@ import {
+   H2_VECTOR,
+   HASH_MAP_ARM,
+   HASH_MAP_FIELD,
++  ALLOC_UNSAFE_FILE,
++  FUZZ_LOCK_ONLY,
+   HASH_WASM_UNSAFE_FILE,
+   LEAF,
+   LOADER,
+@@ -46,6 +48,8 @@ import {
+   expectedMarks,
+   failedRun,
+   failingTests,
++  fuzzLintProblems,
++  fuzzLockProblems,
+   layoutProblems,
+   lexRust,
+   linkUseProblems,
+@@ -110,7 +114,8 @@ function clean() {
+   return {
+     "npt-link": [],
+     "npt-l1": n("npt-link"),
+-    "npt-sim": [...n("libm", "rand_chacha", "rand_core"), ["proptest", "dev"]],
++    "npt-sim": [...n("libm", "rand_chacha", "rand_core"), ["proptest", "dev"], ["npt-alloc", "dev"]],
++    "npt-alloc": [],
+     rand_chacha: n("rand_core", "ppv-lite86"),
+     "npt-proto": n("serde"),
+     "npt-room": n("npt-proto"),
+@@ -267,7 +272,7 @@ const EXPORT_SIGS = {
+ };
+ /** One npt-hash-wasm export as its lib.rs writes it: the placed allow (a multi-line reason), its no_mangle, its body. */
+ const exported = (name, sig = EXPORT_SIGS[name], between = "") =>
+-  `#[allow(\n    unsafe_code,\n    reason = "the third exception (ADR 0002:264-265): this listed name; \\\n              integers only"\n)]\n` +
++  `#[allow(\n    unsafe_code,\n    reason = "the third exception (ADR 0002:269): this listed name; \\\n              integers only"\n)]\n` +
+   `${between}#[unsafe(no_mangle)]\npub extern "C" fn ${name}${sig} {\n    run()\n}\n`;
+ /** begin's first line in the fixtures (its body follows): where U4d2 round 1's FX-3 plants an `unsafe` block. */
+ const BEGIN_HEAD = `pub extern "C" fn begin${EXPORT_SIGS.begin} {\n`;
+@@ -277,10 +282,28 @@ const HASH_WASM_LIB =
+   `${HASH_WASM_EXPORTS.map((n) => exported(n)).join("")}fn run() -> u32 {\n    0\n}\n`;
+ /** npt-hash-wasm's manifest as the fixtures give it: its own tables, unsafe_code denied. */
+ const HASH_WASM_MANIFEST = '[package]\nname = "npt-hash-wasm"\n\n[lints.rust]\nunsafe_code = "deny"\n';
+-
+-/** A clean crate tree for unsafeProblems: the three exceptions and two ordinary crates. */
++/** npt-alloc's manifest as the fixtures give it (U5): its own tables, unsafe_code denied. */
++const ALLOC_MANIFEST = '[package]\nname = "npt-alloc"\n\n[lints.rust]\nunsafe_code = "deny"\n';
++/** npt-alloc's impl head in the fixtures: where the plants put a second allow, or an allow is taken from. */
++const ALLOC_HEAD = "unsafe impl GlobalAlloc for Counting {\n";
++/** npt-alloc's placed allow, as its lib.rs writes it: a multi-line reason with a line continuation. */
++const ALLOC_ALLOW = '#[allow(\n    unsafe_code,\n    reason = "the fourth exception (ADR 0002:269): \\\n              System\'s calls, unchanged"\n)]\n';
++/**
++ * npt-alloc's clean lib.rs in the fixtures: its crate-level deny, a doc naming what it may not do, a helper, the
++ * placed allow with a SAFETY comment between it and the one impl, and the impl's unsafe inside it.
++ */
++const ALLOC_LIB =
++  `${DENY}//! No other #[allow(unsafe_code)] and no unsafe {} outside the impl (a doc comment, not code).\n` +
++  "fn note(size: usize) {\n    let _ = size;\n}\npub struct Counting;\n" +
++  `${ALLOC_ALLOW}// SAFETY: System's calls, unchanged.\n${ALLOC_HEAD}` +
++  "    unsafe fn alloc(&self, layout: Layout) -> *mut u8 {\n        note(layout.size());\n" +
++  "        // SAFETY: System's contract.\n        unsafe { System.alloc(layout) }\n    }\n}\n";
++
++/** A clean crate tree for unsafeProblems: the four exceptions and two ordinary crates. */
+ function cleanCrates() {
+   return {
++    "crates/alloc/Cargo.toml": ALLOC_MANIFEST,
++    [ALLOC_UNSAFE_FILE]: ALLOC_LIB,
+     "crates/hash-wasm/Cargo.toml": HASH_WASM_MANIFEST,
+     [HASH_WASM_UNSAFE_FILE]: HASH_WASM_LIB,
+     "crates/client-wasm/Cargo.toml": '[package]\nname = "npt-client-wasm"\n\n[lints.rust]\nunsafe_code = "allow"\n',
+@@ -352,7 +375,7 @@ test("unsafe_code: an attribute relaxing it outside the three exceptions fails,
+     const p = unsafeWith((f) => {
+       f["crates/net/src/planted.rs"] = code;
+     });
+-    assert.deepEqual(p, ["crates/net/src/planted.rs relaxes unsafe_code (only npt-client-wasm, npt-tcpinfo and npt-hash-wasm may)"], code);
++    assert.deepEqual(p, ["crates/net/src/planted.rs relaxes unsafe_code (only npt-client-wasm, npt-tcpinfo, npt-hash-wasm and npt-alloc may)"], code);
+   }
+ });
+ 
+@@ -559,7 +582,7 @@ test("unsafe code outside the three exception crates fails however the lint was
+     const held = what.includes("macro-built allow") ? [metaHeld("crates/room/src/evil.rs:3")] : [];
+     assert.deepEqual(
+       p,
+-      [`crates/room/src/evil.rs:${firstLine[what]} has unsafe code (${n} \`unsafe\` or \`global_asm\`; only npt-client-wasm, npt-tcpinfo and npt-hash-wasm may)`, ...held],
++      [`crates/room/src/evil.rs:${firstLine[what]} has unsafe code (${n} \`unsafe\` or \`global_asm\`; only npt-client-wasm, npt-tcpinfo, npt-hash-wasm and npt-alloc may)`, ...held],
+       what,
+     );
+   }
+@@ -581,7 +604,7 @@ test("lexRust reads a char literal as one code point, so an emoji cannot hide co
+   const p = unsafeWith((f) => {
+     f["crates/room/src/emoji.rs"] = src;
+   });
+-  assert.deepEqual(p, ["crates/room/src/emoji.rs:4 has unsafe code (1 `unsafe` or `global_asm`; only npt-client-wasm, npt-tcpinfo and npt-hash-wasm may)"]);
++  assert.deepEqual(p, ["crates/room/src/emoji.rs:4 has unsafe code (1 `unsafe` or `global_asm`; only npt-client-wasm, npt-tcpinfo, npt-hash-wasm and npt-alloc may)"]);
+ });
+ 
+ test("npt-tcpinfo: unsafe only inside srtt_us and unacked_and_unsent, unsafe_code named only by their allows", () => {
+@@ -676,6 +699,7 @@ function tcpinfoLints(change) {
+     [TCPINFO_MANIFEST]: readFileSync(join(HERE, TCPINFO_MANIFEST), "utf8"),
+     "crates/client-wasm/Cargo.toml": readFileSync(join(HERE, "crates/client-wasm/Cargo.toml"), "utf8"),
+     "crates/hash-wasm/Cargo.toml": readFileSync(join(HERE, "crates/hash-wasm/Cargo.toml"), "utf8"),
++    "crates/alloc/Cargo.toml": readFileSync(join(HERE, "crates/alloc/Cargo.toml"), "utf8"),
+   };
+   const text = change(real[TCPINFO_MANIFEST]);
+   const lineOf = (needle) => text.split("\n").findIndex((l) => l === needle) + 1;
+@@ -827,12 +851,13 @@ test("a manifest naming unsafe-code (cargo's spelling of unsafe_code) is caught
+   );
+ });
+ 
+-test("the three exceptions hold the workspace's other lints in their own tables, and their own level (review C2R-1; U4d2)", () => {
++test("the four exceptions hold the workspace's other lints in their own tables, and their own level (review C2R-1; U4d2; U5)", () => {
+   const ws = readFileSync(join(HERE, "Cargo.toml"), "utf8");
+   const T = "crates/tcpinfo/Cargo.toml";
+   const W = "crates/client-wasm/Cargo.toml";
+   const H = "crates/hash-wasm/Cargo.toml";
+-  const real = { [T]: readFileSync(join(HERE, T), "utf8"), [W]: readFileSync(join(HERE, W), "utf8"), [H]: readFileSync(join(HERE, H), "utf8") };
++  const A = "crates/alloc/Cargo.toml";
++  const real = Object.fromEntries([T, W, H, A].map((f) => [f, readFileSync(join(HERE, f), "utf8")]));
+   const read = (changed) => (p) => {
+     if (!(p in real)) throw new Error(`no ${p}`);
+     return changed[p] ?? real[p];
+@@ -875,16 +900,21 @@ test("the three exceptions hold the workspace's other lints in their own tables,
+   assert.deepEqual(exceptionLintProblems(ws, read({ [W]: real[W].replace('disallowed_methods = "deny"\n', "") })), [
+     `${W} has no [lints.clippy] disallowed_methods: the workspace's is "deny"`,
+   ]);
+-  // A lint the workspace adds must be added to all three.
++  // A lint the workspace adds must be added to all four.
+   const more = ws.replace('iter_over_hash_type = "deny"\n', 'iter_over_hash_type = "deny"\nundocumented_unsafe_blocks = "deny"\n');
+   assert.deepEqual(exceptionLintProblems(more, read({})), [
+     `${W} has no [lints.clippy] undocumented_unsafe_blocks: the workspace's is "deny"`,
+     `${T} has no [lints.clippy] undocumented_unsafe_blocks: the workspace's is "deny"`,
+     `${H} has no [lints.clippy] undocumented_unsafe_blocks: the workspace's is "deny"`,
++    `${A} has no [lints.clippy] undocumented_unsafe_blocks: the workspace's is "deny"`,
+   ]);
+   assert.deepEqual(exceptionLintProblems(ws, () => {
+     throw new Error("absent");
+-  }), [`${W} cannot be read`, `${T} cannot be read`, `${H} cannot be read`]);
++  }), [`${W} cannot be read`, `${T} cannot be read`, `${H} cannot be read`, `${A} cannot be read`]);
++  // npt-alloc (the fourth, U5): deny, as npt-tcpinfo; forbid would refuse its one allow, allow or warn relax the crate.
++  const al = (from, to) => exceptionLintProblems(ws, read({ [A]: real[A].replace(from, to) }));
++  for (const v of ['"allow"', '"forbid"', '"warn"']) assert.deepEqual(al('unsafe_code = "deny"', `unsafe_code = ${v}`), [`${A} sets [lints.rust] unsafe_code = ${v}, not "deny"`], v);
++  assert.deepEqual(al('disallowed_methods = "deny"\n', ""), [`${A} has no [lints.clippy] disallowed_methods: the workspace's is "deny"`]);
+   // npt-hash-wasm (the third, U4d2): deny, as npt-tcpinfo; its manifest at "allow" or "forbid" is refused by name, and
+   // so is a clippy key the workspace's tables do not hold, or one it drops.
+   const hw = (from, to) => exceptionLintProblems(ws, read({ [H]: real[H].replace(from, to) }));
+@@ -1108,7 +1138,8 @@ test("RUSTC_BOOTSTRAP, cargo's channel override, and a manifest's cargo-features
+   // No false positive: the spike's workspace manifest and every crate manifest under crates/ (what depsStep reads).
+   const own = [{ path: "Cargo.toml", text: readFileSync(join(HERE, "Cargo.toml"), "utf8") }];
+   for (const f of crateFiles(join(HERE, "crates")).files.filter((f) => f.endsWith("/Cargo.toml"))) own.push({ path: f, text: readFileSync(join(HERE, f), "utf8") });
+-  assert.ok(own.length >= 17, `${own.length} manifests`);
++  own.push({ path: "fuzz/Cargo.toml", text: readFileSync(join(HERE, "fuzz", "Cargo.toml"), "utf8") });
++  assert.ok(own.length >= 19, `${own.length} manifests`);
+   assert.deepEqual(manifestKeyProblems(own), []);
+ });
+ 
+@@ -1266,8 +1297,29 @@ function depsRunner({ trees = {}, cfg = cfgModel } = {}) {
+   return { runner, calls };
+ }
+ 
++const CRATES_IO = "registry+https://github.com/rust-lang/crates.io-index";
++/** A Cargo.lock as cargo writes it, from [name, version, checksum] (no checksum: a path package, with no source). */
++const lockText = (packages) =>
++  "# This file is automatically @generated by Cargo.\n# It is not intended for manual editing.\nversion = 4\n" +
++  packages
++    .map(([name, version, checksum]) => `\n[[package]]\nname = "${name}"\nversion = "${version}"\n${checksum ? `source = "${CRATES_IO}"\nchecksum = "${checksum}"\n` : ""}`)
++    .join("");
++/** The fixtures' workspace lock: a registry package, two versions of one name, two path packages. */
++const WS_LOCK = [["cc", "1.11.1", "c".repeat(64)], ["npt-alloc", "0.0.0"], ["npt-proto", "0.0.0"], ["syn", "2.0.119", "2".repeat(64)], ["syn", "3.0.9", "3".repeat(64)]];
++/** The fixtures' fuzz lock: FUZZ_LOCK_ONLY's three as the read cleared them, then a part of the workspace lock. */
++const FUZZ_LOCK = [...Object.entries(FUZZ_LOCK_ONLY).map(([name, p]) => [name, p.version, p.checksum]), ...WS_LOCK.filter(([n, v]) => !(n === "syn" && v === "2.0.119"))];
++/** check.mjs's reason on every fuzz-crate refusal (FUZZ_WHY, the advisor's SEC-U5D-1 ruling), as its messages end. */
++const FUZZ_WHY_TEXT =
++  "the fuzz crate exports only the two functions one fuzz_target! per target expands, as the read cleared them " +
++  "(security-u5-deps.md:96-115), and rustc's forbid does not see another crate's macro (SEC-U5D-1)";
++/** A fuzz target as the fuzz crate writes one (U5): one fuzz_target!, imported by its path. */
++const FUZZ_TARGET =
++  "#![no_main]\n// The two exports fuzz_target! expands: the crate's module doc (no_mangle in a comment is none).\n" +
++  "use libfuzzer_sys::fuzz_target;\n\nfuzz_target!(|data: &[u8]| {\n    let _ = data;\n});\n";
++
+ /**
+- * A spike folder for depsStep (the workspace manifest, the three exceptions, npt-room and a cargo config) and cargo
++ * A spike folder for depsStep (the workspace manifest, the four exceptions, npt-room, the fuzz crate with both locks
++ * and a cargo config) and cargo
+  * metadata's shape for it, from clean()'s graph: every member at crates/<name without npt->/ with one lib target there,
+  * npt-sim's package naming its three dependencies; and a runner for its `cargo tree` and `rustc` calls (depsRunner).
+  * `plant` changes the files, `change` the graph.
+@@ -1277,6 +1329,12 @@ function depsFixture(t, plant = () => {}, change = () => {}, answers = {}) {
+   t.after(() => rmSync(dir, { recursive: true, force: true }));
+   const files = {
+     "Cargo.toml": '[workspace]\nmembers = ["crates/*"]\n\n[workspace.lints.rust]\nunsafe_code = "forbid"\n\n[workspace.lints.clippy]\ndisallowed_types = "deny"\n',
++    "Cargo.lock": lockText(WS_LOCK),
++    "crates/alloc/Cargo.toml": `${ALLOC_MANIFEST}\n[lints.clippy]\ndisallowed_types = "deny"\n`,
++    [ALLOC_UNSAFE_FILE]: ALLOC_LIB,
++    "fuzz/Cargo.toml": '[package]\nname = "npt-fuzz"\n\n[workspace]\nmembers = ["."]\n\n[lints.rust]\nunsafe_code = "forbid"\n\n[lints.clippy]\ndisallowed_types = "deny"\n',
++    "fuzz/Cargo.lock": lockText(FUZZ_LOCK),
++    "fuzz/fuzz_targets/input.rs": FUZZ_TARGET,
+     "crates/client-wasm/Cargo.toml": '[package]\nname = "npt-client-wasm"\n\n[lints.rust]\nunsafe_code = "allow"\n\n[lints.clippy]\ndisallowed_types = "deny"\n',
+     "crates/tcpinfo/Cargo.toml": '[package]\nname = "npt-tcpinfo"\n\n[lints.rust]\nunsafe_code = "deny"\n\n[lints.clippy]\ndisallowed_types = "deny"\n',
+     "crates/tcpinfo/src/lib.rs": `${DENY}mod linux;\n`,
+@@ -1318,7 +1376,7 @@ test("the deps step is depsStep, and it calls every check: one plant per check,
+   const ok = depsFixture(t);
+   const clean = depsStep(ok.dir, ok.env, () => ({ ok: true, meta: ok.meta }), ok.runner);
+   assert.equal(clean.ok, true, clean.out);
+-  assert.match(clean.out, /^held: .* \(8 crate files and 1 cargo config file\(s\) read; rustc 1\.99\.1 .*'s read-back, given no rustflags: .*; npt-sim's features, one set in npt-server, npt-lab, npt-hash-wasm: .*\)$/);
++  assert.match(clean.out, /^held: .* \(12 crate files and 1 cargo config file\(s\) read; rustc 1\.99\.1 .*'s read-back, given no rustflags: .*; npt-sim's features, one set in npt-server, npt-lab, npt-hash-wasm: .*\)$/);
+   // The read-back and the features comparison run through the runner it is given, from the spike's folder.
+   assert.deepEqual(
+     ok.calls.map((c) => c.line),
+@@ -1349,11 +1407,19 @@ test("the deps step is depsStep, and it calls every check: one plant per check,
+       // U4d2's npt-hash-wasm rules: an unsafe block in its lib.rs, in a new fn and (U4d2 round 1, FX-3) inside a listed
+       // export's body, where that export's own allow lets rustc compile it.
+       f[HASH_WASM_UNSAFE_FILE] = `${HASH_WASM_LIB.replace(BEGIN_HEAD, `${BEGIN_HEAD}    unsafe {}\n`)}fn stray() {\n    unsafe {}\n}\n`;
++      // U5: npt-alloc's unsafe outside its impl; the fuzz crate's lints, lock and macros.
++      f[ALLOC_UNSAFE_FILE] = `${ALLOC_LIB}fn stray() {\n    unsafe {}\n}\n`;
++      f["fuzz/Cargo.toml"] = f["fuzz/Cargo.toml"].replace('disallowed_types = "deny"\n', "");
++      f["fuzz/Cargo.lock"] = lockText(FUZZ_LOCK.map(([n, v, c]) => (n === "cc" ? [n, "1.11.2", c] : [n, v, c])));
++      f["fuzz/fuzz_targets/mutate.rs"] = `${FUZZ_TARGET}libfuzzer_sys::fuzz_mutator!(|data: &mut [u8], size: usize, max: usize, seed: u32| size);\n`;
++      f["fuzz/fuzz_targets/twice.rs"] = `${FUZZ_TARGET}fuzz_target!(|data: &[u8]| {});\n`;
+     },
+     (e) => {
+       e["npt-sim"] = n("tokio");
+       // U4d2: npt-hash-wasm ships npt-sim only.
+       e["npt-hash-wasm"] = n("npt-sim", "serde");
++      // U5: no member ships npt-alloc.
++      e["npt-room"] = [...e["npt-room"], ["npt-alloc", null]];
+     },
+     // U4d2's features comparison: the server build's libm with one feature more.
+     { trees: { "npt-server": treeText("npt-server", false, { libm: "arch,default,std" }) } },
+@@ -1383,7 +1449,7 @@ test("the deps step is depsStep, and it calls every check: one plant per check,
+     ],
+     ["layoutProblems", "npt-room's lib target npt-room compiles crates/tcpinfo/src/linux.rs, outside its folder crates/room/"],
+     ["cargoConfigProblems", `${join(bad.dir, ".cargo", "config.toml")} has a key \`include\`: it loads a config file this check does not read`],
+-    ["unsafeProblems", "crates/room/src/evil.rs:3 has unsafe code (1 `unsafe` or `global_asm`; only npt-client-wasm, npt-tcpinfo and npt-hash-wasm may)"],
++    ["unsafeProblems", "crates/room/src/evil.rs:3 has unsafe code (1 `unsafe` or `global_asm`; only npt-client-wasm, npt-tcpinfo, npt-hash-wasm and npt-alloc may)"],
+     ["tickConstantProblems", notAPath("crates/room/src/ticks.rs:1", "LOOP_CATCHUP", "7")],
+     ["roomFloatProblems", roomFloat("crates/room/src/ticks.rs:2", "f64", 2)],
+     ["biteHomeProblems", biteTwice("PM-0001-17/client-rounding", "crates/client/src/lib.rs:1", "crates/sim/src/grid.rs:1")],
+@@ -1413,6 +1479,22 @@ test("the deps step is depsStep, and it calls every check: one plant per check,
+       `${bodyAt} has \`unsafe\` outside an attribute; npt-hash-wasm's only unsafe is the #[unsafe(no_mangle)] of its listed exports (${HASH_WASM_EXPORTS.join(", ")}) in ${HASH_WASM_UNSAFE_FILE}`,
+     ],
+     ["dependencyProblems (npt-hash-wasm)", "npt-hash-wasm depends on serde"],
++    // U5's checks (u5-brief.md Block 1; the advisor's U5-Q3, U5-Q7 and SEC-U5D-1 rulings).
++    ["dependencyProblems (npt-alloc)", "npt-room ships npt-alloc: at U5 only a dev dependency may use it"],
++    [
++      "unsafeProblems (npt-alloc)",
++      `${ALLOC_UNSAFE_FILE}:${ALLOC_LIB.split("\n").length + 1} has \`unsafe\` outside the one \`unsafe impl GlobalAlloc for <type>\` in ${ALLOC_UNSAFE_FILE}`,
++    ],
++    ["fuzzLintProblems", `fuzz/Cargo.toml has no [lints.clippy] disallowed_types: the workspace's is "deny"`],
++    [
++      "fuzzLockProblems",
++      `fuzz/Cargo.lock holds cc 1.11.2 (source ${CRATES_IO}, checksum ${"c".repeat(64)}), Cargo.lock 1.11.1: every package both locks hold has one version`,
++    ],
++    ["unsafeProblems (the fuzz crate)", `fuzz/fuzz_targets/twice.rs calls fuzz_target! 2 times, not once: ${FUZZ_WHY_TEXT}`],
++    [
++      "unsafeProblems (the fuzz crate's macros)",
++      `fuzz/fuzz_targets/mutate.rs:${FUZZ_TARGET.split("\n").length} names \`fuzz_mutator\`, which the fuzz crate may not: ${FUZZ_WHY_TEXT}`,
++    ],
+   ]) {
+     assert.ok(lines.includes(line), `${check}'s plant is not reported:\n${r.out}`);
+   }
+@@ -2049,7 +2131,12 @@ test("npt-hash-wasm, the third exception: one allow on each listed export, its n
+   assert.deepEqual(problemsWith((e) => e["npt-lab"].push(["npt-hash-wasm", "dev"])), ["npt-lab depends on npt-hash-wasm"]);
+   assert.deepEqual(problemsWith((e) => (e["npt-hash-wasm"] = [...n("npt-sim"), ["proptest", "dev"]])), [], "a dev dependency does not ship");
+   assert.ok(LEAF.includes("npt-hash-wasm") && WASM_CRATES.includes("npt-hash-wasm"));
+-  assert.deepEqual(UNSAFE_EXCEPTIONS, { "crates/client-wasm/": "npt-client-wasm", "crates/tcpinfo/": "npt-tcpinfo", "crates/hash-wasm/": "npt-hash-wasm" });
++  assert.deepEqual(UNSAFE_EXCEPTIONS, {
++    "crates/client-wasm/": "npt-client-wasm",
++    "crates/tcpinfo/": "npt-tcpinfo",
++    "crates/hash-wasm/": "npt-hash-wasm",
++    "crates/alloc/": "npt-alloc",
++  });
+ });
+ 
+ test("npt-hash-wasm: an `unsafe` block inside a listed export's body is refused at its line, where that export's own allow lets rustc compile it (U4d2 round 1, FX-3: RR-M1, SEC-U4D2-2, TE-M2)", () => {
+@@ -2084,7 +2171,7 @@ test("npt-tcpinfo and npt-hash-wasm, the deny-level exceptions, have no build sc
+     'fn main() {\n    let out = std::env::var("OUT_DIR").unwrap();\n' +
+     '    let code = "{ let _ = \\x75nsafe { core::ptr::read_volatile(&0u32) }; }";\n' +
+     '    std::fs::write(format!("{out}/gen.rs"), code).unwrap();\n}\n';
+-  for (const crate of ["hash-wasm", "tcpinfo"]) {
++  for (const crate of ["hash-wasm", "tcpinfo", "alloc"]) {
+     assert.deepEqual(unsafeWith((f) => (f[`crates/${crate}/build.rs`] = buildRs)), [`crates/${crate}/build.rs is a build script in npt-${crate}, which may have none: ${why}`]);
+   }
+   // Its second: `use std::include as inc;`, and `inc!(concat!(env!("OUT_DIR"), "/gen.rs"));` in begin's body, which the
+@@ -2117,16 +2204,186 @@ test("npt-tcpinfo and npt-hash-wasm, the deny-level exceptions, have no build sc
+   const manifestKey = (crate) => `crates/${crate}/Cargo.toml has a key \`build\`: a build script in npt-${crate}, which may have none: ${why}`;
+   assert.deepEqual(unsafeWith((f) => (f["crates/hash-wasm/Cargo.toml"] = HASH_WASM_MANIFEST.replace("\n\n[lints.rust]", '\nbuild = "gen.rs"\n\n[lints.rust]'))), [manifestKey("hash-wasm")]);
+   assert.deepEqual(unsafeWith((f) => (f["crates/tcpinfo/Cargo.toml"] = `package.build = true\n${f["crates/tcpinfo/Cargo.toml"]}`)), [manifestKey("tcpinfo")]);
+-  for (const crate of ["hash-wasm", "tcpinfo"]) {
++  for (const crate of ["hash-wasm", "tcpinfo", "alloc"]) {
+     const m = layoutMeta({ [`crates/${crate}`]: [["lib", `npt_${crate}`, "src/lib.rs"], ["custom-build", "build-script-build", "build.rs"]] });
+     assert.deepEqual(layoutProblems(m), [`npt-${crate}'s custom-build target build-script-build is a build script in npt-${crate}, which may have none: ${why}`]);
+   }
+   assert.deepEqual(layoutProblems(layoutMeta({ "crates/bots": [["bin", "npt-bots", "src/main.rs"], ["custom-build", "build-script-build", "build.rs"]] })), [], "another crate's build script");
+-  // The spike's own crates have neither.
+-  const real = crateFiles(join(HERE, "crates")).files;
++  // The spike's own crates have neither, nor has its fuzz crate (U5).
++  const real = [...crateFiles(join(HERE, "crates")).files, ...crateFiles(join(HERE, "fuzz"), "fuzz").files];
++  assert.ok(real.includes("fuzz/Cargo.toml") && real.includes(ALLOC_UNSAFE_FILE), real.join("\n"));
+   assert.deepEqual(unsafeProblems(real, (f) => readFileSync(join(HERE, f), "utf8")), []);
+ });
+ 
++test("npt-alloc, the fourth exception: one allow on its one unsafe impl GlobalAlloc, all its unsafe inside it, the clippy deny at its root; each plant fails by name (U5; the advisor's U5-Q3 ruling)", () => {
++  const F = ALLOC_UNSAFE_FILE;
++  const where = `the one \`unsafe impl GlobalAlloc for <type>\` in ${F}`;
++  const relaxes = (at, on) => `${at} relaxes unsafe_code on ${on}; npt-alloc may only put #[allow(unsafe_code, reason = "...")] directly on ${where}`;
++  const sites = (k) => `npt-alloc's unsafe impl GlobalAlloc has ${k} #[allow(unsafe_code, reason = ...)] attributes, not 1`;
++  const end = ALLOC_LIB.split("\n").length;
++  const allowAt = ALLOC_LIB.split("\n").indexOf("#[allow(") + 1;
++  const impl = "`unsafe impl GlobalAlloc for Counting {`";
++  // An unsafe block or an unsafe fn outside the impl, in lib.rs or another file of the crate.
++  assert.deepEqual(unsafeWith((f) => (f[F] = `${ALLOC_LIB}fn stray() {\n    unsafe {}\n}\n`)), [`${F}:${end + 1} has \`unsafe\` outside ${where}`]);
++  assert.deepEqual(unsafeWith((f) => (f["crates/alloc/tests/t.rs"] = "unsafe fn f() {}\n")), [`crates/alloc/tests/t.rs:1 has \`unsafe\` outside ${where}`]);
++  // A second allow on the impl, or a second impl with its own.
++  assert.deepEqual(unsafeWith((f) => (f[F] = ALLOC_LIB.replace(ALLOC_HEAD, `${ALLOC_ALLOW}${ALLOC_HEAD}`))), [sites(2)]);
++  assert.deepEqual(unsafeWith((f) => (f[F] = `${ALLOC_LIB}${ALLOC_ALLOW}unsafe impl GlobalAlloc for Other {\n}\n`)), [sites(2)]);
++  // An allow with an empty reason, or one that says nothing: not the placed form, so the impl's unsafe is outside too.
++  for (const reason of ['""', '"\\n"']) {
++    const p = unsafeWith((f) => (f[F] = ALLOC_LIB.replace(ALLOC_ALLOW, `#[allow(unsafe_code, reason = ${reason})]\n`)));
++    assert.ok(p.includes(relaxes(`${F}:${allowAt}`, impl)) && p.includes(sites(0)), `${reason}: ${p.join("\n")}`);
++    assert.ok(p.some((x) => x.endsWith(`has \`unsafe\` outside ${where}`)), p.join("\n"));
++  }
++  // The allow moved to a helper, given as expect, or as an inner attribute.
++  const moved = unsafeWith((f) => (f[F] = ALLOC_LIB.replace(ALLOC_ALLOW, "").replace("fn note(", `${ALLOC_ALLOW}fn note(`)));
++  const noteAt = ALLOC_LIB.split("\n").indexOf("fn note(size: usize) {") + 1;
++  assert.ok(moved.includes(relaxes(`${F}:${noteAt}`, "`fn note(size: usize) {`")) && moved.includes(sites(0)), moved.join("\n"));
++  const expected = unsafeWith((f) => (f[F] = ALLOC_LIB.replace(ALLOC_ALLOW, ALLOC_ALLOW.replace("#[allow(", "#[expect("))));
++  assert.ok(expected.includes(relaxes(`${F}:${allowAt}`, impl)) && expected.includes(sites(0)), expected.join("\n"));
++  const inner = unsafeWith((f) => (f["crates/alloc/tests/t.rs"] = "#![allow(unsafe_code)]\n"));
++  assert.deepEqual(inner, [relaxes("crates/alloc/tests/t.rs:1", "its whole module or crate (#!)")]);
++  // unsafe_code named in code outside an attribute (a macro could build the attribute from it).
++  assert.deepEqual(unsafeWith((f) => (f[F] = `${ALLOC_LIB}const N: &str = stringify!(unsafe_code);\n`)), [
++    `${F}:${end} names unsafe_code outside an attribute (a macro can build the attribute from it)`,
++  ]);
++  // The crate-level deny of the two clippy lints: missing, or one of them relaxed in another file.
++  assert.deepEqual(unsafeWith((f) => (f[F] = ALLOC_LIB.replace(DENY, ""))), [
++    `${F} does not deny clippy::undocumented_unsafe_blocks and clippy::multiple_unsafe_ops_per_block at the crate root`,
++  ]);
++  assert.deepEqual(unsafeWith((f) => (f["crates/alloc/tests/t.rs"] = "#![allow(clippy::undocumented_unsafe_blocks)]\n")), [
++    `crates/alloc/tests/t.rs:1 names clippy's undocumented_unsafe_blocks outside ${F}'s crate-level deny (relaxing it would let an unsafe block go without its SAFETY comment or hold more than one unsafe operation)`,
++  ]);
++});
++
++test("npt-alloc has no dependency and no member ships it; a dev dependency on it is fine (U5; the advisor's U5-Q3 ruling, terms 2 and 4)", () => {
++  assert.deepEqual(problemsWith(() => {}), [], "npt-sim's dev dependency on it");
++  assert.deepEqual(problemsWith((e) => (e["npt-alloc"] = n("libc"))), ["npt-alloc depends on libc"]);
++  assert.deepEqual(problemsWith((e) => (e["npt-alloc"] = [["proptest", "dev"]])), ["npt-alloc depends on proptest"]);
++  assert.deepEqual(problemsWith((e) => e["npt-client"].push(["npt-alloc", null])), ["npt-client ships npt-alloc: at U5 only a dev dependency may use it"]);
++  assert.deepEqual(problemsWith((e) => e["npt-proto"].push(["npt-alloc", "build"])), ["npt-proto ships npt-alloc: at U5 only a dev dependency may use it"]);
++});
++
++test("the fuzz crate is read as crates/ is: no relaxing, no unsafe, no export or extern of its own, one fuzz_target! per target file and no other libfuzzer_sys macro, no build script; each plant fails by name (U5-Q7 term 1; the advisor's SEC-U5D-1 ruling)", () => {
++  const T = "fuzz/fuzz_targets/input.rs";
++  const manifest = '[package]\nname = "npt-fuzz"\n\n[workspace]\nmembers = ["."]\n\n[lints.rust]\nunsafe_code = "forbid"\n';
++  const fuzzWith = (files) => unsafeWith((f) => Object.assign(f, { "fuzz/Cargo.toml": manifest, [T]: FUZZ_TARGET }, files));
++  assert.deepEqual(fuzzWith({}), [], "a clean target");
++  const refused = (at, name) => `${at} names \`${name}\`, which the fuzz crate may not: ${FUZZ_WHY_TEXT}`;
++  const end = FUZZ_TARGET.split("\n").length;
++  // libfuzzer-sys's two other macros by name; a hand-written export or placement, extern, macro_use.
++  for (const [line, name] of [
++    ["fuzz_mutator!(|d: &mut [u8], s: usize, m: usize, seed: u32| s);", "fuzz_mutator"],
++    ["fuzz_crossover!(|a: &[u8], b: &[u8], out: &mut [u8], seed: u32| 0);", "fuzz_crossover"],
++    ['#[export_name = "x"]\npub fn x() {}', "export_name"],
++    ['#[link_section = ".x"]\nstatic X: u8 = 0;', "link_section"],
++    ['extern "C" {\n}', "extern"],
++    ["#[macro_use]\nmod m {}", "macro_use"],
++  ]) {
++    assert.deepEqual(fuzzWith({ [T]: `${FUZZ_TARGET}${line}\n` }), [refused(`${T}:${end}`, name)], line);
++  }
++  const unsafeIn = (at) => `${at} has unsafe code (1 \`unsafe\` or \`global_asm\`; only npt-client-wasm, npt-tcpinfo, npt-hash-wasm and npt-alloc may)`;
++  assert.deepEqual(fuzzWith({ [T]: `${FUZZ_TARGET}#[unsafe(no_mangle)]\npub extern "C" fn x() {}\n` }), [
++    unsafeIn(`${T}:${end}`),
++    refused(`${T}:${end}`, "no_mangle"),
++    refused(`${T}:${end + 1}`, "extern"),
++  ]);
++  // An unsafe block or an unsafe fn, and a relaxing attribute, as in any crate under the forbid.
++  assert.deepEqual(fuzzWith({ "fuzz/src/lib.rs": "pub fn f() {\n    unsafe {}\n}\n" }), [unsafeIn("fuzz/src/lib.rs:2")]);
++  assert.deepEqual(fuzzWith({ "fuzz/src/lib.rs": "unsafe fn f() {}\n" }), [unsafeIn("fuzz/src/lib.rs:1")]);
++  assert.deepEqual(fuzzWith({ "fuzz/src/lib.rs": "#![allow(unsafe_code)]\n" }), [
++    "fuzz/src/lib.rs relaxes unsafe_code (only npt-client-wasm, npt-tcpinfo, npt-hash-wasm and npt-alloc may)",
++  ]);
++  // libfuzzer_sys named other than as the path libfuzzer_sys::fuzz_target: a glob, a group, a rename, another item.
++  const named = (at) =>
++    `${at} names libfuzzer_sys other than as the path libfuzzer_sys::fuzz_target (a glob, a group, a rename, another item or extern crate): ${FUZZ_WHY_TEXT}`;
++  for (const form of ["use libfuzzer_sys::*;", "use libfuzzer_sys::{fuzz_target};", "use libfuzzer_sys::fuzz_target as ft;", "use libfuzzer_sys as lf;", "use libfuzzer_sys::Corpus;"]) {
++    assert.deepEqual(fuzzWith({ [T]: FUZZ_TARGET.replace("use libfuzzer_sys::fuzz_target;", form) }), [named(`${T}:3`)], form);
++  }
++  assert.deepEqual(fuzzWith({ [T]: FUZZ_TARGET.replace("use libfuzzer_sys::fuzz_target;", "extern crate libfuzzer_sys;") }), [refused(`${T}:3`, "extern"), named(`${T}:3`)]);
++  assert.deepEqual(fuzzWith({ [T]: FUZZ_TARGET.replace("use libfuzzer_sys::fuzz_target;\n\nfuzz_target!", "libfuzzer_sys::fuzz_target!") }), [], "the call by its path");
++  // fuzz_target! once in each target file and nowhere else.
++  const callsIn = (at, k) => `${at} calls fuzz_target! ${k} times, not once: ${FUZZ_WHY_TEXT}`;
++  assert.deepEqual(fuzzWith({ [T]: FUZZ_TARGET.replace(/fuzz_target!\(\|data: &\[u8\]\| \{\n {4}let _ = data;\n\}\);\n/, "") }), [callsIn(T, 0)]);
++  assert.deepEqual(fuzzWith({ [T]: `${FUZZ_TARGET}fuzz_target!(|data: &[u8]| {});\n` }), [callsIn(T, 2)]);
++  for (const f of ["fuzz/src/lib.rs", "fuzz/fuzz_targets/sub/x.rs", "fuzz/examples/seeds.rs"]) {
++    assert.deepEqual(fuzzWith({ [f]: "fuzz_target!(|data: &[u8]| {});\n" }), [`${f}:1 calls fuzz_target! outside fuzz/fuzz_targets/<name>.rs: ${FUZZ_WHY_TEXT}`], f);
++  }
++  // No build script, in either form; no #[path] or include! outside fuzz/.
++  assert.deepEqual(fuzzWith({ "fuzz/build.rs": "fn main() {}\n" }), [`fuzz/build.rs is a build script in the fuzz crate, which may have none (U5-Q7 term 1): ${FUZZ_WHY_TEXT}`]);
++  assert.deepEqual(fuzzWith({ "fuzz/Cargo.toml": manifest.replace("\n\n[workspace]", '\nbuild = "gen.rs"\n\n[workspace]') }), [
++    `fuzz/Cargo.toml has a key \`build\`: a build script in the fuzz crate, which may have none (U5-Q7 term 1): ${FUZZ_WHY_TEXT}`,
++  ]);
++  assert.deepEqual(fuzzWith({ [T]: `${FUZZ_TARGET}#[path = "../../crates/alloc/src/lib.rs"]\nmod a;\n` }), [
++    `${T}:${end} has #[path = "../../crates/alloc/src/lib.rs"], not a .rs file inside fuzz/`,
++  ]);
++});
++
++test("the fuzz crate's lint tables are the workspace's key for key, forbid included (U5-Q7 term 1)", () => {
++  const ws = readFileSync(join(HERE, "Cargo.toml"), "utf8");
++  const real = readFileSync(join(HERE, "fuzz", "Cargo.toml"), "utf8");
++  const F = "fuzz/Cargo.toml";
++  assert.deepEqual(fuzzLintProblems(ws, real), [], "the spike's own fuzz manifest");
++  const fz = (from, to) => fuzzLintProblems(ws, real.replace(from, to));
++  for (const v of ['"deny"', '"allow"', '"warn"']) {
++    assert.deepEqual(fz('unsafe_code = "forbid"', `unsafe_code = ${v}`), [`${F} sets [lints.rust] unsafe_code = ${v}, not the workspace's "forbid"`], v);
++  }
++  assert.deepEqual(fz('iter_over_hash_type = "deny"\n', ""), [`${F} has no [lints.clippy] iter_over_hash_type: the workspace's is "deny"`]);
++  assert.deepEqual(fz("[lints.clippy]\n", '[lints.clippy]\nundocumented_unsafe_blocks = "allow"\n'), [
++    `${F} sets [lints.clippy] undocumented_unsafe_blocks = "allow", which the workspace does not`,
++  ]);
++  // `workspace = true` would name the fuzz crate's own workspace, which has no lints: the workspace's are then missing.
++  const inherited = fuzzLintProblems(ws, '[package]\nname = "npt-fuzz"\n\n[lints]\nworkspace = true\n');
++  assert.ok(inherited.includes(`${F} has no [lints.rust] unsafe_code: the workspace's is "forbid"`), inherited.join("\n"));
++  // A lint's own sub-table is refused, not skipped (review C2b F1's form).
++  const sub = fz('unsafe_code = "forbid"\n', 'unsafe_code = "forbid"\n\n[lints.rust.unsafe-code]\nlevel = "allow"\n');
++  assert.ok(sub.some((p) => p.includes("[lints.rust.unsafe-code], which this check does not read")), sub.join("\n"));
++});
++
++test("the fuzz lock shares every package with the workspace lock at one version, source and checksum, and holds only the read's three besides, each once (ADV-U5B-3; the advisor's SEC-U5D-1 ruling)", () => {
++  assert.deepEqual(fuzzLockProblems(readFileSync(join(HERE, "Cargo.lock"), "utf8"), readFileSync(join(HERE, "fuzz", "Cargo.lock"), "utf8")), [], "the spike's own locks");
++  const ws = lockText(WS_LOCK);
++  const fuzzWith = (rows) => fuzzLockProblems(ws, lockText(rows));
++  assert.deepEqual(fuzzWith(FUZZ_LOCK), []);
++  const shown = (name, version, checksum) => `${name} ${version} (source ${checksum ? CRATES_IO : "none"}, checksum ${checksum ?? "none"})`;
++  const swap = (name, f) => FUZZ_LOCK.map((r) => (r[0] === name ? f(r) : r));
++  // A version, then a checksum, that differs from the workspace lock's.
++  assert.deepEqual(fuzzWith(swap("cc", ([n, , c]) => [n, "1.11.2", c])), [
++    `fuzz/Cargo.lock holds ${shown("cc", "1.11.2", "c".repeat(64))}, Cargo.lock 1.11.1: every package both locks hold has one version`,
++  ]);
++  assert.deepEqual(fuzzWith(swap("cc", ([n, v]) => [n, v, "d".repeat(64)])), [
++    `fuzz/Cargo.lock holds ${shown("cc", "1.11.1", "d".repeat(64))}, Cargo.lock ${shown("cc", "1.11.1", "c".repeat(64))}: one package, one source and checksum`,
++  ]);
++  // Two versions of one name in the workspace lock: either may be shared, a third may not.
++  assert.deepEqual(fuzzWith([...FUZZ_LOCK, ["syn", "2.0.119", "2".repeat(64)]]), []);
++  assert.deepEqual(fuzzWith(swap("syn", ([n, , c]) => [n, "3.0.10", c])), [
++    `fuzz/Cargo.lock holds ${shown("syn", "3.0.10", "3".repeat(64))}, Cargo.lock 2.0.119 and 3.0.9: every package both locks hold has one version`,
++  ]);
++  // libfuzzer-sys: another version or checksum, a second entry, none.
++  const lf = FUZZ_LOCK_ONLY["libfuzzer-sys"];
++  const lfRead = shown("libfuzzer-sys", lf.version, lf.checksum);
++  assert.deepEqual(fuzzWith(swap("libfuzzer-sys", ([n, , c]) => [n, "0.4.14", c])), [`fuzz/Cargo.lock holds ${shown("libfuzzer-sys", "0.4.14", lf.checksum)}, not ${lfRead} as the read cleared it`]);
++  assert.deepEqual(fuzzWith(swap("libfuzzer-sys", ([n, v]) => [n, v, "e".repeat(64)])), [`fuzz/Cargo.lock holds ${shown("libfuzzer-sys", lf.version, "e".repeat(64))}, not ${lfRead} as the read cleared it`]);
++  assert.deepEqual(fuzzWith([...FUZZ_LOCK, ["libfuzzer-sys", "0.4.10", "f".repeat(64)]]), [
++    `fuzz/Cargo.lock holds 2 libfuzzer-sys entries, not 1: the read cleared ${lfRead}`,
++    `fuzz/Cargo.lock holds ${shown("libfuzzer-sys", "0.4.10", "f".repeat(64))}, not ${lfRead} as the read cleared it`,
++  ]);
++  assert.deepEqual(fuzzWith(FUZZ_LOCK.filter(([n]) => n !== "libfuzzer-sys")), [`fuzz/Cargo.lock holds 0 libfuzzer-sys entries, not 1: the read cleared ${lfRead}`]);
++  // arbitrary pinned likewise; derive_arbitrary refused by name; any other new package refused.
++  const ar = FUZZ_LOCK_ONLY.arbitrary;
++  assert.deepEqual(fuzzWith(swap("arbitrary", ([n, , c]) => [n, "1.4.1", c])), [
++    `fuzz/Cargo.lock holds ${shown("arbitrary", "1.4.1", ar.checksum)}, not ${shown("arbitrary", ar.version, ar.checksum)} as the read cleared it`,
++  ]);
++  assert.deepEqual(fuzzWith([...FUZZ_LOCK, ["derive_arbitrary", "1.5.0", "a".repeat(64)]]), [
++    `fuzz/Cargo.lock holds ${shown("derive_arbitrary", "1.5.0", "a".repeat(64))}: a proc macro (arbitrary's derive feature) no read has seen`,
++  ]);
++  assert.deepEqual(fuzzWith([...FUZZ_LOCK, ["once_cell", "1.21.4", "b".repeat(64)]]), [
++    `fuzz/Cargo.lock holds ${shown("once_cell", "1.21.4", "b".repeat(64))}, which Cargo.lock does not and the read did not clear (FUZZ_LOCK_ONLY)`,
++  ]);
++  // A package this reader cannot read.
++  assert.deepEqual(fuzzLockProblems(ws, `${lockText(FUZZ_LOCK)}\n[[package]]\nname='x'\nversion = "1.0.0"\n`), ["fuzz/Cargo.lock has a [[package]] whose name or version this check cannot read"]);
++});
++
+ /** The target_features entries rustc 1.99.1's release builds of npt-hash-wasm carry (the rust seat's wasminfo run). */
+ const BUILT_FEATURES = ["+bulk-memory", "+bulk-memory-opt", "+call-indirect-overlong", "+multivalue", "+mutable-globals", "+nontrapping-fptoint", "+reference-types", "+sign-ext"];
+ /** LEB128, as WebAssembly's binary format writes an unsigned integer. */
+diff --git a/spikes/netcode-proof/crates/net/Cargo.toml b/spikes/netcode-proof/crates/net/Cargo.toml
+index 42ead52..700fadb 100644
+--- a/spikes/netcode-proof/crates/net/Cargo.toml
++++ b/spikes/netcode-proof/crates/net/Cargo.toml
+@@ -13,6 +13,9 @@ workspace = true
+ # One WebTransport crate per feature, swappable behind npt-link (PM-0001-35), pinned in the workspace.
+ wt-wtransport = ["dep:wtransport"]
+ wt-wtq = ["dep:web-transport-quinn"]
++# U5 (PM-0001-34's scanner target): a `#[doc(hidden)]` entry to DelayStream's request and frame scanner for the fuzz
++# crate, which leaves `Scanner` pub(crate); no dependency (S2's reference is tokio-tungstenite's own tungstenite).
++fuzz = []
+ 
+ [dependencies]
+ npt-link.workspace = true
+diff --git a/spikes/netcode-proof/crates/proto/Cargo.toml b/spikes/netcode-proof/crates/proto/Cargo.toml
+index 53cdf0f..a67a51c 100644
+--- a/spikes/netcode-proof/crates/proto/Cargo.toml
++++ b/spikes/netcode-proof/crates/proto/Cargo.toml
+@@ -26,3 +26,7 @@ npt-link.workspace = true
+ # Cargo.lock (the arch review's F7). Dev dependencies: they never ship (plan §4.2, C10).
+ rand_chacha.workspace = true
+ rand_core.workspace = true
++# U5: the counting allocator (U5-Q3), for catalogue §6 at U4 item 3's allocation half per type (an input one byte
++# over its limit allocates nothing before its refusal) and each type's bar reached by its largest input (u5-brief.md
++# section 3).
++npt-alloc.workspace = true
+diff --git a/spikes/netcode-proof/crates/sim/Cargo.toml b/spikes/netcode-proof/crates/sim/Cargo.toml
+index a5b0d5c..ac3f960 100644
+--- a/spikes/netcode-proof/crates/sim/Cargo.toml
++++ b/spikes/netcode-proof/crates/sim/Cargo.toml
+@@ -20,3 +20,9 @@ bites = []
+ libm.workspace = true
+ rand_chacha.workspace = true
+ rand_core.workspace = true
++
++[dev-dependencies]
++# U5: the counting allocator (U5-Q3), for carry 48 (a push into a full `HitHistory` allocates nothing) and T2-L2
++# (`Recording::decode` of a short file reserves only what its bytes can hold). A dev dependency: it never ships (plan
++# §4.2, C10), and check.mjs's SIM_DEPENDENCIES reads shipped dependencies only.
++npt-alloc.workspace = true
+diff --git a/spikes/netcode-proof/crates/alloc/Cargo.toml b/spikes/netcode-proof/crates/alloc/Cargo.toml
+new file mode 100644
+index 0000000..bd18921
+--- /dev/null
++++ b/spikes/netcode-proof/crates/alloc/Cargo.toml
+@@ -0,0 +1,26 @@
++[package]
++name = "npt-alloc"
++description = "A counting global allocator over System, for the tests and the fuzz harness: per-thread windows of count, bytes and largest request"
++version.workspace = true
++edition.workspace = true
++rust-version.workspace = true
++publish.workspace = true
++
++# Not `workspace = true`: the workspace forbids unsafe_code, which no #[allow] can relax (E0453), and an implementation
++# of GlobalAlloc is unsafe code. So this crate has its own tables, as npt-tcpinfo and npt-hash-wasm have (the spike's
++# fourth unsafe exception, ADR 0002:269: "an exception needs a written invariant, a test and an `#[allow]` with its
++# reason"; the advisor's U5-Q3 ruling): [lints.rust] denies the lint, so the one `unsafe impl GlobalAlloc` over `System`
++# in src/lib.rs can carry one #[allow(unsafe_code, reason = "...")], and nothing else in the crate relaxes it. Every
++# other lint is the workspace's, key for key. check.mjs's deps step checks the level, the tables against the
++# workspace's key for key (it refuses a lint given in any form its reader does not read), and where the allow sits.
++[lints.rust]
++unsafe_code = "deny"
++
++[lints.clippy]
++disallowed_types = "deny"
++disallowed_methods = "deny"
++iter_over_hash_type = "deny"
++
++# std only: no dependency, no build script and no `build` or `include` key (U5-Q3 term 2; check.mjs's
++# DENY_EXCEPTION_WHY). At U5 only dev dependencies (npt-sim's and npt-proto's tests) and the fuzz crate depend on it; a
++# normal dependency (U6's PM-0006-20) is U6's change, with its own read (U5-Q3 term 4).
+diff --git a/spikes/netcode-proof/crates/alloc/src/lib.rs b/spikes/netcode-proof/crates/alloc/src/lib.rs
+new file mode 100644
+index 0000000..9759875
+--- /dev/null
++++ b/spikes/netcode-proof/crates/alloc/src/lib.rs
+@@ -0,0 +1,144 @@
++//! npt-alloc: a global allocator that counts, for the tests and the fuzz harness (U5; the advisor's U5-Q3 ruling).
++//!
++//! [`Counting`] is System's allocator with one addition: each memory request made on a thread while that thread's
++//! window is open is noted there. [`start`] opens the calling thread's window at zero, [`stop`] closes it and gives
++//! what it saw as [`Counts`]: how many requests, their bytes summed and the largest single one. An `alloc` or
++//! `alloc_zeroed` is one request of its size; a `realloc` is one request of its new size (a vector grown by `push`
++//! reaches its largest size by realloc: u5-alloc-bounds.md:105-107); a `dealloc` is none. Another thread's requests
++//! never reach a window, and nothing is counted while no window is open. A test or fuzz binary installs it with
++//! `#[global_allocator] static ALLOC: npt_alloc::Counting = npt_alloc::Counting;`. The allocator only counts: what a
++//! count means (a bar, a refusal) is its caller's to decide, after [`stop`], never inside an allocation.
++//!
++//! **The spike's fourth `unsafe` exception** (after npt-client-wasm, npt-tcpinfo and npt-hash-wasm), under ADR
++//! 0002:269's rule: "an exception needs a written invariant, a test and an `#[allow]` with its reason". The
++//! `#[allow(unsafe_code, reason = ...)]` sits on the one `unsafe impl GlobalAlloc` below and nowhere else in the crate;
++//! the workspace forbids unsafe_code, which no allow can relax, so this crate's manifest has its own lint tables:
++//! unsafe_code denied, every other lint the workspace's. Each unsafe block holds one unsafe operation and a SAFETY
++//! comment (the two clippy lints below are errors). The invariant: every method hands its arguments to System's same
++//! method unchanged and returns System's result, so every pointer this allocator gives out is System's and goes back to
++//! System with the layout it was made with; and counting never allocates, never re-enters the allocator and never
++//! unwinds, since it only reads and writes a `Copy` value in a const-initialised thread-local that has no destructor.
++//! The tests (tests/window.rs) show each count. check.mjs's deps step checks that the crate ships with no dependency and
++//! no member ships it, that its lint tables are the workspace's key for key but for unsafe_code "deny", that it has no
++//! build script, and, as its scan reads the crate's files, that the one attribute sits on that impl and no other
++//! relaxing attribute exists here, that every `unsafe` in the crate lies inside that impl, and that the two clippy lints
++//! below stay denied here and relaxed nowhere.
++
++#![deny(
++    clippy::undocumented_unsafe_blocks,
++    clippy::multiple_unsafe_ops_per_block
++)]
++
++use std::alloc::{GlobalAlloc, Layout, System};
++use std::cell::Cell;
++
++/// What a window saw: the memory requests made on its thread while it was open.
++#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
++pub struct Counts {
++    /// The requests: each `alloc`, `alloc_zeroed` and `realloc` is one; a `dealloc` is none.
++    pub allocations: u64,
++    /// Their sizes summed, a `realloc` at its new size.
++    pub bytes: u64,
++    /// The largest single request.
++    pub largest: u64,
++}
++
++/// No request seen.
++const ZERO: Counts = Counts {
++    allocations: 0,
++    bytes: 0,
++    largest: 0,
++};
++
++/// One thread's window: whether it is open, and what it has seen since it opened.
++#[derive(Clone, Copy)]
++struct Window {
++    open: bool,
++    counts: Counts,
++}
++
++thread_local! {
++    /// The calling thread's window. Const-initialised, and `Window` has no destructor, so reading or writing it never
++    /// allocates and never fails, even while the thread's other thread-locals are being torn down.
++    static WINDOW: Cell<Window> = const { Cell::new(Window { open: false, counts: ZERO }) };
++}
++
++/// Opens the calling thread's window, its counts at zero; a window already open starts again from zero.
++pub fn start() {
++    let _ = WINDOW.try_with(|w| {
++        w.set(Window {
++            open: true,
++            counts: ZERO,
++        });
++    });
++}
++
++/// Closes the calling thread's window and gives what it saw since [`start`] (zero when no window was open).
++#[must_use]
++pub fn stop() -> Counts {
++    WINDOW
++        .try_with(|w| {
++            let seen = w.get().counts;
++            w.set(Window {
++                open: false,
++                counts: ZERO,
++            });
++            seen
++        })
++        .unwrap_or(ZERO)
++}
++
++/// Notes one request of `size` bytes in the calling thread's window, if it is open. Saturating arithmetic on `Copy`
++/// values in a `Cell`: no allocation, no panic.
++fn note(size: usize) {
++    let _ = WINDOW.try_with(|w| {
++        let mut now = w.get();
++        if now.open {
++            let size = size as u64;
++            now.counts.allocations = now.counts.allocations.saturating_add(1);
++            now.counts.bytes = now.counts.bytes.saturating_add(size);
++            now.counts.largest = now.counts.largest.max(size);
++            w.set(now);
++        }
++    });
++}
++
++/// The counting allocator: System's, with each request noted in the calling thread's window (see the crate's doc).
++#[derive(Clone, Copy, Debug, Default)]
++pub struct Counting;
++
++#[allow(
++    unsafe_code,
++    reason = "the fourth exception (ADR 0002:269): GlobalAlloc is an unsafe trait; this impl hands every call to \
++              System unchanged and only notes the request in a const thread-local"
++)]
++// SAFETY: every method passes its arguments to System's same method unchanged and returns System's result, so each
++// pointer this allocator gives out is System's and comes back to System with the layout it was made with, and System
++// meets GlobalAlloc's contract. `note` touches only a `Copy` value in a const thread-local with no destructor: it never
++// allocates, never re-enters the allocator and never unwinds.
++unsafe impl GlobalAlloc for Counting {
++    unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
++        note(layout.size());
++        // SAFETY: the caller meets `alloc`'s contract for `layout` (a non-zero size), which is System's contract too.
++        unsafe { System.alloc(layout) }
++    }
++
++    unsafe fn alloc_zeroed(&self, layout: Layout) -> *mut u8 {
++        note(layout.size());
++        // SAFETY: the caller meets `alloc_zeroed`'s contract for `layout` (a non-zero size), which is System's too.
++        unsafe { System.alloc_zeroed(layout) }
++    }
++
++    unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
++        // SAFETY: the caller gives a pointer this allocator returned for `layout`; every such pointer is System's, made
++        // for that same layout (alloc, alloc_zeroed and realloc return System's results unchanged).
++        unsafe { System.dealloc(ptr, layout) }
++    }
++
++    unsafe fn realloc(&self, ptr: *mut u8, layout: Layout, new_size: usize) -> *mut u8 {
++        note(new_size);
++        // SAFETY: as for dealloc, `ptr` is System's, made for `layout`; the caller meets `realloc`'s contract for
++        // `new_size` (non-zero, no overflow when rounded to the alignment), which is System's too.
++        unsafe { System.realloc(ptr, layout, new_size) }
++    }
++}
+diff --git a/spikes/netcode-proof/crates/alloc/tests/window.rs b/spikes/netcode-proof/crates/alloc/tests/window.rs
+new file mode 100644
+index 0000000..49b3f3b
+--- /dev/null
++++ b/spikes/netcode-proof/crates/alloc/tests/window.rs
+@@ -0,0 +1,124 @@
++//! npt-alloc's window, through the allocator installed as this test binary's global allocator (U5 Block 1; u5-brief.md
++//! section 3): one request counted with its size, the largest of several, a realloc as one request at its new size,
++//! nothing for a dealloc, for code that does not allocate or while no window is open, and two threads' windows apart.
++//! Every value a window should see is passed through `black_box`, so no request is optimised away.
++
++use std::hint::black_box;
++use std::sync::{Arc, Barrier};
++use std::thread;
++
++use npt_alloc::{Counting, Counts, start, stop};
++
++#[global_allocator]
++static ALLOC: Counting = Counting;
++
++fn counts(allocations: u64, bytes: u64, largest: u64) -> Counts {
++    Counts {
++        allocations,
++        bytes,
++        largest,
++    }
++}
++
++#[test]
++fn one_request_is_counted_with_its_size() {
++    start();
++    let boxed = black_box(Box::new([7u8; 100]));
++    let seen = stop();
++    drop(boxed);
++    assert_eq!(seen, counts(1, 100, 100));
++}
++
++#[test]
++fn the_largest_is_the_largest_single_request() {
++    start();
++    let a = black_box(Vec::<u8>::with_capacity(10));
++    let b = black_box(Vec::<u8>::with_capacity(300));
++    let c = black_box(Vec::<u8>::with_capacity(20));
++    let seen = stop();
++    drop((a, b, c));
++    assert_eq!(seen, counts(3, 330, 300));
++}
++
++#[test]
++fn a_realloc_is_one_request_at_its_new_size() {
++    let mut v = black_box(Vec::<u8>::with_capacity(16));
++    start();
++    v.reserve_exact(64);
++    let seen = stop();
++    assert_eq!(v.capacity(), 64);
++    drop(v);
++    assert_eq!(seen, counts(1, 64, 64));
++}
++
++#[test]
++fn a_dealloc_is_not_counted() {
++    let boxed = black_box(Box::new(5u64));
++    start();
++    drop(boxed);
++    assert_eq!(stop(), Counts::default());
++}
++
++#[test]
++fn code_that_does_not_allocate_counts_zero() {
++    start();
++    let mut x = 0u64;
++    for i in 0..1_000u64 {
++        x = black_box(x.wrapping_mul(31).wrapping_add(i));
++    }
++    let on_stack = black_box([x; 32]);
++    let seen = stop();
++    assert_eq!(seen, Counts::default(), "{}", on_stack[31]);
++}
++
++#[test]
++fn only_an_open_window_counts_and_start_begins_again() {
++    let before = black_box(vec![1u8; 50]);
++    start();
++    let first = black_box(vec![2u8; 40]);
++    start();
++    let second = black_box(vec![3u8; 30]);
++    let seen = stop();
++    let closed = stop();
++    let after = black_box(vec![4u8; 20]);
++    drop((before, first, second, after));
++    assert_eq!(seen, counts(1, 30, 30));
++    assert_eq!(closed, Counts::default(), "a closed window gives zero");
++    assert_eq!(
++        stop(),
++        Counts::default(),
++        "nothing is counted while no window is open"
++    );
++}
++
++#[test]
++fn two_threads_windows_are_apart() {
++    let barrier = Arc::new(Barrier::new(2));
++    let theirs = Arc::clone(&barrier);
++    let worker = thread::spawn(move || {
++        start();
++        let v = black_box(vec![0u8; 1_000]);
++        theirs.wait();
++        theirs.wait();
++        let seen = stop();
++        drop(v);
++        seen
++    });
++    start();
++    barrier.wait();
++    let mine = black_box(Vec::<u8>::with_capacity(7));
++    barrier.wait();
++    let seen = stop();
++    drop(mine);
++    let worker_seen = worker.join().expect("the worker thread finishes");
++    assert_eq!(
++        seen,
++        counts(1, 7, 7),
++        "this thread's window holds its own request only"
++    );
++    assert_eq!(
++        worker_seen,
++        counts(1, 1_000, 1_000),
++        "the worker's window holds its own request only"
++    );
++}
+diff --git a/spikes/netcode-proof/crates/sim/tests/allocations.rs b/spikes/netcode-proof/crates/sim/tests/allocations.rs
+new file mode 100644
+index 0000000..57587b5
+--- /dev/null
++++ b/spikes/netcode-proof/crates/sim/tests/allocations.rs
+@@ -0,0 +1,145 @@
++//! npt-sim's two allocation checks, counted by npt-alloc, this test binary's global allocator (U5 Block 2;
++//! u5-brief.md:133-135). Carry 48: a push into a full `HitHistory` allocates nothing (u4s-carries.md carry 48, the
++//! advisor's W1-U4D ruling; history.rs's push, seam.rs's hand-written `clone_from`). T2-L2: decoding a short recording
++//! whose header claims 2^20 ticks reserves at most room x `size_of::<TickInput>()`, room being the ticks its bytes can
++//! hold (u4d-round2-test.md:173-176; replay.rs:323-326). Each window holds the call under test only; what it is given
++//! is made before the window opens.
++
++use std::hint::black_box;
++
++use npt_alloc::{Counting, Counts, start, stop};
++use npt_sim::replay::Recording;
++use npt_sim::{HitHistory, HitVolumes, Scene, TickInput, VolumeBox};
++
++#[global_allocator]
++static ALLOC: Counting = Counting;
++
++/// One tick's volumes at their largest, every soldier and cover box a tick can hold, told apart by the tick.
++fn volumes(tick: u32) -> HitVolumes {
++    let one = VolumeBox {
++        center: [i32::try_from(tick).expect("a small tick"), 0, 0],
++        half: [30, 30, 90],
++        live: true,
++    };
++    HitVolumes {
++        tick,
++        soldiers: vec![one; HitVolumes::MAX_SOLDIERS],
++        cover: vec![one; HitVolumes::MAX_COVER],
++    }
++}
++
++#[test]
++fn a_push_into_a_full_hit_history_allocates_nothing() {
++    let mut ring = HitHistory::for_ms(200).expect("200 ms is a ring under 1 MB");
++    let capacity = ring.capacity();
++    let all: Vec<HitVolumes> = (0..capacity * 3).map(volumes).collect();
++    let boxes = size_of::<VolumeBox>() as u64;
++    // A push into a ring not yet full copies the tick: its two vectors (so the counter sees this binary's requests).
++    start();
++    ring.push(black_box(&all[0]));
++    let first = stop();
++    assert_eq!(
++        first,
++        Counts {
++            allocations: 2,
++            bytes: (HitVolumes::MAX_SOLDIERS + HitVolumes::MAX_COVER) as u64 * boxes,
++            largest: HitVolumes::MAX_COVER as u64 * boxes,
++        }
++    );
++    for v in &all[1..capacity as usize] {
++        ring.push(v);
++    }
++    assert_eq!(ring.len(), capacity, "the ring is full");
++    // Two laps into the full ring: each push copies into the evicted entry's storage.
++    start();
++    for v in &all[capacity as usize..] {
++        ring.push(black_box(v));
++    }
++    let seen = stop();
++    assert_eq!(
++        seen,
++        Counts::default(),
++        "a push into a full HitHistory allocates nothing"
++    );
++    let newest = capacity * 3 - 1;
++    let oldest = newest + 1 - capacity;
++    assert_eq!(
++        ring.get(newest),
++        Some(&all[newest as usize]),
++        "the newest tick is held whole"
++    );
++    assert_eq!(
++        ring.get(oldest),
++        Some(&all[oldest as usize]),
++        "the oldest the ring holds"
++    );
++    assert_eq!(
++        ring.get(oldest - 1),
++        None,
++        "a tick older than the ring is evicted"
++    );
++}
++
++/// The stress scene's recording of `ticks` empty ticks (12 bytes each), its header's tick count then set to `claim`
++/// (the header's eighth word, bytes 28..32: replay.rs's layout).
++fn claiming(ticks: u32, claim: u32) -> Vec<u8> {
++    let first_tick = 5;
++    let mut bytes = Recording {
++        scene: Scene::stress().id(),
++        seed: 9,
++        first_tick,
++        span_ms: 200,
++        generator: 0,
++        ticks: (0..ticks)
++            .map(|k| TickInput {
++                tick: first_tick + k,
++                ..TickInput::default()
++            })
++            .collect(),
++    }
++    .encode();
++    bytes[28..32].copy_from_slice(&claim.to_le_bytes());
++    bytes
++}
++
++#[test]
++fn a_short_recording_claiming_2_20_ticks_reserves_only_what_its_bytes_can_hold() {
++    let claim = 1 << 20;
++    let per_tick = size_of::<TickInput>() as u64;
++    // The 60-byte header alone holds no tick: nothing is reserved, and the decode is refused at the first tick.
++    let header = claiming(0, claim);
++    assert_eq!(header.len(), 60);
++    start();
++    let refused = Recording::decode(black_box(&header));
++    let seen = stop();
++    assert!(
++        refused.is_err(),
++        "a header claiming 2^20 ticks with none after it is refused"
++    );
++    assert_eq!(seen, Counts::default(), "room for no tick, so no reserve");
++    // Seven empty ticks: room for 7, so one reserve of 7 ticks, then a refusal at the 8th.
++    let short = claiming(7, claim);
++    let room = (short.len() as u64 - 60) / 12;
++    assert_eq!(room, 7);
++    start();
++    let refused = Recording::decode(black_box(&short));
++    let seen = stop();
++    assert!(
++        refused.is_err(),
++        "seven ticks where 2^20 are claimed are refused"
++    );
++    assert!(
++        seen.largest <= room * per_tick,
++        "the largest request {} B is past room x size_of::<TickInput>() = {} B",
++        seen.largest,
++        room * per_tick
++    );
++    assert_eq!(
++        seen,
++        Counts {
++            allocations: 1,
++            bytes: room * per_tick,
++            largest: room * per_tick,
++        }
++    );
++}
+diff --git a/spikes/netcode-proof/fuzz/Cargo.lock b/spikes/netcode-proof/fuzz/Cargo.lock
+new file mode 100644
+index 0000000..062df65
+--- /dev/null
++++ b/spikes/netcode-proof/fuzz/Cargo.lock
+@@ -0,0 +1,1181 @@
++# This file is automatically @generated by Cargo.
++# It is not intended for manual editing.
++version = 4
++
++[[package]]
++name = "arbitrary"
++version = "1.5.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "3bc62ac97cc33321f50863d514c3bc38a453947a8f9e781137e47c7401020aed"
++
++[[package]]
++name = "bitflags"
++version = "2.13.2"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "3ded4057c258ba199e2d26386d3af3780957ecaee6c4ef4041c6b4b8b97c0b06"
++
++[[package]]
++name = "block-buffer"
++version = "0.12.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "d2f6c7dbe95a6ed67ad9f18e57daf93a2f034c524b99fd2b76d18fdfeb6660aa"
++dependencies = [
++ "hybrid-array",
++]
++
++[[package]]
++name = "bumpalo"
++version = "3.20.3"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "72f5acc6cb2ba439de613abc23857ec3d78374d8ed5ac84e9d11336e87da8649"
++
++[[package]]
++name = "bytes"
++version = "1.12.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "fc652a48c352aef3ea3aed32080501cf3ef6ed5da78602a020c991775b0aff04"
++
++[[package]]
++name = "cc"
++version = "1.11.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "4ff2a8126fff0f8c839080d619675a585e61720bb12d2baceae45769fd66f155"
++dependencies = [
++ "find-msvc-tools",
++ "jobserver",
++ "libc",
++ "shlex",
++]
++
++[[package]]
++name = "cfg-if"
++version = "1.0.5"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "4e7648175b45a9a48536d676f68d918270699102aa8dab5496df06904c914600"
++
++[[package]]
++name = "cfg_aliases"
++version = "0.2.2"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "f079e83a288787bcd14a6aea84cee5c87a67c5a3e660c30f557a3d24761b3527"
++
++[[package]]
++name = "chacha20"
++version = "0.10.2"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "65c35e4b699c7e15ccbe7ee35c005e4fc0a278d22238a2857e6ce2dadeda1b06"
++dependencies = [
++ "cfg-if",
++ "cpufeatures",
++ "rand_core",
++]
++
++[[package]]
++name = "combine"
++version = "4.6.9"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "4356eba6976435498d05a311ee9fc486da3bc81c200d3f0d7dd9703b41913f92"
++dependencies = [
++ "bytes",
++ "memchr",
++]
++
++[[package]]
++name = "const-oid"
++version = "0.10.2"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "a6ef517f0926dd24a1582492c791b6a4818a4d94e789a334894aa15b0d12f55c"
++
++[[package]]
++name = "core-foundation"
++version = "0.10.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "b2a6cd9ae233e7f62ba4e9353e81a88df7fc8a5987b8d445b4d90c879bd156f6"
++dependencies = [
++ "core-foundation-sys",
++ "libc",
++]
++
++[[package]]
++name = "core-foundation-sys"
++version = "0.8.7"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "773648b94d0e5d620f64f280777445740e61fe701025087ec8b57f45c791888b"
++
++[[package]]
++name = "cpufeatures"
++version = "0.3.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "5ca28b0ae3115b884660db4118d803791fd6756b6e88f39c0f3f7859060d7566"
++dependencies = [
++ "libc",
++]
++
++[[package]]
++name = "crypto-common"
++version = "0.2.2"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "ce6e4c961d6cd6c9a86db418387425e8bdeaf05b3c8bc1411e6dca4c252f1453"
++dependencies = [
++ "hybrid-array",
++]
++
++[[package]]
++name = "data-encoding"
++version = "2.11.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "4583a4551df46e2792f82ceeac45e850d2e2d5debba0b91f102385cda5b11f06"
++
++[[package]]
++name = "digest"
++version = "0.11.3"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "f1dd6dbb5841937940781866fa1281a1ff7bd3bf827091440879f9994983d5c2"
++dependencies = [
++ "block-buffer",
++ "const-oid",
++ "crypto-common",
++]
++
++[[package]]
++name = "fastbloom"
++version = "0.17.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "ef975e30683b2d965054bb0a836f8973857c4ebf6acf274fe46617cd285060d8"
++dependencies = [
++ "foldhash",
++ "libm",
++ "portable-atomic",
++ "siphasher",
++]
++
++[[package]]
++name = "find-msvc-tools"
++version = "0.1.15"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "1c66915cc5391097de7a2b0b972e8505aa33c0df401fd3a6811dbdb32881ba48"
++
++[[package]]
++name = "foldhash"
++version = "0.2.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "77ce24cb58228fbb8aa041425bb1050850ac19177686ea6e0f41a70416f56fdb"
++
++[[package]]
++name = "futures-core"
++version = "0.3.34"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "92d699e522242e69e3003b94ecc1f960f3a5e015aa7c5d7486e65ad01dd94f5e"
++
++[[package]]
++name = "futures-sink"
++version = "0.3.34"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "1944426bf7d03f1d14f708785e4b33efd750b36d48a157b836b3efc15ede8e1d"
++
++[[package]]
++name = "futures-task"
++version = "0.3.34"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "cd417de3d1d015fc3bfd2b1ea46dfc7bab72ef86f1cc7cc9c78e728b34a6d1fd"
++
++[[package]]
++name = "futures-util"
++version = "0.3.34"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "0d50a92467f8ba5dd6e3ee5d4bd04d73ab2e4e1c44474a0674821dfce14b79bc"
++dependencies = [
++ "futures-core",
++ "futures-sink",
++ "futures-task",
++ "pin-project-lite",
++ "slab",
++]
++
++[[package]]
++name = "getrandom"
++version = "0.2.17"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "ff2abc00be7fca6ebc474524697ae276ad847ad0a6b3faa4bcb027e9a4614ad0"
++dependencies = [
++ "cfg-if",
++ "js-sys",
++ "libc",
++ "wasi",
++ "wasm-bindgen",
++]
++
++[[package]]
++name = "getrandom"
++version = "0.4.3"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "300e883d756b2e4ec94e02791f39b04b522276138852cfc41d9fb7e904106099"
++dependencies = [
++ "cfg-if",
++ "js-sys",
++ "libc",
++ "r-efi",
++ "rand_core",
++ "wasm-bindgen",
++]
++
++[[package]]
++name = "http"
++version = "1.5.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "918d3568bebf352712bc2ef3d46a8bcf1a75b373be6539de198e9105cbbf9ce0"
++dependencies = [
++ "bytes",
++ "itoa",
++]
++
++[[package]]
++name = "httparse"
++version = "1.10.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "6dbf3de79e51f3d586ab4cb9d5c3e2c14aa28ed23d180cf89b4df0454a69cc87"
++
++[[package]]
++name = "hybrid-array"
++version = "0.4.15"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "27f864f10dfb56725ce5ce5472bc52252c8f93a4ab86327122cebf62c5f59a17"
++dependencies = [
++ "typenum",
++]
++
++[[package]]
++name = "itoa"
++version = "1.0.18"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "8f42a60cbdf9a97f5d2305f08a87dc4e09308d1276d28c869c684d7777685682"
++
++[[package]]
++name = "jni"
++version = "0.22.4"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "5efd9a482cf3a427f00d6b35f14332adc7902ce91efb778580e180ff90fa3498"
++dependencies = [
++ "cfg-if",
++ "combine",
++ "jni-macros",
++ "jni-sys",
++ "log",
++ "simd_cesu8",
++ "thiserror",
++ "walkdir",
++ "windows-link",
++]
++
++[[package]]
++name = "jni-macros"
++version = "0.22.4"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "a00109accc170f0bdb141fed3e393c565b6f5e072365c3bd58f5b062591560a3"
++dependencies = [
++ "proc-macro2",
++ "quote",
++ "rustc_version",
++ "simd_cesu8",
++ "syn 2.0.119",
++]
++
++[[package]]
++name = "jni-sys"
++version = "0.4.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "c6377a88cb3910bee9b0fa88d4f42e1d2da8e79915598f65fb0c7ee14c878af2"
++dependencies = [
++ "jni-sys-macros",
++]
++
++[[package]]
++name = "jni-sys-macros"
++version = "0.4.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "38c0b942f458fe50cdac086d2f946512305e5631e720728f2a61aabcd47a6264"
++dependencies = [
++ "quote",
++ "syn 2.0.119",
++]
++
++[[package]]
++name = "jobserver"
++version = "0.1.35"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "1c00acbd29eabad4a2392fa0e921c874934dbbf4194312ad20f04a0ed67a3cb3"
++dependencies = [
++ "getrandom 0.4.3",
++ "libc",
++]
++
++[[package]]
++name = "js-sys"
++version = "0.3.107"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "8dc09d2154098bbf4ef54eab6b117a3c24cbbffe94046b16ee6d6d4510584d3a"
++dependencies = [
++ "cfg-if",
++ "futures-util",
++ "wasm-bindgen",
++]
++
++[[package]]
++name = "libc"
++version = "0.2.191"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "65cd87c9a6d60536580b316ad985726104730a5151c99845f2490428ef91240a"
++
++[[package]]
++name = "libfuzzer-sys"
++version = "0.4.13"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "a9fd2f41a1cba099f79a0b6b6c35656cf7c03351a7bae8ff0f28f25270f929d2"
++dependencies = [
++ "arbitrary",
++ "cc",
++]
++
++[[package]]
++name = "libm"
++version = "0.2.16"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "b6d2cec3eae94f9f509c767b45932f1ada8350c4bdb85af2fcab4a3c14807981"
++
++[[package]]
++name = "log"
++version = "0.4.35"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "5d15f86d12da44cd8d4ec3c73984537eb7f4cadcb9776a575a0a8a05ca11005c"
++
++[[package]]
++name = "lru-slab"
++version = "0.1.3"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "4050469837a6ff301cd14c1f8f24f88549e6d548f24f64e2148eb0f72cebc51f"
++
++[[package]]
++name = "memchr"
++version = "2.8.3"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "cf8baf1c55e62ffcace7a9f06f4bd9cd3f0c4beb022d3b367256b91b87513d98"
++
++[[package]]
++name = "mio"
++version = "1.2.4"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "1788edb87fdc09c7e26304471e2f5be8cdefb1b6930d6e3985fc02ff53bf86ee"
++dependencies = [
++ "libc",
++ "wasi",
++ "windows-sys 0.61.2",
++]
++
++[[package]]
++name = "npt-alloc"
++version = "0.0.0"
++
++[[package]]
++name = "npt-client"
++version = "0.0.0"
++dependencies = [
++ "npt-link",
++ "npt-proto",
++ "npt-sim",
++]
++
++[[package]]
++name = "npt-fuzz"
++version = "0.0.0"
++dependencies = [
++ "libfuzzer-sys",
++ "npt-alloc",
++ "npt-client",
++ "npt-link",
++ "npt-net",
++ "npt-proto",
++ "npt-room",
++ "npt-sim",
++ "rand_chacha",
++ "rand_core",
++]
++
++[[package]]
++name = "npt-l1"
++version = "0.0.0"
++dependencies = [
++ "npt-link",
++ "rand_chacha",
++ "rand_core",
++]
++
++[[package]]
++name = "npt-link"
++version = "0.0.0"
++
++[[package]]
++name = "npt-net"
++version = "0.0.0"
++dependencies = [
++ "npt-l1",
++ "npt-link",
++ "npt-tcpinfo",
++ "quinn",
++ "rand_chacha",
++ "rand_core",
++ "tokio",
++ "tokio-rustls",
++ "tokio-tungstenite",
++]
++
++[[package]]
++name = "npt-proto"
++version = "0.0.0"
++dependencies = [
++ "npt-link",
++ "npt-sim",
++]
++
++[[package]]
++name = "npt-room"
++version = "0.0.0"
++dependencies = [
++ "npt-proto",
++ "npt-sim",
++]
++
++[[package]]
++name = "npt-sim"
++version = "0.0.0"
++dependencies = [
++ "libm",
++ "rand_chacha",
++ "rand_core",
++]
++
++[[package]]
++name = "npt-tcpinfo"
++version = "0.0.0"
++dependencies = [
++ "libc",
++]
++
++[[package]]
++name = "once_cell"
++version = "1.21.4"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "9f7c3e4beb33f85d45ae3e3a1792185706c8e16d043238c593331cc7cd313b50"
++
++[[package]]
++name = "openssl-probe"
++version = "0.2.2"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "7e036b411754132fd6b74e94b74e9a13c5cf606fa93d1885c35860d3060820b1"
++
++[[package]]
++name = "pin-project-lite"
++version = "0.2.17"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "a89322df9ebe1c1578d689c92318e070967d1042b512afbe49518723f4e6d5cd"
++
++[[package]]
++name = "portable-atomic"
++version = "1.15.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "05c8b63e8d9609db387f0324918f81d68fe27748f084ef092fb35954d0539a85"
++
++[[package]]
++name = "ppv-lite86"
++version = "0.2.21"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "85eae3c4ed2f50dcfe72643da4befc30deadb458a9b590d720cde2f2b1e97da9"
++dependencies = [
++ "zerocopy",
++]
++
++[[package]]
++name = "proc-macro2"
++version = "1.0.107"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "985e7ec9bb745e6ce6535b544d84d6cd6f7ad8bd711c398938ae983b91a766d9"
++dependencies = [
++ "unicode-ident",
++]
++
++[[package]]
++name = "quinn"
++version = "0.11.12"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "4051e23e9185c255a7e33ef59cdbca87a22d359052eecd22fc6b901fb37d9d11"
++dependencies = [
++ "bytes",
++ "cfg_aliases",
++ "pin-project-lite",
++ "quinn-proto",
++ "quinn-udp",
++ "rustc-hash",
++ "rustls",
++ "socket2",
++ "thiserror",
++ "tokio",
++ "tracing",
++ "web-time",
++]
++
++[[package]]
++name = "quinn-proto"
++version = "0.11.19"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "0e750cca55fe4f0439a15d0bb529da9651e79993e8e72c61a899a36d462befbe"
++dependencies = [
++ "bytes",
++ "fastbloom",
++ "getrandom 0.4.3",
++ "lru-slab",
++ "rand",
++ "rand_pcg",
++ "ring",
++ "rustc-hash",
++ "rustls",
++ "rustls-pki-types",
++ "rustls-platform-verifier",
++ "slab",
++ "thiserror",
++ "tinyvec",
++ "tracing",
++ "web-time",
++]
++
++[[package]]
++name = "quinn-udp"
++version = "0.5.16"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "af66907df18639dcf4db56ca65490cabc4b27a97dbadd96f2926cca73298f016"
++dependencies = [
++ "cfg_aliases",
++ "libc",
++ "once_cell",
++ "socket2",
++ "tracing",
++ "windows-sys 0.61.2",
++]
++
++[[package]]
++name = "quote"
++version = "1.0.47"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "1fbf4db142a473a8d80c26bbf18454ed458bf8d26c8219c331daecfdbd079001"
++dependencies = [
++ "proc-macro2",
++]
++
++[[package]]
++name = "r-efi"
++version = "6.0.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "f8dcc9c7d52a811697d2151c701e0d08956f92b0e24136cf4cf27b57a6a0d9bf"
++
++[[package]]
++name = "rand"
++version = "0.10.3"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "65c9fb96cbc91e3478eaae79a69fcd3f1ae4ad052e471fe6732fff548984b4af"
++dependencies = [
++ "chacha20",
++ "getrandom 0.4.3",
++ "rand_core",
++]
++
++[[package]]
++name = "rand_chacha"
++version = "0.10.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "3e6af7f3e25ded52c41df4e0b1af2d047e45896c2f3281792ed68a1c243daedb"
++dependencies = [
++ "ppv-lite86",
++ "rand_core",
++]
++
++[[package]]
++name = "rand_core"
++version = "0.10.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "63b8176103e19a2643978565ca18b50549f6101881c443590420e4dc998a3c69"
++
++[[package]]
++name = "rand_pcg"
++version = "0.10.2"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "caa0f4137e1c0a72f4c651489402276c8e8e1cf081f3b0ba156d2cbeef09e86a"
++dependencies = [
++ "rand_core",
++]
++
++[[package]]
++name = "ring"
++version = "0.17.14"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "a4689e6c2294d81e88dc6261c768b63bc4fcdb852be6d1352498b114f61383b7"
++dependencies = [
++ "cc",
++ "cfg-if",
++ "getrandom 0.2.17",
++ "libc",
++ "untrusted",
++ "windows-sys 0.52.0",
++]
++
++[[package]]
++name = "rustc-hash"
++version = "2.1.3"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "6b1e7f9a428571be2dc5bc0505c13fb6bf936822b894ec87abf8a08a4e51742d"
++
++[[package]]
++name = "rustc_version"
++version = "0.4.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "cfcb3a22ef46e85b45de6ee7e79d063319ebb6594faafcf1c225ea92ab6e9b92"
++dependencies = [
++ "semver",
++]
++
++[[package]]
++name = "rustls"
++version = "0.23.46"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "48e13bd8c0e9365c43cfa5c9e8f9ad49d3c8444926c9aac819e0e4dc503c8fdf"
++dependencies = [
++ "once_cell",
++ "ring",
++ "rustls-pki-types",
++ "rustls-webpki",
++ "subtle",
++ "zeroize",
++]
++
++[[package]]
++name = "rustls-native-certs"
++version = "0.8.5"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "4a073f5dc7469f984c52ad2752b63b0807745133b6de880b7b64c1ac4c48aec4"
++dependencies = [
++ "openssl-probe",
++ "rustls-pki-types",
++ "schannel",
++ "security-framework",
++]
++
++[[package]]
++name = "rustls-pki-types"
++version = "1.15.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "2f4925028c7eb5d1fcdaf196971378ed9d2c1c4efc7dc5d011256f76c99c0a96"
++dependencies = [
++ "web-time",
++ "zeroize",
++]
++
++[[package]]
++name = "rustls-platform-verifier"
++version = "0.7.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "1167586491e2b18b8bfbb293e8180ec17c201c4f076d7cb3070ca964e7598f98"
++dependencies = [
++ "core-foundation",
++ "core-foundation-sys",
++ "jni",
++ "log",
++ "once_cell",
++ "rustls",
++ "rustls-native-certs",
++ "rustls-platform-verifier-android",
++ "rustls-webpki",
++ "security-framework",
++ "security-framework-sys",
++ "webpki-root-certs",
++ "windows-sys 0.61.2",
++]
++
++[[package]]
++name = "rustls-platform-verifier-android"
++version = "0.2.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "eec689c0bc40ff2458a5977b6619cb718087084a18e02a131c599b62d05e1a5f"
++
++[[package]]
++name = "rustls-webpki"
++version = "0.103.16"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "4443b1b6d39d7c663139942cc4558262562d2c84123bb6282ef177009ca8b281"
++dependencies = [
++ "ring",
++ "rustls-pki-types",
++ "untrusted",
++]
++
++[[package]]
++name = "rustversion"
++version = "1.0.23"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "cf54715a573b99ac80df0bc206da022bcd442c974952c7b9720069370852e21f"
++
++[[package]]
++name = "same-file"
++version = "1.0.6"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "93fc1dc3aaa9bfed95e02e6eadabb4baf7e3078b0bd1b4d7b6b0b68378900502"
++dependencies = [
++ "winapi-util",
++]
++
++[[package]]
++name = "schannel"
++version = "0.1.30"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "9cb23c424d8ee841bb4d813677ca237e2a610067d594fec130f87d6093495ab5"
++dependencies = [
++ "windows-sys 0.61.2",
++]
++
++[[package]]
++name = "security-framework"
++version = "3.7.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "b7f4bc775c73d9a02cde8bf7b2ec4c9d12743edf609006c7facc23998404cd1d"
++dependencies = [
++ "bitflags",
++ "core-foundation",
++ "core-foundation-sys",
++ "libc",
++ "security-framework-sys",
++]
++
++[[package]]
++name = "security-framework-sys"
++version = "2.17.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "6ce2691df843ecc5d231c0b14ece2acc3efb62c0a398c7e1d875f3983ce020e3"
++dependencies = [
++ "core-foundation-sys",
++ "libc",
++]
++
++[[package]]
++name = "semver"
++version = "1.0.28"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "8a7852d02fc848982e0c167ef163aaff9cd91dc640ba85e263cb1ce46fae51cd"
++
++[[package]]
++name = "sha1"
++version = "0.11.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "aacc4cc499359472b4abe1bf11d0b12e688af9a805fa5e3016f9a386dc2d0214"
++dependencies = [
++ "cfg-if",
++ "cpufeatures",
++ "digest",
++]
++
++[[package]]
++name = "shlex"
++version = "2.0.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "f8fadd59c855ef2080decdef8ff161eb6661b86933c9d82e5ba29dc602a55aba"
++
++[[package]]
++name = "simd_cesu8"
++version = "1.2.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "11031e251abf8611c80f460e19dbdeb54a66db918e49c65a7065b46ac7aec520"
++dependencies = [
++ "rustc_version",
++ "simdutf8",
++]
++
++[[package]]
++name = "simdutf8"
++version = "0.1.5"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "e3a9fe34e3e7a50316060351f37187a3f546bce95496156754b601a5fa71b76e"
++
++[[package]]
++name = "siphasher"
++version = "1.0.4"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "33f4fe9184a62d842c9ef383018f3306d8ba224fd9d836f56d7288308847c256"
++
++[[package]]
++name = "slab"
++version = "0.4.12"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "0c790de23124f9ab44544d7ac05d60440adc586479ce501c1d6d7da3cd8c9cf5"
++
++[[package]]
++name = "socket2"
++version = "0.6.5"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "c3d1e2c7f27f8d4cb10542a02c49005dbd6e93095799d6f3be745fae9f8fedd4"
++dependencies = [
++ "libc",
++ "windows-sys 0.61.2",
++]
++
++[[package]]
++name = "subtle"
++version = "2.6.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "13c2bddecc57b384dee18652358fb23172facb8a2c51ccc10d74c157bdea3292"
++
++[[package]]
++name = "syn"
++version = "2.0.119"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "872831b642d1a07999a962a351ed35b955ea2cfc8f3862091e2a240a84f17297"
++dependencies = [
++ "proc-macro2",
++ "quote",
++ "unicode-ident",
++]
++
++[[package]]
++name = "syn"
++version = "3.0.9"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "d78c8dee4c7bf0e14673097256fed6142ce9d3b85a408189d07482442145823b"
++dependencies = [
++ "proc-macro2",
++ "quote",
++ "unicode-ident",
++]
++
++[[package]]
++name = "thiserror"
++version = "2.0.21"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "09e52cb86a36cede5cb101bf8908837b3e4c6e5e59fe7fd85c23fb56200d189e"
++dependencies = [
++ "thiserror-impl",
++]
++
++[[package]]
++name = "thiserror-impl"
++version = "2.0.21"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "fe5197923287db20a58125f0bc85c062f7f2c892de97b18c356f9efb14b28524"
++dependencies = [
++ "proc-macro2",
++ "quote",
++ "syn 3.0.9",
++]
++
++[[package]]
++name = "tinyvec"
++version = "1.13.3"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "fd3ca314f692efd6c868f8408f53fe444634a845f96c028b97d35f6a1f79f0ee"
++
++[[package]]
++name = "tokio"
++version = "1.54.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "b52fd3255258d26fac7264ab5a76b53c13367136dc011d3d6ad4f8ed070396a3"
++dependencies = [
++ "bytes",
++ "libc",
++ "mio",
++ "pin-project-lite",
++ "socket2",
++ "tokio-macros",
++ "windows-sys 0.61.2",
++]
++
++[[package]]
++name = "tokio-macros"
++version = "2.7.2"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "78773a2a397f451582ce068015985c33193cf6dea8b74d2a639fe457b2f07b0e"
++dependencies = [
++ "proc-macro2",
++ "quote",
++ "syn 3.0.9",
++]
++
++[[package]]
++name = "tokio-rustls"
++version = "0.26.6"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "c9cc2678c2cdd569ef8215e2afd7954ada2ae20b4fdd2c5fe6139a3b02d105db"
++dependencies = [
++ "rustls",
++ "tokio",
++]
++
++[[package]]
++name = "tokio-tungstenite"
++version = "0.30.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "17a073bfed563fa236697a068031408a93cd9522e08abf9933ead3e73411bd71"
++dependencies = [
++ "futures-util",
++ "log",
++ "tokio",
++ "tungstenite",
++]
++
++[[package]]
++name = "tracing"
++version = "0.1.44"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "63e71662fa4b2a2c3a26f570f037eb95bb1f85397f3cd8076caed2f026a6d100"
++dependencies = [
++ "log",
++ "pin-project-lite",
++ "tracing-core",
++]
++
++[[package]]
++name = "tracing-core"
++version = "0.1.36"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "db97caf9d906fbde555dd62fa95ddba9eecfd14cb388e4f491a66d74cd5fb79a"
++dependencies = [
++ "once_cell",
++]
++
++[[package]]
++name = "tungstenite"
++version = "0.30.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "e48ac77174b19c110a50ab2128b24215ac9cb40e0e12e093fb602d175c569d22"
++dependencies = [
++ "bytes",
++ "data-encoding",
++ "http",
++ "httparse",
++ "log",
++ "rand",
++ "sha1",
++ "thiserror",
++]
++
++[[package]]
++name = "typenum"
++version = "1.20.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "b6f5e870be6c3b371b77fe0ee0bafb859fa4964b4404c27de1d380043c4dda20"
++
++[[package]]
++name = "unicode-ident"
++version = "1.0.27"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "a2c754d6c33795a1c324727428e5a7dedb5b06195f9890bdbcba760d3e246563"
++
++[[package]]
++name = "untrusted"
++version = "0.9.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "8ecb6da28b8a351d773b68d5825ac39017e680750f980f3a1a85cd8dd28a47c1"
++
++[[package]]
++name = "walkdir"
++version = "2.5.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "29790946404f91d9c5d06f9874efddea1dc06c5efe94541a7d6863108e3a5e4b"
++dependencies = [
++ "same-file",
++ "winapi-util",
++]
++
++[[package]]
++name = "wasi"
++version = "0.11.1+wasi-snapshot-preview1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "ccf3ec651a847eb01de73ccad15eb7d99f80485de043efb2f370cd654f4ea44b"
++
++[[package]]
++name = "wasm-bindgen"
++version = "0.2.130"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "a0181c14ddd6c7b8b0b0132a5f1ea2f32be0d893cd3ea97b6e3b28886b8a3d1c"
++dependencies = [
++ "cfg-if",
++ "rustversion",
++ "wasm-bindgen-macro",
++ "wasm-bindgen-shared",
++]
++
++[[package]]
++name = "wasm-bindgen-macro"
++version = "0.2.130"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "6e931a02a39abdbf66966fc35902b5ed58344750a70885bed4ebb3d8eaf28ed9"
++dependencies = [
++ "quote",
++ "wasm-bindgen-macro-support",
++]
++
++[[package]]
++name = "wasm-bindgen-macro-support"
++version = "0.2.130"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "2ca4b54280e455bd831e33a6b8e734baf432fe63fbc35c42ac14ce67a043a53a"
++dependencies = [
++ "bumpalo",
++ "proc-macro2",
++ "quote",
++ "syn 3.0.9",
++ "wasm-bindgen-shared",
++]
++
++[[package]]
++name = "wasm-bindgen-shared"
++version = "0.2.130"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "3b1f9c3798725016c6ee5f2f57869ec0831e8bbc0ab0310a86e787e97f41389e"
++dependencies = [
++ "unicode-ident",
++]
++
++[[package]]
++name = "web-time"
++version = "1.1.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "5a6580f308b1fad9207618087a65c04e7a10bc77e02c8e84e9b00dd4b12fa0bb"
++dependencies = [
++ "js-sys",
++ "wasm-bindgen",
++]
++
++[[package]]
++name = "webpki-root-certs"
++version = "1.0.11"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "e49d0e65abc00c142e8f9428da991da9f1a250c39be97459901eb12b9b49f62a"
++dependencies = [
++ "rustls-pki-types",
++]
++
++[[package]]
++name = "winapi-util"
++version = "0.1.11"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
++dependencies = [
++ "windows-sys 0.61.2",
++]
++
++[[package]]
++name = "windows-link"
++version = "0.2.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "f0805222e57f7521d6a62e36fa9163bc891acd422f971defe97d64e70d0a4fe5"
++
++[[package]]
++name = "windows-sys"
++version = "0.52.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "282be5f36a8ce781fad8c8ae18fa3f9beff57ec1b52cb3de0789201425d9a33d"
++dependencies = [
++ "windows-targets",
++]
++
++[[package]]
++name = "windows-sys"
++version = "0.61.2"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "ae137229bcbd6cdf0f7b80a31df61766145077ddf49416a728b02cb3921ff3fc"
++dependencies = [
++ "windows-link",
++]
++
++[[package]]
++name = "windows-targets"
++version = "0.52.6"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "9b724f72796e036ab90c1021d4780d4d3d648aca59e491e6b98e725b84e99973"
++dependencies = [
++ "windows_aarch64_gnullvm",
++ "windows_aarch64_msvc",
++ "windows_i686_gnu",
++ "windows_i686_gnullvm",
++ "windows_i686_msvc",
++ "windows_x86_64_gnu",
++ "windows_x86_64_gnullvm",
++ "windows_x86_64_msvc",
++]
++
++[[package]]
++name = "windows_aarch64_gnullvm"
++version = "0.52.6"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "32a4622180e7a0ec044bb555404c800bc9fd9ec262ec147edd5989ccd0c02cd3"
++
++[[package]]
++name = "windows_aarch64_msvc"
++version = "0.52.6"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "09ec2a7bb152e2252b53fa7803150007879548bc709c039df7627cabbd05d469"
++
++[[package]]
++name = "windows_i686_gnu"
++version = "0.52.6"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "8e9b5ad5ab802e97eb8e295ac6720e509ee4c243f69d781394014ebfe8bbfa0b"
++
++[[package]]
++name = "windows_i686_gnullvm"
++version = "0.52.6"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "0eee52d38c090b3caa76c563b86c3a4bd71ef1a819287c19d586d7334ae8ed66"
++
++[[package]]
++name = "windows_i686_msvc"
++version = "0.52.6"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "240948bc05c5e7c6dabba28bf89d89ffce3e303022809e73deaefe4f6ec56c66"
++
++[[package]]
++name = "windows_x86_64_gnu"
++version = "0.52.6"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "147a5c80aabfbf0c7d901cb5895d1de30ef2907eb21fbbab29ca94c5b08b1a78"
++
++[[package]]
++name = "windows_x86_64_gnullvm"
++version = "0.52.6"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "24d5b23dc417412679681396f2b49f3de8c1473deb516bd34410872eff51ed0d"
++
++[[package]]
++name = "windows_x86_64_msvc"
++version = "0.52.6"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "589f6da84c646204747d1270a2a5661ea66ed1cced2631d546fdfb155959f9ec"
++
++[[package]]
++name = "zerocopy"
++version = "0.8.63"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "e5fe1f8f1b06191a00962174c61aa5005e0bb391a6d80d07e24d115c01a92ed8"
++dependencies = [
++ "zerocopy-derive",
++]
++
++[[package]]
++name = "zerocopy-derive"
++version = "0.8.63"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "863ad3ac83293fb4d740aedbfdc9240dd8d1a50c1099acd76ce80ce7c7230c7f"
++dependencies = [
++ "proc-macro2",
++ "quote",
++ "syn 2.0.119",
++]
++
++[[package]]
++name = "zeroize"
++version = "1.9.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "e13084392c5e4bc371903e2935a5eaeed24905a7511356b883835e18a78f6879"
+diff --git a/spikes/netcode-proof/fuzz/Cargo.toml b/spikes/netcode-proof/fuzz/Cargo.toml
+new file mode 100644
+index 0000000..c96329c
+--- /dev/null
++++ b/spikes/netcode-proof/fuzz/Cargo.toml
+@@ -0,0 +1,189 @@
++# The netcode proof test's fuzz crate (U5; PM-0001-34, plan §4.7 and §4.8): cargo-fuzz's targets, built and run on a
++# dated nightly (`cargo +nightly-2026-11-01 fuzz ...`; rust-toolchain.toml keeps everything else on 1.99.1), with
++# --locked. Not a member of the spike's workspace (its Cargo.toml excludes fuzz/): a workspace of its own, below, so its
++# instrumented nightly builds never change the workspace's resolve. Its Cargo.lock began as a copy of the workspace's,
++# then gained only libfuzzer-sys and its own dependencies by a minimal resolve (never `generate-lockfile`): every
++# package both locks hold has one version and checksum (check.mjs checks it), and the audits read both locks
++# (u5-brief.md Block 0; ADV-U5B-3).
++[package]
++name = "npt-fuzz"
++description = "The decoder fuzz targets (PM-0001-34) and DelayStream's scanner target, counted by npt-alloc's window"
++version = "0.0.0"
++edition = "2024"
++rust-version = "1.99.1"
++publish = false
++
++[package.metadata]
++cargo-fuzz = true
++
++# Its own workspace, so cargo never takes it for a member of the spike's (cargo-fuzz's form).
++[workspace]
++members = ["."]
++resolver = "3"
++
++# The workspace's lints, key for key (U5-Q7 term 1; check.mjs compares the tables): outside the spike's workspace,
++# `workspace = true` would name this workspace's own, empty table. unsafe_code is forbid: no #[allow] here can relax it.
++# libfuzzer-sys's `fuzz_target!` expands in this crate (the exported entry each target links to libFuzzer), and rustc
++# does not lint code another crate's macro builds, so the read of that expansion at Block 0 is the check there (U5-Q7
++# term 3).
++[lints.rust]
++unsafe_code = "forbid"
++
++[lints.clippy]
++disallowed_types = "deny"
++disallowed_methods = "deny"
++iter_over_hash_type = "deny"
++
++[features]
++# The bites build (plan §4.7; U5-Q6): npt-proto's planted defects (PM-0001-34/unchecked-index among them), one chosen
++# at run time by NPT_BITE, read once at a target's start; a build without this feature that sees NPT_BITE set refuses
++# to start.
++bites = ["npt-proto/bites"]
++
++[dependencies]
++# libFuzzer's driver and `fuzz_target!` (cargo-fuzz's runtime crate). Its exact version and its own dependencies are the
++# minimal resolve's, read with their sources before anything is built (DEP-HOLD; u5-brief.md Block 0).
++libfuzzer-sys = "0.4"
++# The spike's own crates, by path, at the workspace's lock entries: the decoders (npt-proto, with npt-link's
++# `Channel`), the client's receive path and the fixed joined state it starts from (npt-client, npt-room, npt-sim's
++# stress scene), DelayStream's request and frame scanner (npt-net's `fuzz` entry) and the counting allocator.
++npt-alloc = { path = "../crates/alloc" }
++npt-client = { path = "../crates/client" }
++npt-link = { path = "../crates/link" }
++npt-net = { path = "../crates/net", features = ["fuzz"] }
++npt-proto = { path = "../crates/proto" }
++npt-room = { path = "../crates/room" }
++npt-sim = { path = "../crates/sim" }
++# The seed generator's draws (every draw seeded and recorded), at the workspace's pins: already in both locks.
++rand_chacha = { version = "=0.10.0", default-features = false }
++rand_core = { version = "=0.10.1", default-features = false }
++
++# One target per [[bin]] (cargo-fuzz's form: no test, doc or bench build of a target); the code they share is the
++# crate's library. The 14 parts of PM-0001-34 (Ping and Pong each on both receivers' ways), SessionStatus and
++# RoomControl (U5-Q1), then the three with state: Snapshot and FullState through npt-client's receive path, and
++# DelayStream's scanner in both directions with S2's differential.
++[[bin]]
++name = "input"
++path = "fuzz_targets/input.rs"
++test = false
++doc = false
++bench = false
++
++[[bin]]
++name = "resync"
++path = "fuzz_targets/resync.rs"
++test = false
++doc = false
++bench = false
++
++[[bin]]
++name = "ping"
++path = "fuzz_targets/ping.rs"
++test = false
++doc = false
++bench = false
++
++[[bin]]
++name = "pong"
++path = "fuzz_targets/pong.rs"
++test = false
++doc = false
++bench = false
++
++[[bin]]
++name = "join"
++path = "fuzz_targets/join.rs"
++test = false
++doc = false
++bench = false
++
++[[bin]]
++name = "join_accepted"
++path = "fuzz_targets/join_accepted.rs"
++test = false
++doc = false
++bench = false
++
++[[bin]]
++name = "join_rejected"
++path = "fuzz_targets/join_rejected.rs"
++test = false
++doc = false
++bench = false
++
++[[bin]]
++name = "client_settings"
++path = "fuzz_targets/client_settings.rs"
++test = false
++doc = false
++bench = false
++
++[[bin]]
++name = "room_ended"
++path = "fuzz_targets/room_ended.rs"
++test = false
++doc = false
++bench = false
++
++[[bin]]
++name = "leave"
++path = "fuzz_targets/leave.rs"
++test = false
++doc = false
++bench = false
++
++[[bin]]
++name = "kick"
++path = "fuzz_targets/kick.rs"
++test = false
++doc = false
++bench = false
++
++[[bin]]
++name = "session_control"
++path = "fuzz_targets/session_control.rs"
++test = false
++doc = false
++bench = false
++
++[[bin]]
++name = "session_status"
++path = "fuzz_targets/session_status.rs"
++test = false
++doc = false
++bench = false
++
++[[bin]]
++name = "room_control"
++path = "fuzz_targets/room_control.rs"
++test = false
++doc = false
++bench = false
++
++[[bin]]
++name = "snapshot"
++path = "fuzz_targets/snapshot.rs"
++test = false
++doc = false
++bench = false
++
++[[bin]]
++name = "full_state"
++path = "fuzz_targets/full_state.rs"
++test = false
++doc = false
++bench = false
++
++[[bin]]
++name = "ws_scanner"
++path = "fuzz_targets/ws_scanner.rs"
++test = false
++doc = false
++bench = false
++
++# As the workspace (plan §4.5; ADR 0002 part 2): overflow checks stay on for the sim and the protocol in the release
++# profile cargo-fuzz builds with, as in the measured builds.
++[profile.release.package.npt-sim]
++overflow-checks = true
++[profile.release.package.npt-proto]
++overflow-checks = true
+diff --git a/spikes/netcode-proof/fuzz/fuzz_targets/input.rs b/spikes/netcode-proof/fuzz/fuzz_targets/input.rs
+new file mode 100644
+index 0000000..0d252fc
+--- /dev/null
++++ b/spikes/netcode-proof/fuzz/fuzz_targets/input.rs
+@@ -0,0 +1,7 @@
++//! PM-0001-34's Input part: the room's decode of a client's `Input` datagram, judged by npt_fuzz's shared check.
++#![no_main]
++
++use libfuzzer_sys::fuzz_target;
++
++// The two exports this macro expands, and why the crate's forbid does not see them: npt_fuzz's crate doc (SEC-U5D-1).
++fuzz_target!(|data: &[u8]| npt_fuzz::check("Input", data));
+diff --git a/spikes/netcode-proof/fuzz/src/lib.rs b/spikes/netcode-proof/fuzz/src/lib.rs
+new file mode 100644
+index 0000000..64aceb6
+--- /dev/null
++++ b/spikes/netcode-proof/fuzz/src/lib.rs
+@@ -0,0 +1,329 @@
++//! npt-fuzz: the shared check of PM-0001-34's fuzz targets (U5 Block 3; u5-brief.md §1.4 Block 3). Each target is one
++//! file under fuzz_targets/ that hands libFuzzer's bytes to [`check`] with its message type's name.
++//!
++//! **Per input:** the harness writes the channel's framing and the type's byte (each target pins its type, so it meets
++//! its own type's path only), then the fuzzer's bytes after them; that copy is made before npt-alloc's window opens. The
++//! window holds the decode call alone, once for each way the type's receivers decode it (Ping and Pong: the room's and
++//! the client's). After it closes, the harness judges what it saw ([`judge`]): an input over its type's limit must be
++//! refused with nothing allocated (catalogue §6 at U4 item 3's allocation half); an input within it must ask for no
++//! single request larger than its type's bar ([`Part::bar`]). A failure prints one `npt-fuzz: OVER:` line and aborts,
++//! so libFuzzer keeps the input as a crash; the decision is never taken inside the allocator. Each run prints a header
++//! line (its part, its limit, its bar and every type's bar) and a record line at each new largest request.
++//!
++//! **The bars** are option (a) of his open U5-ALLOC (u5-alloc-bounds.md:224-245, measured at rustc 1.99.1): the most a
++//! message within its limit can make the decoder ask for at once. His answer may change the bar, never the figures:
++//! every call's largest request and total are recorded whichever bar applies.
++//!
++//! **The exports libfuzzer-sys's macro writes into this crate** (the advisor's SEC-U5D-1 ruling): each target's one
++//! `fuzz_target!` call expands two `#[no_mangle] pub extern "C"` functions in the target's binary,
++//! `LLVMFuzzerInitialize` and `rust_fuzzer_test_input`, plus a safe function holding the closure, as the dependency
++//! read cleared libfuzzer-sys 0.4.13 (security-u5-deps.md:96-115). rustc does not lint another crate's macro, so this
++//! crate's forbid of unsafe_code does not see them; nothing else exported or unsafe is written here by hand. check.mjs's
++//! deps step holds that: one `fuzz_target!` per fuzz_targets/ file and no other libfuzzer_sys macro, no `no_mangle`,
++//! `export_name`, `link_section` or `extern` (fuzzProblems), and libfuzzer-sys at exactly 0.4.13 in fuzz/Cargo.lock
++//! (fuzzLockProblems).
++
++use std::sync::Once;
++use std::sync::atomic::{AtomicU64, Ordering};
++
++use npt_alloc::Counts;
++use npt_link::Channel;
++use npt_proto::{Direction, Limits, decode};
++
++/// Every target's allocator: npt-alloc's, so each decode call's window counts (U5-Q3 term 5: it compiles under this
++/// crate's forbid).
++#[global_allocator]
++static ALLOC: npt_alloc::Counting = npt_alloc::Counting;
++
++/// One fuzzed message type: its type byte (its row in [`Limits::TYPES`], from 1), the ways its receivers decode it, and
++/// its bar, the largest single request in bytes a message within its limit may make the decoder ask for.
++#[derive(Debug)]
++pub struct Part {
++    pub ty: u8,
++    pub ways: &'static [Direction],
++    pub bar: u64,
++}
++
++const ROOM: &[Direction] = &[Direction::ClientToRoom];
++const CLIENT: &[Direction] = &[Direction::RoomToClient];
++/// Ping and Pong: the room's way and the client's, two decode calls per input (ADV-U5B-20).
++const BOTH: &[Direction] = &[Direction::ClientToRoom, Direction::RoomToClient];
++
++/// One row of [`PARTS`].
++const fn row(ty: u8, ways: &'static [Direction], bar: u64) -> Part {
++    Part { ty, ways, bar }
++}
++
++/// The bars, one per type, option (a) of U5-ALLOC (u5-alloc-bounds.md:224-245; the site each comes from beside it).
++pub const PARTS: [Part; 15] = [
++    // Input: input.rs:212 reserves its count's commands, 8 x 32 B.
++    row(1, ROOM, 256),
++    // Snapshot, the decoder alone: its entities grow by push to 512 x 104 B (snapshot.rs:599-608); through the
++    // client its bar depends on the held state (Block 4).
++    row(2, CLIENT, 53_248),
++    // FullState, the decoder alone: 16,384 x 104 B (snapshot.rs:705-708); through the client 2,213,272 (Block 4).
++    row(3, CLIENT, 1_703_936),
++    row(4, ROOM, 0),
++    row(5, BOTH, 0),
++    row(6, BOTH, 0),
++    row(7, ROOM, 0),
++    row(8, CLIENT, 0),
++    row(9, CLIENT, 0),
++    row(10, ROOM, 0),
++    row(11, CLIENT, 0),
++    row(12, ROOM, 0),
++    row(13, CLIENT, 0),
++    // SessionControl: its note, up to 480 B (control.rs:285).
++    row(14, ROOM, 480),
++    row(15, CLIENT, 0),
++];
++
++impl Part {
++    /// Its type's name, as [`Limits::TYPES`] gives it.
++    pub fn name(&self) -> &'static str {
++        Limits::TYPES[usize::from(self.ty) - 1].0
++    }
++
++    /// The channel its type travels on.
++    pub fn channel(&self) -> Channel {
++        Limits::TYPES[usize::from(self.ty) - 1].1
++    }
++
++    /// The most bytes a receiver takes, framing included: the catalogue's limit, which counts a control message's 2 B
++    /// length and not a full state's 4 B length; `Snapshot`'s receive limit (msg.rs:244-263).
++    pub fn limit(&self) -> usize {
++        let limit = Limits::TYPES[usize::from(self.ty) - 1].3;
++        match (self.ty, self.channel()) {
++            (2, _) => Limits::SNAPSHOT_RECEIVE,
++            (_, Channel::FullState) => 4 + limit,
++            _ => limit,
++        }
++    }
++
++    /// The message the harness feeds: the channel's framing (a length that states the rest exactly), the type byte,
++    /// then `data`, into `out`.
++    pub fn framed(&self, data: &[u8], out: &mut Vec<u8>) {
++        out.clear();
++        match self.channel() {
++            Channel::Datagram => {}
++            Channel::Control => out.extend_from_slice(
++                &u16::try_from(data.len() + 1)
++                    .unwrap_or(u16::MAX)
++                    .to_le_bytes(),
++            ),
++            Channel::FullState => out.extend_from_slice(
++                &u32::try_from(data.len() + 1)
++                    .unwrap_or(u32::MAX)
++                    .to_le_bytes(),
++            ),
++        }
++        out.push(self.ty);
++        out.extend_from_slice(data);
++    }
++}
++
++/// The part of the type called `name`.
++///
++/// # Panics
++/// If no type has that name: a target's own mistake.
++pub fn part(name: &str) -> &'static Part {
++    PARTS
++        .iter()
++        .find(|p| p.name() == name)
++        .expect("a fuzzed type's name")
++}
++
++/// One decode call judged: `data` framed for `part` outside the window, then `decode` on it inside the window alone.
++/// `Ok` with what the window saw when it holds; `Err` with why not: an input over the limit that was accepted, or that
++/// asked for memory before its refusal, or an input within the limit that asked for more at once than the bar.
++///
++/// # Errors
++/// As above, one sentence.
++pub fn judge<T, E>(
++    part: &Part,
++    way: Direction,
++    data: &[u8],
++    decode: impl FnOnce(&[u8]) -> Result<T, E>,
++) -> Result<Counts, String> {
++    let mut bytes = Vec::with_capacity(data.len() + 5);
++    part.framed(data, &mut bytes);
++    let over = bytes.len() > part.limit();
++    npt_alloc::start();
++    let result = decode(&bytes);
++    let seen = npt_alloc::stop();
++    let refused = result.is_err();
++    drop(result);
++    let at = format!(
++        "{} ({way:?}), an input of {} B against its limit of {} B",
++        part.name(),
++        bytes.len(),
++        part.limit()
++    );
++    if over && !refused {
++        Err(format!("{at}: accepted"))
++    } else if over && seen.allocations > 0 {
++        Err(format!(
++            "{at}: {} request(s), {} B, before its refusal",
++            seen.allocations, seen.bytes
++        ))
++    } else if !over && seen.largest > part.bar {
++        Err(format!(
++            "{at}: one request of {} B, over its bar of {} B",
++            seen.largest, part.bar
++        ))
++    } else {
++        Ok(seen)
++    }
++}
++
++/// The largest request and the largest total any call of this run has made: the record lines print each new largest.
++static LARGEST: AtomicU64 = AtomicU64::new(0);
++static TOTAL: AtomicU64 = AtomicU64::new(0);
++static HEADER: Once = Once::new();
++
++/// One fuzz input for the type called `name`: each way its receivers decode it, through npt-proto's [`decode`], judged
++/// by [`judge`]; a failure prints its `npt-fuzz: OVER:` line and aborts, which libFuzzer keeps as a crash.
++pub fn check(name: &str, data: &[u8]) {
++    let part = part(name);
++    HEADER.call_once(|| {
++        let bars: Vec<String> = PARTS.iter().map(|p| format!("{} {}", p.name(), p.bar)).collect();
++        eprintln!(
++            "npt-fuzz header: part {}, type {}, ways {:?}, channel {:?}, limit {} B, bar {} B; bars (U5-ALLOC option (a), B): {}",
++            part.name(),
++            part.ty,
++            part.ways,
++            part.channel(),
++            part.limit(),
++            part.bar,
++            bars.join(", ")
++        );
++    });
++    for &way in part.ways {
++        match judge(part, way, data, |b| decode(way, part.channel(), b)) {
++            Ok(seen) => {
++                let total = TOTAL
++                    .fetch_max(seen.bytes, Ordering::Relaxed)
++                    .max(seen.bytes);
++                if seen.largest > LARGEST.fetch_max(seen.largest, Ordering::Relaxed) {
++                    eprintln!(
++                        "npt-fuzz record: {} ({way:?}): largest request {} B, its total {} B in {} request(s); the run's largest total {total} B (bar {} B)",
++                        part.name(),
++                        seen.largest,
++                        seen.bytes,
++                        seen.allocations,
++                        part.bar
++                    );
++                }
++            }
++            Err(why) => {
++                eprintln!("npt-fuzz: OVER: {why}");
++                std::process::abort();
++            }
++        }
++    }
++}
++
++#[cfg(test)]
++mod tests {
++    use std::hint::black_box;
++
++    use npt_proto::{Input, Message, encode};
++    use npt_sim::Command;
++
++    use super::*;
++
++    #[test]
++    fn every_part_is_its_rows_type_and_frames_its_limit() {
++        for (k, p) in PARTS.iter().enumerate() {
++            assert_eq!(usize::from(p.ty), k + 1, "{p:?}");
++            let mut out = Vec::new();
++            p.framed(&[7; 3], &mut out);
++            let frame = match p.channel() {
++                Channel::Datagram => 0,
++                Channel::Control => 2,
++                Channel::FullState => 4,
++            };
++            assert_eq!((out.len(), out[frame]), (frame + 4, p.ty), "{}", p.name());
++        }
++        let limits: Vec<(&str, usize)> = PARTS.iter().map(|p| (p.name(), p.limit())).collect();
++        assert_eq!(
++            &limits[..3],
++            &[("Input", 166), ("Snapshot", 1_150), ("FullState", 65_540)]
++        );
++        assert_eq!(part("SessionControl").limit(), 512);
++    }
++
++    /// A decoder planted to trust a length: it reserves 1 KiB for each unit of the type's first body byte.
++    fn trusting(b: &[u8]) -> Result<Vec<u8>, ()> {
++        Ok(Vec::with_capacity(usize::from(b[1]) * 1_024))
++    }
++
++    #[test]
++    fn a_planted_decoder_that_believes_a_length_is_over_its_bar() {
++        let input = part("Input");
++        let why = judge(input, Direction::ClientToRoom, &[200], trusting).unwrap_err();
++        assert_eq!(
++            why,
++            "Input (ClientToRoom), an input of 2 B against its limit of 166 B: one request of 204800 B, over its bar of 256 B"
++        );
++        assert_eq!(
++            judge(input, Direction::ClientToRoom, &[0], trusting),
++            Ok(Counts::default())
++        );
++    }
++
++    #[test]
++    fn an_input_over_its_limit_is_refused_with_nothing_asked_for() {
++        let input = part("Input");
++        let over = [0u8; Limits::INPUT];
++        let asks = |b: &[u8]| -> Result<(), ()> {
++            black_box(Vec::<u8>::with_capacity(b.len()));
++            Err(())
++        };
++        let why = judge(input, Direction::ClientToRoom, &over, asks).unwrap_err();
++        assert!(
++            why.ends_with(
++                "167 B against its limit of 166 B: 1 request(s), 167 B, before its refusal"
++            ),
++            "{why}"
++        );
++        let accepts = |_: &[u8]| -> Result<(), ()> { Ok(()) };
++        assert!(
++            judge(input, Direction::ClientToRoom, &over, accepts)
++                .unwrap_err()
++                .ends_with(": accepted")
++        );
++        // npt-proto's own decoder: refused before any request (msg.rs:403).
++        let real = judge(input, Direction::ClientToRoom, &over, |b| {
++            decode(Direction::ClientToRoom, Channel::Datagram, b)
++        });
++        assert_eq!(real, Ok(Counts::default()));
++    }
++
++    #[test]
++    fn inputs_largest_message_reaches_its_bar_and_no_further() {
++        let commands = (0..8u32)
++            .map(|k| Command {
++                tick: 100 - k,
++                seq: 50 - k as u16,
++                view_tick: 100 - k,
++                ..Command::default()
++            })
++            .collect();
++        let mut bytes = Vec::new();
++        let msg = Message::Input(Input {
++            ack_tick: 0,
++            ack_groups: 0,
++            commands,
++        });
++        encode(&msg, &mut bytes).expect("an Input of 8 commands encodes");
++        let seen = judge(part("Input"), Direction::ClientToRoom, &bytes[1..], |b| {
++            decode(Direction::ClientToRoom, Channel::Datagram, b)
++        });
++        assert_eq!(
++            seen.map(|c| c.largest),
++            Ok(256),
++            "8 commands of 32 B, reserved at once (input.rs:212)"
++        );
++    }
++}

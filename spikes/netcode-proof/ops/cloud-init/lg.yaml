@@ -1,0 +1,165 @@
+#cloud-config
+# LG's cloud-init for the netcode proof test (u8-brief.md rev 1.1, section 1 Block 1; plan.md §10.5). No secret, no
+# address of the day; under 32 KiB. /etc/npt/commit names the run's code commit Y (the commit pair, choice 2).
+# npt-load's key is installed after boot by `npt-ctl loadkey` into a root-owned file (C4), never by cloud-init.
+ssh_pwauth: false
+disable_root: true
+ssh_genkeytypes: [ed25519]
+package_update: true
+package_upgrade: false
+package_reboot_if_required: false
+system_info:
+  default_user:
+    name: npt
+    uid: 2000
+    gecos: npt run login
+    lock_passwd: true
+    shell: /bin/bash
+    sudo: null
+users:
+  - default
+  - {name: npt-build, uid: 2003, gecos: npt build, shell: /usr/sbin/nologin, lock_passwd: true}
+  - {name: npt-load, uid: 2004, gecos: npt load restricted login, shell: /bin/sh, lock_passwd: true, homedir: /var/lib/npt-load}
+# LG's own wall: TCP 22 from any source (fw-lg admits only RS's IPv4) and ICMP echo for PM-0006-12 (fw-lg admits it
+# only from his home address). Outbound stays open: npt-load reaches RS's game ports and 9100.
+bootcmd:
+  - |
+    nft -f - <<'NFT'
+    flush ruleset
+    table inet npt {
+      chain input {
+        type filter hook input priority filter; policy drop;
+        ct state invalid drop
+        ct state established,related accept
+        iifname "lo" accept
+        icmpv6 type { nd-router-advert, nd-neighbor-solicit, nd-neighbor-advert, packet-too-big } accept
+        udp sport 67 udp dport 68 accept
+        tcp dport 22 accept
+        icmp type echo-request accept
+      }
+      chain forward { type filter hook forward priority filter; policy drop; }
+      chain output {
+        type filter hook output priority filter; policy accept;
+        meta skuid 2004 ip daddr 169.254.169.254 drop
+        meta skuid 2004 ip6 daddr fe80::a9fe:a9fe drop
+      }
+    }
+    NFT
+write_files:
+  - path: /etc/npt/commit
+    permissions: '0644'
+    content: |
+      1ceecc321eaf194d59568fdab56644d1e9eb4f05
+  - path: /etc/npt/role
+    permissions: '0644'
+    content: |
+      lg
+  # npt-load's key lives in a root-owned file (/etc/ssh/authorized_keys/npt-load), so root never writes a path
+  # npt-load can write (Q-U8-1 term 4).
+  - path: /etc/ssh/sshd_config.d/00-npt.conf
+    permissions: '0644'
+    content: |
+      PasswordAuthentication no
+      KbdInteractiveAuthentication no
+      PermitRootLogin no
+      AuthenticationMethods publickey
+      X11Forwarding no
+      AllowAgentForwarding no
+      MaxAuthTries 3
+      LoginGraceTime 20
+      AllowUsers npt npt-load
+      DisableForwarding yes
+      AuthorizedKeysFile .ssh/authorized_keys /etc/ssh/authorized_keys/%u
+  - path: /etc/apt/apt.conf.d/99-npt
+    permissions: '0644'
+    content: |
+      APT::Periodic::Update-Package-Lists "0";
+      APT::Periodic::Unattended-Upgrade "0";
+      Unattended-Upgrade::Automatic-Reboot "false";
+  - path: /usr/local/sbin/npt-firstboot
+    permissions: '0700'
+    content: |
+      #!/bin/bash
+      # LG's first boot, once, from runcmd, as root (the same shape as RS's).
+      set -euo pipefail
+      umask 022
+      export PATH=/usr/sbin:/usr/bin:/sbin:/bin DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=l
+      B=/var/lib/npt/bringup
+      install -d -o root -g root -m 0755 /var/lib/npt "$B"
+      step() { printf '%s %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$*" >> "$B/steps.log"; }
+      trap 'step "FAILED at line $LINENO"; touch "$B/build.failed"' ERR
+      step "host-key fingerprints to the console before any fetch (F12's term): /etc/issue.d, then agetty --reload"
+      install -d -o root -g root -m 0755 /etc/issue.d   # Ubuntu 24.04 ships no /etc/issue.d (SEC-R2-1)
+      { echo "npt LG host keys (SHA256):"; for k in /etc/ssh/ssh_host_*_key.pub; do ssh-keygen -l -E sha256 -f "$k"; done; } \
+        > /etc/issue.d/50-npt-hostkeys.issue
+      agetty --reload || step "agetty --reload failed (recorded); the keys show at the console's next prompt"
+      COMMIT="$(tr -d '\n' < /etc/npt/commit)"
+      [[ "$COMMIT" =~ ^[0-9a-f]{40}$ ]] && [ "$COMMIT" != 0000000000000000000000000000000000000000 ] \
+        || { step "the code commit is not filled"; touch "$B/build.failed"; exit 2; }
+      REPO=https://github.com/Mergincanli/Shamble-Frontlines.git
+      SPIKE=spikes/netcode-proof
+      NB=/home/npt-build
+
+      step "login user npt: its own group only; no cloud-init sudo rule"
+      rm -f /etc/sudoers.d/90-cloud-init-users
+      for g in $(id -nG npt); do [ "$g" = npt ] || gpasswd -d npt "$g" >/dev/null; done
+
+      step "upgrades: security once now, then automatic upgrades and reboots off"
+      systemctl disable --now apt-daily.timer apt-daily-upgrade.timer unattended-upgrades.service || true
+      unattended-upgrade || step "unattended-upgrade returned non-zero (recorded)"
+
+      step "root-owned clone at the code commit"
+      install -d -o root -g root -m 0755 /opt/npt /opt/npt/bin
+      git init -q /opt/npt/clone
+      git -c http.lowSpeedLimit=1000 -c http.lowSpeedTime=60 -C /opt/npt/clone fetch -q --depth 1 "$REPO" "$COMMIT"
+      git -C /opt/npt/clone checkout -q --detach FETCH_HEAD
+      [ "$(git -C /opt/npt/clone rev-parse HEAD)" = "$COMMIT" ]
+      O=/opt/npt/clone/$SPIKE/ops
+
+      step "wrappers, npt-load-ctl and sudoers from the clone"
+      install -d -m 0755 /usr/local/lib/npt /etc/ssh/authorized_keys
+      install -m 0644 "$O/sbin/npt-lib.sh" /usr/local/lib/npt/npt-lib.sh
+      for w in npt-ctl npt-userdata; do install -m 0755 "$O/sbin/$w" "/usr/local/sbin/$w"; done
+      install -m 0755 "$O/sbin/npt-load-ctl" /usr/local/bin/npt-load-ctl
+      visudo -c -q -f "$O/sbin/sudoers.d/npt-lg"
+      install -m 0440 "$O/sbin/sudoers.d/npt-lg" /etc/sudoers.d/npt
+      visudo -c -q
+
+      step "npt-load's directories (its own; root-owned parent)"
+      install -d -o root -g root -m 0755 /var/lib/npt-load
+      install -d -o npt-load -g npt-load -m 0700 /var/lib/npt-load/run /var/lib/npt-load/tokens /var/lib/npt-load/logs
+
+      step "toolchain, the clone and the build, as npt-build"
+      runuser -u npt-build -- env -i HOME="$NB" PATH=/usr/bin:/bin COMMIT="$COMMIT" REPO="$REPO" \
+        bash -euo pipefail -s <<'BUILD' >> "$B/build.log" 2>&1
+      cd "$HOME"
+      curl --proto '=https' --tlsv1.2 -fsSL --max-time 900 --retry 2 --speed-limit 1000 --speed-time 60 -o rustup-init \
+        https://static.rust-lang.org/rustup/archive/1.29.3/aarch64-unknown-linux-gnu/rustup-init
+      echo "9f608c142e0e38a78957d0661ba1dfaf0b6fb37184cfaa4b9a0aa57af6184282  rustup-init" | sha256sum -c -
+      chmod 0755 rustup-init
+      ./rustup-init -y -q --no-modify-path --profile minimal --default-toolchain none
+      export PATH="$HOME/.cargo/bin:$PATH"
+      git init -q clone
+      git -c http.lowSpeedLimit=1000 -c http.lowSpeedTime=60 -C clone fetch -q --depth 1 "$REPO" "$COMMIT"
+      git -C clone checkout -q --detach FETCH_HEAD
+      test "$(git -C clone rev-parse HEAD)" = "$COMMIT"
+      cd clone/spikes/netcode-proof
+      rustup toolchain install
+      cargo fetch --locked
+      cargo build --locked --offline --release --workspace --bins
+      BUILD
+      pkill -u npt-build || true
+
+      step "binaries, read as their owner npt-build and installed by root (SEC-SB-6)"
+      T="$NB/clone/$SPIKE/target/release"
+      take() { runuser -u npt-build -- cat "$1" > "/opt/npt/bin/.$2.tmp"; install -m 0755 "/opt/npt/bin/.$2.tmp" "/opt/npt/bin/$2"; rm -f "/opt/npt/bin/.$2.tmp"; }
+      for b in npt-load npt-bots; do
+        [ -f "$T/$b" ] && [ ! -L "$T/$b" ] || { step "missing binary $b"; false; }
+        take "$T/$b" "$b"
+      done
+      sha256sum /opt/npt/bin/* > "$B/bin.sha256"
+      git -C /opt/npt/clone rev-parse HEAD > "$B/head.txt"
+      step "build done"
+      touch "$B/build.done"
+runcmd:
+  - [/usr/local/sbin/npt-firstboot]

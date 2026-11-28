@@ -1,0 +1,190 @@
+{
+  "verdict": "READY AFTER THE CHANGES BELOW",
+  "summary": "I ruled the test-engineer's read of C62H-BOUND (a). It agrees with mine on the core: E1 and E2 are the only ways a correct npt-client on L1 files a tick lost, and each planted bug fails only its own figure.\n\nAll ten findings stand. None is declined:\n- Accepted: TE-CB-1, -2, -5 (part ii), -6 and -7.\n- Merged with my conditions: TE-CB-3 into C9, TE-CB-4 into C7, TE-CB-5 (part i) into C2, TE-CB-8 into C1 and C4 (already applied), TE-CB-9 into C6, TE-CB-10 into C11.\n\nCode confirmed for this ruling:\n- eval.rs:1226-1231 and :1475-1478: a run with one failing check stays valid with its gaps set aside, and a bite reads 'shown' when any check fails. So bite evidence must read every check and require no gaps.\n- logs.rs:620 is the only writer of room tick records. It always sets hs.server_hash (log/src/lib.rs:158-164), so C2's broad gap is right.\n- Client tick records always carry snap_incomplete (logs.rs:449), so TE-CB-5's second gap is a real defect signal.\n- The client writer already keeps per-(tick, slot) room-hash flags (logs.rs:540, removed at :420), so TE-CB-2's tally is cheap to build.\n- No crate has changed since fc411116c1f1 or fd4612050cd6, so TE-CB-7's whole-line comparison holds.\n\nTexts v2 check (by word-diff script):\n- C1, C2's phrase, C4 and C8 are applied exactly, and nothing else changed.\n- C2's place is right.\n- 'Gaps as snap_lost_unexplained_count's.' stays, provided both figures share one reader and one gap list.\n\nTwo more word changes to the frozen texts (four replacements, each tested to match once):\n- one more gap in row 1 (TE-CB-5, part ii);\n- 'each measured 1' in the :320 row. My C1 missed this unscoped clause.\n\nMy C3 item (v) was not a difference: option (a) already said B1 comes with U4g. It moves to 'still unbounded'.\n\nNew planned size: about 650 changed lines (545 to 755). The stop stays at 1,050.\n\nNot checked: I built and ran nothing. The judged runs must still show 0 and 0 on clean runs and 48 on each bite.",
+  "te_rulings": [
+    {
+      "id": "TE-CB-1",
+      "ruling": "accept",
+      "how": "Goes into the build plan and the planned size. The per-slot read becomes one pure function, for example link_lost(groups, has_session, server_hash, DatagramCounts) -> Result<u32, String>. It has five unit tests in scenario.rs: one datagram too many, one too few, groups with a null server hash, groups with no session (C7) and the Ok path. It adds +8 to +12 code lines and +20 to +30 test lines. No frozen text changes."
+    },
+    {
+      "id": "TE-CB-2",
+      "ruling": "accept",
+      "how": "Report only, never judged. No frozen text changes.\n- npt-lab's summary phrase becomes: '; measured snapshot datagrams S, lost by the link L (in bursts B); measured client-ticks filed lost: the room sent nothing E1, the link lost a datagram E2, neither N'.\n- The counts are taken at the client write. E1 comes from the existing `logged` flags. E2 and N come from the per-(tick, slot) link-loss values the room log gets, kept beside `logged`.\n- Expected lines on every run, bites included: E1 + E2 + N = measured incomplete, and N = the judge's snap_lost_unexplained_count.\n- P3 s1's E1 is above 0. If it is not, the report says condition 2 is shown by fixtures only. That case is not a stop.\n- Any difference between N and the judge's figure, or N above 0 on a clean run, stops the unit and goes to Mustafa (freeze line).\n- The short P2 lab test asserts the same identities. About +25 to +35 lines across logs.rs and scenario.rs."
+    },
+    {
+      "id": "TE-CB-3",
+      "ruling": "merge",
+      "how": "Merged into C9. Any change after his yes, a review finding included, goes back to him before the judged runs. That covers:\n- an approved text: a check's name, figure, parts or value; the bite's id or text; the four SERIES rows; the README sentence;\n- what either figure computes, as its SERIES row states it.\nEach set's runs.txt prints marks.json's sha256 (c-u4r-runs.mjs:475). It must equal the sha256 of the marks.json that the C9 script showed equal to the frozen texts. The report quotes both."
+    },
+    {
+      "id": "TE-CB-4",
+      "ruling": "merge",
+      "how": "Merged into C7: groups that are not empty on a slot with no session make the run return Err. Its unit test is one of TE-CB-1's five."
+    },
+    {
+      "id": "TE-CB-5",
+      "ruling": "accept",
+      "how": "(i) A room record with no hs.server_hash: merged into C2. C2's broader text stands, 'a room tick record without `hs.server_hash`' (any room tick record), already in v2. Only logs.rs:620 writes room tick records, and it always sets the list.\n(ii) A measured client tick record with no tick.s.snap_incomplete: accepted. It becomes a gap of the shared reader, with one fixture. The row-1 Gaps sentence changes in its row block and in series-placement (replacements 1 and 2). Figure B inherits it through 'Gaps as ...'s'.\nThe gap fixtures assert that both figures read gap, not only that the run is INVALID."
+    },
+    {
+      "id": "TE-CB-6",
+      "ruling": "accept",
+      "how": "Two engine.rs fixtures go into the build plan:\n- an after-phase incomplete tick with a non-null server hash and link-loss 0: figure A reads 0;\n- a warm-up and an after-phase whole hash at ticks with link-loss 1 or more: figure B reads 0.\nAbout +12 to +20 lines. No text changes."
+    },
+    {
+      "id": "TE-CB-7",
+      "ruling": "accept",
+      "how": "Into the build plan's expected lines.\n(1) whole-as-lost on P2:\n- client hashes s1's minus 48 (861,948 if s1 reads 861,996 again);\n- measured incomplete s1's + 48;\n- fate log equal to s1's;\n- N = 48, with E1 and E2 equal to s1's.\nlink-lost-overstated:\n- incomplete and client hashes equal to s1's;\n- L is taken from the counts, not the written values, so it equals s1's (ruled: the plant falsifies only the written record);\n- E1, E2 and N equal to s1's.\n(2) Each clean summary line, without the new phrase and the wall time, equals its old line whole: fc411116c1f1/P2/runs.txt:24-26 and fd4612050cd6/P3/runs.txt:24-26. No crate has changed since (git log empty).\n(3) P3 s1 and s3 carry the carry-58 flag again and go to the advisor before they count.\n(4) Each bite run's outcomes are read per check from verdict-bites.json (see TE condition 6).\n(5) and (6) are merged into C10: judge peaks are quoted as projections, and the stop counts are 30 / 24 / 23 on P2.\nThe bite stop rule is accepted and goes into the freeze line."
+    },
+    {
+      "id": "TE-CB-8",
+      "ruling": "merge",
+      "how": "Merged into C1 and C4, which v2 already applies: 'measured client-tick' in both check names, 'in each run's measured ten minutes (not its warm-up or its last few seconds)' in the plain words, and 'the lab's per-client log writer'. TE's own phrasing ('in the measured window', 'the lab's client-log writer') means the same and is not used, so the texts are not reworded twice. The one unscoped clause left, the :320 row's 'each 1', is fixed by replacements 3 and 4."
+    },
+    {
+      "id": "TE-CB-9",
+      "ruling": "merge",
+      "how": "Merged into C6. Before the P2 set, a recorded dry print of planJudged and its projections for all four profiles. Expected:\n- P0: 3 measured runs plus 6 bites (tick16, client-rounding, whole-as-lost, pos-4cm, yaw-12bit, pitch-8bit), with no link-lost-overstated;\n- P2: 3 plus 2 (whole-as-lost, link-lost-overstated);\n- P3: 3;\n- B1: 3.\nIt is asserted in the lane's scratch evidence harness, as U4r-F2 and U4r-F3 did. That harness is not tracked, so it adds no planned lines."
+    },
+    {
+      "id": "TE-CB-10",
+      "ruling": "merge",
+      "how": "Merged into C11's report line. The round's test-engineer notes must:\n- name the marks.json lines and the judge lines read (figures.rs and engine.rs; no main.rs, eval.rs or cli.rs, since JDG-ONLY-1 is out of this lane under C5);\n- give marks.json's sha256 before (9fb5be57…) and after;\n- record git diff --stat <lane base>..<head> -- spikes/netcode-proof/marks/marks.json spikes/netcode-proof/crates/judge at the close.\nA fix pass that touches those paths gets a read of what changed. SERIES.md and README.md are read too."
+    },
+    {
+      "id": "TE-cond-1",
+      "ruling": "accept",
+      "how": "As TE-CB-1: in the plan and its size before the paste."
+    },
+    {
+      "id": "TE-cond-2",
+      "ruling": "accept",
+      "how": "As TE-CB-2: the summary tally and its expected lines, in the plan and its size before the paste. The 'differs' block names it as an addition."
+    },
+    {
+      "id": "TE-cond-3",
+      "ruling": "merge",
+      "how": "As TE-CB-3: into C9 and the freeze line."
+    },
+    {
+      "id": "TE-cond-4",
+      "ruling": "merge",
+      "how": "As TE-CB-8: already met by C1 and C4 in v2. Replacements 3 and 4 close the :320 row's clause."
+    },
+    {
+      "id": "TE-cond-5",
+      "ruling": "accept",
+      "how": "TE-CB-4, -5, -6, -7, -9 and -10 all go into the build plan as ruled above. None is deferred. The size with every accepted condition is about 650 lines (545 to 755), under the 1,050 stop."
+    },
+    {
+      "id": "TE-cond-6",
+      "ruling": "accept",
+      "how": "Strengthened. A bite counts only if:\n- its run is valid;\n- its own figure reads exactly 48 (fail);\n- the other new figure and decoded_hash_mismatch_count read 0 (pass);\n- its verdict's gaps list is empty (eval.rs keeps gaps beside a failure);\n- the lab's N equals the judge's figure A.\nAny other reading stops the unit and goes to Mustafa (freeze line)."
+    }
+  ],
+  "texts_v2_check": "Checked by a word-diff script of the design's texts against v2's blocks.\n\nC1, exact and in place:\n- Both check names gain 'measured', in marks-json-placement and in check-objects.\n- The plain words gain 'in each run's measured ten minutes (not its warm-up or its last few seconds)' right after 'files as \"lost\"'.\n- The README sentence reads 'a measured tick filed lost'.\n\nC2, exact: '`hs.server_hash`' is code-quoted to match the row's style.\n\nC4, exact: the comma before 'fails the first check' is needed for the grammar.\n\nC8, exact: the :320 Marks cell.\n\nNothing else changed in any block. Each frozen block occurs exactly once inside its placement block.\n\nC2's place, right after 'a room tick record without it,', is right: it groups the room-record gaps before the generic 'a list that does not hold the run's `clients` entries'. That phrase then covers every list (hs.server_hash, snap_link_lost_count, snap_incomplete), which is what the code checks.\n\nThe snap_whole_despite_link_loss_count row's 'Gaps as snap_lost_unexplained_count's.' is right as it stands, and it inherits the hs.server_hash gap. Why:\n- Both figures read one shared room-side reader and the same measured client records.\n- Inheriting a gap changes no run's outcome. A gap on figure A alone already makes a non-failing run INVALID (eval.rs:1226-1231). On a failing bite run, the bite rule requires an empty gaps list (TE condition 6).\n- Writing B's own shorter list would let the two figures disagree on what a sound record is.\n\nCondition: the build implements one shared reader with one gap list, and the gap fixtures assert that both figures read gap. No text change for that row.\n\nOne miss of my own: the :320 row's new Meaning clause says 'each 1 must be explained'. That over-claims for the after-phase ticks the stop decides lost, as C1 found elsewhere. Replacements 3 and 4 make it 'each measured 1'.",
+  "replacements": [
+    {
+      "block": "series-row-snap_lost_unexplained_count",
+      "old": "a `snap_incomplete` entry other than 0 or 1,",
+      "new": "a measured client tick record without `tick.s.snap_incomplete`, a `snap_incomplete` entry other than 0 or 1,",
+      "why": "TE-CB-5 (ii): today a client record without snap_incomplete gives figure A nothing to count, so A reads 0 (figures.rs:362-364 skips such records). It becomes a gap, so a broken client record can never pass figure A on its own."
+    },
+    {
+      "block": "series-placement",
+      "old": "a `snap_incomplete` entry other than 0 or 1,",
+      "new": "a measured client tick record without `tick.s.snap_incomplete`, a `snap_incomplete` entry other than 0 or 1,",
+      "why": "The same row inside the placement block. series-placement must keep holding the row block word for word."
+    },
+    {
+      "block": "series-row-tick.s.snap_incomplete",
+      "old": "on L1 P2, P3 and B1 each 1 must be explained",
+      "new": "on L1 P2, P3 and B1 each measured 1 must be explained",
+      "why": "C1's measured scope: the figure reads measured tick records only. Without 'measured', the row claims that the after-phase ticks the stop decides lost (23 to 87 per run) must be explained."
+    },
+    {
+      "block": "series-placement",
+      "old": "on L1 P2, P3 and B1 each 1 must be explained",
+      "new": "on L1 P2, P3 and B1 each measured 1 must be explained",
+      "why": "The same row inside the placement block, kept equal to the row block."
+    }
+  ],
+  "planned_size": {
+    "by_file": [
+      {
+        "file": "spikes/netcode-proof/crates/l1/src/lib.rs",
+        "lines": "+25 to +32",
+        "what": "DatagramCounts and FateLog::server_datagrams_since, with docs. Read-only: no draw, and no change to the fate log's canonical form or hash."
+      },
+      {
+        "file": "spikes/netcode-proof/crates/l1/src/tests.rs",
+        "lines": "+30 to +40",
+        "what": "One test: a forced datagram loss and a B1 burst are counted; Ack and Stream entries and client-to-server datagrams in the same window are not."
+      },
+      {
+        "file": "spikes/netcode-proof/crates/lab/src/scenario.rs (code)",
+        "lines": "+70 to +95",
+        "what": "- the per-slot read as one pure join function (TE-CB-1; C7: groups with no session is an Err) and its call at each send;\n- the per-slot list into room_tick;\n- the measured totals and the summary phrase with TE-CB-2's three counts;\n- the Bites field, LAB_BITES to 3 ids and the link-lost-overstated plant;\n- the module text."
+      },
+      {
+        "file": "spikes/netcode-proof/crates/lab/src/scenario.rs (tests)",
+        "lines": "+115 to +170",
+        "what": "- The short P2 run (16 clients, 6 s warm-up, 4 s measured) asserts: 16 entries per room record; a link-lost sum above 0; a test-side join of 0 and 0; E1 + E2 + N = incomplete; N equals the join.\n- whole-as-lost gives 16 unexplained; link-lost-overstated gives 16 whole-despite-loss.\n- TE-CB-1's five join tests."
+      },
+      {
+        "file": "spikes/netcode-proof/crates/lab/src/logs.rs",
+        "lines": "+25 to +35",
+        "what": "room_tick's link_lost parameter and the series; the per-(tick, slot) link-loss kept beside `logged` and the three measured counts at the client write (TE-CB-2); the module text; the two existing test call sites."
+      },
+      {
+        "file": "spikes/netcode-proof/crates/judge/src/figures.rs",
+        "lines": "+95 to +120",
+        "what": "One shared room-side reader with one gap list (C2's and TE-CB-5's gaps included), the two figures and two FIGURES entries."
+      },
+      {
+        "file": "spikes/netcode-proof/crates/judge/tests/engine.rs",
+        "lines": "+135 to +195",
+        "what": "Fixtures:\n- each explanation alone; an unexplained tick;\n- a warm-up tick and an after-phase tick counted on neither figure (TE-CB-6);\n- the converse; the sentinel;\n- seven gaps, each read on both figures: the series missing, a room tick without it, a room tick without hs.server_hash (C2), a wrong-length list, a negative entry, a measured client record without snap_incomplete (TE-CB-5), an incomplete measured tick with no room record;\n- a shown bite."
+      },
+      {
+        "file": "spikes/netcode-proof/marks/marks.json",
+        "lines": "+26, 2 changed (numstat about 30)",
+        "what": "Two checks on PM-0001-17's L1 P2, P3 and B1 parts, and one planted bug."
+      },
+      {
+        "file": "spikes/netcode-proof/marks/SERIES.md",
+        "lines": "+3 rows, 3 changed (numstat about 9)",
+        "what": "Two figure rows, one figures-only series row, two header counts and the :320 row."
+      },
+      {
+        "file": "spikes/netcode-proof/marks/README.md",
+        "lines": "about +4 to +8",
+        "what": "One sentence in §1's decoded_hash paragraph, with the paragraph reflowed to 120 columns. git diff --word-diff must show only the added sentence."
+      },
+      {
+        "file": "spikes/netcode-proof/ops/runs/c-u4r-runs.mjs",
+        "lines": "+10 to +20",
+        "what": "- bitesOf per bite: -17's whole-as-lost on P0 and P2, link-lost-overstated on P2 only, every other bite as today;\n- SPLIT_LINE names no profile (C6);\n- the header comment's 'only P0'."
+      }
+    ],
+    "total": "About 650 changed lines for C62H-BOUND alone, range 545 to 755. That is up from about 530 (450 to 615) under C2, C6 and C7, by about 120 lines for TE-CB-1, -2, -5 and -6. JDG-ONLY-1 is not in it (C5). Evidence harnesses under .gate/ and .checkpoints/ are not counted.",
+    "stop_line": "SIZE-CHECK: if `git diff --numstat <lane base>..HEAD -- spikes/netcode-proof/` passes 1,050 changed lines (added plus deleted) of C62H-BOUND alone, the build stops and goes to Mustafa in three lines: what grew, why, and the cheaper option. The line stays at 1,050: about 1.6 times the plan and 1.4 times the top of its range."
+  },
+  "paste_blocks": {
+    "differs": "How this differs from option (a) as you chose it:\n- \"It arrived too late\" is no longer an accepted reason. On the simulated network nothing can arrive that late, so the bar is stricter.\n- Two checks and two planted bugs, not one of each. The second check catches a network record that claims losses that never happened.\n- The judge makes the comparison, in two new figures: a judge change, read under your 13:35 rule. It works from one new lab record: per client and tick, how many snapshot packets the network lost, checked one to one against what was sent. Option (a) named one lab change and one series definition; this adds three series rows, changes one, and adds one README sentence.\n- The planted bugs run as full ten-minute runs inside the judged P2 set, not on one short P2 run. A short P2 run stays as a lab test.\n- About 46 minutes of runs, not about 35 (the two planted-bug runs).\n- Added from the test-engineer's read: each run's summary line also counts its measured lost ticks by reason (the server sent nothing, the network lost a packet, neither). It is a report only and is never judged. The lab's \"neither\" must equal the judge's count on every run.",
+    "still_unbounded": "Still unbounded after this:\n- -58's two wrap parts (L1 P0 and L1 P3): the same kind of hiding place. It can come to you as a decision once both sets pass.\n- -17's real-network parts (L2): no network record exists there to explain a loss.\n- -17's L1 B1 part, until U4g's judged B1 runs carry both checks. Until then, B1's report line from option (c) stays.\n- Outside each run's measured ten minutes (the warm-up and the last few seconds), no lost tick is checked, as the wording says.\n- A double fault stays possible: a wrong network record at exactly the tick where a client bug files a snapshot as lost. The two-way checks, the planted bugs and the 17,000 to 43,000 real losses in every run make it narrow, not zero.",
+    "adr_line": "This is a stricter reading of ADR 0001's row for -17 (\"Every decoded snapshot is the server's state\"). The row itself does not change (sha256 3075f638…). Your yes is the decision, and the readings pull request lists it.",
+    "run_numbers": "The runs after the build: P2, then P3. P0 is not re-run; B1 comes with U4g.\n- Time: P2 about 1,735 s (29 min): the last set's 1,047 s, plus two planted-bug runs at about 336 s each, plus a second judge call of about 15 s. P3 about 1,020 s (17 min). About 46 minutes in all.\n- Disk: the runner checks at each set's start that its projected logs leave the 4,096 MiB floor. P2 projects 887.6 MiB, so it needs 4,983.6 MiB free; P3 projects 524.4 MiB, so it needs 4,620.4 MiB. Free today: 7,638 MiB, before the build's own compiles. If it is short on run day, the kept-logs packing goes first, and only after its pull request (#53) is on main and this branch has taken main in.\n- Judge memory, as the runner's projections against its 10,240 MiB line: P2 measured runs 2,129 MiB, P2 planted-bug runs about 552 MiB, P3 1,530 MiB. Last time, from the logs on disk: 1,758 and 982 MiB.\n- Ticks the lab decides lost at the stop: last sets P2 30 / 24 / 23 and P3 87 / 62 / 59 per run. All fall after the measured window and are never checked.\n- Expected: every clean run reads 0 on both checks. whole-as-lost reads 48 on the first check and 0 on the second; link-lost-overstated reads 48 on the second and 0 on the first.",
+    "freeze": "Freeze: at your yes, the main session records by script the sha256 of each exact text above: the two checks, the planted bug, the four SERIES rows and the README sentence.\n- Before the judged runs, a script shows that the built marks.json, SERIES.md and README.md hold exactly those texts. Each set's runs.txt prints the sha256 of that same marks.json.\n- Any change after your yes, a review finding included, comes back to you before the judged runs. That covers an approved text, and what either figure computes as its SERIES row states it.\n- The work stops and comes to you if:\n  - any clean run or test (the lab's short P2 test included) shows a lost tick that nothing explains;\n  - the lab's own count of unexplained ticks differs from the judge's;\n  - a planted-bug run reads anything other than 48 on its own check, with every other check passing and no gap.\n- The check is never reworded to fit."
+  },
+  "other_changes": [
+    "Texts v3: the main session writes it by script from c62h-bound-texts-v2.md with the four replacements above. Each must match exactly once, and each row block must still occur once inside series-placement after the change. The script prints every block's sha256. The paste quotes v3's blocks (plain-words, check-objects, bite-object, the four SERIES rows, readme-sentence), and C9's freeze hashes are v3's at his yes. The plain words, the check objects, the bite and the README sentence do not change from v2.",
+    "The paste carries C10's and C5's corrections from the design:\n- the judge peaks quoted as the runner's projections, not 1.76 GiB;\n- the stop counts 30 / 24 / 23 on P2, not '24 to 33';\n- no TE-B1-R2-2 sentence;\n- no JDG-ONLY-1 riding lines, and no 'with JDG-ONLY-1 riding' size.",
+    "My C3 is corrected: its item (v) (B1 only with U4g) is not a difference, since option (a) as he chose it already said 'B1 comes with U4g's judged B1 runs' (advisor-c62h-review-full.md:79). It moves to 'Still unbounded'.",
+    "The paste shows the design's questions C62HB-Q1 to Q5 as ruled by the advisor, not as open:\n- Q1 (a), Q2 (a) and Q3 (a) appear in the 'differs' block;\n- Q4 (a), with (b) offered later, appears in 'Still unbounded';\n- Q5 (b) appears in the size: JDG-ONLY-1 becomes its own change-set, plan first, before PR #40 is marked ready.",
+    "The paste's Decisions needed holds one entry, C62H-BOUND-YES:\n- the question: yes to the exact wording (v3) and the planned size (about 650 lines, 545 to 755, stop at 1,050)?\n- options: (a) yes; (b) yes with changes he names; (c) no, keep only option (c)'s report lines;\n- my recommendation: (a).\nFor Mustafa: 1. Answer C62H-BOUND-YES. The paste does not ask him about anything ruled here.",
+    "The build brief, not the paste, carries C5-C7, C9-C11 and these rulings as build items:\n- TE-CB-1's pure join function and its five tests;\n- TE-CB-2's tally with its expected lines and stop rule;\n- one shared reader and one gap list, with C2's and TE-CB-5's gap fixtures asserting both figures;\n- TE-CB-6's two fixtures;\n- TE-CB-7's expected lines, with L taken from the counts;\n- the dry print of planJudged for P0 (3 + 6), P2 (3 + 2), P3 (3) and B1 (3);\n- TE-CB-10's form of the marks.json and judge read, with marks.json sha256 9fb5be57… before;\n- u4r-run.sh's and main-run.sh's current sha256s, and the runner's (99dd070e… today)."
+  ],
+  "to_mustafa": "The test-engineer also checked the design for the limit you chose (C62H-BOUND (a)) against the code, and agrees with me. On the simulated network, a correct client files a snapshot as lost only when the server sent it nothing or the network dropped a packet of it. Each of the two planted bugs trips only its own check. I took all ten of its points. Most are tests and build steps. One adds a count to each run's summary line of how many lost snapshots each reason covered (a report only, never judged), so the numbers can be shown to add up. Two make the wording slightly more exact: one more \"missing record\" case counts as a gap, and \"measured\" goes in one more place. None of them changes what the limit demands. The planned size is now about 650 changed lines (545 to 755), and the build still stops and tells you past 1,050. The text you get carries: the exact wording, the size, how it differs from option (a) as you chose it, what stays unbounded, and the run numbers (about 46 minutes). Nothing is built before your yes."
+}

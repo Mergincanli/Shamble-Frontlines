@@ -1,0 +1,18 @@
+# rust-reviewer's scratch crate (U4s proof): the wire grid's results on native and on wasm32, hashed, for a byte
+# comparison. Never part of the spike; built with CARGO_TARGET_DIR=/home/user/Shamble-Frontlines/.gate/shared-target.
+[package]
+name = "u4s-xtarget"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+npt-sim = { path = "/home/user/Shamble-Frontlines/.claude/worktrees/wf_aa2cc979-004-1/spikes/netcode-proof/crates/sim" }
+
+[profile.release.package.npt-sim]
+overflow-checks = true
+
+[workspace]

@@ -1,0 +1,7 @@
+# /etc/sudoers.d/npt on LG (u8-brief.md rev 1.1 section 1 Block 3; C4): `npt` may install RS's public key for npt-load
+# and read the user data, nothing else. Anchored patterns only (L5). npt-load has no sudo at all: its one command is
+# the forced npt-load-ctl, which runs as npt-load.
+Defaults:npt env_reset, !setenv, secure_path="/usr/sbin:/usr/bin:/sbin:/bin"
+npt ALL=(root) NOPASSWD: /usr/local/sbin/npt-ctl ^loadkey (25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])([.](25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}$
+npt ALL=(root) NOPASSWD: /usr/local/sbin/npt-userdata ""
+npt ALL=(root) NOPASSWD: /usr/local/sbin/npt-userdata ^head$

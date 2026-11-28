@@ -1,0 +1,136 @@
+{
+  "verdict": "APPROVE WITH CONDITIONS",
+  "plan_sha256": "2d3bb7a9c3b4bd643dee7246da821dfd747ca6e6a606238e121a0e2410ff56d4",
+  "conditions": [
+    {
+      "id": "C1",
+      "text": "Only text he typed goes inside a '> ' quote. Plan §3 step 2 strips the two-space indent and adds '> ' to whole lines. For history.md:2205, :2200 and :2190 that would put the session's framing ('- **Mustafa, typed into this chat (transcript ...), verbatim:** ') inside his quote. For each of those lines, the script takes only the text inside the outer quote marks, behind an exact asserted prefix: 'I agree with all your recommendations, continue', 'Merge #54' and 'yes'. The assistant's text stays out of '> ' lines everywhere: :2201's 'For Mustafa' line, :2191's question, the questions at :2215, :2217, :2223 and :2225, and the three night-shift lines. It goes in a labelled plain bullet or a fenced block marked 'the session's text, not his words'. Before writing, the script prints a table of every block with the exact text that goes inside '> ' and the text that goes outside it. The verifier checks that table."
+    },
+    {
+      "id": "C2",
+      "text": "The transcript is the primary source, and his words are copied byte for byte from it. history.md:2151 (E6) drops a trailing space that the transcript has (message at line 42064 starts 'You have just been /compact-ed, ... reset: ' with a space at the end), so the planned byte-for-byte check against the transcript fails there. Copy E1-E9 from the transcript record, keeping that space. Check history.md against it and name the one known difference (:2151, a trailing space) in the hash table. Define the transform exactly, and make the check its exact inverse: a blank line maps to '>' with nothing after it, and 'X' maps to '> X'. E3's three lines keep their three-space indent. Their sha256 is taken without the final newline (4e3d1565...) and must equal origin/main NIGHT_SHIFT.md:45-47 (cmp: equal today)."
+    },
+    {
+      "id": "C3",
+      "text": "Correct R4. The STATUS edit at :29 (the #52 row out, the DOCS-54 row in) sits next to PR #40's edit of :28. Git's three-way merge conflicts on changed lines that touch, so leaving :28 alone does not avoid the conflict. Say so in the plan and the PR. Before ready, check it with `git merge-tree --write-tree` (the DOCS-54 head against #40's head) and record the result. Put the resolution on #40's card for its next take of main: keep #40's :28 row and main's other rows. Also fix R4's line numbers: the archive's are :109-110, :292-293, the insert after :988, :1043 and the insert after :1201; DECISIONS also has :896-897."
+    },
+    {
+      "id": "C4",
+      "text": "E10 (his go for #52) has one source here: merge commit 4460ef5's message, which says it was captured by script from session_019YNMUWSsyRgaYWxk4auQ5b, message 14ea7caa-8c5d-47cd-bde5-df0d72d859d1. This account cannot read that event: get_event returned 'the requested resource was not found'. The header says that it was copied from the commit message only (re-quoting it gives the commit's block back byte for byte) and not checked against that chat's record. It must not claim the check that the #48 entry got."
+    },
+    {
+      "id": "C5",
+      "text": "Sweep his typed messages in the transcript from 2026-11-14 09:02 UTC to now, not only history.md's headings. In the plan's table, list each one as main, lane or operational. The sweep finds one more for main: his 'go' (2026-11-15 18:42:53.995Z, transcript line 42437). It answers the session's 18:04:58 ask to type 'go' in Accept edits so the three KEPT-LOGS kit files could be copied in: his chat go for #53's kit write. Record it as its own entry, with the ask labelled as the session's text, or leave it out with the reason written in the plan. The 2026-11-16 09:06:54 paste ('Netcode: what I confirmed in the repo'), the usage and resume lines and the interrupts are lane or operational. List them as such."
+    },
+    {
+      "id": "C6",
+      "text": "Make each partial message's cuts visible where they happen. Each contiguous copied run gets its own '> ' block, with an italic line between blocks, outside any quote, naming the history.md lines and codes left out and saying they stay with PR #40. Example: '_[history.md:2141-2146 left out: C62H-KEEP and C62H-BOUND, the netcode test's; they stay with PR #40]_'. The header names them too."
+    },
+    {
+      "id": "C7",
+      "text": "Headers follow the precedent. Each names the transcript message id and stamp as the primary source, this session (session_0173vVo6igCNyQYBWPvhH36A) on his university account, history.md's lines at 110c303 as the copy checked, and his own time label in quotes. The build commit's message carries the hash table and history.md's blob id at 110c303 (`git rev-parse 110c303:.checkpoints/netcode-proof-test/history.md`). That commit stays reachable from main through DOCS-54's merge commit."
+    },
+    {
+      "id": "C8",
+      "text": "The pointers cite the right entries. For #54, the freeze exception points to E4 (its terms: 'My yes will also be the exception') and to E3 (his yes). For #53 it points to E7. The Queued pointer for 'the kit's next change after the freeze' covers NS-TRAILER and NS-FIRST (E1) and also SA-KL-1 to -4 and KLT-1 to -8 (E5, his KL-MERGE words). The archive's #54 follow-ups say they were deferred in writing by the session, merged on his 'Merge #54'. Only #53's are 'accepted as left open by his word'. Nothing on main may claim that DECISIONS.md is complete to date: the foundation chat's words after its #52 go are that lane's to record."
+    },
+    {
+      "id": "C9",
+      "text": "State how agents and commands run. Name the verifier's and the advisor's model and effort (opus, effort high, passed explicitly on workflow agents). Note that the 3-agent cap is shared with the netcode lane's agents in this same session. Name the calls expected to ask, in the message before each is sent (his NS-STATUS words, history.md:2187): `git worktree add` under .gate/, the first push of the new branch, the `gh api` POSTs for the PR and the label, and the NODE_PATH-prefixed gate. The ROADMAP fold goes after :84, as in earlier folds, not 'to the end' (:85-86 follow). Fold C1-C9 into the plan file and record its new sha256 before the copy script is written."
+    }
+  ],
+  "rulings": [
+    {
+      "id": "DOCS-54 wording",
+      "ruling": "His 'I agree with all your recommendations, continue' (history.md:2205; transcript 2026-11-17T10:43:48Z) answers DOCS-54 as last posed: 08:54:58 (history.md:2215), repeated 10:35:38 (:2223). It is his yes to one docs-only branch and PR updating main's dashboard and decision record for #52, #53 and #54. That yes is the permission to push a branch beyond #40's. The branch name claude/docs-after-54 and the method (plan first, by script, one round, his go) are the session's proposal, shown to him at 07:33:20 (transcript line 48217, with the branch name) and 07:39:46 (48321, the method). They fit the protocol and need no new ask, but they are never quoted as his words. The plan's reading is right; §0 should cite those two stamps. ROADMAP, the archive and REPO_MAP are the dashboard's own upkeep (STATUS:14: 'Every merge: ROADMAP; the archive's In flight') and sit inside his yes."
+    },
+    {
+      "id": "Q1",
+      "ruling": "Agreed: history.md:2039-2086 stays with PR #40 whole. SIZE-U4R and SIZE-CHECK govern the netcode units, COMPACT-WAIT governs this chat's /compact, and MAIN-52 governs when #40 takes main in. None was carried out by #52, #53 or #54. #40's final docs step records them."
+    },
+    {
+      "id": "Q2",
+      "ruling": "Leave STATUS :28 as it is: it is dated ('read 2026-11-14 01:05 UTC'), so it is old, not false, and its text is #40's. Removing #52's row at :29 conflicts with #40's :28 edit anyway (C3): name that conflict and check it, rather than claiming it is avoided."
+    },
+    {
+      "id": "Q3",
+      "ruling": "The PR description only, as for #53 and #54; no new docs/reports path. The record lasts through C7: transcript message ids in each header, and the hash table plus history.md's blob id in the build commit, reachable from main through the merge commit."
+    },
+    {
+      "id": "Q4",
+      "ruling": "Yes, in scope. #53 made REPO_MAP :80 incomplete (it stops at §10; CHECKPOINTS.md:231 is §11). Add one clause and set 'Last checked' to 2026-11-17 only after repo-map-check passes. #40 does not touch :6 or :80."
+    },
+    {
+      "id": "Partial copies",
+      "ruling": "Copy partially, not whole messages. Lane words would otherwise land on main ahead of #40's own record, and be recorded twice. Each copied run gets its own quote block, with the cut shown in place outside the quote (C6) and named in the header."
+    },
+    {
+      "id": "Not yet checked",
+      "ruling": "checkpoint.mjs save from the linked worktree: try it once. If it fails, a plain `git commit` with [skip ci] in the worktree is fine; record which one ran. The last commit before ready must not carry [skip ci]. CI on 4460ef5 and 53272a1: read the check runs by REST at build time and tag them [verified], or leave them out. Never infer them."
+    }
+  ],
+  "findings": [
+    {
+      "id": "ADV-D54-1",
+      "severity": "High",
+      "what": "The copy method would put session text inside his quote. Plan §3 step 2 (plan:93-94) strips the indent and adds '> ' to whole lines. For history.md:2205, :2200 and :2190 that quotes the session's framing as his words. The '> ' form (plan:83, 'his lines with \"> \"') also has no rule keeping assistant text (:2191, :2201, :2215, :2217, :2223, :2225, the fenced lines) out of the quote. His words would be misquoted if this were built as written.",
+      "fix": "C1: take only the quoted substring behind an asserted prefix; keep assistant text outside '> ', labelled; the script prints its in/out table for the verifier."
+    },
+    {
+      "id": "ADV-D54-2",
+      "severity": "Medium",
+      "what": "The planned byte-for-byte check against the transcript (plan:96-97) fails for E6. Transcript line 42064 ends its first line with 'reset: ' (a trailing space); history.md:2151 has 'reset:'. A read-only python comparison found E9, E8, E7, E5 and E4 equal to their transcript messages, and E6 differing by that one byte. The plan does not say which source wins.",
+      "fix": "C2: copy from the transcript, name the one difference in the hash table, define the transform exactly, and keep E3's indent."
+    },
+    {
+      "id": "ADV-D54-3",
+      "severity": "Medium",
+      "what": "R4 (plan:120-122) says conflicts with PR #40 are avoided by leaving STATUS :28 alone. But DOCS-54 replaces :29 (the #52 row), next to #40's :28 edit (`git diff -U0 origin/main...HEAD -- docs/STATUS.md`: '@@ -28 +28 @@'). Git's three-way merge treats touching hunks as a conflict. R4's archive line numbers are also off: #40's hunks are at :109, :292, after :988, :1043 and after :1201, not :106, :289 and :1211. It also omits DECISIONS :896.",
+      "fix": "C3: state the conflict, check it with git merge-tree before ready, put the resolution on #40's card, and correct the line numbers."
+    },
+    {
+      "id": "ADV-D54-4",
+      "severity": "Medium",
+      "what": "E10 cannot get the check that the #48 entry got: DECISIONS.md:177-178 on main says that entry was 'checked byte for byte against that session's chat record ... read with the sessions API'. From this account, get_event on session_019YNMUWSsyRgaYWxk4auQ5b / 14ea7caa-8c5d-47cd-bde5-df0d72d859d1 returns 'the requested resource was not found'. The plan's second check (plan:96-97) cannot cover E10, and the plan does not say so.",
+      "fix": "C4: the header says E10 was copied from 4460ef5's message only and not checked against the chat record."
+    },
+    {
+      "id": "ADV-D54-5",
+      "severity": "Medium",
+      "what": "The plan looked for his words in history.md's headings only, and misses one. A transcript sweep of his typed messages from 2026-11-14 to 2026-11-17 finds his 'go' at 2026-11-15T18:42:53.995Z (line 42437). It answers the 18:04:58 ask to type 'go' in Accept edits for the KEPT-LOGS kit-file copy: his chat go for #53's kit write. It is not in history.md and not in the plan.",
+      "fix": "C5: sweep the transcript, classify every typed message, and record the 'go' (or write down why not)."
+    },
+    {
+      "id": "ADV-D54-6",
+      "severity": "Low",
+      "what": "Plan §0 (plan:9-11) says the branch name and method come from the advisor's draft and the card, not from what he answered. That is true of the last-posed form, but the long form, with claude/docs-after-54, was posted to him at 07:33:20Z (transcript 48217), and the method at 07:39:46Z (48321).",
+      "fix": "Cite both stamps in §0. The record still uses the 08:54:58 form as what he answered (see the DOCS-54 ruling)."
+    },
+    {
+      "id": "ADV-D54-7",
+      "severity": "Low",
+      "what": "For #54, the KIT-FREEZE-2 pointer (plan:77) cites E4 only. E4's words (history.md:2185) make his later yes the exception, and that yes is E3 (:2190). The Queued pointer (plan:78) also covers NS-TRAILER and NS-FIRST but not KL-MERGE's 'the kit's next change after the freeze takes them' (:2169).",
+      "fix": "C8."
+    },
+    {
+      "id": "ADV-D54-8",
+      "severity": "Low",
+      "what": "The header form (plan:80-83) names history.md at a #40 branch SHA as the source. #40 is squash-merged, so that SHA will not be in main's history. The precedent entries name the transcript message id and the account (DECISIONS.md:111-112, :117-118 on main).",
+      "fix": "C7."
+    },
+    {
+      "id": "ADV-D54-9",
+      "severity": "Low",
+      "what": "Three gaps in how the plan runs things. It names no model or effort for the verifier and advisor runs (advisor.md, plan-review checklist), and it does not say the 3-agent cap is shared with the netcode lane in the same session. It states his ask-first rule (plan:85) but not which calls it expects to ask (history.md:2187). It says the ROADMAP fold goes 'to the end of Build history (after :84)' (plan:45), but :85-86 come after :84.",
+      "fix": "C9."
+    },
+    {
+      "id": "ADV-D54-10",
+      "severity": "Low",
+      "what": "Process note on this review (mine, not the plan's). Notes lines 15-20 were appended with a shell heredoc (`cat >>`), against the task's 'Write and Edit tools only' rule. The content is as intended, every later line was written with Edit, and no repository file other than the notes file was written.",
+      "fix": "None needed for the plan; recorded for the record."
+    }
+  ],
+  "to_mustafa": "I approved, with conditions, the plan for the one docs-only pull request that brings main's status page, roadmap and record of your decisions up to date for #52, #53 and #54. The main fixes are that only words you typed go inside the quote marks, and that your \"go\" of 15 November for #53's kit files gets recorded too. Nothing is needed from you now: the pull request will wait for your go to merge, and the one small clash it causes in the status page's row for the netcode test (#40) gets sorted out when the netcode chat next takes in main.",
+  "notes_file": "/home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/docs-54/advisor-plan-review.md"
+}

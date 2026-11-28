@@ -1,0 +1,211 @@
+#!/bin/bash -p
+# npt-ctl: the run's root controls (u8-brief.md rev 1.1 section 1 Block 3; C1, C4; Q-U8-1, -3, -7; L4).
+# Installed root-owned, 0755, at /usr/local/sbin/npt-ctl; `npt` reaches it only through sudoers.d/npt (RS) or npt-lg
+# (LG), each argument matched there by an anchored pattern and validated again here by npt-lib.sh.
+#   RS:  npt-ctl peers <LG IPv4> [<more LG IPv4s>]   metrics_src, PermitOpen <LG>:22, sshd -t, reload; VM addresses only
+#        npt-ctl cpus <tick vCPU>                     condition 4's housekeeping set (slices, workqueue mask, kthreads)
+#        npt-ctl rooms start NN                       `npt-super start` (its hold form) as npt-room in npt-rooms.slice,
+#                                                     its flags from the room's settings (stdin held)
+#        npt-ctl rooms tokens NN                      that room's token file, read as npt-room, to stdout only
+#        npt-ctl quic off|on                          UDP 30001-30032 dropped from all but metrics_src, 15 min at most
+#   LG:  npt-ctl loadkey <RS IPv4>                    RS's .pub (one line on stdin) for npt-load, forced command (C4)
+# No free argument reaches systemd-run, setpriv, taskset, nft, sshd or systemctl: each command line is built from
+# validated values and root-owned records only (Q-U8-1 term 2).
+if [ "${NPT_ENV_CLEARED:-}" != 1 ]; then
+  exec /usr/bin/env -i NPT_ENV_CLEARED=1 PATH=/usr/sbin:/usr/bin:/sbin:/bin LC_ALL=C /bin/bash -p /usr/local/sbin/npt-ctl "$@"
+fi
+set -euo pipefail
+set -f
+umask 022
+. /usr/local/lib/npt/npt-lib.sh
+
+readonly STATE=/var/lib/npt/state
+readonly SETPRIV_ROOM=(/usr/bin/setpriv --reuid=npt-room --regid=npt-room --clear-groups --no-new-privs
+  --bounding-set=-all --inh-caps=-all --ambient-caps=-all --reset-env)
+
+die() { printf 'npt-ctl: %s\n' "$*" >&2; exit 2; }
+role() { tr -d '\n' < /etc/npt/role; }
+need_role() { [ "$(role)" = "$1" ] || die "this verb runs on ${1^^} only"; }
+
+peers() {
+  need_role rs
+  [ "$#" -ge 1 ] && [ "$#" -le 4 ] || die "peers takes 1 to 4 LG addresses"
+  local a open=() rule
+  for a in "$@"; do npt_valid_ipv4 "$a" || die "not a public IPv4 in plain form"; open+=("$a:22"); done
+  rule=$(npt_metrics_rule "$@")
+  nft flush set inet npt metrics_src
+  nft "$rule"
+  local conf=/etc/ssh/sshd_config.d/00-npt-open.conf tmp
+  tmp=$(mktemp /etc/ssh/sshd_config.d/.npt-open.XXXXXX)
+  cp -p "$conf" "$conf.prev"
+  printf 'PermitOpen %s\n' "${open[*]}" > "$tmp"
+  chmod 0644 "$tmp"
+  mv -f "$tmp" "$conf"
+  if ! /usr/sbin/sshd -t; then
+    mv -f "$conf.prev" "$conf"
+    die "sshd -t refused the new PermitOpen; the previous file is back"
+  fi
+  rm -f "$conf.prev"
+  systemctl --no-pager reload ssh.service
+  printf 'lg=%s\n' "$*" > "$STATE/peers.tmp"
+  mv -f "$STATE/peers.tmp" "$STATE/peers"
+  printf 'peers: metrics_src {%s}; PermitOpen %s; sshd -t ok; reloaded\n' "$*" "${open[*]}"
+  # Bring-up's dry runs (plan.md:1151, u8-brief.md section 3): the effective sshd values of plan.md:1150-1155 and the
+  # loaded ruleset, for comparison with rs.yaml. VM addresses only.
+  printf -- '--- sshd -T (the plan'"'"'s keys)\n'
+  /usr/sbin/sshd -T | grep -Ei '^(passwordauthentication|kbdinteractiveauthentication|permitrootlogin|authenticationmethods|x11forwarding|allowagentforwarding|maxauthtries|logingracetime|allowusers|allowtcpforwarding|permitlisten|allowstreamlocalforwarding|permittunnel|gatewayports|permitopen) '
+  printf -- '--- nft list ruleset\n'
+  nft list ruleset
+}
+
+cpus() {
+  need_role rs
+  [ "$#" -eq 1 ] || die "cpus takes one tick vCPU"
+  local online n tick sib hk path refused=0 moved=0 left=0 counts=0 line
+  online=$(tr -d '\n' < /sys/devices/system/cpu/online)
+  npt_cpulist_valid "$online" || die "unreadable online CPU list"
+  n=$(npt_cpulist_count "$online")
+  npt_valid_vcpu "$1" "$n" || die "the tick vCPU must be an online CPU index"
+  tick=$((10#$1))
+  sib=$(tr -d '\n' < "/sys/devices/system/cpu/cpu$tick/topology/thread_siblings_list")
+  hk=$(npt_housekeeping "$online" "$tick" "$sib") || die "no housekeeping set would be left"
+  local rec="$STATE/cpus.tmp"
+  {
+    printf 'tick=%s\nsiblings=%s\nonline=%s\nhousekeeping=%s\n' "$tick" "$sib" "$online" "$hk"
+    for u in system.slice user.slice; do
+      systemctl --no-pager set-property --runtime "$u" "AllowedCPUs=$hk"
+      printf 'allowed.%s=%s\n' "$u" "$(systemctl --no-pager show -P AllowedCPUs "$u")"
+    done
+    # L4: systemd may refuse AllowedCPUs= on init.scope, or take it and leave PID 1's own list on the tick vCPU
+    # (INF-SB-9); PID 1's Cpus_allowed_list is read after it, and while it still holds the tick vCPU (or reads
+    # nothing) PID 1's threads are moved by taskset too. Both are recorded.
+    if systemctl --no-pager set-property --runtime init.scope "AllowedCPUs=$hk" 2>/dev/null; then
+      printf 'init.scope=AllowedCPUs %s\n' "$(systemctl --no-pager show -P AllowedCPUs init.scope)"
+    else
+      printf 'init.scope=set-property refused\n'
+    fi
+    line=$(sed -n 's/^Cpus_allowed_list:[[:space:]]*//p' /proc/1/status)
+    printf 'pid1.allowed_after_set_property=%s\n' "$(npt_comm_clean "$line")"
+    if npt_pid1_needs_move "$line" "$tick"; then
+      local pid1=()
+      set +f
+      pid1=(/proc/1/task/[0-9]*)
+      set -f
+      for path in "${pid1[@]}"; do taskset -pc "$hk" "${path##*/}" >/dev/null; done
+      printf 'init.scope=taskset on PID 1 threads\npid1.allowed_after_taskset=%s\n' \
+        "$(npt_comm_clean "$(sed -n 's/^Cpus_allowed_list:[[:space:]]*//p' /proc/1/status)")"
+    fi
+    printf '%s\n' "$(npt_cpumask_hex "$hk")" > /sys/devices/virtual/workqueue/cpumask
+    printf 'workqueue.cpumask=%s\n' "$(tr -d '\n' < /sys/devices/virtual/workqueue/cpumask)"
+    while read -r line; do
+      set -- $line
+      case $1 in
+        move)
+          if taskset -pc "$hk" "$2" >/dev/null 2>&1; then moved=$((moved + 1))
+          else refused=$((refused + 1)); printf 'kthread.refused=%s %s\n' "$2" "$3"; fi ;;
+        left) left=$((left + 1)) ;;
+        counts) counts=$((counts + 1)) ;;
+      esac
+    done < <(affinity_records | npt_affinity_scan "$tick")
+    printf 'kthreads.moved=%s\nkthreads.refused=%s\nkthreads.left_per_cpu=%s\n' "$moved" "$refused" "$left"
+    # The read-back: threads that would still count against `alone` after the moves (before any room starts).
+    printf 'tasks.on_tick_after_moves=%s\n' "$(affinity_records | npt_affinity_scan "$tick" | grep -c '^\(counts\|move\) ' || true)"
+    # IRQ affinity is read and recorded per vCPU, never changed (no mark asks it).
+    awk 'NR == 1 { n = NF; next } { for (i = 2; i <= n + 1; i++) if ($i ~ /^[0-9]+$/) s[i - 2] += $i }
+         END { for (c = 0; c < n; c++) printf "irq.cpu%d=%d\n", c, s[c] }' /proc/interrupts
+  } > "$rec"
+  chmod 0644 "$rec"
+  mv -f "$rec" "$STATE/cpus"
+  cat "$STATE/cpus"
+}
+
+# One record per thread for npt_affinity_scan: tid, stat flags, Cpus_allowed_list, a clean name.
+affinity_records() {
+  local t stat rest flags allowed comm tasks=()
+  set +f
+  tasks=(/proc/[0-9]*/task/[0-9]*)
+  set -f
+  for t in "${tasks[@]}"; do
+    stat=$(cat "$t/stat" 2>/dev/null) || continue
+    rest=${stat##*) }
+    set -- $rest
+    flags=${7:-}
+    allowed=$(sed -n 's/^Cpus_allowed_list:[[:space:]]*//p' "$t/status" 2>/dev/null) || continue
+    comm=$(cat "$t/comm" 2>/dev/null) || continue
+    printf '%s %s %s %s\n' "${t##*/}" "$flags" "$allowed" "$(npt_comm_clean "$comm")"
+  done
+}
+
+housekeeping_record() {
+  local hk
+  [ -f "$STATE/cpus" ] && [ ! -L "$STATE/cpus" ] || die "run npt-ctl cpus first"
+  hk=$(sed -n 's/^housekeeping=//p' "$STATE/cpus")
+  npt_cpulist_valid "$hk" || die "the housekeeping record is unreadable"
+  printf '%s\n' "$hk"
+}
+
+rooms() {
+  need_role rs
+  [ "$#" -eq 2 ] && npt_valid_word "$1" start tokens && npt_valid_nn "$2" || die "rooms start|tokens NN"
+  local nn=$2
+  case $1 in
+    tokens)
+      # Q-U8-7 with Q-U8-1 term 4: read as npt-room, so a link the room plants reaches nothing npt-room cannot read.
+      exec "${SETPRIV_ROOM[@]}" /usr/bin/head -c 1048576 -- "/var/lib/npt/rooms/room-$nn.tok" ;;
+    start)
+      local hk vals=()
+      hk=$(housekeeping_record)
+      [ -f "/var/lib/npt/run/room-$nn.json" ] || die "no settings at /var/lib/npt/run/room-$nn.json"
+      # npt-super's flags from the room's own settings, read as npt-room and checked field by field (npt-lib.sh).
+      mapfile -t vals < <("${SETPRIV_ROOM[@]}" /usr/bin/python3 -I -c "$NPT_SETTINGS_PY" \
+        "/var/lib/npt/run/room-$nn.json" "$NPT_SUPER_FIELDS")
+      npt_super_args "$nn" "${vals[@]}" || die "the room's settings do not give npt-super's flags"
+      # A restart frees the room's token and hash paths as npt-room (U6a and U6b refuse an existing path).
+      "${SETPRIV_ROOM[@]}" /usr/bin/rm -f -- "/var/lib/npt/rooms/room-$nn.tok" "/var/lib/npt/hash/room-$nn.json"
+      # Condition 3 and Q-U8-1: npt-super's hold form (`start`, U6a's merged code) as npt-room in npt-rooms.slice
+      # (every CPU), started off the tick vCPU by taskset so only the room's tick thread pins itself onto it
+      # (Q-U6A-5); stdin passes through, and its close is npt-super's end (never a kill: a log with no footer
+      # makes the run INVALID).
+      exec systemd-run --quiet --scope --collect --slice=npt-rooms.slice --unit="npt-room-$nn-$$" \
+        "${SETPRIV_ROOM[@]}" /usr/bin/taskset -c "$hk" /opt/npt/bin/npt-super start "${NPT_SUPER_ARGS[@]}" ;;
+  esac
+}
+
+quic() {
+  need_role rs
+  [ "$#" -eq 1 ] && npt_valid_word "$1" off on || die "quic off|on"
+  if [ "$1" = off ]; then
+    nft list set inet npt metrics_src | grep -Eq 'elements = \{' || die "metrics_src is empty: run npt-ctl peers first"
+    nft "$NPT_QUIC_OFF_RULE"
+  else
+    nft "$NPT_QUIC_ON_RULE"
+  fi
+  nft list set inet npt quic_off | sed -n 's/^[[:space:]]*elements = /quic_off: /p'
+  printf 'quic %s\n' "$1"
+}
+
+loadkey() {
+  need_role lg
+  [ "$#" -eq 1 ] && npt_valid_ipv4 "$1" || die "loadkey takes RS's IPv4"
+  local key tmp
+  key=$(head -c 512 | head -n 1 | tr -d '\r')
+  npt_valid_pubkey "$key" || die "stdin is not one ed25519 public key line"
+  set -- "$1" $key
+  tmp=$(mktemp /etc/ssh/authorized_keys/.npt-load.XXXXXX)
+  printf 'from="%s",restrict,command="/usr/local/bin/npt-load-ctl" %s %s npt-rs-to-lg\n' "$1" "$2" "$3" > "$tmp"
+  chmod 0644 "$tmp"
+  mv -f "$tmp" /etc/ssh/authorized_keys/npt-load
+  ssh-keygen -l -f /etc/ssh/authorized_keys/npt-load
+}
+
+[ "$#" -ge 1 ] || die "a verb is needed"
+verb=$1
+shift
+case $verb in
+  peers) peers "$@" ;;
+  cpus) cpus "$@" ;;
+  rooms) rooms "$@" ;;
+  quic) quic "$@" ;;
+  loadkey) loadkey "$@" ;;
+  *) die "unknown verb" ;;
+esac

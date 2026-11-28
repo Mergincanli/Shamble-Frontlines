@@ -1,0 +1,11 @@
+# R1's expected dist (SEC-SB-5, advisor-u8-stopb.md section 5): one `<sha256>  ./<path>` line per file, the form
+# rs.yaml writes to /var/lib/npt/bringup/dist.sha256. Filled at Stop B from two equal builds of U7's dist at Y in the
+# container (two clone paths, two CARGO_HOMEs); committed at X. Empty, r1.sh bringup records the dist as differing,
+# and `r1.sh host` and every `browsers` call refuse.
+be1c4ce736532704c8c1c9dd042b4fd0273d6b90eee4651158c33a00f83cf814  ./hooks.js
+46febaacfc3b2fa43a3b342c39293f0f25ca861efa98cc2f4267cca475f35f95  ./index.html
+4f374eafe567444bf53c802cb94b2e104fe9b7743e0fbc26c6387c073fdc4bbe  ./lib.js
+c9be4a1666f9f1086999f46ed0dc38ccd702450bb3f975c7c1cf33685e41ccec  ./main.js
+b355d85ca53dd9534b460d3e5c3b180296a740ecd4043741d070a058be103965  ./npt_client_wasm.js
+901a649231dc9c217204b121a2800641c3c6aa9cd3cb9d42eb5657452b0a0e77  ./npt_client_wasm_bg.wasm
+4f060d1851c530f86767efdcf5f3fee68e0e702ef393fcf5fede3e653ae71857  ./worker.js

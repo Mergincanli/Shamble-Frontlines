@@ -1,0 +1,29 @@
+{
+  "title": "BRAWL-1 round 2 (only what changed since snapshot ee2973aa: the fix pass FP-1 to FP-9 of the advisor's ruling on round 1, and FP-0's two runner diffs)",
+  "out": ".checkpoints/netcode-proof-test/brawl1-r2-packet.md",
+  "heads": [
+    "The snapshot reviewed in round 1: `.checkpoints/netcode-proof-test/wip/brawl1.patch` sha256 ee2973aa8ad8c453b5720099c27b37cb9980820da74f33ad9c78ddd7ad591dc7 (10 files on 352a245; committed at 0e2bf9a). Its read copy `.gate/brawl1-snap1`: a detached worktree at 352a245 with that patch applied (`git diff HEAD | sha256sum` there gives ee2973aa...).",
+    "The snapshot under review: `.checkpoints/netcode-proof-test/wip/brawl1.patch` sha256 c2561b6ca54c8cde994fcdad5954c63d332df73f2db038c12aba3d71a0daa49f (10 files on 352a245; committed at 888ecbb). Its read copy is the builder's worktree `/home/user/Shamble-Frontlines/.claude/worktrees/brawl1` (detached at 352a245, the change uncommitted; `git diff HEAD | sha256sum` there gives c2561b6c...; no builder runs there now). Change nothing in it.",
+    "The diffs below compare `.gate/brawl1-snap1/spikes/netcode-proof` with the builder's worktree's `spikes/netcode-proof`, file by file: the 6 files that differ (cmp). The fix pass added no file under spikes/ and removed none.",
+    "Counts at snapshot ee2973aa (round 1's head), from `.gate/u4r/brawl1/final-check.log`: check.mjs all 11 steps; measured build 535 tests passed, bites build 613.",
+    "The fix pass's runs, all through the lane's runner `.checkpoints/netcode-proof-test/u4r-run.sh` (sha256 2f754d125b10b6bde06a980f46cb4e078a582ca277ec8828bc48e8aacb064e50, after FP-0) in the builder's worktree, logs under `.gate/u4r/brawl1/`: fp-0-header.log (the first, before any edit), fp-check-1.log, fp-check-2.log, fp-fmt-2.log, the plant runs fp-plant-1.log to fp-plant-4.log, and FP-8's final-fp-check.log, final-fp-det.log and final-fp-regen-tests.log. Each log's header carries the diff hash at that moment (FP-0).",
+    "FP-0's two runner diffs are copied below: the runners are outside the patch, and the main session edited them (each diff is `git diff` of the runner in commit 7402dac).",
+    "Round 1's packet, with the approved plan's lines, the rulings it copies and the carries as round 1 had them: `.checkpoints/netcode-proof-test/brawl1-packet.md`."
+  ],
+  "diffs": [
+    {"label": "spikes/netcode-proof/crates/bots/src/lib.rs", "a": ".gate/brawl1-snap1/spikes/netcode-proof/crates/bots/src/lib.rs", "b": ".claude/worktrees/brawl1/spikes/netcode-proof/crates/bots/src/lib.rs"},
+    {"label": "spikes/netcode-proof/crates/client/src/lib.rs", "a": ".gate/brawl1-snap1/spikes/netcode-proof/crates/client/src/lib.rs", "b": ".claude/worktrees/brawl1/spikes/netcode-proof/crates/client/src/lib.rs"},
+    {"label": "spikes/netcode-proof/crates/client/tests/endpoint.rs", "a": ".gate/brawl1-snap1/spikes/netcode-proof/crates/client/tests/endpoint.rs", "b": ".claude/worktrees/brawl1/spikes/netcode-proof/crates/client/tests/endpoint.rs"},
+    {"label": "spikes/netcode-proof/crates/lab/src/hash.rs", "a": ".gate/brawl1-snap1/spikes/netcode-proof/crates/lab/src/hash.rs", "b": ".claude/worktrees/brawl1/spikes/netcode-proof/crates/lab/src/hash.rs"},
+    {"label": "spikes/netcode-proof/crates/lab/src/logs.rs", "a": ".gate/brawl1-snap1/spikes/netcode-proof/crates/lab/src/logs.rs", "b": ".claude/worktrees/brawl1/spikes/netcode-proof/crates/lab/src/logs.rs"},
+    {"label": "spikes/netcode-proof/crates/lab/src/scenario.rs", "a": ".gate/brawl1-snap1/spikes/netcode-proof/crates/lab/src/scenario.rs", "b": ".claude/worktrees/brawl1/spikes/netcode-proof/crates/lab/src/scenario.rs"}
+  ],
+  "docs": [
+    {"label": "FP-0: u4r-run.sh's change (git diff in commit 7402dac)", "path": ".checkpoints/netcode-proof-test/u4r-run.sh.te-b1-7.diff"},
+    {"label": "FP-0: main-run.sh's change (git diff in commit 7402dac)", "path": ".checkpoints/netcode-proof-test/main-run.sh.te-b1-7.diff"},
+    {"label": "The advisor's ruling on round 1: the fix pass, the pins, round 2, the merge step, U4g's brief, the size and each finding (advisor-brawl1-r1-full.md)", "path": ".checkpoints/netcode-proof-test/advisor-brawl1-r1-full.md"},
+    {"label": "Round 1's findings, the four seats' results word for word (brawl1-review-r1-full.md)", "path": ".checkpoints/netcode-proof-test/brawl1-review-r1-full.md"},
+    {"label": "The advisor's ruling on the builder's points (advisor-brawl1-points-full.md; its ADV-PT-L1 and ADV-PT-L2 ride the fix pass)", "path": ".checkpoints/netcode-proof-test/advisor-brawl1-points-full.md"}
+  ],
+  "carries": {"path": ".checkpoints/netcode-proof-test/u4s-carries.md", "include": "^(18|39|74|75|82|87)\\. \\*\\*"}
+}

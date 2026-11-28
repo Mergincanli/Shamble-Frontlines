@@ -1,0 +1,23 @@
+{
+  "title": "U4d-F round 1 (the estimate scene fix: N2-M1's reckoning and N2-M2's vehicles, before U4d2 pins the recordings)",
+  "out": ".checkpoints/netcode-proof-test/u4df-packet.md",
+  "heads": [
+    "Base: dad9566 on the spike branch, where U4d-F's build started; its spikes/netcode-proof/crates/sim equals the branch head's (U4d's merge 39f4290; nothing in crates/sim has changed since).",
+    "U4d-F's copy: `.claude/worktrees/wf_9ce88fa3-452-1` (branch u4df-build; the change is uncommitted there).",
+    "The diffs below compare the base copy `.gate/u4df-prefix` (a worktree at dad9566) with U4d-F's copy."
+  ],
+  "diffs": [
+    {"label": "npt-sim's sources (crates/sim/src)", "a": ".gate/u4df-prefix/spikes/netcode-proof/crates/sim/src", "b": ".claude/worktrees/wf_9ce88fa3-452-1/spikes/netcode-proof/crates/sim/src"},
+    {"label": "npt-sim's tests (crates/sim/tests)", "a": ".gate/u4df-prefix/spikes/netcode-proof/crates/sim/tests", "b": ".claude/worktrees/wf_9ce88fa3-452-1/spikes/netcode-proof/crates/sim/tests"}
+  ],
+  "docs": [
+    {"label": "The approved plan: the advisor's U4d close ruling, B1.1 to B1.3 (advisor-u4d-close.md)", "path": ".checkpoints/netcode-proof-test/advisor-u4d-close.md", "lines": [23, 181]},
+    {"label": "Round 2's netcode findings U4d-F answers (N2-M1, N2-M2)", "path": ".checkpoints/netcode-proof-test/u4d-round2-netcode.md"},
+    {"label": "Round 2's test findings U4d-F answers (T2-M1, T2-L1 and its plants O1 to O3, probe X2)", "path": ".checkpoints/netcode-proof-test/u4d-round2-test.md"},
+    {"label": "Mustafa's words on the drift, 2026-11-11 (his words)", "path": ".checkpoints/netcode-proof-test/history.md", "lines": [338, 339], "words_of_mustafa": true}
+  ],
+  "cited": [
+    {"label": "§5 U4d", "path": ".checkpoints/netcode-proof-test/u4-build-plan.md", "heading": "^### U4d, ", "ref": "§4\\.\\d+", "section": "^### {num} "}
+  ],
+  "carries": {"path": ".checkpoints/netcode-proof-test/u4s-carries.md", "include": "U4d-F|N2-M1|N2-M2|aim_one_in|estimate scene"}
+}

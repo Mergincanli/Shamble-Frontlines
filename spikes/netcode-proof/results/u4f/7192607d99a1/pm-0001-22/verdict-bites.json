@@ -1,0 +1,46 @@
+[
+  {
+    "mark": "PM-0001-22",
+    "title": "A client that never acknowledges cannot grow the server",
+    "verdict": "NOT-RUN",
+    "why": [
+      "L1, one never-acker among 48: 0 of 3 valid runs"
+    ],
+    "parts": [
+      {
+        "name": "L1, one never-acker among 48",
+        "verdict": "NOT-RUN",
+        "why": [
+          "L1, one never-acker among 48: 0 of 3 valid runs"
+        ],
+        "runs": []
+      }
+    ],
+    "bites": [
+      {
+        "id": "PM-0001-22/unbounded",
+        "status": "shown",
+        "runs": [
+          {
+            "run": "bite-unbounded",
+            "valid": true,
+            "checks": [
+              {
+                "name": "its event queue held at the cap: it reaches the cap and never passes it (headroom = cap - length)",
+                "outcome": "fail",
+                "value": "-3922",
+                "needs": "== 0"
+              },
+              {
+                "name": "the client resynced or dropped",
+                "outcome": "fail",
+                "value": "0",
+                "needs": ">= 1"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

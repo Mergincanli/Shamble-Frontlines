@@ -1,0 +1,67 @@
+{
+  "verdict": "APPROVE WITH FINDINGS",
+  "head_sha": "20f9d59918eea1e3431ae830f72510f83f6424c7",
+  "summary": "PR #54 adds only Mustafa's three lines, byte for byte. It changes one file, .claude/NIGHT_SHIFT.md (+3 -0), placed right after step 6's last line. It is a plain file mode change and touches no guard, hook, settings, script, CI or gate file.\n\n**The hash matches his record.** Lines 45-47 of the head file hash to 4e3d15658c0afaf40d922cdce9559a8dc2d1079ea04a8fc96e327798b3639223 when the final newline is dropped. With the newline they are identical to history.md 2194-2196, and the committed copy at 7fe4100 matches too.\n\n**His order of steps holds.** P2's results landed at 21:18Z and P3's at 21:36Z. The NS-LINES question went out at 20:50Z, his yes came at 21:09Z, and the commit was made at 21:56Z.\n\n**KIT-FREEZE-2.** The freeze stops new rules, and this line is one. NS-STATUS gives the exception in his words: \"My yes will also be the exception to the kit freeze (KIT-FREEZE-2) for this one change.\" His yes at 21:09Z covers exactly these lines, and any rewording needs a new yes.\n\n**The lines fit the rest of NIGHT_SHIFT.md:**\n- checkpoint.mjs on main accepts `--every 10 --for 25`: it requires --every of at least 0.01 and --for above 0 and at most 115.\n- watch() saves at 10 and 20 minutes, then makes a last save at 25 and exits. The harness's notice that the task ended is what wakes an idle run.\n- A status refreshed every ~25 minutes stays under step 6's 30 minutes and well under the 45 minutes of steps 3 and 4. A later hourly run then sees \"busy\" instead of starting a false handoff.\n- A run that is really cut off still ages past 45 minutes and is handed off as step 4 means.\n- \"Then start the next stint\" is §5's restart after \"time is up\".\n- Last night's checkpoint (34a2e55, Running work) and issue #16 comment 6904274561 show the method working in a routine.\n\n**The command form does not break step 7's rule.** The backquoted command has no comment, `$`, backslash, here-document, brace or parenthesis. `<slug>` is the doc's usual placeholder, and the parentheses around the command are prose. With the slug filled in, main's routine guard admits it: the plain-form check passes, node is an allowed program, the script is tracked and equal to main's copy, and only git is refused in the background.\n\n**Risk tier 2** (a `.claude/` kit file), class needs-mustafa. CI shows gate, smoke and toolchain green on 20f9d59.\n\n**Not done here, because the task forbade it:** I ran no gate and no kit tests. No test reads NIGHT_SHIFT.md from disk, and every test and script equals main's, so the counts cannot move. The merging session still has to run them (C2).\n\n**Merge conditions:**\n- C1: security-auditor's review is in (its notes were at block 6 of 7) and each of its findings is addressed or deferred in writing.\n- C2: the day session runs the full gate and the three kit tests on 20f9d59 in a worktree, with the same counts as on main.\n- C3: the head stays 20f9d59. Any push needs a new advisor review and his go again.\n- C4: the PR leaves draft, then merges from a day session on Mustafa's own go for this head, passing the SHA as the expected head.\n\n**Findings:** five Lows, none of which needs a push.",
+  "findings": [
+    {
+      "id": "ADV-NS-L1",
+      "severity": "Low",
+      "where": ".claude/NIGHT_SHIFT.md:46 (the backquoted command); CHECKPOINTS.md §3/§5",
+      "what": "The command has no `--trailer`, but §3 and §5 give one `--trailer` per attribution line, and last night's autosaves carried both lines (34a2e55, 8bfa7ce). A run that copies the line literally would make autosave commits without attribution. Nothing breaks: no check requires trailers.",
+      "fix": "None now. The run keeps §5's `--trailer` options, since step 7 points to §5. Only Mustafa can decide to reword the line, later and with a new yes. Otherwise this stays as a STATUS follow-up.",
+      "changes_his_lines": true
+    },
+    {
+      "id": "ADV-NS-L2",
+      "severity": "Low",
+      "where": ".claude/NIGHT_SHIFT.md:45-47 (the condition 'while the run waits on agents')",
+      "what": "A stint's end can wake the run only if the agents run in the background (Agent run_in_background or a workflow). A foreground agent call blocks the run, so the refresh waits until the call returns. The gap was already there and this change does not cause it; last night's agents ran in the background.",
+      "fix": "Follow-up for the kit's next change after the freeze, with his yes: night runs start long agents in the background. No change to this PR.",
+      "changes_his_lines": false
+    },
+    {
+      "id": "ADV-NS-L3",
+      "severity": "Low",
+      "where": ".claude/CHECKPOINTS.md §5 ('running' test) and §2's 'Running work' template",
+      "what": "§5's running test (first line 'every 10 min for 110 min', less than 110 minutes old) and the template's 'stops by HH:MM (110 minutes on)' still say 110 minutes. For a stint the figure is 25. The harness's ended notice still decides. §5's one-saver rule means a running 110-minute saver must be stopped (TaskStop) before the first stint, as last night's run did.",
+      "fix": "Follow-up after the freeze, with his yes: let §5's figures read 'the --for in use'. No change to this PR.",
+      "changes_his_lines": false
+    },
+    {
+      "id": "ADV-NS-L4",
+      "severity": "Low",
+      "where": ".claude/hooks/routine-guard.test.mjs:2807-2819 (KIT_LINES)",
+      "what": "The guard test's list of the kit's routine lines does not include the new stint command. By inspection it is plain form and the guard admits it, but no test covers it.",
+      "fix": "Add the filled-in line to KIT_LINES at the kit's next change. His words allow no script change now.",
+      "changes_his_lines": false
+    },
+    {
+      "id": "ADV-NS-L5",
+      "severity": "Low",
+      "where": "docs/STATUS.md, docs/ROADMAP.md, docs/DECISIONS.md on main",
+      "what": "NS-STATUS (a) and NS-LINES (a) are recorded only on the netcode branch (history.md). Main's STATUS, ROADMAP and DECISIONS.md don't record them. The PR is right not to carry them, because his words say 'Only that file'.",
+      "fix": "docs-keeper records his words and the merge after #54 merges, in a separate docs change.",
+      "changes_his_lines": false
+    }
+  ],
+  "checked": [
+    "Main's .claude/agents/advisor.md, read whole (git show origin/main:...) and followed: its risk tiers, the tier-2 checklist, its merge rules and its Never lines.",
+    "git diff --stat 53272a1 20f9d59: 1 file, .claude/NIGHT_SHIFT.md, 3 insertions. git diff --raw --no-renames origin/main...20f9d59: mode 100644 to 100644, no symlink or submodule. origin/main = 53272a1 = merge-base.",
+    "sha256 of worktree lines 45-47 without the final newline: 4e3d15658c0afaf40d922cdce9559a8dc2d1079ea04a8fc96e327798b3639223, matching his record. A diff against history.md 2194-2196 is IDENTICAL, and the committed copy at 7fe4100 matches too.",
+    "His words read whole (history.md 2177-2199). Timing: question 20:50:16Z, yes 21:09:27Z, P2 results 21:18Z (daec788), P3 results 21:36Z (8ca774a), PR commit 21:56:23Z. I did not read the chat transcript itself; this rests on the session's committed script copy.",
+    "KIT-FREEZE-2 on main's DECISIONS.md 27-37, including FREEZE-FDN, against NS-STATUS's exception sentence.",
+    "NIGHT_SHIFT.md read whole on the head: step 3 busy under 45 minutes, step 4 handoff over 45 minutes, step 6 refresh every 30 minutes, step 7 saver sentence and shell-command rule, step 8 TaskStop.",
+    "checkpoint.mjs on main: parse() 60-80 (--every at least 0.01; --for above 0 and at most 115; defaults 10 and 110) and watch() 189-211 (saves at 10 and 20, a last save and exit at 25).",
+    "CHECKPOINTS.md §3, §5 and the Running work template on main.",
+    "Main's routine guard: R-PLAIN and R-PROG (routine-guard.mjs 570-675), the background rule (688-689, 753-756: git only) and interpreter() (989-1013) for checkpoint.mjs watch.",
+    "Last night's checkpoint (34a2e55, Running work lines 94-106) and its autosave commits carrying both attribution lines.",
+    "Issue #16 comment 6904274561 (by Mergincanli): the NS-STATUS decision with options (a) and (b).",
+    "PR #54 via gh api REST: open draft, not a fork, base 53272a1, head 20f9d59, 1 file +3 -0, no labels. The body matches the facts.",
+    "Check runs on 20f9d59: gate, smoke and toolchain all success.",
+    "git grep for NIGHT_SHIFT in *.mjs, *.js, *.json and *.yml: no test reads the file from disk (comments and a hard-coded KIT_LINES list only).",
+    "security-auditor's notes (security-ns-stints.md): in progress, block 6 of 7, no verdict yet.",
+    "NOT run, because the task forbids it: the gate, the smoke run and the three kit tests. These are owed by the merging session (C2)."
+  ],
+  "to_mustafa": "The pull request with your three night-shift lines (#54) holds them exactly as you said yes to them. It changes nothing else.\n\n- **The lines match.** The file's new lines 45-47 hash to the sha256 you approved (4e3d1565...). It is one file, three added lines, no other change.\n- **They fit the night shift's rules.** A 25-minute stint ends and wakes the run. A status refreshed about every 25 minutes stays under the 30-minute rule. It also stays well under the 45 minutes at which a later run would take over by mistake.\n- **The command is in the plain form** the night rules require, and the guard on main allows it.\n- **Your exception holds.** Your yes covers this one change under the kit freeze (KIT-FREEZE-2).\n- **CI is green** on the head: gate and smoke.\n- **Not checked by me:** I was told not to run the gate or the kit's tests. The merging session runs them before the merge.\n- **Five small notes; none needs a new push.** The main one: the command leaves out the attribution option (`--trailer`) that last night's run used. Rewording your line is your call only; I recommend leaving it as is.\n\n**Decisions needed:**\n- NS-TRAILER: should the command in your line also show the attribution option? Why it matters: without it, a run that copies the line exactly makes save commits without the attribution lines; nothing else breaks. Options: (a) leave your lines as they are; the run takes the option from CHECKPOINTS.md §5, and it goes in STATUS as a follow-up. (b) Reword the line in a later kit change, after the freeze, with a new yes from you. Recommendation: (a).\n\n**For Mustafa:**\n1. Once the security reviewer's round is in, its findings are handled, and the day session has run the gate and the kit tests on 20f9d59: reconfirm the merge of #54 at head 20f9d59918eea1e3431ae830f72510f83f6424c7. Why: it changes a night-shift rule file (risk tier 2). Say \"merge #54\" in a day session's chat.",
+  "notes_file": "/home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/advisor-ns-stints.md"
+}

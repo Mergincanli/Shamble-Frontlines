@@ -1,0 +1,5 @@
+# The security seat's round-2 probe (u4d2-r2-review-security.md): a CARGO_HOME config that names another linker for
+# wasm32 (a program that could write the module's target_features section). Read only by sec-r2-deps-home.mjs; no
+# cargo process is given this folder.
+[target.wasm32-unknown-unknown]
+linker = "/bin/false"

@@ -1,0 +1,32 @@
+{
+  "title": "U4j round 2 (the judge and marks change: the fix pass on round 1's findings)",
+  "out": ".checkpoints/netcode-proof-test/u4j-round2-packet.md",
+  "side_out": ".checkpoints/netcode-proof-test/u4j-round2-packet-fixtures.diff",
+  "heads": [
+    "Base: 411eeeed50d8c71e7e1f74366f0e1d5c27388444 on the spike branch (U4b's merge), where U4j's build started.",
+    "Round 1 reviewed the pre-fix copy `.gate/u4j-prefix` (U4j's first build).",
+    "Round 2 reviews the fixed copy `.claude/worktrees/agent-a3b8dfeb01ed52b50` (uncommitted there; saved on the branch as `.checkpoints/netcode-proof-test/wip/u4j.patch` at 4ad80a9, sha256 98ee1f638db724c5…, 64 files on the base).",
+    "The diffs below compare the two copies: what changed since round 1."
+  ],
+  "diffs": [
+    {"label": "npt-judge's sources (crates/judge/src)", "a": ".gate/u4j-prefix/spikes/netcode-proof/crates/judge/src", "b": ".claude/worktrees/agent-a3b8dfeb01ed52b50/spikes/netcode-proof/crates/judge/src"},
+    {"label": "npt-judge's tests (crates/judge/tests)", "a": ".gate/u4j-prefix/spikes/netcode-proof/crates/judge/tests", "b": ".claude/worktrees/agent-a3b8dfeb01ed52b50/spikes/netcode-proof/crates/judge/tests"},
+    {"label": "The fixtures' README", "a": ".gate/u4j-prefix/spikes/netcode-proof/crates/judge/fixtures/README.md", "b": ".claude/worktrees/agent-a3b8dfeb01ed52b50/spikes/netcode-proof/crates/judge/fixtures/README.md"},
+    {"label": "npt-log (crates/log)", "a": ".gate/u4j-prefix/spikes/netcode-proof/crates/log", "b": ".claude/worktrees/agent-a3b8dfeb01ed52b50/spikes/netcode-proof/crates/log"},
+    {"label": "marks/ (marks.json, SERIES.md, README.md)", "a": ".gate/u4j-prefix/spikes/netcode-proof/marks", "b": ".claude/worktrees/agent-a3b8dfeb01ed52b50/spikes/netcode-proof/marks"},
+    {"label": "The fixtures (crates/judge/fixtures, logs only)", "a": ".gate/u4j-prefix/spikes/netcode-proof/crates/judge/fixtures", "b": ".claude/worktrees/agent-a3b8dfeb01ed52b50/spikes/netcode-proof/crates/judge/fixtures", "side": true}
+  ],
+  "docs": [
+    {"label": "The plan: u4-build-plan.md §5 U4j", "path": ".checkpoints/netcode-proof-test/u4-build-plan.md", "heading": "^### U4j, the judge and marks change"},
+    {"label": "The advisor's rulings on round 1 (advisor-u4j.md)", "path": ".checkpoints/netcode-proof-test/advisor-u4j.md"},
+    {"label": "Round 1's findings: netcode-architect", "path": ".checkpoints/netcode-proof-test/u4j-review-netcode.md"},
+    {"label": "Round 1's findings: security-auditor", "path": ".checkpoints/netcode-proof-test/u4j-review-security.md"},
+    {"label": "Round 1's findings: test-engineer", "path": ".checkpoints/netcode-proof-test/u4j-review-test.md"},
+    {"label": "Mustafa's WS-BAR and its refinement, 2026-11-07 (plan.md §0.5, his words)", "path": ".checkpoints/netcode-proof-test/plan.md", "lines": [200, 213]},
+    {"label": "Mustafa's NETEM-BAR (a), 2026-11-10 (his words)", "path": ".checkpoints/netcode-proof-test/history.md", "lines": [364, 366], "words_of_mustafa": true}
+  ],
+  "cited": [
+    {"label": "§5 U4j", "path": ".checkpoints/netcode-proof-test/u4-build-plan.md", "heading": "^### U4j, the judge and marks change", "ref": "§4\\.\\d+", "section": "^### {num} "}
+  ],
+  "carries": {"path": ".checkpoints/netcode-proof-test/u4s-carries.md", "include": "U4j|npt-judge|marks\\.json|SERIES\\.md"}
+}

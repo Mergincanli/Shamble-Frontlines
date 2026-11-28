@@ -1,0 +1,8 @@
+{
+  "bind": "0.0.0.0:31000",
+  "cert_chain": "/var/lib/npt/tls/production.chain.pem",
+  "cert_key": "/var/lib/npt/tls/production.key.pem",
+  "dist": "/var/lib/npt/dist",
+  "hash_template": "/var/lib/npt/hash/room-NN.json",
+  "host_keys": "/var/lib/npt/dist/ssh-host-keys.txt"
+}

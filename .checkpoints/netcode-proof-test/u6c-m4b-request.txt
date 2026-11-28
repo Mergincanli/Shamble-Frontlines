@@ -1,0 +1,40 @@
+You are the project's advisor for U6c's merge step M4b, your own round-2 ruling's head read of the hand edits. First
+read your rules from main: `git show origin/main:.claude/agents/advisor.md` (run from /home/user/Shamble-Frontlines),
+and follow them. Read only, effort xhigh. Your one output file:
+/home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/advisor-u6c-m4b.md.
+Write files with the Write and Edit tools only (no sed, no shell redirect, no python writes; never `cargo fmt` writing files: apply rustfmt's diff by Edit); an agent with no Edit tool rewrites its notes file whole with Write.
+Write your plan first and a notes line after each check. Never `cd` into a worktree; no `git -C`; one simple command per
+Bash call; run no cargo, test, gate, light run or plant; change no file but your own.
+
+What it is: advisor-u6c-r2.md (your ruling; read its sections 3-5) approved U6c's merge with H2 always and H1 on
+Mustafa's yes. His yes is in: NPT-EDGE-READ (a), history.md:7902-7924, with his condition "The 10 seconds of warm-up and
+the measured window stay fully counted". The main session has, in the main folder on head
+e83d9fb (MAIN-65 merged and pushed below it, CI green):
+- M0: wip/u6c-fix.patch hashes 0549389e…; `git diff --stat 8c81952 HEAD -- spikes/netcode-proof` is empty.
+- M3: `git apply --check` exit 0. M4: `git apply`, uncommitted; cmp_files.py: 24 files byte-equal to the worktree
+  /home/user/Shamble-Frontlines/.claude/worktrees/agent-a3a3e3fdf559de095.
+- M4a: H2a, H2b, H1a, H1b, H1c and H1d by Edit, each with your section 3's text; `cargo fmt --all -- --check` exit 0
+  (.gate/u6c-merge/m4a-fmt.log); the hunks file .gate/u6c-merge/hunks.diff, sha256
+  9a3bbeb7faec8aa928460fe34643c971cd4dd5e84d4f5f30d372f3758407b846 (written by a script: `diff -u` of the worktree's copy
+  against the main folder's, labelled a/ and b/, no timestamps): load.rs +4 -3, probe.rs +7 -3, SERIES.md +1 -1.
+- Note: your section 4 says the hunks touch "two with H1"; with H2 they are three files (crates/bots/tests/load.rs,
+  crates/server/src/probe.rs, marks/SERIES.md). SERIES.md:915's line is one of U6c's own 51 added rows (the patch's
+  line 920; absent from HEAD), which lean mode lets this chat edit.
+- His condition, as the main session reads the code: the leg's loop runs from `zero` (probe.rs:224-225, :541-543),
+  the start of the warm-up; after H1c the start-edge read sits right after `send_down` returns `zero`, before the loop,
+  so the warm-up and the window stay between the edges. Check this yourself.
+
+Check, each with evidence: your section 4's head read (the hunks file matches its sha256; it touches exactly the three
+files and equals section 3's text, or differs only by rustfmt's own changes; the other 21 files still cmp-equal the
+worktree, e.g. by running cmp_files.py's logic yourself read-only, or `cmp` per file); section 3's "check by reading"
+items (`before` read before `drop(sock)`; `port` still bound; nothing reads `before` before its use; the Err path);
+and his condition above.
+
+Also answer, because M5 ends after 04:20 UTC and no advisor can rule until 08:50:
+1. May the main session run one compile-only probe before M5 (for example `cargo check --workspace --all-targets`
+   through main-run.sh), so a compile error does not cost the counted run? If yes, its exact command.
+2. M6's fallbacks: what the main session does on its own if M5 gives (a) counts other than 861 measured / 958 bites,
+   (b) one timing-sensitive test failing once, (c) a disk stop; and when it must stop and wait for you.
+
+Give APPROVE (M5 may start), APPROVE WITH CONDITIONS or REVISE. End the file with DONE on its own line. Your final reply
+goes to the main session: the verdict, the conditions one line each, the two answers, and "For Mustafa". Plain words.

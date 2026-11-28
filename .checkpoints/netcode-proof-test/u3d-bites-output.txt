@@ -1,0 +1,74 @@
+/dev/vda        252G   24G   16G  61% /
+original socket_tests.rs sha256 312949530016f993a1330983626b5a803acb8042db609a2cdc39f57e2fa90625
+original socket.rs sha256 7ad7cb22e4316c9f98f4d3abedc36fcab8ddea312239dd5e0b95f2c0856e76f9
+original stats.rs sha256 27dfd3266a0647b28cd642a062ffa45c7caac8da31a55ec4e62f9983187e9e22
+BITES  T1a poller on its own thread, parked waker: l2::socket::tests::the_task_poller_takes_lateness_where_the_task_runs; ran 1 test(s); compiled; result test result: FAILED. 0 passed; 1 failed; says 'inbound lateness': True
+       at crates/net/src/l2/socket_tests.rs:1054:5: inbound lateness 122566 ns: at least 50 ms (the worker was held ~90 ms past due), at most 133423 ns | stack backtrace: | 0: __rustc::rust_begin_unwind | at /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/std/src/panicking.rs:679:5
+       restored socket_tests.rs: sha256 312949530016f993a1330983626b5a803acb8042db609a2cdc39f57e2fa90625 == original
+BITES  T1b poller under block_on: l2::socket::tests::the_task_poller_takes_lateness_where_the_task_runs; ran 1 test(s); compiled; result test result: FAILED. 0 passed; 1 failed; says 'inbound lateness': True
+       at crates/net/src/l2/socket_tests.rs:1045:5: inbound lateness 94143 ns: at least 50 ms (the worker was held ~90 ms past due), at most 103972 ns | stack backtrace: | 0: __rustc::rust_begin_unwind | at /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/std/src/panicking.rs:679:5
+       restored socket_tests.rs: sha256 312949530016f993a1330983626b5a803acb8042db609a2cdc39f57e2fa90625 == original
+BITES  T2a L = out - t_in: l2::socket::tests::the_fate_log_and_the_histogram_agree; ran 1 test(s); compiled; result test result: FAILED. 0 passed; 1 failed; says "the fate log's E": True
+       at crates/net/src/l2/socket_tests.rs:1100:9: up: the fate log's E 24817457 ns against the histogram's 12037 ns | stack backtrace: | 0: __rustc::rust_begin_unwind | at /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/std/src/panicking.rs:679:5
+       restored socket_tests.rs: sha256 312949530016f993a1330983626b5a803acb8042db609a2cdc39f57e2fa90625 == original
+BITES  T2b lost fates not filtered out: l2::socket::tests::the_fate_log_and_the_histogram_agree; ran 1 test(s); compiled; result test result: FAILED. 0 passed; 1 failed; says 'the E set': True
+       at crates/net/src/l2/socket_tests.rs:1084:9: assertion `left == right` failed: up: the E set is the histogram's samples | left: 2000 | right: 1978 | stack backtrace:
+       restored socket_tests.rs: sha256 312949530016f993a1330983626b5a803acb8042db609a2cdc39f57e2fa90625 == original
+BITES  T3a < for <=: l2::socket::tests::the_verdict_line_is_per_direction_and_inclusive; ran 1 test(s); compiled; result test result: FAILED. 0 passed; 1 failed; says 'assertion': True
+       at crates/net/src/l2/socket_tests.rs:1111:5: assertion `left == right` failed | left: ["MISS", "MISS"] | right: ["PASS", "PASS"] | stack backtrace:
+       restored socket_tests.rs: sha256 312949530016f993a1330983626b5a803acb8042db609a2cdc39f57e2fa90625 == original
+BITES  T3b pooled mean: l2::socket::tests::the_verdict_line_is_per_direction_and_inclusive; ran 1 test(s); compiled; result test result: FAILED. 0 passed; 1 failed; says 'assertion': True
+       at crates/net/src/l2/socket_tests.rs:1113:5: assertion `left == right` failed | left: ["PASS", "PASS"] | right: ["MISS", "PASS"] | stack backtrace:
+       restored socket_tests.rs: sha256 312949530016f993a1330983626b5a803acb8042db609a2cdc39f57e2fa90625 == original
+BITES  T4a floor rank: l2::socket::tests::nearest_rank_and_loss_band_on_fixed_inputs; ran 1 test(s); compiled; result test result: FAILED. 0 passed; 1 failed; says 'not the 999th': True
+       at crates/net/src/l2/socket_tests.rs:1124:5: assertion `left == right` failed: not the 999th | left: 999 | right: 1000 | stack backtrace:
+       restored socket_tests.rs: sha256 312949530016f993a1330983626b5a803acb8042db609a2cdc39f57e2fa90625 == original
+BITES  T4b interpolated quantile: l2::socket::tests::nearest_rank_and_loss_band_on_fixed_inputs; ran 1 test(s); compiled; result test result: FAILED. 0 passed; 1 failed; says 'the 1,000th': True
+       at crates/net/src/l2/socket_tests.rs:1133:5: assertion `left == right` failed: the 1,000th | left: 10009 | right: 10000 | stack backtrace:
+       restored socket_tests.rs: sha256 312949530016f993a1330983626b5a803acb8042db609a2cdc39f57e2fa90625 == original
+BITES  T4c band (0, n): l2::socket::tests::nearest_rank_and_loss_band_on_fixed_inputs; ran 1 test(s); compiled; result test result: FAILED. 0 passed; 1 failed; says 'assertion': True
+       at crates/net/src/l2/socket_tests.rs:1135:5: assertion `left == right` failed | left: (0, 1000000) | right: (9505, 10495) | stack backtrace:
+       restored socket_tests.rs: sha256 312949530016f993a1330983626b5a803acb8042db609a2cdc39f57e2fa90625 == original
+BITES  T4d sd rounded up: l2::socket::tests::nearest_rank_and_loss_band_on_fixed_inputs; ran 1 test(s); compiled; result test result: FAILED. 0 passed; 1 failed; says 'assertion': True
+       at crates/net/src/l2/socket_tests.rs:1134:5: assertion `left == right` failed | left: (9500, 10500) | right: (9505, 10495) | stack backtrace:
+       restored socket_tests.rs: sha256 312949530016f993a1330983626b5a803acb8042db609a2cdc39f57e2fa90625 == original
+BITES  T4e sd in f64: l2::socket::tests::nearest_rank_and_loss_band_on_fixed_inputs; ran 1 test(s); compiled; result test result: FAILED. 0 passed; 1 failed; says 'assertion': True
+       at crates/net/src/l2/socket_tests.rs:1135:5: assertion `left == right` failed | left: (9503, 10497) | right: (9505, 10495) | stack backtrace:
+       restored socket_tests.rs: sha256 312949530016f993a1330983626b5a803acb8042db609a2cdc39f57e2fa90625 == original
+BITES  T5a L0 swapped: l2::socket::tests::the_exact_excess_on_fixed_samples; ran 1 test(s); compiled; result test result: FAILED. 0 passed; 1 failed; says 'assertion': True
+       at crates/net/src/l2/socket_tests.rs:1147:5: assertion `left == right` failed | left: Forms { p50: 100000, at_p50: 10100, at_zero: 10000 } | right: Forms { p50: 100000, at_p50: 10000, at_zero: 10100 } | stack backtrace:
+       restored socket_tests.rs: sha256 312949530016f993a1330983626b5a803acb8042db609a2cdc39f57e2fa90625 == original
+BITES  T5b divided by the over count: l2::socket::tests::the_exact_excess_on_fixed_samples; ran 1 test(s); compiled; result test result: FAILED. 0 passed; 1 failed; says 'assertion': True
+       at crates/net/src/l2/socket_tests.rs:1147:5: assertion `left == right` failed | left: Forms { p50: 100000, at_p50: 10000000, at_zero: 10100000 } | right: Forms { p50: 100000, at_p50: 10000, at_zero: 10100 } | stack backtrace:
+       restored socket_tests.rs: sha256 312949530016f993a1330983626b5a803acb8042db609a2cdc39f57e2fa90625 == original
+BITES  T5c L0 = the mean: l2::socket::tests::the_exact_excess_on_fixed_samples; ran 1 test(s); compiled; result test result: FAILED. 0 passed; 1 failed; says 'assertion': True
+       at crates/net/src/l2/socket_tests.rs:1147:5: assertion `left == right` failed | left: Forms { p50: 100000, at_p50: 9989, at_zero: 10100 } | right: Forms { p50: 100000, at_p50: 10000, at_zero: 10100 } | stack backtrace:
+       restored socket_tests.rs: sha256 312949530016f993a1330983626b5a803acb8042db609a2cdc39f57e2fa90625 == original
+BITES  T5d allowance not subtracted above the threshold: l2::socket::tests::the_exact_excess_on_fixed_samples; ran 1 test(s); compiled; result test result: FAILED. 0 passed; 1 failed; says 'assertion': True
+       at crates/net/src/l2/socket_tests.rs:1147:5: assertion `left == right` failed | left: Forms { p50: 100000, at_p50: 10250, at_zero: 10350 } | right: Forms { p50: 100000, at_p50: 10000, at_zero: 10100 } | stack backtrace:
+       restored socket_tests.rs: sha256 312949530016f993a1330983626b5a803acb8042db609a2cdc39f57e2fa90625 == original
+BITES  T6a delay = due - t_in: l2::socket::tests::the_cross_check_reads_delay_plus_lateness; ran 1 test(s); compiled; result test result: FAILED. 0 passed; 1 failed; says 'assertion': True
+       at crates/net/src/l2/socket_tests.rs:1216:5: assertion `left == right` failed | left: Cross { n: 1000, count: 1010, lost: 10, p001: 20000000, p90: 28990000, p999: 29980000, mean: 24995000, pass: [false, true, true, true, true, true] } | right: Cross { n: 1000, count: 1010, lost: 10, p001: 20000000, p90: 28990000, p999: 30280000, mean: 24995600, pass: [false, true, true, true, true, false] } | stack backtrace:
+       restored socket_tests.rs: sha256 312949530016f993a1330983626b5a803acb8042db609a2cdc39f57e2fa90625 == original
+BITES  T6b lost entries kept: l2::socket::tests::the_cross_check_reads_delay_plus_lateness; ran 1 test(s); compiled; result test result: FAILED. 0 passed; 1 failed; says 'released before it arrived': True
+       at crates/net/src/l2/socket_tests.rs:746:43: a fate released before it arrived: Fate { ordinal: 0, dir: 0, kind: Lost, overtaken: false, index: 0, t_in_ns: 1000001, due_ns: 0, out_ns: 0, len: 40, errno: 0 } | stack backtrace: | 0: __rustc::rust_begin_unwind | at /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/std/src/panicking.rs:679:5
+       restored socket_tests.rs: sha256 312949530016f993a1330983626b5a803acb8042db609a2cdc39f57e2fa90625 == original
+BITES  T6c count over Delivered: l2::socket::tests::the_cross_check_reads_delay_plus_lateness; ran 1 test(s); compiled; result test result: FAILED. 0 passed; 1 failed; says 'assertion': True
+       at crates/net/src/l2/socket_tests.rs:1216:5: assertion `left == right` failed | left: Cross { n: 1000, count: 1000, lost: 10, p001: 20000000, p90: 28990000, p999: 30280000, mean: 24995600, pass: [false, true, true, true, true, false] } | right: Cross { n: 1000, count: 1010, lost: 10, p001: 20000000, p90: 28990000, p999: 30280000, mean: 24995600, pass: [false, true, true, true, true, false] } | stack backtrace:
+       restored socket_tests.rs: sha256 312949530016f993a1330983626b5a803acb8042db609a2cdc39f57e2fa90625 == original
+BITES  T6d band rule off by a term (p90 at d + 0.9a): l2::socket::tests::the_cross_check_reads_delay_plus_lateness; ran 1 test(s); compiled; result test result: FAILED. 0 passed; 1 failed; says 'assertion': True
+       at crates/net/src/l2/socket_tests.rs:1172:5: assertion `left == right` failed | left: Bands { count_min: 1000000, loss_ppm: (9500, 10500), mean: (23750000, 26250000), p001: (19750000, 20250000), p90: (29250000, 29750000), p999: (29750000, 30250000) } | right: Bands { count_min: 1000000, loss_ppm: (9500, 10500), mean: (23750000, 26250000), p001: (19750000, 20250000), p90: (28750000, 29250000), p999: (29750000, 30250000) } | stack backtrace:
+       restored socket_tests.rs: sha256 312949530016f993a1330983626b5a803acb8042db609a2cdc39f57e2fa90625 == original
+BITES  T7a down's release stamp = its due: l2::socket::tests::a_held_lock_makes_both_directions_late; ran 1 test(s); compiled; result test result: FAILED. 0 passed; 1 failed; says 'down: due at': True
+       at crates/net/src/l2/socket_tests.rs:1296:13: down: due at 421345830 ns inside the held lock (420906499-471025411 ns), released only 0 ns late (under 251000 ns): the release stamp does not see the stall | stack backtrace: | 0: __rustc::rust_begin_unwind | at /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/std/src/panicking.rs:679:5
+       restored socket.rs: sha256 7ad7cb22e4316c9f98f4d3abedc36fcab8ddea312239dd5e0b95f2c0856e76f9 == original
+BITES  T7b up's release stamp = its due: l2::socket::tests::a_held_lock_makes_both_directions_late; ran 1 test(s); compiled; result test result: FAILED. 0 passed; 1 failed; says 'up: due at': True
+       at crates/net/src/l2/socket_tests.rs:1296:13: up: due at 421256139 ns inside the held lock (420822900-470904187 ns), released only 0 ns late (under 251000 ns): the release stamp does not see the stall | stack backtrace: | 0: __rustc::rust_begin_unwind | at /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/std/src/panicking.rs:679:5
+       restored socket.rs: sha256 7ad7cb22e4316c9f98f4d3abedc36fcab8ddea312239dd5e0b95f2c0856e76f9 == original
+BITES  T7c summarize skips the log buckets: l2::socket::tests::a_held_lock_makes_both_directions_late; ran 1 test(s); compiled; result test result: FAILED. 0 passed; 1 failed; says 'samples at least': True
+       at crates/net/src/l2/socket_tests.rs:1307:9: up: over 118, under the 204 samples at least 314509 ns late | stack backtrace: | 0: __rustc::rust_begin_unwind | at /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/std/src/panicking.rs:679:5
+       restored stats.rs: sha256 27dfd3266a0647b28cd642a062ffa45c7caac8da31a55ec4e62f9983187e9e22 == original
+restored copy: socket tests test result: ok. 18 passed; 0 failed; 2 ignored; 0 measured; 152 filtered out; finished in 1.34s
+missed: 0
+
+[exited with code 0]

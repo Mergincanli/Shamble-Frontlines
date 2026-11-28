@@ -1,0 +1,14 @@
+# /etc/sudoers.d/npt on RS (u8-brief.md rev 1.1 section 1 Block 3): `npt` may run exactly these command lines as
+# root. Every argument is an anchored regular expression (sudo 1.9.10 or later reads ^...$), never `*`, which in
+# sudoers matches spaces too; "" admits no argument (Q-U8-1 confirmation 1, L5). Each wrapper validates again.
+# Checked by `visudo -c -f` before install and by the container test (ops/tests/wrappers.test.sh).
+Defaults:npt env_reset, !setenv, secure_path="/usr/sbin:/usr/bin:/sbin:/bin"
+npt ALL=(root) NOPASSWD: /usr/local/sbin/npt-ctl ^peers( (25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])([.](25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}){1,4}$
+npt ALL=(root) NOPASSWD: /usr/local/sbin/npt-ctl ^cpus ([0-9]|[12][0-9]|3[01])$
+npt ALL=(root) NOPASSWD: /usr/local/sbin/npt-ctl ^rooms (start|tokens) (0[0-9]|[12][0-9]|3[01])$
+npt ALL=(root) NOPASSWD: /usr/local/sbin/npt-ctl ^quic (off|on)$
+npt ALL=(root) NOPASSWD: /usr/local/sbin/npt-cert ^issue (staging|production)$
+npt ALL=(root) NOPASSWD: /usr/local/sbin/npt-capture ^(start|stop)$
+npt ALL=(root) NOPASSWD: /usr/local/sbin/npt-userdata ""
+npt ALL=(root) NOPASSWD: /usr/local/sbin/npt-userdata ^head$
+npt ALL=(root) NOPASSWD: /usr/local/sbin/npt-s14 ^run$

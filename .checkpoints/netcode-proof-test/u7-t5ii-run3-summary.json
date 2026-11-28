@@ -1,0 +1,584 @@
+{
+ "when": "2026-11-25T19:53:08.664Z",
+ "commit": "7e2d6f333ae2f1dce76b96ccbc341d047e4972bb",
+ "room": "27",
+ "server": {
+  "path": "/home/user/Shamble-Frontlines/.claude/worktrees/agent-a9873cdba07a3219e/.gate/u7/t5ii-bin/npt-server",
+  "sha256": "0db5ca7c0537ddf527c69f1107cd6d7179acbc02e33056e87f2fc4d6bbf95676"
+ },
+ "host": {
+  "path": "/home/user/Shamble-Frontlines/.claude/worktrees/agent-a9873cdba07a3219e/.gate/u7/t5ii-bin/npt-host",
+  "sha256": "5c7c7201c2d342e598f73f923aead25571a9b43f1826db4873b813847ccb561b"
+ },
+ "dist": {
+  "index.html": "46febaacfc3b2fa43a3b342c39293f0f25ca861efa98cc2f4267cca475f35f95",
+  "main.js": "7c0c171e80f13d6b38074afdec24915fb7095258f6f5ecd077051286ba6d4516",
+  "worker.js": "02a548d03684d90c494e6febbe3c3e5d8a5fec9b36f694048bc478119ad1aa4b",
+  "lib.js": "668903416abc6e161e6a8c4cbab9d173532ad1782e2b1860e588a7748cb25bab",
+  "hooks.js": "be1c4ce736532704c8c1c9dd042b4fd0273d6b90eee4651158c33a00f83cf814",
+  "npt_client_wasm.js": "b355d85ca53dd9534b460d3e5c3b180296a740ecd4043741d070a058be103965",
+  "npt_client_wasm_bg.wasm": "dbdc8629d1b35d6b354c564a093ed83a34ff4c51675ae3e1697b06d3eaeb80d4"
+ },
+ "bites_dist": {
+  "index.html": "46febaacfc3b2fa43a3b342c39293f0f25ca861efa98cc2f4267cca475f35f95",
+  "main.js": "7c0c171e80f13d6b38074afdec24915fb7095258f6f5ecd077051286ba6d4516",
+  "worker.js": "02a548d03684d90c494e6febbe3c3e5d8a5fec9b36f694048bc478119ad1aa4b",
+  "lib.js": "668903416abc6e161e6a8c4cbab9d173532ad1782e2b1860e588a7748cb25bab",
+  "hooks.js": "cd7be6c0a3696dbe1759a6da221a577f2a68e5aafb160e09db83570b44332972",
+  "npt_client_wasm.js": "b355d85ca53dd9534b460d3e5c3b180296a740ecd4043741d070a058be103965",
+  "npt_client_wasm_bg.wasm": "dbdc8629d1b35d6b354c564a093ed83a34ff4c51675ae3e1697b06d3eaeb80d4"
+ },
+ "browser": {
+  "path": "/opt/pw-browsers/chromium-1243/chrome-linux64/chrome",
+  "version": "153.0.8010.12",
+  "headless": true
+ },
+ "playwright_core": "1.56.1",
+ "command": "node web/e2e/t5ii.mjs --server /home/user/Shamble-Frontlines/.claude/worktrees/agent-a9873cdba07a3219e/.gate/u7/t5ii-bin/npt-server --server-sha256 0db5ca7c0537ddf527c69f1107cd6d7179acbc02e33056e87f2fc4d6bbf95676 --host /home/user/Shamble-Frontlines/.claude/worktrees/agent-a9873cdba07a3219e/.gate/u7/t5ii-bin/npt-host --host-sha256 5c7c7201c2d342e598f73f923aead25571a9b43f1826db4873b813847ccb561b --chromium /opt/pw-browsers/chromium-1243/chrome-linux64/chrome --playwright /home/user/Shamble-Frontlines/tools/node_modules/playwright-core/index.mjs --dist /home/user/Shamble-Frontlines/.claude/worktrees/agent-a9873cdba07a3219e/.gate/netcode-proof-test/t5-dist --bites-dist /home/user/Shamble-Frontlines/.claude/worktrees/agent-a9873cdba07a3219e/.gate/netcode-proof-test/dist-bites",
+ "console_probe": {
+  "worker_marker": true,
+  "worker_csp": false,
+  "status": "Done: refused in 3 ms; violation connect-src",
+  "error": null,
+  "responses": [
+   [
+    "/probe.html",
+    200
+   ],
+   [
+    "/probe.js",
+    200
+   ],
+   [
+    "/probe-worker.js",
+    200
+   ]
+  ],
+  "failed": [],
+  "lines": [
+   {
+    "type": "error",
+    "page": true,
+    "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+   },
+   {
+    "type": "log",
+    "page": true,
+    "text": "npt-probe: worker console"
+   }
+  ]
+ },
+ "marks": {
+  "m1_smoke_wt_playing_ms": 272,
+  "m1_within_3_s": true,
+  "m2_smoke_ws_playing_ms": 276,
+  "m3_cert_14d_ok": [
+   [
+    1
+   ],
+   [
+    1
+   ],
+   [
+    1
+   ]
+  ],
+  "m4_wrong_hash_ok": [
+   0
+  ],
+  "m5_fallback": {
+   "status": "WebSocket · Playing",
+   "playing_ns": [
+    1601100000
+   ]
+  },
+  "m6_mds_reads": [
+   1024,
+   1024
+  ],
+  "m7_record_problems": [],
+  "m7_csp_lines": [],
+  "m8_read_once_reads": 1,
+  "m8_no_wt_timeout_fallbacks": 1,
+  "m8_no_wt_timeout_playing_ns": [
+   4064900000
+  ],
+  "m9_room_log": "no per-slot refusal or forged count in the binary's log (tick_loop.rs:1159-1185): not readable",
+  "commands": {
+   "1-smoke-wt": [
+    {
+     "commands": 148,
+     "last_run_command": 144,
+     "unencodable_commands": 0,
+     "refused": 0
+    }
+   ],
+   "2-smoke-ws": [
+    {
+     "commands": 88,
+     "last_run_command": 86,
+     "unencodable_commands": 0,
+     "refused": 0
+    }
+   ],
+   "3-cert-14d": [
+    {},
+    {},
+    {}
+   ],
+   "4-wt-attempts-wrong-hash": [
+    {}
+   ],
+   "5-fallback": [
+    {}
+   ],
+   "6-mds": [
+    {
+     "commands": 327,
+     "last_run_command": 325,
+     "unencodable_commands": 0,
+     "refused": 0
+    }
+   ],
+   "8a-bite-read-once": [
+    {
+     "commands": 328,
+     "last_run_command": 325,
+     "unencodable_commands": 0,
+     "refused": 0
+    }
+   ],
+   "8b-bite-no-wt-timeout": [
+    {
+     "commands": 148,
+     "last_run_command": 146,
+     "unencodable_commands": 0,
+     "refused": 0
+    }
+   ],
+   "C8-real-host": [
+    {
+     "commands": 58,
+     "last_run_command": 56,
+     "unencodable_commands": 0,
+     "refused": 0
+    },
+    {
+     "commands": 57,
+     "last_run_command": 54,
+     "unencodable_commands": 0,
+     "refused": 0
+    }
+   ]
+  }
+ },
+ "c8": {
+  "host_listening": true,
+  "statuses": [
+   [
+    "WebTransport · Playing",
+    305,
+    null
+   ],
+   [
+    "WebSocket · Playing",
+    276,
+    null
+   ]
+  ],
+  "dist_types": [
+   {
+    "path": "/",
+    "status": 200,
+    "type": "text/html; charset=utf-8",
+    "as_listed": true
+   },
+   {
+    "path": "/main.js",
+    "status": 200,
+    "type": "text/javascript; charset=utf-8",
+    "as_listed": true
+   },
+   {
+    "path": "/worker.js",
+    "status": 200,
+    "type": "text/javascript; charset=utf-8",
+    "as_listed": true
+   },
+   {
+    "path": "/lib.js",
+    "status": 200,
+    "type": "text/javascript; charset=utf-8",
+    "as_listed": true
+   },
+   {
+    "path": "/hooks.js",
+    "status": 200,
+    "type": "text/javascript; charset=utf-8",
+    "as_listed": true
+   },
+   {
+    "path": "/npt_client_wasm.js",
+    "status": 200,
+    "type": "text/javascript; charset=utf-8",
+    "as_listed": true
+   },
+   {
+    "path": "/npt_client_wasm_bg.wasm",
+    "status": 200,
+    "type": "application/wasm",
+    "as_listed": true
+   }
+  ],
+  "responses": [
+   {
+    "path": "/",
+    "status": 200,
+    "type": "text/html; charset=utf-8",
+    "ip": "127.0.0.1",
+    "port": 31000
+   },
+   {
+    "path": "/main.js",
+    "status": 200,
+    "type": "text/javascript; charset=utf-8",
+    "ip": "127.0.0.1",
+    "port": 31000
+   },
+   {
+    "path": "/hooks.js",
+    "status": 200,
+    "type": "text/javascript; charset=utf-8",
+    "ip": "127.0.0.1",
+    "port": 31000
+   },
+   {
+    "path": "/lib.js",
+    "status": 200,
+    "type": "text/javascript; charset=utf-8",
+    "ip": "127.0.0.1",
+    "port": 31000
+   },
+   {
+    "path": "/worker.js",
+    "status": 200,
+    "type": "text/javascript; charset=utf-8",
+    "ip": "127.0.0.1",
+    "port": 31000
+   },
+   {
+    "path": "/lib.js",
+    "status": 200,
+    "type": "text/javascript; charset=utf-8",
+    "ip": "127.0.0.1",
+    "port": 31000
+   },
+   {
+    "path": "/npt_client_wasm.js",
+    "status": 200,
+    "type": "text/javascript; charset=utf-8",
+    "ip": "127.0.0.1",
+    "port": 31000
+   },
+   {
+    "path": "/npt/cert-hash-27.json",
+    "status": 200,
+    "type": "application/json",
+    "ip": "127.0.0.1",
+    "port": 31000
+   },
+   {
+    "path": "/npt_client_wasm_bg.wasm",
+    "status": 200,
+    "type": "application/wasm",
+    "ip": "127.0.0.1",
+    "port": 31000
+   },
+   {
+    "path": "/",
+    "status": 200,
+    "type": "text/html; charset=utf-8",
+    "ip": "127.0.0.1",
+    "port": 31000
+   },
+   {
+    "path": "/main.js",
+    "status": 200,
+    "type": "text/javascript; charset=utf-8",
+    "ip": "127.0.0.1",
+    "port": 31000
+   },
+   {
+    "path": "/hooks.js",
+    "status": 200,
+    "type": "text/javascript; charset=utf-8",
+    "ip": "127.0.0.1",
+    "port": 31000
+   },
+   {
+    "path": "/lib.js",
+    "status": 200,
+    "type": "text/javascript; charset=utf-8",
+    "ip": "127.0.0.1",
+    "port": 31000
+   },
+   {
+    "path": "/worker.js",
+    "status": 200,
+    "type": "text/javascript; charset=utf-8",
+    "ip": "127.0.0.1",
+    "port": 31000
+   },
+   {
+    "path": "/lib.js",
+    "status": 200,
+    "type": "text/javascript; charset=utf-8",
+    "ip": "127.0.0.1",
+    "port": 31000
+   },
+   {
+    "path": "/npt_client_wasm.js",
+    "status": 200,
+    "type": "text/javascript; charset=utf-8",
+    "ip": "127.0.0.1",
+    "port": 31000
+   },
+   {
+    "path": "/npt_client_wasm_bg.wasm",
+    "status": 200,
+    "type": "application/wasm",
+    "ip": "127.0.0.1",
+    "port": 31000
+   }
+  ],
+  "every_response_from_npt_host": true,
+  "failed": [],
+  "csp_lines": []
+ },
+ "files": [
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/1-smoke-wt/hash-27.json",
+   "sha256": "5a90119c0c2d0a7e5e6567c87a9c93721a4049eefca552f459e139f1ebd74328"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/1-smoke-wt/result.json",
+   "sha256": "67a46b86278fbd16470dcbf7bd3254c119b74a254a8bceba5489aa7cd6f8fe94"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/1-smoke-wt/room.jsonl",
+   "sha256": "8942770a5eccb38bfba3a31174e7536ea57558d54d4cb5c764ea727cfa6141d9"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/1-smoke-wt/room.stderr.txt",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/1-smoke-wt/room.stdout.txt",
+   "sha256": "ab466d3f7d3a7ae47af766ca0796ddfd76943ffe97c60055e4ca19825ce4b886"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/1-smoke-wt/settings.json",
+   "sha256": "69bde29157e43b2c757bd74cb65a9b0608bf8ddc81fe0f0f596a4920605a469f"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/2-smoke-ws/hash-27.json",
+   "sha256": "d29e023a4101b40b9b29f6960fdb05cca487bc083ce4fc2ee51e6f0cb1ac0c5c"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/2-smoke-ws/result.json",
+   "sha256": "38bb809332338f90c36a4c1bee3910b1663718b39e78bbd103359a89a99fc2f6"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/2-smoke-ws/room.jsonl",
+   "sha256": "0ccf8e26bdb84efe6fbb3fef2fe502b4587412268870e0beec8535fbf4971f1b"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/2-smoke-ws/room.stderr.txt",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/2-smoke-ws/room.stdout.txt",
+   "sha256": "ab466d3f7d3a7ae47af766ca0796ddfd76943ffe97c60055e4ca19825ce4b886"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/2-smoke-ws/settings.json",
+   "sha256": "de99d8984b399fb8f10e8107f208b7bf98538734291a8b10e1c77136fffa4c60"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/3-cert-14d/hash-27.json",
+   "sha256": "fb4a9cbff22947dce64dc524d5fa30ff162a2f48927da6a90a041efdb12def38"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/3-cert-14d/result.json",
+   "sha256": "a32ec28d862a4a58372fcc48f5582ada4ac69ac13cde374a270a93c942807b0c"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/3-cert-14d/room.jsonl",
+   "sha256": "9d579969dc159a0def2c21673dd4568297705762ff30ae3cee9341a9b7b7388c"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/3-cert-14d/room.stderr.txt",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/3-cert-14d/room.stdout.txt",
+   "sha256": "ab466d3f7d3a7ae47af766ca0796ddfd76943ffe97c60055e4ca19825ce4b886"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/3-cert-14d/settings.json",
+   "sha256": "0f740832d4d4456f6e1b49b86f1f4916de305dc726c5bdd0f8a3b6b39519f0d3"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/4-wt-attempts-wrong-hash/hash-27.json",
+   "sha256": "2b89a0de3f61bcc902cac2ca5f2c4229a03771d1358868cd09cbece650ca10bd"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/4-wt-attempts-wrong-hash/result.json",
+   "sha256": "f2ccd4bd92541dbe90558a1a39a938d317e11afbb022037e6ace4baa2afccea8"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/4-wt-attempts-wrong-hash/room.jsonl",
+   "sha256": "09db15469882a2c9ce436ba54e138b4e9ab7c64a7443d495b687887d4b6d64ba"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/4-wt-attempts-wrong-hash/room.stderr.txt",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/4-wt-attempts-wrong-hash/room.stdout.txt",
+   "sha256": "ab466d3f7d3a7ae47af766ca0796ddfd76943ffe97c60055e4ca19825ce4b886"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/4-wt-attempts-wrong-hash/settings.json",
+   "sha256": "da9c1ecc75375cf8ce9fec8958d4e167bdf75edff77afbbb9870f23a1b9584e5"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/5-fallback/hash-27.json",
+   "sha256": "41f9f28ea1e9e7d0e60d75e2eee25f862ecd45f32ccda0f40840d655585dfbf3"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/5-fallback/result.json",
+   "sha256": "ac7c1e3dd6457f4b70b7785569d5369a9d0d00c94fe24ef8b1e00e3afa7f0fe3"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/5-fallback/room.jsonl",
+   "sha256": "d50bad117e7bac3d29f7f7734c837b81fa9b62705f4f0f4bf40f304114657e62"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/5-fallback/room.stderr.txt",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/5-fallback/room.stdout.txt",
+   "sha256": "ab466d3f7d3a7ae47af766ca0796ddfd76943ffe97c60055e4ca19825ce4b886"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/5-fallback/settings.json",
+   "sha256": "8100ae99edc5049141d94837eee3368dd975821f46c5f1d2cf1c41b42a509756"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/6-mds/hash-27.json",
+   "sha256": "1c62c6c72152d0d7aed452776bc91db6c31326cf7b212eb2f89c198866d4ab2a"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/6-mds/result.json",
+   "sha256": "59e979cbf8e08890b4502c4453e5e30a452b4a77b34d8e5b381c8d54a7d8bcc8"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/6-mds/room.jsonl",
+   "sha256": "4bd3e58cc22b5cdedb50c7127cd4b2ce32159a0459eb97fb6c56dccbc91b3cd1"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/6-mds/room.stderr.txt",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/6-mds/room.stdout.txt",
+   "sha256": "ab466d3f7d3a7ae47af766ca0796ddfd76943ffe97c60055e4ca19825ce4b886"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/6-mds/settings.json",
+   "sha256": "66ff5d9856d34a2353d443f7a8b39f9a015baff6b2d2e01b7175e992b335fb67"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/8a-bite-read-once/hash-27.json",
+   "sha256": "e4980f259fdde90d0cf77dacff2a45cb68dc5e5e938af5bc752cfb862df9269a"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/8a-bite-read-once/result.json",
+   "sha256": "ab4a81c391c88508b527fbdd35b57f404b65842223e5f8c2754ea93474ef1343"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/8a-bite-read-once/room.jsonl",
+   "sha256": "5350fa0321d7da4cd4b51f4e32022a299092a50671140775489ddc913c93b451"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/8a-bite-read-once/room.stderr.txt",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/8a-bite-read-once/room.stdout.txt",
+   "sha256": "ab466d3f7d3a7ae47af766ca0796ddfd76943ffe97c60055e4ca19825ce4b886"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/8a-bite-read-once/settings.json",
+   "sha256": "b0aa9d67a48dddeae10e4aa090e6ddaa3186f1d1e743e2b7dde94d1f88e0824b"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/8b-bite-no-wt-timeout/hash-27.json",
+   "sha256": "6c9d0748f57bcf08f840f98e9967a33d72a3316c94f5526d27afb246a42d2d94"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/8b-bite-no-wt-timeout/result.json",
+   "sha256": "6a62dada175506b1efeac355359865c6fd152bfd91464e5482613f9e1a1ab538"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/8b-bite-no-wt-timeout/room.jsonl",
+   "sha256": "3439d76c5f9437a543b444ea938fb8214ea5853206bcc402fe0facd732e8b9af"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/8b-bite-no-wt-timeout/room.stderr.txt",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/8b-bite-no-wt-timeout/room.stdout.txt",
+   "sha256": "ab466d3f7d3a7ae47af766ca0796ddfd76943ffe97c60055e4ca19825ce4b886"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/8b-bite-no-wt-timeout/settings.json",
+   "sha256": "22cb1fc39c011646312c70e8b8bd85761b1e93d09bee42520c6981d6fde72b32"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/C8-real-host/hash-27.json",
+   "sha256": "9072f20d018297496103aca953a6e912c0bfe474e56db33f7e61cd7bd43073ac"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/C8-real-host/host-keys.txt",
+   "sha256": "781864cf8af8cde8e645e9bedbe89889ab9087ec77f70e1b52cbde3bc4e5b627"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/C8-real-host/host.json",
+   "sha256": "b26fc6dedebb7f9637c06b3ee6b51945131dd2dc5d23965bb96226cb27c75686"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/C8-real-host/result.json",
+   "sha256": "b5da50a3ea55bcb53d96d00e3663ced92ed1a9f96751f71ad5eb2b4c94fb4034"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/C8-real-host/room.jsonl",
+   "sha256": "c78ae4f2bf91ffa7a3c20b374879395cbfb05351f2d7bd8469b013b894611bc5"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/C8-real-host/room.stderr.txt",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/C8-real-host/room.stdout.txt",
+   "sha256": "ab466d3f7d3a7ae47af766ca0796ddfd76943ffe97c60055e4ca19825ce4b886"
+  },
+  {
+   "file": ".gate/u7/t5ii/2026-11-25T19-53-08-358Z/C8-real-host/settings.json",
+   "sha256": "d051b48310fe06b394ad3992ce77d1531a0d7ceed516f1b17c42cb764cafd5e1"
+  }
+ ]
+}

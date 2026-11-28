@@ -1,0 +1,89 @@
+#!/bin/bash -p
+# npt-load-ctl: LG's forced command for npt-load (C4; plan.md:1157-1162). Installed root-owned, 0755, at
+# /usr/local/bin/npt-load-ctl; it runs as npt-load (never root), named by `command=` in the root-owned
+# /etc/ssh/authorized_keys/npt-load with `from="<RS IPv4>",restrict` (written by `npt-ctl loadkey`). RS's run script
+# uses it to start, feed and stop U6c's npt-load, copy token files and run C5's check while Mustafa is away.
+# Fixed verbs from SSH_ORIGINAL_COMMAND, parsed by npt-lib.sh's npt_load_parse (no other word passes); fixed paths
+# under /var/lib/npt-load:
+#   token NN      stdin (at most 64 KiB) -> tokens/room-NN.tok (0600)
+#   settings NN   stdin (at most 64 KiB) -> run/load-NN.json (0600)
+#   start NN      /opt/npt/bin/npt-load run/load-NN.json, detached; log logs/load-NN.log
+#   stop NN       TERM, then KILL after 10 s; prints the exit (the abort path: recorded as stopped, no DONE)
+#   status NN     running or stopped
+#   log NN        the load's log (at most 256 MiB) to stdout
+#   npt-log NN    the load's npt-log, logs/load-NN.jsonl (at most 256 MiB), to stdout (NC-SB-7: RS keeps it)
+#   fwcheck       C5's LG half: a TCP connect to RS's port 22 must time out (only fw-rs can drop it)
+# npt-load's command line is U6c's (advisor-u6c-brief.md C1 (c)): `npt-load <settings path>`, one argument. It prints
+# READY once its clients are up and ends at the settings' duration_s with DONE and exit 0; its stdin is /dev/null
+# here, so stdin's close is no end for it.
+if [ "${NPT_ENV_CLEARED:-}" != 1 ]; then
+  exec /usr/bin/env -i NPT_ENV_CLEARED=1 PATH=/usr/sbin:/usr/bin:/sbin:/bin LC_ALL=C \
+    SSH_ORIGINAL_COMMAND="${SSH_ORIGINAL_COMMAND:-}" SSH_CONNECTION="${SSH_CONNECTION:-}" \
+    /bin/bash -p /usr/local/bin/npt-load-ctl
+fi
+set -euo pipefail
+set -f
+umask 077
+. /usr/local/lib/npt/npt-lib.sh
+
+readonly BASE=/var/lib/npt-load
+readonly BIN=/opt/npt/bin/npt-load
+readonly CAP=65536
+
+die() { printf 'npt-load-ctl: %s\n' "$*" >&2; exit 2; }
+npt_load_parse "${SSH_ORIGINAL_COMMAND:-}" || die "refused (verbs: token|settings|start|stop|status|log|npt-log NN, fwcheck)"
+readonly VERB=$NPT_VERB NN=$NPT_NN
+
+store() {
+  local tmp size
+  tmp=$(mktemp "$1.XXXXXX")
+  head -c $((CAP + 1)) > "$tmp"
+  size=$(stat -c %s "$tmp")
+  if ((size > CAP)); then rm -f "$tmp"; die "over $CAP bytes"; fi
+  mv -f "$tmp" "$1"
+  printf 'stored %s bytes\n' "$size"
+}
+
+PID=''
+running() {
+  local f="$BASE/run/load-$NN.pid"
+  [ -f "$f" ] || return 1
+  PID=$(tr -dc '0-9' < "$f")
+  [ -n "$PID" ] && [ "$(readlink "/proc/$PID/exe" 2> /dev/null)" = "$BIN" ]
+}
+
+case $VERB in
+  token) store "$BASE/tokens/room-$NN.tok" ;;
+  settings) store "$BASE/run/load-$NN.json" ;;
+  start)
+    running && die "load $NN is running already"
+    [ -f "$BASE/run/load-$NN.json" ] && [ -f "$BASE/tokens/room-$NN.tok" ] || die "settings and token first"
+    rm -f -- "$BASE/logs/load-$NN.jsonl"   # a re-run's fresh npt-log (RS kept the last one: NC-SB-7, NC-SB-10)
+    setsid "$BIN" "$BASE/run/load-$NN.json" < /dev/null > "$BASE/logs/load-$NN.log" 2>&1 &
+    printf '%s\n' "$!" > "$BASE/run/load-$NN.pid"
+    printf 'load %s started\n' "$NN"
+    ;;
+  stop)
+    running || die "load $NN is not running"
+    kill -TERM "$PID"
+    for _ in $(seq 1 20); do kill -0 "$PID" 2> /dev/null || break; sleep 0.5; done
+    if kill -0 "$PID" 2> /dev/null; then kill -KILL "$PID"; printf 'load %s killed after 10 s\n' "$NN"
+    else printf 'load %s stopped\n' "$NN"; fi
+    rm -f "$BASE/run/load-$NN.pid"
+    ;;
+  status) if running; then printf 'load %s running\n' "$NN"; else printf 'load %s stopped\n' "$NN"; fi ;;
+  log) head -c 268435456 -- "$BASE/logs/load-$NN.log" ;;
+  npt-log) head -c 268435456 -- "$BASE/logs/load-$NN.jsonl" ;;
+  fwcheck)
+    rs=${SSH_CONNECTION%% *}
+    npt_valid_ipv4 "$rs" || die "no RS address in the connection"
+    rc=0
+    timeout 5 bash -c 'exec 3<>"/dev/tcp/$0/22"' "$rs" 2> /dev/null || rc=$?
+    if [ "$rc" -eq 124 ]; then
+      printf 'fwcheck: blocked (LG cannot reach RS port 22: fw-rs is in force)\n'
+    else
+      printf 'fwcheck: OPEN (LG reached RS port 22: fw-rs is NOT in force; stop before any room opens)\n'
+      exit 3
+    fi
+    ;;
+esac

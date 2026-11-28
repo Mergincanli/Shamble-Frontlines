@@ -1,0 +1,48 @@
+{
+  "verdict": "APPROVE WITH FINDINGS",
+  "summary": "I reviewed PR #53 (head a637c7a, one commit on main 4460ef5, risk tier 2) from the security side. I found no Critical, High or Medium issues and four Low ones. Under the review budget, each Low becomes a follow-up in STATUS and does not force a push.\n\n**What the script can delete.** kept-logs.mjs can remove only two things:\n- a folder under `.gate/netcode-proof-test/runs/` whose name matches `SET_OK` (no slashes or dots, ending in 12 hex digits);\n- the fixed folder `.gate/u3c-review-target`.\n\nBefore removing anything it checks that the path's real location equals the plain path (realDir) and that the folder holds only plain files and folders (an lstat walk). Names must match `PATH_OK`: ASCII only, no leading dot, at most 99 characters, so nesting depth is limited. For a run-set folder it also checks:\n- the list is committed in HEAD and in the pushed branch;\n- the folder matches the list before packing;\n- every path, size and sha256 read back from the archive equals the list;\n- a second walk throws a Mismatch, so the script exits 1 and the folder stays.\n\nI confirmed in a scratch folder that Node 22's `rmSync` deletes a link (at the path or inside the folder) without following it. It does follow a link in a parent folder, which is the gap in SA-KL-1.\n\n**The archive.** The header writer is correct: names are ASCII, octal fields have the right widths, size is capped below 8 GiB and the checksum fits. The read-back loop always consumes data or stops, uses memory bounded by one chunk, and compares sha256 hashes, so a damaged or crafted archive cannot pass. The `.part` file is opened with `wx`, which refuses a planted link, and it is kept on every failure.\n\n**Who may run it.** Routines cannot clear `SHAMBLE_ROLE` on the command line: the guard accepts only TZ, LC_ALL, LANG, LANGUAGE and NO_COLOR, and refuses `env` options (routine-guard.mjs:469-497). The script also refuses a routine itself. git runs through `execFileSync` with no shell.\n\n**The guard and section 11.** The PR changes no settings, hook, CI or gate file (diff check: 0 files). The `Bash(rm -rf *)` deny at settings.json:247 is unchanged. kept-logs.mjs is not on the allow list, so a day session's run still prompts or goes to the classifier. Section 11 quotes his words of 08:20 word for word and only narrows them. It keeps \"rm -rf stays denied\" (CHECKPOINTS.md:229 and the new paragraph at 233). Nothing in the PR gets around the guard, the merge check or branch protection.\n\n**Evidence.** In the worktree, the test suite gave 9 pass, 1 skip (the dry run, as expected) and 0 fail. I re-ran two planted bugs and both are caught: M5 (symlink check removed) fails tests 7 and 8, and M3 (routine refusal removed) fails test 6. compare-head.log shows the four files equal the approved text plus kl-change-v2.diff.\n\n**Not checked.** I could not read the PR body: no GitHub or ToolSearch tool was available to me. The anti-cheat coverage table does not apply: this PR has no game, server or network code.",
+  "checks_run": [
+    "Read Mustafa's words in history.md lines 2088-2161 (KEPT-LOGS (c), KL-YES with its change, KL-CHANGE-YES) and compared section 11 with them: the quote is word for word, the rule is narrower, and 'rm -rf stays denied' is kept",
+    "Ran (cd .gate/kept-logs-wt && git diff 4460ef5 a637c7a): 4 files; no file under .claude/settings.json, .claude/hooks, .github or tools/gate.mjs changes (0 files)",
+    "Read kept-logs.mjs (323 lines) and kept-logs.test.mjs (326 lines) in full",
+    "node --test .claude/scripts/kept-logs.test.mjs in the worktree (Node v22.23.4): 9 pass, 1 skip (dry run, expected), 0 fail",
+    "Re-ran planted bugs: KEPT_LOGS_SCRIPT=.gate/kept-logs-rule/M5 fails tests 7 and 8; M3 fails test 6",
+    "Read kl-evidence: compare-head.log (compare: PASS, 4 files equal the approved text with the diff applied); M1-M14 each fail 1 to 4 tests; both dry-run TAP files pass 1 of 1",
+    "Scratch proof (.gate/kept-logs-rule/review/rm-link.mjs, temp folders only): Node 22 rmSync recursive deletes a link at the path and links inside without following them, but follows a link in a parent folder",
+    "Guard read: routine-guard.mjs:455-497 (routines can set only TZ, LC_ALL, LANG, LANGUAGE and NO_COLOR, and no env options), 693-698 and 772 (day-session ask for GIT_DIR, GIT_WORK_TREE, GIT_COMMON_DIR and GIT_INDEX_FILE), 988-1013 (routines run only main's tracked scripts, nothing under .gate/)",
+    "settings.json: kept-logs.mjs is not on the allow list; Bash(rm -rf *) is still denied at line 247",
+    "Archive review: ustar header fields and checksum, readBack loop ending and memory, .part opened wx, fsync, renameSync",
+    "PR body via the GitHub tools: not possible, no ToolSearch or GitHub tool available to this agent; skipped"
+  ],
+  "findings": [
+    {
+      "id": "SA-KL-1",
+      "severity": "Low",
+      "where": ".claude/scripts/kept-logs.mjs:132 (realDir check), 273 (rmSync in pack); 289 and 303 (cache)",
+      "what": "Time of check to time of use on the parent folders. The no-symlink check on the set folder's path runs once, before packing, which can take minutes. rmSync runs after that, and in my scratch test it followed a link swapped into a parent folder (.gate, .gate/netcode-proof-test or runs). Exploit: a second process run by the same user replaces `runs` with a link to another place that holds a folder of the same name, and that folder is deleted. It needs a deliberately concurrent local process; a link at the set folder itself or inside it is never followed.",
+      "fix": "Right before each rmSync, check again that realpathSync(dir) === dir and that lstat says it is a folder. Optionally rename the folder to a fixed name in the same parent and check that before removing it. This is a follow-up; it changes approved text, so it needs Mustafa's yes."
+    },
+    {
+      "id": "SA-KL-2",
+      "severity": "Low",
+      "where": ".claude/scripts/kept-logs.mjs:49-55 (git() inherits process.env); .claude/scripts/kept-logs.test.mjs:36-45 (sh() and run() inherit it too)",
+      "what": "git variables in the environment can point the script's git checks at another repository. GIT_CONFIG_COUNT/KEY_n/VALUE_n (for example core.worktree) is not caught by the day-session ask in routine-guard.mjs:772. Exploit: with those variables set, the 'committed and pushed' checks read a different repository. The archive is still read back against the list on disk, so no log is lost without an archive. In the tests, a run with GIT_DIR exported would write user.name, user.email and commit.gpgsign into that repository's config.",
+      "fix": "Call git with an environment that has every GIT_* variable removed, in the script's git() and in the test's sh() and run(). This is a follow-up."
+    },
+    {
+      "id": "SA-KL-3",
+      "severity": "Low",
+      "where": ".claude/scripts/kept-logs.mjs:283-299 (newest() and the OLD_BEFORE bound)",
+      "what": "cache recognises the old build cache only by its path and by modification times, which `touch -d` can set back. A file's ctime cannot be set that way. Exploit: a session moves some other folder to .gate/u3c-review-target, backdates it, and runs cache. That takes deliberate misuse, and the tracked-files and worktree checks still apply.",
+      "fix": "Also require ctimeMs to be older than OLD_BEFORE, or require cargo's .rustc_info.json older than the bound. Either way a refusal leaves the folder in place. It changes approved text, so it is a follow-up for his yes."
+    },
+    {
+      "id": "SA-KL-4",
+      "severity": "Low",
+      "where": ".claude/scripts/kept-logs.mjs:224 (archive exists check), 250-251 (fsync of .part), 264 (renameSync), 273 (rmSync)",
+      "what": "Two small gaps when the archive is finalised. First, the kept-logs folder itself is never flushed to disk after the rename and before the run-set folder is removed, so after a power loss the rename may not have reached the disk. Second, renameSync would replace an archive that appeared after the check at line 224, against 'an archive is never overwritten'. Only an outside writer could cause that, because the wx open serialises concurrent packs.",
+      "fix": "Use linkSync(part, archive), which fails with EEXIST, or check again before the rename. Then fsync the .gate/netcode-proof-test/kept-logs folder before rmSync. This is a follow-up."
+    }
+  ],
+  "answers": "For the main session (not a finding on #53; this PR does not touch it): settings.json:50-51 lets a day session run `node .gate/*.mjs` and `node .gate/*.js` without a prompt. A script a session writes under .gate/ could therefore call rmSync on any path. That is a wider way around 'rm -rf stays denied' than anything in this PR. Routines are not affected: the guard refuses .gate/ scripts there (routine-guard.mjs:1001). I suggest the advisor rule whether it goes on STATUS as a kit follow-up. Notes: /home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/kl-pr-security.md. Scratch proof: /home/user/Shamble-Frontlines/.gate/kept-logs-rule/review/rm-link.mjs."
+}

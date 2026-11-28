@@ -1,0 +1,12 @@
+# npt-host.path on RS (Q-U6C-7 as ruled, U8's F22; advisor-u6c-brief.md C1 (f)): starts npt-host.service once the
+# production order's chain exists. The issue mode writes that chain last, after the key's sync_all (C1 (a)), so the
+# host starts with both files whole. Staging writes staging.* beside it and starts nothing. rs.yaml installs this file
+# root-owned, 0644, from the root-owned clone; no sudoers line names npt-host or systemctl.
+[Unit]
+Description=npt page host: start once the production chain exists
+
+[Path]
+PathExists=/var/lib/npt/tls/production.chain.pem
+
+[Install]
+WantedBy=multi-user.target

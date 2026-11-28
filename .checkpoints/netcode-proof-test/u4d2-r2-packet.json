@@ -1,0 +1,23 @@
+{
+  "title": "U4d2 round 2 (on what changed: the fix pass FX-1 to FX-12 after the advisor's round-1 ruling)",
+  "out": ".checkpoints/netcode-proof-test/u4d2-r2-packet.md",
+  "side_out": ".checkpoints/netcode-proof-test/u4d2-r2-packet-tests.md",
+  "heads": [
+    "Base: round 1's reviewed tree, the read copy `.gate/u4d2-r1` (51520b4 with round 1's snapshot patch applied: wip/u4d2.patch at e2f2a5b, sha256 a526ef8e…; `git show e2f2a5b:.checkpoints/netcode-proof-test/wip/u4d2.patch`).",
+    "U4d2's copy after the fix pass: `.claude/worktrees/u4d2-build` (branch u4d2-build at 51520b4; uncommitted). The same change as a patch on 51520b4: `.checkpoints/netcode-proof-test/wip/u4d2.patch` (committed at cb27931; 18 files; sha256 9e71cda0…; `git apply --check` exits 0 on 51520b4 and on the spike head, whose spikes/ is 1b4a3c8's). Its 18 files' sha256: `.gate/u4d2/fx-hashes-end.sha256` (`sha256sum -c` in the copy: 18 of 18 OK).",
+    "The diffs below compare round 1's tree with the fixed copy. Files the fix pass did not change show no diff: `cmp` finds Cargo.lock, every crate's Cargo.toml, crates/hash-wasm/src/lib.rs, recordings.json, std-sin-scan.txt and co-initial-dump.txt byte-equal to round 1's. The fix pass's runs are under `.gate/u4d2/` as fx-*.log (fx-check1.log and fx-check2.log: its two counted check.mjs runs).",
+    "The spike branch since round 1: A13 at 1b4a3c8 (crates/server/clippy.toml gains the HashMap and HashSet type bans; CI's gate runs 43330155579 and 43330163225 green). U4e merged at c88eb31 before round 1."
+  ],
+  "diffs": [
+    {"label": "The workspace manifest (Cargo.toml)", "a": ".gate/u4d2-r1/spikes/netcode-proof/Cargo.toml", "b": ".claude/worktrees/u4d2-build/spikes/netcode-proof/Cargo.toml"},
+    {"label": "check.mjs", "a": ".gate/u4d2-r1/spikes/netcode-proof/check.mjs", "b": ".claude/worktrees/u4d2-build/spikes/netcode-proof/check.mjs"},
+    {"label": "npt-hash-wasm (crates/hash-wasm)", "a": ".gate/u4d2-r1/spikes/netcode-proof/crates/hash-wasm", "b": ".claude/worktrees/u4d2-build/spikes/netcode-proof/crates/hash-wasm"},
+    {"label": "npt-lab (crates/lab)", "a": ".gate/u4d2-r1/spikes/netcode-proof/crates/lab", "b": ".claude/worktrees/u4d2-build/spikes/netcode-proof/crates/lab"},
+    {"label": "check.test.mjs (check.mjs's self-tests)", "a": ".gate/u4d2-r1/spikes/netcode-proof/check.test.mjs", "b": ".claude/worktrees/u4d2-build/spikes/netcode-proof/check.test.mjs", "side": true}
+  ],
+  "docs": [
+    {"label": "The advisor's round-1 ruling, Blocks 1 to 8: the findings' routes, the fix pass's scope, bounds and evidence, round 2's seats (advisor-u4d2-r1.md)", "path": ".checkpoints/netcode-proof-test/advisor-u4d2-r1.md", "lines": [68, 469]},
+    {"label": "The advisor's round-1 ruling, the texts T1 to T5 (advisor-u4d2-r1.md)", "path": ".checkpoints/netcode-proof-test/advisor-u4d2-r1.md", "lines": [548, 649]}
+  ],
+  "carries": {"path": ".checkpoints/netcode-proof-test/u4s-carries.md", "include": "^(29|34|41|42|52|65|66|67|71|72)\\. \\*\\*|U4d2"}
+}

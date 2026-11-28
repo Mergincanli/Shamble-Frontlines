@@ -1,0 +1,11 @@
+PASS  fmt           0.3 s  
+PASS  clippy        2.4 s  measured build and bites build both linted
+PASS  clippy-wasm32 0.3 s  measured build and bites build both linted
+PASS  test          74.7 s  measured build: 258 tests passed, 0 failed, 0 reported a skip; bites build: 272 tests passed, 0 failed, 0 reported a skip
+PASS  deps          0.3 s  held: no leaf crate reaches a transport or runtime; npt-client has no npt-net; npt-super and npt-host keep off the sim, room, proto (and client) crates; npt-judge ships npt-log and serde only; npt-tcpinfo ships libc only and only npt-net uses it; npt-net has no direct libc; nothing depends on npt-lab; the workspace forbids unsafe_code and every member inherits its lints but npt-client-wasm (allow) and npt-tcpinfo (deny), whose own lint tables are the workspace's otherwise; as the scan reads crates/ (lexRust), no other crate relaxes unsafe_code or has unsafe code, and npt-tcpinfo relaxes it only by the #[allow] on srtt_us and unacked_and_unsent, has unsafe code only inside them, and keeps lib.rs's deny of the two clippy unsafe lints; the environment and the cargo configs read pass no lint-lowering rustflags and set no clippy or fmt alias, no other rustc or workspace wrapper, no config include and no test runner; every member lives in crates/ and builds only .rs files in its own folder, in edition 2024, none a proc-macro, and every path dependency is a member; no symbolic link under crates/; every #[path] and include! literal names a .rs file in its own crate (78 crate files and 1 cargo config file(s) read)
+PASS  refs          0.0 s  441 tracked files: none outside spikes/ references it
+PASS  marks         0.5 s  npt-judge: 81 marks read and checked (drafts at 626df678cae0835fb2ce62b8113f548697968406); rows in this branch's docs/adr/: all unchanged
+PASS  self          0.6 s  35 of 35 tests passed
+PASS  redact        0.7 s  10 of 10 tests passed; redact-check: 148 item(s) checked, 0 finding(s)
+check: all 9 steps pass
+exit 0

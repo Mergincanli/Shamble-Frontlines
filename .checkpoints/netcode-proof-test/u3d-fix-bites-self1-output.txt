@@ -1,0 +1,52 @@
+# U3d fix pass proof, mode bites, 2026-11-09T03:30:08Z
+fixed state: socket_tests.rs sha256 ca17a9f6f6be03224c8921ef21f1731c1c0d86f3161c7bf7add0afb6b032b2b9
+fixed state: socket.rs sha256 7ad7cb22e4316c9f98f4d3abedc36fcab8ddea312239dd5e0b95f2c0856e76f9
+S2: (re-run: order kept) the stop with no d + a + 500 ms wait (l2_timing_self_test)
+    df /home/user: 14.2 GB free
+    built npt_net-f72f21a42e60b4c9 (release) in 11.6 s; newer than the touch: True
+  BITES S2: exit 101; ran 1; test result: FAILED. 0 passed; 1 failed; prints before the panic 39
+    message: assertion `left == right` failed: up: every datagram accounted for: the run is INVALID, not a lateness verdict | left: 29757 | right: 30000 | stack backtrace:
+    expected in it: 'every datagram accounted for'
+    slack now 1 ns, at start 1 ns, set 1, error None; policy SCHED_OTHER 0: the run condition accepts [1] ns at both reads (not SCHED_FIFO or SCHED_RR)
+    restored: {'socket_tests.rs': True}
+S3: (re-run) the loss band at twice P1's ppm (l2_timing_self_test)
+    df /home/user: 14.2 GB free
+    built npt_net-f72f21a42e60b4c9 (release) in 11.7 s; newer than the touch: True
+  BITES S3: exit 101; ran 1; test result: FAILED. 0 passed; 1 failed; prints before the panic 39
+    message: up: 325 lost, outside P1's band 480-720: the run is INVALID, not a lateness verdict | stack backtrace: | 0: __rustc::rust_begin_unwind | 1: core::panicking::panic_fmt
+    expected in it: "outside P1's band"
+    slack now 1 ns, at start 1 ns, set 1, error None; policy SCHED_OTHER 0: the run condition accepts [1] ns at both reads (not SCHED_FIFO or SCHED_RR)
+    restored: {'socket_tests.rs': True}
+S4: (re-run) the fate log's capacity n (too small) (l2_timing_self_test)
+    df /home/user: 14.2 GB free
+    built npt_net-f72f21a42e60b4c9 (release) in 12.1 s; newer than the touch: True
+  BITES S4: exit 101; ran 1; test result: FAILED. 0 passed; 1 failed; prints before the panic 39
+    message: assertion `left == right` failed: the fate log filled: the run is INVALID, not a lateness verdict | left: 30000 | right: 0 | stack backtrace:
+    expected in it: 'the fate log filled'
+    slack now 1 ns, at start 1 ns, set 1, error None; policy SCHED_OTHER 0: the run condition accepts [1] ns at both reads (not SCHED_FIFO or SCHED_RR)
+    restored: {'socket_tests.rs': True}
+S5: (re-run) the pre-touch's drain removed (log full from the start) (l2_timing_self_test)
+    df /home/user: 14.2 GB free
+    built npt_net-f72f21a42e60b4c9 (release) in 12.0 s; newer than the touch: True
+  BITES S5: exit 101; ran 1; test result: FAILED. 0 passed; 1 failed; prints before the panic 39
+    message: assertion `left == right` failed: the fate log filled: the run is INVALID, not a lateness verdict | left: 60000 | right: 0 | stack backtrace:
+    expected in it: 'the fate log filled'
+    slack now 1 ns, at start 1 ns, set 1, error None; policy SCHED_OTHER 0: the run condition accepts [1] ns at both reads (not SCHED_FIFO or SCHED_RR)
+    restored: {'socket_tests.rs': True}
+S5b: one pre-touch entry left in the log after the drain (l2_timing_self_test)
+    df /home/user: 14.2 GB free
+    built npt_net-f72f21a42e60b4c9 (release) in 11.6 s; newer than the touch: True
+  BITES S5b: exit 101; ran 1; test result: FAILED. 0 passed; 1 failed; prints before the panic 39
+    message: assertion `left == right` failed: up: the fate log holds 30001 fates of the 30000 sent: the run is INVALID, not a lateness verdict | left: 30001 | right: 30000 | stack backtrace:
+    expected in it: 'the fate log holds'
+    slack now 1 ns, at start 1 ns, set 1, error None; policy SCHED_OTHER 0: the run condition accepts [1] ns at both reads (not SCHED_FIFO or SCHED_RR)
+    restored: {'socket_tests.rs': True}
+S6: (re-run) the pre-touch skipped (l2_timing_self_test)
+    df /home/user: 14.2 GB free
+    built npt_net-f72f21a42e60b4c9 (release) in 11.4 s; newer than the touch: True
+  BITES S6: exit 101; ran 1; test result: FAILED. 0 passed; 1 failed; prints before the panic 39
+    message: assertion `left == right` failed: the fate log pre-touched with 0 of its 61000 entries: the run is INVALID, not a lateness verdict | left: 0 | right: 61000 | stack backtrace:
+    expected in it: 'pre-touched with 0 of'
+    slack now 1 ns, at start 1 ns, set 1, error None; policy SCHED_OTHER 0: the run condition accepts [1] ns at both reads (not SCHED_FIFO or SCHED_RR)
+    restored: {'socket_tests.rs': True}
+summary: S2 BITES; S3 BITES; S4 BITES; S5 BITES; S5b BITES; S6 BITES

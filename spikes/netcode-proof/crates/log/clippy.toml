@@ -1,0 +1,9 @@
+# The clock ban (plan §4.5's rule, applied here too): npt-log reads no clock; times, dates and ticks are passed in.
+disallowed-types = [
+    { path = "std::time::Instant", reason = "the clock ban: time is passed in" },
+    { path = "std::time::SystemTime", reason = "the clock ban: time is passed in" },
+]
+disallowed-methods = [
+    { path = "std::time::Instant::now", reason = "the clock ban" },
+    { path = "std::time::SystemTime::now", reason = "the clock ban" },
+]

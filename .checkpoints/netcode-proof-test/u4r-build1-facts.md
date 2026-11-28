@@ -1,0 +1,82 @@
+# U4r build copy 1: fact check for the advisor (read-only, adversarial)
+
+Sources: questions u4r-build1-questions.md; notes u4r-build.md; code .gate/u4r-snap1 (2fbec77 + wip/u4r.patch);
+logs .gate/u4r/; brief u4r-brief.md; carries u4s-carries.md; plan.md.
+
+## Plan
+1. Read notes (282 lines), questions (done).
+2. Point 1: logs regen-all.log, regen-precheck.log; check.mjs wasmStep; hash.rs legs/regenerate_all/--only;
+   33.1/61.6 base source; WASM_CALL_LIMIT_MS location and scope (carry 84); arithmetic for (a)-(d).
+3. Point 2: npt-room RADIUS_CM, AreaFlood visibility; interest set build; mirror.rs checks.
+4. Point 3: run file sizes; lab.jsonl -57 per-tick; SERIES.md:66-73; brief 7.1 table; df; du shared-target.
+5. Point 4: client refusal causes; L1 P0 fates; logs.rs refused_as_lost; carry 62 (h).
+6. Point 5: HISTORY_MS, ROOM_HISTORY_MS, span_ms writer.
+7. Point 6: World dump events section; shot counting.
+8. Point 7: Behaviour::step view.
+9. Point 8: d13.log vs notes table; U4R-Q14 arithmetic.
+10. Point 9: --lead, --every-step, --logs 0 refusal/limits.
+
+## Items (a line per item, marked done)
+
+- P1 done (reads): regen-all.log real 3m20.992s (201.0 held); regen-precheck.log real 1m50.068s (110.1 held). mtimes:
+  regen-all start 20:28:09.88, synthetic done 20:28:09.996, SS-P2-s1.rec 20:30:32.54 (~142.6 s), ES-P3-s2.rec
+  20:31:25.14 (~52.6 s), native-*.lines 20:31:30.85 (~5.7 s legs). regen/: SS-P0-s4.rec 20:27:23.74 (~108.1 s), legs ~1.9 s.
+- P1: wasmStep check.mjs:2254; calls :2319 "npt-lab hash" (no --only), :2374 "hash-map native legs" (--only rec0),
+  :2432 "std-sin native legs" (--only scan's catch SS-s1; std-sin-scan.txt has catch SS-s1 2). Held: 3 legs calls.
+- P1: hash.rs legs :823; selected :484 (replayed only); regenerate_all(&entries) :870ish over whole manifest; same in
+  2fbec77 (:751 selected, :770 regenerate_all(&entries)). serve() reads files (:965-975), no regen. Held.
+- P1: WASM_CALL_LIMIT_MS check.mjs:2212, applied per call :2263 (cargo 0); no step deadline today. Carry 84 (a)
+  (u4s-carries.md:396-410) makes it one shared deadline for non-cargo calls from the first of them, at U4r's change.
+- P1: 33.1 s = m5-counted.log:170 (builds 5.4+5.2+1.2+1.2=13.0; non-cargo sum 19.9). 61.6 = cold-run2.log:23 (builds
+  41.8; non-cargo 19.6). Latest warm on spike code: l3-manifests/counted.log:172 35.8 s (builds 15.0; non-cargo 20.8).
+- P1 done. P2 done: room.rs:29 `const RADIUS_CM` private; interest.rs:77 `pub struct AreaFlood` re-exported lib.rs:27,
+  methods new/update/reaches/sees_portal pub(crate) (:86,:99,:140,:147). find_relevant room.rs:904-970: soldier/hull/
+  projectile by point() (room.rs:345-351) within r2 AND flood.reaches; parts with relevant hull; doors sees_portal, wall
+  reaches (no radius). Snapshot Add/Update only from c.relevant (room.rs:1240); Removes otherwise. FullState tick t
+  from c.relevant (room.rs:1106-1115). mirror.rs audit_records :224-275: radius on Soldier/Vehicle (grid0,1), Projectile
+  (grid1,2), Part via hull; Door/Wall `_ => None` unchecked; no flood; events: only own-shot (mirror.rs:421-430).
+  => cannot flag a legit send of the 4 checked kinds; can pass in-radius unreached-area records, any door/wall, any
+  non-own cosmetic/gameplay event. breaches list capped at 16 (mirror.rs breach). r4 log b11-r4r8r9.log:31-34 0 breaches.
+- P6 done: World::dump pub (world.rs:1018); events cleared each step (world.rs:2100); Shot pushed per fired
+  (world.rs:1550); dump events count + 4 words each (world.rs:1995-2017); pools fixed-size (world.rs:846,855) so
+  cached events_at stays valid; logs.rs room_second :520-603 per room tick, only when s.logs (scenario.rs:884-888);
+  Room::tick steps sim once (room.rs:814); SimCore::step returns events but room calls it (seam.rs:546-548); no pub
+  events getter on SimCore/World/Room (Room.stamped private room.rs:417).
+- P7 done: newest_tick = "newest snapshot tick read in a header" (client/src/lib.rs:335-338); mirror.tick fed room's
+  datagrams before server.send (scenario.rs:830-852); view = mirror frame of client's newest tick, soldiers only
+  (mirror.rs:203-215; scenario.rs:916-921). Frame = mirror's baseline frame + every group of the tick (mirror.rs:1-4).
+- P3 done: sizes smoke1 lab 10,961,471 / room 881,985 / client 492,198 (held). lab tick lines bytes/tick (awk):
+  smoke1 P0 24,376 (449 lines); relp2 P2 9,270; d13-1 P2 9,226; d13-2 9,020; d13-3 P2 lead3 15,000; d13-4 P3 3,984;
+  d13-5 P0 24,691. Tick lines hold only s.pos_err_um/yaw/pitch (python read). room+client d13-1: 3,648,994+1,976,863
+  over 1,828 ticks. SERIES.md:66,67,73 are -57's rows (68-72 others). marks.json:4008-4100 -57 parts P0,P2,P3,B1 min 3,
+  max checks + p99 report. Brief 7.1 :1153-1170: -57 on -17's runs, 4 parts x 3 seeds, 10 min; bites one run per bite
+  at seed 1. df now 5.6G (5,998,694,400 B avail). du shared-target 8.1G; .gate 22G; .gate/u4r 291M.
+- P4 done: refused_as_lost logs.rs:275-282 turns every filed sentinel (h==0) into Lost (null, incomplete 1); bite id
+  PM-0001-17/refused-as-lost scenario.rs:200 (bites build). Client sentinel causes client/src/lib.rs:473-487 (decode
+  err), :690-701 (dup group, other bytes), :703-710 (groups/base-age mismatch), :711-730 (no baseline), :741-749
+  (apply err), :501-530 (bad header), :608-622 (second different hash). L1 P0 = 0 ms, 0 jitter, 0 loss, reorder 1 %
+  (l1/src/lib.rs:166-180; smoke header reorder_step_permille 10); no duplication built (l1 :75). Runs: sentinels 0 in
+  smoke1, d13-5, rec SS-P0-s4. Carry 62 (h) u4s-carries.md:289-312; wording from advisor-u4j.md:438-449 (R2.4).
+- P5 done: room.rs:33 private HISTORY_MS 2_000, used :446; scenario.rs:54-56 ROOM_HISTORY_MS copy; span_ms written
+  scenario.rs:770 (Recording header), :1068 (lab `recording` event); s5 asserts r.span_ms == ROOM_HISTORY_MS (copy vs
+  copy) scenario.rs:1590-1592; hash.rs runner entries' manifest span_ms read (:297) but not compared (generate :330-344,
+  check :353-365 bytes+sha only). Room has no history accessor; HitHistory::capacity pub (sim history.rs:42).
+- P8 done: d13.log:19,22,25,28,31 all table figures held; shares recomputed. Notes :175 "1,800 ticks measured" not held
+  (warm-up 300 + measured 1,500; after 0-35). U4R-Q14 (b) 1/6 arithmetic held (J/T x 1/6: P2 10.0 %, P3 15.0 %).
+  Measured skipped shares: (1) 12,290/87,709 = 14.01 %; (4) 17,889/87,541 = 20.44 %.
+- P9 done: parse scenario.rs:1260-1292; no-log runs skip room_tick (scenario.rs:884-888) so shots, measured incomplete,
+  carry 75's events_stamped bound (:803-809) not counted: rec.log:7,14,21 print shots 0. Fix for -57 pile-up present at
+  scenario.rs:833-835. rec.log real 3m20.101s/1m44.248s/2m47.190s. CI workflows run no check.mjs (gate.yml,
+  toolchain.yml). "plan :800-802" = u4-build-plan.md:800-802 (det-u4.mjs text), not plan.md.
+
+## Computed (all from the measured figures above; W = the two runner entries' Wasm leg-1 calls, not measured)
+- Runner regen G = 142.6 + 52.6 = 195.2 s (regen-all mtimes); hash call 201.0 s.
+- Today's code, runner entries in recordings.json: non-cargo 19.9 + (201.0-3.1) + 195.2 + 195.2 + W = 608.2 + W;
+  step warm 13.0 + 608.2 = 621.2 + W (L3 basis 623.9 + W); cold 649.7 + W. No single call reaches 300 s (max 201.0).
+- (a) RR-L4 (Wasm leg only): saving <= Wasm calls 11.6 + W -> non-cargo >= 596.6 s; step >= 609.6 s warm.
+- (b) --only regen: non-cargo 19.9 + 197.9 + W = 217.8 + W; step warm 230.8 + W (L3 233.5 + W), cold 259.3 + W.
+  Margins vs 300: shared non-cargo deadline 82.2 - W; whole printed step 69.2 - W warm, 40.7 - W cold.
+- (c)/(d) step = base 33.1 warm (M5) / 35.8 warm (L3) / 61.6 cold.
+- P3 per 10-min run (18,300 ticks, measured-phase B/tick of 3 logs): P0 27,810 -> 508.9 MB (lab 453.3); P2 12,005 ->
+  219.7 MB; P3 6,868 -> 125.7 MB; B1 not measured. 12 measured runs: 2,562.9 MB + 3 x B1.
+- All items done.

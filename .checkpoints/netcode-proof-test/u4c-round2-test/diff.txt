@@ -1,0 +1,771 @@
+diff -ru /home/user/Shamble-Frontlines/.gate/u4c-prefix/spikes/netcode-proof/crates/l1/src/lib.rs /home/user/Shamble-Frontlines/.claude/worktrees/wf_f54246ff-e0d-2/spikes/netcode-proof/crates/l1/src/lib.rs
+--- /home/user/Shamble-Frontlines/.gate/u4c-prefix/spikes/netcode-proof/crates/l1/src/lib.rs	2026-11-10 15:46:25.418628233 +0000
++++ /home/user/Shamble-Frontlines/.claude/worktrees/wf_f54246ff-e0d-2/spikes/netcode-proof/crates/l1/src/lib.rs	2026-11-10 21:04:00.681276563 +0000
+@@ -51,7 +51,10 @@
+ //!   allows up to two); a probe while only datagrams are in flight (quinn sends a PING; L1 arms no PTO then), or when
+ //!   every stream packet in flight carries data already acknowledged through another copy (L1 counts the expiry and
+ //!   sends nothing; quinn sends a PING); the acknowledgement's own packet number, its delay and its frequency (L1
+-//!   acknowledges every packet at once); and any undo of a spurious loss.
++//!   acknowledges every packet at once); and any undo of a spurious loss. And the handshake: in QUIC the handshake's
++//!   acknowledgements give RTT samples before any application data (RFC 9002 §6.2.1 arms no PTO for application data
++//!   until the handshake is confirmed), while an L1 link starts from the starting state, so on a quiet link a stream
++//!   message lost before the first sample waits for the 1,024 ms PTO (L-c9).
+ //! - **RTT** (the advisor's C2, advisor-u2.md:79-83) is each end's RFC 9002 §5.3 smoothed estimate from its
+ //!   acknowledgements, never the profile's value (plan §4.7, npt-lab). A sample comes only from the acknowledgement of
+ //!   the newest packet of its link and direction to arrive, when that acknowledgement newly acknowledges it at the
+diff -ru /home/user/Shamble-Frontlines/.gate/u4c-prefix/spikes/netcode-proof/crates/l1/src/tests.rs /home/user/Shamble-Frontlines/.claude/worktrees/wf_f54246ff-e0d-2/spikes/netcode-proof/crates/l1/src/tests.rs
+--- /home/user/Shamble-Frontlines/.gate/u4c-prefix/spikes/netcode-proof/crates/l1/src/tests.rs	2026-11-10 15:46:25.418762152 +0000
++++ /home/user/Shamble-Frontlines/.claude/worktrees/wf_f54246ff-e0d-2/spikes/netcode-proof/crates/l1/src/tests.rs	2026-11-10 21:04:00.681276563 +0000
+@@ -29,6 +29,8 @@
+     ends: Vec<[Box<dyn Link>; 2]>,
+     /// `got[link][end]`.
+     got: Vec<[Vec<Got>; 2]>,
++    /// `at[link][end]`: the instant of the poll that handed out each of `got[link][end]`.
++    at: Vec<[Vec<u64>; 2]>,
+ }
+ 
+ impl Rig {
+@@ -49,14 +51,17 @@
+             })
+             .collect();
+         let got = ends.iter().map(|_| [Vec::new(), Vec::new()]).collect();
+-        Rig { net, ends, got }
++        let at = ends.iter().map(|_| [Vec::new(), Vec::new()]).collect();
++        Rig { net, ends, got, at }
+     }
+ 
+     fn poll(&mut self, t: u64) {
+-        for (ends, got) in self.ends.iter_mut().zip(&mut self.got) {
+-            for (end, got) in ends.iter_mut().zip(got.iter_mut()) {
++        let links = self.ends.iter_mut().zip(&mut self.got).zip(&mut self.at);
++        for ((ends, got), at) in links {
++            for ((end, got), at) in ends.iter_mut().zip(got.iter_mut()).zip(at.iter_mut()) {
+                 while let Some(r) = end.poll_recv(t) {
+                     got.push((r.channel, r.bytes, r.arrival_ns));
++                    at.push(t);
+                 }
+             }
+         }
+@@ -843,20 +848,111 @@
+     }
+ }
+ 
+-/// What one run of L-c5's script gave: the canonical log, what each end received, PTOs fired, losses declared, and the
+-/// steps that found nothing ahead.
+-type Lc5 = (Vec<u8>, Vec<[Vec<Got>; 2]>, usize, usize, u64);
++/// Drives `rig` as an event-driven host does: it calls the net only at `next_event_ns` and at the script's own instants
++/// (`script`, ascending, each once), up to `horizon`; at each, first the script's sends (`act`), then a poll of every
++/// end. Returns the instants it called, and how often `next_event_ns` then named one not after the call.
++fn drive(
++    rig: &mut Rig,
++    script: &[u64],
++    horizon: u64,
++    mut act: impl FnMut(&mut Rig, u64),
++) -> (std::collections::BTreeSet<u64>, u64) {
++    let mut calls = std::collections::BTreeSet::new();
++    let mut stuck = 0;
++    let mut own = script.iter().copied().peekable();
++    let Some(mut t) = own.peek().copied() else {
++        return (calls, 0);
++    };
++    loop {
++        calls.insert(t);
++        if own.peek() == Some(&t) {
++            own.next();
++            act(rig, t);
++        }
++        rig.poll(t);
++        let mut event = rig.net.next_event_ns();
++        if event.is_some_and(|x| x <= t) {
++            stuck += 1;
++            event = Some(t + 1);
++        }
++        match [event, own.peek().copied()].into_iter().flatten().min() {
++            Some(x) if x <= horizon => t = x,
++            _ => break,
++        }
++    }
++    (calls, stuck)
++}
++
++/// Whether a host driven by `drive` was called for everything: each item handed out in the instant `due` says, and
++/// every internal event up to `horizon` (each arrival and acknowledgement in the fate log, each PTO, each loss declared)
++/// at an instant it called. `name` starts each failure.
++fn woken(
++    rig: &Rig,
++    calls: &std::collections::BTreeSet<u64>,
++    horizon: u64,
++    name: &str,
++    due: impl Fn(&Got) -> u64,
++) -> Result<(), String> {
++    for (link, (got, at)) in rig.got.iter().zip(&rig.at).enumerate() {
++        for (g, &a) in got.iter().zip(at).flat_map(|(g, a)| g.iter().zip(a)) {
++            let d = due(g);
++            ensure!(
++                a == d,
++                "{name}: link {link}: an item that arrived at {:.6} ms was handed out at {:.6} ms, not in its instant, \
++                 {:.6} ms",
++                ms(g.2),
++                ms(a),
++                ms(d)
++            );
++        }
++    }
++    let net = rig.net.net.borrow();
++    let arrivals = net.log.entries.iter().filter_map(arrival_of);
++    let timers = net.trace.ptos.iter().map(|p| p.at_ns);
++    let declared = net.trace.declared.iter().map(|d| d.at_ns);
++    let skipped: std::collections::BTreeSet<u64> = arrivals
++        .filter(|&x| x <= horizon)
++        .chain(timers)
++        .chain(declared)
++        .filter(|x| !calls.contains(x))
++        .collect();
++    ensure!(
++        skipped.is_empty(),
++        "{name}: the host was never called at {} instants with an internal event, the first {:.6} ms",
++        skipped.len(),
++        skipped.first().map_or(0.0, |&x| ms(x))
++    );
++    Ok(())
++}
++
++/// What one run of L-c5's script gave.
++struct Lc5 {
++    /// The canonical fate log.
++    log: Vec<u8>,
++    /// What each end received.
++    got: Vec<[Vec<Got>; 2]>,
++    /// PTOs fired and losses declared.
++    ptos: usize,
++    declared: usize,
++    /// The event-driven host: how often `next_event_ns` named an instant not after its call, and `woken`'s verdict.
++    stuck: u64,
++    woken: Result<(), String>,
++}
+ 
+ /// L-c5's script: link 0 B1 (P2 and a burst at 2 s), link 1 P3; until 6 s, sends at whole milliseconds only: datagrams
+ /// both ways on both links every 33 ms (none on link 0 from 2 s to 3.5 s, so its PTOs fire), link 0's client a 50 B
+ /// control message every 100 ms and its server a 2,500 B full state every 500 ms, link 1's client a 3,000 B control
+ /// message every 250 ms and its server a 10 B one every 70 ms; then polls until 10 s. With `every_ms` it polls every
+-/// millisecond; else only at `next_event_ns` and at its own sends.
++/// millisecond; else it is an event-driven host (`drive`): called only at `next_event_ns` and at its own sends.
+ fn lc5_run(net: L1Net, every_ms: bool) -> Lc5 {
+     let mut rig = Rig::new(net, &[Profile::b1(&[2 * SEC]), Profile::p3()]);
++    let sends_at = |m: u64| {
++        (1..=6_000).contains(&m)
++            && (m % 33 == 1 || m % 100 == 7 || m % 500 == 11 || m % 250 == 3 || m % 70 == 5)
++    };
+     let sends = |rig: &mut Rig, m: u64| {
+         let t = m * MS;
+-        if m > 6_000 {
++        if !sends_at(m) {
+             return;
+         }
+         if m % 33 == 1 {
+@@ -879,36 +975,23 @@
+         }
+     };
+     let end = 10 * SEC;
+-    let mut stuck = 0;
++    let (mut stuck, mut woke) = (0, Ok(()));
+     if every_ms {
+         for m in 1..=10_000 {
+             rig.poll(m * MS);
+             sends(&mut rig, m);
+         }
+     } else {
+-        let mut t = MS;
+-        while t <= end {
+-            rig.poll(t);
+-            if t.is_multiple_of(MS) {
+-                sends(&mut rig, t / MS);
+-            }
+-            let next_send = (t / MS + 1) * MS;
+-            let next_send = (next_send <= 6_000 * MS).then_some(next_send);
+-            let next = match (rig.net.next_event_ns(), next_send) {
+-                (Some(a), Some(b)) => a.min(b),
+-                (a, b) => match a.or(b) {
+-                    Some(x) => x,
+-                    None => break,
+-                },
+-            };
+-            if next <= t {
+-                stuck += 1;
+-                t += 1;
+-            } else {
+-                t = next;
+-            }
+-        }
++        let script: Vec<u64> = (1..=6_000)
++            .filter(|&m| sends_at(m))
++            .map(|m| m * MS)
++            .collect();
++        let (calls, s) = drive(&mut rig, &script, end, |rig, t| sends(rig, t / MS));
++        stuck = s;
++        // A last poll, as the every-millisecond run's: it finds nothing when next_event_ns named everything.
+         rig.poll(end);
++        // Every delay here is at least 40 ms, so each item is due in the instant it arrived.
++        woke = woken(&rig, &calls, end, "L-c5", |g| g.2);
+     }
+     let mut log = Vec::new();
+     rig.net
+@@ -916,36 +999,44 @@
+     let net = rig.net.net.borrow();
+     let (ptos, declared) = (net.trace.ptos.len(), net.trace.declared.len());
+     drop(net);
+-    (log, std::mem::take(&mut rig.got), ptos, declared, stuck)
++    Lc5 {
++        log,
++        got: std::mem::take(&mut rig.got),
++        ptos,
++        declared,
++        stuck,
++        woken: woke,
++    }
+ }
+ 
+-/// L-c5 (the event-driven model): the same sends polled every millisecond and only at `next_event_ns` give equal fate
+-/// logs and equal arrivals.
++/// L-c5 (the event-driven model): the same sends polled every millisecond and driven only at `next_event_ns` (and the
++/// sends) give equal fate logs and equal arrivals, and the driven host is called at every internal event and hands each
++/// item out in the instant it arrived.
+ fn lc5(make: &dyn Fn() -> L1Net) -> Result<(), String> {
+     let a = lc5_run(make(), true);
+     let b = lc5_run(make(), false);
+     ensure!(
+-        a.2 > 0 && a.3 > 0,
++        a.ptos > 0 && a.declared > 0,
+         "L-c5: the script fired {} probe timeouts and declared {} losses: it must exercise both",
+-        a.2,
+-        a.3
++        a.ptos,
++        a.declared
+     );
+     ensure!(
+-        b.4 == 0,
++        b.stuck == 0,
+         "L-c5: next_event_ns named a past instant {} times",
+-        b.4
++        b.stuck
+     );
+     ensure!(
+-        a.0 == b.0,
++        a.log == b.log,
+         "L-c5: the fate logs differ ({} and {} bytes) between polling every millisecond and at next_event_ns",
+-        a.0.len(),
+-        b.0.len()
++        a.log.len(),
++        b.log.len()
+     );
+     ensure!(
+-        a.1 == b.1,
++        a.got == b.got,
+         "L-c5: the ends received differently between polling every millisecond and at next_event_ns"
+     );
+-    Ok(())
++    b.woken
+ }
+ 
+ #[test]
+@@ -955,21 +1046,309 @@
+     }
+ }
+ 
++/// One payload of the next_event_ns test: its own number and its send instant, so each hand-out's due instant is known.
++fn stamp(n: u8, t: u64) -> Vec<u8> {
++    let mut b = vec![n];
++    b.extend_from_slice(&t.to_le_bytes());
++    b
++}
++
++/// A stamped payload's send instant.
++fn stamped(bytes: &[u8]) -> u64 {
++    let mut t = [0u8; 8];
++    t.copy_from_slice(&bytes[1..9]);
++    u64::from_le_bytes(t)
++}
++
++/// A link with a fixed 100 ms round trip: no jitter, no loss, and the reorder step at `permille`.
++fn fixed(permille: u32) -> Profile {
++    Profile {
++        name: "F",
++        rtt_ns: 100 * MS,
++        jitter_ns: 0,
++        loss_ppm: 0,
++        bursts_ns: Vec::new(),
++        reorder: ReorderStep { permille },
++    }
++}
++
++/// `next_event_ns`'s own check (round 1's M1): a host called only at `next_event_ns` and at its own sends (`drive`)
++/// misses nothing. Link 0, a fixed 100 ms round trip: 30 Hz datagrams both ways until 1 s settle the estimate, then
++/// quiet; at 2 s a control message, lost, and nothing else, so only its PTO resends it; at 3 s another, lost, and a
++/// datagram 1 ms later, whose acknowledgement leaves it to the time threshold's timer, 3 s + 9/8 x 100 ms. Link 1, P0:
++/// what arrives in the instant it was sent is due 1 ns later (a datagram up at 10 ms; at 20 ms a control message up and a
++/// datagram down). Link 2, a fixed 100 ms round trip with the reorder step on every datagram: one up at 30 ms, held to its
++/// own arrival; two at 500 ms and 510 ms, the first overtaken. Every item is handed out once, in its due instant
++/// (its arrival, or 1 ns after its send), before `next_event_ns` says nothing is left; the host is called at every
++/// internal event; and `next_event_ns` never names an instant at or before the call that asked it.
++fn host_at_next_event(net: L1Net) -> Result<(), String> {
++    lose_up(&net, 0, piece(Channel::Control, 0, 0), 0);
++    lose_up(&net, 0, piece(Channel::Control, 1, 0), 0);
++    let mut rig = Rig::new(net, &[fixed(0), Profile::p0(), fixed(1_000)]);
++    // (instant, link, sending end, a control message rather than a datagram)
++    let mut acts: Vec<(u64, usize, usize, bool)> = Vec::new();
++    for k in 0..30 {
++        let t = MS + k * TICK;
++        acts.extend([(t, 0, CLIENT, false), (t, 0, SERVER, false)]);
++    }
++    acts.extend([
++        (10 * MS, 1, CLIENT, false),
++        (20 * MS, 1, CLIENT, true),
++        (20 * MS, 1, SERVER, false),
++        (30 * MS, 2, CLIENT, false),
++        (500 * MS, 2, CLIENT, false),
++        (510 * MS, 2, CLIENT, false),
++        (2 * SEC, 0, CLIENT, true),
++        (3 * SEC, 0, CLIENT, true),
++        (3 * SEC + MS, 0, CLIENT, false),
++    ]);
++    acts.sort_by_key(|a| a.0);
++    let mut script: Vec<u64> = acts.iter().map(|a| a.0).collect();
++    script.dedup();
++    // (link, receiving end, payload)
++    let mut sent: Vec<(usize, usize, Vec<u8>)> = Vec::new();
++    let horizon = 5 * SEC;
++    let (calls, stuck) = drive(&mut rig, &script, horizon, |rig, t| {
++        for (n, &(at, link, end, control)) in acts.iter().enumerate() {
++            if at != t {
++                continue;
++            }
++            let b = stamp(n as u8, t);
++            if control {
++                rig.send_on(link, end, Channel::Control, &b, t);
++            } else {
++                rig.send(link, end, &b, t);
++            }
++            sent.push((link, 1 - end, b));
++        }
++    });
++    ensure!(
++        stuck == 0,
++        "next_event_ns: it named an instant at or before the call that asked it, {stuck} times"
++    );
++    for link in 0..3 {
++        for end in [CLIENT, SERVER] {
++            let mut want: Vec<&Vec<u8>> = sent
++                .iter()
++                .filter(|s| s.0 == link && s.1 == end)
++                .map(|s| &s.2)
++                .collect();
++            let mut have: Vec<&Vec<u8>> = rig.got[link][end].iter().map(|g| &g.1).collect();
++            want.sort();
++            have.sort();
++            ensure!(
++                have == want,
++                "next_event_ns: link {link}, end {end}: {} of {} items handed out when the host stopped at {:.3} ms \
++                 (next_event_ns said nothing was left)",
++                have.len(),
++                want.len(),
++                calls.last().map_or(0.0, |&x| ms(x))
++            );
++        }
++    }
++    let before = rig.entries().len();
++    rig.poll(10 * SEC);
++    ensure!(
++        rig.entries().len() == before
++            && rig.got.iter().flatten().map(Vec::len).sum::<usize>() == sent.len(),
++        "next_event_ns: a poll after the host stopped found more to do"
++    );
++    woken(&rig, &calls, horizon, "next_event_ns", |g| {
++        g.2.max(stamped(&g.1) + 1)
++    })?;
++    // The run reached each path: link 0's PTO and its time threshold, link 1's same-instant arrivals, link 2's holds.
++    let ptos = rig.ptos(0, Dir::Up);
++    let by_time = rig
++        .declared(0, Dir::Up)
++        .iter()
++        .any(|d| !d.by_count && d.at_ns == 3 * SEC + 112_500_000);
++    let log = rig.entries();
++    let overtaken = log.iter().filter(|e| e.link == 2 && e.overtaken).count();
++    let held_alone = log
++        .iter()
++        .any(|e| e.link == 2 && e.sent_ns == 30 * MS && arrival_of(e) == Some(80 * MS));
++    ensure!(
++        ptos.len() == 1
++            && (2 * SEC..3 * SEC).contains(&ptos[0].at_ns)
++            && by_time
++            && rig.at[1][SERVER].contains(&(10 * MS + 1))
++            && overtaken == 1
++            && held_alone,
++        "next_event_ns: the run missed a path (PTOs {:?} ms, time threshold {by_time}, overtaken {overtaken}, held \
++         alone {held_alone})",
++        ptos.iter().map(|p| ms(p.at_ns)).collect::<Vec<_>>()
++    );
++    Ok(())
++}
++
++#[test]
++fn a_host_called_only_at_next_event_ns_and_its_sends_misses_nothing() {
++    host_at_next_event(L1Net::new(1)).unwrap();
++}
++
++/// RFC 9002 §6.1.1's kPacketThreshold, exactly (round 1's M2). Link 0, a fixed 100 ms round trip, quiet: from 1 s five
++/// one-packet control messages 1 ms apart, the first lost. The second's, third's and fourth's acknowledgements arrive at
++/// 1.101, 1.102 and 1.103 s; the first is declared lost by count at the third later packet's, 1.103 s exactly: not at
++/// the second's (a threshold of 2), and not by the time threshold at 1 s + 9/8 x 100 ms = 1.1125 s (no count rule).
++fn packet_threshold(net: L1Net) -> Result<(), String> {
++    lose_up(&net, 0, piece(Channel::Control, 0, 0), 0);
++    let mut rig = Rig::new(net, &[fixed(0)]);
++    for j in 0..5u64 {
++        let t = SEC + j * MS;
++        rig.poll(t);
++        rig.send_on(0, CLIENT, Channel::Control, &j.to_le_bytes(), t);
++    }
++    rig.poll(3 * SEC);
++    let log = rig.entries();
++    let first = sends_of(&log, 0, Dir::Up, Channel::Control, 0);
++    let p = pn_of(&first[0].1);
++    let third = log
++        .iter()
++        .find(|e| {
++            e.link == 0
++                && e.dir == Dir::Down
++                && matches!(e.carries, Carries::Ack { acked, .. } if acked == p + 3)
++        })
++        .and_then(arrival_of);
++    ensure!(
++        third == Some(SEC + 103 * MS),
++        "packet threshold: the third later packet's acknowledgement arrived at {:?} ms, not 1,103 ms",
++        third.map(ms)
++    );
++    let declared = rig.declared(0, Dir::Up);
++    ensure!(
++        declared.len() == 1
++            && declared[0].pn == p
++            && declared[0].by_count
++            && Some(declared[0].at_ns) == third,
++        "packet threshold: losses declared at {:?} ms (by count {:?}), not the first message's alone, by count, at the \
++         third later packet's acknowledgement, 1,103 ms",
++        declared.iter().map(|d| ms(d.at_ns)).collect::<Vec<_>>(),
++        declared.iter().map(|d| d.by_count).collect::<Vec<_>>()
++    );
++    ensure!(
++        first.len() == 2 && first[1].1.sent_ns == SEC + 103 * MS,
++        "packet threshold: the first message was not resent at its declaration, 1,103 ms"
++    );
++    Ok(())
++}
++
++#[test]
++fn the_packet_threshold_declares_a_loss_at_the_third_later_packets_acknowledgement() {
++    packet_threshold(L1Net::new(1)).unwrap();
++}
++
++/// RFC 9002 §6.1.2's time threshold takes the latest RTT where it is above the smoothed one (an RTT step up that the
++/// smoothed estimate has not caught up with; round 1's L1). Link 0, a 100 ms round trip with ±20 ms of jitter (50 ±
++/// 10 ms each way) and no loss but the planted ones: 30 Hz datagrams both ways until 2 s settle the estimate, then
++/// quiet. Ten trials, one a second from 3 s: a control message, lost, then a datagram in the same instant, whose
++/// acknowledgement gives the one sample r before the loss rules run. The message is declared lost by the time threshold
++/// exactly 9/8 x max(smoothed, r) after its send, the smoothed estimate taken after r: in the trials where r is above
++/// it (each seed has some), 9/8 x r. Returns the trials' steps up and down.
++fn time_threshold(net: L1Net) -> Result<(u32, u32), String> {
++    const TRIALS: u64 = 10;
++    for i in 0..TRIALS {
++        lose_up(&net, 0, piece(Channel::Control, i, 0), 0);
++    }
++    let p = Profile {
++        name: "J",
++        rtt_ns: 100 * MS,
++        jitter_ns: 40 * MS,
++        loss_ppm: 0,
++        bursts_ns: Vec::new(),
++        reorder: ReorderStep::OFF,
++    };
++    let mut rig = Rig::new(net, &[p]);
++    for k in 0..60 {
++        let t = MS + k * TICK;
++        rig.poll(t);
++        rig.tick(0, t);
++    }
++    let (mut ups, mut downs) = (0, 0);
++    for i in 0..TRIALS {
++        let s = 3 * SEC + i * SEC;
++        rig.poll(s);
++        let mut est = rig.est(0, Dir::Up);
++        rig.send_on(0, CLIENT, Channel::Control, b"lost", s);
++        rig.send(0, CLIENT, b"later", s);
++        rig.poll(s + SEC - MS);
++        let log = rig.entries();
++        let arrived = |e: &Fate| {
++            e.link == 0 && e.dir == Dir::Up && e.sent_ns == s && e.carries == Carries::Datagram
++        };
++        let Some(a) = log.iter().find(|e| arrived(e)).and_then(arrival_of) else {
++            return Err(format!(
++                "time threshold: trial {i}: the datagram did not arrive"
++            ));
++        };
++        let ack = log
++            .iter()
++            .find(|e| {
++                e.link == 0
++                    && e.dir == Dir::Down
++                    && matches!(e.carries, Carries::Ack { .. })
++                    && e.sent_ns == a
++            })
++            .and_then(arrival_of);
++        let Some(r) = ack.map(|x| x - s) else {
++            return Err(format!(
++                "time threshold: trial {i}: no acknowledgement came back"
++            ));
++        };
++        est.sample(r);
++        let smoothed = est.smoothed.unwrap_or(INITIAL_RTT_NS);
++        if r > smoothed {
++            ups += 1;
++        } else {
++            downs += 1;
++        }
++        let want = (smoothed.max(r) * 9 / 8).max(GRANULARITY_NS);
++        let sends = sends_of(&log, 0, Dir::Up, Channel::Control, i);
++        let pn = sends.first().map_or(u64::MAX, |x| pn_of(&x.1));
++        let d = rig.declared(0, Dir::Up).into_iter().find(|d| d.pn == pn);
++        ensure!(
++            d.is_some_and(|d| !d.by_count && d.at_ns == s + want && d.delay_ns == want)
++                && sends.get(1).is_some_and(|x| x.1.sent_ns == s + want),
++            "time threshold: trial {i}: declared lost {:?} ms after its send, not 9/8 x max({:.3}, {:.3}) = {:.3} ms",
++            d.map(|d| ms(d.at_ns - s)),
++            ms(smoothed),
++            ms(r),
++            ms(want)
++        );
++    }
++    ensure!(
++        ups > 0 && downs > 0 && rig.ptos(0, Dir::Up).is_empty(),
++        "time threshold: the trials gave {ups} steps up and {downs} down (both needed), PTOs {}",
++        rig.ptos(0, Dir::Up).len()
++    );
++    Ok((ups, downs))
++}
++
++#[test]
++fn the_time_threshold_takes_the_latest_rtt_when_it_is_above_the_smoothed_one() {
++    for seed in [1, 2, 3] {
++        let (ups, downs) = time_threshold(L1Net::new(seed)).unwrap();
++        println!("time threshold seed {seed}: {ups} steps up, {downs} down");
++    }
++}
++
+ /// L-c6 (the event order): at one instant, internal events come before application sends, by (time, fate-log index).
+ /// Link 0, P2's delays with no loss but the planted one: datagrams from 1 s to 3 s settle the estimate, then quiet
+ /// (their acknowledgements are all back by 3.1 s, so nothing moves the timer); at 4 s a control message, lost; at its
+ /// PTO's instant exactly the client sends another. Link 1, P0: at 10 ms the client
+-/// sends a datagram, which arrives in that instant, and the server end sends one in the same instant. Links 2 and 3,
+-/// P0: both clients send at 20 ms. The probe goes before the application's message (a lower fate-log index and packet
+-/// number); link 1's acknowledgement before the server's datagram; link 2's acknowledgement before link 3's.
++/// sends a datagram, which arrives in that instant, and the server end sends one in the same instant. Links 2 and 3, a
++/// fixed 100 ms round trip: at 20 ms link 3's client sends, then link 2's; both datagrams arrive at 70 ms, and the next
++/// call (at 1 s) applies both. The probe goes before the application's message (a lower fate-log index and packet
++/// number); link 1's acknowledgement before the server's datagram; link 3's acknowledgement before link 2's (fate-log
++/// order, not link order).
+ fn lc6(net: L1Net) -> Result<(), String> {
+     lose_up(&net, 0, piece(Channel::Control, 0, 0), 0);
+     let p0 = Profile::p0();
+-    let mut rig = Rig::new(net, &[lossless(Profile::p2()), p0.clone(), p0.clone(), p0]);
++    let mut rig = Rig::new(net, &[lossless(Profile::p2()), p0, fixed(0), fixed(0)]);
+     rig.send(1, CLIENT, b"A", 10 * MS);
+     rig.send(1, SERVER, b"B", 10 * MS);
+-    rig.send(2, CLIENT, b"X", 20 * MS);
+     rig.send(3, CLIENT, b"Y", 20 * MS);
++    rig.send(2, CLIENT, b"X", 20 * MS);
+     rig.poll(20 * MS);
+     for k in 0..60 {
+         let t = SEC + k * TICK;
+@@ -1037,13 +1416,14 @@
+     );
+     let ack_index = |link: u32| {
+         log.iter().position(|e| {
+-            e.link == link && matches!(e.carries, Carries::Ack { .. }) && e.sent_ns == 20 * MS
++            e.link == link && matches!(e.carries, Carries::Ack { .. }) && e.sent_ns == 70 * MS
+         })
+     };
+     let (i2, i3) = (ack_index(2), ack_index(3));
+     ensure!(
+-        i2.is_some() && i3.is_some() && i2 < i3,
+-        "L-c6: the two arrivals at 20 ms were not acknowledged in fate-log order ({i2:?}, {i3:?})"
++        i2.is_some() && i3.is_some() && i3 < i2,
++        "L-c6: the two arrivals at 70 ms were not acknowledged in fate-log order, link 3's first (links 2 and 3 at \
++         {i2:?}, {i3:?})"
+     );
+     Ok(())
+ }
+@@ -1270,51 +1650,63 @@
+         assert!(L1Net::with_model_bite(1, "PM-0001-3/rtt-each-way").is_none());
+     }
+ 
+-    /// The check fails, naming its L-c test.
+-    fn fails<T: std::fmt::Debug>(r: Result<T, String>, lc: &str) {
++    /// The check fails on the check the bite is for: its L-c test (`lc`, as `L-cN: `) and words of that check's message
++    /// (`check`), not on another check of the same test.
++    fn fails<T: std::fmt::Debug>(r: Result<T, String>, lc: &str, check: &str) {
+         let e = r.expect_err("the planted defect passed");
+-        assert!(e.starts_with(lc), "failed for another reason: {e}");
++        assert!(
++            e.starts_with(&format!("{lc}: ")) && e.contains(check),
++            "failed on another check than {lc}'s \"{check}\": {e}"
++        );
+         println!("{e}");
+     }
+ 
+     #[test]
+     fn bite_separate_spaces_fails_lc1() {
+-        fails(lc1(bitten("npt-l1/separate-spaces")), "L-c1");
++        let r = lc1(bitten("npt-l1/separate-spaces"));
++        fails(r, "L-c1", "probe timeouts fired");
+     }
+ 
+     #[test]
+     fn bite_no_pto_doubling_fails_lc3() {
+-        fails(lc3(bitten("npt-l1/no-pto-doubling")), "L-c3");
++        let r = lc3(bitten("npt-l1/no-pto-doubling"));
++        fails(r, "L-c3", "doubles at each expiry");
+     }
+ 
+     #[test]
+     fn bite_acks_in_bursts_fails_lc3() {
+-        fails(lc3(bitten("npt-l1/acks-in-bursts")), "L-c3");
++        let r = lc3(bitten("npt-l1/acks-in-bursts"));
++        fails(r, "L-c3", "no probe timeout fired");
+     }
+ 
+     #[test]
+     fn bite_one_draw_per_message_fails_lc4() {
+-        fails(lc4(bitten("npt-l1/one-draw-per-message")), "L-c4");
++        let r = lc4(bitten("npt-l1/one-draw-per-message"));
++        fails(r, "L-c4", "its middle packet alone was not lost");
+     }
+ 
+     #[test]
+     fn bite_events_at_polls_fails_lc5() {
+-        fails(lc5(&|| bitten("npt-l1/events-at-polls")), "L-c5");
++        let r = lc5(&|| bitten("npt-l1/events-at-polls"));
++        fails(r, "L-c5", "the fate logs differ");
+     }
+ 
+     #[test]
+     fn bite_sends_before_events_fails_lc6() {
+-        fails(lc6(bitten("npt-l1/sends-before-events")), "L-c6");
++        let r = lc6(bitten("npt-l1/sends-before-events"));
++        fails(r, "L-c6", "did not resend message 0 in its instant");
+     }
+ 
+     #[test]
+     fn bite_every_packet_sampled_fails_lc7() {
+-        fails(lc7(bitten("npt-l1/every-packet-sampled")), "L-c7");
++        let r = lc7(bitten("npt-l1/every-packet-sampled"));
++        fails(r, "L-c7", "where the newest-packet rule gives");
+     }
+ 
+     #[test]
+     fn bite_stream_sample_in_order_fails_lc7() {
+-        fails(lc7(bitten("npt-l1/stream-sample-in-order")), "L-c7");
++        let r = lc7(bitten("npt-l1/stream-sample-in-order"));
++        fails(r, "L-c7", "link 1's samples after 4 s");
+     }
+ 
+     /// u4-build-plan.md §4.11 (T10): a bite is chosen per instance, never by a static, so a bitten net and a clean one
+diff -ru /home/user/Shamble-Frontlines/.gate/u4c-prefix/spikes/netcode-proof/crates/l1/tests/l1.rs /home/user/Shamble-Frontlines/.claude/worktrees/wf_f54246ff-e0d-2/spikes/netcode-proof/crates/l1/tests/l1.rs
+--- /home/user/Shamble-Frontlines/.gate/u4c-prefix/spikes/netcode-proof/crates/l1/tests/l1.rs	2026-11-10 15:46:25.418628233 +0000
++++ /home/user/Shamble-Frontlines/.claude/worktrees/wf_f54246ff-e0d-2/spikes/netcode-proof/crates/l1/tests/l1.rs	2026-11-10 21:04:00.681276563 +0000
+@@ -382,8 +382,11 @@
+         assert!(stream.windows(2).all(|w| w[0].seq < w[1].seq), "in order");
+     }
+     // A message sent inside the burst [2 s, 3 s) waits for its first resend outside it. With a packet sent every
+-    // millisecond the PTO never fires (each send restarts it); the first acknowledgement after the burst, about 3.1 s,
+-    // declares every packet of the burst lost by the packet threshold, and their resends arrive about 50 ms later.
++    // millisecond the PTO never fires (each send restarts it): the losses found before the burst are resent by about
++    // 2.1 s (the last acknowledgements sent before 2 s arrive by 2.06 s, and the time threshold is at most 9/8 x 120 ms
++    // after a send), and nothing is resent from 2.2 s until the burst ends. The first acknowledgements after it, from
++    // about 3.1 s, declare its packets lost by the loss rules (the unit tests pin the packet and the time threshold),
++    // and their resends arrive about 50 ms later.
+     for stream in [&control, &full] {
+         for g in stream
+             .iter()
+@@ -397,6 +400,26 @@
+             );
+         }
+     }
++    let inside = net.with_fate_log(|log| {
++        let mut sends = Vec::new();
++        log.for_each_canonical(|b| {
++            // A stream packet's entry (64 bytes): its resends field, then its send time.
++            let sent = || u64::from_le_bytes(b[16..24].try_into().unwrap());
++            if b.len() == 64
++                && u32::from_le_bytes(b[36..40].try_into().unwrap()) > 0
++                && (2_200 * MS..3 * SEC).contains(&sent())
++            {
++                sends.push(sent());
++            }
++        });
++        sends
++    });
++    assert!(
++        inside.is_empty(),
++        "{} stream packets resent inside the burst after 2.2 s, the first at {} ns: a PTO fired",
++        inside.len(),
++        inside.first().copied().unwrap_or(0)
++    );
+     // Outside the burst, P2's 2 % loss makes some messages wait for a resend, past the one-way ceiling of 60 ms, and
+     // hold back those behind them.
+     let late = control
+@@ -512,6 +535,48 @@
+     }
+ }
+ 
++/// Q15: an acknowledgement is lost only inside a burst. In the mixed run under B1 (its 2 % loss, and a burst at 1 s),
++/// the loss outside the burst takes packets of the other flows but no acknowledgement: in the v2 log no
++/// acknowledgement's entry is lost (kind 1), and one is lost in a burst (kind 2) exactly when it was sent inside
++/// [1 s, 2 s).
++#[test]
++fn acknowledgements_are_lost_only_inside_bursts() {
++    let net = mixed(Profile::b1(&[SEC]), 1);
++    // (packets lost outside the burst, acknowledgements lost in it, acknowledgements delivered)
++    let mut n = (0u64, 0u64, 0u64);
++    let mut wrong = Vec::new();
++    net.with_fate_log(|log| {
++        log.for_each_canonical(|b| {
++            if b.len() < 40 {
++                return;
++            }
++            let (code, kind) = (b[5], b[6]);
++            let sent = u64::from_le_bytes(b[16..24].try_into().unwrap());
++            let inside = (SEC..2 * SEC).contains(&sent);
++            if code == 3 {
++                match (kind, inside) {
++                    (0, false) => n.2 += 1,
++                    (2, true) => n.1 += 1,
++                    _ => wrong.push((kind, sent)),
++                }
++            } else if kind == 1 {
++                n.0 += 1;
++            }
++        });
++    });
++    assert!(
++        wrong.is_empty(),
++        "{} acknowledgements with the wrong fate, the first (kind, sent ns) {:?}",
++        wrong.len(),
++        wrong.first()
++    );
++    assert!(
++        n.0 > 50 && n.1 > 50 && n.2 > 3_000,
++        "the run did not lose packets outside the burst and acknowledgements in it: {n:?}"
++    );
++    println!("lost outside the burst, acknowledgements lost in it, delivered: {n:?}");
++}
++
+ #[test]
+ fn next_event_ns_names_the_next_arrival_then_its_acknowledgement_then_nothing() {
+     let net = L1Net::new(5);

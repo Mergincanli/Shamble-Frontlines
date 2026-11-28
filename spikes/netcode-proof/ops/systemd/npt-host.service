@@ -1,0 +1,26 @@
+# npt-host.service on RS (Q-U6C-7 as ruled; advisor-u6c-brief.md C1 (f)): U6c's page host, `npt-host serve`, as the
+# npt-host user on TCP 31000 with /etc/npt/host.json. Started only by npt-host.path (no [Install] section); runs until
+# stopped. rs.yaml installs this file root-owned, 0644, from the root-owned clone.
+# The restart rule (INF-SB-6, systemd.path(5)): when the host ends, the path unit checks the chain again and starts it
+# at once, so `Restart=no` does not hold it; the start limit does: a fourth start inside 300 s fails this unit and the
+# path unit for good, and `r1.sh host` then refuses. The sandbox (SEC-SB-9's part a read-only server cannot trip; the
+# rest, ProtectSystem=strict, PrivateDevices, MemoryDenyWriteExecute, SystemCallFilter and RestrictAddressFamilies,
+# comes from the host's needs at U6c's merge).
+[Unit]
+Description=npt page host (npt-host serve) on TCP 31000
+StartLimitIntervalSec=300
+StartLimitBurst=3
+
+[Service]
+Type=simple
+User=npt-host
+Group=npt-host
+NoNewPrivileges=yes
+ExecStart=/opt/npt/bin/npt-host serve /etc/npt/host.json
+Restart=no
+ProtectHome=yes
+PrivateTmp=yes
+CapabilityBoundingSet=
+RestrictNamespaces=yes
+LockPersonality=yes
+SystemCallArchitectures=native

@@ -1,0 +1,52 @@
+== R1-OFF [BITES] BITES (6.2 s)
+test l2::delay::tests::a_down_record_released_in_a_pump_pass_is_written_or_owed_a_wake ... FAILED
+thread 'l2::delay::tests::a_down_record_released_in_a_pump_pass_is_written_or_owed_a_wake' (9422) panicked at crates/net/src/l2/delay_tests.rs:2003:9:
+a released down record left unwritten with no wake owed to the pump (R1)
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 161 filtered out; finished in 0.31s
+error: test failed, to rerun pass `-p npt-net --lib`
+== WAKE-CURRENT-ONLY-OFF [BITES] BITES (1.9 s)
+test l2::delay::tests::an_acknowledgement_an_application_task_steps_that_reopens_the_up_room_wakes_the_pump ... FAILED
+thread 'l2::delay::tests::an_acknowledgement_an_application_task_steps_that_reopens_the_up_room_wakes_the_pump' (9703) panicked at crates/net/src/l2/delay_tests.rs:2108:9:
+  left: 0
+ right: 1
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 161 filtered out; finished in 0.48s
+error: test failed, to rerun pass `-p npt-net --lib`
+== PANIC-OFF [BITES] BITES (1.5 s)
+test l2::delay::tests::a_pump_that_panics_gives_the_reader_an_error_never_a_clean_eof ... FAILED
+thread 'tokio-rt-worker' (10017) panicked at crates/net/src/l2/delay_tests.rs:2293:9:
+thread 'l2::delay::tests::a_pump_that_panics_gives_the_reader_an_error_never_a_clean_eof' (10015) panicked at crates/net/src/l2/delay_tests.rs:2330:18:
+a panicked pump read as a clean EOF
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 161 filtered out; finished in 0.11s
+error: test failed, to rerun pass `-p npt-net --lib`
+== F10-OFF [BITES] BITES (1.6 s)
+test l2::delay::tests::tiny_frames_that_fill_the_up_room_drain_whole_and_in_order ... FAILED
+thread 'tokio-rt-worker' (10298) panicked at /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/core/src/slice/index.rs:1020:55:
+thread 'l2::delay::tests::tiny_frames_that_fill_the_up_room_drain_whole_and_in_order' (10297) panicked at crates/net/src/l2/delay_tests.rs:2205:14:
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 161 filtered out; finished in 0.13s
+error: test failed, to rerun pass `-p npt-net --lib`
+== FH-20K [BITES] BITES (2.7 s)
+test l2::delay::tests::a_full_budget_is_pending_until_it_frees_and_the_held_bytes_stay_bounded ... FAILED
+thread 'l2::delay::tests::a_full_budget_is_pending_until_it_frees_and_the_held_bytes_stay_bounded' (10596) panicked at crates/net/src/l2/delay_tests.rs:797:5:
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 161 filtered out; finished in 1.58s
+error: test failed, to rerun pass `-p npt-net --lib`
+== NC4-ZERO [BITES] BITES (1.2 s)
+test l2::delay::tests::one_record_per_write_never_beyond_the_budget ... FAILED
+thread 'l2::delay::tests::one_record_per_write_never_beyond_the_budget' (10878) panicked at crates/net/src/l2/delay_tests.rs:735:5:
+  left: (5013740, 0, 65536)
+ right: (5013740, 10044, 65536)
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 161 filtered out; finished in 0.08s
+error: test failed, to rerun pass `-p npt-net --lib`
+== NC2-TIGHT [BITES] BITES (16.8 s)
+test l2::delay::tests::under_loss_the_held_bytes_stay_within_64_kb_and_the_front_records_acknowledged_prefix ... FAILED
+thread 'l2::delay::tests::under_loss_the_held_bytes_stay_within_64_kb_and_the_front_records_acknowledged_prefix' (11160) panicked at crates/net/src/l2/delay_tests.rs:2262:5:
+  left: [366, 0]
+ right: [0, 0]
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 161 filtered out; finished in 15.77s
+error: test failed, to rerun pass `-p npt-net --lib`
+== WAKE-ADDBURST-ONLY-OFF [INFO] all passed (25.5 s)
+test result: ok. 30 passed; 0 failed; 1 ignored; 0 measured; 131 filtered out; finished in 24.44s
+== PANIC-ALWAYS [INFO] all passed (26.1 s)
+test result: ok. 30 passed; 0 failed; 1 ignored; 0 measured; 131 filtered out; finished in 24.55s
+== R1-SPIN [INFO] all passed (26.5 s)
+test result: ok. 30 passed; 0 failed; 1 ignored; 0 measured; 131 filtered out; finished in 24.66s
+== FINAL rebuild from restored scratch: rc 0 (1.3 s)

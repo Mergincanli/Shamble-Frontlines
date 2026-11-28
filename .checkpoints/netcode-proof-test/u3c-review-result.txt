@@ -1,0 +1,975 @@
+{
+  "summary": "Skeptic round on U3c final diff: four reviewers, each adversarially verified",
+  "agentCount": 8,
+  "logs": [],
+  "result": [
+    {
+      "reviewer": "rust",
+      "review": {
+        "verdict": "APPROVE_WITH_FINDINGS",
+        "findings": [
+          {
+            "id": "F1",
+            "severity": "medium",
+            "where": "spikes/netcode-proof/crates/net/src/l2/delay.rs:708 and :434 (with tcp_model.rs:2190-2201)",
+            "claim": "DelayStream::add_burst overflows when start_ns + len_ns is past u64::MAX on DelayStream's clock, and a \"forever\" length (u64::MAX) is enough. TcpModel::add_burst accepts any len_ns > 0. Line 708 saturates the burst end on the model axis to u64::MAX. due() at :434 then computes `x + self.origin`, which overflows. In a debug build this panics with the Conn lock held, the burst already pushed, so every later current() or poll on the connection panics in its caller. In release, npt-net has no overflow checks (Cargo.toml:91-95 covers only npt-sim and npt-proto), so the sum wraps to a due time in the past. The clock then fires at once, step_to never passes the burst end (it only advances to times <= t), and the pump spins forever on an idle connection.",
+            "evidence": "Reproduced in a scratch copy (/home/user/Shamble-Frontlines/.gate/u3c-review-f1; a test was appended there only, nothing in the branch changed). Setup: quiet P2 over a duplex, add_burst(now + 1 ms, len). Control, len 10 s: Ok, 0 pump polls in the next 200 ms. len u64::MAX in debug: panic 'attempt to add with overflow' at delay.rs:434:55. len u64::MAX with `[profile.dev.package.npt-net] overflow-checks = false`, which matches release: Ok, then 3,870 pump polls in 200 ms and the pump never ends. The burst's caller arrives at U6 (the B1 trigger of ADR 0001's check item 11).",
+            "fix": "In DelayStream::add_burst, refuse with InvalidInput when start_ns.checked_add(len_ns) is None (on DelayStream's clock), or cap the length. Use saturating_add in due() for both the event and burst-end terms. Add a test that passes u64::MAX. Do this before U6 wires add_burst to any trigger."
+          },
+          {
+            "id": "F3",
+            "severity": "low",
+            "where": "spikes/netcode-proof/crates/net/src/l2/delay.rs:1200-1335",
+            "claim": "Pump::poll holds the std Mutex<Conn> across S's poll_write, poll_flush, poll_read and poll_shutdown (:1234, :1269, :1292, :1321). That covers rustls encryption of up to 16 KB plus the TCP syscalls. tungstenite's task, on another runtime worker, blocks that worker on the mutex in poll_read or poll_write meanwhile. There is no deadlock (lock order is conn, then clock state; the clock thread wakes outside its lock) and no lock is held across an .await. It is, however, a plausible contributor to the release lateness that fired condition 10's trigger.",
+            "evidence": "Lock taken at :1200 and released at :1333. Quiet lateness run: p99.9 1.908 ms down and 2.111 ms up (results/u3c-lateness/lateness-run1-20261108T0041Z.txt). C10 was not re-ruled; this is the code mechanism only.",
+            "fix": "Take the released record's bytes out under the lock, release the lock around S's I/O, then re-lock to commit what S took. Or record this in the C10 or U6 notes as a known lateness source with a measurement."
+          },
+          {
+            "id": "F2",
+            "severity": "low",
+            "where": "spikes/netcode-proof/crates/net/src/l2/delay.rs:750-755 (also :1156)",
+            "claim": "current() calls the pump's wake_by_ref() and wake_all(c.wakers(..)) while it still holds the Conn lock, contrary to wakers()'s own doc at :507 ('The wakers to call after the lock is released'). poll_shutdown at :1156 does the same. A woken task on another worker then contends for the mutex at once.",
+            "evidence": "Code reading: wake_all is called before `c` is returned. Every other path (add_burst :720-726, poll_read :1063, Pump :1333-1334) drops the lock first.",
+            "fix": "Collect the wakers in current() and return them, or wake after the guard drops (for example, return the wakers alongside the guard). Also for poll_shutdown."
+          },
+          {
+            "id": "F6",
+            "severity": "low",
+            "where": "spikes/netcode-proof/crates/net/src/l2/delay.rs:890; delay_clock.rs:154-175 and :191-199",
+            "claim": "header_numbers(), a pub fn, calls clock.slack_now(), which blocks the caller for up to 1 s on a Condvar. Called from async code on a runtime worker (npt-server at U6), it blocks that worker. The clock thread also does the /proc timerslack read while holding the state lock, so every pump's schedule() stalls for that read.",
+            "evidence": "slack_now loops on info_cv.wait_timeout until it has an answer or 1 s has passed. run() calls set_own_slack(t, 0), which does std::fs::read_to_string, inside the state-lock region.",
+            "fix": "Document that header_numbers must be called via spawn_blocking (or make it async). In run(), drop the state lock before the /proc read."
+          },
+          {
+            "id": "F7",
+            "severity": "low",
+            "where": "spikes/netcode-proof/crates/net/src/l2/delay.rs:263-264, :654-655; l2/stats.rs:11-15, :62-68",
+            "claim": "Each DelayStream allocates and zeroes about 565 KB at wrap, before any WebSocket byte. That is 4 Lateness histograms (late and late_run, per direction), each 2 x Box<[u64; 8,440]> = 135,040 B, plus the 8,192 B parse buffer and the 16 KB scratch. The amount per connection is bounded, but the number of connections is the client's choice: peer_capacity 512 gives about 290 MB, and the 1,000-connection test churns about 565 MB.",
+            "evidence": "BUCKETS = 8,192 + 8 x 31 = 8,440 (stats.rs:11-15). Lateness::new allocates two boxed arrays (stats.rs:62-68).",
+            "fix": "State the per-connection footprint in the header and size U6's accept cap from it. Or keep one histogram pair per direction and derive the per-second window as a difference between marks, or use a coarser histogram."
+          },
+          {
+            "id": "F11",
+            "severity": "low",
+            "where": "spikes/netcode-proof/crates/net/src/l2/delay.rs:766-784; l2/delay_tests.rs:1715-1723",
+            "claim": "Fix 1's gate inputs (srtt, outstanding, owed, free) are read through four accessors. Each takes the lock separately, and three of them step the model separately, so N(srtt) and the outstanding bytes can come from different model instants. Mechanism test (c) reads them this way, and U6's WsServer would too. The plan's W2 fixed the same pattern for the tests with snapshot().",
+            "evidence": "srtt_ns, outstanding_bytes and free_bytes each call current(); owed_bytes calls lock(). writer_run builds Inputs from four calls.",
+            "fix": "Add one pub(crate) gate_inputs() -> ws_gate::Inputs that reads all four under one lock after one step. Use it in test (c) and at U6."
+          },
+          {
+            "id": "F4",
+            "severity": "nit",
+            "where": "spikes/netcode-proof/crates/net/src/l2/delay.rs:1228-1233",
+            "claim": "The pump copies the front down record from the VecDeque into scratch again on every attempt, including after Pending and after a partial write.",
+            "evidence": "The copy happens inside the `while c.released[DOWN] > 0` loop before each poll_write.",
+            "fix": "Track how much of the record is already staged and copy only the new part, or call make_contiguous once per record."
+          },
+          {
+            "id": "F5",
+            "severity": "nit",
+            "where": "spikes/netcode-proof/crates/net/src/l2/delay.rs:1033, :1082",
+            "claim": "poll_read with buf.remaining() == 0 and a released record waiting returns Pending with only the reader waker registered. No later event re-wakes it for that record. tungstenite never polls with an empty buffer.",
+            "evidence": "The `buf.remaining() > 0 && released` branch is skipped, and the function falls through to Pending.",
+            "fix": "Return Ready(Ok(())) at once for a zero-capacity buffer while data is released (the caller already knows it passed no room), or document the assumption."
+          },
+          {
+            "id": "F8",
+            "severity": "nit",
+            "where": "spikes/netcode-proof/crates/tcpinfo/src/linux.rs:124-129",
+            "claim": "srtt_us's docs say a socket that is not TCP answers ENOPROTOOPT or EOPNOTSUPP. An MPTCP socket instead answers SOL_TCP TCP_INFO from its first subflow, so srtt_us reads it while unacked_and_unsent refuses it (SO_PROTOCOL 262). Soundness is unaffected: the subflow's tcp_getsockopt copies min(len).",
+            "evidence": "Linux v6.8 net/mptcp/sockopt.c:1337 (case TCP_INFO) and :1344 (mptcp_getsockopt_first_sf_only).",
+            "fix": "Correct the doc, or apply the same SO_DOMAIN/SO_TYPE/SO_PROTOCOL check in srtt_us for symmetry."
+          },
+          {
+            "id": "F9",
+            "severity": "nit",
+            "where": "spikes/netcode-proof/crates/net/src/l2/delay.rs:1235-1238",
+            "claim": "The pump trusts S to return n <= rem. A misbehaving S returning more would underflow `len - front_done` or panic in drain(..n). S is the server's own TLS stream, which is trusted under the AsyncWrite contract.",
+            "evidence": "There is no clamp before c.bytes[DOWN].drain(..n) and front_done += n.",
+            "fix": "Use n.min(rem), or debug_assert!(n <= rem)."
+          },
+          {
+            "id": "F10",
+            "severity": "nit",
+            "where": "spikes/netcode-proof/crates/net/src/l2/delay.rs:479-485",
+            "claim": "move_up shifts the parse buffer (copy_within) and every pending bound for each record moved, so the work per read is O(records x buffer). After the head the buffer is at most 527 B, so it stays bounded and cheap: about 23 KB of memmove per 527 B read of 6-byte frames.",
+            "evidence": "copy_within(end..parse_len, 0) and `for b in &mut self.bounds { b.0 -= end }` run per record.",
+            "fix": "Keep a start offset and compact once per read."
+          }
+        ],
+        "checked": [
+          "Read the whole of delay.rs, delay_clock.rs, ws_frame.rs (parser), ws_gate.rs, ws_config.rs, tcp_kernel.rs, the npt-tcpinfo crate (lib.rs, linux.rs, stub.rs, Cargo.toml, test list), the tcp_model.rs diff, the fixes.rs diff, the wt_tests P2 fix (292e526) and the check.mjs unsafe and libc rules, against u3c-plan.md rev 2 [C1]-[C16].",
+          "npt-tcpinfo has 3 unsafe blocks, not 2: srtt_us getsockopt (linux.rs:148), the SO_* getsockopt in a closure (:192) and the ioctl (:235). Each holds one operation, has a SAFETY comment and sits under its function's allow. The getsockopt length checks (len == 4; written >= RTT_END, read with get()) and the offset_of! read cannot panic. BorrowedFd keeps the descriptor open between the SO_PROTOCOL check and the SIOCOUTQ ioctl, so that check cannot be raced. Sound.",
+          "Every Linux v6.8 line cited in the tcpinfo SAFETY comments was checked against the kernel source (tcp.c:624-646, :3842, :4067; socket.c:553-567, :1222, :1341, :2364-2365, :2397-2399; sock.c:1609, :1999-2001, :4191-4199, :4207-4224). All match.",
+          "The ws_frame Scanner cannot panic on any input. The header index stays at or below 13, the state is fixed in size and nothing is allocated. The server direction never closes. Read limits match the scanner's caps, so the parse slice cannot go out of bounds.",
+          "DelayStream's state machine: no lost wake for the writer, reader, pump or shutter, since registration and the matching checks happen under one lock. The poll_shutdown bound holds: the deadline is in due(), and the timeout drops S. Dropping DelayStream ends the pump, and no clock entry can outlive Pump::drop. No lock is held across an .await. Lock order is conn, then clock state, then info, with no reverse path.",
+          "Clock thread: the schedule and the waker table stay in step, there is no lost Condvar wake, and Duration::from_nanos(due - now) cannot underflow.",
+          "Restriction lints (arithmetic_side_effects, indexing_slicing, cast_possible_truncation) were run over the new files and every hit was triaged. Only F1 can overflow, and it was reproduced in both debug and release-like builds.",
+          "No allocation per record in steady state: the VecDeques grow only up to the budget, scratch is reused and the logs are cfg(test). Every cfg(test) knob is #[cfg(test)]. npt-net's only features are wt-wtransport and wt-wtq.",
+          "The fixes.rs gate rewrite makes the same decisions as the old inline condition, and PINNED_RECOMMENDED is unchanged.",
+          "Cargo.lock adds only npt-tcpinfo and tokio-rustls 0.26.6, with no second rustls. `cargo tree -d` shows only the getrandom duplicate that was already there.",
+          "Ran with toolchain 1.99.1 and CARGO_TARGET_DIR=/home/user/Shamble-Frontlines/.gate/u3c-review-target: clippy -D warnings on npt-net and npt-tcpinfo, all targets, with and without --all-features, clean; cargo fmt --all --check clean; cargo test -p npt-tcpinfo 8 passed; cargo test -p npt-net --lib (DelayStream, frame parser, gate, configs, kernel readings) 38 passed and 1 ignored in 18.4 s; the TLS and ws_config tests with --all-features 4 passed.",
+          "Not verified: the full check.mjs run (taken from the evidence), the 5.6-minute lateness run and the root or iptables runs (not re-run, by the rules), the AF_INET6 branch (IPv6 is off in this container), and any target other than Linux x86-64.",
+          "Notes: /home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/u3c-review-rust.md (ends with DONE). Build outputs left for the main session's cleanup under Mustafa's rule; I deleted nothing: /home/user/Shamble-Frontlines/.gate/u3c-review-target (2.0 GB), /home/user/Shamble-Frontlines/.gate/u3c-review-f1 (the F1 reproduction copy), /home/user/Shamble-Frontlines/.gate/u3c-review-f1.tar, /home/user/Shamble-Frontlines/.gate/u3c-review-net-tests.txt."
+        ]
+      },
+      "verified": {
+        "results": [
+          {
+            "id": "F1",
+            "real": true,
+            "severity": "medium",
+            "reason": "Reproduced in the reviewer's scratch copy (.gate/u3c-review-f1). In debug, add_burst(now+1ms, u64::MAX) panics 'attempt to add with overflow' at delay.rs:434:55, reached from :718 through :444. With release-like arithmetic it is accepted, and the pump runs 4,279 times in 200 ms and never stops while the connection lives (the 10 s control: 0 runs). The cause: due() wraps to a time in the past, and step_to never passes the end, which is u64::MAX. Because every reschedule hits the shared clock, that thread busy-loops too. The input is not absurd here: wrap's profile bursts saturate and then subtract (:598-602), and TcpModel and ImpairSocket both treat a u64::MAX length as 'forever' safely, so only add_burst breaks. No caller exists until U6, so fix it before U6 with a checked_add refusal plus saturating sums in due(). One note for anyone re-running: this target dir is shared with the branch build, and cargo silently ran the branch's cached test binary until an extra --config forced a rebuild."
+          },
+          {
+            "id": "F7",
+            "real": true,
+            "severity": "low",
+            "reason": "The footprint holds: 4 Lateness × 2 × 8,440 × 8 B = 540,160 B, plus the 8,192 B parse buffer at the defaults and the 16,384 B scratch, comes to about 565 KB, allocated at wrap before any WebSocket byte. The scale figures are mis-framed. peer_capacity (config.rs:50-53) is ImpairSocket's UDP peer table and caps no WebSocket connections. The 1,000-connection test opens them one at a time (delay_tests.rs:1283-1302), so its peak is one connection, not 565 MB. At the 48-player target the cost is about 27 MB. It stays a sizing input for U6's accept cap."
+          },
+          {
+            "id": "F3",
+            "real": true,
+            "severity": "nit",
+            "reason": "True: the lock is held from :1200 to :1333 across S's poll_write, poll_flush, poll_read and poll_shutdown. There is no deadlock (the clock thread never takes the Conn lock), and S's calls don't block. The 'contributor to lateness' part is not shown. Down lateness is stamped inside the pump's own hold. Up waits at most one hold, which at the run's ~1 KB records is microseconds against a 1.9-2.1 ms p99.9. C10 was accepted (a), and R1's planned split into clock wake, pump start and poll_write return would settle the lock's share."
+          },
+          {
+            "id": "F2",
+            "real": true,
+            "severity": "nit",
+            "reason": "True: current() (:750-755) and poll_shutdown (:1155-1156) wake while holding the lock, against wakers()'s doc at :507, and the other paths do drop the lock first. The cost is small: tokio's wake only queues the task (a same-worker wake goes to the LIFO slot and runs after the current task yields), and no waker in use takes the Conn lock. The effect is at most brief contention, with nothing broken."
+          },
+          {
+            "id": "F6",
+            "real": true,
+            "severity": "nit",
+            "reason": "True by code: slack_now waits on info_cv for up to 1 s, and run() reads /proc while holding the state lock (delay_clock.rs:191-199). The 1 s is only reached if the clock thread is stuck. Normally the wait is one wake and one /proc read, tens of microseconds, once per header build. The state-lock stall is that same read, once per header. The lock order (state, then info) has no reverse path, so there is no deadlock."
+          },
+          {
+            "id": "F8",
+            "real": true,
+            "severity": "nit",
+            "reason": "Confirmed in the MPTCP source in the scratchpad: at mptcp_sockopt.c:1337/:1344, TCP_INFO goes to mptcp_getsockopt_first_sf_only, which calls tcp_getsockopt on the first subflow. So srtt_us answers an MPTCP socket while unacked_and_unsent refuses it (protocol 262). The '# Errors' text (ENOPROTOOPT/EOPNOTSUPP on a non-TCP socket) is therefore inaccurate. The finding cites the wrong lines: the doc is at linux.rs:27-32, not :124-129. The issue is doc-only and sound either way, and npt-server never makes MPTCP sockets."
+          },
+          {
+            "id": "F5",
+            "real": true,
+            "severity": "nit",
+            "reason": "True: with buf.remaining()==0 and a record already released, the branch at :1033 is skipped and the call returns Pending (:1082). Only a later up release, EOF or the pump's end wakes the reader. A zero-capacity read is a legal call, and tokio's TcpStream answers it with Ready at once, so this deviates from convention. tungstenite always reads into a non-empty chunk, though, so no caller reaches it."
+          },
+          {
+            "id": "F4",
+            "real": true,
+            "severity": "nit",
+            "reason": "True: :1228-1233 copy the front record's remaining bytes (up to 16 KB) into scratch on every loop pass and every new poll, including after Pending or a partial write. It costs about a microsecond of memcpy per retry and has no correctness effect."
+          },
+          {
+            "id": "F10",
+            "real": true,
+            "severity": "nit",
+            "reason": "True: :479-485 run copy_within and shift every bound for each record moved. With the 527 B post-head buffer and 6 B frames that is roughly 87 records × ~263 B, about 23 KB of memmove per read. The bounds list usually holds one entry, because move_up runs after each boundary. The cost is bounded and small, even from a hostile client."
+          },
+          {
+            "id": "F9",
+            "real": false,
+            "severity": "nit",
+            "reason": "There is no clamp, but this is not a defect. n <= buf.len() is AsyncWrite's own contract, which tokio's write_all relies on in the same way. S is the server's own tokio-rustls stream, which cannot return more than it was offered, and the finding concedes S is trusted. A debug_assert is optional hardening only."
+          },
+          {
+            "id": "F11",
+            "real": false,
+            "severity": "nit",
+            "reason": "The four separate locks are real, but they change no judged outcome. The kernel path this mirrors also reads srtt and outstanding in two separate syscalls (npt-tcpinfo's srtt_us and unacked_and_unsent; plan E15), so separate reads are faithful. Only the reading task writes, so outstanding can only fall between the reads. Test (c) judges each return against srtt at that return, a different instant from the gate's in any case. W2 was about replay logs and counters in the tests, not gate inputs."
+          }
+        ]
+      }
+    },
+    {
+      "reviewer": "netcode",
+      "review": {
+        "verdict": "APPROVE_WITH_FINDINGS",
+        "findings": [
+          {
+            "id": "NC-U3c-1",
+            "severity": "medium",
+            "where": "/home/user/Shamble-Frontlines/spikes/netcode-proof/crates/net/src/l2/delay_tests.rs:1763-1786",
+            "claim": "Mechanism test (c) checks outstanding <= N(srtt at the return) x size, as plan 1.4 (c) words it. The gate does not guarantee that. What it guarantees is outstanding <= N(srtt at the last write) x size. A correct build can fail (c), as a rare flake, and the same misreading would apply to R13's returns recorded on RS.",
+            "evidence": "may_write (ws_gate.rs:36-38) bounds outstanding with the N in force at each write, and outstanding never grows between writes. But srtt can fall after the budget has filled. The model takes an RTT sample from 'the first segment it newly SACKs' (tcp_model.rs:29-34), so a SACK-only ACK (a loss just before the burst holds snd_una) lowers srtt, and so N, without lowering write_seq - snd_una. At P2, srtt is about 116 +/- 3 ms, about 5 ms above the N 6/7 boundary (111.1 ms), so a return can show 7,350 B against 6 x 1,050 B. Without a loss just before the burst it cannot happen: the budget fills about 117 ms after the burst starts, and the last ACK arrives about 60 ms after. I worked this out from the code; I did not observe it. 5 runs of (c) here all gave exactly 7,350 = 7 x 1,050, and I have not measured the probability.",
+            "fix": "In writer_run, record N at each write and judge each return against the N of the last write before it, or have the Return record carry the writer's N. Correct plan 1.4 (c)'s wording and R13's 'recorded at every return' reading to match."
+          },
+          {
+            "id": "NC-U3c-2",
+            "severity": "low",
+            "where": "/home/user/Shamble-Frontlines/spikes/netcode-proof/crates/net/src/l2/delay.rs:39",
+            "claim": "The stated bound on bytes held in the down direction ('at most the 64 KB budget') is wrong. The true bound is 64 KB plus the acknowledged but unreleased prefix of the front record, up to 16,405 B.",
+            "evidence": "free_budget(0) = budget - (write_seq - snd_una) (tcp_model.rs:2211-2214). An ACK that covers the start of a record that is not yet released (a lost segment inside it) frees budget, but the record's bytes stay in bytes[DOWN] until the whole record is delivered. down_free subtracts only released_model (delay.rs:283-287). The same claim appears in plan 1.2 and in SERIES.md:533 (ws_*_held_bytes). The held-bytes test (delay_tests.rs:580-581) runs a lossless profile, so it never exercises this case.",
+            "fix": "State the bound as 64 KB + 16,405 B (and the up direction's equivalent) in the module doc, SERIES row and plan; add a lossy case to the held-bytes test that asserts the corrected bound."
+          },
+          {
+            "id": "NC-U3c-3",
+            "severity": "low",
+            "where": "/home/user/Shamble-Frontlines/spikes/netcode-proof/crates/net/src/l2/delay.rs:1219",
+            "claim": "The loopback test proves only half of 1.5's identity (delay = model delivery - write stamp + lateness): the release half. In the up direction the model's write stamp is taken before the bytes are read, and the intake delay (S readable to model write) is never measured.",
+            "evidence": "The pump takes t at the start of its poll (delay.rs:1219), runs step_to and writes released down records into S (TLS encryption plus syscalls), and only then reads S. Records read in that poll go into the model at the earlier t (delay.rs:1281, :1290-1304), so the emulated delay is shortened by that work. Wake latency before the read adds unmeasured delay on top. The test already has both stamps on one clock (stamped() uses DelayStream::now_ns; logs.steps holds the Write{UP} stamps) but only asserts r >= wrote + least (delay_tests.rs:1482-1485).",
+            "fix": "Take t again after a successful S read, before scan_up. In the loopback test, report model write stamp - wrote per up message beside the release lateness. Add the intake split to the self-test carried to R1."
+          },
+          {
+            "id": "NC-U3c-4",
+            "severity": "low",
+            "where": "/home/user/Shamble-Frontlines/spikes/netcode-proof/crates/net/src/l2/delay.rs:421",
+            "claim": "burst_return.outstanding_bytes no longer matches its definition in advisor-ws-docs-r2.md:379 (3), and nothing in the return record shows what is owed at a return.",
+            "evidence": "r2:379 (3) defines the field as 'DelayStream's unsent plus unacknowledged bytes at the return, plus any held above it'. The built field is model.outstanding(DOWN) only, and the SERIES row (SERIES.md:595) says so. C8 does narrow it to outstanding(0), so the change is the plan's, but the same name now carries two meanings, and -31's 'at most one snapshot above the socket' cannot be read at a return. DelayStream does hold c.owed.",
+            "fix": "Add ws_owed_bytes (c.owed at the return) to the Return row and its SERIES row, or state in the row that 'held above' is U6's to add."
+          },
+          {
+            "id": "NC-U3c-5",
+            "severity": "low",
+            "where": "/home/user/Shamble-Frontlines/spikes/netcode-proof/crates/net/src/l2/delay.rs:766-784",
+            "claim": "The gate's inputs come from four separate calls, each with its own lock and its own model step, so may_write can combine readings from different instants.",
+            "evidence": "srtt_ns, outstanding_bytes and free_bytes each call current(); owed_bytes reads under a separate lock. Test (c) reads them that way (delay_tests.rs:1714-1722), and U6's WsServer would copy the pattern. It is harmless in (c), where free never binds (7,350 B against 64 KB). The rust-reviewer reports the same issue as its F11.",
+            "fix": "Add one pub(crate) gate_inputs() -> ws_gate::Inputs that reads all four under a single current(), as the tests' snapshot() does, and use it in (c) and at U6."
+          },
+          {
+            "id": "NC-U3c-6",
+            "severity": "low",
+            "where": "/home/user/Shamble-Frontlines/spikes/netcode-proof/results/u3c-kernel-check/out-20261108T004723Z/verdict.txt:6",
+            "claim": "The kernel cross-check applies its pre-written rule correctly and its PASS stands. But its check (2) has almost no power, and check (1) on loopback cannot test RACK's RTT or reordering-window terms. The verdict should not be cited as evidence about the timeout path or about RACK's timing.",
+            "evidence": "compare.py:25-43 and tests.rs:1391-1459 apply run.sh:19-37 identically to the kernel and the model (half a gap, nearest-rank p50, 1 ms prefilter, bound RTT + gap + 3 ms). The header was committed in c5d7260, before the run in 1a9fd73. For check (2), band(172, p) contains k = 6 for any p from about 0.01 to 0.085 (computed with the same code). The model's 246 'other' episodes are about 125 timeouts, 2 probes and about 119 double losses, so a model with no timeout path at all (p about 0.02, band 0-9) would also pass. For check (1), the model gives L = gap + tcpi_rtt = 33.458 ms and the kernel gap + 11 us = 33.344 ms; the 2 ms tolerance is 16 times the RTT, so the check only shows that the repair follows the next send's SACK.",
+            "fix": "Add a line to the committed verdict (and to the report) stating what (1) and (2) cannot see, and that S14 on RS is the binding check for RACK timing and the timeout path."
+          },
+          {
+            "id": "NC-U3c-7",
+            "severity": "nit",
+            "where": "/home/user/Shamble-Frontlines/spikes/netcode-proof/crates/net/src/tcp_model/fixes.rs:166-168",
+            "claim": "adaptive_limit is now called only by mechanism test (e). The room step calls snapshot_budget directly, so (e) pins a wrapper that no shipped path uses.",
+            "evidence": "fixes.rs:778-785 builds n from ws_gate::snapshot_budget and calls ws_gate::may_write; adaptive_limit's only callers are at fixes.rs:1908 and :1916. One definition still holds, structurally.",
+            "fix": "Remove adaptive_limit and have (e) compare snapshot_budget with the pre-U3c formula directly, or route fixes.rs:779 through adaptive_limit."
+          },
+          {
+            "id": "NC-U3c-8",
+            "severity": "nit",
+            "where": "/home/user/Shamble-Frontlines/spikes/netcode-proof/crates/net/src/l2/delay.rs:702-705",
+            "claim": "add_burst(DelayStream::now_ns(), len) is always refused. Meanwhile a start exactly at the model's now is accepted, even though a transmission stamped at that instant has already been sent and not lost.",
+            "evidence": "add_burst steps the model to a clock reading taken after the caller's own, and then refuses start < now (tcp_model.rs:2192). The tests work around it by retrying now + 1 ms (delay_tests.rs:146-153). step_to processes events at times <= t, so with start == now, one transmission at exactly now is unlost but falls inside [start, start + len) under in_burst's rule.",
+            "fix": "For U6's per-session trigger, clamp the start to max(start, model now + 1) or refuse start <= now, and document the behaviour."
+          },
+          {
+            "id": "NC-U3c-9",
+            "severity": "nit",
+            "where": "/home/user/Shamble-Frontlines/spikes/netcode-proof/marks/SERIES.md:577",
+            "claim": "Two SERIES rows describe the code inaccurately.",
+            "evidence": "ws_shutdown_timeout_count says '(delivery or S's taking unfinished)', but the code also counts S's own unfinished poll_shutdown (delay.rs:1317-1327). ws_*_first_byte_ns (SERIES.md:599) says 'first in-order byte released', but the code takes the model's in-order delivery (rcv_nxt, delay.rs:394-401), not a record release.",
+            "fix": "Reword both rows to match the code."
+          },
+          {
+            "id": "NC-U3c-10",
+            "severity": "nit",
+            "where": "/home/user/Shamble-Frontlines/spikes/netcode-proof/crates/net/src/l2/delay_tests.rs:1694-1703",
+            "claim": "Test (c) has no guard against passing vacuously, and its stated burst phases are only nominal.",
+            "evidence": "No assertion checks that the faithful returns actually reached the bound (for example outstanding > (N - 1) x SNAP); the bites that would show the bound being reached run on other connections. The bursts are placed from start = now() taken after pair(), while the ticks run from a later t0, so the '0/11/17/29 ms' phases are not the phases relative to the tick grid.",
+            "fix": "Assert that the faithful outstanding at each return exceeds (N - 1) x SNAP, and either measure the phase against t0 or drop the phase claim."
+          },
+          {
+            "id": "NC-U3c-11",
+            "severity": "nit",
+            "where": "/home/user/Shamble-Frontlines/spikes/netcode-proof/crates/net/src/l2/delay.rs:84-85",
+            "claim": "The model starts with no RTT sample: RTO 1 s and the gate's 100 ms default until the first data ACK. Linux has the handshake's RTT sample from establishment.",
+            "evidence": "The HANDSHAKE header text records this. The kernel's passive open samples RTT on the final ACK of the handshake (tcp_synack_rtt_meas). The difference matters only before the first data ACK, which the upgrade exchange gives within the first round trip.",
+            "fix": "Optionally seed one RTT sample at the profile's round trip when wrapping; otherwise leave it as recorded."
+          },
+          {
+            "id": "NC-U3c-12",
+            "severity": "nit",
+            "where": "/home/user/Shamble-Frontlines/spikes/netcode-proof/results/u3c-kernel-check/run.sh:51",
+            "claim": "The header's band wording says 'the smallest lo ... with P(X < lo) <= 0.005'. That would always be 0. The code takes the largest such lo.",
+            "evidence": "compare.py:86-101 returns the tightest two-sided band (for example 1-15 at n = 172, p = 0.0416), which is the intended band.",
+            "fix": "Change the wording to 'the largest lo and the smallest hi'."
+          }
+        ],
+        "checked": [
+          "Read u3c-plan.md rev 2 [C1]-[C16], advisor-u3c-plan.md (including the side rulings of 2026-11-08), advisor-u3q.md S0-S14, u3c-build-a.md, u3c-build-a-fix.md and u3c-critic-a.md before reading the code",
+          "ws_gate.rs:36-38: may_write is exactly W22's three conditions (owed == 0, free >= size, outstanding + size <= n x size). fixes.rs:778-785 now calls it with n = scale x snapshot_budget, or u64::MAX when not adaptive: same decisions as the old inline test (the rust-reviewer also found the pins unchanged)",
+          "snapshot_budget table (a) recomputed by hand at 2 x TICK = 66,666,666 ns: no sample 6, 20 ms 3, 50 ms 4, 100 ms 6, 150 ms 8, 300 ms 15",
+          "TickWriter (ws_gate.rs:116-137) holds nothing outside the cfg(test) bite: newest-only and never-written-later are structural; the (b) sweep checks the iff, newest-only, never-later, the counts and -31's limit, and both bites fail it",
+          "DelayStream down side (delay.rs:1100-1136): one record per poll_write, n = min(len, 16,384, free - 22), +22 B in the model, Pending at free <= 22, never Ok(0); the 30,000/40,000 test is exact (16,406 / 16,406 / 2,724 then 16,406 / 13,594, then Pending with 10,044 owed, outstanding exactly 65,536)",
+          "harvest (delay.rs:358-411) releases only whole records, in order (model_end <= rcv_nxt); the pump writes each released record into S with one write call (delay.rs:1225-1267) and counts splits",
+          "Up read floor: S is read only while up_room >= read_floor (549 B at the defaults, delay.rs:1286); move_up moves a record into the model only when it fits whole (delay.rs:472-487)",
+          "Bursts after wrap: TcpModel::add_burst refuses earlier starts and caps pending bursts at 64; DelayStream::add_burst logs each burst for the replay; the profile's bursts are converted to the model's axis at wrap; fates keyed by (seed, conn, direction) per S10 (tcp_model.rs:2108-2114)",
+          "Per-return record (delay.rs:414-428, :394-409): taken at each burst's end at the model's time, holding outstanding(0), srtt(0), released-but-untaken bytes and S12's first-byte and first-message times; control frames never count as message ends (ws_frame.rs:243-258)",
+          "tungstenite 0.30's write_out_buffer offers its whole out buffer on every write call (protocol/frame/mod.rs:271-290 in the registry copy), so owed = the untaken rest is accurate",
+          "SERIES.md DelayStream rows checked against delay_names and the code: the names match and delay_names' tests pass; the wording drifts noted as findings",
+          "Kernel cross-check: compare.py and kernel_cross_check_model apply run.sh's pre-written rule identically to kernel and model; run.sh was committed (c5d7260) before the run (1a9fd73); verdict PASS reproduced from verdict.json; the power of check (2) computed with the same band code",
+          "Ran with CARGO_TARGET_DIR=.gate/u3c-review-target: the ws_gate tests, (c), one-record, full-budget, added-burst, replay and fixes (e): all pass (output .gate/u3c-review-netcode-run1.txt); (c) 4 more times: faithful returns always exactly 7,350 = N 7 x 1,050, bites at 14,700/16,800 and 15,750, owed after every write 0",
+          "Lateness evidence file read (n 10,051 each way, the trigger fired); the advisor's ruling (a) not re-ruled",
+          "Glanced at the wt_tests P2 fix (292e526): the FT1/FT2 assertions are present as ruled; outside my focus",
+          "Notes kept at /home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/u3c-review-netcode.md, ending with DONE; no source edited, no network change, nothing deleted (the .gate/u3c-review-target build cache and .gate/u3c-review-netcode-run1.txt remain for the main session's cleanup)"
+        ]
+      },
+      "verified": {
+        "results": [
+          {
+            "id": "NC-U3c-1",
+            "real": true,
+            "severity": "low",
+            "reason": "Confirmed on the pure model: a scratch sim (no source edited; /tmp/claude-0/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/scratchpad/nc1sim/src/main.rs, which drives the real tcp_model.rs and ws_gate.rs through writer_run's pattern) found 36 of 40,000 returns where outstanding > N(srtt at the return) x 1,050, each with N one lower than at the last write (e.g. 7,350 B against N 6, 8,400 B against N 7). Two corrections to the finding. First, srtt at returns averages about 131 ms, not 116, so crossings happen at the 7/8 boundary as well as 6/7. Second, partial cumulative ACKs cause them too (e.g. 6,554 B), not only SACK-only ACKs. With test (c)'s own seeds (41/conn 0/phase 0 and 42/conn 1/phase 11), 20,000 timing variants gave 0 of 40,000 returns over, with N = 7 at every return and srtt 119-131 ms. So no check.mjs flake is shown for the current seeds. What is wrong is the stated property (plan 1.4 (c), the test's doc, R13's at-return reading): on RS's 480 returns a run, which are recorded but not judged, about 35 % of runs would show at least one return over."
+          },
+          {
+            "id": "NC-U3c-2",
+            "real": true,
+            "severity": "low",
+            "reason": "down_free = free_budget(0) - released_model (delay.rs:283-287). An ACK inside an unreleased record frees budget while bytes[DOWN] keeps the whole record. Example: 4 records fill 64 KB, a loss in record 1's 5th segment moves snd_una by 5,792, and poll_write takes about 5.8 KB more, so held is about 71 KB. The excess is at most the front record's acked prefix (just under one 16,406 B record; up to about 548 B up). The held-bytes test writes everything at t = 0 on a lossless profile, so it cannot reach this. The bound stays fixed, but the doc, plan 1.2 and SERIES:533 state it wrong."
+          },
+          {
+            "id": "NC-U3c-3",
+            "real": true,
+            "severity": "low",
+            "reason": "Confirmed. t is taken at the poll's start (delay.rs:1219). Released down records are written into S (TLS plus syscalls) before S is read, and every record read in that poll enters the model via scan_up(t) with that earlier t (:1281 loop). The loopback test checks only r >= wrote + least and hand-over = delivery + lateness (delay_tests.rs:1482-1500). It never compares the Write{UP} model stamp with the app's write stamp, so intake lag (wake latency, or the down-write work) is unmeasured and not in the R1 split carry. The effect is probably microseconds to a few ms, the same scale as the release lateness that fired condition 10."
+          },
+          {
+            "id": "NC-U3c-4",
+            "real": true,
+            "severity": "nit",
+            "reason": "Return.outstanding is model.outstanding(DOWN) only (delay.rs:421; SERIES.md:595 says so), while r2:379 (3) defines the field with 'plus any held above it', and the Return record has no owed field. The SERIES row is explicit and self-consistent, and owed is 0 after every gated write (test (c) asserts it), so nothing is misjudged. The '-31 cannot be read at a return' part is weak: -31 is sampled per tick (unsent_snaps_max_count), not at returns."
+          },
+          {
+            "id": "NC-U3c-5",
+            "real": true,
+            "severity": "nit",
+            "reason": "Confirmed: srtt_ns, outstanding_bytes and free_bytes each call current() (a separate lock and step), and owed_bytes takes another lock (delay.rs:766-784); test (c) reads them that way (delay_tests.rs:1714-1722). It breaks nothing now: the writer task is the only writer, so a later read of outstanding or free is only as conservative or more. On the plain path at U6, TCP_INFO and SIOCOUTQ are separate syscalls anyway. A single gate_inputs() is a tidy-up."
+          },
+          {
+            "id": "NC-U3c-6",
+            "real": true,
+            "severity": "low",
+            "reason": "Recomputed with compare.py's band(): band(172, p, 0.99) contains k = 6 for p from 0.010 to 0.088. A model with no timeout path (p = 119/5,918, about 0.020) gets the band 0-9 and would also pass. The model's 246 other episodes match repairs [6054, 2, 125] plus about 119 double losses (0.02 squared x 300,000 messages). In check (1), the model's 33.458 ms is the gap plus tcpi_rtt (124.7 us), against the kernel's gap plus 11 us, so the 2 ms tolerance cannot see RACK's RTT or reordering-window terms. The PASS stands, but its limits are not written into the verdict; only 'S14 on RS stays binding' is in run.sh's header."
+          },
+          {
+            "id": "NC-U3c-7",
+            "real": true,
+            "severity": "nit",
+            "reason": "Confirmed: adaptive_limit (fixes.rs:166-168) is called only at fixes.rs:1908 and :1916 (test (e)); the room step uses ws_gate::snapshot_budget and may_write directly (:778-785). It is a dead wrapper, but (e) also pins snapshot_budget against the pre-U3c rule directly (:1897-1899), so the one-definition check is not empty."
+          },
+          {
+            "id": "NC-U3c-8",
+            "real": true,
+            "severity": "nit",
+            "reason": "Confirmed. DelayStream::add_burst steps the model to a clock reading taken after the caller's, then TcpModel::add_burst refuses start < now (tcp_model.rs:2192), so add_burst(now_ns(), ...) is refused in practice (the tests retry with now + 1 ms, delay_tests.rs:146-153). start == the model's now is accepted even though advance(now) has already sent transmissions stamped at now unlost, which in_burst's t >= start rule counts as inside. This edge is exact to the nanosecond and no caller hits it."
+          },
+          {
+            "id": "NC-U3c-9",
+            "real": true,
+            "severity": "nit",
+            "reason": "SERIES.md:577 is incomplete: the counter also counts the case where S's own poll_shutdown is still unfinished at the deadline (delay.rs:1317-1327, the taken-but-not-ready branch), as the module doc (delay.rs:33-35) already says. The :599 half is arguable: first_byte_ns is the model's rcv_nxt advance (delay.rs:394-401), and the model itself calls in-order delivery 'released' (S9; delivered()'s doc)."
+          },
+          {
+            "id": "NC-U3c-10",
+            "real": true,
+            "severity": "nit",
+            "reason": "The vacuity part holds: for the faithful runs nothing asserts written > 0 or outstanding near N x SNAP. first_message_ns only shows some message came after the return, and the bound is shown reached only on the bite connections. The phase part is wrong: writer_run has no await between start = now() and t0 (only two add_burst calls and TickWriter::new), so t0 - start is microseconds and the 0/11/17/29 ms phases hold against the tick grid, apart from tokio's timer lateness of about 1 ms."
+          },
+          {
+            "id": "NC-U3c-11",
+            "real": true,
+            "severity": "nit",
+            "reason": "True and already recorded: DelayStream's model starts with no RTT sample (the HANDSHAKE text in delay.rs:84-85). Linux's passive open takes one at the handshake's final ACK (tcp_synack_rtt_meas in tcp_rcv_state_process, and the model's own reconnect handshake primes it). It matters only until the upgrade exchange's first ACK, about one round trip."
+          },
+          {
+            "id": "NC-U3c-12",
+            "real": true,
+            "severity": "nit",
+            "reason": "Confirmed: run.sh:51-52 says 'the smallest lo and hi with P(X < lo) <= 0.005 ...', and taken literally lo would always be 0. compare.py:86-101 takes the largest lo with P(X < lo) <= tail and the smallest hi with P(X > hi) <= tail (e.g. 1-15 at n = 172, p = 0.0416). This is a wording fix only; the verdict is unaffected."
+          }
+        ]
+      }
+    },
+    {
+      "reviewer": "security",
+      "review": {
+        "verdict": "APPROVE_WITH_FINDINGS",
+        "findings": [
+          {
+            "id": "S2",
+            "severity": "medium",
+            "where": "spikes/netcode-proof/crates/net/src/l2/ws_frame.rs:152",
+            "claim": "Reproduced: the request scanner and tungstenite disagree on where the HTTP head ends. Condition C6 says a frame above the limit is closed and counted before any of its payload enters the model. That is false for a hostile client: an over-limit frame can pass DelayStream uncounted, and the scanner's frame view stays misaligned for the rest of the connection.",
+            "evidence": "The scanner ends the head only at \"\\r\\n\\r\\n\" (ws_frame.rs:152). httparse 1.10.1, tungstenite's parser, also accepts a bare \"\\n\\n\" or \"\\r\\n\\n\" (httparse lib.rs:1105-1116). tungstenite reads the handshake in 4,096 B chunks (tungstenite lib.rs:36, buffer.rs:57), and DelayStream hands it min(rest of record, buf.remaining()) (delay.rs:1036). So a head of exactly 4,096 B ending in \"\\n\\n\" completes tungstenite's handshake with an empty tail, and the JunkAfterRequest check (server.rs:256-258) never fires. Scratch run through the public API (scratchpad headdiff/, build dir .gate/u3c-review-target/headdiff), sending a 604 B masked frame after the head. CRLF control: DelayStream closes it as Frame=1, and 4,096 B go up (the head only). Bare LF: the handshake succeeds and the 101 is sent; every DelayStream close count stays 0; 4,708 B go up, so the over-limit frame went through the model; tungstenite then reports MessageTooLong{size: 604, max_size: 513}. Memory stays bounded: the 64 KB budget holds, and tungstenite's own 513 B limit is the backstop.",
+            "fix": "In U3c's fix round, not carried: end the head at LF, optional CR, LF, as httparse does (or use httparse's own Complete(size)). Add bare-LF, mixed and leading-blank-line requests to each_limit_closes_before_buffering_and_is_counted. Make U5's parser fuzz target (-34) a differential test: DelayStream's head length must equal tungstenite's for every input."
+          },
+          {
+            "id": "S1",
+            "severity": "low",
+            "where": "spikes/netcode-proof/check.mjs (RELAX_UNSAFE, unsafeProblems, crateFiles)",
+            "claim": "check.mjs's unsafe_code check can be bypassed in ways rustc accepts, so the workspace Cargo.toml comment ('fails on any other crate that relaxes it') claims more than it checks.",
+            "evidence": "I imported unsafeProblems in node and fed it a crafted crates/room/src/evil.rs. It missed `#[allow(dead_code, /* x */ unsafe_code)]` and a macro-built `#[allow($l)]` called as lax!(unsafe_code). It also missed an allow of clippy::undocumented_unsafe_blocks inside npt-tcpinfo, and .cargo/config.toml (rustflags) is never read. In a scratch crate under [lints] unsafe_code=\"deny\" (rustc 1.99.1), an unsafe block compiles with each of: comment-in-list, macro-built, RUSTFLAGS=-Aunsafe_code, and --cap-lints=warn. `cargo rustc -- -F unsafe_code` rejects all three of the variants I re-ran with it (comment-in-list, macro-built, RUSTFLAGS -A).",
+            "fix": "Add a compiler check: build or clippy every crate except npt-client-wasm and npt-tcpinfo with `-F unsafe_code` on the command line. Also scan comment- and literal-blanked code for the `unsafe` token outside the two exception crates. Refuse rustflags in .cargo/config.toml and RUSTFLAGS. Extend the tcpinfo scan to allows of the two clippy unsafe lints."
+          },
+          {
+            "id": "S3",
+            "severity": "low",
+            "where": "spikes/netcode-proof/crates/net/src/ws_config.rs:52-58",
+            "claim": "Each connection costs memory that the client triggers and that nothing in U3c caps: tungstenite's 128 KiB read buffer is left at its default, plus DelayStream's histograms. The model also pays a per-record cost for tiny frames, which is unmeasured.",
+            "evidence": "tungstenite's read_buffer_size defaults to 128 KiB (tungstenite protocol/mod.rs:57, :98). FrameCodec::new allocates it up front (frame/mod.rs:126), and one read may pull that much (in_buf_max_read). tungstenite's own docs suggest about 4 KiB when there are many connections (protocol/mod.rs:50-56). DelayStream adds about 565 KB per wrap (rust-reviewer F7), so each TLS-completed connection costs about 700 KB. Each 6 B empty client frame becomes a 28 B model record (delay.rs:310-326, scan_up/move_up), and its CPU cost is not measured. It is bounded per connection, but the client chooses how many connections there are.",
+            "fix": "Set read_buffer_size to about 4 KiB in ws_config and assert it in one_source. At U6: per-address and total accept caps before TLS; a message-rate limit that closes the connection (dropping DelayStream) rather than discarding messages; and run E14's floods with the wrapper on, with its CPU and memory recorded."
+          },
+          {
+            "id": "S7",
+            "severity": "low",
+            "where": "spikes/netcode-proof/crates/net/src/l2/delay.rs:691-735",
+            "claim": "The security side of rust-reviewer F1: add_burst will be driven by a per-session control that a client triggers. F1's overflow spins the release clock thread, which the whole process shares, so on release builds it would be a denial of service across every session, not just the caller's.",
+            "evidence": "delay.rs:708 pushes s.saturating_add(len_ns), and delay.rs:434 then computes `x + self.origin`, which overflows (rust F1 reproduced the spin). One clock thread serves every connection (delay_clock.rs). Per-session B1 is client-triggered and capability-checked: plan E23, ADR 0001 check item 11, plan.md:500.",
+            "fix": "Apply F1's checked_add in add_burst and due(). At U6, range-check the control's start and length (a stated maximum length, start within the session) before calling add_burst, and add a test with u64::MAX."
+          },
+          {
+            "id": "S4",
+            "severity": "nit",
+            "where": "spikes/netcode-proof/results/u3c-kernel-check/siocoutq-root-check.py:283-294; run.sh:77",
+            "claim": "The root scripts' iptables handling is sound: rules are scoped to one port on lo, removed in a trap or finally block, compared with iptables -S before and after (identical in the committed evidence), and a leftover rule is refused. Three edge cases remain.",
+            "evidence": "(a) on_signal raises Interrupted, so a second SIGINT/TERM/HUP during the finally block's remove_rule can leave the 100 % DROP rule in place and skip the -S comparison. (b) No iptables call uses -w. Under xtables lock contention, -C exits non-zero and ends remove_rule's loop early, and a CalledProcessError from -I or -D is not in the except tuple, so the script exits 1, which its own codes call 'fail'. The -S diff (exit 3) is the backstop. (c) run.sh reads the generic PORT environment variable; the bind check on 127.0.0.1 limits the risk.",
+            "fix": "Set SIGINT/TERM/HUP to SIG_IGN at the start of the finally block. Pass -w to every iptables call and catch CalledProcessError as a setup error (exit 2). Rename the variable to NPT_KC_PORT."
+          },
+          {
+            "id": "S5",
+            "severity": "nit",
+            "where": "spikes/netcode-proof/crates/net/src/ws_config.rs:52; check.mjs PLACED_ALLOW; ws_gate.rs snapshot_budget",
+            "claim": "Three U6 carries and one gap in check.mjs's checks.",
+            "evidence": "(a) 'One source' is a convention across two call sites: delay.rs:581/:633 read cfg.ws_max_message_bytes, while ws_config takes a bare usize. Only the test helper pair() (delay_tests.rs:341) ties them together. (b) The TLS accept runs before DelayStream exists (the HANDSHAKE note in delay.rs), and tokio-rustls's accept has no timeout. (c) PLACED_ALLOW accepts `reason = \"\"`: a node probe with an empty reason on srtt_us gives 0 problems, against ADR 0002:264-265's 'an #[allow] with its reason'. crateFiles reads only crates/. (d) snapshot_budget has no upper bound, and srtt on the plain path is client-influenced (delayed ACKs); memory stays bounded only by the socket's free room.",
+            "fix": "At U6: build both limits from one &L2Config; make the 2 s Join deadline cover the TLS accept; state the plain path's free bound (e.g. SO_SNDBUF). In check.mjs: require a non-empty reason and scan every workspace member's folder."
+          },
+          {
+            "id": "S6",
+            "severity": "nit",
+            "where": ".checkpoints/netcode-proof-test/plan.md:627, :432",
+            "claim": "Plan §4.8's audit list for U5 says 'npt-tcpinfo's two unsafe blocks', but there are three. The SOL_SOCKET check that makes the ioctl sound is the block left off.",
+            "evidence": "spikes/netcode-proof/crates/tcpinfo/src/linux.rs has unsafe blocks at :51 (getsockopt TCP_INFO), :95 (getsockopt SOL_SOCKET in int_option) and :138 (ioctl SIOCOUTQ); grep counts 3.",
+            "fix": "Name all three blocks in §4.8, and in §4.2's description of the exception."
+          }
+        ],
+        "checked": [
+          "Notes: /home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/u3c-review-security.md, one line per finding, ending with DONE. Nothing in the source tree was edited.",
+          "Request and frame parser (ws_frame.rs) checked against C6: the 14 B header buffer is bounded; 64-bit lengths with the top bit set (:226), unmasked frames (:234), control frames over 125 B or fragmented (:237), frames over the limit (:240) and fragmented totals (saturating, :248-253) are all closed; the request cap check comes after the blank-line test, so a request of exactly the cap passes; no allocation. The only gap is the head-terminator differential (S2).",
+          "DelayStream's buffers fed by peer data are bounded: the parse buffer is fixed at max(request cap, 527); the boundary list is limited by the parse buffer; bytes and records are limited by the 64 KB budget; reading stops below a 549 B floor; per-return records are capped at 1,024 and bursts at 64; the clock holds one entry per live connection. A peer that never reads gets Pending at the budget (tested); a peer that never sends grows nothing; a limit close ends the pump and drops S at once.",
+          "Possible panics on peer input: indexing and arithmetic on the poll_read, move_up and pump read paths are guarded. rust-reviewer's restriction-lint sweep found only F1, which is not reachable from peer bytes.",
+          "TLS: builder_with_provider(ring), TLS 1.3 only, ALPN http/1.1, early data off (tokio-rustls's early-data feature is off), and nothing installs a process-default provider (grep plus the tests' get_default asserts). The tests refuse a TLS 1.2-only client with a protocol_version alert and refuse a client offering only h3.",
+          "tls_test.rs, with its fixed-seed key, is #[cfg(test)], so no non-test build can reach it.",
+          "npt-tcpinfo linux.rs: each unsafe block holds one operation with a SAFETY comment; the SO_DOMAIN, SO_TYPE and SO_PROTOCOL checks (with a length check) run before the ioctl; the field is read with offset_of! after a length check; the non-Linux stub returns Unsupported. Its kernel citations were verified by rust-reviewer.",
+          "New dependencies: the lock diff adds only tokio-rustls 0.26.6 and npt-tcpinfo (libc; socket2 as a dev dependency). futures-util is a dev dependency only. tokio-rustls's manifest: the ring feature is rustls/ring and the defaults are off.",
+          "Advisories, checked by hand on rustsec.org (cargo-deny and cargo-audit are not installed here): tokio-rustls's only advisory, RUSTSEC-2020-0019, is fixed from 0.13.1. rustls's RUSTSEC-2026-0285 is fixed from 0.23.45, and -0346, -0347, -0348 and -0349 from 0.23.46, the pinned version: treat 0.23.46 as the floor. libc has no advisories page.",
+          "Ran with CARGO_TARGET_DIR=.gate/u3c-review-target: 23 filtered npt-net tests passed (ws_frame, ws_config, ws_gate, each_limit, a_full_budget, the_request_is_one_record, the_websocket_tls, wrap_refuses, dropping_it, a_shutdown_s_never, a_thousand_opens); npt-tcpinfo's 8 passed; `node check.mjs --only deps,self` passed (78 crate files read, 21 of 21 self-tests).",
+          "S2 reproduced with a scratch binary through DelayStream's public API (/tmp/claude-0/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/scratchpad/headdiff/src/main.rs).",
+          "S1 proven with a scratch crate built by rustc 1.99.1 (/tmp/claude-0/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/scratchpad/lintprobe/run.sh and run2.sh) and with node probes of check.mjs's exported unsafeProblems.",
+          "Root scripts (run.sh, siocoutq-root-check.py) read in full. The committed evidence shows iptables -S identical before and after (3 lines), the rule going in and out on port 47613, and a PASS verdict. I changed nothing on the machine's network.",
+          "Transport coverage (client action, where the server checks it, gap): oversize request: the scanner (8,192 B) and tungstenite (64 KiB), gap S2. Frame or message over 513 B: the scanner, then tungstenite, gap S2 (tungstenite still closes). Unmasked or bad control frame or 64-bit length: the scanner and tungstenite, no gap. A peer that never reads: the 64 KB budget and the 128 KB write bound. A peer that never sends: U6's deadline (S5 b). Tiny-frame floods and many connections: U6's caps (S3). Per-session B1: U6's range check (S7).",
+          "Not re-ruled: condition 10's lateness trigger (with the advisor). Not re-reported: rust F1, F7 and F11, netcode F-held and F-inputs; I cite them where they bear on security.",
+          "Left for the main session's cleanup and not deleted, per Mustafa's rule: .gate/u3c-review-target/headdiff (445 MB) and .gate/u3c-review-target/lintprobe (248 KB). About 9.7 GB of disk is free."
+        ]
+      },
+      "verified": {
+        "results": [
+          {
+            "id": "S2",
+            "real": true,
+            "severity": "low",
+            "reason": "I re-ran the headdiff repro on the current tree with rustc 1.99.1. With CRLF line ends, DelayStream closes the connection and counts it (Frame=1), and 4,096 B go up. With bare LF, the handshake succeeds and the 101 goes out, every close count stays 0, 4,708 B go up, and tungstenite then reports MessageTooLong{604,513}. The scanner ends the head only at CRLFCRLF (ws_frame.rs:152); httparse 1.10.1 also accepts a bare LF (lib.rs:1105-1116); tungstenite reads in 4,096 B chunks (lib.rs:36) and its JunkAfterRequest check is at server.rs:256-258. So C6 is false for a hostile client and its counters undercount. Rated low, not medium: memory stays bounded (the scanner's 8,192 B head cap, then 527 B per frame, and the 64 KB up room), tungstenite's 513 B limit still closes the connection, only the attacker's own connection is affected, and browsers never send bare LF."
+          },
+          {
+            "id": "S1",
+            "real": true,
+            "severity": "low",
+            "reason": "Reproduced. Fed a crafted crates/room file, unsafeProblems reports 0 problems for both `#[allow(dead_code, /* x */ unsafe_code)]` and the macro-built `#[allow($l)]` (control: 1). In the lintprobe crate under [lints] unsafe_code=\"deny\", rustc 1.99.1 compiles an unsafe block with comment-in-list, macro-built, RUSTFLAGS=-Aunsafe_code and --cap-lints=warn. check.mjs never reads RUSTFLAGS, .cargo/config.toml rustflags, or allows of the clippy unsafe lints in tcpinfo. Low: the Cargo.toml comment claims more than the check does. Accidental relaxing is still caught; each bypass is deliberate and shows in diff review."
+          },
+          {
+            "id": "S3",
+            "real": true,
+            "severity": "nit",
+            "reason": "The facts hold. ws_config leaves read_buffer_size at tungstenite's 128 KiB default (protocol/mod.rs:98). FrameCodec reserves it (frame/mod.rs:126, :137) and fills it with zeros on the first read (:237). Nothing breaks in U3c, though: there is no accept path until U6's WsServer, the connection cap is already carried by rust-reviewer F7, and R1's 48 connections at about 700 KB each come to about 34 MB. Treat it as a one-line sizing note for U6."
+          },
+          {
+            "id": "S7",
+            "real": true,
+            "severity": "low",
+            "reason": "The code shows it: delay.rs:708 pushes s.saturating_add(len_ns), delay.rs:434 then computes x + origin unchecked (npt-net has no release overflow-checks: Cargo.toml:91-95), and the result is a due in the past. There is one process-wide clock thread (delay_clock.rs:57, :177), so the clock and the pump keep waking each other. Rated low: add_burst has no caller outside tests in U3c. At U6 the trigger is a capability-checked control for one session (plan E23: Mustafa's own session, per-run capability), not any client. And the clock still fires other connections' entries when they are due, so the cost is CPU and lateness, not a halt. The fix is rust-reviewer F1's, plus the U6 range check."
+          },
+          {
+            "id": "S4",
+            "real": true,
+            "severity": "nit",
+            "reason": "(a) holds: on_signal stays installed through the finally block (siocoutq-root-check.py:214-215, :283-294), so a second signal escapes remove_rule and skips the -S comparison. (c) holds: run.sh:77 reads the shared PORT variable, and the 127.0.0.1 bind check limits the risk. (b) does not apply here: this container has iptables v1.8.10 (nf_tables), which takes no xtables lock (iptables-nft ignores -w), so lock contention cannot cut remove_rule's -C loop short. It matters only on a legacy backend. The committed evidence shows -S identical before and after."
+          },
+          {
+            "id": "S5",
+            "real": true,
+            "severity": "nit",
+            "reason": "(c) confirmed: PLACED_ALLOW accepts `allow(unsafe_code, reason = \"\")` (node test: true); linux.rs's two reasons are non-empty today. (a), (b) and (d) are accurate U6 notes with no effect now: ws_config takes a bare usize and its only callers are tests (delay_tests.rs:341, ws_config_tests.rs); there is no TLS accept loop in U3c; and snapshot_budget saturates but has no upper bound (ws_gate.rs:25-32). crateFiles reads only crates/, but every workspace member is under crates/ (Cargo.toml:6-23), so nothing is missed today."
+          },
+          {
+            "id": "S6",
+            "real": true,
+            "severity": "nit",
+            "reason": "linux.rs has three unsafe blocks (:51 getsockopt TCP_INFO, :95 getsockopt SOL_SOCKET, :138 ioctl SIOCOUTQ; grep counts 3). plan.md:627 says two, and §4.2 (plan.md:432) names only getsockopt TCP_INFO and ioctl SIOCOUTQ, leaving out the SOL_SOCKET check that makes the ioctl sound. The workspace Cargo.toml comment names all three, so this is drift in the plan text only."
+          }
+        ]
+      }
+    },
+    {
+      "reviewer": "test",
+      "review": {
+        "verdict": "REVISE",
+        "findings": [
+          {
+            "id": "F-K",
+            "severity": "medium",
+            "where": "spikes/netcode-proof/crates/net/src/l2/delay_tests.rs:1791-1792 (with :1755-1756 and :1704)",
+            "claim": "Mechanism test (c) has a hidden wall-clock limit, which breaks binding condition C16. Its S12 check (`expect(\"a byte after the return\")`) needs the first down byte after the second burst's return to arrive inside a fixed 230-tick run. That leaves about 2.1 s after the return (start + 5.5 s + phase, while the loop ends at t0 + 7.63 s). Whether the byte arrives in time depends on the model's timeout backoff, which depends on the wall-clock phase between the writer's ticks and the bursts.",
+            "evidence": "Observed first-byte times were 1,729-1,869 ms: my baseline, the build's notes, and cloop.py with 24 runs of the unmodified binary under 3-way parallel load (0 failures, max 1,868.7 ms), so the margin is about 0.25 s. In probe M12, the scratch copy writes 5 ms later in each tick, which is just another tick/burst phase. 1 of 4 runs failed at exactly that expect (copy line 1795:46 = original 1791:46). A timeout backoff of 1.2 s to 2.4 s after a 1 s burst can put the first byte past 2.1 s.",
+            "fix": "Run (c) until every return has first_byte_ns and first_message_ns down recorded (model state), with a HANG guard instead of a fixed tick count. Alternatively, size the drain from the model's own timeout (for example now ≥ return + 2 × the backed-off timeout) and say so in the test doc."
+          },
+          {
+            "id": "F-D",
+            "severity": "medium",
+            "where": "spikes/netcode-proof/check.mjs:351-356 (crateFiles) and :473-478 (DEPS_CHECKED); spikes/netcode-proof/Cargo.toml:76",
+            "claim": "The deps step's unsafe_code rule rests on the workspace root's `[workspace.lints.rust] unsafe_code = \"deny\"`, but the step never reads the root Cargo.toml or .cargo/config.toml rustflags. Changing that one line to allow relaxes unsafe code in every crate, yet the step still passes and prints that unsafe_code is relaxed only by npt-client-wasm and npt-tcpinfo's two #[allow]s.",
+            "evidence": "rootlint.py, run on a scratch copy and restored byte for byte. With the root set to \"allow\" and an attribute-free `unsafe { *(&raw const x) }` planted in npt-room, `node check.mjs --only deps` gives \"check: all 1 steps pass\" and npt-room builds with `--allow=unsafe_code`. The control (root deny restored, same block) fails with \"error: usage of an `unsafe` block\".",
+            "fix": "In unsafeProblems or dependencyProblems, also require the root manifest's [workspace.lints.rust] unsafe_code to be \"deny\" or \"forbid\", and require no `unsafe_code` or `-A`/`--cap-lints` in .cargo/config.toml rustflags (or check the rustc flags cargo would pass). Add a self-test with a bite for each."
+          },
+          {
+            "id": "F-B",
+            "severity": "medium",
+            "where": "spikes/netcode-proof/crates/net/src/l2/delay.rs:704; delay_tests.rs:944-1010 and :1694-1696",
+            "claim": "Condition C5 says bursts added on DelayStream's clock are converted to the model's axis by subtracting origin, and no test checks that conversion directly. The burst test judges on the logged, already converted start, and (c) never asserts where the returns land. Dropping the subtraction is caught only when other tests have run first in the same process.",
+            "evidence": "Mutation M3 (`let start = Some(start_ns);`): the full l2::delay module run fails at the refusal check (delay_tests.rs:948-953, which needs origin > 1 ms). The burst test run alone passed 3 of 3 times. (c) run alone passed too, with its returns shifted by the origin (3,134,868,249 ns).",
+            "fix": "In the burst test, assert the logged Step::Burst start == the requested clock start − snapshot.origin. In (c), assert each Return.at_ns == start + b + SEC (both are identities on stamps the code records)."
+          },
+          {
+            "id": "F-L",
+            "severity": "low",
+            "where": "spikes/netcode-proof/crates/net/src/l2/delay_tests.rs:1713-1723",
+            "claim": "(c)'s gate inputs come from four separately locked calls (srtt_ns, outstanding_bytes, owed_bytes, free_bytes), and each one steps the model. An acknowledgement processed between the srtt read and the outstanding read can let a correct gate write with N from the old srtt, leaving outstanding one snapshot above N(srtt at the return). That would be a rare false failure, the same pattern as the critic's earlier W2. The bite assertions also need the writer to keep up with the tick.",
+            "evidence": "Code reading of delay.rs:766-784 (each accessor calls current()). Probe M11 (a 20 ms blocking gap, so the loop falls behind) failed the budget-x2 bite assertion (original :1802) instead of a faithful one. No natural failure was seen in 24 + 4 runs.",
+            "fix": "Add one atomic gate-input reading (all four under one current()), and use it in writer_run. U6's WsServer will need the same reading on the delayed path anyway."
+          },
+          {
+            "id": "F-A",
+            "severity": "low",
+            "where": "spikes/netcode-proof/crates/net/src/l2/delay.rs:591-608",
+            "claim": "wrap's conversion of L2Config's profile bursts (clock to model axis, clipping at origin, burst_ends, the more-than-64 refusal) is shipped code with no test. No test sets profile.bursts_ns.",
+            "evidence": "A grep for bursts_ns in delay_tests.rs finds only `bursts_ns: Vec::new()` (line 64). Every burst test uses add_burst.",
+            "fix": "Add a unit test: one profile burst already ended at wrap, one straddling the origin, one in the future. Assert the model's bursts() and that losses land inside the clipped window, plus the refusal at 65 future bursts."
+          },
+          {
+            "id": "F-F",
+            "severity": "low",
+            "where": "spikes/netcode-proof/crates/net/src/l2/delay.rs:451-452, :746, :1281-1283; delay_tests.rs:653-666",
+            "claim": "Records that arrive before a bad frame do enter the model, but they are never handed to tungstenite. The close ends the pump, pump_done stops current() from stepping, and poll_read returns InvalidData first. The doc's 'so the records before a bad frame enter in order' suggests they are delivered, and no test states either behaviour.",
+            "evidence": "Probe (limit_case's read loop instrumented in the scratch copy): in all 9 limit cases, the first read after the close is the error, although 170 B (the request) or 500 B (request + first fragment) had entered the model.",
+            "fix": "Either state in the doc and the test that a limit close discards undelivered earlier records (and assert it), or keep stepping until those records are released before reporting the close. That design choice is the netcode-architect's; the test should pin whichever is chosen."
+          },
+          {
+            "id": "F-R2",
+            "severity": "low",
+            "where": "spikes/netcode-proof/crates/net/src/l2/delay.rs:1286",
+            "claim": "C2's read floor ('S is read only while the up room is at least 549 B') is untested. The held-bytes bound stays correct without it, because the parse buffer caps it.",
+            "evidence": "Mutation M2 (floor check removed): all 22 l2::delay tests pass. Mutation M1 (released-but-unread bytes not counted in up_room) does fail a_full_budget (held up 152,548 B), so the bound itself bites.",
+            "fix": "Add a test that S's read side is not polled while up_room < read_floor (for example a counting S, as NeverShut counts poll_shutdown), or record the floor as an optimisation rather than a condition."
+          },
+          {
+            "id": "F-G",
+            "severity": "low",
+            "where": "spikes/netcode-proof/crates/net/src/l2/delay.rs:1075, :1299-1302",
+            "claim": "C3's 'an EOF from S ends the up direction after its last delivered byte' has no test: no test closes the client's write half and reads DelayStream to EOF.",
+            "evidence": "In every duplex test the client's write half is held (`_cw`) or aborted. The drop test checks the down EOF only (delay_tests.rs:1106-1133).",
+            "fix": "Client writes N frames then shuts down its write half. Assert DelayStream yields all N frames' bytes, then Ok(0), and that Ok(0) never comes while up records are still in the model."
+          },
+          {
+            "id": "F-H",
+            "severity": "low",
+            "where": "spikes/netcode-proof/crates/net/src/l2/delay_tests.rs:573-590",
+            "claim": "The held-bytes test asserts only upper bounds and `!flood.is_finished()`, so it would pass without ever exercising the bound (for example after a stall).",
+            "evidence": "The baseline reached held up 62,632 B and down 65,360 B, but nothing asserts it got near 64 KB.",
+            "fix": "Also assert max[DOWN] ≥ BUDGET − one record and max[UP] ≥ BUDGET − one largest record, so the bound is shown to be reached."
+          },
+          {
+            "id": "F-M",
+            "severity": "low",
+            "where": "spikes/netcode-proof/crates/net/src/l2/delay_clock.rs:85-95, :177-181; delay.rs:902-904",
+            "claim": "DelayStream's release clock is claimed to run with a 1 ns timer slack, written and read back (plan 1.2; commit c5d7260), and no test asserts it. ImpairSocket's release thread has that test.",
+            "evidence": "A grep for 'slack' in delay_tests.rs finds nothing. The precedent is socket_tests.rs:294-333 (l2_timer_slack_ns, _start_ns, _set asserted).",
+            "fix": "In its_rows_use_the_named_series, assert ws_clock_timer_slack_start_ns == 1 and ws_clock_timer_slack_set == 1 where /proc allows it, mirroring socket_tests.rs."
+          },
+          {
+            "id": "F-N",
+            "severity": "low",
+            "where": "spikes/netcode-proof/check.mjs:22, :448; crates/net/src/tcp_kernel.rs:39-42",
+            "claim": "C12 (c)'s 'the workspace still builds anywhere' (the non-Linux stub) is not in check.mjs. clippy-wasm32 covers the LEAF crates only, and npt-net's not(unix) handle is never compiled. Critic B raised this and it is still open.",
+            "evidence": "LEAF has no npt-tcpinfo. Build B's notes record one manual wasm32 clippy of npt-tcpinfo's lib only.",
+            "fix": "Add npt-tcpinfo to the wasm32 clippy step (it has no dependencies off Linux), or record in the plan's U6 carries that the stub is checked by hand."
+          },
+          {
+            "id": "F-E",
+            "severity": "low",
+            "where": "spikes/netcode-proof/check.mjs:238-266 (pathProblems)",
+            "claim": "Another route lets a crate compile npt-tcpinfo's file under its own name: a crate manifest's [lib]/[[bin]]/[[example]]/[[test]] `path` or `build =` pointing into crates/tcpinfo/. pathProblems does not cover it.",
+            "evidence": "pathProblems reads only #[path] and include! in .rs files. Manifests are checked only for unsafe_code and [lints].",
+            "fix": "From cargo metadata (already loaded in the deps step), require every target's src_path to lie inside its own package's manifest folder."
+          },
+          {
+            "id": "F-C",
+            "severity": "nit",
+            "where": "spikes/netcode-proof/crates/net/src/l2/delay_tests.rs:1374-1376",
+            "claim": "The TLS test's 'ring provider' check compares the config's provider with ws_config::provider() itself, so it cannot fail if provider() changes. The measured build's rustls features are the real guard.",
+            "evidence": "`let ring = ws_config::provider(); assert_eq!(groups(tls.crypto_provider()), groups(&ring))`.",
+            "fix": "Compare against `rustls::crypto::ring::default_provider()` named directly."
+          },
+          {
+            "id": "F-O",
+            "severity": "nit",
+            "where": "spikes/netcode-proof/crates/net/src/l2/delay_tests.rs:469-492",
+            "claim": "order_and_integrity's 'no release before its stamp' half holds by construction (a release is stamped at the step time, which is never after now), so it cannot catch an early release. The replay test is what proves it.",
+            "evidence": "Mutation M10 (release up to 1,100 B before delivery): replay, split and loopback fail; order_and_integrity passes.",
+            "fix": "Reword the test name and doc, or check each release stamp against the model's delivery of that record's end."
+          },
+          {
+            "id": "F-I",
+            "severity": "nit",
+            "where": "spikes/netcode-proof/crates/net/src/l2/delay_tests.rs:503-537",
+            "claim": "The one-record test assumes no acknowledgement arrives within the 2 s round trip, so a stall of about 2 s would break its exact numbers. This is an unstated wall-clock margin.",
+            "evidence": "It uses fixed(2_000) and judges outstanding_bytes() == 65,536 after the writes.",
+            "fix": "Say so in the doc, or use a longer round trip (for example 20 s) to make the margin irrelevant."
+          },
+          {
+            "id": "F-J",
+            "severity": "nit",
+            "where": "spikes/netcode-proof/results/u3c-kernel-check/siocoutq-root-check.py:186-188",
+            "claim": "The provenance line always reads '(with uncommitted changes)', because git status covers the spike folder, including the log being written under results/. It cannot tell a source change from its own output.",
+            "evidence": "The committed log reads 'spike commit 1a9fd73... (with uncommitted changes)'.",
+            "fix": "Exclude results/ from the status check, or print the dirty paths."
+          },
+          {
+            "id": "F-P",
+            "severity": "nit",
+            "where": "spikes/netcode-proof/crates/net/src/l2/wt_tests.rs:75-84; .checkpoints/netcode-proof-test/u3c-build-b-fix.md (bites_check.py)",
+            "claim": "The FT fix keeps the '>= 180 of 200' bar without stating its band level: about 1e-9 at one datagram per packet, Binomial(200, 0.02). Build B's '15 of 15 mutations' script was not kept in .checkpoints, so that evidence cannot be re-run. SHUTDOWN_WAIT_NS's 10 s default is never asserted.",
+            "evidence": "The comment says only '2 % loss each way on 200 datagrams: at least 90 % arrive'. Only the first 11-mutation u3c-build-b-bites.py is in .checkpoints. The tests use set_shutdown_wait(300 ms).",
+            "fix": "State the level in the comment, keep the mutation script beside the notes, and assert header_numbers' ws_shutdown_wait value."
+          }
+        ],
+        "checked": [
+          "Verdict REVISE, for three small test fixes: F-K, F-D and F-B. The shipped code's properties are otherwise proven: every other rev 2 item has a test that fails when the property breaks.",
+          "Read u3c-plan.md rev 2 (C1-C16), advisor-u3c-plan.md (C10 is ruled (a) accept; I did not re-rule it), u3c-build-a/-a-fix/-b/-b-fix, the two critic notes, the commit messages of 2a93038, c5d7260, 292e526, 1a9fd73 and 989118e, and the full diff 2c68bf9..989118e under spikes/.",
+          "The pass rules were fixed before the runs. run.sh, compare.py and probe.py were committed in c5d7260 at 00:35:47Z and the run started at 00:47:23Z. siocoutq-root-check.py was committed in 2a93038 at 00:05Z and run at 00:52:58Z. The kernel check's verdict.json has no problems, cubic on both sockets in all 3 runs, 3000 of 3000 delivered, retransmissions 61/56/61, and 100 model lines. The root-run output matches its commit message (R0-R4 pass, 9 writes inside cwnd 10, release 435 ms within 1.632 s).",
+          "Baseline (scratch copy of the spike tree, CARGO_TARGET_DIR=.gate/u3c-review-target): l2::delay 22 passed, 1 ignored, in 18.4 s. In (c), the faithful returns sit exactly at N x SNAP (7,350 / 8,400), budget x2 reaches 14,700-16,800 and unsent-only 15,750.",
+          "Mutations on the scratch copy, file restored after each: M1 (released-but-unread bytes left out of the up room) fails a_full_budget, so C2's bound bites. M2 (read floor removed): all tests pass, so the floor is untested. M3 (add_burst without the origin) is caught only by test order: the burst test alone passed 3 of 3 and (c) alone passed. M4 (release stamped at the step target) fails replay and base-RTT. M6 (records ignore their 22 B) fails one_record and 2 more. M10 (early release) fails replay, split and loopback but passes order_and_integrity.",
+          "Probes: M12 (writes 5 ms later per tick) failed (c)'s S12 expect in 1 of 4 runs. M11 (a 20 ms blocking gap) failed the x2 bite. The unmodified (c) passed 24 of 24 under 3-way parallel load, with first byte at most 1,868.7 ms against a deadline of about 2.1 s.",
+          "ws_gate_tests: (a) is pinned with literals and has its x2 bite. (b)'s sweep restates the three conditions independently, and the boundary cases at 233-238 catch off-by-one errors. Queueing and x2 bites exist. (e) checks against an independent formula. fixes.rs's room step and adaptive_limit go through ws_gate, and both pins are unchanged.",
+          "check.mjs on the real tree (`--only deps,self`, my build dir): PASS, 78 crate files, 21 of 21 self-tests. Eight of my own check.mjs mutations (checkbites.py) were all caught by check.test.mjs.",
+          "F-D shown with rootlint.py: with the root unsafe_code set to allow and an unsafe block planted in npt-room, the deps step passes and npt-room builds. The control with deny fails the build.",
+          "F-F shown with a probe: in all 9 limit cases, records that entered before the bad frame never reach the reader.",
+          "wt_tests FT1-FT4: FT1 (sent == 200 and received == frame_rx) and FT2 (missing <= real, up drops 0) are asserted at wt_tests.rs:120-150, FT3 is in the checkpoint at :333-356, and FT4's comment is at :40-48. The all-features wt tests passed 3 of 3 (P2 up 193-195, down 198-199, every sender's frames 200). The leftover wall-clock checks (rtt 75-160 ms, setup < 10 s, clean rtt < 20 ms) were there before U3c.",
+          "npt-tcpinfo tests and the tcp_kernel test were read. They are judged on identities between kernel readings, waits are only hang guards, and the comparisons that run are counted. The RTT_AT offset mutation is caught by tcpi_rtt_is_read_only_when_the_answer_covers_it.",
+          "Cargo.lock diff: npt-tcpinfo and tokio-rustls are the only new packages; npt-net gains futures-util (dev), npt-tcpinfo and tokio-rustls. The test counts 242/256 equal build A fix's 233/247 plus build B's 9.",
+          "Not verified: the full check.mjs 9 steps (the main session's run is taken as given), the release-build lateness numbers, and the kernel-check run itself. Following the rules, I ran no iptables or tc.",
+          "Notes: /home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/u3c-review-test.md, ending in DONE. Scratch scripts (mutate.py, rootlint.py, cloop.py, checkbites.py) and the source copy npt/ are in /tmp/claude-0/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/scratchpad. The build cache /home/user/Shamble-Frontlines/.gate/u3c-review-target is now 2.7 GB; I did not delete it, since cleanup is the main session's job and asks Mustafa first."
+        ]
+      },
+      "verified": {
+        "results": [
+          {
+            "id": "F-K",
+            "real": true,
+            "severity": "medium",
+            "reason": "Confirmed and stronger than claimed. The expect at delay_tests.rs:1791 needs the model's first down byte inside the fixed 230-tick loop, so about 2.13 s after the second return. Unmodified: 0 failures in 18 runs here (12 alone, 3-way parallel, plus 5 full-binary runs; first bytes cluster at 1,728 and 1,788 ms). A private scratch copy (scratchpad/fkc) moved every write by a fixed offset. At 0 ms, 3 of 3 runs passed; at 2, 5, 8, 12, 16, 20 and 25 ms, 10 of 21 runs failed at that expect (copy line 1797:46). Faithful B's second return, normally about 0.55 s, jumps past 2.1 s. The test passes only on a lucky phase. That makes it a latent flake in check.mjs (false failures only, never a false pass), against C16."
+          },
+          {
+            "id": "F-D",
+            "real": true,
+            "severity": "low",
+            "reason": "Confirmed by code: crateFiles (check.mjs:351-356) reads crates/ only, unsafeProblems never reads the root Cargo.toml:76 or .cargo/config.toml, and DEPS_CHECKED still says the rule holds. Re-rated low: no shipped code is broken today. The bypass needs a deliberate change in a reviewed, commented root line (\"warn\" would still be caught by clippy -D warnings; only \"allow\" or rustflags get through). The fix is cheap."
+          },
+          {
+            "id": "F-B",
+            "real": true,
+            "severity": "low",
+            "reason": "Confirmed by code: add_burst's checked_sub(origin) (delay.rs:704) is tested only through the burst test's refusal (delay_tests.rs:948-953). That check bites only when origin is above 1 ms (the clock is created by the first now() in the process). No test asserts the logged start == clock start − origin, or (c)'s Return.at_ns. Re-rated low: check.mjs runs the whole binary, where earlier tests make origin large, so M3 is still caught there; the gap is order-dependent detection, not a missed defect."
+          },
+          {
+            "id": "F-L",
+            "real": true,
+            "severity": "low",
+            "reason": "Partly confirmed. srtt_ns, outstanding_bytes and free_bytes each call current(), which steps the model (delay.rs:766-784). owed_bytes takes the lock only and does not step it, so it is three reads that step, not four. An ACK between the srtt read and the outstanding read can let the gate write with a stale, larger N. The window is microseconds, so a false failure is very rare. It matters mainly as a U6 carry: WsServer needs one atomic reading."
+          },
+          {
+            "id": "F-A",
+            "real": true,
+            "severity": "low",
+            "reason": "Confirmed. The only bursts_ns in delay_tests.rs is `bursts_ns: Vec::new()` (line 64), and every DelayStream burst test uses add_burst. wrap's conversion of profile bursts (delay.rs:591-608: axis change, clipping at origin, burst_ends, the more-than-64 refusal) is shipped and untested."
+          },
+          {
+            "id": "F-F",
+            "real": true,
+            "severity": "nit",
+            "reason": "Behaviour confirmed by code. close() ends the pump, current() stops stepping once pump_done is set, and poll_read returns InvalidData (delay.rs:746, :1068-1070). Records in the model before the bad frame are never handed over. The doc's 'enter in order' is literally accurate, though, and this affects only a connection being closed for a protocol violation. Pinning the chosen behaviour is a nit."
+          },
+          {
+            "id": "F-R2",
+            "real": true,
+            "severity": "nit",
+            "reason": "Confirmed by code. move_up only moves a record the room holds (delay.rs:472-476), and parse is capped at read_limit (one frame or the request cap), so the up bound holds without the floor at :1286. The floor is redundant with the parse cap, not a guard of the bound, so the point is record-keeping: test it or call it an optimisation."
+          },
+          {
+            "id": "F-G",
+            "real": true,
+            "severity": "low",
+            "reason": "Confirmed. No test shuts the client's write half and reads DelayStream to Ok(0): every duplex test holds `_cw` or aborts it (delay_tests.rs:931, :1142, :1228), and the drop test checks the down EOF only. The up-EOF path in poll_read (delay.rs:1075) is untested."
+          },
+          {
+            "id": "F-H",
+            "real": true,
+            "severity": "nit",
+            "reason": "Confirmed. delay_tests.rs:578-590 has only upper bounds and !flood.is_finished(), so a starved pump would pass it vacuously. M1 shows the test does reach and bite the bound in normal runs, so this is a strengthening (add lower bounds), not a gap that hides a defect."
+          },
+          {
+            "id": "F-M",
+            "real": true,
+            "severity": "low",
+            "reason": "Confirmed. delay_tests.rs never mentions slack, and its_rows_use_the_named_series checks 4 header values but not ws_clock_timer_slack_ns, _start_ns or _set. socket_tests.rs:328-333 asserts the equivalent fields for ImpairSocket, so a claim in the plan and commit is unproven for DelayStream."
+          },
+          {
+            "id": "F-N",
+            "real": true,
+            "severity": "low",
+            "reason": "Confirmed. LEAF (check.mjs:22) has no npt-tcpinfo, and tcp_kernel.rs:39-42's not(unix) handle is compiled nowhere. The stub's body is compiled on Linux under cfg(test) (lib.rs:40), so only the cfg wiring and npt-net's non-Unix branch are unchecked. Critic B's point is still open."
+          },
+          {
+            "id": "F-E",
+            "real": true,
+            "severity": "low",
+            "reason": "Confirmed. pathProblems (check.mjs:238-266) reads only #[path] and include! in .rs files; manifests are checked only for unsafe_code and [lints] (:337-341). A [lib] path or build= into crates/tcpinfo/ would compile linux.rs, with its allows, under another crate's name. That needs a deliberate manifest edit, so low."
+          },
+          {
+            "id": "F-C",
+            "real": true,
+            "severity": "nit",
+            "reason": "Confirmed. delay_tests.rs:1374-1376 compares against ws_config::provider(), which is ring::default_provider() (ws_config.rs:22-24). If provider() switched to aws-lc-rs, the 'on ring' check would still pass."
+          },
+          {
+            "id": "F-O",
+            "real": true,
+            "severity": "nit",
+            "reason": "Confirmed by code. A release is logged at the step time, which is never after now, and the client sees the bytes later, so 'seen >= origin + stamp' (delay_tests.rs:479-490) holds by construction. The replay test is the real proof."
+          },
+          {
+            "id": "F-I",
+            "real": true,
+            "severity": "nit",
+            "reason": "Confirmed. The pinned outstanding and free values (delay_tests.rs:515-530) assume no ACK inside fixed(2_000)'s 2 s round trip. That is an unstated margin, but the code between the writes and the asserts is synchronous, so only a 1-2 s process freeze breaks it."
+          },
+          {
+            "id": "F-J",
+            "real": true,
+            "severity": "nit",
+            "reason": "Confirmed. Log() opens the output file under results/u3c-kernel-check/ (siocoutq-root-check.py:119, :180) before `git status --porcelain -- .` runs at :187. The new untracked log always makes it print '(with uncommitted changes)', as the committed log shows."
+          },
+          {
+            "id": "F-P",
+            "real": true,
+            "severity": "nit",
+            "reason": "Confirmed. The wt_tests.rs:75 comment states no level; the Binomial(200, 0.02) tail P(X >= 21) is 9.3e-10 (computed here). bites_check.py exists only in the session scratchpad (u3cbfix/), not under .checkpoints/. SHUTDOWN_WAIT_NS (delay.rs:68) is never asserted, and the header test skips ws_shutdown_wait_ns."
+          }
+        ]
+      }
+    }
+  ],
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Review"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 2,
+      "title": "Verify"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "review:rust",
+      "phaseIndex": 1,
+      "phaseTitle": "Review",
+      "agentId": "a25e7341d956d978b",
+      "agentType": "rust-reviewer",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1794131648169,
+      "queuedAt": 1794131648136,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "APPROVE_WITH_FINDINGS",
+      "promptPreview": "You are the rust-reviewer on U3c's skeptic round.\n\n**Context.** This reviews unit U3c of the netcode proof test, on the spike branch claude/netcode-proof-test-plan-hcky5g in the main folder /home/user/Shamble-Frontlines. Never switch its branch. Read the code there and with git.\n\n**What to review.** Run `git diff 2c68bf9..989118e -- spikes/`, plus plan.md's U3c text (.checkpoints/netcode-proof-tes…",
+      "promptFramed": true,
+      "lastProgressAt": 1794132495831,
+      "tokens": 202818,
+      "toolCalls": 72,
+      "durationMs": 847661,
+      "resultPreview": "{\"verdict\":\"APPROVE_WITH_FINDINGS\",\"findings\":[{\"id\":\"F1\",\"severity\":\"medium\",\"where\":\"spikes/netcode-proof/crates/net/src/l2/delay.rs:708 and :434 (with tcp_model.rs:2190-2201)\",\"claim\":\"DelayStream::add_burst overflows when start_ns + len_ns is past u64::MAX on DelayStream's clock, and a \\\"forever\\\" length (u64::MAX) is enough. TcpModel::add_burst accepts any len_ns > 0. Line 708 saturates the b…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "review:netcode",
+      "phaseIndex": 1,
+      "phaseTitle": "Review",
+      "agentId": "a21c3d4f9e29a4046",
+      "agentType": "netcode-architect",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1794131648170,
+      "queuedAt": 1794131648136,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "APPROVE_WITH_FINDINGS",
+      "promptPreview": "You are the netcode-architect on U3c's skeptic round.\n\n**Context.** This reviews unit U3c of the netcode proof test, on the spike branch claude/netcode-proof-test-plan-hcky5g in the main folder /home/user/Shamble-Frontlines. Never switch its branch. Read the code there and with git.\n\n**What to review.** Run `git diff 2c68bf9..989118e -- spikes/`, plus plan.md's U3c text (.checkpoints/netcode-proof…",
+      "promptFramed": true,
+      "lastProgressAt": 1794132610381,
+      "tokens": 271191,
+      "toolCalls": 60,
+      "durationMs": 962209,
+      "resultPreview": "{\"verdict\":\"APPROVE_WITH_FINDINGS\",\"findings\":[{\"id\":\"NC-U3c-1\",\"severity\":\"medium\",\"where\":\"/home/user/Shamble-Frontlines/spikes/netcode-proof/crates/net/src/l2/delay_tests.rs:1763-1786\",\"claim\":\"Mechanism test (c) checks outstanding <= N(srtt at the return) x size, as plan 1.4 (c) words it. The gate does not guarantee that. What it guarantees is outstanding <= N(srtt at the last write) x size. A…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 3,
+      "label": "review:security",
+      "phaseIndex": 1,
+      "phaseTitle": "Review",
+      "agentId": "ac3bb6571c08b7b8d",
+      "agentType": "security-auditor",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1794132496638,
+      "queuedAt": 1794131648136,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "APPROVE_WITH_FINDINGS",
+      "promptPreview": "You are the security-auditor on U3c's skeptic round.\n\n**Context.** This reviews unit U3c of the netcode proof test, on the spike branch claude/netcode-proof-test-plan-hcky5g in the main folder /home/user/Shamble-Frontlines. Never switch its branch. Read the code there and with git.\n\n**What to review.** Run `git diff 2c68bf9..989118e -- spikes/`, plus plan.md's U3c text (.checkpoints/netcode-proof-…",
+      "promptFramed": true,
+      "lastProgressAt": 1794133412449,
+      "tokens": 238886,
+      "toolCalls": 84,
+      "durationMs": 915810,
+      "resultPreview": "{\"verdict\":\"APPROVE_WITH_FINDINGS\",\"findings\":[{\"id\":\"S2\",\"severity\":\"medium\",\"where\":\"spikes/netcode-proof/crates/net/src/l2/ws_frame.rs:152\",\"claim\":\"Reproduced: the request scanner and tungstenite disagree on where the HTTP head ends. Condition C6 says a frame above the limit is closed and counted before any of its payload enters the model. That is false for a hostile client: an over-limit fram…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 4,
+      "label": "review:test",
+      "phaseIndex": 1,
+      "phaseTitle": "Review",
+      "agentId": "a1037676cf46159c7",
+      "agentType": "test-engineer",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1794132611266,
+      "queuedAt": 1794131648136,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "REVISE",
+      "promptPreview": "You are the test-engineer on U3c's skeptic round.\n\n**Context.** This reviews unit U3c of the netcode proof test, on the spike branch claude/netcode-proof-test-plan-hcky5g in the main folder /home/user/Shamble-Frontlines. Never switch its branch. Read the code there and with git.\n\n**What to review.** Run `git diff 2c68bf9..989118e -- spikes/`, plus plan.md's U3c text (.checkpoints/netcode-proof-tes…",
+      "promptFramed": true,
+      "lastProgressAt": 1794134018874,
+      "tokens": 346489,
+      "toolCalls": 103,
+      "durationMs": 1407607,
+      "resultPreview": "{\"verdict\":\"REVISE\",\"findings\":[{\"id\":\"F-K\",\"severity\":\"medium\",\"where\":\"spikes/netcode-proof/crates/net/src/l2/delay_tests.rs:1791-1792 (with :1755-1756 and :1704)\",\"claim\":\"Mechanism test (c) has a hidden wall-clock limit, which breaks binding condition C16. Its S12 check (`expect(\\\"a byte after the return\\\")`) needs the first down byte after the second burst's return to arrive inside a fixed 23…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 5,
+      "label": "verify:rust",
+      "phaseIndex": 2,
+      "phaseTitle": "Verify",
+      "agentId": "a9069dac7d2b890a3",
+      "agentType": "general-purpose",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1794133413561,
+      "queuedAt": 1794132496666,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "You are an adversarial verifier for the rust-reviewer's findings on U3c of the netcode proof test (main folder /home/user/Shamble-Frontlines, branch claude/netcode-proof-test-plan-hcky5g, `git diff 2c68bf9..989118e -- spikes/`).\n\nFor each finding below, try hard to REFUTE it:\n- read the cited code yourself;\n- check the claim against the plan /home/user/Shamble-Frontlines/.checkpoints/netcode-proof…",
+      "promptFramed": true,
+      "lastProgressAt": 1794133813398,
+      "tokens": 174991,
+      "toolCalls": 33,
+      "durationMs": 399836,
+      "resultPreview": "{\"results\":[{\"id\":\"F1\",\"real\":true,\"severity\":\"medium\",\"reason\":\"Reproduced in the reviewer's scratch copy (.gate/u3c-review-f1). In debug, add_burst(now+1ms, u64::MAX) panics 'attempt to add with overflow' at delay.rs:434:55, reached from :718 through :444. With release-like arithmetic it is accepted, and the pump runs 4,279 times in 200 ms and never stops while the connection lives (the 10 s con…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 6,
+      "label": "verify:netcode",
+      "phaseIndex": 2,
+      "phaseTitle": "Verify",
+      "agentId": "a6bb246e1fecc07d7",
+      "agentType": "general-purpose",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1794133814370,
+      "queuedAt": 1794132611286,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "You are an adversarial verifier for the netcode-architect's findings on U3c of the netcode proof test (main folder /home/user/Shamble-Frontlines, branch claude/netcode-proof-test-plan-hcky5g, `git diff 2c68bf9..989118e -- spikes/`).\n\nFor each finding below, try hard to REFUTE it:\n- read the cited code yourself;\n- check the claim against the plan /home/user/Shamble-Frontlines/.checkpoints/netcode-p…",
+      "promptFramed": true,
+      "lastProgressAt": 1794134469027,
+      "tokens": 221199,
+      "toolCalls": 44,
+      "durationMs": 654657,
+      "resultPreview": "{\"results\":[{\"id\":\"NC-U3c-1\",\"real\":true,\"severity\":\"low\",\"reason\":\"Confirmed on the pure model: a scratch sim (no source edited; /tmp/claude-0/-home-user-Shamble-Frontlines/077a208e-2c05-50f2-8333-d6ac6effb7f2/scratchpad/nc1sim/src/main.rs, which drives the real tcp_model.rs and ws_gate.rs through writer_run's pattern) found 36 of 40,000 returns where outstanding > N(srtt at the return) x 1,050, …"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 7,
+      "label": "verify:security",
+      "phaseIndex": 2,
+      "phaseTitle": "Verify",
+      "agentId": "ad661059949b7cf94",
+      "agentType": "general-purpose",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1794134019576,
+      "queuedAt": 1794133413610,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "You are an adversarial verifier for the security-auditor's findings on U3c of the netcode proof test (main folder /home/user/Shamble-Frontlines, branch claude/netcode-proof-test-plan-hcky5g, `git diff 2c68bf9..989118e -- spikes/`).\n\nFor each finding below, try hard to REFUTE it:\n- read the cited code yourself;\n- check the claim against the plan /home/user/Shamble-Frontlines/.checkpoints/netcode-pr…",
+      "promptFramed": true,
+      "lastProgressAt": 1794134386129,
+      "tokens": 172104,
+      "toolCalls": 44,
+      "durationMs": 366553,
+      "resultPreview": "{\"results\":[{\"id\":\"S2\",\"real\":true,\"severity\":\"low\",\"reason\":\"I re-ran the headdiff repro on the current tree with rustc 1.99.1. With CRLF line ends, DelayStream closes the connection and counts it (Frame=1), and 4,096 B go up. With bare LF, the handshake succeeds and the 101 goes out, every close count stays 0, 4,708 B go up, and tungstenite then reports MessageTooLong{604,513}. The scanner ends …"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 8,
+      "label": "verify:test",
+      "phaseIndex": 2,
+      "phaseTitle": "Verify",
+      "agentId": "ae2a223ffeab741b9",
+      "agentType": "general-purpose",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1794134386925,
+      "queuedAt": 1794134019655,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "You are an adversarial verifier for the test-engineer's findings on U3c of the netcode proof test (main folder /home/user/Shamble-Frontlines, branch claude/netcode-proof-test-plan-hcky5g, `git diff 2c68bf9..989118e -- spikes/`).\n\nFor each finding below, try hard to REFUTE it:\n- read the cited code yourself;\n- check the claim against the plan /home/user/Shamble-Frontlines/.checkpoints/netcode-proof…",
+      "promptFramed": true,
+      "lastProgressAt": 1794134962645,
+      "tokens": 206678,
+      "toolCalls": 70,
+      "durationMs": 575719,
+      "resultPreview": "{\"results\":[{\"id\":\"F-K\",\"real\":true,\"severity\":\"medium\",\"reason\":\"Confirmed and stronger than claimed. The expect at delay_tests.rs:1791 needs the model's first down byte inside the fixed 230-tick loop, so about 2.13 s after the second return. Unmodified: 0 failures in 18 runs here (12 alone, 3-way parallel, plus 5 full-binary runs; first bytes cluster at 1,728 and 1,788 ms). A private scratch cop…"
+    }
+  ],
+  "totalTokens": 1834356,
+  "totalToolCalls": 510
+}

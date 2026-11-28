@@ -1,0 +1,128 @@
+# Condition-10 diagnostic (the advisor's ruling "condition 10 again", 2026-11-08): DelayStream's lateness evidence run
+# with the per-release split, interleaved with ImpairSocket's M13 lateness run, twice; reported, not judged.
+# Code: f6cd1d7 (U3c's final fix round merged), release build in .gate/netcode-proof-test/target. No agent or build ran
+# during these runs. Commands (from the repository root):
+#   NPT_WS_LATENESS_TICKS=10050 cargo +1.99.1 test --release --locked --manifest-path spikes/netcode-proof/Cargo.toml
+#     --target-dir .gate/netcode-proof-test/target -p npt-net --lib l2::delay::tests::lateness_evidence_run
+#     -- --ignored --nocapture --exact
+#   NPT_L2_SECS=10 cargo +1.99.1 test --release --locked --manifest-path spikes/netcode-proof/Cargo.toml
+#     --target-dir .gate/netcode-proof-test/target -p npt-net --lib
+#     l2::socket::tests::l2_sustains_10000_per_second_each_way -- --ignored --nocapture --exact
+# The output below is the runs' own, unchanged (stdout and stderr), with `uptime` before and after each run.
+=== DELAY 1 20261108T215229Z
+ 21:52:29 up  1:50,  0 user,  load average: 0.94, 0.63, 0.75
+    Finished `release` profile [optimized] target(s) in 0.07s
+     Running unittests src/lib.rs (.gate/netcode-proof-test/target/release/deps/npt_net-f72f21a42e60b4c9)
+
+running 1 test
+loadavg at the start: 1.42 0.74 0.78 9/129 18064
+test l2::delay::tests::lateness_evidence_run has been running for over 60 seconds
+dir 0: receipt − release (lateness, the kernel's TCP, TLS and tungstenite): p50 0.205 ms p99 0.814 ms max 6.746 ms
+dir 0: 9931 segments, 200 stalls (99.9 % band 154-246), repairs rack 205 probe 0 timeout 0
+dir 1: receipt − (delivery + lateness): p50 0.016 ms p99 0.054 ms max 3.174 ms; the poll's own window: p50 0.023 ms p99 0.077 ms max 3.185 ms; intake (model write − send): p50 0.073 ms p99 0.172 ms max 2.493 ms
+dir 1: 9799 segments, 197 stalls (99.9 % band 152-243), repairs rack 199 probe 0 timeout 0
+lateness down (P2, 30 Hz, 335.0 s): n 10051 p50 0.161 ms p99 0.615 ms p99.9 2.545 ms max 6.679 ms E 11.5 µs over 156  ** CONDITION 10's TRIGGER: bring to the advisor **
+  down split (pooled): woken n 9932 (clock + hop + work = L), other n 119 (wait + work = L; open 51 mid 5 app 63); violations 0
+  down woken clock W − M: p50 0.051 ms p99 0.162 ms p99.9 1.631 ms max 3.147 ms E 3.3 µs over 41
+  down woken hop P − W: p50 0.065 ms p99 0.238 ms p99.9 1.487 ms max 2.936 ms E 3.2 µs over 55
+  down woken work (3) − P: p50 0.040 ms p99 0.122 ms p99.9 1.405 ms max 6.499 ms E 3.4 µs over 35
+  down other wait T − M: p50 0.040 ms p99 1.478 ms p99.9 1.478 ms max 1.478 ms E 65.4 µs over 9
+  down other work (3) − T: p50 0.071 ms p99 0.812 ms p99.9 1.986 ms max 1.986 ms E 22.1 µs over 3
+  down largest: L 6.679 ms = woken: clock 0.051 + hop 0.128 + work 6.499 ms
+  down largest: L 4.117 ms = woken: clock 0.040 + hop 0.103 + work 3.974 ms
+  down largest: L 3.655 ms = woken: clock 3.147 + hop 0.453 + work 0.055 ms
+  down largest: L 3.103 ms = woken: clock 0.811 + hop 2.236 + work 0.055 ms
+  down largest: L 3.095 ms = woken: clock 3.017 + hop 0.054 + work 0.025 ms
+lateness up (P2, 30 Hz, 335.0 s): n 10051 p50 0.212 ms p99 1.439 ms p99.9 2.846 ms max 22.281 ms E 26.8 µs over 352  ** CONDITION 10's TRIGGER: bring to the advisor **
+  up split (pooled): woken n 9961 (clock + hop + work = L), other n 90 (wait + work = L; open 58 mid 21 app 11); violations 0
+  up woken clock W − M: p50 0.052 ms p99 0.198 ms p99.9 2.271 ms max 3.205 ms E 4.7 µs over 58
+  up woken hop P − W: p50 0.068 ms p99 0.265 ms p99.9 1.886 ms max 2.663 ms E 3.8 µs over 65
+  up woken work (3) − P: p50 0.084 ms p99 0.825 ms p99.9 2.504 ms max 22.172 ms E 16.6 µs over 182
+  up other wait T − M: p50 0.033 ms p99 2.712 ms p99.9 2.712 ms max 2.712 ms E 49.0 µs over 7
+  up other work (3) − T: p50 0.103 ms p99 0.349 ms p99.9 0.349 ms max 0.349 ms E 0.0 µs over 0
+  up largest: L 22.281 ms = woken: clock 0.038 + hop 0.070 + work 22.172 ms
+  up largest: L 4.405 ms = woken: clock 0.063 + hop 0.036 + work 4.307 ms
+  up largest: L 4.384 ms = woken: clock 0.077 + hop 0.040 + work 4.267 ms
+  up largest: L 3.828 ms = woken: clock 1.780 + hop 0.091 + work 1.957 ms
+  up largest: L 3.762 ms = woken: clock 0.055 + hop 0.135 + work 3.573 ms
+loadavg at the end: 0.01 0.26 0.54 1/123 18418
+lateness samples: down 10051 up 10051
+test l2::delay::tests::lateness_evidence_run ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 163 filtered out; finished in 338.06s
+
+ 21:58:07 up  1:56,  0 user,  load average: 0.01, 0.26, 0.54
+=== IMPAIR 1 20261108T215807Z
+ 21:58:07 up  1:56,  0 user,  load average: 0.01, 0.26, 0.54
+    Finished `release` profile [optimized] target(s) in 0.13s
+     Running unittests src/lib.rs (.gate/netcode-proof-test/target/release/deps/npt_net-f72f21a42e60b4c9)
+
+running 1 test
+M13: 100000 per direction in 10.000 s = 10000 pps each way; received down 98017, up 97926
+  up: delivered 97926 lost 2074 queue 0 pool 0 shaper 0 overtaken 507 reordered 89146; lateness us: n 97926 p50 27.5 p99 163.4 p99.9 3457.4 max 8100.3 E[(L-L0-0.25ms)+] 11.610 over 791
+  down: delivered 98017 lost 1983 queue 0 pool 0 shaper 0 overtaken 485 reordered 89146; lateness us: n 98017 p50 32.5 p99 97.4 p99.9 1250.4 max 3092.4 E[(L-L0-0.25ms)+] 2.672 over 356
+  release thread CPU 4.152 s over 10.560 s = 0.393 core; reorder up 910 down 909 permille; slack Some(("l2_timer_slack_ns", 1))
+test l2::socket::tests::l2_sustains_10000_per_second_each_way ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 163 filtered out; finished in 10.62s
+
+ 21:58:18 up  1:56,  0 user,  load average: 0.40, 0.33, 0.56
+=== DELAY 2 20261108T215818Z
+ 21:58:18 up  1:56,  0 user,  load average: 0.40, 0.33, 0.56
+    Finished `release` profile [optimized] target(s) in 0.05s
+     Running unittests src/lib.rs (.gate/netcode-proof-test/target/release/deps/npt_net-f72f21a42e60b4c9)
+
+running 1 test
+loadavg at the start: 0.40 0.33 0.56 2/123 18455
+test l2::delay::tests::lateness_evidence_run has been running for over 60 seconds
+dir 0: receipt − release (lateness, the kernel's TCP, TLS and tungstenite): p50 0.221 ms p99 1.158 ms max 4.878 ms
+dir 0: 9977 segments, 192 stalls (99.9 % band 155-247), repairs rack 198 probe 0 timeout 0
+dir 1: receipt − (delivery + lateness): p50 0.016 ms p99 0.053 ms max 4.033 ms; the poll's own window: p50 0.025 ms p99 0.080 ms max 4.035 ms; intake (model write − send): p50 0.080 ms p99 0.241 ms max 2.896 ms
+dir 1: 9813 segments, 189 stalls (99.9 % band 152-243), repairs rack 191 probe 0 timeout 0
+lateness down (P2, 30 Hz, 335.0 s): n 10051 p50 0.175 ms p99 0.947 ms p99.9 2.680 ms max 4.670 ms E 16.6 µs over 234  ** CONDITION 10's TRIGGER: bring to the advisor **
+  down split (pooled): woken n 9925 (clock + hop + work = L), other n 126 (wait + work = L; open 52 mid 4 app 70); violations 0
+  down woken clock W − M: p50 0.054 ms p99 0.257 ms p99.9 2.339 ms max 3.647 ms E 6.1 µs over 74
+  down woken hop P − W: p50 0.069 ms p99 0.302 ms p99.9 2.006 ms max 3.170 ms E 5.6 µs over 93
+  down woken work (3) − P: p50 0.045 ms p99 0.149 ms p99.9 1.050 ms max 3.116 ms E 2.5 µs over 47
+  down other wait T − M: p50 0.039 ms p99 1.689 ms p99.9 1.892 ms max 1.892 ms E 64.9 µs over 11
+  down other work (3) − T: p50 0.082 ms p99 1.962 ms p99.9 1.986 ms max 1.986 ms E 26.9 µs over 3
+  down largest: L 4.670 ms = woken: clock 3.564 + hop 1.020 + work 0.086 ms
+  down largest: L 3.788 ms = woken: clock 3.647 + hop 0.105 + work 0.036 ms
+  down largest: L 3.556 ms = woken: clock 3.478 + hop 0.061 + work 0.017 ms
+  down largest: L 3.352 ms = woken: clock 0.119 + hop 3.170 + work 0.063 ms
+  down largest: L 3.263 ms = woken: clock 3.102 + hop 0.076 + work 0.084 ms
+lateness up (P2, 30 Hz, 335.0 s): n 10051 p50 0.231 ms p99 1.772 ms p99.9 2.997 ms max 8.534 ms E 35.4 µs over 482  ** CONDITION 10's TRIGGER: bring to the advisor **
+  up split (pooled): woken n 9957 (clock + hop + work = L), other n 94 (wait + work = L; open 57 mid 30 app 7); violations 0
+  up woken clock W − M: p50 0.054 ms p99 0.234 ms p99.9 2.146 ms max 6.825 ms E 8.0 µs over 77
+  up woken hop P − W: p50 0.070 ms p99 0.322 ms p99.9 1.984 ms max 3.827 ms E 6.8 µs over 101
+  up woken work (3) − P: p50 0.092 ms p99 1.012 ms p99.9 2.619 ms max 8.444 ms E 18.6 µs over 257
+  up other wait T − M: p50 0.028 ms p99 1.608 ms p99.9 1.608 ms max 1.608 ms E 28.9 µs over 3
+  up other work (3) − T: p50 0.117 ms p99 1.413 ms p99.9 1.413 ms max 1.413 ms E 11.1 µs over 1
+  up largest: L 8.534 ms = woken: clock 0.040 + hop 0.051 + work 8.444 ms
+  up largest: L 6.964 ms = woken: clock 6.825 + hop 0.056 + work 0.083 ms
+  up largest: L 5.866 ms = woken: clock 0.085 + hop 3.702 + work 2.079 ms
+  up largest: L 3.953 ms = woken: clock 0.032 + hop 3.827 + work 0.094 ms
+  up largest: L 3.639 ms = woken: clock 0.045 + hop 0.064 + work 3.529 ms
+loadavg at the end: 0.01 0.11 0.38 1/116 18508
+lateness samples: down 10051 up 10051
+test l2::delay::tests::lateness_evidence_run ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 163 filtered out; finished in 338.07s
+
+ 22:03:56 up  2:02,  0 user,  load average: 0.01, 0.11, 0.38
+=== IMPAIR 2 20261108T220356Z
+ 22:03:56 up  2:02,  0 user,  load average: 0.01, 0.11, 0.38
+    Finished `release` profile [optimized] target(s) in 0.13s
+     Running unittests src/lib.rs (.gate/netcode-proof-test/target/release/deps/npt_net-f72f21a42e60b4c9)
+
+running 1 test
+M13: 100000 per direction in 10.000 s = 10000 pps each way; received down 98017, up 97926
+  up: delivered 97926 lost 2074 queue 0 pool 0 shaper 0 overtaken 507 reordered 89145; lateness us: n 97926 p50 32.5 p99 526.5 p99.9 4242.1 max 7986.9 E[(L-L0-0.25ms)+] 16.921 over 1365
+  down: delivered 98017 lost 1983 queue 0 pool 0 shaper 0 overtaken 486 reordered 89147; lateness us: n 98017 p50 36.5 p99 286.7 p99.9 4124.0 max 8207.7 E[(L-L0-0.25ms)+] 12.939 over 981
+  release thread CPU 4.372 s over 10.566 s = 0.414 core; reorder up 910 down 909 permille; slack Some(("l2_timer_slack_ns", 1))
+test l2::socket::tests::l2_sustains_10000_per_second_each_way ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 163 filtered out; finished in 10.63s
+
+ 22:04:07 up  2:02,  0 user,  load average: 0.23, 0.15, 0.39
+=== END 20261108T220407Z

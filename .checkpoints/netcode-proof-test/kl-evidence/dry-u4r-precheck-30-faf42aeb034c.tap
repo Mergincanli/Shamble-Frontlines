@@ -1,0 +1,18 @@
+TAP version 13
+# Subtest: dry run on a copy of a real run-set folder: listed, packed, read back, removed; GNU tar unpacks the same bytes
+ok 1 - dry run on a copy of a real run-set folder: listed, packed, read back, removed; GNU tar unpacks the same bytes
+  ---
+  duration_ms: 2379.189835
+  type: 'test'
+  ...
+# u4r-precheck-30-faf42aeb034c: 2 files; list 96 ms, pack 539 ms
+# kept-logs: free before: 7631 MiB\\nkept-logs: archive: .gate/netcode-proof-test/kept-logs/u4r-precheck-30-faf42aeb034c.tar.gz, 3456457 bytes from 17323081; read back: 2 of 2 files equal the list (path, bytes, sha256)\\nkept-logs: removed: .gate/netcode-proof-test/runs/u4r-precheck-30-faf42aeb034c\\nkept-logs: free after: 7644 MiB
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2452.930869
