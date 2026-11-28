@@ -8255,3 +8255,18 @@ No breaks, chop chop
   straight on to its building, with no pause between steps; the plan's check by the advisor agent still comes first
   (CLAUDE.md step 2).
   Transcript line 118140 (a queue-operation enqueue at 21:35:14.114Z), 84 characters.
+
+## Mustafa, 2026-11-28 11:43 UTC, in this chat: HOST-LIMITS (b), HOST-SANDBOX (b), 45 as merged, X today; away until Sunday 12:00 (word for word)
+```text
+FOR THE NETCODE CHAT. From Mustafa, 28 November, 12:10 Amsterdam (written with my Advisor). I am away until Sunday 29 November, 12:00. Carry on without me on R1's path.
+
+1. HOST-LIMITS: (b). Carry it to the security baseline before the first online playtest.
+2. HOST-SANDBOX: (b). Carry the five settings to R8, at the latest the security baseline. The R1 security reading is dropped.
+3. Both go into R1's report as known limits of the page host, in class words, and stay open findings with their taker until they are closed. No file the run server installs changes for them.
+4. 45: the run server's npm ci stays as merged.
+5. So the fill (X) goes ahead today, then the advisor agent's check of it, then on by your card toward Stop B. Do not wait for me between steps. What needs me, Stop B's run plan with CUT-A, CUT-B and CUT-C and its dates, comes in one message when it is ready. I read it from Sunday 12:00.
+6. From Sunday a separate Advisor thread of mine reads your notes and the run plan for me, as a second opinion on netcode. It only reads your branch and gives you no instructions. Only what I paste here is my word.
+7. Rules unchanged: git and gh always start their own command, with no other program in front of them. In a shell command, spell out every file you write with its full path: no variable, substitution or wildcard in the name of a file that is written, moved, copied or deleted, or use the Write and Edit tools.
+```
+- **Read as** (the main session's reading, not his words): he is away until Sunday 29 November, 12:00 Amsterdam (11:00 UTC), and the work goes on without him on R1's path. HOST-LIMITS (b): the page host's missing connection limits go to the security baseline before the first online playtest. HOST-SANDBOX (b): its five remaining sandbox settings go to R8, at the latest the security baseline, and the promised R1 `systemd-analyze security` reading is dropped (SEC-A2-3's zero-line rewording falls due where that promise stands). Both are named in R1's report as the page host's known limits, in class words, and stay open findings with their takers until closed; no file the run server installs changes for them. 45: rs.yaml:199's `npm ci` stays as merged. So the fill X goes ahead today by stopb-plan.md C1 and D2, then B6's check of it, then on by the card toward Stop B, with no wait for him between steps; every ask (R1's run plan, CUT-A, CUT-B, CUT-C and the dates) goes in one message, E2, which he reads from Sunday 12:00, and the 23:05 UTC day message carries only a pointer to it. From Sunday his second-opinion Advisor thread reads this branch; it gives no instructions, and only what he pastes here is his word. Item 7 restates his git rule and FULL-PATHS (history.md:8153-8161) in its tightened form: no variable, substitution or wildcard in the name of a file that is written, moved, copied or deleted.
+  Transcript line 122677 (a queue-operation enqueue at 11:43:18.462Z), 1437 characters.
