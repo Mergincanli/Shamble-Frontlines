@@ -264,8 +264,16 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
     i16) becomes required and holds NONE from spawn, beside `facing: [f32; 2]`, `held_move: [i8; 2]` and the body's
     carry; the facing rule compares the integers first and leaves the facing bit for bit on NONE; tests S-1 to S-3
     beside netcode-architect's N-1 to N-3; first-loop's hashes move in step 1 (the row joins the hashed state), and
-    step 2 moves none only if NONE lands whole in step 1 (endpoint.rs:258 writing NONE in place of (0, 0, 0)). Running
-    from
+    step 2 moves none only if NONE lands whole in step 1 (endpoint.rs:258 writing NONE in place of (0, 0, 0)).
+    engine-architect's block 6 DONE: "no aim yet" in the block YES, with `own_flags` bit 1 "aim held" (clear while the
+    aim is NONE and before the first snapshot that carries the soldier; the aim then written as 0, so NONE never
+    crosses to the page as a number), the owner's section showing the held aim from the newest snapshot (the endpoint
+    no longer holds one), the row's pitch 0 and the yaw the spawn facing while NONE; the page draws no aim line and the
+    readout says "none yet"; the section stays 20 bytes, the block 1,988; about 8 / 20 in steps 3 and 4; it changes
+    the meaning netcode-architect's 2.1 (:240) gives the owner's aim, with no wire change (for netcode-architect to
+    note at step 2's review). A world with no aim area: NO constructor change (the loader already refuses such a
+    playable map, map.rs:13-14; only a map built in code can lack it, and it fails safe), one room test with a planted
+    panic, about 0 / 10. So "no aim yet" has all three yeses. Running from
     02:44 Amsterdam: security-auditor on the reworded batch (with RR1's correction of its item 3), rust-reviewer's
     block 8 and engine-architect's block 6 ("no aim yet"; the aim area in the constructors).
 - **The sheet's revision 3** (from 02:14 Amsterdam): the record rule applied with its confirmations outstanding, the

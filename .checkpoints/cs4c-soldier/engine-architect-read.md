@@ -755,6 +755,58 @@ Today `facing_deg` is any degree in [0, 360) (map.rs:58-66); the soldier keeps h
   it?
 - B5 DONE.
 
+### Plan (block 6: netcode-architect's block 8.5 flag and block 7.3's constructor question)
+Asked 2026-11-28 on 3ab59bd7 by the main session. Read only; this file is the only one I write.
+1. Read netcode-architect-read block 8 (:830-953) and 7.3 (:714-760); recheck my block 3.2 (the owner's section, the
+   row), my design's pitch (engine-architect-cs4.md:513), room/endpoint constructors, sim-wasm's `local_world`.
+2. Answer yes or no, each with its reason and count: what the owner's section and the row's pitch show for "no aim
+   yet"; whether `Room::new` and `Endpoint::new` refuse a world with no aim box.
+3. A notes line per finding; the block; B6 DONE; "Not verified" extended.
+
+- N42. netcode-architect-read 8.3 (:871-917): `AimCm::NONE` = (-32,768, 0, 0) cm, "no aim yet"; the row holds it from the spawn; the facing keeps the spawn's while it is NONE; NONE never passes `clamp_cm`; `Endpoint::new` takes no aim and the endpoint holds no aim of its own (item 4); the snapshot's own soldier carries the row's `aim_cm` (B8-N6, :849). 8.5 (:943-945) asks me what the owner's section and the row's pitch show for NONE, and proposes "no aim point drawn, and a pitch of 0".
+- N43. My block 3.2: the owner's section holds `aim_x/y/z f32 @8, 12, 16`, which netcode-architect's 2.1 (:240) calls "the aim the endpoint sent"; `own_flags u8 @6` uses bit 0 (sprint locked) only. The row's `pitch` is "radians, positive up, from the aim point and the eye height" (engine-architect-cs4.md:513). With the endpoint holding no aim (8.3 item 4), "the aim the endpoint sent" exists per post only, and is NONE on every post with no new ray, so it would flicker between a point and nothing.
+- N44. 7.3 (:725-735): an aim box empty on some axis exists only for a map built in code; every loaded map lies inside the reach (map.rs:319-339; his words at map.rs:13-14), so its box is its bounds. sim-wasm's `local_world` builds from the loaded map (sim-wasm/src/lib.rs:83-86); `Room::new` returns `Self` (room/src/lib.rs:105), `Endpoint::new` an `Option` (client-endpoint/src/endpoint.rs:117). map.rs:16-17: "A map built in code, for a test of the simulation alone, never passes the loader and is no playable map."
+
+## Block 6. "No aim yet" in the block, and a world with no aim box (DONE)
+Counts are my estimates of written new lines, code / tests, plus or minus 30 %.
+
+### 6.1 What the block shows for "no aim yet": YES to its proposal, with one bit and one change of source
+- **The owner's section's aim is the soldier's held aim**, as the newest snapshot's own soldier carries it
+  (`aim_cm`, B8-N6), turned into metres in the endpoint (each axis cm / 100 as f32, exact, as its 7.2 has it). It is no
+  longer "the aim the endpoint sent" (N43): the endpoint holds none, and the held aim is what the facing follows, so
+  the page shows what the authority took. A change of meaning in my layout, for netcode-architect's note; no wire change
+  (`aim_cm` already rides the own soldier).
+- **New: `own_flags` bit 1, "aim held"**, set when that held aim is a real point. While it is NONE, and before the
+  first snapshot that carries the soldier, bit 1 is clear and `aim_x/y/z` are written 0 by the writer. NONE never
+  crosses the boundary as a number: not its metres (-327.68, 0, 0), not a NaN. One meaning per field (the argument of
+  5.4), and the page needs no copy of the wire's sentinel. The section stays 20 bytes, the block 1,988.
+- **The row's pitch is 0 while the held aim is NONE** (level); its yaw comes from the facing (the spawn's, under
+  FACING-SPAWN (a)); with a real held aim, the pitch is computed from it and the eye height, as laid out. Yes, as
+  proposed.
+- **The page:** the development aim point and line are drawn only while bit 1 is set; the readout's aim row reads
+  "none yet" while it is clear.
+- **Tests, each with its plant:** the block writer (client-endpoint), before the first snapshot and with NONE held:
+  bit 1 clear, aim 0, the row's pitch 0; with a real held aim: bit 1 set, the metres equal cm / 100 bit for bit.
+  Plants, each red: NONE's metres written (aim_x -327.68); the pitch computed from NONE's point (not 0). The page
+  (vitest): bit 1 clear draws no aim line and the readout says "none yet". Plant: the line drawn from (0, 0, 0).
+- **Count:** about 8 code (the layout's bit and its doc 2, the writer 3, the page's two reads 3) / about 20 tests,
+  in step 3's block part and step 4.
+
+### 6.2 A world with no aim box: NO constructor change (its option (B))
+- **Reason:** by block 4 the room and the endpoint take their world from the constructor that loads the content, and
+  the loader refuses a playable map beyond the reach (his words, map.rs:13-14), so every loaded map's box is its
+  bounds (N44). A world with no box is built in code, for a test of the simulation alone. A refusal in `Room::new`
+  would be an error path no product caller can take, and four callers would change for it.
+- **No check in `create` either**, if 7.3's "the box is checked once where a match's world is built" means a new
+  refusal there: it could not fire on any loaded map, and it would be a second home for the loader's rule. The loader's
+  check stays the one home; 7.3's tie test (d) already shows a loaded map's box equals its bounds.
+- **It fails safe:** under block 8, on such a world every real aim is refused by `holds_cm` and counted, NONE is taken,
+  and the soldier keeps his facing.
+- **Test:** one room test on a code-built world wholly past the reach: every real aim refused and counted, NONE
+  commands taken, no panic. Plant: a `clamp_cm` that unwraps the empty box (it panics: red). **Count:** 0 code /
+  about 10 tests.
+- B6 DONE.
+
 ## Not verified
 - Nothing was built or run for this read but one import of three/webgpu in plain Node (N7). Every count is the
   designs' estimate (plus or minus 30 %).
@@ -771,5 +823,6 @@ Today `facing_deg` is any degree in [0, 360) (map.rs:58-66); the soldier keeps h
   through Python 3 on this machine, not the libm crate's.
 - Block 5: the scan's gap (N37) and every plant of 5.2 are read from the source, not run; T1 to T3 and the counts are
   estimates. netcode-architect's block 7 was read as its file stood during this block.
+- Block 6: read only; the bit, the pitch rule and the room test are design, not built or run.
 
 DONE
