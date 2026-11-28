@@ -10,7 +10,7 @@
   `/home/user/Shamble-Frontlines` is never switched.
 - **Base:** origin/main dae6d107fdbe942567104bcf1c9a2cbc6b3a1e0f (pull request #79's merge commit), taken in by
   fast-forward from b7145273.
-- **Last update:** 2026-11-28 01:24 Amsterdam (from the clock; an earlier save said 01:08, a time written without
+- **Last update:** 2026-11-28 01:44 Amsterdam (from the clock; an earlier save said 01:08, a time written without
   reading the clock: it was 00:57)
 
 ## Steps done
@@ -59,9 +59,31 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   `.gate/dist-development-4c`, exit 0 with the build's own checks): the production page holds `inventory(){return
   null}` and neither marker; the development page holds both. So the inventory's cut by the build flag holds, and
   no dynamic import is needed.
-- **Next:** the map's reading in content.ts (and `LOCAL_MAP` from a module of its own in the Worker's package, since
-  recording.ts is test-only), the hand-off in boot.ts, the readout's rows, the tests (T1 to T10, S1 to S7, R1, E1 to
-  E5), the counts' timing check in both orders, render-counts.json measured; the count after each piece.
+- **Since (01:44 Amsterdam): the step's code and tests are written, and every check run so far passes** (the patch
+  holds them all, 23 source files):
+  - the map's reading in content.ts (`readMap`, `readContent`, the kinds and their constants, `NOT_THE_MAP`,
+    `PageContent(deliver, read)`); `LOCAL_MAP` from a module of its own in the Worker's package (recording.ts is
+    test-only, so the page takes in nothing of it); boot's hand-off; the readout's content and scene rows;
+  - tests: content.test.ts (the map read field by field, closed key sets, members by kind, ramps alone with
+    `rises_toward`, nothing read through a prototype, the two fixed sentences, the bundle's files, delivery once),
+    content-map.test.mjs (the committed test scene reads as itself), content-ties.test.mjs (the kinds' formats and
+    folders tied to the Rust source), scene.test.ts (corners, outward flat faces for a box and a ramp toward each
+    side, greys, grid, disposal, overview at three aspects, the inventory reading the buffers), report.test.ts (the
+    rows), content-schema.test.mjs (each member's kind, 4B-MEMBER-KINDS, with its planted mismatch), the browser
+    specs (the drawn scene equals the built map; the refused bundles leave the empty floor and its counts; a broken
+    Worker leaves the content "none");
+  - the type checks of the Worker, the page and the specs; the page's 171 unit tests, the Worker's 53, the types' 14;
+  - the Chromium specs: 27 of 29 on the first run, the two failures my test's strict "lighter" where the design says
+    "never darker" (the yard's 0.55 m and 0.56 m steps share a grey: one grey level spans about 4 cm); fixed in both
+    tests; the skeleton spec 5 of 5 after; the whole run took 217 s (CI's limit for it: 5 minutes);
+  - the render counts measured: 32 draw calls, 267 triangles, 162 lines, 32 geometries, 3 textures, 6 programs, the
+    arithmetic exactly, and the same with the map drawn in after the first frame (ready at 4,463 ms, first frame at
+    4,114 ms) and before it (ready at 124 ms, first frame at 10,115 ms), by `counts-order-4c.mjs`;
+  - allocation on main's page and the scene's: 100 and 85 bytes per frame, 572 and 553 per block, 18,166 and 17,536
+    a second (the sampling profiler's noise; both pass);
+  - the after picture: `.gate/scene-after-4c.png` (not committed: a binary).
+- **Running now:** the full local checks (`local-checks.sh` in this folder, 4b's with full paths), then the count, the
+  gate, and the code commit (no `[skip ci]`).
 
 ## Next steps
 1. **The plan sheet** `.checkpoints/cs4c-soldier/reread-sheet.md`, revision 1, against main dae6d107: step 0 (the first

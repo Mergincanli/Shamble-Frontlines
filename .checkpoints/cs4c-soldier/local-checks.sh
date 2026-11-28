@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 # The toolchain job's own commands, run here by hand (the session may not run npx or npm test): the same order, each
-# tool called through node. From the worktree's root: bash .checkpoints/cs4b-content/local-checks.sh
+# tool called through node. 4b's script (`.checkpoints/cs4b-content/local-checks.sh`, readable at 59f6cc7), with every
+# folder it writes named by its full path. From the worktree's root:
+#   bash .checkpoints/cs4c-soldier/local-checks.sh > /home/user/Shamble-Frontlines/.gate/cs4b-2/.gate/local-checks-4c.log 2>&1
 # It calls no git: the generated types are compared by their digests before and after they are written again.
-# It stops at the first failure and prints which step failed; the log is .gate/local-checks.log.
+# It stops at the first failure and prints which step failed.
 set -euo pipefail
-export SHAMBLE_WASM_BINDGEN="$PWD/.gate/wb-tool/wasm-bindgen"
+export SHAMBLE_WASM_BINDGEN="/home/user/Shamble-Frontlines/.gate/cs4b-2/.gate/wb-tool/wasm-bindgen"
 tsc() { node node_modules/typescript/bin/tsc "$@"; }
 vitest() { node node_modules/vitest/vitest.mjs "$@"; }
 step() { echo "== $*"; }
@@ -28,9 +30,9 @@ step "type checks of the types package"
 shipped=$(find packages/types/src -name "*.ts" ! -name "*.test.ts" | LC_ALL=C sort); tests=$(find packages/types/src -name "*.test.ts" | LC_ALL=C sort)
 tsc --ignoreConfig $strict $shipped; tsc --ignoreConfig $strict --skipLibCheck $shipped $tests
 step "the production page, then the development page"
-node packages/client/scripts/build.mjs --production --out-dir "$PWD/.gate/dist-production"
+node packages/client/scripts/build.mjs --production --out-dir /home/user/Shamble-Frontlines/.gate/cs4b-2/.gate/dist-production
 sha256sum packages/sim-worker/pkg/sim_wasm_bg.wasm; stat -c '%s bytes (production)' packages/sim-worker/pkg/sim_wasm_bg.wasm
-node packages/client/scripts/build.mjs --out-dir "$PWD/.gate/dist-development"
+node packages/client/scripts/build.mjs --out-dir /home/user/Shamble-Frontlines/.gate/cs4b-2/.gate/dist-development
 sha256sum packages/sim-worker/pkg/sim_wasm_bg.wasm; stat -c '%s bytes (development)' packages/sim-worker/pkg/sim_wasm_bg.wasm
 step "the boundary tests"; vitest run --root packages/sim-worker --dir packages/sim-worker/boundary
 step "type checks of the Worker, the page and the browser specs"
@@ -45,7 +47,7 @@ tsc --ignoreConfig $common --lib es2023,dom,dom.iterable,esnext.disposable --typ
 tsc --ignoreConfig $common --lib es2023,dom,dom.iterable --skipLibCheck packages/e2e/node-names.d.ts packages/e2e/playwright.config.ts $specs
 step "the browser tests, timed (CI stops them after 5 minutes)"
 start=$(date +%s)
-SHAMBLE_DIST="$PWD/.gate/dist-development" SHAMBLE_CHROMIUM=/opt/pw-browsers/chromium node node_modules/@playwright/test/cli.js test -c packages/e2e/playwright.config.ts --project=chromium --workers=1 --retries=0 --trace off --reporter=list --global-timeout=300000
+SHAMBLE_DIST=/home/user/Shamble-Frontlines/.gate/cs4b-2/.gate/dist-development SHAMBLE_CHROMIUM=/opt/pw-browsers/chromium node node_modules/@playwright/test/cli.js test -c packages/e2e/playwright.config.ts --project=chromium --workers=1 --retries=0 --trace off --reporter=list --global-timeout=300000
 echo "the browser tests took $(( $(date +%s) - start )) seconds"
 step "the recordings are what their scripts make"; cargo run -q -p devtools --locked --bin make_recordings -- --check
 echo "ALL LOCAL CHECKS PASSED"
