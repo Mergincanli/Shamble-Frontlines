@@ -266,6 +266,20 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   re-exports. (13) the tests of rows 22, 25, 27, 28, 31, 33, 34, 35, 36, 37, 38 (bar the direct feed), 39; world.rs's
   known answers re-made by a second implementation written for it in the notes (no committed script exists: earlier
   change-sets' agents wrote theirs in notes), `world-known-answers-c4.py`, FNV-1a 64 over the canonical bytes.
+- **State (19:31 Amsterdam, from the clock): C4 proven and committed after this notes commit (the code head, so CI
+  runs on it).** The full local checks on the tree with the plants put back: **ALL LOCAL CHECKS PASSED**
+  (`.gate/local-checks-c4.log`: fmt, clippy `-D warnings`, cargo test twice with the generated types unchanged when
+  written again, the release tests, the wasm build, the vector generators' checks, libm's included; the packages' tests,
+  client 182, Worker 53, types 14, net 1; the boundary tests 41 of 41 in 6 files; the players' file bdbcba92..., 287,113
+  bytes in both builds, from C3's 258,488; the browser tests 29 of 29 in 213 s; the recordings are what their scripts
+  make). The two files the advisor agent's conditions edited, after that run's package and build steps: the client's
+  tests again 182 of 182, build-checks.test.mjs 59 of 59 (its condition 4), the production build's check clean
+  (`.gate/build-production-c4b.log`). **The gate PASS with smoke** (`.gate/gate-c4.log`). The tree compared with
+  `c4-wip.patch` (`cmp`: the same) and the new file with its copy (the same); both leave the notes in this commit.
+  **The count: 4c-2 at 6,170 written lines** against 946fef73 (C1 442, C2 459, C3 with its fix 2,137, C4 3,132, of
+  which 865 are first-loop.vector.txt). Next: the code commit, its push, CI on it; then security-auditor on the commit
+  (the advisor agent's ruling 8 (d); brief in the scratchpad, `c4-security-brief.txt`, with the advisor agent's five
+  points); a fix, if any, in its own commit before C5; the board.
 - **State (19:27 Amsterdam, from the clock; first written as 19:28 without reading it, corrected): the advisor agent on the build-check test's departure
   (`advisor-c4-maths-test.md`): APPROVE, not a thinning (the banned rule reads no list; the only entries the new form
   admits are the two exact strings its ruling 8 accepted, each held to its own two lines; with its condition 1 the
