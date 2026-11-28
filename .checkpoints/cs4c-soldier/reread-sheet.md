@@ -680,3 +680,94 @@ folded in.
     held until it is settled with him. Anything else you need before you would approve steps 1 to 7 once his answers
     are in?
 11. **Under SIZE-4C (c) only:** may PM-0004-28 ("before 4c merges") be met in 4c-3 (engine-architect's seam)?
+
+## I. Revision 4 (2026-11-28, from 13:00 Amsterdam by the clock): his answers of 12:10 applied to steps 1 to 7
+His message is saved by script (`.checkpoints/cs4-walk/mustafa-2026-11-28-answers.md`, 4,516 bytes, sha256
+3b14fb63...) and is in the register (step 0). Where this section and the text above differ, this section holds.
+
+### I1. The shape of 4c from here (his SIZE-4C (b) and his item 6)
+- **4c-1 is step 0 and step S**, finished now: the six reviews, one fix pass, the verifier, the docs pass, the report,
+  the pull request's title and text in the notes, the notes out of the head, a green CI run, the advisor agent on that
+  head; then he is told the final head with its full id and the Brave steps (his item 6a).
+- **4c-2 is steps 1 to 7, built on the same branch on top of 4c-1's final head** (his item 6b). On Sunday his Advisor
+  points a branch of its own at exactly that head and opens 4c-1's pull request from it, so this branch's pushes never
+  move it (6c). A change he wants in the scene after his Brave check goes into 4c-2 (6d). When 4c-1's merge is on main,
+  this branch takes main in once (6d).
+- **4c-2's count** starts from 4c-1's final head (the same lines as from the main that will hold 4c-1's merge, since
+  4c-2 sits on top of it), by `count-4c.mjs`'s method, the generated TypeScript counted (the advisor agent's item 3).
+- **4c-2's stop line: 18,700 written lines** (his word). The two-thirds sentence at about 12,470. "If the count
+  reaches it before the early look is ready, do not stop: tell me in two lines in your next report and build on to
+  the early look. Past the line, nothing after the early look starts without my word." So the early look (after step
+  5) is never cut by the line; the steps after it (6, 6b, 6c, 7) wait for his word if the line is passed.
+- **The rung (what leaves first), for the advisor agent to rule:** the plan's ladder moves the far-corner map
+  (PM-0004-39, step 6c) to 4d at 13,150 written lines, the plan's planned size for a stop line of 16,450. His new line
+  is 18,700; the plan's rule would put the rung at its planned size, 18,700 / 1.25 = about 14,960. Either way he is
+  told before it moves, and nothing else moves.
+
+### I2. The movement (step 1) under his answers
+- **MOVE-RULES (a), as starting rules,** each his to change after he has played. Rows 6 and 7 (Q aims too; the
+  sights camera) are 4d's and confirmed again there. **Row 9 is open, not decided:** the soldier walks any slope a
+  tick's step allows, as his sandbox does, and **nothing is built that depends on roofs being walkable or not** (no
+  test, recording route, mark or readout asserts that a roof is or is not walked; the yard's and street's tests stay
+  off the roofs; the walk recording's route keeps off them). He decides a slope limit after he has walked the roofs in
+  the early look.
+- **BODY-SHAPE (3a):** his sandbox's body: the 0.4 m body for walls and the step trigger, the 0.15 m foot for standing,
+  the pull, the 0.2 m snap down with its slope term (rust-reviewer's blocks 5 and 6; the 2.5D form honestly counted at
+  about 205 / 265, the head test and the stood-on slope included). The two model holes are fixed in step 1, one
+  condition each (the in-air step's "toward" from the tick's start; a top crossed inside one tick counts as landed),
+  with a test and a plant each, and game-designer's yes at the review that neither is a rule of his.
+- **NO-SOURCE (b):** the game starts from his sandbox's numbers, each a row of the content marked "not from his
+  Export": the foot radius 0.15 m; the pull's half time 1/30 s, its done-under 0.03 m and its 90 % of the foot; the
+  step allowance 5 mm (**his answer takes the sandbox's number**, where this sheet had recommended none: the 0.55 m step
+  is still gained and the 0.56 m step still stopped, so PM-0004-30 holds either way); the snap 0.2 m; the push's height
+  gap 1.0 m, its sideways share 0.7, its keep-going share 0.5, its most 0.25 m a tick, and its two speed gates 0.2 and
+  0.1 m/s. Each number's sandbox file:line comes from the Testlines read (I4). The Testlines table gains rows with a
+  `field` and no `export`, which `testlines.mjs --check` takes, with a planted row that claims an export it does not
+  have; each new field of the movement kind states its version rule (4B-FIRST-DEFAULT). A later Export of his that
+  carries one of them replaces it the same way (his words: "I may make them sliders in Testlines later, and a later
+  Export then replaces them the same way").
+- **FALL-STEP (c), by reading:** the game does what his sandbox does; if the sandbox's code does not settle it, (a)
+  (an unjumped fall steps up onto a slightly higher top, as the old game does). The Testlines read (I4) settles it
+  before step 1's movement is written.
+- **The head bump** (MOVE-RULES row 8) and **the ramp met from the side** (the sandbox's set-back along the slope):
+  the Testlines read settles both, numbers and behaviour only.
+- **DEPART-4C (a), on his terms:** (1) **SWEEP-ROUTE:** our own sweeps; **the collision library stays the check on
+  them for every shape the game uses, the ramp included, before the movement step counts as done** (a test that runs
+  every form pair through the library and compares, so the ramp's sweep is no longer untried); the report shows the
+  old and the new wording of PM-0004-20 and PM-0004-35 side by side, **and the new wording asks no less than the old
+  about what the players' file does.** (2) **PM-0004-60:** 2,000,000 hostile commands per CI run now; **the mark is
+  not met by that: it stays open in STATUS until the nightly job runs its 10 million, named with the change-set that
+  brings it.** (3) **PM-0004-20's 48-soldier run is not met by the one-soldier recording: it stays open in STATUS,
+  named with the first build that can show it.**
+- Settled without him and confirmed by the reviewers (section E): the floor (the bounds' bottom is solid ground), the
+  spawn facing (FACING-SPAWN (a), `libm::sincos`, in the batch `deps-4c-v2.diff` answered by security-auditor), the
+  record rule (the held move and aim in the hashed row), "no aim yet" (his "fine"; he looks at it in the early look).
+
+### I3. The page (steps 3 to 5) under his answers
+- **RESUME-FLASH (b):** as (a) (the match as it stood; a tick later the keys count as let go, and the soldier slows to
+  a stop), and the development key diagram goes dark the moment the tab hides (netcode-architect's block 5: about 10 /
+  20 more; one test with its plant).
+- **TUNE-HOME (b):** movement, jump, stamina, pushing and the aiming rule stay in his sandbox (he exports, the tool
+  rewrites the content, the check holds them equal); the camera's values start from his Export once and then live in
+  the game's camera file, tuned in the panel on the real picture, with "copy values" giving the file's bytes to paste
+  into the chat (engine-architect's read 3.6: (b) as designed).
+- **STREET-GREY (b)** stands as built (he looks at it at the scene's Brave check).
+
+### I4. The Testlines read (his TESTLINES yes)
+"Yes, you may read my Testlines repository by its public address, read only. Copy no code from it: numbers and
+behaviour only. Do not attach it to this chat as a second repository." game-designer reads it for: FALL-STEP; the
+head bump (what it does to the upward speed and the position, which circle and height it tests, the headroom rule);
+the ramp met from the side (the set-back along the slope); every NO-SOURCE number with its file:line at the commit his
+Export names, and whether the branch moved since 703fd922. Nothing of its code enters this repository: the read's
+notes describe rules in plain words with file:line.
+
+### I5. CI's Chromium time (his CHROME-TIME)
+The CI Builder is parked until Tuesday 1 December, 20:00, and raises the Chromium run's limit then. Until then no test
+is cut or thinned to fit the 5 minutes; a run stopped at the limit is re-run once (`gh api -X POST
+repos/mergincanli/shamble-frontlines/actions/runs/<run>/rerun-failed-jobs`); stopped again, he is told in two lines and
+the build goes on. A head that goes to the advisor agent needs a green run.
+
+### I6. What the advisor agent is asked, for steps 1 to 7 (after the Testlines read is folded in)
+Its item 10's thirteen points stand as section H's table, with his answers on (1) BODY-SHAPE, (3) SWEEP-ROUTE and
+(6) the slope now in; the asks: APPROVE or REVISE steps 1 to 7 as revised here; the rung (I1); and the order inside
+4c-2 (its item 7's six conditions, now that SIZE-4C is answered and 4c-2 sits on top of 4c-1's final head).
