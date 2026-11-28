@@ -391,3 +391,11 @@ DONE
 3. The old game: the map's single spawn field at start or restart, a random spread of up to 4 m in x on respawn (shamble-game.js:521, :642, :1827, :1843); no MOVE-RULES row or answer carries it over.
 
 DONE (block 9, with corrections)
+
+## Block 10. The thirteen NO-SOURCE rows for the Testlines table (step 1's commit C2) (2026-11-28)
+### Plan
+1. Read content/source/testlines-table.json (its row style, units, the old_game wording) and rust-reviewer-read.md 11.4.
+2. Each of the twelve: value and file:line at be608cad (from N22, re-checked), what it does, unit, the old game (legacy/ by file:line or none).
+3. Flag differences and missing numbers (N22's slope-head tolerances, the jump guard, the snap's slope term).
+4. Write the thirteen rows as JSON. 5. DONE.
+### Notes
