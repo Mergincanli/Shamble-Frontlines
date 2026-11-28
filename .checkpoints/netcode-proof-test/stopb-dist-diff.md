@@ -19,7 +19,18 @@ The plan's C1 bar: build 2 at Y must equal Y's committed list byte for byte. It 
 - The two worktree paths have the same length (stopb-a, stopb-b): the difference is in a value derived from the paths,
   not their length.
 
-## Reading (not proven)
+## Update 02:0x UTC on 11-28: NOT path-dependent (the reading below is disproved)
+- Worktree A recreated at Y (652e9513) on build 1's own path, with a fresh CARGO_HOME on build 1's path:
+  a94698198f73... (build1-again.log, 02:01-02:03), equal to build 2's. Two paths at Y give the same Wasm.
+- So the odd one out is build 1 itself (path A at Y0 87cb8677, 22:28-22:31). Y0 and Y differ only in
+  ops/runs/r1-dist.sha256, which no build step reads (B6's grep of build.mjs; no include_str!/include_bytes!/env! in the
+  release code of client-wasm: engine.rs:533's include_str! is inside a #[test]).
+- The deciding build runs now: a third worktree at Y0 (.gate/stopb-c, fresh CARGO_HOME). 2a97394b again would mean the
+  commit matters by a route not yet found; a94698198f73 would mean build 1 was a one-off (the build is not reliably
+  reproducible).
+- Build 2's dist is kept at .gate/stopb/dist-b (7 files); build 1's Wasm is lost (worktree A removed at 22:50).
+
+## Reading (not proven; superseded by the update above)
 build.mjs:69-74 passes `--remap-path-prefix=<CARGO_HOME>=/cargo-home`, `<spike>=/npt` and `<target>=/npt-target`
 in CARGO_ENCODED_RUSTFLAGS: the real paths are inside the flags, and cargo's per-crate hashes (`-C metadata`, symbol
 disambiguators) can depend on the flags or on path sources. So the Wasm depends on the build's absolute paths even
