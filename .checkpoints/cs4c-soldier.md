@@ -221,6 +221,24 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   `/home/user/Shamble-Frontlines/.gate/cs4b-2`. A session of another account works on its own branch from this
   branch's head and never pushes here (his Lanes rule). SEAT-OUT from him: stop at a whole point and report the last
   commit's id.
+- **The advisor agent on C2's and C3's departures (`advisor-delta-c2c3.md`): all 8 ACCEPTED; GO for C4 on
+  conditions:** C4 not pushed until CI on 9e9a1cc8 is green (a red run makes it HOLD); C4's maths list exactly the
+  paths the real build refuses, for both builds, each a whole path (no covering prefix), any path outside the exp and
+  sincos families or any compiler_builtins or C-named one reported and not added, `rem_pio2_large`'s reason "linked,
+  unreachable on [0, 360), the one target-dependent routine", and security-auditor reads the real list in C4's commit
+  (a fix in its own commit before C5); the report names the departures (block 17's Q1, Q2; the recorded digests prove
+  sameness, not accuracy; the accuracy figures with their method, from rust-reviewer's 33,648-input scratch set where
+  the committed file holds 33,646: said so, or re-measured; libm's cost against std's not measured); step1-build-order.md's
+  superseded lines marked (done in this notes commit).
+- **C4's predictions, written before the Rust side runs (the advisor tool's "predict, then run"):** world.rs's known
+  answers by `world-known-answers-c4.py` (it first reproduces all six old answers and the old shared one, so its
+  FNV-1a and byte order hold): new(0, 0) 0xfe5c_1b37_2be6_b04f; after 3 empty ticks 0xed75_6338_8a8f_e700; new(1, 0)
+  0x5e87_f5ee_6b99_ae0f; new(0, 131069) 0x356d_7029_9b57_4922; new(0, u32::MAX) 0x7514_161d_05d9_e31b; played ([],
+  [pressed]) 0x2d3a_5263_e54c_3740, its shared 0x6ad4_99aa_4def_3e40; moved (move (127, -3), aim (100, 50, -200))
+  0x1464_7681_b7aa_69fc; no spawn new(0, 0) 0x4492_32b7_23f1_4ddd; new(0, 0) shared 0xfe9a_6ff7_b575_8ccf. The
+  recordings: `first-loop.content.json` must NOT move (C2's freeze; content unchanged in C4); `first-loop.rec` must not
+  move if it holds no command field C4 adds (to check in recording.rs before the run); `first-loop.hashes` (every tick
+  line), `first-loop.vector.txt` (the rows join the state) and `manifest.txt` move.
 - **security-auditor's round 2 on C3's fix 9e9a1cc8: APPROVE** (`security-auditor-c3.md`, "Round 2"): M1, L1, L3, L4
   and its item-2 remark FIXED (its probe re-run on the fixed marking; the three changed test targets passed at
   9e9a1cc8); no new finding. **L5's deferral is accepted on three conditions, which travel to 4c-2's report and

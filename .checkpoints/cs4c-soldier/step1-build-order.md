@@ -38,8 +38,9 @@ the wire into the hashed row without the room having checked it** (G2's rule).
   the converter also learns to read (today it reads only `values.<group>.<name>`, `testlines.mjs:136-139`:
   game-designer's Medium flag). The unit word for a fraction: "share" (new) or one of the table's own.
 - The first recording's frozen bundle re-frozen (`make_recordings --freeze first-loop`) and the recordings re-made:
-  **their `.hashes` files byte-identical** (G5: no state changed), their headers naming the new bundle; `recordings.rs`
-  green.
+  **their `.hashes` files byte-identical** [SUPERSEDED, advisor-delta-c2c3.md item 6: the 1,800 tick lines and the
+  vector file byte for byte; the `.hashes` file's first line names the `.rec`, whose header names the bundle] (G5: no
+  state changed), their headers naming the new bundle; `recordings.rs` green.
 - **The version rule** (the advisor agent's VERSION-RULE ruling, `advisor-version-rule.md`, conditions 1 to 9): the
   movement kind goes to `VERSION = 2` ("the one version the typed read takes"), `TEST_TEXT` at version 2 with all 28
   fields; `read.rs`'s `header` takes the newest version only (`whole_in(node, &path, newest, newest)`, its doc saying
@@ -55,9 +56,13 @@ the wire into the hashed row without the room having checked it** (G2's rule).
 ## C3. The dependency batch, exp and sincos, the rules and the spawns, called only by sim's tests (no state change)
 - The batch `deps-4c-v2.diff` applied, its five digests checked first (`dependency-check.md`; security-auditor's
   third answer: head plus the patch rebuilds exactly fc436ec3, b7c6ee5d, c7432b03, 79b829a9 and 22e2c5bf).
-- `fmath.rs` (`share_per_tick` with `libm::exp`, `facing_of` with `libm::sincos`, `DEG_TO_RAD`), `rules.rs`
+- `fmath.rs` (`share_per_tick` with `libm::exp`, `facing_of` with `libm::sincos` [SUPERSEDED, advisor-delta-c2c3.md
+  item 1: the allowances sit on `exp_of` and `sincos_of`, which the two call, with the raw-name rule; rust-reviewer's
+  block 17, Q1], `DEG_TO_RAD`), `rules.rs`
   (`Rules::take` with its refusals and `HEADROOM_FEET` = `SandboxTest`, his (b) until his word), `soldiers.rs`'s
-  `SpawnPoint` and `spawn_points` (ranked by the id's byte order); in this commit only sim's tests call them (G10).
+  `SpawnPoint` and `spawn_points` (ranked by the id's byte order); in this commit only sim's tests call them (G10)
+  [SUPERSEDED, advisor-delta-c2c3.md item 7: in C3 nothing in the players' build reaches exp or sincos; the
+  vectors' test-only module calls `exp_of` and `sincos_of` by design].
 - In the same commit (Q4 condition 2 as the delta verdict amends it): F1's tightened `dependency_rules.rs`; F2's
   `layering.rs` with security-auditor's narrow marking, shared in `crates/sim/tests/support/marking.rs` with content's
   panic scan (its F5, fixed here; how devtools' `layering.rs` includes the file: rust-reviewer's block 16, G8); the
@@ -87,7 +92,9 @@ the wire into the hashed row without the room having checked it** (G2's rule).
   by `Room::new` and `LocalMatch::new` for `World::new` and kept by neither** (G1, its owners' yes first);
   `LocalMatch::new` takes the constants and loses `world`; the callers and test callers; **the maths list's exact
   entries for what the players' build now prints** (expected `libm::math::exp`, `libm::math::sincos`,
-  `libm::math::rem_pio2`, `libm::math::rem_pio2_large`; G10).
+  `libm::math::rem_pio2`, `libm::math::rem_pio2_large`; G10) [SUPERSEDED, advisor-delta-c2c3.md item 8: exactly the
+  paths the real build refuses, for both builds (the dev twin about 14, rust-reviewer's B17-6), each a whole path;
+  anything outside the exp and sincos families reported, not added; security-auditor reads the real list].
 - **The soldier:** `World { tick, player: PlayerRecord, soldiers, seed }`; `World::new(setup, &Rules, &[SpawnPoint])`
   (slot 0 at the lowest-id spawn, `PLAYER_SLOT` and `PLAYER_TEAM`; B4 with netcode-architect's conditions; grounded at
   spawn); `PlayerCommand` gains the move and the aim; the fold with NONE (the record rule, "no aim yet"); a slot with
