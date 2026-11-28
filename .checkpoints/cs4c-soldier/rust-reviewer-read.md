@@ -678,3 +678,15 @@ Under C1, by the beam run's rule, a jump under an upper floor would put him out 
 his vision; if he answers MOVE-RULES row 8 (a), that is C2.
 
 DONE
+
+## Block 7. engine-architect's RR1 to RR5 (engine-architect-read.md 5.7, :729-745), FACING-SPAWN (a), and the CEILING correction (2026-11-28)
+### Plan
+1. RR1: the scan's name lists and path rule (crates/sim/tests/rules_scan.rs) against libm's own spellings; what it must hold when exp and sincos join; security-auditor's planned bites (security-auditor-deps-4c.md:102-105).
+2. RR2 to RR4: libm 0.2.16's sincos read and built offline (rustc on the cargo cache's source, under .gate/rr7/), a scratch program (rr-trig-proto.rs) for K's bits, quarter turns, f64-then-narrow against sincosf against a correctly rounded reference (Python decimal), and what sincos links.
+3. RR5: the floor plane and the ray (collision.rs's cast_ray, world proofs).
+4. FACING-SPAWN (a) yes/no and the batch's root comment.
+5. The correction to block 6 (CEILING is MOVE-RULES row 8: game-designer-cs4.md:29, F18).
+6. DONE.
+
+### Notes
+- [B7-C, correction to block 6] Block 6's "his sandbox by its reading has no head rule" is WRONG: game-designer's walk-check read has the sandbox's head rule, "head bumps a floating block (:132-138)" (cs4-walk/game-designer-cs4.md:29, F18, movement.ts:132-138), and MOVE-RULES row 8 already lists "the head bumps a block above" (question-2026-11-28-before-4c.md:28-31); F19 (:30) adds "no headroom = wall" for the step. So CEILING is not a new question: it is row 8's, and under row 8 (a) the head bumps. My C2 ("the head stops at the bottom and he falls back": feet set to bottom - 1.8 m, upward speed to 0) is consistent with "bumps" but F18's one line leaves unknown: what the speed becomes (0, or reversed), whether the feet are put back under the bottom, which circle and which height test the bump uses (the body's 0.4 m and the 1.8 m height, or another), and the floating test's formula. Also F19's "no headroom = wall" differs from my run "up the step under the 2.2 m beam": there the step itself would be the wall (he stays on the ground), where my model lets him onto the step and stops him at the beam. C1 (no rule) is not the sandbox's and falls; C3's VISION point stands. Block 6's 2.5D answer and counts do not change (the head test was already counted in them).

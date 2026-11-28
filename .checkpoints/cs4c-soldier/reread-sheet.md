@@ -20,6 +20,10 @@ outstanding (end of section E), the recount of steps 1 to 7 with each option's s
 evidence, reviewers and his checklist (section G), and where each of item 10's thirteen points stands (section H).
 Running: rust-reviewer's block 6 (the bodies on the cases block 5 left out; the 2.5D question), engine-architect's
 block 5 (GROUND, FACING-SPAWN), netcode-architect's block 7 (the record rule, the bounds' home, the zero ray).
+**Revision 3.1 (by 02:37 Amsterdam, from the clock):** those three DONE and folded in (the record rule confirmed by both, section E;
+the recount with their numbers, F2; the table of item 10, H). Running: rust-reviewer's block 7 (engine-architect's
+RR1 to RR5, FACING-SPAWN from the maths side, a correction on the head bump), netcode-architect's block 8 (NA1 to NA3,
+G-2), game-designer's new block (an unjumped fall onto the 0.56 m step; the head bump from its notes).
 
 **The branch rule (condition 2; F-ORD-1):** pull request #79's head was this same branch, so until he answers SIZE-4C
 only step 0 and step S go on it: anything of steps 1 to 7 committed before his answer would make (b) and (c)
@@ -374,10 +378,19 @@ The clash above (whether the world keeps the command's move and aim) is ruled by
   dropped from the row; the row restored without it).
 - **One home for the bounds:** `StaticWorld::build` derives both from the map's bounds once (metres for the sweeps,
   whole centimetres rounded inward for the aim's clamp), and a test ties the two.
-- **Outstanding:** rust-reviewer's written yes (its read contradicts itself: F17 at line 29 takes (i), 1.6 at lines 246
-  to 247 has `visit_shared` write the record's move and aim) and netcode-architect's (its option (i) does not say what a
-  tick with no command does), both asked on 2026-11-28 (their blocks 6 and 7, running). Until both are in, the design
-  stands as the advisor agent's and is not built.
+- **Confirmed by both (2026-11-28):** netcode-architect YES (its block 7): a command-less tick keeps the record's
+  buttons and presses (no new press, no jump) and the soldier's `held_move: [i8; 2]`, and he walks on toward the held
+  aim; the aim held as the command's integers, `aim_cm: AimCm` (6 bytes), so 8 bytes of each row hold move and aim; the
+  restore test plants 30 command-less ticks and rebuilds a world from the shared bytes, and must catch the held move or
+  aim left out of the hashed bytes and a command-less tick that zeroes the move; a room test pins that a tick with no
+  command due hands the world none; step 2 moves no first-loop hash on four named conditions (its block 7). rust-
+  reviewer YES (its block 6, section 3): F17 stands and 1.6's "move and aim of the record" is withdrawn; the row also
+  holds the body's own carry-over that the next tick reads (`pull: u16` under BODY-SHAPE (3a), `stepped: u16` under
+  (3b), none under (2)); `visit_shared` writes the tick, the record's buttons and presses, then the 48 rows in slot
+  order. The bounds' one home: netcode-architect YES, with the loader's own grid rule (content's `on_grid`, made
+  public) and its earlier "off the grid is refused" withdrawn; a tie test with four planted defects. The zero ray
+  (under SIZE-4C (c)): netcode-architect YES (all-zero judged by value; a non-finite number refused and counted in
+  `rays_refused`), tests Z1 and Z2. Their counts: step 2 to about 340 / 675; step 1 about +10 / +100.
 
 ## F. Sizes, the ladder and the stop lines
 - By the designs' count: steps 1 to 7, 7,315; step S about 740 (engine-architect's recount; 630 before); together
@@ -409,8 +422,8 @@ and c1de41e5's 11), about 1.74 times its recount of 740: under the 1,420 he hear
 **Steps 1 to 7 by the designs' count (code / tests), as the reads recount them against today's code:**
 | Step | The plan | The reads | Where |
 |---|---|---|---|
-| 1 | 1,240 / 1,090 = 2,330 | body (3a) on our own sweeps: 1,350 / 1,360 = **2,710** in the 2.5D form; 1,440 / 1,420 = **2,860** with the 3D sweeps | rust-reviewer-read 1.10 (1,300 / 1,260, body (2) in 3D), E1 above (+130 / +110: the ray counts, the sweep proof, NO-SOURCE's fields), block 5 item 3 ((3a): +30 / +50 and -20; the 2.5D sweeps 170 / 200 for 260 / 260) |
-| 2 | 385 / 530 = 915 | 315 / 630 = **945** | netcode-architect-read, its counts, block 1 |
+| 1 | 1,240 / 1,090 = 2,330 | body (3a) on our own sweeps: about **3,040** in the 2.5D form (1,430 / 1,610), about **3,140** with the 3D sweeps (1,500 / 1,640) | rust-reviewer-read 1.10 (1,300 / 1,260, body (2) in 3D); E1 above (+130 / +110: the ray counts, the sweep proof, NO-SOURCE's fields); block 5 item 3 ((3a): +30 / +50 and -20); **block 6 section 2: the honest 2.5D sweeps 205 / 265 (shapes may have space under them; with the two model fixes, the head test and the stood-on slope), not block 5's 170 / 200; the 3D sweeps 260 / 260 plus the same fixes and the head's stop, about 275 / 295 (my estimate from its words)**; netcode-architect's block 7 (+10 / +100: the record rule's row, the bounds' home); engine-architect's block 5 (GROUND about 9 / 42; FACING-SPAWN (a) about 25 / 45) |
+| 2 | 385 / 530 = 915 | 340 / 675 = **1,015** | netcode-architect-read, its counts, block 1, raised by its block 7 (the record rule's tests, the bounds' tie test, Z1 and Z2) |
 | 3 | 320 / 340 = 660 | **660** (with engine-architect's layout) | netcode-architect-read block 2 |
 | 4 | 800 / 540 = 1,340 | **1,340** (split by file, not counted again; the camera kind moves in from step 5 with its lines) | engine-architect-read block 3 |
 | 5 | 360 / 300 = 660 | **660** less the camera kind's lines (the sum of 4 and 5 unchanged) | engine-architect-read block 3 |
@@ -418,23 +431,23 @@ and c1de41e5's 11), about 1.74 times its recount of 740: under the 1,420 he hear
 | 6b | 130 / 110 = 240 | 130 / 115 = **245** | netcode-architect-read block 4 |
 | 6c | 30 / 180 = 210 | 45 / 220 = **265** | netcode-architect-read block 4 |
 | 7 | 0 / 410 = 410 | **410** (no read counted it again) | the plan |
-| **All** | **7,315** | **7,785 to 7,935** (6 to 8 % above the plan) | |
-Not in these numbers: (3a)'s five more NO-SOURCE fields than body (2) (about 50 to 75 lines; block 6 or the step's own
-count settles them); RESUME-FLASH beyond (a) ((b) about +30; (c) about 5 changed and two tests reversed; (d1) about
-+65; (d2) a new recording format and every recording made anew); which sweep form is honest waits for rust-reviewer's
-block 6 (the 2.5D form for shapes whose bottom is above the ground), so both are carried.
+| **All** | **7,315** | **about 8,190 to 8,290** (12 to 13 % above the plan) | |
+Not in these numbers: (3a)'s five more NO-SOURCE fields than body (2) (about 50 to 75 lines); RESUME-FLASH beyond (a)
+((b) about +30; (c) about 5 changed and two tests reversed; (d1) about +65; (d2) a new recording format and every
+recording made anew); whatever game-designer's answer on an unjumped fall adds. The two sweep forms are both carried
+(revision 3.1: the 2.5D form's honest count, rust-reviewer's block 6, narrows the gap to about 100 lines).
 
 **The plan's rule** (planned size times 1.8, then the stop line at 1.25 times that, so 2.25 times the designs'
-count: the plan's 16,450 is 7,315 x 2.25) **on the recount:** steps 1 to 7 alone, a stop line of about 17,520 to
-17,850, two thirds about 11,680 to 11,900. At the measured rates (2.17 to 2.7 written lines a counted line, 4a to
-4b-2) steps 1 to 7 come to about 16,900 to 21,400 written lines: likely to reach that line near the end.
+count: the plan's 16,450 is 7,315 x 2.25) **on the recount:** steps 1 to 7 alone, a stop line of about 18,420 to
+18,640, two thirds about 12,280 to 12,430. At the measured rates (2.17 to 2.7 written lines a counted line, 4a to
+4b-2) steps 1 to 7 come to about 17,800 to 22,400 written lines: likely to reach that line near the end.
 
 **By his SIZE-4C option** (the line is his in each; these are the plan's rule's numbers for him to take or change):
 | Option | Pull requests and their designs' count | Stop line by the rule | Two thirds | The rung (what leaves first) |
 |---|---|---|---|---|
-| (a) one | all of 4c: the scene (740) and steps 1 to 7 (7,785 to 7,935) | about 19,190 to 19,520 (the question said about 17,870 on the old counts) | about 12,790 to 13,010 | the plan's: the far-corner map (PM-0004-39) to 4d at 13,150 written lines, told to him before it moves |
-| (b) two | 4c-1: step 0 and the scene (1,288 written now); 4c-2: steps 1 to 7 (7,785 to 7,935) | 4c-1: the hold, 1,665; 4c-2: the plan's 16,450 (on the old count) or about 17,520 to 17,850 (on the recount), his to say which | 4c-2: about 10,970 on 16,450, or 11,680 to 11,900 | 4c-2: the plan's 13,150, the far-corner map (the plan's planned size, 1.8 times 7,315); the planned size on the recount would be about 14,010 to 14,280, his to move to or keep |
-| (c) three | 4c-1 as (b); 4c-2: steps 1, 2 (less RESUME-FLASH's part), 6, 6c and step 3's snapshot share, 4,425 to 5,010; 4c-3: step 3's rest, RESUME-FLASH, steps 4, 5, 6b, 7, 2,925 to 3,360 | 4c-2 about 9,960 to 11,270; 4c-3 about 6,580 to 7,560 | 4c-2 about 6,640 to 7,510; 4c-3 about 4,390 to 5,040 | 4c-2 holds the far-corner map (step 6c): its rung inside 4c-2 is his to set, since the plan's 13,150 lies above 4c-2's whole line |
+| (a) one | all of 4c: the scene (740) and steps 1 to 7 (8,190 to 8,290) | about 20,090 to 20,310 (the question said about 17,870 on the old counts) | about 13,390 to 13,540 | the plan's: the far-corner map (PM-0004-39) to 4d at 13,150 written lines, told to him before it moves |
+| (b) two | 4c-1: step 0 and the scene (1,288 written now); 4c-2: steps 1 to 7 (8,190 to 8,290) | 4c-1: the hold, 1,665; 4c-2: the plan's 16,450 (on the old count) or about 18,420 to 18,640 (on the recount), his to say which | 4c-2: about 10,970 on 16,450, or 12,280 to 12,430 | 4c-2: the plan's 13,150, the far-corner map (the plan's planned size, 1.8 times 7,315); the planned size on the recount would be about 14,730 to 14,910, his to move to or keep |
+| (c) three | 4c-1 as (b); 4c-2: steps 1, 2 (less RESUME-FLASH's part), 6, 6c and step 3's snapshot share, 4,825 to 5,360; 4c-3: step 3's rest, RESUME-FLASH, steps 4, 5, 6b, 7, 2,925 to 3,360 | 4c-2 about 10,860 to 12,060; 4c-3 about 6,580 to 7,560 | 4c-2 about 7,240 to 8,040; 4c-3 about 4,390 to 5,040 | 4c-2 holds the far-corner map (step 6c): its rung inside 4c-2 is his to set, since the plan's 13,150 lies above 4c-2's whole line |
 Under every option nothing else moves: at a stop line the chat stops and he decides; the plan's never-moved list stands
 (the movement recording on its four runs with PM-0004-17, -19, -21 and -24, the paced replay PM-0004-28, the stale-id
 run PM-0004-15, the hostile commands PM-0004-60, the parity marks PM-0004-30 and -59, the camera panel). The card
@@ -586,12 +599,12 @@ part's stop line, its two-thirds sentence and its rungs on the card before step 
 | Point | State |
 |---|---|
 | (1) BODY-SHAPE with him on the corrected rows | asked (the question file, 5597b00d and 04646ca3); his |
-| (2) the body prototype with numbers | block 5 of rust-reviewer's read DONE (steps, ledges, ramps, seams, roofs, edges, thin wall); block 6 running (ramp sides and the set-back, a ceiling on a made map, landing, the snap's numbers, the push with two soldiers, for (3a), (3b) and (2); the 2.5D question) |
+| (2) the body prototype with numbers | blocks 5 and 6 of rust-reviewer's read DONE: (3a), (3b) and (2) (the last with a one-line wall fix) pass the steps, ledges, ramps up, down and from the side, seams, roofs, edges, the thin wall, landings (240 each), the snap (6 each, margin 0.094 m), easing from rest (72 each) and the push's 16 cases; two model holes shared by every body, each one condition and no rule of his; not run: the sandbox itself, its set-back and headroom formulas, the far corner, a push on a ramp, four or more soldiers. Open: the head bump (below) and an unjumped fall from the 0.55 m step gaining the 0.56 m step (game-designer, running) |
 | (3) SWEEP-ROUTE | asked (DEPART-4C); his |
-| (4) GROUND | engine-architect's block 5, running (it reconciles map.rs:39, map.rs:317-330 and the height scene.ts draws the ground at) |
-| (5) FACING-SPAWN | engine-architect's block 5, running; a pick that narrows what a map file says goes to him |
+| (4) GROUND | ruled by engine-architect (block 5): the bounds' bottom is solid ground; its words in step 1's commit, tests T1 to T3; three findings (G-1 Low and G-3 Low on wording and step S's test; G-2 Medium if built as written, the aim's fallback plane, netcode-architect's NA1, running) |
+| (5) FACING-SPAWN | engine-architect recommends (a): one `libm::sincos` per spawn at the match's start, quarter turns exact; nothing to him under (a); it changes the dependency batch's root comment, so security-auditor answers once more; rust-reviewer (RR1 to RR5) and netcode-architect (NA3) confirm, running |
 | (6) the slope | his (MOVE-RULES row 9; the unit recommended a grade in percent) |
-| (7) item 6 applied | applied in section E ("The record rule"); rust-reviewer's and netcode-architect's written yes running |
+| (7) item 6 applied | applied in section E ("The record rule") and confirmed by rust-reviewer and netcode-architect |
 | (8) NO-SOURCE's rows in the Testlines table, `--check` and its plant, the version rule of new fields | waits for NO-SOURCE and BODY-SHAPE (which fields); designed in E1 |
 | (9) `Rules::take`'s refusals; jump tests against `jump_reach_m` | designed (E1; G step 1); built in step 1 |
 | (10) the dependency hold | answered: APPROVE (`security-auditor-deps-4c.md`, `dependency-check.md`), F1 and F2 on the commit that applies it |

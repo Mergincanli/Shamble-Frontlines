@@ -10,7 +10,7 @@
   `/home/user/Shamble-Frontlines` is never switched.
 - **Base:** origin/main dae6d107fdbe942567104bcf1c9a2cbc6b3a1e0f (pull request #79's merge commit), taken in by
   fast-forward from b7145273.
-- **Last update:** 2026-11-28 02:24 Amsterdam (from the clock; an earlier save said 01:08, a time written without
+- **Last update:** 2026-11-28 02:35 Amsterdam (from the clock; an earlier save said 01:08, a time written without
   reading the clock: it was 00:57; an edit at 02:04 wrote "02:06", also unread, corrected here)
 
 ## Steps done
@@ -140,8 +140,9 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
 ## Key numbers
 - Step S as built: 1,288 written lines (bc7720f3 1,277, c1de41e5 11; `count-4c.mjs` at 3ab59bd7 against dae6d107),
   about 1.74 times its recount of 740.
-- Steps 1 to 7 recounted (the sheet's F2): 7,785 to 7,935 by the designs' count (the plan 7,315); by the plan's rule
-  (2.25 times) a stop line of about 17,520 to 17,850; each SIZE-4C option's line, two thirds and rung are in F2.
+- Steps 1 to 7 recounted (the sheet's F2, revision 3.1 with the blocks of 02:25 to 02:33 Amsterdam): about 8,190 to
+  8,290 by the designs' count (the plan 7,315); by the plan's rule (2.25 times) a stop line of about 18,420 to 18,640;
+  each SIZE-4C option's line, two thirds and rung are in F2.
 - Measured written lines against the designs' count: 4a 2.4 times, 4b-1 2.17, 4b-2 2.7.
 - 4c by the designs' count: 7,315 (steps 1 to 7, the plan's section 6) and about 630 for the scene with the map's
   reading (230 / 260 by 4b's sheet, and 60 to 80 more with as many in tests) = about 7,950. At the measured rates:
@@ -210,7 +211,22 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
     security-auditor answers once more; nothing to him under (a) (FACING-QUARTER only if a reviewer wants (b)). The held
     aim at spawn: the spawn point in whole centimetres. Questions RR1 to RR5 for rust-reviewer (RR1 Medium: the scan
     refuses std's names only, so `libm::sincos(` and `libm::expm1(` pass today) and NA1 to NA3 for netcode-architect,
-    sent after rust-reviewer's block 6. rust-reviewer running.
+    sent after rust-reviewer's block 6.
+    rust-reviewer DONE (block 6, `rr-body-proto-6.rs`, outputs `-3a`, `-3b`, `-2`, `-2w`; with the new options off it
+    reproduces block 5 byte for byte): (3a) / (3b) / (2) pass ramps met from the side 306 / 306 / 306 (body (2) only
+    with a one-line wall fix, "2w"; without it 108 of 306 walk into the ramps), landings 240 each, the snap down the
+    ramps 6 each (smallest margin 0.094 m), easing from rest 72 each, the push's 16 cases with the sandbox's push-out
+    and the plan's sweep (nobody stopped on open ground, none inside a solid, the 0.25 m cap never bit; ties must go by
+    soldier id). Two model holes every body shares, each one condition and no rule of his (the in-air step's "toward"
+    from the tick's start; a top crossed inside one tick counts as landed). The 2.5D count for step 1 honestly about
+    205 / 265 (shapes may have space under them: VISION_V2:90-91, LOOK_V2:32), against 3D's 260 / 260. The record rule
+    YES (F17 stands; the row also holds the body's carry-over: `pull: u16` under (3a), `stepped: u16` under (3b)).
+    Two open points: CEILING (it says the sandbox has no head rule; but game-designer-cs4.md:29, F18, reads "head bumps
+    a floating block", movement.ts:132-138, and MOVE-RULES row 8 already lists it: correction sent to it and to
+    game-designer at 02:35) and an unjumped fall from the 0.55 m step gaining the 0.56 m step 2 m away (to
+    game-designer). Follow-ups running from about 02:33 Amsterdam: rust-reviewer's block 7 (RR1 to RR5, FACING-SPAWN
+    from the maths side, the CEILING correction), netcode-architect's block 8 (NA1 to NA3, G-2), game-designer's new
+    block (the unjumped fall; the head bump from its notes).
 - **The sheet's revision 3** (from 02:14 Amsterdam): the record rule applied with its confirmations outstanding, the
   recount F2 with each option's stop line, section G for steps 1 to 7 with his checklist as a draft, section H's table
   of item 10's thirteen points.
