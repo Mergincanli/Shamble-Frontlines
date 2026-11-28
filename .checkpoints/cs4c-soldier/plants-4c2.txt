@@ -1,8 +1,9 @@
-plants on f21bf71e7e87a338e54154108d18676268176029-with-C2
+plants on e5da290e293d7acb8a5ed16d15d37a36a77abc90-with-C2
 R1 CAUGHT (defect): a spawn that does not raise the slot's generation: an id despawned before resolves again: exit 101, found 1 of 1 wanted texts
 R2 CAUGHT (defect): a despawn that leaves the row occupied: the despawned id still resolves: exit 101, found 1 of 1 wanted texts
 RC1 HELD (control): the clean tree: the soldier table's tests: exit 0, found 1 of 1 wanted texts
 V1 CAUGHT (defect): the typed read takes versions from 1 again: a movement file at version 1 is read as version 2: exit 101, found 1 of 1 wanted texts
+V1b CAUGHT (defect): the same lower bound of 1, seen by the header's own test at newest 2 (the ruling's read.rs test): exit 101, found 1 of 1 wanted texts
 V2 CAUGHT (defect): the page takes the old range of versions again: a movement file at version 1 is delivered: exit 1, found 2 of 2 wanted texts
 V3 CAUGHT (defect): the converter writes version 1: its header is no longer the loader's movement version: exit 1, found 2 of 2 wanted texts
 F1 CAUGHT (defect): a member read from another field's place: two of version 2's fields swapped in the read: exit 101, found 1 of 1 wanted texts
@@ -18,5 +19,5 @@ VC1 HELD (control): the clean tree: the content crate's tests: exit 0, found 1 o
 VC2 HELD (control): the clean tree: the page's content tests: exit 0, found 2 of 2 wanted texts
 VC3 HELD (control): the clean tree: the converter's tests: exit 0, found 1 of 1 wanted texts
 VC4 HELD (control): the clean tree: the converter's check on the real table and content file: exit 0, found 1 of 1 wanted texts
-DEFECT CHECKS: 14 caught, 0 not caught. CONTROLS: 5 held, 0 did not hold.
+DEFECT CHECKS: 15 caught, 0 not caught. CONTROLS: 5 held, 0 did not hold.
 EVERY FILE PUT BACK (sha256 of 8 files as at the start): yes

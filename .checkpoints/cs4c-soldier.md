@@ -221,7 +221,18 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   `/home/user/Shamble-Frontlines/.gate/cs4b-2`. A session of another account works on its own branch from this
   branch's head and never pushes here (his Lanes rule). SEAT-OUT from him: stop at a whole point and report the last
   commit's id.
-- **State (16:50 Amsterdam, from the clock): C2's plants passed once (14 of 14 caught, 5 of 5 held, every file put
+- **State (17:00 Amsterdam, from the clock): C2 is committed and pushed, CI running on it.** The code commit follows
+  this notes commit (no `[skip ci]` on it, so CI runs on the head). Its proof, on the very tree committed (`git diff
+  --binary` compared byte for byte with `c2-wip.patch` after the plants, the checks and the gate): the plants' whole
+  run again with V1b (`plants-4c2.txt`: 15 of 15 caught, 5 of 5 held, every file put back); the full local checks
+  passed (`.gate/local-checks-c2.log`: the players' file d16cb57d..., 258,455 bytes in both builds, from C1's
+  a624ff32..., 257,421; the browser tests 29 of 29 in 211 s); the gate PASS with smoke (`.gate/gate-c2.log`). The count
+  against 946fef73: **901 written lines** (C1 442, C2 459; `content/` is outside the count's folders). `c2-wip.patch` is
+  removed in this commit (C2 is in the code commit after it); C1's copies (`c1-wip.patch`, `c1-wip/`) are stale too
+  and are not applied by anyone. **Next: C3** (`step1-build-order.md` C3; drafts of `fmath.rs`, `rules.rs` and the
+  spawn table in the scratchpad, not in the tree: `share_per_tick` takes a rate, so the push's strength goes in as
+  written and the easing's rate is ln 10 over its time, a departure from 11.5's signature to name in the report).
+  Earlier state (16:50), kept: **C2's plants passed once (14 of 14 caught, 5 of 5 held, every file put
   back: `plants-4c2.txt` on f21bf71e plus C2); the first full local run stopped at the types package's type check (its
   `index.test.ts` built a movement table of 15 fields: fixed, 13 made-up values as in `TEST_TEXT`, its key count 29);
   the ruling's header-level test added (`read.rs`, `the_header_takes_the_newest_version_only`, header at newest 2:
