@@ -166,7 +166,8 @@ and an aim outside the map; one jump per command (3B-ONE-PER-TICK).
 | T2-16 | a Chromium spec beside `presses.spec.ts` (PM-0002-14's page half) | 10,000 frames with the mouse moving: the match never fails (a post without finite ray numbers ends it at the guard), the page's posts reach 10,000, and the aim the block's own section shows follows the cursor (step 3's section) (50) | a separate `{type: "aim"}` message (the guard refuses it: the match fails) |
 
 ### 1.3 The count, recounted (bottom-up, unmultiplied)
-- Code: `sim` aim.rs 45, bounds 20, `PlayerCommand` and record 15; `post.rs` 45; `endpoint.rs` 35; `room` 30;
+- [SUPERSEDED by block 7.5: step 2 is about 340 / 675; the bounds 35; `PlayerCommand` and record 15 go with
+  whichever step adds the fields] Code: `sim` aim.rs 45, bounds 20, `PlayerCommand` and record 15; `post.rs` 45; `endpoint.rs` 35; `room` 30;
   `sim-wasm` 15, `local_match` 15; `replay.rs` 10; the jump rule 10 (built in step 1's movement): Rust 240. TS:
   messages.ts 15, host.ts 25, worker-link.ts 15, recording.ts 15, the e2e worker 5: 75. **Code 315 (+-30 %).**
 - Tests: Rust T2-1 to T2-10 400, J1-J5 80: 480. TS T2-11 to T2-16 150. **Tests 630.**
@@ -610,7 +611,7 @@ Asked 2026-11-28 on head 3ab59bd7: (1) the record rule, (2) one home for the bou
 this block is my only write. rust-reviewer answers (1) from its side at the same time; I did not wait for it.
 
 ### 7.0 Plan
-1. Re-read the ruling (advisor-reread-4c.md :30-31, :40), my block 1.1 (:74-105), block 6 (:581), N24, N30,
+1. Re-read the ruling (advisor-reread-4c.md :30-31, :40), my block 1.1 (:74-105), block 6 (:582), N24, N30,
    rust-reviewer-read 1.1 (:71-73) and 1.6 (:240-247), world.rs (:33-51, :112-117, :143-191), room/lib.rs (:262-300),
    map.rs (:9-14, :33-52, :244-250, :316-335, :645-646), collision.rs (:94-108, :212-250), endpoint.rs (:56-88),
    worker.ts (:53-54). A notes line per finding.
@@ -624,7 +625,7 @@ this block is my only write. rust-reviewer answers (1) from its side at the same
 - B7-N1 (the record today): `World.player` is the whole `PlayerCommand` (buttons, presses), hashed as bytes 4 to 21 of the shared state (world.rs:18, :115, :185-187); `authority_step` keeps it when a tick has no command (:143-151). The room hands `&[]` to the world on a tick whose queue gives nothing due (room/lib.rs:262-282) and runs a late command in a later tick (`late`, :273-275); the echo reads the record (:286-296). So a starved tick reaches the world as a command-less tick, and nothing outside the world repeats a command today.
 - B7-N2 (my (i) left a gap): block 1.1 (:76-79) said the soldier "consumes" move and aim and never said what a tick with no command does; N24 (:50) the same. With nothing kept, a command-less tick would stop him, a rule change nobody chose. The ruling closes it; my answer below keeps the held move and aim in the soldier's row.
 - B7-N3 (the row's fields): rust-reviewer-read 1.1 (:71-73) gives the Soldier `aim: V3` and `facing: [f32; 2]` and no held move; its 1.6 (:246-247) has `visit_shared` write "the move and aim of the record", which contradicts its F17 (:29) taking (i). The move is the one new field.
-- B7-N4 (no signed method): `StateSink` has `u16`, `u32`, `bytes`, `secret` (world.rs:57-67) and no `i8`; the path form `i8::to_le_bytes(x)` is what the rule scan needs (world.rs:91-92). rust-reviewer adds `f32` in step 1 (F12), which the `aim: V3` field uses.
+- B7-N4 (no signed method): `StateSink` has `u16`, `u32`, `bytes`, `secret` (world.rs:57-67) and no `i8`; the path form `i8::to_le_bytes(x)` is what the rule scan needs (world.rs:90-91). rust-reviewer adds `f32` in step 1 (F12), which the `aim: V3` field uses.
 - B7-N5 (no reader of the bytes): `write_state` is `#[cfg(test)]` (world.rs:190-198) and nothing reads canonical bytes back. A restore test needs a test-only reader; change-set 7's reset is the real one and is not built here.
 - B7-N6 (first-loop's aim): first-loop runs on the test scene (N10) whose bounds hold the origin (x -32..80, y 0..20, z -24..24; N28), so the clamped start aim is (0, 0, 0) cm, exactly what today's endpoint writes (endpoint.rs:251-263). Its rays are all-zero bits (N9).
 - B7-N7 (the grid trap): `on_grid` rounds `value * 100` and keeps it only if it divides back to the same double (map.rs:244-250); 0.55 x 100 is not 55 to the last bit (map.rs:645-646), so a plain `ceil` on a lower face at 0.55 gives 56. `on_grid` is private to content today (`fn`, no `pub`).
@@ -654,15 +655,17 @@ move and the aim are the soldier's, kept in its row.
 **The bytes** (rust-reviewer's Soldier, its read 1.1 :71-73, owns the row's order; these two follow `facing`):
 - `held_move: [i8; 2]`, new: move_x then move_y as the room took them (length within 127), **2 bytes**, written as
   `sink.bytes::<2>("soldier.held_move", &[i8::to_le_bytes(move_x)[0], i8::to_le_bytes(move_y)[0]])`: the two's
-  complement bits, the path form the rule scan needs (world.rs:91-92), no new sink method (B7-N4).
-- `aim: V3`, the field the ruling names (rust-reviewer's): written at take as `f32::from(x_cm) / 100.0` per axis
-  (`i16` and `u16` to `f32` are exact, one correctly rounded division, the same bits on both targets; never a minus
-  zero, since 0 converts to +0.0), **12 bytes** through `StateSink::f32` (bits, little-endian, rust-reviewer's F12).
-  So 14 bytes of each row hold them. **Flagged option, not my answer:** hold the command's integers instead (`AimCm`,
-  x `i16`, y `u16`, z `i16`: 6 bytes, so 8 bytes in all) and divide where the facing reads them: one canonical form, no
-  float to restore, exactly what the room judged; rust-reviewer's call, either width meets the invariant.
+  complement bits, the path form the rule scan needs (world.rs:90-91), no new sink method (B7-N4).
+- The aim: written first as the ruling names it (rust-reviewer's `aim: V3`, 12 bytes of `f32` bits, taken as
+  `f32::from(x_cm) / 100.0` per axis), with the integer form flagged as rust-reviewer's call. **rust-reviewer's own
+  answer (its read, B6-R, :568) took the integer form, and I agree:** `aim_cm: AimCm` (x `i16`, y `u16`, z `i16`, the
+  command's own integers as the room took them), **6 bytes**, little-endian, in place of 1.1's `aim: V3`; the metres
+  are derived each tick where the facing reads them (`i16` and `u16` to `f32` exact, one correctly rounded division,
+  the same bits on both targets, never a minus zero) and are not state. One canonical form, no float to restore,
+  exactly what the room judged. So **8 bytes** of each row hold the move and the aim. rust-reviewer and I also agree on
+  `held_move: [i8; 2]` and on the restore test's shape.
 - The record never takes move or aim: `visit_shared` writes the tick, the record (22 bytes as today), then the soldier
-  rows. That settles rust-reviewer-read 1.6 (:246-247) against its F17 (:29) in (i)'s favour, if it agrees.
+  rows. rust-reviewer's B6-R (:568) withdraws 1.6's phrase "the move and aim of the record" (:246-247): agreed.
 
 **The restore test** (step 1, in world.rs's test module beside `write_state`, which is `#[cfg(test)]`, :190-198):
 - A test-only reader `read_shared(bytes, constants) -> World` that takes the shared bytes field by field in
@@ -677,7 +680,9 @@ move and the aim are the soldier's, kept in its row.
   B stops at tick 31, bytes differ; (P2) the held aim left out: B's facing differs from tick 31; (P3) a command-less tick
   that zeroes the move (the narrow record with nothing kept): A stops, the "advanced by 30 ticks" check is red.
 - **The room's pin** (room tests): a room on the test scene, commands 1 to 30 with move (127, 0), then the datagrams
-  for ticks 31 to 33 dropped so the queue gives nothing due at ticks 31 to 33, then the repeat brings them late. At
+  for ticks 31 to 33 dropped so the queue gives nothing due at ticks 31 to 33, then tick 34's datagram brings them
+  late (it repeats up to `REDUNDANCY_CAP` = 8 commands, protocol/src/messages.rs:18; `missing` counts any the repeat
+  no longer carries, 0 here). At
   ticks 31 to 33 the world is handed **no** command (a test-only count of the slice length at room/lib.rs:282, beside
   `commands_run`) and the soldier walks on; when the late commands run, `late` counts them and the newest's move is
   taken. Plant: the room re-feeds `last_run`'s command on a starved tick (the slice length becomes 1: red). Without
@@ -686,9 +691,10 @@ move and the aim are the soldier's, kept in its row.
 - Count: the reader 35, the world test 35, the room pin 30 (tests, all step 1's); the held move in the row 10 (code).
 
 **First-loop's hashes in step 2: NO, they do not move**, on four conditions, each written down:
-1. Step 1's room already hands each command's move and aim to the soldier (rust-reviewer's 1.6 puts the
-   `PlayerCommand` fields in step 1; my block 1.1 had them in step 2: step 1 it is). If step 1's soldier kept a spawn
-   aim until step 2, step 2 would move the hashes and would re-make first-loop in its own commit.
+1. Step 1's room already hands each command's move and aim to the soldier from its first command (the
+   `PlayerCommand` fields land with whichever of steps 1 and 2 is built first: rust-reviewer's 1.6 has step 1, my block
+   1.1 step 2, block 6 row 2g either). If step 1's soldier kept a spawn aim until step 2, step 2 would move the hashes
+   and would re-make first-loop in its own commit.
 2. The all-zero ray is no ray and keeps the aim (answer 3).
 3. The test scene's bounds hold the origin, so the clamped start aim is (0, 0, 0) cm, the same aim today's endpoint
    writes (B7-N6); and first-loop's move word is 0, which `clamp_move` leaves (0, 0).
@@ -714,7 +720,13 @@ stands). First-loop moves in step 1's commit, which re-makes it anyway (F12).
   in `build`. Every loaded map lies inside the reach already (map.rs:319-335), so there the box is the bounds. A map
   built in code past the reach still builds: block 4.3's 2 km map (0 to 2,000 m on x and z) gets the box 0 to 32,767 cm
   on x and z and runs the simulation alone. A box empty on some axis (bounds wholly past 327.67 m, only a code-built
-  map can have it) is `None`; `Room::new` and `Endpoint::new` refuse such a world by name.
+  map can have it) is `None`. What a room or an endpoint does with such a world is **engine-architect's call**, two
+  ways: (A) `Room::new` (today `-> Self`, room/lib.rs:105) becomes fallible and `Endpoint::new` (already `-> Option`,
+  endpoint.rs:117) gains one more `None`: the four `Room::new` callers of N12, about +10 lines, not in the count; (B) no
+  constructor change: the box is checked once where a match's world is built (sim-wasm's `create`, which already
+  refuses a world that fails to build, sim-wasm/src/lib.rs:85), and on a code-built world with no box `holds_cm` is
+  false and `clamp_cm` gives the reach's nearest corner, so the room refuses every aim and counts it. I lean to (B): no
+  new error path for a world no loader can make.
 - **Withdrawn, in so many words:** my block 1.1 line "a document built in code whose bounds are off that grid is
   refused (`WorldError` gains `Bounds`, with its `message`)" (:69-71). Off the grid is no refusal now. `WorldError`
   gains `Bounds` only for bounds that are not finite or have no thickness, the checks a shape gets (collision.rs:227-232),
@@ -785,16 +797,18 @@ stands). First-loop moves in step 1's commit, which re-makes it anyway (F12).
 Each older line also carries a "SUPERSEDED by block 7" mark in place; line numbers are as they stand after those marks.
 | Older line | Was | Now |
 |---|---|---|
-| N24 (:50), block 1.1 (:76-79) | (i): "the soldier consumes move and aim" | 7.2: the soldier's row holds them (`held_move` 2 bytes, `aim` 12); a command-less tick keeps both |
+| N24 (:50), block 1.1 (:76-79) | (i): "the soldier consumes move and aim" | 7.2: the soldier's row holds them (`held_move` 2 bytes, `aim_cm` 6, as rust-reviewer's B6-R); a command-less tick keeps both |
 | block 1.1 (:69-71) | "a document built in code whose bounds are off that grid is refused" | 7.3: withdrawn; one step inward off the grid; `WorldError::Bounds` only for bounds not finite or without thickness |
 | block 1.1 (:89-91), T2-2 (:151) | the ray `None` unless all six are finite | 7.4: `PostRay { None, Refused, Ray }`; all-zero is `None`, a non-finite number `Refused` |
 | block 1.1 (:103-104), T2-5 (:154) | `aims_kept` counts every kept aim, a post without a usable ray included | 7.4: `rays_refused` (non-finite) and `rays_missed` (finite, met nothing); an all-zero post counts in neither |
+| block 1.3 (:169-170) and the last section's block 1 line | step 2: 315 / 630 = 945 | about 340 / 675 = 1,015 (the count below); step 1 gains about 10 / 100 |
 | T2-4 (:153) | "bounds off the grid refused by name" | 7.3's tie test and its four plants |
-| block 3.1 (:340-341) | "the zero ray has no direction, so the endpoint keeps its first aim" | the zero ray is no ray (not cast, not counted): the same aim, by rule rather than by the cast |
+| block 3.1 (:341-342) | "the zero ray has no direction, so the endpoint keeps its first aim" | the zero ray is no ray (not cast, not counted): the same aim, by rule rather than by the cast |
 | "For the sheet" item 2 | the bounds' one home, flagged | settled by 7.3 |
 | "For the sheet" item 6 | "I recommend the narrow record" | (i) as ruled, with the held move and aim in the row (7.2), never the narrow record with nothing kept |
-- Moved between steps: `PlayerCommand`'s move and aim fields go to step 1 (rust-reviewer's 1.6), not step 2 (my 1.1),
-  so that step 2 moves no hash (7.2 condition 1). Block 6 row 2g stands.
+- Which step adds `PlayerCommand`'s move and aim: whichever of steps 1 and 2 is built first (block 6 row 2g: they
+  can come before step 1). The binding condition is 7.2's condition 1: step 1's soldier takes the command's move and
+  aim from its first command (no spawn aim kept until step 2), so that step 2 moves no hash.
 - **Count:** step 2 (block 1.3) from 315 / 630 to about **340 / 675** (the bounds' two views and the aim box +15 / +10;
   the ray's three kinds and the second counter +10 / +35). Step 1 gains about **10 / 100** (the held move in the row;
   the restore reader, the world test and the room's pin), counted in rust-reviewer's step 1 so they are counted once.
@@ -828,7 +842,8 @@ DONE (block 7)
    newer block's due (N21, rule B); the pool is 16; there is no placement counter; first-loop moves with step 1.
 
 ## Counts, one line per block (bottom-up, unmultiplied; plus or minus 30 %)
-- Block 1, step 2: 315 code / 630 tests = 945 (plan 385 / 530 = 915).
+- Block 1, step 2: 315 code / 630 tests = 945 (plan 385 / 530 = 915). [SUPERSEDED by block 7.5: about 340 / 675 =
+  1,015; step 1 gains about 10 / 100.]
 - Block 2, step 3: mine 215 / 325 = 540; with engine-architect's layout about 320 / 340 (plan 320 / 340).
 - Block 3, step 6: mine 245 / 170 = 415 (plan 320 / 230 = 550, the rest being the other designs' marks).
 - Block 4, step 6b: 130 / 115 = 245 (plan 130 / 110); step 6c: 45 / 220 = 265 (plan 30 / 180).

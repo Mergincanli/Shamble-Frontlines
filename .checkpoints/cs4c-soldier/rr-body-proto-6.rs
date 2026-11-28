@@ -28,6 +28,7 @@ const MAX_STEP: f32 = 0.25;
 const HEAD_ON_GATE: f32 = 0.2;
 const KEEP_GATE: f32 = 0.1;
 const SKIN: f32 = 0.001;
+static TOWARD_START: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
 static WALL_DISC: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
 
 #[derive(Clone, Copy, PartialEq, Debug)]
@@ -207,7 +208,12 @@ fn tick(world: &[Block], s: &mut S, body: Body, wish: (f32, f32), speed: f32, ju
         if floating(b, s.y, s.cfg) || !overlaps(b, s.x, s.z, R) { continue; }
         let h = if body == Body::Cyl { height_max(b, s.x, s.z, R) } else { height_near(b, s.x, s.z) };
         let (nx, nz) = nearest(b, s.x, s.z);
-        let toward = (nx - s.x) * dir.0 + (nz - s.z) * dir.1 > 0.0;
+        let toward = if TOWARD_START.load(std::sync::atomic::Ordering::Relaxed) {
+            // Candidate fix: "toward" judged from where the tick started, so a centre that crossed into the footprint
+            // this tick still counts as moving toward the block.
+            let (sx, sz) = nearest(b, x_start, z_start);
+            (sx - x_start) * dir.0 + (sz - z_start) * dir.1 > 0.0 || (nx - s.x) * dir.0 + (nz - s.z) * dir.1 > 0.0
+        } else { (nx - s.x) * dir.0 + (nz - s.z) * dir.1 > 0.0 };
         if h > s.y + 1e-4 && h <= test_feet + STEP + e && toward && best.is_none_or(|(_, bh)| h > bh) { best = Some((i, h)); }
     }
     if let Some((i, h)) = best {
@@ -636,7 +642,7 @@ fn block6(world: &[Block], body: Body, v0: f32) {
                 SNAP + (mv + FOOT) * 0.25, mv * 0.25, SNAP + (mv + FOOT) * 0.5, mv * 0.5);
         }
         let mut s = start(31.0, -9.0, 0.55);
-        for _ in 0..40 { tick(world, &mut s, body, (1.0, 0.0), sp, false, v0); if s.x > 34.0 { break; } }
+        for _ in 0..40 { tick(world, &mut s, body, (0.0, -1.0), sp, false, v0); if s.z < -12.0 { break; } }
         println!("  down the 0.55 step at {sp}: {} airborne ticks {} flickers {} feet {:.3}", if s.fall_at.is_some() { "fell" } else { "snapped" }, s.airborne_ticks, s.flickers, s.y);
         for (name, z, top) in [("gentle", 6.0_f32, 1.0_f32), ("steep", 12.0, 1.5)] {
             let mut s = start(47.0, z, top);
@@ -710,14 +716,43 @@ fn block6(world: &[Block], body: Body, v0: f32) {
                 for t in 0..60 {
                     tick(&cmap, &mut s, body, if walk { (1.0, 0.0) } else { (0.0, 0.0) }, sp, t == 0, v0);
                     emb += u32::from(embedded(&cmap, &s, body));
+                    if std::env::var("TRACE6").is_ok() && walk && sp == 13.27 { println!("    trace {cname} t {t} x {:.4} y {:.4} vy {:.3} grounded {} emb {}", s.x, s.y, s.vy, s.grounded, embedded(&cmap, &s, body)); }
                     top = top.max(s.y); maxdz = maxdz.max(s.z.abs());
                     if s.grounded && t > 0 { break; }
                 }
-                println!("ceiling {cname} {what} at {sp}: highest feet {top:.4} (head {:.4}; beam bottom 2.0) ended x {:.4} z {:.4} feet {:.4} sideways at most {maxdz:.4} head-hits {} embedded-ticks {emb}", top + BODY_H, s.x, s.z, s.y, s.head_hits);
+                println!("ceiling {cname} {what} at {sp}: highest feet {top:.4} (head {:.4}; beam bottom 2.0) ended x {:.4} z {:.4} feet {:.4} moved along x {:.4} sideways at most {maxdz:.4} head-hits {} embedded-ticks {emb}", top + BODY_H, s.x, s.z, s.y, s.x - if walk { 54.0 } else { 56.0 }, s.head_hits);
             }
-            if !head { break; }
         }
     }
+
+    // G. Block 5's ledge jumps and the beam again, counting ticks inside a solid, with and without the candidate fix.
+    println!("# G. ledges with the inside counter");
+    let fix_before = TOWARD_START.load(std::sync::atomic::Ordering::Relaxed);
+    for fix in [false, true] {
+        TOWARD_START.store(fix, std::sync::atomic::Ordering::Relaxed);
+        for (face, top) in [(30.0_f32, 2.9_f32), (35.0, 3.05), (40.0, 3.1)] {
+            let mut z = 0.0_f32;
+            for sp in speeds { for d in [0.05_f32, 0.3, 0.8, 1.2] {
+                let mut s = start(face - R - d, -2.5, 0.0);
+                let mut emb = 0;
+                for t in 0..90 { tick(world, &mut s, body, (1.0, 0.0), sp, t == 0, v0); emb += u32::from(embedded(world, &s, body)); if s.x >= face + 1.2 { break; } }
+                let caught = s.y == top && s.grounded;
+                let pass = emb == 0 && s.falls_unjumped == 0 && if top < 3.076 { caught } else { !caught };
+                count(if fix { "G ledges, toward from the tick's start" } else { "G ledges, block 5's toward" }, pass, &mut tally);
+                if emb > 0 { z += 1.0; println!("ledge {top} speed {sp} jump {d} m out, fix {fix}: {} caught {caught} inside-ticks {emb}", pf(pass)); }
+            }}
+            println!("ledge {top} fix {fix}: {z} of 12 runs spent a tick inside the block");
+        }
+        let cmap = ceiling_map();
+        for sp in speeds { for head in [false, true] {
+            let mut s = start(54.0, 0.0, 0.0);
+            s.cfg.head_stop = head;
+            let mut emb = 0;
+            for t in 0..60 { tick(&cmap, &mut s, body, (1.0, 0.0), sp, t == 0, v0); emb += u32::from(embedded(&cmap, &s, body)); if s.grounded && t > 0 { break; } }
+            println!("beam jump walking {sp} head-stop {head} fix {fix}: ended x {:.4} feet {:.4} inside-ticks {emb}", s.x, s.y);
+        }}
+    }
+    TOWARD_START.store(fix_before, std::sync::atomic::Ordering::Relaxed);
 
     // F. The push, game-designer-read.md block 3 (velocities: this tick's displacement / dt, after the walls).
     println!("# F. the push (share {:.5} a tick)", 1.0 - (-PUSH_STRENGTH * DT).exp());
@@ -786,6 +821,7 @@ fn block6(world: &[Block], body: Body, v0: f32) {
 fn main() {
     let body = match std::env::args().nth(1).as_deref() { Some("3a") => Body::A3, Some("3b") => Body::B3, Some("3x") => Body::X3, _ => Body::Cyl };
     if std::env::args().nth(1).as_deref() == Some("2w") { WALL_DISC.store(true, std::sync::atomic::Ordering::Relaxed); }
+    if std::env::var("FIX_TOWARD").is_ok() { TOWARD_START.store(true, std::sync::atomic::Ordering::Relaxed); }
     let world = scene();
     let v0 = (2.0 * G * (REACH - STEP)).sqrt();
     match std::env::args().nth(2).as_deref() { Some("b5") => block5(&world, body, v0), _ => block6(&world, body, v0) }

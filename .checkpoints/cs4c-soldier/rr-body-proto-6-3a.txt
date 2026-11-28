@@ -370,15 +370,15 @@ high drop from 10 to 18 m, land on a top crossed in the tick false: 4 of 21 miss
 high drop from 10 to 18 m, land on a top crossed in the tick true: 0 of 21 missed the top (fell inside it and were put out to the ground)
 # C. the snap
 snap speed 6.3: allowance flat 0.2, 25 % 0.2900 (drop a tick 0.0525), 50 % 0.3800 (drop 0.1050), the 0.55 step 0.55 > 0.2: a fall
-  down the 0.55 step at 6.3: fell airborne ticks 6 flickers 0 feet 0.560
+  down the 0.55 step at 6.3: fell airborne ticks 6 flickers 0 feet 0.000
   down the gentle ramp at 6.3: PASS largest drop a tick 0.0775, smallest margin under the allowance 0.1700, airborne ticks 0
   down the steep ramp at 6.3: PASS largest drop a tick 0.1550, smallest margin under the allowance 0.1150, airborne ticks 0
 snap speed 9.576: allowance flat 0.2, 25 % 0.3173 (drop a tick 0.0798), 50 % 0.4346 (drop 0.1596), the 0.55 step 0.55 > 0.2: a fall
-  down the 0.55 step at 9.576: fell airborne ticks 4 flickers 0 feet 0.560
+  down the 0.55 step at 9.576: fell airborne ticks 6 flickers 0 feet 0.070
   down the gentle ramp at 9.576: PASS largest drop a tick 0.0798, smallest margin under the allowance 0.1364, airborne ticks 0
   down the steep ramp at 9.576: PASS largest drop a tick 0.1596, smallest margin under the allowance 0.0940, airborne ticks 0
 snap speed 13.27: allowance flat 0.2, 25 % 0.3481 (drop a tick 0.1106), 50 % 0.4962 (drop 0.2212), the 0.55 step 0.55 > 0.2: a fall
-  down the 0.55 step at 13.27: fell airborne ticks 2 flickers 0 feet 0.560
+  down the 0.55 step at 13.27: fell airborne ticks 4 flickers 0 feet 0.337
   down the gentle ramp at 13.27: PASS largest drop a tick 0.1106, smallest margin under the allowance 0.1376, airborne ticks 0
   down the steep ramp at 13.27: PASS largest drop a tick 0.2212, smallest margin under the allowance 0.1328, airborne ticks 0
 # D. easing (k 0.37375 a tick, up = stop, air 100 %)
@@ -422,23 +422,60 @@ ease ledge 3.1 jump from rest 1.2 m out speed 13.27: PASS feet 0.0000 x 39.600
 ceiling C1 under the 2.0 beam at 6.3: x 58.5100 z 0.0000 feet 0.0000 head 1.8000 embedded-ticks 0 wall-pushes 0
 ceiling C1 into the 1.7 beam at 6.3: x 59.6000 z 0.0000 feet 0.0000 head 1.8000 embedded-ticks 0 wall-pushes 53
 ceiling C1 up the step under the 2.2 beam at 6.3: x 65.6000 z 0.0000 feet 0.5500 head 2.3500 embedded-ticks 0 wall-pushes 48
-ceiling C1 jump standing under the 2.0 beam at 6.3: highest feet 2.5202 (head 4.3202; beam bottom 2.0) ended x 54.6000 z 0.0000 feet 0.0000 sideways at most 0.0000 head-hits 0 embedded-ticks 0
-ceiling C1 jump walking under the 2.0 beam at 6.3: highest feet 2.3000 (head 4.1000; beam bottom 2.0) ended x 54.8100 z 0.0000 feet 2.3000 sideways at most 0.0000 head-hits 0 embedded-ticks 0
+ceiling C1 jump standing under the 2.0 beam at 6.3: highest feet 2.5202 (head 4.3202; beam bottom 2.0) ended x 54.6000 z 0.0000 feet 0.0000 moved along x -1.4000 sideways at most 0.0000 head-hits 0 embedded-ticks 0
+ceiling C1 jump walking under the 2.0 beam at 6.3: highest feet 2.3000 (head 4.1000; beam bottom 2.0) ended x 54.8100 z 0.0000 feet 2.3000 moved along x 0.8100 sideways at most 0.0000 head-hits 0 embedded-ticks 0
+ceiling C1 under the 2.0 beam at 9.576: x 58.7032 z 0.0000 feet 0.0000 head 1.8000 embedded-ticks 0 wall-pushes 0
+ceiling C1 into the 1.7 beam at 9.576: x 59.6000 z 0.0000 feet 0.0000 head 1.8000 embedded-ticks 0 wall-pushes 55
+ceiling C1 up the step under the 2.2 beam at 9.576: x 65.6000 z 0.0000 feet 0.5500 head 2.3500 embedded-ticks 0 wall-pushes 52
+ceiling C1 jump standing under the 2.0 beam at 9.576: highest feet 2.5202 (head 4.3202; beam bottom 2.0) ended x 54.6000 z 0.0000 feet 0.0000 moved along x -1.4000 sideways at most 0.0000 head-hits 0 embedded-ticks 0
+ceiling C1 jump walking under the 2.0 beam at 9.576: highest feet 2.3000 (head 4.1000; beam bottom 2.0) ended x 54.9192 z 0.0000 feet 2.3000 moved along x 0.9192 sideways at most 0.0000 head-hits 0 embedded-ticks 0
+ceiling C1 under the 2.0 beam at 13.27: x 58.6350 z 0.0000 feet 0.0000 head 1.8000 embedded-ticks 0 wall-pushes 0
+ceiling C1 into the 1.7 beam at 13.27: x 59.6000 z 0.0000 feet 0.0000 head 1.8000 embedded-ticks 0 wall-pushes 57
+ceiling C1 up the step under the 2.2 beam at 13.27: x 65.6000 z 0.0000 feet 0.5500 head 2.3500 embedded-ticks 0 wall-pushes 55
+ceiling C1 jump standing under the 2.0 beam at 13.27: highest feet 2.5202 (head 4.3202; beam bottom 2.0) ended x 54.6000 z 0.0000 feet 0.0000 moved along x -1.4000 sideways at most 0.0000 head-hits 0 embedded-ticks 0
+ceiling C1 jump walking under the 2.0 beam at 13.27: highest feet 2.5202 (head 4.3202; beam bottom 2.0) ended x 61.2350 z 0.0000 feet 2.0000 moved along x 7.2350 sideways at most 0.0000 head-hits 0 embedded-ticks 3
 ceiling C2 under the 2.0 beam at 6.3: x 58.5100 z 0.0000 feet 0.0000 head 1.8000 embedded-ticks 0 wall-pushes 0
 ceiling C2 into the 1.7 beam at 6.3: x 59.6000 z 0.0000 feet 0.0000 head 1.8000 embedded-ticks 0 wall-pushes 53
 ceiling C2 up the step under the 2.2 beam at 6.3: x 65.6000 z 0.0000 feet 0.5500 head 2.3500 embedded-ticks 0 wall-pushes 48
-ceiling C2 jump standing under the 2.0 beam at 6.3: highest feet 0.2000 (head 2.0000; beam bottom 2.0) ended x 56.0000 z 0.0000 feet 0.0000 sideways at most 0.0000 head-hits 1 embedded-ticks 0
-ceiling C2 jump walking under the 2.0 beam at 6.3: highest feet 2.3000 (head 4.1000; beam bottom 2.0) ended x 54.8100 z 0.0000 feet 2.3000 sideways at most 0.0000 head-hits 0 embedded-ticks 0
+ceiling C2 jump standing under the 2.0 beam at 6.3: highest feet 0.2000 (head 2.0000; beam bottom 2.0) ended x 56.0000 z 0.0000 feet 0.0000 moved along x 0.0000 sideways at most 0.0000 head-hits 1 embedded-ticks 0
+ceiling C2 jump walking under the 2.0 beam at 6.3: highest feet 2.3000 (head 4.1000; beam bottom 2.0) ended x 54.8100 z 0.0000 feet 2.3000 moved along x 0.8100 sideways at most 0.0000 head-hits 0 embedded-ticks 0
 ceiling C2 under the 2.0 beam at 9.576: x 58.7032 z 0.0000 feet 0.0000 head 1.8000 embedded-ticks 0 wall-pushes 0
 ceiling C2 into the 1.7 beam at 9.576: x 59.6000 z 0.0000 feet 0.0000 head 1.8000 embedded-ticks 0 wall-pushes 55
 ceiling C2 up the step under the 2.2 beam at 9.576: x 65.6000 z 0.0000 feet 0.5500 head 2.3500 embedded-ticks 0 wall-pushes 52
-ceiling C2 jump standing under the 2.0 beam at 9.576: highest feet 0.2000 (head 2.0000; beam bottom 2.0) ended x 56.0000 z 0.0000 feet 0.0000 sideways at most 0.0000 head-hits 1 embedded-ticks 0
-ceiling C2 jump walking under the 2.0 beam at 9.576: highest feet 2.3000 (head 4.1000; beam bottom 2.0) ended x 54.9192 z 0.0000 feet 2.3000 sideways at most 0.0000 head-hits 0 embedded-ticks 0
+ceiling C2 jump standing under the 2.0 beam at 9.576: highest feet 0.2000 (head 2.0000; beam bottom 2.0) ended x 56.0000 z 0.0000 feet 0.0000 moved along x 0.0000 sideways at most 0.0000 head-hits 1 embedded-ticks 0
+ceiling C2 jump walking under the 2.0 beam at 9.576: highest feet 2.3000 (head 4.1000; beam bottom 2.0) ended x 54.9192 z 0.0000 feet 2.3000 moved along x 0.9192 sideways at most 0.0000 head-hits 0 embedded-ticks 0
 ceiling C2 under the 2.0 beam at 13.27: x 58.6350 z 0.0000 feet 0.0000 head 1.8000 embedded-ticks 0 wall-pushes 0
 ceiling C2 into the 1.7 beam at 13.27: x 59.6000 z 0.0000 feet 0.0000 head 1.8000 embedded-ticks 0 wall-pushes 57
 ceiling C2 up the step under the 2.2 beam at 13.27: x 65.6000 z 0.0000 feet 0.5500 head 2.3500 embedded-ticks 0 wall-pushes 55
-ceiling C2 jump standing under the 2.0 beam at 13.27: highest feet 0.2000 (head 2.0000; beam bottom 2.0) ended x 56.0000 z 0.0000 feet 0.0000 sideways at most 0.0000 head-hits 1 embedded-ticks 0
-ceiling C2 jump walking under the 2.0 beam at 13.27: highest feet 2.5202 (head 4.3202; beam bottom 2.0) ended x 61.2350 z 0.0000 feet 2.0000 sideways at most 0.0000 head-hits 0 embedded-ticks 3
+ceiling C2 jump standing under the 2.0 beam at 13.27: highest feet 0.2000 (head 2.0000; beam bottom 2.0) ended x 56.0000 z 0.0000 feet 0.0000 moved along x 0.0000 sideways at most 0.0000 head-hits 1 embedded-ticks 0
+ceiling C2 jump walking under the 2.0 beam at 13.27: highest feet 2.5202 (head 4.3202; beam bottom 2.0) ended x 61.2350 z 0.0000 feet 2.0000 moved along x 7.2350 sideways at most 0.0000 head-hits 0 embedded-ticks 3
+# G. ledges with the inside counter
+ledge 2.9 speed 13.27 jump 0.05 m out, fix false: FAIL caught true inside-ticks 3
+ledge 2.9 speed 13.27 jump 0.3 m out, fix false: FAIL caught true inside-ticks 3
+ledge 2.9 speed 13.27 jump 0.8 m out, fix false: FAIL caught true inside-ticks 3
+ledge 2.9 speed 13.27 jump 1.2 m out, fix false: FAIL caught true inside-ticks 3
+ledge 2.9 fix false: 4 of 12 runs spent a tick inside the block
+ledge 3.05 speed 13.27 jump 0.05 m out, fix false: FAIL caught true inside-ticks 1
+ledge 3.05 speed 13.27 jump 0.3 m out, fix false: FAIL caught true inside-ticks 1
+ledge 3.05 speed 13.27 jump 0.8 m out, fix false: FAIL caught true inside-ticks 1
+ledge 3.05 speed 13.27 jump 1.2 m out, fix false: FAIL caught true inside-ticks 1
+ledge 3.05 fix false: 4 of 12 runs spent a tick inside the block
+ledge 3.1 fix false: 0 of 12 runs spent a tick inside the block
+beam jump walking 6.3 head-stop false fix false: ended x 54.8100 feet 2.3000 inside-ticks 0
+beam jump walking 6.3 head-stop true fix false: ended x 54.8100 feet 2.3000 inside-ticks 0
+beam jump walking 9.576 head-stop false fix false: ended x 54.9192 feet 2.3000 inside-ticks 0
+beam jump walking 9.576 head-stop true fix false: ended x 54.9192 feet 2.3000 inside-ticks 0
+beam jump walking 13.27 head-stop false fix false: ended x 61.2350 feet 2.0000 inside-ticks 3
+beam jump walking 13.27 head-stop true fix false: ended x 61.2350 feet 2.0000 inside-ticks 3
+ledge 2.9 fix true: 0 of 12 runs spent a tick inside the block
+ledge 3.05 fix true: 0 of 12 runs spent a tick inside the block
+ledge 3.1 fix true: 0 of 12 runs spent a tick inside the block
+beam jump walking 6.3 head-stop false fix true: ended x 54.8100 feet 2.3000 inside-ticks 0
+beam jump walking 6.3 head-stop true fix true: ended x 54.8100 feet 2.3000 inside-ticks 0
+beam jump walking 9.576 head-stop false fix true: ended x 54.9192 feet 2.3000 inside-ticks 0
+beam jump walking 9.576 head-stop true fix true: ended x 54.9192 feet 2.3000 inside-ticks 0
+beam jump walking 13.27 head-stop false fix true: ended x 55.0423 feet 2.3000 inside-ticks 0
+beam jump walking 13.27 head-stop true fix true: ended x 55.0423 feet 2.3000 inside-ticks 0
 # F. the push (share 0.23407 a tick)
 push head-on 6.3 [push-out]: min distance 0.2359 end distance 12.7608 overlapping pair-ticks 4 pushes 4 turned 4 kept-going 0 capped 0 largest push 0.0852 walker stalled ticks 0 embedded-ticks 0; [0] (68.379, 0.119, y 0.00) [1] (55.621, -0.119, y 0.00) | slot orders 2 bit-identical: true
 push head-on 6.3 [sweep]: min distance 0.2359 end distance 12.7608 overlapping pair-ticks 4 pushes 4 turned 4 kept-going 0 capped 0 largest push 0.0852 walker stalled ticks 0 embedded-ticks 0; [0] (68.379, 0.119, y 0.00) [1] (55.621, -0.119, y 0.00) | slot orders 2 bit-identical: true
@@ -475,3 +512,5 @@ tally B landings: 240 runs, 240 pass
 tally C snap down the ramps: 6 runs, 6 pass
 tally D easing at the steps: 48 runs, 48 pass
 tally D easing at the ledges: 24 runs, 24 pass
+tally G ledges, block 5's toward: 36 runs, 28 pass
+tally G ledges, toward from the tick's start: 36 runs, 36 pass

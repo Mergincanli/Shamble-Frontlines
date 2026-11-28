@@ -194,7 +194,12 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
     its own file: rust-reviewer's **block 6** in `rust-reviewer-read.md` (the bodies 3a, 3b and 2 on block 5's "not
     run" list; the 2.5D question; its yes or no on the record rule); engine-architect's **block 5** in
     `engine-architect-read.md` (GROUND, FACING-SPAWN); netcode-architect's **block 7** in `netcode-architect-read.md`
-    (the record rule, the bounds' one home, the zero ray). Running.
+    (the record rule, the bounds' one home, the zero ray). netcode-architect DONE: the record rule YES ((i), the
+    soldier's hashed row holds `held_move: [i8; 2]` and `aim_cm` in 8 bytes; a command-less tick walks on and turns
+    toward the held aim; the restore test plants 30 command-less ticks; step 2 moves no first-loop hash on four named
+    conditions), the bounds' one home YES (the loader's own grid rule, its "off the grid is refused" withdrawn), the
+    zero ray YES (Z1, Z2); step 2 rises to about 340 / 675, step 1 gains about 10 / 100; whether `Room::new` and
+    `Endpoint::new` refuse a world with no aim area is engine-architect's call. The other two running.
 - **The sheet's revision 3** (from 02:14 Amsterdam): the record rule applied with its confirmations outstanding, the
   recount F2 with each option's stop line, section G for steps 1 to 7 with his checklist as a draft, section H's table
   of item 10's thirteen points.
