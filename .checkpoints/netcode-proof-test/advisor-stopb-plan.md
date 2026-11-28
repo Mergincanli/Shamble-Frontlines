@@ -829,3 +829,129 @@ Mustafa and the Status line. Nothing run or built; no GitHub writes.
 
 Status: COMPLETE 2026-11-28 02:59 UTC
 
+## X head read
+Plan: launch-x-read.md is the whole brief. His 11:43 answers are at history.md:8259-8272, read word for word. Then, by
+SHA, one git call each:
+- X 6e623788: its subject and parent;
+- `git diff --name-only` and `--numstat` of 1ceecc32 against 6e623788 over spikes/netcode-proof, and the hunks;
+- the parent 11a10949 against Y′ over the spike;
+- `git show 6e623788:` of rs.yaml and lg.yaml at the commit lines, and of R1.md :86-97;
+- `git blame` on R1.md's lines for the line-number shift;
+- a printing fill sweep at X.
+
+Then, with Read: x-counted.log and x-gate.txt. Then: the wording of step 7; the A4 and Q5 triggers; anything in X's
+bytes that blocks his item 3 on PR #40's list; CI as appended. Last: the verdict, Decisions needed, For Mustafa and
+the Status line. File writes by the Edit tool only, which his item 7 allows; no GitHub writes.
+
+### Notes (one line per check)
+- history.md:8259-8272 (Read), his 11:43 UTC words:
+  - items 1-2: HOST-LIMITS (b) and HOST-SANDBOX (b), "The R1 security reading is dropped";
+  - item 3: "known limits of the page host, in class words ... No file the run server installs changes for them";
+  - item 4: "45: the run server's npm ci stays as merged";
+  - item 5: "the fill (X) goes ahead today, then the advisor agent's check of it ... Do not wait for me between steps";
+  - item 7: his git and full-paths rules.
+  - The brief quotes items 1-4 exactly.
+- `git log -1 6e623788`: parent 11a10949; subject "Stop B X: the run commit Y' in both cloud-init files, Let's
+  Encrypt's terms link in R1.md".
+- `git diff --name-only 1ceecc32 11a10949` lists only .checkpoints/ notes, nothing under spikes/. So X's parent holds
+  Y′'s spike exactly.
+- `git diff --numstat 1ceecc32 6e623788 -- spikes/netcode-proof`: lg.yaml `1 1`, rs.yaml `1 1`, R1.md `2 2`. Exactly
+  the three files.
+- The hunks (`git diff`):
+  - lg.yaml:52 and rs.yaml:69: the 40 zeros under `/etc/npt/commit`'s `content: |` become
+    1ceecc321eaf194d59568fdab56644d1e9eb4f05;
+  - R1.md:93-94: step 7's placeholder becomes "he reads it first, at the production ACME directory's /
+    meta.termsOfService, `https://letsencrypt.org/documents/LE-SA-v1.8-July-06-2026.pdf` (read 2026-11-27)."
+- `git grep -n <Y′ full SHA> 6e623788 -- …/ops/cloud-init`: lg.yaml:52 and rs.yaml:69, each at six spaces, which is the
+  form config.mjs:102's codeCommit reads.
+- `git blame -L 86,96 6e623788 -- …/R1.md`:
+  - :89 is 87cb8677's (Y0's note line);
+  - :93-94 are 6e623788's;
+  - the rest is 05c63a8a's and ddb06ffe's.
+  - So the placeholder sat on :93-94 after Y0, and the hunk is inside them. C1's "hunk inside :92-93" means :93-94 now:
+    the line shift is Y0's own +1, a correction of the number only.
+- The fill sweep at X (`git grep -n -E "0{40}|filled at Stop B" 6e623788 -- spikes/netcode-proof ":(exclude)…/fixtures"`),
+  twelve hits, none an open fill:
+  - zero refusals: rs.yaml:122, lg.yaml:97;
+  - comments: config.mjs:100, browser.test.mjs:205, R1.md:19, R1.md:314;
+  - test text: r1plan.test.mjs:150, r1sh.test.mjs:442, judge tests/engine.rs:64;
+  - the lab's own constants: lab main.rs:346, scenario.rs:2564.
+- `git grep -n -e LOCATION -e fsn1 -e nbg1 6e623788 -- …/ops`:
+  - r1.sh:34 `LOCATION=fsn1 # LOCATION: a Stop B fill, fsn1 or nbg1 (INF-SB-3)`, used in the room settings' machine
+    record (:265, :327);
+  - R1.md:63, :114, :135 name `fsn1`.
+  - D4's rendered read (stopb-plan.md :185-191) saw no FSN1 in either product row. If he picks nbg1 at Stop B, r1.sh:34
+    changes, and r1.sh is a server file at Y.
+- x-counted.log (Read):
+  - 12:02:55-12:03:12 at HEAD 11a10949, diff b2a2780d…, untracked empty;
+  - self 88 of 88; ops 104 of 104 and "315 ok, 0 failed"; redact 11 of 11, 464 items, 0 findings; refs 2245; exit 0.
+  - The diff equals X's spike change, since the parent's spike equals Y′'s (above). The hash compare is the main
+    session's; there is no pipe in my seat.
+- x-gate.txt (Read): base dae6d10, [1]-[4] and [5b]-[5d] PASS, "GATE PASS", "gate exit 0".
+- Main: `git rev-parse origin/main` and `git ls-remote origin refs/heads/main` both give dae6d107fdbe…, so the A4 tip is
+  unchanged. `git diff --name-only 6e623788 origin/main -- CLAUDE.md .claude .github` printed nothing and no error, so
+  PROMPT-R1.md:22's kit compare would pass at X today.
+- `git diff --name-only 6e623788 53346e55`: three notes files only (the card, launch-x-read.md, stopb-plan.md). So CI on
+  S runs X's code unchanged.
+- His item 3 against X's bytes:
+  - X touches neither npt-host.service nor crates/host.
+  - SEC-A2-3's fix is "zero lines": PR #40's entry wording (stopb-a2-security.md:218-221, :290-291).
+  - Nothing in X blocks it. The stale carry words in npt-host.service:6-8 stay as they are, since the run server
+    installs that file and he forbids changing it for these findings.
+  - u8-report.md:65-66 is notes and can take a dated note.
+- CI on S 53346e55: not yet appended to launch-x-read.md (:49 still holds the placeholder at this read). Not read with
+  gh in this seat.
+
+### Rulings
+- **X stands, on its own bytes.**
+  - The spike changes in exactly three files, each in place: lg.yaml and rs.yaml `1 1`, R1.md `2 2`, net 0.
+  - Y′'s full SHA sits on both commit lines, in the form codeCommit reads.
+  - R1.md's hunk lies inside the placeholder's lines.
+  - X's parent holds Y′'s spike, so the RS-side tree X names is Y′'s.
+  - No open fill is left (the sweep).
+  - The counted run and the gate pass on these bytes.
+  - Main is unchanged at dae6d107, and the kit compare PROMPT-R1.md:22 runs on R1's day is clean today.
+- **The line numbers: correction accepted.** The placeholder sat on R1.md:93-94 after Y0 added :89 (blame), so C1's
+  bar is met at :93-94. A number, not a rule.
+- **Step 7's wording: acceptable.** "he reads it first, at the production ACME directory's meta.termsOfService,
+  `https://letsencrypt.org/documents/LE-SA-v1.8-July-06-2026.pdf` (read 2026-11-27)" names where the link comes from,
+  the link itself, and when it was read. That is what he needs to read the agreement before he OKs.
+- **His item 3:** nothing in X's bytes blocks PR #40's list edit or SEC-A2-3's zero-line rewording. X touches no file
+  the run server installs for the page host.
+
+### Findings (Low; none blocks X)
+- **XH-1 (Low):** the Subscriber Agreement can change between its read and R1's certificate order on Thu 3 Dec. The
+  order agrees to whatever terms the directory names at order time (issue.rs, `terms_of_service_agreed: true`).
+  - Re-read `meta.termsOfService` on Stop B's day, beside the two price pages (R1.md step 8).
+  - If it changed, a new X with R1.md's link only (the same Y′, the same bars), and the new link goes to him before
+    the certificate block.
+  - The step's "(read 2026-11-27)" may gain "re-read 2026-11-28" with that next X, if one comes. Not worth an X alone.
+- **XH-2 (Low, for E2's one screen):** the location fill.
+  - r1.sh:34 holds `LOCATION=fsn1`, a Stop B fill, and D4's rendered read listed no FSN1 for CCX23 or CAX21.
+  - If his console shows fsn1 unavailable and he picks nbg1 at Stop B, r1.sh changes. r1.sh is a server file at Y′
+    (and r1sh.test.mjs:199 pins "fsn1" in a fixture's machine record), so Q5's trigger (1) fires:
+    - a new Y with the same list (r1.sh is no dist input);
+    - build 2 redone at it;
+    - a new X naming it, with his two new raw URLs;
+    - his Primary IPv4s and firewall objects made in that location.
+  - Name it in E2 as his Stop B choice, with its cost: about an hour of the session's time and no money.
+
+### Verdict on the pushed head (X 6e623788c7d4badfb36c2d17fabec1b8280c5e0e, under the save 53346e550095ed494883bc38d251780c7b2d65e8)
+**APPROVE WITH FINDINGS** (two Lows).
+- X stands as the commit pair's second half: Y′ named in both cloud-init files, the terms link in R1.md step 7.
+- CI on S was not yet in at this read. The verdict holds once the main session's lines show its four runs success. A
+  failure reopens this read.
+- Next by the card: his item 3's PR #40 list edit, then E2's one message, read again at its send for the price pages
+  and the terms link (XH-1).
+
+### Decisions needed
+- None from this read.
+- His Stop B choices (CUT-A, CUT-B, CUT-C, the dates, and the location if fsn1 is unavailable: XH-2) go in E2's one
+  message, as his item 5 says.
+
+### For Mustafa
+- Nothing to act on until E2's message, which he reads from Sunday 12:00.
+
+Status: COMPLETE 2026-11-28 12:08 UTC
+
+

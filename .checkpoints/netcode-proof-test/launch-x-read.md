@@ -1,11 +1,12 @@
 # X head read: the brief for B6 (advisor-stopb-plan.md's author), stopb-plan.md E1's last read
 Status: FILLED 12:0x UTC on 11-28 after X (his answers 11:43 UTC: both (b), 45 as merged). The advisor tool read the
-plan with X's start (11:5x: go). <S> is filled after the save that pushes X; CI's lines are appended when the runs end.
+plan with X's start (11:5x: go). S = 53346e550095ed494883bc38d251780c7b2d65e8, the save that pushed X at 12:05:40 UTC (its subject carries no
+[skip ci], so CI runs on it); CI's lines are appended when the runs end.
 
 ## The brief (to B6: resumed if it answers, else a new advisor agent with this file as its whole brief)
 Your E1 read of X, by SHA only.
 - X = 6e623788c7d4badfb36c2d17fabec1b8280c5e0e ("Stop B X: the run commit Y' in both cloud-init files, Let's Encrypt's
-  terms link in R1.md"), pushed under the card save <S>; Y' = 1ceecc321eaf194d59568fdab56644d1e9eb4f05. X's parent
+  terms link in R1.md"), pushed under the card save S = 53346e55 (12:05:40 UTC); Y' = 1ceecc321eaf194d59568fdab56644d1e9eb4f05. X's parent
   11a10949 is a notes-only save; `git diff --stat 1ceecc32 11a10949 -- spikes/netcode-proof` printed empty before X.
 - The change, all in place: spikes/netcode-proof/ops/cloud-init/rs.yaml:69 and lg.yaml:52, the 40 zeros under
   /etc/npt/commit's `content: |` to Y''s full SHA; spikes/netcode-proof/ops/runs/R1.md:93-94, step 7's text from
@@ -45,7 +46,7 @@ Your E1 read of X, by SHA only.
 - His item 3 is owed outside X and before E2 goes: PR #40's closing list gains both findings with their takers, in
   class words, and SEC-A2-3's zero-line rewording of the dropped reading. Not part of your X verdict; name anything in
   X's bytes that would block it.
-- CI on <S>: <the four runs' lines, appended by the main session when they end; write every other block meanwhile>.
+- CI on S 53346e55: <the runs' lines, appended by the main session when they end; write every other block meanwhile>.
 Rule: X stands, or what is owed. Write your blocks into
 /home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/advisor-stopb-plan.md under a new heading "## X head
 read" (your plan first, then each block as it is done); end with "Decisions needed" and "For Mustafa", then the last

@@ -1,9 +1,9 @@
-# E2: Stop B's message to him (DRAFT 0.3, 06:3x UTC on 11-28; sent after X, B6's read of X first; one screen)
-Status: 0.3 after the advisor tool's read of 06:3x: the three cuts said once, in Decisions needed (his B.2 and B.3),
-with codes of their own (a bare "(b)" would collide with HOST-LIMITS (b)); section 1 on R1.md's own dates (:267-282);
-every cite re-printed 06:3x (R1.md:93-94, :242-246, :267-282, :323; r1.sh:38; rs.yaml:69, lg.yaml:52; plan.md:410).
-At send: X's full SHA in For Mustafa 2; his host answers in section 3's last line; re-print the opening's "no kit, CI or
-dependency change against main" and Hetzner's two pages (stopb-plan.md D4). The advisor tool reads it before it goes.
+# E2: Stop B's message to him (DRAFT 0.4, 12:1x UTC on 11-28; one screen; his one message, read from Sun 29 Nov 12:00)
+Status: 0.4 after his answers (11:43, history.md:8259-8272) and X (6e623788; B6's head read 12:08 APPROVE WITH FINDINGS,
+XH-1 and XH-2 placed in For Mustafa 2; CI on 53346e55: gate and smoke green, toolchain running at 12:10). Re-printed
+12:10: no kit, CI or dependency change against main (outside spikes/ and .checkpoints/ only six docs files differ);
+Hetzner's two pages (rendered: no FSN1 for either type, CAX21's row "not available", no prices). The other cites: 0.3's
+(06:3x). The advisor tool reads it before it goes.
 
 ---
 **Stop B: R1's run plan is ready for your review (R1 stays Thursday 3 December).**
@@ -36,13 +36,16 @@ With CUT-A: B3 alone. Without it: B3, and H3 once its server change lands on my 
 **3. One line each:**
 - The expected page list's Wasm carries wasm-bindgen's plain version, as the run server builds it; a first list
   carried our commit's name (through wasm-bindgen's build script) and was voided before the fill.
-- R1.md:323 still says "no reading exists yet" for the probe's window: one exists (u6c-r2-netcode.md:90-93); named
-  here, not edited.
+- Stale words, named here and not edited before R1 (a spike change now would void X): R1.md:323 says no reading of
+  the probe's window exists (one does: u6c-r2-netcode.md:90-93); npt-host.service:6-8 and cloudinit.test.mjs:215 say
+  the page host's remaining sandbox settings come at U6c's merge.
 - If bring-up finds the tick core shared (`alone` 0), the DelayStream self-test is skipped (r1.sh:38, R1.md:242-246):
   its clock thread never runs on the tick core; whether its numbers lean on the tick thread is a follow-up after R1.
 - The count: your two notes add 2 lines to U8's files, so U8 stands at 6,284, your stop; the two test stand-ins were
   rewritten in place at 0 net (+2 from you if you count in-place lines); the fills sit outside the stop, as you ruled.
-- The page host: <TO FILL: his HOST-LIMITS and HOST-SANDBOX answers, and 45 (kept as merged unless he said otherwise)>.
+- The page host, as you answered (11:43 today): the connection limits go to the security baseline; the five sandbox
+  settings to R8, at the latest the baseline; the R1 security reading is dropped. Both stay open in PR #40's closing
+  list with those takers and go into R1's report as its known limits; npm ci stays as merged (45); no file changed.
 
 **Decisions needed** (your B.2 and B.3: what each cut saves in lines and days, and my lean; none decided yet)
 - **CUT-A (your (a)): move R5 to Slice 6?** R5 is the 48-player run plus the 8-room soak (Mon 14 Dec); its eight
@@ -69,12 +72,15 @@ With CUT-A: B3 alone. Without it: B3, and H3 once its server change lands on my 
 **For Mustafa**
 1. Review R1's run plan (spikes/netcode-proof/ops/runs/R1.md): its cap EUR 0.80 (planned 0.62) and its delete-by
    times on Thu 3 Dec, LG about 13:20 and RS 13:30 Amsterdam.
-2. At Stop B (Tue 1 Dec, before any VM): R1.md's "Once" list (:57-94, about 75 minutes). Its step 3: `fsn1`, R1.md's
-   location for both machines, is not listed today on Hetzner's pages for CCX23 or CAX21 (both list NBG1 and HEL1), so
-   check it in the create form, else `nbg1`. Its step 7: approve settings.json and PROMPT-R1.md, OK the plan, its cap
-   and delete-bys, and first read Let's Encrypt's terms: https://letsencrypt.org/documents/LE-SA-v1.8-July-06-2026.pdf
-   The Cloud config, at X <TO FILL: X's full SHA in both links>:
-   https://raw.githubusercontent.com/Mergincanli/Shamble-Frontlines/<X>/spikes/netcode-proof/ops/cloud-init/rs.yaml
-   https://raw.githubusercontent.com/Mergincanli/Shamble-Frontlines/<X>/spikes/netcode-proof/ops/cloud-init/lg.yaml
+2. At Stop B (Tue 1 Dec, before any VM): R1.md's "Once" list (:57-94, about 75 minutes). Its step 3: Hetzner's
+   public pages (read again 12:10 UTC today) list no FSN1, R1.md's location, for CCX23 or CAX21 (both NBG1 and HEL1),
+   and CAX21's row reads "not available", so check both in the create form. `nbg1` is your choice there: it changes
+   r1.sh's location, so a new Y and X (about an hour of my time, no money) and your fixed addresses and firewalls in
+   nbg1. If no location offers CAX21, R1.md has no stand-in for the load machine: tell me and it comes back to you.
+   Its step 7: approve settings.json and PROMPT-R1.md, OK the plan, its cap and delete-bys, and first read Let's
+   Encrypt's terms: https://letsencrypt.org/documents/LE-SA-v1.8-July-06-2026.pdf (re-read on Stop B's day; if it
+   changed, a new X with only that link). The Cloud config, at X 6e623788c7d4badfb36c2d17fabec1b8280c5e0e:
+   https://raw.githubusercontent.com/Mergincanli/Shamble-Frontlines/6e623788c7d4badfb36c2d17fabec1b8280c5e0e/spikes/netcode-proof/ops/cloud-init/rs.yaml
+   https://raw.githubusercontent.com/Mergincanli/Shamble-Frontlines/6e623788c7d4badfb36c2d17fabec1b8280c5e0e/spikes/netcode-proof/ops/cloud-init/lg.yaml
 3. Answer CUT-A, CUT-B and CUT-C. The day you do, I hand Builder 2 its pieces (section 2).
 4. Nothing to check in Brave.

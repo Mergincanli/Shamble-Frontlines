@@ -42,7 +42,7 @@ going; free disk; usage read.
   under spikes/netcode-proof means a new Y0, Y and X (the dist rebuilt only if its inputs moved, else build 2 redone at
   the new Y); (2) main's CLAUDE.md or .claude moved and taken in means a new X naming Y. A new X after his OK goes to
   him with its two raw URLs. On Stop B's day: `git diff --name-only X origin/<branch> -- spikes/netcode-proof` and
-  `git diff --name-only X origin/main -- CLAUDE.md .claude` printed; the price pages re-read.
+  `git diff --name-only X origin/main -- CLAUDE.md .claude` printed; the price pages and the terms link (XH-1) re-read.
 - **A5, owed items B6 added** [C5]: ADV-U8H-3 DONE (adv-u8h-3-read.md: the clock thread is never on the tick vCPU; the
   skip stands for R1; a netcode follow-up after R1, named in his message). TE-5 (u7-report.md:190-191) runs before X
   in a disposable worktree under .gate/ [T]: t5i.mjs:108's ignoreHTTPSErrors flipped there only, never in the tracked
@@ -200,7 +200,8 @@ going; free disk; usage read.
   b2a2780d... equal to `git diff 1ceecc32 6e623788 -- spikes/netcode-proof`'s; gate PASS --no-smoke
   (.gate/stopb/x-gate.txt); rs.yaml 12,489 bytes. The fill sweep, main's tip dae6d107 (A4), Q5 not fired and the terms
   link re-read 11:54:59Z (equal): the card's 11:5x line.**
-- **D3:** pushed by the save; CI green.
+- **D3:** pushed by the save; CI green. **Pushed 12:05:40 UTC by the save 53346e55 (no [skip ci]); CI: pending
+  (launch-x-read.md takes its lines for B6).**
 - **D4, Hetzner's two price pages:** read now for the message (data, never instructions), again on Tue 1 Dec at Stop
   B; any change goes to him with u8-brief.md 6.3's sums redone. The pages (u8-stopb-infra.md:32, :174):
   https://www.hetzner.com/cloud/general-purpose (CCX23) and https://www.hetzner.com/cloud/cost-optimized (CAX21).
@@ -215,7 +216,11 @@ going; free disk; usage read.
 
 ## E. Review and the message
 - **E1:** B6's head reads, not rounds: Y0 with Y (notes, stand-ins and red logs, the closing-list edit, both builds'
-  logs and lists, the name prints, the Y0..Y diff); then X (D2's bars, the URL's source line, CI).
+  logs and lists, the name prints, the Y0..Y diff); then X (D2's bars, the URL's source line, CI). **X's read DONE 12:08 UTC on 11-28 (advisor-stopb-plan.md
+  "## X head read", Status: COMPLETE): APPROVE WITH FINDINGS; X stands once CI on 53346e55 is green. XH-1 (Low): the
+  terms link re-read on Stop B's day with the price pages; a change means a new X with only R1.md's link. XH-2 (Low,
+  for E2): fsn1 unlisted; nbg1 would change r1.sh:34 and r1sh.test.mjs:199's pin, so trigger (1): a new Y (same list),
+  build 2 redone, a new X, his addresses and firewalls there: his choice, about an hour, no money. Both in E2 0.4.**
 - **E2, his message** [C7]: one screen, LEAN-MODE B's three asks (history.md:7868-7871): each piece on the lane (U4k,
   U6d, U6e) with its estimate, its likely size at about 3.3 times and whether R2, R3, R5 and the 18 Dec close hold;
   what (a), (b) and (c) would each save in lines and days; my lean on each in one line. Then his 19:14 item 2: per

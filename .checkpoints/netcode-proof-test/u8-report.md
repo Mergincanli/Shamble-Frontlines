@@ -62,8 +62,8 @@ stop set for U8 (history.md:7703-7722); nothing carried.
 ## Open at the merge (with their takers)
 - From advisor-u8-stopb.md: F28 (U6b's flush, proven live at R1); ds-selftest's place in R1's run list; U6c's names:
   test 7's item 4 reads fixtures; on real output, the head read's run of probe_presence on U6c's 24 Nov log (P0
-  present, P1 at the drop rule); SEC-SB-9's rest (the page host's sandbox options, from U6c's
-  host needs, else carried to R2 with R1's `systemd-analyze security` reading); SEC-SB-5's two-path dist build (at U7's
+  present, P1 at the drop rule); SEC-SB-9's rest (the page host's sandbox options; 11-28, his HOST-SANDBOX (b): to R8,
+  at the latest the security baseline, no R1 `systemd-analyze` reading); SEC-SB-5's two-path dist build (at U7's
   merge, before Stop B's fill). U6b's null certificate pair: CLOSED by the fix above.
 - Stop B's fills and reads: the laptop's reads (driver listen, passphrase, fsn1 stock, Claude Code >= 2.1.257),
   `sudo -l` over ssh on RS (only the container's read so far), SEC-U6C-5's URL, rs.yaml's commit line (Y).
