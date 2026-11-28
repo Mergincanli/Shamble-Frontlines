@@ -10,7 +10,7 @@
   `/home/user/Shamble-Frontlines` is never switched.
 - **Base:** origin/main dae6d107fdbe942567104bcf1c9a2cbc6b3a1e0f (pull request #79's merge commit), taken in by
   fast-forward from b7145273.
-- **Last update:** 2026-11-28 02:10 Amsterdam (from the clock; an earlier save said 01:08, a time written without
+- **Last update:** 2026-11-28 02:17 Amsterdam (from the clock; an earlier save said 01:08, a time written without
   reading the clock: it was 00:57; an edit at 02:04 wrote "02:06", also unread, corrected here)
 
 ## Steps done
@@ -138,6 +138,10 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   security-auditor's two developer-machine risks, recorded as a dated note.
 
 ## Key numbers
+- Step S as built: 1,288 written lines (bc7720f3 1,277, c1de41e5 11; `count-4c.mjs` at 3ab59bd7 against dae6d107),
+  about 1.74 times its recount of 740.
+- Steps 1 to 7 recounted (the sheet's F2): 7,785 to 7,935 by the designs' count (the plan 7,315); by the plan's rule
+  (2.25 times) a stop line of about 17,520 to 17,850; each SIZE-4C option's line, two thirds and rung are in F2.
 - Measured written lines against the designs' count: 4a 2.4 times, 4b-1 2.17, 4b-2 2.7.
 - 4c by the designs' count: 7,315 (steps 1 to 7, the plan's section 6) and about 630 for the scene with the map's
   reading (230 / 260 by 4b's sheet, and 60 to 80 more with as many in tests) = about 7,950. At the measured rates:
@@ -186,4 +190,12 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   - security-auditor (`security-auditor-deps-4c.md`): the dependency hold's answer on the batch `deps-4c.diff`, by
     the digests in `deps-4c.sha256` (started just before 02:04 Amsterdam, the clock read right after it): DONE,
     APPROVE with F1 and F2.
+  - Started together just after 02:10 Amsterdam (the clock read 02:10 before the launch, 02:14 after it), each in
+    its own file: rust-reviewer's **block 6** in `rust-reviewer-read.md` (the bodies 3a, 3b and 2 on block 5's "not
+    run" list; the 2.5D question; its yes or no on the record rule); engine-architect's **block 5** in
+    `engine-architect-read.md` (GROUND, FACING-SPAWN); netcode-architect's **block 7** in `netcode-architect-read.md`
+    (the record rule, the bounds' one home, the zero ray). Running.
+- **The sheet's revision 3** (from 02:14 Amsterdam): the record rule applied with its confirmations outstanding, the
+  recount F2 with each option's stop line, section G for steps 1 to 7 with his checklist as a draft, section H's table
+  of item 10's thirteen points.
 - The scene's before picture: `.gate/scene-before-4c.png` (main's page, 3 draw calls), by `shot-4c.mjs`.

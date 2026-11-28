@@ -547,3 +547,22 @@ BODY-SHAPE stays his; game-designer's condition for (3a) (every run passes, vert
 included) is met in this prototype, with the "not run" list above as its limit.
 
 DONE
+
+## Block 6. The bodies on the cases block 5 did not run (the advisor agent's item 10 point 2; 2026-11-28)
+### Plan
+1. New prototype `rr-body-proto-6.rs` (block 5's source kept as it is), same 2.5D model and same three bodies (3a),
+   (3b), (2), plus: horizontal velocity with the easing (k 0.37375 a tick, up = stop, air 100 %) as an option; the
+   soft push by game-designer-read block 3 (both wall rules: the sandbox's push-out, and a swept circle with one slide
+   for the plan's sweep); made-map shapes (a beam over flat ground, a high drop onto a top); per-run counters for
+   flickers (an unjumped fall that comes back up), bounces, landing tick and the per-tick drop.
+2. Cases: ramps from their sides (gentle x 41..45 z 4..8, steep x 42..45 z 10..14, met along z at several x, both
+   directions); ceilings on a made map (shown as cost only if the reading has no ceiling rule); landings off the
+   2.9 / 3.05 m ledges and the platforms onto the ground and onto the 0.55 m step; the snap's numbers down the step and
+   the ramps at three speeds; the push (head-on, glancing, one still, both still, into a wall, across the 0.55 step and
+   at the 1.0 m gap, three at once, slot order swapped); easing's first ticks at the 0.55 / 0.56 steps.
+3. The 2.5D question against map.rs:9-13 and :317 on (no resting rule).
+4. The record rule (advisor-reread-4c.md:31) against F17 and 1.6.
+5. Table, then DONE.
+
+### Notes
+- [B6-R, the record rule, written first] YES to the advisor agent's item 6 ruling (advisor-reread-4c.md:31). F17 (:29, option (i): the record stays buttons and presses, the soldier consumes move and aim) STANDS; 1.6's words "and the move and aim of the record" (:246-247) are WITHDRAWN: under (i) the record holds no move and no aim, so that phrase described option (ii). Why (i): world.rs:114 already says "the soldier table takes its place", so per-soldier held input belongs in the soldier row that scales to 48, and the record keeps what the echo and the jump's press base need. Under (i) the Soldier row (1.1) gains `held_move: [i8; 2]` (the newest command's move_x, move_y, kept unchanged by a tick with no command, as world.rs:143-145 keeps buttons) and holds the aim as received, `aim_cm: AimCm` (i16, u16, i16), in place of 1.1's `aim: V3` (6 bytes, exact; the metres are derived each tick by one IEEE division, the same on both targets, and are not state); `facing: [f32; 2]` stays. `visit_shared` writes: tick; the record's buttons and presses (as today, world.rs:177-189); then each of the 48 rows in slot order, every field including held_move and aim_cm. Tests: a command-less tick after a moving command keeps walking and turning (plant: held_move zeroed on a command-less tick: red); a world restored from the hashed shared bytes at tick n runs tick n+1 to the same bytes as the original (plant: held_move kept in an unhashed scratch: red).

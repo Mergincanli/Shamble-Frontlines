@@ -12,6 +12,15 @@ and step S APPROVED, with conditions 1 to 9; steps 1 to 7 not yet** (its item 10
 H). Each condition is applied where it lands, marked "(condition n)". Revision 1 was written from four reads
 (engine-architect, netcode-architect and rust-reviewer, then game-designer's on BODY-SHAPE and the push, since DONE).
 
+**Revision 3 (2026-11-28, from 02:14 Amsterdam by the clock): the advisor agent's item 10, as far as it goes without
+his answers.**
+Step S is built (bc7720f3, c1de41e5; 1,288 written lines by the count; CI green on 8bee8365). The dependency batch is
+answered (security-auditor APPROVE, `dependency-check.md`). New here: the record rule applied with its confirmations
+outstanding (end of section E), the recount of steps 1 to 7 with each option's stop line (section F), each step's
+evidence, reviewers and his checklist (section G), and where each of item 10's thirteen points stands (section H).
+Running: rust-reviewer's block 6 (the bodies on the cases block 5 left out; the 2.5D question), engine-architect's
+block 5 (GROUND, FACING-SPAWN), netcode-architect's block 7 (the record rule, the bounds' home, the zero ray).
+
 **The branch rule (condition 2; F-ORD-1):** pull request #79's head was this same branch, so until he answers SIZE-4C
 only step 0 and step S go on it: anything of steps 1 to 7 committed before his answer would make (b) and (c)
 impossible to cut without rewriting history. Meanwhile notes and prototypes only. Told to him as a consequence of his
@@ -334,6 +343,26 @@ The read holds every symbol with today's file:line and each test with its plante
   CI's release line (not 10 million nightly through a fuzzer); PM-0002-14 met in its ray half only until change-set 8
   brings the view time; PM-0004-20's hash half on `walk` (one soldier), its flag-off timing not runnable.
 
+### The record rule: the advisor agent's ruling, applied (revision 3); confirmations outstanding
+The clash above (whether the world keeps the command's move and aim) is ruled by the advisor agent's item 6
+(`advisor-reread-4c.md` line 31), and the sheet takes it as the design for steps 1 and 2:
+- **The invariant:** every value a later tick reads is in the hashed shared state (ADR 0004 part 9: "a canonical
+  serialization of its whole state"), and a tick with no command keeps the held move and aim as it keeps held buttons
+  today (`crates/sim/src/world.rs:143-145`: "With none the record holds, so a held button stays held").
+- **The design:** netcode-architect's record (i), the record kept as buttons and presses, with the soldier's hashed row
+  holding the held move as well as the aim point (rust-reviewer's Soldier already has the aim point, its read 1.1). A
+  command-less tick moves the soldier by the held move toward the held aim. Not the narrow record with nothing kept: a
+  command-less tick would then stop the soldier, a rule change for change-set 7 that is not made silently.
+- **Its test,** in step 2: a planted command-less tick (the soldier keeps moving and turning as with the held command),
+  and a restore from the hashed bytes alone that must carry on identically; each with its planted defect (the held move
+  dropped from the row; the row restored without it).
+- **One home for the bounds:** `StaticWorld::build` derives both from the map's bounds once (metres for the sweeps,
+  whole centimetres rounded inward for the aim's clamp), and a test ties the two.
+- **Outstanding:** rust-reviewer's written yes (its read contradicts itself: F17 at line 29 takes (i), 1.6 at lines 246
+  to 247 has `visit_shared` write the record's move and aim) and netcode-architect's (its option (i) does not say what a
+  tick with no command does), both asked on 2026-11-28 (their blocks 6 and 7, running). Until both are in, the design
+  stands as the advisor agent's and is not built.
+
 ## F. Sizes, the ladder and the stop lines
 - By the designs' count: steps 1 to 7, 7,315; step S about 740 (engine-architect's recount; 630 before); together
   about 8,055. At the measured rates (2.17 to 2.7): about 17,500 to 21,750 written lines. The plan's stop line, 16,450,
@@ -356,6 +385,44 @@ The read holds every symbol with today's file:line and each test with its plante
   it in); each part is counted from the main commit it starts on (4c-1 from dae6d107; under (b) or (c) the next part
   from the main that holds 4c-1's merge); the about 35 lines moved from empty-scene.ts count as added, and the report
   says so.
+
+### F2. The recount of steps 1 to 7, and each option's stop line (revision 3; the advisor agent's item 10, point 12)
+**Step S as built:** 1,288 written lines (`count-4c.mjs` on the branch at 3ab59bd7 against dae6d107: bc7720f3's 1,277
+and c1de41e5's 11), about 1.74 times its recount of 740: under the 1,420 he hears about first and the 1,665 hold.
+
+**Steps 1 to 7 by the designs' count (code / tests), as the reads recount them against today's code:**
+| Step | The plan | The reads | Where |
+|---|---|---|---|
+| 1 | 1,240 / 1,090 = 2,330 | body (3a) on our own sweeps: 1,350 / 1,360 = **2,710** in the 2.5D form; 1,440 / 1,420 = **2,860** with the 3D sweeps | rust-reviewer-read 1.10 (1,300 / 1,260, body (2) in 3D), E1 above (+130 / +110: the ray counts, the sweep proof, NO-SOURCE's fields), block 5 item 3 ((3a): +30 / +50 and -20; the 2.5D sweeps 170 / 200 for 260 / 260) |
+| 2 | 385 / 530 = 915 | 315 / 630 = **945** | netcode-architect-read, its counts, block 1 |
+| 3 | 320 / 340 = 660 | **660** (with engine-architect's layout) | netcode-architect-read block 2 |
+| 4 | 800 / 540 = 1,340 | **1,340** (split by file, not counted again; the camera kind moves in from step 5 with its lines) | engine-architect-read block 3 |
+| 5 | 360 / 300 = 660 | **660** less the camera kind's lines (the sum of 4 and 5 unchanged) | engine-architect-read block 3 |
+| 6 | 320 / 230 = 550 | **550** (netcode-architect's own part 245 / 170; the rest the other designs' marks) | netcode-architect-read block 3 |
+| 6b | 130 / 110 = 240 | 130 / 115 = **245** | netcode-architect-read block 4 |
+| 6c | 30 / 180 = 210 | 45 / 220 = **265** | netcode-architect-read block 4 |
+| 7 | 0 / 410 = 410 | **410** (no read counted it again) | the plan |
+| **All** | **7,315** | **7,785 to 7,935** (6 to 8 % above the plan) | |
+Not in these numbers: (3a)'s five more NO-SOURCE fields than body (2) (about 50 to 75 lines; block 6 or the step's own
+count settles them); RESUME-FLASH beyond (a) ((b) about +30; (c) about 5 changed and two tests reversed; (d1) about
++65; (d2) a new recording format and every recording made anew); which sweep form is honest waits for rust-reviewer's
+block 6 (the 2.5D form for shapes whose bottom is above the ground), so both are carried.
+
+**The plan's rule** (planned size times 1.8, then the stop line at 1.25 times that, so 2.25 times the designs'
+count: the plan's 16,450 is 7,315 x 2.25) **on the recount:** steps 1 to 7 alone, a stop line of about 17,520 to
+17,850, two thirds about 11,680 to 11,900. At the measured rates (2.17 to 2.7 written lines a counted line, 4a to
+4b-2) steps 1 to 7 come to about 16,900 to 21,400 written lines: likely to reach that line near the end.
+
+**By his SIZE-4C option** (the line is his in each; these are the plan's rule's numbers for him to take or change):
+| Option | Pull requests and their designs' count | Stop line by the rule | Two thirds | The rung (what leaves first) |
+|---|---|---|---|---|
+| (a) one | all of 4c: the scene (740) and steps 1 to 7 (7,785 to 7,935) | about 19,190 to 19,520 (the question said about 17,870 on the old counts) | about 12,790 to 13,010 | the plan's: the far-corner map (PM-0004-39) to 4d at 13,150 written lines, told to him before it moves |
+| (b) two | 4c-1: step 0 and the scene (1,288 written now); 4c-2: steps 1 to 7 (7,785 to 7,935) | 4c-1: the hold, 1,665; 4c-2: the plan's 16,450 (on the old count) or about 17,520 to 17,850 (on the recount), his to say which | 4c-2: about 10,970 on 16,450, or 11,680 to 11,900 | 4c-2: the plan's 13,150, the far-corner map (the plan's planned size, 1.8 times 7,315); the planned size on the recount would be about 14,010 to 14,280, his to move to or keep |
+| (c) three | 4c-1 as (b); 4c-2: steps 1, 2 (less RESUME-FLASH's part), 6, 6c and step 3's snapshot share, 4,425 to 5,010; 4c-3: step 3's rest, RESUME-FLASH, steps 4, 5, 6b, 7, 2,925 to 3,360 | 4c-2 about 9,960 to 11,270; 4c-3 about 6,580 to 7,560 | 4c-2 about 6,640 to 7,510; 4c-3 about 4,390 to 5,040 | 4c-2 holds the far-corner map (step 6c): its rung inside 4c-2 is his to set, since the plan's 13,150 lies above 4c-2's whole line |
+Under every option nothing else moves: at a stop line the chat stops and he decides; the plan's never-moved list stands
+(the movement recording on its four runs with PM-0004-17, -19, -21 and -24, the paced replay PM-0004-28, the stale-id
+run PM-0004-15, the hostile commands PM-0004-60, the parity marks PM-0004-30 and -59, the camera panel). The card
+takes the chosen option's line, its two-thirds sentence and its rung before step 1 (SIZE-4B point 2).
 
 ## G. Evidence, reviewers, his checks, risks
 - **Step S:** a visual change. Before and after pictures of the real page, made by `shot-4c.mjs` (this folder) on
@@ -384,7 +451,84 @@ The read holds every symbol with today's file:line and each test with its plante
   5. Press "Copy report" and paste it into the chat. **Expected:** the same rows (`content.*`, `scene.*`), "errors: 0",
      the render counts.
   6. Open the same page once in Firefox. **Expected:** the same scene and rows, "errors: 0".
-- **Steps 1 to 7:** pending the reads.
+- **Steps 1 to 7 (revision 3; the advisor agent's item 10, point 13).** Each step's evidence, by the plan's section 17
+  (logic by tests on the real code, each with its planted defect, run by a plants script; netcode by deterministic
+  tests; performance by numbers with their method; what a player sees by screenshots that name their backend, then his
+  eyes). Reviews run on the part's final diff, not per step (the review budget); "read by" names who covers that
+  step's part of the diff.
+  - **Step 1, the movement:** the body's cases as tests (blocks 5 and 6 of rust-reviewer's read become the table);
+    PM-0004-30 (the 0.55 m step gained, the 0.56 m step stopped); PM-0004-59 and every jump test against
+    `jump_reach_m` as read, never a literal; PM-0004-15 (stale ids, a 64-slot table through the capacity parameter);
+    PM-0004-6 (nothing allocates in the step); `Rules::take`'s refusals (a jump reach below the step height; a sprint
+    or refill time that rounds to 0 units), each tested; PM-0004-22 for exp (at least 10,000 inputs, bit-identical
+    natively and in WebAssembly in Node and each browser engine, the largest error in ulp, libm's cost; one native run
+    over all 2^32 inputs); the source scan's one named allowance with its control and bites, and the maths list's
+    exact paths (security-auditor's item 3); the dependency batch in one commit with F1's test and F2's layering test;
+    world.rs's known answers and first-loop re-made in the commit that changes the state (CI green at each commit).
+    Read by rust-reviewer, netcode-architect (the hashed state), game-designer (the rules against his words),
+    test-engineer.
+  - **Step 2, the command path:** deterministic tests: the post's 13 numbers with the move in one word; the endpoint's
+    cast on its own copy of the world; the room's refusals counted (a move longer than 1, an aim outside the map); one
+    jump per command (3B-ONE-PER-TICK; J1 to J5 counted once); the record rule's command-less tick and restore; the
+    bounds' one home with its tie test; the host zeroing the move when the tab hides; the first aim clamped into the
+    bounds; under (c) the zero ray, both ways. Read by netcode-architect, security-auditor (message handling),
+    rust-reviewer.
+  - **Step 3, the snapshot's soldier and the block:** the layout's sizes pinned (header 12 bytes, the owner's section
+    20, 48 rows of 40: 1,988 bytes) and `layout_hash` re-pinned; the blend's tests (B1, the allowance's estimator; the
+    first frame after a pause: no jump, no step back); the ring of three blocks with `dueAt`; the pool of 16
+    (3B-POOL-16); allocation.spec's limit holding. Read by netcode-architect (the wire, the timing), engine-architect
+    (the layout across the boundary), perf-auditor.
+  - **Step 4, the page:** before and after pictures of the real page naming their backend; the render counts; the
+    allocation measured again; the aim line in the development build only (`DEV_MARKERS` gains `"aim-line"`; the
+    production scan reads `.css`: 3B-CSS-PROD); 3B-BLUR-TEST; the stamina bar (hidden when full and not locked); the
+    camera's content kind (`shamble-camera` 1, his Export's 21 values) with its schema, generated type and
+    `readCamera`. Read by engine-architect, graphics-engineer (the drawing code), art-director on a narrow brief (the
+    stand-in, the stamina bar and the aim line readable; no judgement of the look: for the advisor agent to confirm,
+    as for step S), test-engineer, perf-auditor.
+  - **Step 5, the camera panel:** its limits from the generated schema through `numberLimits` in `@shamble/types`
+    (4B-LIMIT-IMPORT); the five old presets written by script from `docs/legacy-tuning.json` (each sets the six values
+    the old preset set); "copy values" through one browser-safe copy of the content's canonical rule; the development
+    code out of the production build (the scan). The early-look zip after this step. Read by engine-architect,
+    security-auditor (the panel's text, the clipboard), art-director (narrow), test-engineer.
+  - **Step 6, the recordings:** `walk` (2,400 ticks) and `lane-walk` (1,200) on four runs (native, Node's WebAssembly,
+    Chromium, Firefox) with PM-0004-17, -19, -21 and -24; the three planted divergences run again on movement;
+    `walk_reaches.rs` proving every query kind is hit (4B-QUERY-RECORDING; FEATURE-COMPARE condition 4: `walk` lands
+    in the pull request that brings step 1 and the cast); 4B-RAY-WASM's three lines in `static-world.txt`
+    (4B-RAY-COUNTS). Read by netcode-architect, test-engineer, rust-reviewer.
+  - **Step 6b, the paced replay:** in development builds, a recording at live pace in the real Worker, the camera still
+    and moved, its hashes the recording's own (PM-0004-28), in `tests/paced/`; it waits for the CI Builder's answer on
+    4B-CHROMIUM-TIME. Read by netcode-architect, test-engineer, perf-auditor.
+  - **Step 6c:** 2,000,000 hostile movement commands with no panic (PM-0004-60, by his DEPART-4C reading); the yard
+    at the far corner of a 2 km map built in code (PM-0004-39, the rung). Read by security-auditor, rust-reviewer,
+    test-engineer.
+  - **Step 7, the page's browser tests:** walk, jump, the two steps, aim on a ramp, the camera follows, keys let go on
+    blur (3B-BLUR-TEST), the hidden tab with a soldier, allocation measured again. Read by test-engineer,
+    perf-auditor.
+  - **The part's reviewers** (the plan's section 17; at most three at a time, two rounds at most, the second on what
+    changed): rust-reviewer, netcode-architect, engine-architect; then graphics-engineer, test-engineer,
+    security-auditor; then game-designer, perf-auditor; art-director on the narrow brief if the advisor agent confirms
+    it. The verifier until PASS, the advisor agent on every pushed head, docs-keeper.
+- **His main check of steps 1 to 7 (the plan's section 17: about 35 minutes, Brave then Firefox), a draft;** the
+  numbered list with every expected result is written with the part's zip. Where a result hangs on an answer of his,
+  the answer is named:
+  1. Open the page as the zip's README says. **Expected:** the scene, the stand-in at a spawn of the test scene facing
+     +x (every spawn there faces 90 degrees), the follow camera at his Export's framing, "errors: 0".
+  2. Walk, then sprint until the stamina locks. **Expected:** the walk eases in and out; the sprint is faster, the bar
+     shows and drains, and at empty the sprint stops and stays locked until the bar is back at its share.
+  3. Jump, and hold the jump key. **Expected:** one jump per press, its top at his reach (3.071 m); held, by MOVE-RULES.
+  4. The two steps, then the three ledges. **Expected:** he walks up the 0.55 m step and is stopped by the 0.56 m one;
+     a jump catches the 2.9 m and 3.05 m ledges and not the 3.10 m one.
+  5. The cover wall and a roof edge (only if he takes MOVE-RULES row 5); a ramp up and down; the thin wall at a
+     sprint. **Expected:** by row 5; no hop on the ramps (the snap); never through the thin wall.
+  6. Aim on the ground, on a ledge and on a ramp. **Expected:** the aim line ends where the cursor points; he faces it.
+  7. The camera panel (backquote): its five presets, "copy values". **Expected:** each preset sets its six values;
+     "copy values" gives what TUNE-HOME says.
+  8. The tab hidden for 1 minute, and once for 6 minutes, while walking (PM-0002-34); then a covered window.
+     **Expected:** by RESUME-FLASH; no jump of the soldier or the camera on return.
+  9. The replay button on each screen he has, its refresh rate noted. **Expected:** it says the hashes are the
+     recording's (PM-0004-28).
+  10. Two minutes of walking the lane. **Expected:** the smoothness numbers in the readout.
+  11. "Copy report", pasted into the chat; then steps 1 to 6 once in Firefox. **Expected:** "errors: 0" in both.
 - **Risks:** CI's Chromium run uses 3.6 to 3.9 of its 5 minutes (4B-CHROMIUM-TIME): 4c's browser tests may pass it,
   and the fix is a CI edit, the CI Builder's, with his yes first. Others pending the reads.
 
@@ -421,6 +565,25 @@ rule; (9) `Rules::take`'s refusals, and jump tests against `jump_reach_m` as rea
 (11) the CI Builder's request for 4B-CHROMIUM-TIME sent now, through him; (12) the recount of steps 1 to 7 with the
 part's stop line, its two-thirds sentence and its rungs on the card before step 1; (13) section G's line for steps 1 to
 7 replaced by each step's evidence, reviewers and his checklist.
+
+**Where the thirteen points stand (revision 3, 2026-11-28):**
+| Point | State |
+|---|---|
+| (1) BODY-SHAPE with him on the corrected rows | asked (the question file, 5597b00d and 04646ca3); his |
+| (2) the body prototype with numbers | block 5 of rust-reviewer's read DONE (steps, ledges, ramps, seams, roofs, edges, thin wall); block 6 running (ramp sides and the set-back, a ceiling on a made map, landing, the snap's numbers, the push with two soldiers, for (3a), (3b) and (2); the 2.5D question) |
+| (3) SWEEP-ROUTE | asked (DEPART-4C); his |
+| (4) GROUND | engine-architect's block 5, running (it reconciles map.rs:39, map.rs:317-330 and the height scene.ts draws the ground at) |
+| (5) FACING-SPAWN | engine-architect's block 5, running; a pick that narrows what a map file says goes to him |
+| (6) the slope | his (MOVE-RULES row 9; the unit recommended a grade in percent) |
+| (7) item 6 applied | applied in section E ("The record rule"); rust-reviewer's and netcode-architect's written yes running |
+| (8) NO-SOURCE's rows in the Testlines table, `--check` and its plant, the version rule of new fields | waits for NO-SOURCE and BODY-SHAPE (which fields); designed in E1 |
+| (9) `Rules::take`'s refusals; jump tests against `jump_reach_m` | designed (E1; G step 1); built in step 1 |
+| (10) the dependency hold | answered: APPROVE (`security-auditor-deps-4c.md`, `dependency-check.md`), F1 and F2 on the commit that applies it |
+| (11) the CI Builder's request for 4B-CHROMIUM-TIME | asked of him in the chat (it goes through him); his |
+| (12) the recount, the stop line, two thirds, the rungs | section F2, for each SIZE-4C option; the card takes his option's numbers before step 1 |
+| (13) section G for steps 1 to 7 | section G, with his checklist as a draft |
+The advisor agent is asked to approve steps 1 to 7 only once his answers on (1), (3) and (6) are in, with blocks 5 to 7
+folded in.
 
 **Revision 1's asks, as they were put (kept for the record):**
 1. **Step 0 and step S: APPROVE or REVISE now.** Neither waits for a movement answer. Step 0 is made after your verdict
