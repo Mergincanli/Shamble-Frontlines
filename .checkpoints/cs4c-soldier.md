@@ -10,7 +10,7 @@
   `/home/user/Shamble-Frontlines` is never switched.
 - **Base:** origin/main dae6d107fdbe942567104bcf1c9a2cbc6b3a1e0f (pull request #79's merge commit), taken in by
   fast-forward from b7145273.
-- **Last update:** 2026-11-28 02:40 Amsterdam (from the clock; an earlier save said 01:08, a time written without
+- **Last update:** 2026-11-28 02:44 Amsterdam (from the clock; an earlier save said 01:08, a time written without
   reading the clock: it was 00:57; an edit at 02:04 wrote "02:06", also unread, corrected here)
 
 ## Steps done
@@ -245,7 +245,22 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
     lean to yes but do not settle it; the old game does (legacy/shamble-game.js:2531-2540); options (a) yes, (b) no
     (the prototype's runs again), (c) he tries it in the sandbox or lets it be read again; recommended (c), else (a);
     PM-0004-30 holds as worded; the 0.56 m test starts on the ground beside the step. The head bump: the sandbox's own
-    rule (F18), what it does not in its notes. netcode-architect's block 8 running.
+    rule (F18), what it does not in its notes.
+    netcode-architect's block 8 DONE: NA1 YES (the aim's fallback meets the floor, the bounds' bottom face, in whole
+    centimetres; no hash moves), NA3 YES (FACING-SPAWN (a) changes neither the snapshot's soldier record nor the
+    recordings; the general sine and cosine rest on PM-0004-22's vectors), NA2 NO to both options and in their place a
+    new protocol meaning, (-32,768, 0, 0) = "no aim yet" (the row holds it from spawn, the spawn facing stays until a
+    real aim, never through the bounds' clamp; `Endpoint::new` has no first aim; tests N-1 to N-3), which revises its
+    block 7 and needs rust-reviewer's and engine-architect's yes (asked at 02:44). Counts: step 2 about 335 / 690, step
+    1 about +25 / +145 (from +10 / +100).
+    **FACING-SPAWN (a) picked with its reviewers** (engine-architect, rust-reviewer, netcode-architect). **The batch
+    reworded** (`deps-4c-v2.diff`, 85 lines, `deps-4c-v2.sha256`): only the root comment changed (it names `sincos`
+    for the spawns' facings), so only Cargo.toml's digest moves (fc436ec3... for 099d224b...); `git apply --check`
+    passes; `cargo metadata --offline --locked` exits 0; `dependency-check.md` marked to be rewritten; the two v2 files
+    stay on this machine until security-auditor's answer, as the first version's did (the advisor tool's caution; a
+    new seat remakes them from the scratch worktree by the same `diff -u` loop if they are lost). Running from
+    02:44 Amsterdam: security-auditor on the reworded batch (with RR1's correction of its item 3), rust-reviewer's
+    block 8 and engine-architect's block 6 ("no aim yet"; the aim area in the constructors).
 - **The sheet's revision 3** (from 02:14 Amsterdam): the record rule applied with its confirmations outstanding, the
   recount F2 with each option's stop line, section G for steps 1 to 7 with his checklist as a draft, section H's table
   of item 10's thirteen points.

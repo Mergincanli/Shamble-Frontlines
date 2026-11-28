@@ -29,7 +29,7 @@ by option. Then DONE.
 - N3 (endpoint): `build_input` writes move 0, aim {0,0,0}, view {newest snapshot tick, 0} (endpoint.rs:251-263); `Sent{sequence, tick, view_tick, post}` (:83-88). The endpoint holds no static world.
 - N4 (world placement, 4B-WORLD-ROOM): the one `StaticWorld` is owned by `LocalMatch` (local_match.rs:48-50, :63, :96-100), "no step queries it yet"; `Room::new(setup, content_hash)` takes no map (room/lib.rs:105-118); `World` holds tick, player, seed only (world.rs:112-117). `StaticWorld` derives Clone (collision.rs:94).
 - N5 (cast): `StaticWorld::cast_ray(origin: V3, direction: V3, limit: f32) -> Option<RayHit{shape, t}>` (collision.rs:300-345): no hit for any number beyond RAY_REACH 2^20 or NaN, zero direction, negative/NaN limit; limit capped at RAY_REACH; ties to the lowest index; allocates nothing. The point is ours to form (origin + direction * t).
-- N6 (legacy aim, corrects my design 3.7): the old game casts with far = 400 m and falls back to the GROUND plane (y = 0), keeping the last ground point when the ray never crosses it (legacy/shamble-game.js:1120-1126, `raycaster.far=400`, `intersectPlane(groundPlane)`, `aimPoint.copy(aimGround)`); my design said 500 m and the plane at fire height. Plan section 10 already says "the cursor ray's first hit, else the ground". Facing turns only beyond 2 cm horizontally (:2708-2709).
+- N6 (legacy aim, corrects my design 3.7): the old game casts with far = 400 m and falls back to the GROUND plane (y = 0), keeping the last ground point when the ray never crosses it (legacy/shamble-game.js:1120-1126, `raycaster.far=400`, `intersectPlane(groundPlane)`, `aimPoint.copy(aimGround)`); my design said 500 m and the plane at fire height. Plan section 10 already says "the cursor ray's first hit, else the ground". Facing turns only beyond 2 cm horizontally (:2709-2710).
 - N7 (bounds): the loader holds a map's bounds inside the aim's reach, on the centimetre grid (content/src/map.rs:9-14, :316-335; AIM_REACH_CM 32,767 both ways, AIM_HEIGHT_MAX_CM 65,535; Mustafa 2026-11-26 "until the aim codec widens, the loader refuses a playable map larger than its reach"). So the room's aim check is integer compares against the bounds in cm, and no loaded map can hold a far corner at 1 km: PM-0004-39 can only be a sim-level map built in code (map.rs:15-16 says such a map "is no playable map").
 - N8 (float scan reach): the rule scan reads `crates/sim/src` and `crates/content/src` only (sim/tests/rules_scan.rs:1-7, :472). Float arithmetic written in `client-endpoint` (the ground crossing, the clamp, the rounding to cm) would sit outside it, though it decides a replayed, hashed value. Finding for step 2: that arithmetic lives in `sim` (beside `cast_ray`), the endpoint only calls it.
 - N9 (replay refusals): the native runner refuses a recording whose move, ray or view words are non-zero (devtools/src/replay.rs:81-84 move, :85-91 aim, :92-98 view time; line numbers rechecked with grep -n); the TS reader likewise (packages/sim-worker/src/recording.ts:141-143); the replay calls `input` with six numbers (replay.rs:150, recording.ts:160, e2e/tests/replay/determinism.spec.ts:26-27, :84). The format (version 1, 68 bytes a step) already holds move, ray and view (recording.rs:1-11, :71-90): no format change in 4c.
@@ -59,9 +59,10 @@ and an aim outside the map; one jump per command (3B-ONE-PER-TICK).
 - ADD `crates/sim/src/aim.rs` (new; `pub mod aim;` in `lib.rs:18-23`): `pub struct AimCm { x: i16, y: u16, z: i16 }`
   (the wire's integers; the sim turns them into metres itself); `pub const AIM_REACH_M: f32 = 400.0` (the old game's
   `raycaster.far=400`, shamble-game.js:1120: a code number of the old game, like its 2 cm facing rule, not a value of
-  his Export); `pub fn aim_point(world: &StaticWorld, origin: V3, direction: V3, last: AimCm) -> (AimCm, AimFrom)` with
+  his Export); `pub fn aim_point(world: &StaticWorld, origin: V3, direction: V3, last: AimCm) -> (AimCm, AimFrom)` [SUPERSEDED
+  by block 8.3: `aim_point(world, origin, direction) -> Option<(AimCm, AimFrom)>`, no `last`, no `Kept`] with
   `enum AimFrom { Hit, Ground, Kept }`: the first hit within 400 m (`cast_ray`), else the crossing of the ground plane
-  y = 0 ahead of the origin [SUPERSEDED by block 8.2: the floor, `bounds_m`'s lower y], else `last`; then rounded to whole centimetres (`round`, on part 7's list) and clamped
+  y = 0 ahead of the origin [SUPERSEDED by block 8.2: the floor, `bounds_m`'s lower y], else `last` [SUPERSEDED by block 8.3: else nothing]; then rounded to whole centimetres (`round`, on part 7's list) and clamped
   into the bounds in whole centimetres (integer compares). It lives in `sim`, not in the endpoint, so the rule scan
   (which reads only `sim` and `content`, N8) holds its float arithmetic: it decides a value that is replayed and,
   once the soldier faces it, hashed. Corrects my design 3.7 (fire-height plane, 500 m) to the old game's rule (N6).
@@ -150,12 +151,12 @@ and an aim outside the map; one jump per command (3B-ONE-PER-TICK).
 |---|---|---|---|
 | T2-1 | `post.rs` | `clamp_move` over all 65,536 pairs: result within 127, unchanged if inside, each part only toward 0, sign kept; the eight directions unchanged; the ties pinned: (90, 90) -> (89, 89), (-90, 90) -> (-89, 89) (25) | `<` for `<=` in the length test, so (127, 0) moves |
 | T2-2 | `post.rs` | `from_numbers` takes any numbers; a NaN, an infinity in any one of the six ray numbers gives no ray [SUPERSEDED by block 7.4: a refused ray, counted]; spare move and held bits ignored (30) | the finite check on five of the six numbers |
-| T2-3 | `sim/src/aim.rs` | a ray onto the step's top gives its point in cm; one that misses gives the ground crossing; one to the sky, one parallel to the ground, keep the last; a hit at 401 m is no hit; a point beyond the bounds is clamped to the bound's cm; the rounding of a half centimetre pinned (70) | the fallback plane at fire height (my old design); the reach 500 m; no clamp |
+| T2-3 | `sim/src/aim.rs` | a ray onto the step's top gives its point in cm; one that misses gives the ground crossing; one to the sky, one parallel to the ground, keep the last [SUPERSEDED by block 8.3: give no point]; a hit at 401 m is no hit; a point beyond the bounds is clamped to the bound's cm; the rounding of a half centimetre pinned (70) | the fallback plane at fire height (my old design); the reach 500 m; no clamp |
 | T2-4 | `collision.rs` | `bounds_cm` exact at the reach's edges (+-32,767; 0 to 65,535); `holds_cm` on each face true, 1 cm past false; bounds off the grid refused by name (30) [SUPERSEDED by block 7.3's tie test] | the bounds narrowed through `f32` before the cm (an off-by-one at a face) |
 | T2-5 | `endpoint.rs` | PM-0002-14's native half: each command's aim is the cast of the post handed in for that tick (posts alternate rays onto two shapes); repeats carry their own first aim; the first aim lies inside bounds that exclude the origin [SUPERSEDED by block 8.3's N-3: before any ray every command carries NONE]; a post without a usable ray keeps the aim and counts `aims_kept` [SUPERSEDED by block 7.4's Z1 and Z2]; a (-128, -128) post sends a move the room takes (90) | the previous post's ray cast; repeats cast again from the newest post; the first aim (0, 0, 0) unclamped |
 | T2-6 | `room/lib.rs` | moves (127, 0), (0, -127), (89, 89), (-89, -89) taken; (90, 90), (-128, 0), (127, 127) refused and counted; an aim on each of the six faces taken, 1 cm past each refused; a refused command never runs, and its sequence counts as missing when the next one runs (70) | `<` for `<=`; the aim held to the `i16` range instead of the bounds; `refused_aim` left out of `refused()` |
-| T2-7 | `room/tests/any_bytes.rs:139-143` | the generator's move and aim over their full ranges (the aim is `{1, 2, 3}` today); its identities still hold (15) | as T2-6's third plant: the identity breaks |
-| T2-8 | `client-endpoint/tests/any_bytes.rs` | random posts with hostile rays (NaN, infinities, beyond 2^20, zero direction): no panic, every aim sent inside the bounds (25) | the clamp skipped on the ground fallback |
+| T2-7 | `room/tests/any_bytes.rs:139-143` | the generator's move and aim over their full ranges (the aim is `{1, 2, 3}` today; [block 8.3] (-32,768, 0, 0) is taken as no aim, any other x of -32,768 refused); its identities still hold (15) | as T2-6's third plant: the identity breaks |
+| T2-8 | `client-endpoint/tests/any_bytes.rs` | random posts with hostile rays (NaN, infinities, beyond 2^20, zero direction): no panic, every aim sent inside the bounds [block 8.3: or NONE] (25) | the clamp skipped on the ground fallback |
 | T2-9 | `sim-wasm/src/lib.rs` tests | the 13 numbers reach the endpoint and the room: a ray onto a shape is the aim of the room's next decoded command; `:240-259`'s echo test on 13 numbers (30) | the input call dropping the ray |
 | T2-10 | `sim-wasm/tests/step_alloc.rs` | rays every tick (hits, sky, NaN, beyond the bounds): 0 allocations over 18,000 ticks (15) | a `Vec` made in `aim_point` |
 | J1-J5 | the movement's tests (step 1's code) | 3B-ONE-PER-TICK as my design 4.1: 255 presses in one grounded command make one jump; a press in the air nothing, and none kept for the landing; Space held jumps at each landing; two commands in a tick, each +1, one jump; a tap shorter than a tick one jump (80) | a jump per press; presses kept for the landing; the held bit read alone |
@@ -486,9 +487,9 @@ ours). The whole `lane-walk` at live pace (40 s a run) is his check's button, no
 **Tests (all new files; release-line counts in CI's `cargo test --release`, toolchain.yml:162; a short count in debug)**
 | # | Where | What it holds | Planted defect |
 |---|---|---|---|
-| H1 | `crates/room/tests/hostile_moves.rs` | a running `Room` on the test scene with its soldier, fed decoded `Input`s whose commands run every field over its whole range (ticks near and far, sequences in order, repeated and out of order, every move in i8 x i8, every aim, every held bit, press counts jumping by up to 255): 2,000,000 commands in release, 20,000 in debug; no panic; each refusal count equal to the test's own count of the commands that broke that rule; every float of the state finite each tick; one tick per step (70) | the move normalised with no zero-length check (a NaN: the finite read red); a client-sent number used as an index (a panic); `refused_move` not counted for (-128, -128) |
+| H1 | `crates/room/tests/hostile_moves.rs` | a running `Room` on the test scene with its soldier, fed decoded `Input`s whose commands run every field over its whole range (ticks near and far, sequences in order, repeated and out of order, every move in i8 x i8, every aim, every held bit, press counts jumping by up to 255): 2,000,000 commands in release, 20,000 in debug; no panic; each refusal count equal to the test's own count of the commands that broke that rule [block 8.3: NONE breaks none]; every float of the state finite each tick; one tick per step (70) | the move normalised with no zero-length check (a NaN: the finite read red); a client-sent number used as an index (a panic); `refused_move` not counted for (-128, -128) |
 | H2 | `crates/sim/tests/hostile_commands.rs` | the world's step fed `PlayerCommand`s directly, with no room before it (moves longer than 1, any aim, any presses): 2,000,000 in release, 20,000 in debug; no panic, a finite state, the soldier inside the bounds the map's edge rule keeps him in (50) | H1's first plant |
-| H3 | a `sim-wasm` test | 200,000 hostile posts through `Sim::input`'s 13 numbers (NaN, infinities, numbers beyond 2^20, zero directions, any move word) into a running local match: no panic; the room refuses 0 (the endpoint turns any post into a command the room takes); every aim inside the bounds (30) | the endpoint's clamp skipped on the ground fallback |
+| H3 | a `sim-wasm` test | 200,000 hostile posts through `Sim::input`'s 13 numbers (NaN, infinities, numbers beyond 2^20, zero directions, any move word) into a running local match: no panic; the room refuses 0 (the endpoint turns any post into a command the room takes); every aim inside the bounds [block 8.3: or NONE] (30) | the endpoint's clamp skipped on the ground fallback |
 **Reading to state (N17):** 2,000,000 of the mark's 10 million, in CI's release line, not a nightly cargo-fuzz run (no
 nightly job exists; that is a CI file). Walk's commands carry no float and no id: the mark's "NaN, infinities" reach
 only the post (H3), and "claims on ids that do not exist" have no field to ride. **Not in DEPART-4's fourteen (N26):
@@ -737,7 +738,8 @@ stands). First-loop moves in step 1's commit, which re-makes it anyway (F12).
   gains `Bounds` only for bounds that are not finite or have no thickness, the checks a shape gets (collision.rs:227-232),
   which `build` does not make for the bounds today (B7-N8).
 - **Where the aim reads them:** only through `StaticWorld::clamp_cm(AimCm) -> AimCm` and `holds_cm(AimCm) -> bool`, on
-  the aim's box. Their callers: (1) `sim::aim::aim_point`: the hit, the ground crossing and the kept aim all leave
+  the aim's box. Their callers: (1) `sim::aim::aim_point`: the hit, the ground crossing and the kept aim all leave [SUPERSEDED by block 8.3: the hit and the ground crossing
+  only; nothing is kept, and NONE never passes `clamp_cm`]
   through `clamp_cm` (after `round` to whole centimetres and the saturating `as i32`, integer compares only);
   (2) `Endpoint::new`: the first aim is `clamp_cm` of (0, 0, 0) (N13) [WITHDRAWN by block 8.3: no first aim]; (3) the room's per-command check (`holds_cm`,
   counted as `refused_aim`, block 1.1). **`clamp_move` reads no bounds**: it holds the move's length to 127, integers
@@ -778,7 +780,8 @@ stands). First-loop moves in step 1's commit, which re-makes it anyway (F12).
   without that guard: the replays (replay.rs:150, recording.ts:160, determinism.spec.ts:26-27), H3's 200,000 hostile
   posts, and the endpoint's tests (B7-N9). All-zero passes the guard (zeros are finite).
 - **Why it matters under SIZE-4C (c):** the first part posts six zeros every frame until the page makes its ray
-  (step 4, in the later part); under this rule each is no ray, so the soldier keeps the clamped start aim and both
+  (step 4, in the later part); under this rule each is no ray, so the soldier keeps the clamped start aim [SUPERSEDED by block 8.3: every command carries NONE, and he keeps his
+  spawn facing] and both
   counts stay 0 (no false refusals in the readout). First-loop's recorded rays (all-zero bits, N9) are the same case.
 - **Test Z1, the all-zero ray** [its aim assertions SUPERSEDED by block 8.3's N-3; its counts and plants P1 and P3
   stand] (endpoint.rs tests, about 25 lines), on a map whose bounds exclude the origin (x 10 to
@@ -792,7 +795,8 @@ stands). First-loop moves in step 1's commit, which re-makes it anyway (F12).
 - **Test Z2, the non-finite ray** (post.rs and endpoint.rs tests, about 30 lines): after a ray onto a box top, 24
   posts each with one of the six numbers a quiet NaN, a signalling NaN pattern (`f32::from_bits(0x7FA0_0000)`), +inf
   or -inf, the other five finite and not zero (6 places x 4), then 6 posts with one NaN among five zeros (each place):
-  every command keeps the box top, `rays_refused` rises by **exactly 1 per post** (30 in all), `rays_missed` stays 0,
+  every command keeps the box top [SUPERSEDED by block 8.3: every command carries NONE, and the room's row keeps the
+  box top], `rays_refused` rises by **exactly 1 per post** (30 in all), `rays_missed` stays 0,
   no panic. Plants, each red: (P1) the finite check on five of the six numbers (T2-2's): the sixth place's 5 posts go
   to the cast and are not refused (`rays_refused` 25); (P2) the all-zero test written as "no number above or below
   zero" (`!(v > 0.0 || v < 0.0)`, true for a NaN): the 6 NaN-among-zeros posts count as no ray (`rays_refused` 24).
@@ -811,7 +815,7 @@ stood after block 7's marks; block 8's marks have since moved some of them down 
 | block 1.1 (:103-104), T2-5 (:154) | `aims_kept` counts every kept aim, a post without a usable ray included | 7.4: `rays_refused` (non-finite) and `rays_missed` (finite, met nothing); an all-zero post counts in neither |
 | block 1.3 (:169-170) and the last section's block 1 line | step 2: 315 / 630 = 945 | about 340 / 675 = 1,015 (the count below); step 1 gains about 10 / 100 |
 | T2-4 (:153) | "bounds off the grid refused by name" | 7.3's tie test and its four plants |
-| block 3.1 (:341-342) | "the zero ray has no direction, so the endpoint keeps its first aim" | the zero ray is no ray (not cast, not counted): the same aim, by rule rather than by the cast |
+| block 3.1 (:341-342) | "the zero ray has no direction, so the endpoint keeps its first aim" | the zero ray is no ray (not cast, not counted): the same aim, by rule rather than by the cast [block 8.3: NONE, and the spawn facing kept] |
 | "For the sheet" item 2 | the bounds' one home, flagged | settled by 7.3 |
 | "For the sheet" item 6 | "I recommend the narrow record" | (i) as ruled, with the held move and aim in the row (7.2), never the narrow record with nothing kept |
 - Which step adds `PlayerCommand`'s move and aim: whichever of steps 1 and 2 is built first (block 6 row 2g: they
@@ -829,7 +833,7 @@ Asked 2026-11-28 on head 3ab59bd7 by the main session. Read only; this block is 
 ### 8.0 Plan
 1. Read engine-architect-read block 5 (:596-756) and its N27 to N41 (:580-594); recheck the wire's aim
    (protocol messages.rs:110-144, codec.rs:205-232), the reach test (devtools/tests/aim_reach.rs:1-60), the legacy
-   facing rule (legacy/shamble-game.js:2708-2709). A notes line per finding.
+   facing rule (legacy/shamble-game.js:2709-2710). A notes line per finding.
 2. NA1: the ground crossing at the floor; T3 and its plant.
 3. NA2: the held aim at spawn; `Endpoint::new`'s first aim; how "no aim yet" travels on the wire; tests and plants;
    what it does to block 7's first-loop answer.
@@ -838,7 +842,7 @@ Asked 2026-11-28 on head 3ab59bd7 by the main session. Read only; this block is 
 
 ### 8.1 Notes (one line per finding)
 - B8-N1 (G-2 holds): my aim falls back to "the ground plane y = 0" (block 1.1 :62-64), which was the old game's floor (`groundPlane` at 0, N6). engine-architect's GROUND rule (5.2) makes the bounds' bottom the solid ground, and step S draws the ground at `bounds.min[1]` (its N28). On a map whose bounds start at h > 0, the plane at 0 puts the aim h / tan(pitch) beyond the floor point the cursor shows. No map starts above 0 today (its N27), so no recording or hash moves by the fix.
-- B8-N2 (the spawn point turns him back): the facing turns toward the held aim whenever it lies more than 2 cm away horizontally (legacy/shamble-game.js:2708-2709, `fd.lengthSq()>0.0004`, the rule the plan keeps). A held aim at the spawn point holds his facing only while he stands within 2 cm of it; once he walks off, he turns to face his own spawn point and walks on facing backwards. So the spawn point in whole centimetres (engine-architect's N41 and 5.6) is no good held aim.
+- B8-N2 (the spawn point turns him back): the facing turns toward the held aim whenever it lies more than 2 cm away horizontally (legacy/shamble-game.js:2709-2710, `fd.lengthSq()>0.0004`, the rule the plan keeps). A held aim at the spawn point holds his facing only while he stands within 2 cm of it; once he walks off, he turns to face his own spawn point and walks on facing backwards. So the spawn point in whole centimetres (engine-architect's N41 and 5.6) is no good held aim.
 - B8-N3 (the origin is worse): `Endpoint::new`'s first aim (block 7.3 (2): (0, 0, 0) clamped into the bounds), which the zero-ray rule keeps until a ray arrives, turns every new soldier toward the map's origin on his first command, whatever FACING-SPAWN gives (its N41: the yard's spawns, which face +x, would turn toward -x). Under SIZE-4C (c) the first part posts no ray at all, and neither does first-loop, so that would be every command of theirs.
 - B8-N4 (a free value on the wire): the aim's x and z are `i16` centimetres (messages.rs:137-144), and the reach is +-32,767 on purpose, "one centimetre short of that type's own negative end (-32,768)" (map.rs:33-37); aim_reach.rs:54-60 pins that -32,768 fits the type and lies outside the reach. So x = -32,768 is the one value of the wire that no map can ever hold: a value for "no aim", with no bit or byte added. The codec takes any `i16` (codec.rs:218-226), and the room's bounds check (step 2) refuses any other aim with x -32,768, because every map's bounds lie inside the reach (map.rs:319-335). So the value has one form, and the codec needs no change.
 - B8-N5 (the fold): with several commands in one tick, "the newest's aim" would drop a real aim that sits in an older command of the same tick (a lost datagram's repeat, run late) whenever the newest carries "no aim". The tick's commands must be folded oldest first: each real aim sets the held aim, and "no aim" leaves it as it is.
@@ -871,16 +875,23 @@ Asked 2026-11-28 on head 3ab59bd7 by the main session. Read only; this block is 
 - **The rule: `AimCm::NONE` = (-32,768, 0, 0), "no aim yet"**, the one wire value no map can hold (B8-N4):
   1. **The row** holds `aim_cm = NONE` from the spawn (block 7.2's 6 bytes, unchanged). **The facing keeps its spawn
      facing while the held aim is NONE**, and turns toward a real held aim beyond 2 cm as before. One compare in
-     rust-reviewer's facing rule; FACING-SPAWN gives the facing, and NONE leaves it alone.
+     rust-reviewer's facing rule; FACING-SPAWN gives the facing, and NONE leaves it alone. This needs the integer
+     form, `aim_cm`. rust-reviewer proposed it and calls it optional (its read :663-664); with NONE it is no longer
+     optional, because a `V3` aim would need a flag of its own. Its yes on that, and on the facing's compare, is
+     wanted.
   2. **The wire:** no bit and no byte changes. Protocol gains `AimPoint::NONE` and one sentence in the aim's doc
      (messages.rs:132-134): x -32,768 with y 0 and z 0 means "no aim in this command". The codec is unchanged. The
      room's per-command check takes NONE as "no aim" without asking the bounds; any other aim with x -32,768 lies
      outside every map's bounds and is refused and counted as `refused_aim`. So "no aim" has one form.
-  3. **The endpoint** sends NONE for every post that brings no new aim: before its first ray, for an all-zero ray, for
+  3. **`aim_point` changes with it:** `aim_point(world, origin, direction) -> Option<(AimCm, AimFrom)>`, no `last`
+     argument and no `Kept` case: a hit or a floor crossing goes through `clamp_cm`, and a ray that meets nothing
+     gives `None`. **NONE never passes `clamp_cm`**: the clamp would turn (-32,768, 0, 0) into a real point on the
+     bounds' low-x face.
+  4. **The endpoint** sends NONE for every post that brings no new aim: before its first ray, for an all-zero ray, for
      a refused one, and for a finite ray that met nothing (block 7.4's `None`, `Refused` and the missed case; the counts
      are as 7.4 has them). It holds **no aim of its own**: no first aim, no last aim. `Endpoint::new` takes no aim, so
      my N13 and block 7.3 (2) go. A repeat still carries the aim its command first carried.
-  4. **The room's fold** (B8-N5): a tick's commands are applied oldest first. Each real aim sets the row's held aim;
+  5. **The room's fold** (B8-N5): a tick's commands are applied oldest first. Each real aim sets the row's held aim;
      NONE leaves it. A tick with no command keeps it (block 7.2).
 - Anti-cheat: a client can send NONE at any time. That only keeps its soldier's last aim, which an idle client gets
   anyway: no new power.
@@ -899,8 +910,9 @@ Asked 2026-11-28 on head 3ab59bd7 by the main session. Read only; this block is 
     Plant: NONE read as the point (-327.68, 0, 0) (he turns toward -x on the first tick).
   - N-3 (endpoint tests; block 7.4's Z1 rewritten): before any ray, every command carries NONE, and the room counts no
     `refused_aim` on the map that excludes the origin. A ray onto a box top gives that point. The 20 all-zero posts
-    after it carry NONE, not the box top, and the room's row stays on the box top. Plant: the old first aim (the
-    origin clamped into the bounds): red at the first command.
+    after it carry NONE, not the box top, and the room's row stays on the box top. A finite ray that meets nothing (to the sky) gives a command carrying NONE, and `rays_missed` 1.
+    Plants, each red: the old first aim (the origin clamped into the bounds), red at the first command; the missed
+    case's NONE passed through `clamp_cm`, which sends the bounds' low-x face point instead of NONE.
   - devtools/tests/aim_reach.rs gains one line: `AimPoint::NONE.x` is -(`AIM_REACH_CM` + 1), so no reach can hold it.
     Plant: NONE at -32,767, which then fits the reach.
 

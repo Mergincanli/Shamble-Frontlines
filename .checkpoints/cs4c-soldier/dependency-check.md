@@ -1,5 +1,10 @@
 # Dependency check: cs4c-soldier (libm in `sim`; `content` in the tests of `room` and `client-endpoint`)
 
+**To be rewritten (2026-11-28, 02:44 Amsterdam, from the clock):** the batch was reworded (`deps-4c-v2.diff`, `deps-4c-v2.sha256`: the
+root comment names the sine and cosine for the spawns' facings, FACING-SPAWN (a)), so the root Cargo.toml's digest
+below no longer is the batch's. security-auditor answers on the reworded batch (`security-auditor-deps-4c-v2.md`), and
+this file is rewritten from that answer. Until then nothing applies the batch.
+
 security-auditor's answer on exactly this content: `.checkpoints/cs4c-soldier/security-auditor-deps-4c.md` (APPROVE,
 2026-11-28; it names the same five digests, and the patch `deps-4c.diff` at 4865c3f9b8c52d4e223ffd77ddce718f0b3956c230d25392bc11620c0ac7e710,
 which rebuilds exactly these five from 8bee8365). No package from a registry, git or another source is added, no
