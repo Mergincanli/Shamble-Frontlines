@@ -1032,3 +1032,29 @@ DONE
 3. Test 21's faces; J1 to J5 as a row; the recordings under both modes; 11.9. 4. DONE.
 
 ### Notes
+- [B13-1] Every group was re-run on the design's form (WALK_SWEEP and PULL_CLIP on) under (b) (HEADROOM_ON_OWN_TOP=1) and under (a), printed outputs and per-tick bit traces compared (out-*.txt and trace-*-a/-b.txt under .gate/rr7/; rr-trace-compare.py).
+  - Block 5: 10,111 runs, 0 differ by bits, the six roof runs included.
+  - Block 6: 1,021 runs, 0 differ.
+  - Block 12: 12 runs, 0 differ.
+  - Block 9 with block 10's cases: 5 of 329 runs differ, all block 10's H5 layouts. The window wall's top at 6.3 and 9.576: (b) stopped at x 53.6, (a) to x 58. The floor over the crate at both speeds: (b) at x 63.6, (a) to 68. Dropped onto the stretch over the window: (b) put off the wall to feet 0 at z -0.4, (a) stands at 3.0.
+  - Nothing else differs, so tests 6 to 14 and 16 to 20 keep their numbers.
+- [B13-2] A correction to block 9's B9-2 and to the advisor agent's Q2 condition 3. The beam 1 m into a 0.55 m step flickers 6, 8 and 12 times under (b) only with a push-out wall pass. Under the design's sweep, (b) gives what (a) gives: on the step 0.40 m short of the beam, 1 step, 0 falls, at all three speeds. The reason: the swept circle stops at the beam's face exactly 0.40 m away, so it never overlaps the beam, and headroom needs an overlap. So question 13's sentence "under (b) he flickers off and on 6 to 12 times" holds for his sandbox's own push-out by the prototype's model, not for the game under (b).
+- [B13-3] Scan of content/maps/test-scene.json's 23 shapes for every pair where (b) can bite: a floating shape whose underside lies strictly inside the 1.8 m above another shape's top, within 0.8 m of it in plan. None found (the roofs' undersides are exactly the houses' tops, 2.6 m, not inside). So on the test scene the two modes are identical by construction: the walk and lane-walk routes give the same hashes either way, and a flip to (a) moves no committed pin; only test 15's made layouts change.
+
+### Block 13's answers
+1. **Under (b), as the default, re-run:** only block 10's three made HEADROOM-FEET layouts differ (5 runs, B13-1); blocks 5, 6 and 12 are bit-identical, the roofs included. 11.7's tests 6 to 14 and 16 to 20 keep their numbers. Test 15 is rewritten by mode, and 11.3, 11.4 and 11.6 now default to `SandboxTest`, with `OwnTopNeverWall` only through `Rules::with_headroom_feet` (`#[cfg(test)]`).
+2. **Test 15** (11.7, rewritten), mode by mode and layout by layout:
+   - the window wall's top and the floor over a crate: (b) stopped 0.40 m short, (a) walked whole;
+   - dropped onto the window stretch: (b) put off the wall, (a) stands;
+   - a step with a beam over its edge, and a floating plank: a wall in both;
+   - a beam 1 m into a 0.55 m step: no flicker in **both** under the sweep (B13-2). The 6 to 12 falls are the push-out's, pinned by a plant (the wall pass as a push-out under (b)), not by the game's expected numbers.
+   - Plants: each mode run with the other's rule.
+3. **Test 21** (F3, rewritten):
+   - Compared: the box's four faces and four vertical edges; the ramp's two sides, its exposed high-end face and their shared vertical edges; hit times, and a miss against a miss.
+   - Left out, with the reason: the ramp's low end and its slope face (the set-back's and the step-up's, never met by our sweep); every top and bottom face (the arc's); contacts that are a step for us; exactly equal heights. Those are counted, not compared.
+   - Seeded heights include each bottom and top at plus and minus 1e-4.
+4. **J1 to J5** are row 26 of 11.7, +10 / +80 in 11.9; step 2's count drops them.
+5. **The recordings:** walk and lane-walk run on the test scene, which holds no case where (b) can bite (B13-3), so their hashes are identical under both modes. A flip to (a) moves no committed pin, only test 15's expected numbers; test 15 checks the two routes' hashes under both modes, so a later map that breaks this shows at once.
+6. **The count:** 11.9 moves to about **1,520 / 1,945** (3,465 lines): J1 to J5 +10 / +80, test 15's both modes +10, test 21's faces +15. 11.6's placement of `rules`, `statics` and `spawns` is untouched (block 14).
+
+DONE

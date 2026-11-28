@@ -175,8 +175,9 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   count) at about 15,360 to 19,110 written lines.
 - 4c-1 as built: 1,565 written lines at 0645432f (`count-4c.mjs` against dae6d107: 1,564 at the fix pass 2b2f44c2,
   plus one comment line in 0645432f; the hold 1,665; he was told when it passed 1,420).
-- Step 1 by rust-reviewer's block 11 with block 12: about 1,510 / 1,840 (code / tests), 3,350 in all; the ridge flag
-  (block 12, a STATUS follow-up, not now) would add 15 / 20.
+- Step 1 by rust-reviewer's block 11 with blocks 12 and 13: **about 1,520 / 1,945 (code / tests), 3,465 in all**
+  (block 13 adds J1 to J5 as test row 26, +10 / +80, which step 2's count drops; test 15 per mode; test 21's faces and
+  misses); the ridge flag (block 12, a STATUS follow-up, not now) would add 15 / 20.
 - Measured written lines against the designs' count: 4a 2.4 times, 4b-1 2.17, 4b-2 2.7.
 - 4c by the designs' count: 7,315 (steps 1 to 7, the plan's section 6) and about 630 for the scene with the map's
   reading (230 / 260 by 4b's sheet, and 60 to 80 more with as many in tests) = about 7,950. At the measured rates:

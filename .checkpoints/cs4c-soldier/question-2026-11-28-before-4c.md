@@ -344,9 +344,14 @@ in this folder.)
 - **Until he answers, the game is built with (b), his sandbox's rule** (the advisor agent's ruling of 2026-11-28 on
   steps 1 to 7: his MOVE-RULES (a) takes the sandbox's rows as the starting rules); a switch flips it to (a) only on
   his word, and both ways are tested.
-- **What (b) does in one more case**, by the prototype's model of his sandbox (not tried in his sandbox itself): a
-  soldier standing on a 0.55 m step with a beam 1 m into it, over its edge, drops off and steps back up 6 to 12 times
-  in 40 ticks (a flicker); under (a) he stands still.
+- **What (b) does in one more case:** in his sandbox (by the prototype's model of its push-out, not tried in the
+  sandbox itself), a soldier standing on a 0.55 m step with a beam 1 m into it, over its edge, drops off and steps
+  back up 6 to 12 times in 40 ticks (a flicker). In the game, whose wall test is a sweep, he never overlaps the beam,
+  so under (b) he stands still there as under (a) (rust-reviewer's block 13, correcting this line as first written
+  at 15:09, which put the flicker in the game).
+- **His early look is the same either way:** none of the test scene's 23 shapes gives (b) a case, so the walk
+  recordings are identical under (a) and (b); the two differ only on the made layouts of the window wall's top and a
+  floor over a crate, where (b) stops him 0.40 m short and (a) lets him walk on (rust-reviewer's block 13).
 - Not his, and so not asked (game-designer's blocks 7 and 8: none is a rule of his): the pull clipped where a wall
   stands in its reach (no step at his sizes has one; it changes nothing where no wall is in reach); the wall test as a
   sweep of the body's circle (row 3 as the game builds it: it matches his sandbox's push-out in the open and on every
