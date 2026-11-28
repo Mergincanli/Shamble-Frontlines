@@ -2,4 +2,5 @@
 //! `tests/`) and in WebAssembly (the test-only module) on the same inputs.
 
 pub mod f32_ops;
+pub mod libm_ops;
 pub mod stream;

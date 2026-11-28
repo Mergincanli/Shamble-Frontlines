@@ -10,5 +10,11 @@ publish.workspace = true
 protocol = { path = "../protocol" }
 sim = { path = "../sim" }
 
+# The endpoint's own tests build its copy of the collision world (the aim's cast) from a map document (a content
+# type); the endpoint's code takes the world from the constructor, and never names `content` (devtools'
+# tests/layering.rs holds that).
+[dev-dependencies]
+content = { path = "../content" }
+
 [lints]
 workspace = true

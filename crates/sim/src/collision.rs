@@ -99,8 +99,9 @@ pub struct StaticWorld {
 }
 
 /// A corner as the simulation holds it: narrowed once, here, and a zero without its sign (a file cannot hold a
-/// minus zero, a document built in code can, and the sign would reach the tree's bytes).
-fn narrow(corner: [f64; 3]) -> [f32; 3] {
+/// minus zero, a document built in code can, and the sign would reach the tree's bytes). A spawn's point is
+/// narrowed by the same rule (`soldiers::spawn_points`).
+pub(crate) fn narrow(corner: [f64; 3]) -> [f32; 3] {
     corner.map(|value| {
         let value = value as f32;
         if value == 0.0 { 0.0 } else { value }

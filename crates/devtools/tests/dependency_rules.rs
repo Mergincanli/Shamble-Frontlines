@@ -5,10 +5,12 @@
 //! would be in the simulation's tree too. The rule names direct dependencies only, so the manifest's text is the
 //! whole input: no cargo call, and nothing that needs a package to be on disk.
 //!
-//! `sim` depends on `content` and on the collision library alone (ADR 0002 part 3; ADR 0004 part 10), and the
-//! library's line and three locked versions are the ones Mustafa said yes to: a change to any of them fails here
-//! by name, so it reaches him before it reaches a build (security-auditor's finding on the batch: the feature
-//! compare stays silent when `std` is turned on in every build alike, and a version bump trips nothing).
+//! `sim` depends on `content`, on the collision library and on the pinned maths routines alone (ADR 0002 part 3; ADR
+//! 0004 parts 7 and 10), and the library's line and three locked versions are the ones Mustafa said yes to: a change
+//! to any of them fails here by name, so it reaches him before it reaches a build (security-auditor's finding on the
+//! batch: the feature compare stays silent when `std` is turned on in every build alike, and a version bump trips
+//! nothing). The maths routines' crate, `libm`, is held the same way (change-set 4c's dependency batch, F1): the
+//! root's one line to the byte, one locked version, and the simulation the only crate of ours that names it.
 //!
 //! The content crate's rule is stricter than "no normal dependency": its manifest has three tables, `[package]`,
 //! `[dev-dependencies]` and `[lints]`, and the second holds exactly one line, the type writer
@@ -112,13 +114,46 @@ fn locked(lock: &str, name: &str) -> Vec<String> {
         .collect()
 }
 
-/// Whether a manifest asks for the collision library: its name on any line that is not a comment (a dependency's
-/// line in any table, or a table of its own).
-fn names_library(manifest: &str) -> bool {
+/// Whether a manifest asks for a package: its name on any line that is not a comment (a dependency's line in any
+/// table, a table of its own, or a `package = ".."` that renames it).
+fn names(manifest: &str, package: &str) -> bool {
     manifest
         .lines()
-        .any(|line| !line.trim_start().starts_with('#') && line.contains("parry3d"))
+        .any(|line| !line.trim_start().starts_with('#') && line.contains(package))
 }
+
+/// The crates of ours whose manifests name a package, by folder name, in the folder's order.
+fn askers(root: &Path, package: &str) -> Vec<String> {
+    let mut askers = Vec::new();
+    let mut crates: Vec<String> = std::fs::read_dir(root.join("crates"))
+        .expect("the crates folder")
+        .map(|entry| {
+            entry
+                .expect("an entry")
+                .file_name()
+                .to_string_lossy()
+                .into_owned()
+        })
+        .collect();
+    crates.sort_unstable();
+    for krate in crates {
+        if root
+            .join("crates")
+            .join(&krate)
+            .join("Cargo.toml")
+            .is_file()
+            && names(&manifest_of(&krate), package)
+        {
+            askers.push(krate);
+        }
+    }
+    askers
+}
+
+/// The maths routines' line in the root, to the byte, and its one locked version (the batch's F1; security-auditor's
+/// answer of 2026-11-28 names them with the batch's five digests).
+const MATHS: &str = r#"libm = "=0.2.16""#;
+const MATHS_LOCKED: &str = "0.2.16";
 
 /// What a failure says: whose decision the pinned text is.
 const HIS_YES: &str = "pinned by Mustafa's FEATURE-COMPARE (a) of 2026-11-26 (docs/DECISIONS.md, 14:09:13 UTC): \"a change of parry3d's version or of the two packages' versions needs a new yes from me; the library's std stays off\". Ask him before this changes";
@@ -130,7 +165,8 @@ const PINNED: [(&str, &str); 3] = [
 ];
 
 #[test]
-fn the_simulation_depends_on_the_content_crate_and_the_collision_library_alone() {
+fn the_simulation_depends_on_the_content_crate_the_collision_library_and_the_maths_routines_alone()
+{
     let manifest = manifest_of("sim");
     let (tables, _) = tables_and_package_keys(&manifest);
     assert_eq!(
@@ -138,13 +174,16 @@ fn the_simulation_depends_on_the_content_crate_and_the_collision_library_alone()
         ["package", "dependencies", "lints"],
         "crates/sim/Cargo.toml has a table this rule does not allow"
     );
+    // Three exact lines: a renamed dependency (`m = { package = "libm" }`) or a feature of the simulation's own is
+    // another line, and fails here.
     assert_eq!(
         table(&manifest, "dependencies"),
         [
             "content = { path = \"../content\" }",
+            "libm = { workspace = true }",
             "parry3d = { workspace = true }"
         ],
-        "the simulation's dependencies are the content crate and the collision library, and nothing else"
+        "the simulation's dependencies are the content crate, the maths routines and the collision library, and nothing else"
     );
     // The library's one line in the root: its version to the digit, default features off (so no `std`), four features.
     let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
@@ -161,6 +200,17 @@ fn the_simulation_depends_on_the_content_crate_and_the_collision_library_alone()
         [LIBRARY],
         "the root Cargo.toml's parry3d line: {HIS_YES}"
     );
+    // The maths routines' one line in the root, to the byte (no feature of its own: `default` and `arch`, as the
+    // lockfile had them before the batch).
+    let maths: Vec<String> = table(&read("Cargo.toml"), "workspace.dependencies")
+        .into_iter()
+        .filter(|line| line.starts_with("libm"))
+        .collect();
+    assert_eq!(
+        maths,
+        [MATHS],
+        "the root Cargo.toml's libm line is the batch's (security-auditor's answer of 2026-11-28)"
+    );
     let lock = read("Cargo.lock");
     for (name, version) in PINNED {
         assert_eq!(
@@ -169,28 +219,25 @@ fn the_simulation_depends_on_the_content_crate_and_the_collision_library_alone()
             "Cargo.lock's {name}: {HIS_YES}"
         );
     }
+    assert_eq!(
+        locked(&lock, "libm"),
+        [MATHS_LOCKED],
+        "Cargo.lock holds libm at another version, or at two: the maths routines are pinned at one"
+    );
     // The library has one asker. Another crate naming it could turn a feature on for every build beside the
     // root's pinned line (cargo joins the features of all who ask), and the simulation would link what it never
     // chose. One such feature, `spade`, compiles the library's one use of `rstar` and with it `heapless` 0.8.0,
     // which has nine advisories (2026-11-18): with `spade` off nothing reaches either, and the lockfile shows it.
-    let mut askers = Vec::new();
-    for entry in std::fs::read_dir(root.join("crates")).expect("the crates folder") {
-        let krate = entry.expect("an entry").file_name();
-        let krate = krate.to_string_lossy().into_owned();
-        if root
-            .join("crates")
-            .join(&krate)
-            .join("Cargo.toml")
-            .is_file()
-            && names_library(&manifest_of(&krate))
-        {
-            askers.push(krate);
-        }
-    }
+    // The maths routines too: only the simulation names them, so no other crate of ours calls them on its own.
     assert_eq!(
-        askers,
+        askers(&root, "parry3d"),
         ["sim"],
         "only the simulation's manifest names the collision library"
+    );
+    assert_eq!(
+        askers(&root, "libm"),
+        ["sim"],
+        "only the simulation's manifest names the maths routines"
     );
     assert_eq!(
         locked(&lock, "spade"),
@@ -257,11 +304,42 @@ fn the_rule_reads_what_it_should_refuse() {
         "[dev-dependencies.parry3d]\nworkspace = true\n",
         "[target.'cfg(unix)'.dependencies]\n  parry3d = \"=0.31.1\"\n",
     ] {
-        assert!(names_library(asking), "{asking}");
+        assert!(names(asking, "parry3d"), "{asking}");
     }
-    assert!(!names_library(
-        "# The simulation holds parry3d; this crate does not.\n[dependencies]\nsim = { path = \"../sim\" }\n"
+    assert!(!names(
+        "# The simulation holds parry3d; this crate does not.\n[dependencies]\nsim = { path = \"../sim\" }\n",
+        "parry3d"
     ));
+    // The maths routines' half (F1): a renamed libm and a feature of the simulation's own are other lines of its
+    // table; a second asker is seen in each spelling, a rename's `package` included; a moved version is seen.
+    let renamed = "[package]\nname = \"sim\"\n[dependencies]\ncontent = { path = \"../content\" }\nm = { package = \"libm\", workspace = true }\nparry3d = { workspace = true }\n[lints]\n";
+    assert_eq!(
+        table(renamed, "dependencies"),
+        [
+            "content = { path = \"../content\" }",
+            "m = { package = \"libm\", workspace = true }",
+            "parry3d = { workspace = true }"
+        ]
+    );
+    for asking in [
+        "[dependencies]\nlibm = { workspace = true }\n",
+        "[dependencies]\nmaths = { package = \"libm\", version = \"=0.2.16\" }\n",
+        "[dev-dependencies.libm]\nworkspace = true\n",
+    ] {
+        assert!(names(asking, "libm"), "{asking}");
+    }
+    assert!(!names(
+        "# The simulation alone calls libm.\n[dependencies]\nsim = { path = \"../sim\" }\n",
+        "libm"
+    ));
+    assert_ne!(MATHS.replace("=0.2.16", "0.2.16"), MATHS);
+    assert_eq!(
+        locked(
+            "[[package]]\nname = \"libm\"\nversion = \"0.2.15\"\n\n[[package]]\nname = \"libm\"\nversion = \"0.2.16\"\n",
+            "libm"
+        ),
+        ["0.2.15", "0.2.16"]
+    );
     assert_eq!(
         locked(
             "[[package]]\nname = \"spade\"\nversion = \"2.15.0\"\n",

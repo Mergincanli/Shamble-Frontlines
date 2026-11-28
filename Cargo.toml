@@ -20,6 +20,12 @@ wasm-bindgen = "=0.2.130"
 # (crates/sim/src/collision.rs). Each bump is its own change-set: the source audit behind the built-file check
 # (packages/client/scripts/build-checks.mjs) is per version.
 parry3d = { version = "=0.31.1", default-features = false, features = ["dim3", "f32", "alloc", "enhanced-determinism"] }
+# The maths routines the simulation calls itself (ADR 0004 part 7: transcendental maths only through pinned libm):
+# the exponential for the movement's easing shares and the sine and cosine (one routine, `sincos`) for the spawns'
+# facings, each worked out once per match (change-set 4c). Already in the lockfile, at this version, through the
+# collision library's vector maths; each routine it brings is on the built-file check's reviewed list with its
+# vectors (packages/client/scripts/maths-allowed.mjs).
+libm = "=0.2.16"
 
 # Every crate opts in with `[lints] workspace = true` (ADR 0002 parts 4 and 7).
 [workspace.lints.rust]

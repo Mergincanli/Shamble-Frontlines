@@ -27,6 +27,9 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
+#[path = "support/marking.rs"]
+mod marking;
+
 /// Part 7's float methods, word for word; its operators, comparisons and `as` casts are syntax. The list of the
 /// "exact non-arithmetic methods" is read as closed at the four the draft names (Mustafa's DEPART-3 (a)).
 #[rustfmt::skip]
@@ -94,6 +97,25 @@ const ESCAPE: [&str; 13] = ["#", "[", "allow", "(", "clippy", "::", "disallowed_
 /// `collision.rs` in a folder below is another file.
 const LIBRARY: &str = "parry3d";
 const LIBRARY_FILE: &str = "collision.rs";
+
+/// The maths routines' crate (ADR 0004 part 7: "transcendental maths only via pinned libm"), the one file of `src/`
+/// that may name it, and, in that file, the one routine each named function may call (change-set 4c; rust-reviewer's
+/// B7-1, the collision library's rule applied to `libm`). A routine is called by its full path, `libm::<routine>(`:
+/// never imported, renamed or handed on. Every other `libm` path is refused, whatever its name, so `expm1`, `expf`,
+/// `sincosf` and `atan2f` are refused by construction and not by a list. Each allowance is one routine for one
+/// function, run while a match's constants are worked out (the built-file check's reviewed list says why each may be
+/// in the players' file: packages/client/scripts/maths-allowed.mjs).
+const MATHS: &str = "libm";
+const MATHS_FILE: &str = "fmath.rs";
+const MATHS_CALLS: [(&str, &str); 2] = [("exp_of", "exp"), ("sincos_of", "sincos")];
+
+/// libm's two routines as the simulation reaches them, by their own names, each with its one caller (rust-reviewer's
+/// block 17, Q1). Each name may stand only in `fmath.rs`, and there only in its own `fn` and in the body of its one
+/// caller. A name counts wherever it stands as a whole token (a call, a path, `use`, `as`, `pub use`, a function
+/// pointer, a macro's argument), test code included, so no file but `fmath.rs` reaches them and no other function
+/// there does. Outside `src/` the vectors call them (crates/devtools), and nothing else may: devtools'
+/// `tests/layering.rs` holds that for the room, the client endpoint and the players' module.
+const RAW: [(&str, &str); 2] = [("exp_of", "share_per_tick"), ("sincos_of", "facing_of")];
 
 /// A fused multiply-add under the names it has outside std's `mul_add` (C's, which the `libm` crate and the
 /// toolchain's own routines share): Mustafa's MUL-ADD (a) again. The built-file check refuses the same names in
@@ -352,6 +374,92 @@ fn library_breach(file: &str, t: &[Token], at: usize) -> Option<&'static str> {
     }
 }
 
+/// Whether a token is a name: a letter or `_` first, then letters, digits and `_`.
+fn is_name(text: &str) -> bool {
+    let mut chars = text.chars();
+    chars
+        .next()
+        .is_some_and(|first| first.is_alphabetic() || first == '_')
+        && chars.all(|c| c.is_alphanumeric() || c == '_')
+}
+
+/// The name of the innermost named function whose body holds token `at`, if any: a function's body is the first
+/// `{` after its name outside parentheses and brackets, to the `}` that closes it.
+fn enclosing_fn(t: &[Token], at: usize) -> Option<&str> {
+    let text = |index: usize| t.get(index).map_or("", |token| token.text.as_str());
+    let mut found = None;
+    for k in 0..at {
+        if text(k) != "fn" || !is_name(text(k + 1)) {
+            continue;
+        }
+        let mut depth = 0_usize;
+        let mut open = None;
+        for index in k + 2..at {
+            match text(index) {
+                "(" | "[" => depth += 1,
+                ")" | "]" => depth = depth.saturating_sub(1),
+                "{" if depth == 0 => {
+                    open = Some(index);
+                    break;
+                }
+                ";" if depth == 0 => break,
+                _ => {}
+            }
+        }
+        let Some(open) = open else { continue };
+        let mut braces = 0_usize;
+        let mut close = t.len();
+        for (index, token) in t.iter().enumerate().skip(open) {
+            match token.text.as_str() {
+                "{" => braces += 1,
+                "}" => {
+                    braces = braces.saturating_sub(1);
+                    if braces == 0 {
+                        close = index;
+                        break;
+                    }
+                }
+                _ => {}
+            }
+        }
+        if at < close {
+            found = Some(text(k + 1));
+        }
+    }
+    found
+}
+
+/// What is wrong with one naming of the maths routines' crate, if anything: it stands outside its one file; it is
+/// no full-path call of a routine (an import, a rename, a path that goes on, a function's address); or the routine is
+/// not the one the function it stands in may call. A fused multiply-add by its libm name is the fused rule's to name.
+fn maths_breach(file: &str, t: &[Token], at: usize) -> Option<String> {
+    let text = |index: usize| t.get(index).map_or("", |token| token.text.as_str());
+    let routine = text(at + 2);
+    if text(at + 1) == "::" && FUSED.contains(&routine) {
+        return None;
+    }
+    if file != MATHS_FILE {
+        return Some(
+            "are named outside `fmath.rs`: the simulation calls them from one file".to_owned(),
+        );
+    }
+    if text(at + 1) != "::" || !is_name(routine) || text(at + 3) != "(" {
+        return Some("are named but not called by a full path, `libm::<routine>(`: never imported, renamed or handed on".to_owned());
+    }
+    let function = enclosing_fn(t, at).unwrap_or("no function");
+    if MATHS_CALLS.contains(&(function, routine)) {
+        return None;
+    }
+    let allowed: Vec<String> = MATHS_CALLS
+        .iter()
+        .map(|(function, routine)| format!("`libm::{routine}` in `{function}`"))
+        .collect();
+    Some(format!(
+        "are called as `libm::{routine}` in `{function}`, where the rule allows only {}",
+        allowed.join(" and ")
+    ))
+}
+
 /// Every breach of the rules in one file's source, each as "file:line: what".
 fn breaches(file: &str, source: &str) -> Vec<String> {
     breaches_of(file, source, true)
@@ -383,7 +491,8 @@ fn breaches_of(file: &str, source: &str, simulation: bool) -> Vec<String> {
         // A method call (a range's `..` is its own token, so `0..min(a, b)` is none), or any path that is not an
         // integer's.
         let called = before == "." && next == "(";
-        let on_a_path = before == "::" && !NOT_FLOATS.contains(&before_2);
+        // A `libm` path is the maths rule's to judge, below: it refuses every one but the allowed calls.
+        let on_a_path = before == "::" && !NOT_FLOATS.contains(&before_2) && before_2 != MATHS;
         let float_call = simulation && STD.contains(&name) && (called || on_a_path);
         if let Some((_, why)) = HELD.iter().find(|(held, _)| float_call && *held == name) {
             found.push(format!(
@@ -436,6 +545,24 @@ fn breaches_of(file: &str, source: &str, simulation: bool) -> Vec<String> {
                 "{file}:{}: `{name}`: the collision library {why} (ADR 0004 part 10)",
                 token.line
             ));
+        }
+        if let Some(why) = (simulation && name == MATHS)
+            .then(|| maths_breach(file, &t, i))
+            .flatten()
+        {
+            found.push(format!(
+                "{file}:{}: `{name}`: the maths routines {why} (ADR 0004 part 7)",
+                token.line
+            ));
+        }
+        if let Some((_, caller)) = RAW.iter().find(|(raw, _)| simulation && *raw == name) {
+            let own = before == "fn" || enclosing_fn(&t, i) == Some(*caller);
+            if file != MATHS_FILE || !own {
+                found.push(format!(
+                    "{file}:{}: `{name}`: libm's routine as the simulation reaches it stands only in `fmath.rs`, in its own `fn` and in `{caller}` (ADR 0004 part 7)",
+                    token.line
+                ));
+            }
         }
         // `#[path = ".."]`, also as `#[cfg_attr(.., path = "..")]`: the name, `=`, then a text, inside brackets.
         let path_attribute = name == "path"
@@ -580,9 +707,34 @@ const BITES: [(&str, &str); 43] = [
 ];
 
 /// The same for the rules of change-set 4b-2: a fused multiply-add by its other names, a target feature outside a
-/// build's own refusal, and the collision library's name by the file it stands in.
+/// build's own refusal, and the collision library's name by the file it stands in; and change-set 4c's maths rule
+/// (B7-1's bites): a routine in a function not allowed it, another routine of libm's, an import with a bare call,
+/// libm in a second file, a path that goes on, a function's address.
 #[rustfmt::skip]
-const LATER_BITES: [(&str, &str, &str); 16] = [
+const LATER_BITES: [(&str, &str, &str); 37] = [
+    // The raw names (block 17's bites): in the other caller, in other files, imported, renamed, handed on, as a
+    // function's address, through a glob import, in fmath.rs's own tests; and libm called back in a caller.
+    ("fmath.rs", "fn facing_of(x: f64) -> f64 { exp_of(x) }", "`exp_of`: libm's routine as the simulation reaches it stands only in `fmath.rs`, in its own `fn` and in `share_per_tick`"),
+    ("fmath.rs", "fn share_per_tick(x: f64) -> (f64, f64) { sincos_of(x) }", "`sincos_of`: libm's routine as the simulation reaches it"),
+    ("world.rs", "fn f() -> f64 { crate::fmath::exp_of(1.0) }", "`exp_of`: libm's routine as the simulation reaches it"),
+    ("rules.rs", "use crate::fmath::exp_of as e;", "`exp_of`: libm's routine as the simulation reaches it"),
+    ("soldiers.rs", "use crate::fmath::{sincos_of};", "`sincos_of`: libm's routine as the simulation reaches it"),
+    ("lib.rs", "pub use fmath::exp_of;", "`exp_of`: libm's routine as the simulation reaches it"),
+    ("collision.rs", "fn g() { let f: fn(f64) -> f64 = crate::fmath::exp_of; }", "`exp_of`: libm's routine as the simulation reaches it"),
+    ("world.rs", "use crate::fmath::*;\nfn g(x: f64) -> (f64, f64) { sincos_of(x) }", "2: `sincos_of`: libm's routine as the simulation reaches it"),
+    ("fmath.rs", "#[cfg(test)]\nmod tests {\n    fn t() -> f64 { super::exp_of(1.0) }\n}", "3: `exp_of`: libm's routine as the simulation reaches it"),
+    ("fmath.rs", "pub fn share_per_tick(r: f64, dt: f64) -> f32 { (1.0 - libm::exp(-(r * dt))) as f32 }", "are called as `libm::exp` in `share_per_tick`"),
+    ("fmath.rs", "fn share_per_tick(x: f64) -> f64 { libm::expm1(x) }", "`libm`: the maths routines are called as `libm::expm1` in `share_per_tick`"),
+    ("fmath.rs", "fn exp_of(x: f64) -> f64 { libm::exp(x) }\nfn other(x: f64) -> (f64, f64) { libm::sincos(x) }", "2: `libm`: the maths routines are called as `libm::sincos` in `other`"),
+    ("fmath.rs", "fn facing_of(x: f32) -> (f32, f32) { libm::sincosf(x) }", "are called as `libm::sincosf` in `facing_of`"),
+    ("fmath.rs", "fn share_per_tick(x: f64) -> f64 { libm::sin(x) }", "are called as `libm::sin` in `share_per_tick`"),
+    ("fmath.rs", "const ONE: f64 = 1.0;\nconst E: f64 = libm::exp(ONE);", "2: `libm`: the maths routines are called as `libm::exp` in `no function`"),
+    ("fmath.rs", "use libm::{exp};\nfn share_per_tick(x: f64) -> f64 { exp(x) }", "`libm`: the maths routines are named but not called by a full path"),
+    ("fmath.rs", "use libm::*;\nfn share_per_tick(x: f64) -> f64 { exp(x) }", "`libm`: the maths routines are named but not called by a full path"),
+    ("fmath.rs", "pub use libm::exp;", "`libm`: the maths routines are named but not called by a full path"),
+    ("fmath.rs", "fn facing_of(x: f64) -> f64 { libm::math::sincos(x).0 }", "`libm`: the maths routines are named but not called by a full path"),
+    ("fmath.rs", "fn share_per_tick() -> fn(f64) -> f64 { libm::exp }", "`libm`: the maths routines are named but not called by a full path"),
+    ("movement.rs", "fn f(x: f64) -> f64 { libm::exp(x) }", "`libm`: the maths routines are named outside `fmath.rs`"),
     ("planted.rs", "fn f(a: f32, b: f32, c: f32) -> f32 { fmaf(a, b, c) }", "`fmaf`: a fused multiply-add"),
     ("planted.rs", "fn f(a: f64, b: f64, c: f64) -> f64 { libm::fma(a, b, c) }", "`fma`: a fused multiply-add"),
     ("collision.rs", "use parry3d::simba::scalar::ComplexField;\nfn f(a: f32) -> f32 { ComplexField::fma_round(a) }", "2: `fma_round`"),
@@ -604,9 +756,12 @@ const LATER_BITES: [(&str, &str, &str); 16] = [
 ];
 
 /// And what those rules let through: a build's refusal under a target feature, the library in its own file with
-/// its own names, and words that only look like the banned ones.
+/// its own names, words that only look like the banned ones, and the maths rule's two allowed calls.
 #[rustfmt::skip]
-const LATER_CONTROLS: [(&str, &str); 6] = [
+const LATER_CONTROLS: [(&str, &str); 9] = [
+    ("fmath.rs", "pub fn exp_of(x: f64) -> f64 { libm::exp(x) }\npub fn share_per_tick(rate: f64, dt: f64) -> f32 { (1.0 - exp_of(-(rate * dt))) as f32 }"),
+    ("fmath.rs", "pub fn sincos_of(x: f64) -> (f64, f64) { libm::sincos(x) }\npub fn facing_of(deg: f64) -> [f32; 2] { let (s, c) = sincos_of(deg * K); [s as f32, 0.0 - c as f32] }"),
+    ("world.rs", "// libm, exp_of and sincos_of live in fmath.rs\nfn f(libmx: u32, exp_offset: u32, my_exp_of: u32) -> &'static str { \"libm::exp(x) and sincos_of\" }"),
     ("lib.rs", "#[cfg(any(target_feature = \"fma\", target_feature = \"avx2\"))]\ncompile_error!(\"the simulation is built without them\");"),
     ("lib.rs", "#[cfg(target_feature = \"fma\")] compile_error!(\"x\"); fn f(fmax: u32, format: u32) -> u32 { fmax + format }"),
     ("collision.rs", "use parry3d::bounding_volume::Aabb;\nuse parry3d::query::{Ray, RayCast};\nfn f(ray: &Ray, shape: &parry3d::shape::Cuboid) -> f32 { ray.dir.x as f32 }"),
@@ -686,85 +841,13 @@ const PANIC_MACROS: [&str; 10] = [
     "panic", "unreachable", "todo", "unimplemented", "assert", "assert_eq", "assert_ne", "debug_assert",
     "debug_assert_eq", "debug_assert_ne",
 ];
-/// The words an item starts with, after its attributes and its `pub`.
-#[rustfmt::skip]
-const TEST_ITEMS: [&str; 13] = [
-    "mod", "fn", "use", "impl", "struct", "enum", "const", "static", "type", "trait", "unsafe", "async", "extern",
-];
-
-/// For each token, whether it stands in test-only code: a whole file whose first line is `#![cfg(test)]` (the
-/// content crate's export test of its generated types is one), or the item that follows `#[cfg(test)]`, to its
-/// closing brace, or to its `;` when it has no body. A `#[cfg(test)]` on anything that is no item (a match arm, a field, a
-/// statement) marks nothing: what follows it is read as code the game runs.
-fn in_tests(t: &[Token]) -> Vec<bool> {
-    const MARK: [&str; 7] = ["#", "[", "cfg", "(", "test", ")", "]"];
-    let text = |at: usize| t.get(at).map_or("", |token| token.text.as_str());
-    // The place after the bracket or parenthesis that opens at `at`.
-    let past = |mut at: usize| {
-        let mut depth = 0_usize;
-        while at < t.len() {
-            match text(at) {
-                "[" | "(" => depth += 1,
-                "]" | ")" => depth = depth.saturating_sub(1),
-                _ => {}
-            }
-            at += 1;
-            if depth == 0 {
-                break;
-            }
-        }
-        at
-    };
-    // A file that starts with `#![cfg(test)]` is test-only as a whole: the mark on the file itself, to the letter.
-    const FILE_MARK: [&str; 8] = ["#", "!", "[", "cfg", "(", "test", ")", "]"];
-    if (0..FILE_MARK.len()).all(|k| text(k) == FILE_MARK[k]) {
-        return vec![true; t.len()];
-    }
-    let mut inside = vec![false; t.len()];
-    let mut at = 0;
-    while at < t.len() {
-        let marked = (0..MARK.len()).all(|k| text(at + k) == MARK[k]);
-        // What the mark stands on, past further attributes and a `pub` with or without its reach.
-        let mut item = at + MARK.len();
-        loop {
-            if text(item) == "#" && text(item + 1) == "[" {
-                item = past(item + 1);
-            } else if text(item) == "pub" {
-                item = if text(item + 1) == "(" {
-                    past(item + 1)
-                } else {
-                    item + 1
-                };
-            } else {
-                break;
-            }
-        }
-        if marked && TEST_ITEMS.contains(&text(item)) {
-            let mut depth = 0_usize;
-            while at < t.len() {
-                inside[at] = true;
-                match text(at) {
-                    "{" | "[" | "(" => depth += 1,
-                    "}" | "]" | ")" => depth = depth.saturating_sub(1),
-                    _ => {}
-                }
-                if depth == 0 && matches!(text(at), "}" | ";") {
-                    break;
-                }
-                at += 1;
-            }
-        }
-        at += 1;
-    }
-    inside
-}
-
 /// The content crate's breaches in one file: the simulation's rules without its two allowances (the float list:
 /// the loader's arithmetic on doubles is judged where it enters the players' file; and part 9's escape: no hashed
 /// map anywhere in this crate), and a call that can panic outside the tests.
 fn content_breaches(file: &str, source: &str) -> Vec<String> {
-    let t = tokens(source);
-    let tests = in_tests(&t);
+    // The narrow marking, shared with devtools' layering test (F5: one home, so the two cannot drift).
+    let t = marking::tokens(source);
+    let tests = marking::test_only(&t);
     let mut found = breaches_of(file, source, false);
     for (i, token) in t.iter().enumerate() {
         let name = token.text.as_str();
@@ -839,7 +922,14 @@ fn the_content_crate_keeps_its_rules() {
 }
 
 #[rustfmt::skip]
-const CONTENT_BITES: [(&str, &str); 20] = [
+const CONTENT_BITES: [(&str, &str); 23] = [
+    // The narrow marking (support/marking.rs, change-set 4c's F5): `#[cfg(test)]` marks a top-level `mod NAME { .. }`
+    // and nothing else, so a test-only `const` or `fn` outside a tests module is read as shipped (a false red on the
+    // safe side: it moves into the tests module); and a raw name is no keyword, so a parameter `r#fn` under
+    // `#[cfg(test)]` hides no body.
+    ("#[cfg(test)]\n#[allow(dead_code)]\npub(crate) const X: [u8; 2] = [Some(1_u8).unwrap(), 2];\nfn f() {}", "3: `unwrap`"),
+    ("#[cfg(test)]\npub fn g(x: Option<u8>) -> u8 { x.unwrap() }\nfn f() {}", "2: `unwrap`"),
+    ("fn f(#[cfg(test)] r#fn: u8) -> u8 { x.unwrap() }", "`unwrap`"),
     // A file is test-only as a whole only by `#![cfg(test)]` itself, at its start: another condition, or the
     // words further down, mark nothing.
     ("#![cfg(not(test))]\nfn f(x: Option<u8>) -> u8 { x.unwrap() }", "2: `unwrap`"),
@@ -865,10 +955,9 @@ const CONTENT_BITES: [(&str, &str); 20] = [
 ];
 
 #[rustfmt::skip]
-const CONTENT_CONTROLS: [&str; 9] = [
+const CONTENT_CONTROLS: [&str; 8] = [
     "//! A test-only file, like the export test of the generated types.\n\n#![cfg(test)]\n\nuse std::fs;\nfn f(x: Option<u8>) -> u8 { assert!(x.is_some()); fs::read(\"x\").expect(\"a file\"); x.unwrap() }",
-    "#[cfg(test)]\n#[allow(dead_code)]\npub(crate) const X: [u8; 2] = [Some(1_u8).unwrap(), 2];\nfn f() {}",
-    "#[cfg(test)]\npub fn g(x: Option<u8>) -> u8 { assert!(x.is_some()); x.unwrap() }\nfn f() {}",
+    "#[cfg(test)]\n#[allow(dead_code)]\nmod helpers {\n    pub(crate) const X: [u8; 2] = [Some(1_u8).unwrap(), 2];\n    pub fn g(x: Option<u8>) -> u8 { assert!(x.is_some()); x.unwrap() }\n}\nfn f() {}",
     "fn f(x: Option<u8>) -> u8 { x.unwrap_or(0) }",
     "fn f(x: Result<u8, u8>) -> u8 { x.unwrap_or_default() }",
     "#[cfg(test)]\nmod tests {\n    #[test]\n    fn g() { let x: Option<u8> = None; assert!(x.is_none()); panic!(\"a test may\"); }\n    fn h(x: Option<u8>) -> u8 { x.expect(\"in a test\") }\n}",

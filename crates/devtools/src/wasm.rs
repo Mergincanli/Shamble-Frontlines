@@ -13,7 +13,7 @@ use crate::content_proofs;
 use crate::files::vector_text;
 use crate::recording::{Recording, hashes_text};
 use crate::replay::replay;
-use crate::rules::{f32_ops, stream};
+use crate::rules::{f32_ops, libm_ops, stream};
 use crate::world_proofs;
 
 /// The float vectors (PM-0004-22): an empty text when every operation gives the exact reference's results and
@@ -22,6 +22,14 @@ use crate::world_proofs;
 #[must_use]
 pub fn f32_vectors(inputs: &[u8], expected: &str) -> String {
     f32_ops::check(inputs, expected).err().unwrap_or_default()
+}
+
+/// The maths routines' vectors (PM-0004-22): an empty text when libm's exponential and sine-and-cosine give, on this
+/// engine, the outputs the native build recorded, or what differs.
+#[wasm_bindgen]
+#[must_use]
+pub fn libm_vectors(inputs: &[u8], expected: &str) -> String {
+    libm_ops::check(inputs, expected).err().unwrap_or_default()
 }
 
 /// The random stream's vectors (PM-0004-27): an empty text when the generator gives the file's words, or the first

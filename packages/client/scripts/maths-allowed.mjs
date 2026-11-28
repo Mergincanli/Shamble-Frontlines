@@ -5,8 +5,9 @@
 // refused whatever this list says.
 //
 // Two entries, both brought by the content loader, which the players' constructor links from change-set 4b-2's step
-// 9 on (rust-reviewer's decision of 2026-11-27): each runs when a bundle loads, never per tick. The simulation itself
-// calls no maths routine, and the static collision world links none (its tree's build and its rays are additions,
+// 9 on (rust-reviewer's decision of 2026-11-27): each runs when a bundle loads, never per tick. The simulation's own
+// two (crates/sim/src/fmath.rs: libm's exp and sincos, since change-set 4c's C3) are not linked into the players' file
+// until its constructor calls them (4c's C4, which brings their entries), and the static collision world links none (its tree's build and its rays are additions,
 // subtractions, multiplications, divisions and comparisons; rust-reviewer's read of 2026-11-27). Each entry names a
 // routine by its path as the build check prints it, and covers the steps below it:
 // { routine: "libm::math::sqrt", why: "..." } covers libm::math::sqrt::sqrtf; a C-named one is "C::round".

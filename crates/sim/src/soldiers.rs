@@ -3,7 +3,11 @@
 //! step 1). Every slot is reached through `get` and `get_mut`, so a slot from anywhere, a command's included, never
 //! panics.
 
+use content::map::{MapDocument, Spawn};
+
 use crate::aim::AimCm;
+use crate::collision::narrow;
+use crate::fmath::facing_of;
 use crate::ids::SoldierId;
 use crate::vec::V3;
 
@@ -163,6 +167,33 @@ impl<const N: usize> Default for Soldiers<N> {
     }
 }
 
+/// Where a soldier can start: a map's spawn as the simulation holds it, its point narrowed once (as a shape's corners
+/// are) and its heading as a direction (x, z).
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct SpawnPoint {
+    pub at: V3,
+    pub facing: [f32; 2],
+}
+
+/// A map's spawns as the match's spawn table, built once when a match starts (allocating, never in a tick): ranked by
+/// id in byte order, as the shapes are (`collision.rs`), so "street_10" comes before "street_2". The first is where
+/// the first soldier stands: a build default until the barracks, not a rule of his (game-designer's N37).
+#[must_use]
+pub fn spawn_points(map: &MapDocument) -> Vec<SpawnPoint> {
+    let mut spawns: Vec<&Spawn> = map.spawns.iter().collect();
+    spawns.sort_by(|a, b| a.id.as_bytes().cmp(b.id.as_bytes()));
+    spawns
+        .into_iter()
+        .map(|spawn| {
+            let [x, y, z] = narrow(spawn.at);
+            SpawnPoint {
+                at: V3::new(x, y, z),
+                facing: facing_of(spawn.facing_deg),
+            }
+        })
+        .collect()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -294,5 +325,66 @@ mod tests {
         let again = table.spawn(0, spot(0), EAST).expect("an empty slot");
         assert_eq!(again, first);
         assert!(table.resolve(first).is_some());
+    }
+
+    /// A map built in code with the spawns it is given, in that order (it never passed the loader).
+    fn map_with(spawns: &[(&str, [f64; 3], f64)]) -> MapDocument {
+        MapDocument {
+            id: "spawns".to_owned(),
+            bounds: content::map::Bounds {
+                min: [-50.0, 0.0, -50.0],
+                max: [50.0, 20.0, 50.0],
+            },
+            spawns: spawns
+                .iter()
+                .map(|(id, at, facing_deg)| Spawn {
+                    id: (*id).to_owned(),
+                    at: *at,
+                    facing_deg: *facing_deg,
+                })
+                .collect(),
+            shapes: Vec::new(),
+            regions: Vec::new(),
+        }
+    }
+
+    /// The spawn table is ranked by id in byte order, whatever the file's order (W-2's order half, block 15): "c",
+    /// "a", "b" give "a" first; "street_10" comes before "street_2" (no number-aware order). Each point is narrowed as
+    /// a shape's corner is (a minus zero loses its sign), and each heading is `facing_of`'s.
+    #[test]
+    fn the_spawn_table_is_ranked_by_id_in_byte_order() {
+        let ids = |map: &MapDocument| -> Vec<[u32; 3]> {
+            spawn_points(map)
+                .iter()
+                .map(|point| point.at.to_array().map(f32::to_bits))
+                .collect()
+        };
+        let map = map_with(&[
+            ("c", [3.0, 0.0, 0.0], 0.0),
+            ("a", [1.0, 0.0, 0.0], 90.0),
+            ("b", [2.0, 0.0, 0.0], 180.0),
+        ]);
+        let order: Vec<f32> = spawn_points(&map)
+            .iter()
+            .map(|point| point.at.to_array()[0])
+            .collect();
+        assert_eq!(order, [1.0, 2.0, 3.0]);
+        assert_eq!(
+            spawn_points(&map)
+                .iter()
+                .map(|point| point.facing)
+                .collect::<Vec<_>>(),
+            [facing_of(90.0), facing_of(180.0), facing_of(0.0)]
+        );
+        let streets = map_with(&[
+            ("street_2", [2.0, 0.0, 0.0], 0.0),
+            ("street_10", [10.0, 0.0, 0.0], 0.0),
+        ]);
+        let first = spawn_points(&streets)[0].at.to_array()[0];
+        assert_eq!(first, 10.0);
+        // A point is narrowed once, and a minus zero (which only a map built in code can hold) loses its sign.
+        let signed = map_with(&[("z", [-0.0, 0.1, -0.0], 0.0)]);
+        assert_eq!(ids(&signed), [[0, 0.1_f32.to_bits(), 0]]);
+        assert!(spawn_points(&map_with(&[])).is_empty());
     }
 }

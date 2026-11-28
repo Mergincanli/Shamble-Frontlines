@@ -1,4 +1,4 @@
-// The rule tests in WebAssembly, in the browser's own engine: the float vectors (PM-0004-22), the random stream's
+// The rule tests in WebAssembly, in the browser's own engine: the float vectors and the maths routines' (PM-0004-22), the random stream's
 // vectors (PM-0004-27) and the planted counter overflow with the panic hook's text (PM-0002-53), on the test-only
 // module in its release and its dev profile. No server hands the module out: this spec answers a made-up address
 // from the module's own folder, so nothing here can reach a page players get. A missing module fails the test.
@@ -8,11 +8,13 @@ import { expect, test } from "@playwright/test";
 
 const root = fileURLToPath(new URL("../../../..", import.meta.url));
 const ORIGIN = "http://rules.invalid";
-const VECTORS = ["f32-inputs.bin", "f32-expected.txt", "chacha8-words.bin"];
+const VECTORS = ["f32-inputs.bin", "f32-expected.txt", "chacha8-words.bin", "libm-inputs.bin", "libm-expected.txt"];
 
 interface Outcome {
   f32: string;
   f32Changed: string;
+  libm: string;
+  libmChanged: string;
   stream: string;
   wrapped: number;
   fits: number;
@@ -46,6 +48,11 @@ for (const profile of ["release", "dev"] as const) {
       const f32: string = glue.f32_vectors(inputs, expected);
       inputs[1] = (inputs[1] ?? 0) ^ 0x40;
       const f32Changed: string = glue.f32_vectors(inputs, expected);
+      const libmInputs = await bytes("libm-inputs.bin");
+      const libmExpected = new TextDecoder().decode(await bytes("libm-expected.txt"));
+      const libm: string = glue.libm_vectors(libmInputs, libmExpected);
+      libmInputs[1] = (libmInputs[1] ?? 0) ^ 0x40;
+      const libmChanged: string = glue.libm_vectors(libmInputs, libmExpected);
       const stream: string = glue.chacha8_vectors(await bytes("chacha8-words.bin"));
       const buffer: number = glue.panic_buffer();
       const wrapped: number = glue.plant_u16_wrapping_add(65_535, 1);
@@ -59,12 +66,13 @@ for (const profile of ["release", "dev"] as const) {
       // The hook's text, read through the memory alone: no call into a trapped instance.
       const length = new DataView(wasm.memory.buffer, buffer, 8).getUint32(0, true);
       const panic = new TextDecoder().decode(new Uint8Array(wasm.memory.buffer, buffer + 8, length));
-      return { f32, f32Changed: f32Changed.slice(0, 41), stream, wrapped, fits, thrown, panic };
+      return { f32, f32Changed: f32Changed.slice(0, 41), libm, libmChanged: libmChanged.slice(0, 62), stream, wrapped, fits, thrown, panic };
     });
     console.log(`the rule tests, ${profile} profile: ${JSON.stringify(outcome)}`);
-    expect(outcome).toMatchObject({ f32: "", stream: "", wrapped: 0, fits: 65_535, thrown: "WebAssembly.RuntimeError" });
+    expect(outcome).toMatchObject({ f32: "", libm: "", stream: "", wrapped: 0, fits: 65_535, thrown: "WebAssembly.RuntimeError" });
     // The check runs in the Wasm and can fail: one changed bit of one input was found.
     expect(outcome.f32Changed).toBe("not the exact reference's results: add 4 ");
+    expect(outcome.libmChanged).toBe("the inputs are not the ones the expected file's header names: ");
     expect(outcome.panic).toMatch(/^panicked at crates\/devtools\/src\/wasm\.rs:\d+:\d+:\nattempt to add with overflow$/);
   });
 }

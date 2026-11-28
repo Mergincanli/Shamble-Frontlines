@@ -17,8 +17,10 @@ compile_error!(
 
 pub mod aim;
 pub mod collision;
+pub mod fmath;
 pub mod ids;
 pub mod rng;
+pub mod rules;
 pub mod soldiers;
 pub mod state_hash;
 pub mod time;

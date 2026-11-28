@@ -1,4 +1,4 @@
-// The rule tests in WebAssembly, under Node: the float vectors (PM-0004-22), the random stream's vectors
+// The rule tests in WebAssembly, under Node: the float vectors and the maths routines' (PM-0004-22), the random stream's vectors
 // (PM-0004-27), the planted counter overflow with the panic hook's text (PM-0002-53), and the imports of the Wasm
 // players get (PM-0004-10: no clock). They load the test-only module (crates/devtools), which every build but a
 // production one makes in its release and its dev profile (`node packages/client/scripts/build.mjs --wasm-only`),
@@ -16,6 +16,8 @@ const vectors = (name) => readFileSync(new URL(`../../../crates/devtools/vectors
 const inputs = vectors("f32-inputs.bin");
 const expected = vectors("f32-expected.txt").toString("utf8");
 const words = vectors("chacha8-words.bin");
+const libmInputs = vectors("libm-inputs.bin");
+const libmExpected = vectors("libm-expected.txt").toString("utf8");
 // The dev profile is not optimised: its own limit, far above what it took here (under 0.1 s).
 const LIMIT_MS = 60_000;
 
@@ -29,6 +31,14 @@ describe.each([["release", release], ["dev", dev]])("the test-only module, %s pr
     const changed = Uint8Array.from(inputs);
     changed[1] ^= 0x40;
     expect(glue.f32_vectors(changed, expected)).toContain("not the exact reference's results: add 4 ");
+  });
+
+  test("libm's exponential and sine-and-cosine give the outputs the native build recorded (PM-0004-22)", { timeout: LIMIT_MS }, () => {
+    expect(glue.libm_vectors(libmInputs, libmExpected)).toBe("");
+    // The check runs in the Wasm and can fail: one changed byte of the inputs is named by the expected file's header.
+    const changed = Uint8Array.from(libmInputs);
+    changed[1] ^= 0x40;
+    expect(glue.libm_vectors(changed, libmExpected)).toContain("the inputs are not the ones the expected file's header names: ");
   });
 
   test("the random stream gives the vector file's words", { timeout: LIMIT_MS }, () => {

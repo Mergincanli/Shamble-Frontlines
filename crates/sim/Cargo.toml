@@ -5,10 +5,12 @@ edition.workspace = true
 rust-version.workspace = true
 publish.workspace = true
 
-# The content the simulation runs on (ADR 0002 part 3: `sim` depends on `content`), and the collision library, which
-# only crates/sim/src/collision.rs names (ADR 0004 part 10); its version and features are set once, in the root.
+# The content the simulation runs on (ADR 0002 part 3: `sim` depends on `content`), the collision library, which
+# only crates/sim/src/collision.rs names (ADR 0004 part 10), and the pinned maths routines (ADR 0004 part 7); their
+# versions and features are set once, in the root.
 [dependencies]
 content = { path = "../content" }
+libm = { workspace = true }
 parry3d = { workspace = true }
 
 [lints]
