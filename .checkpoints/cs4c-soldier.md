@@ -221,7 +221,20 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   `/home/user/Shamble-Frontlines/.gate/cs4b-2`. A session of another account works on its own branch from this
   branch's head and never pushes here (his Lanes rule). SEAT-OUT from him: stop at a whole point and report the last
   commit's id.
-- **State (16:32 Amsterdam, from the clock): step 1's C1 is committed and green, C2 is being built.** C1
+- **State (16:43 Amsterdam, from the clock): C2 is written and its tests pass; its plants run next, then the full
+  local checks, the gate and C2's commit.** Saved as `cs4c-soldier/c2-wip.patch` (`git diff --binary HEAD -- crates
+  packages content` on 43897d29: 20 files; apply with `git apply` on 43897d29 if the worktree is lost). Done since 16:32:
+  the proofs' committed digests (`content-verdicts.txt` written again by `SHAMBLE_WRITE_VERDICTS=1`); the frozen bundle
+  re-frozen (`make_recordings --freeze first-loop`: only `movement/soldier.json` differs, version 1 to 2 and the
+  thirteen new fields; the map the same) and the recordings made again: **`first-loop.rec` differs in 32 bytes only,
+  offsets 51 to 82, the header's bundle sha256 (now f0093b57...); `first-loop.hashes`' 1,800 tick lines are byte for byte
+  the same, only its first line changes (it names the `.rec`'s sha256); `first-loop.vector.txt` is byte for byte the
+  same.** So G5 holds (no state changed); the build order's "`.hashes` byte-identical" was loose wording: a `.hashes`
+  file's header names its `.rec`, which names the bundle. The whole workspace: 246 Rust tests pass, 0 fail (two_instances
+  and two_processes too). C2's plants are written in `plants-4c2.py` (V1 to V3, F1, F2, S1 to S4, T1 to T3, controls
+  VC1 to VC4; anchors 14 of 14 once). Not plantable: `bundle.rs`'s exact version rule (the bundle's VERSION is 1, so
+  the rule's lower end changes nothing today). Earlier state (16:32), kept: step 1's C1 is committed and green, C2 is
+  being built. C1
   (71e0f857: the soldier table, the aim's type, the vector helpers; no state change: the players' file a624ff32...
   unchanged, the recordings unchanged): the full local checks and the gate with smoke passed before its commit; its
   plants R1 and R2 caught, RC1 held; CI green (gate and smoke run 46159411516, toolchain run 46159411530, 10 min 49 s);

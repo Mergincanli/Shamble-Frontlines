@@ -41,6 +41,22 @@ def cargo_test(package, *filters, lib=True):
     return ("cargo", "test", "-p", package, "--locked", *(["--lib"] if lib else []), *filters)
 
 SOLDIER_TESTS = cargo_test("sim", "soldiers::tests")
+# C2's files and commands.
+READ = "crates/content/src/read.rs"
+MOVEMENT = "crates/content/src/movement.rs"
+SCHEMA = "crates/content/src/schema.rs"
+PAGE_CONTENT = "packages/client/src/app/content.ts"
+CONVERTER = "packages/client/scripts/testlines.mjs"
+TABLE = "content/source/testlines-table.json"
+SOLDIER_FILE = "content/movement/soldier.json"
+MOVEMENT_TESTS = cargo_test("content", "movement::tests")
+SCHEMA_TESTS = cargo_test("content", "schema::tests")
+CONTENT_TESTS = cargo_test("content")
+VITEST = ("node", f"{ROOT}/node_modules/vitest/vitest.mjs", "run", "--root", f"{ROOT}/packages/client")
+PAGE_TESTS = (*VITEST, "src/app/content.test.ts")
+CONVERTER_TESTS = (*VITEST, "scripts/testlines.test.mjs")
+CONVERTER_CHECK = ("node", f"{ROOT}/packages/client/scripts/testlines.mjs", "--check")
+SANDBOX_RULE = "a row with no place in his Export fills a field with its own value and names its place in his sandbox"
 
 # name, kind, what the defect is, the edits (file, text there once, its replacement), the command, the words its output must hold
 PLANTS = [
@@ -54,6 +70,53 @@ PLANTS = [
      SOLDIER_TESTS, ["test soldiers::tests::a_stale_id_never_resolves ... FAILED"]),
     ("RC1", "control", "the clean tree: the soldier table's tests",
      [], SOLDIER_TESTS, ["test result: ok. 5 passed"]),
+    # C2: content's thirteen fields at version 2 (the advisor agent's VERSION-RULE conditions; the build order's C2).
+    ("V1", "defect", "the typed read takes versions from 1 again: a movement file at version 1 is read as version 2",
+     [(READ, "        whole_in(node, &path, newest, newest).map_err(", "        whole_in(node, &path, 1, newest).map_err(")],
+     MOVEMENT_TESTS, ["test movement::tests::version_2_is_read_and_every_other_version_is_refused_as_a_version ... FAILED"]),
+    ("V2", "defect", "the page takes the old range of versions again: a movement file at version 1 is delivered",
+     [(PAGE_CONTENT, "    if (format !== kind.format || version !== kind.newest) return fault;",
+                     '    if (format !== kind.format || typeof version !== "number" || !Number.isInteger(version) || version < 1 || version > kind.newest) return fault;')],
+     PAGE_TESTS, ["each kind is read at its newest version only: a movement file at version 1 or 3 is refused", "1 failed"]),
+    ("V3", "defect", "the converter writes version 1: its header is no longer the loader's movement version",
+     [(CONVERTER, 'export const HEADER = { format: "shamble-movement", id: "soldier", version: 2 };',
+                  'export const HEADER = { format: "shamble-movement", id: "soldier", version: 1 };')],
+     CONVERTER_TESTS, ["the header's format and version are the movement kind's own in the loader's source", "failed"]),
+    ("F1", "defect", "a member read from another field's place: two of version 2's fields swapped in the read",
+     [(MOVEMENT, "        push_sideways_share,\n        push_keep_going_share,\n        push_most_m_per_step,\n        push_head_on_gate_m_per_s,\n        push_keep_going_gate_m_per_s,\n    ] = values;",
+                 "        push_keep_going_share,\n        push_sideways_share,\n        push_most_m_per_step,\n        push_head_on_gate_m_per_s,\n        push_keep_going_gate_m_per_s,\n    ] = values;")],
+     MOVEMENT_TESTS, ["test movement::tests::the_fields_of_version_2_each_land_in_their_own_member ... FAILED"]),
+    ("F2", "defect", "a new field without its schema description",
+     [(SCHEMA, '    ("movement", "push_keep_going_gate_m_per_s", "The keep-going limit applies only when he moves faster than this, in metres per second."),\n', "")],
+     SCHEMA_TESTS, ["test schema::tests::every_property_has_one_description_and_the_table_no_other ... FAILED"]),
+    ("S1", "defect", "the converter takes a sandbox row without its place in his sandbox",
+     [(CONVERTER, 'fromSandbox && (typeof row.sandbox !== "string" || row.sandbox.trim() === "" || ', "fromSandbox && (")],
+     CONVERTER_TESTS, ["a sandbox row without its value, its place or its field, and an Export row with a value of its own, are refused", "1 failed"]),
+    ("S2", "defect", "the converter takes an Export row that carries a value or a sandbox line of its own",
+     [(CONVERTER, '!fromSandbox && (Object.hasOwn(row, "value") || Object.hasOwn(row, "sandbox"))', "!fromSandbox && false")],
+     CONVERTER_TESTS, ["a sandbox row without its value, its place or its field, and an Export row with a value of its own, are refused", "1 failed"]),
+    ("S3", "defect", "a measured. place read while his Export's values hold a group of that name too (a place naming two values)",
+     [(CONVERTER, '  return own(own(exp, "values"), "measured") === undefined ? own(own(exp, "measured"), steps[1]) : undefined;',
+                  '  return own(own(exp, "measured"), steps[1]);')],
+     CONVERTER_TESTS, ["his Export's measured block is read by a measured. place, and by none while the values hold a group of that name", "1 failed"]),
+    ("S4", "defect", "the converter reads no measured block: the body height row finds nothing in his Export",
+     [(CONVERTER, '  if (steps[0] !== "measured") return own(own(own(exp, "values"), steps[0]), steps[1]);',
+                  '  return own(own(own(exp, "values"), steps[0]), steps[1]);')],
+     CONVERTER_TESTS, ["his Export's measured block is read by a measured. place, and by none while the values hold a group of that name", "failed"]),
+    ("T1", "defect", "the real table's planted row: the body height row claims a place his Export does not have",
+     [(TABLE, '      "export": "measured.soldier_height_m",', '      "export": "measured.soldier_height_cm",')],
+     CONVERTER_CHECK, ['("measured.soldier_height_cm"): his Export has no such value']),
+    ("T2", "defect", "the real table: a sandbox row with its place in his sandbox emptied",
+     [(TABLE, '      "sandbox": "src/movement.ts:59-60, used :163, :194, :199",', '      "sandbox": "",')],
+     CONVERTER_CHECK, [SANDBOX_RULE]),
+    ("T3", "defect", "the real content file: a sandbox value one hundredth away from his sandbox's",
+     [(SOLDIER_FILE, '  "foot_radius_m": 0.15,', '  "foot_radius_m": 0.16,')],
+     CONVERTER_CHECK, ["foot_radius_m is 0.16, and his sandbox has 0.15 (src/movement.ts:59-60, used :163, :194, :199)"]),
+    ("VC1", "control", "the clean tree: the content crate's tests", [], CONTENT_TESTS, ["test result: ok. 45 passed"]),
+    ("VC2", "control", "the clean tree: the page's content tests", [], PAGE_TESTS, ["Tests  ", " passed"]),
+    ("VC3", "control", "the clean tree: the converter's tests", [], CONVERTER_TESTS, ["Tests  17 passed (17)"]),
+    ("VC4", "control", "the clean tree: the converter's check on the real table and content file", [], CONVERTER_CHECK,
+     ["content/movement/soldier.json: 28 values, 16 from his Export (sha256 a9d47785...) and 12 from his sandbox, each as the table names it"]),
 ]
 
 def note(name, kind, ok, what, detail):

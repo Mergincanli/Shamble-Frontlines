@@ -1,0 +1,1228 @@
+diff --git a/content/movement/soldier.json b/content/movement/soldier.json
+index de01369b..f1867e1f 100644
+--- a/content/movement/soldier.json
++++ b/content/movement/soldier.json
+@@ -1,20 +1,33 @@
+ {
+   "ads_speed_multiplier": 0.55,
+   "air_control_pct": 100,
++  "body_height_m": 1.8,
+   "body_radius_m": 0.4,
++  "foot_radius_m": 0.15,
+   "format": "shamble-movement",
+   "gravity_m_per_s2": 24,
+   "id": "soldier",
+   "jump_reach_m": 3.071,
++  "pull_done_under_m": 0.03,
++  "pull_share_per_step": 0.5,
++  "pull_to_foot_pct": 90,
++  "push_head_on_gate_m_per_s": 0.2,
++  "push_height_gap_m": 1,
++  "push_keep_going_gate_m_per_s": 0.1,
++  "push_keep_going_share": 0.5,
++  "push_most_m_per_step": 0.25,
+   "push_radius_m": 0.4,
++  "push_sideways_share": 0.7,
+   "push_strength_per_s": 8,
++  "snap_down_m": 0.2,
+   "speed_up_time_to_90pct_s": 0.164,
+   "sprint_multiplier": 1.52,
+   "sprint_returns_at_pct": 30,
+   "sprint_time_from_full_s": 7,
+   "stamina_refill_time_s": 5,
++  "step_allowance_m": 0.005,
+   "step_up_m": 0.55,
+   "stop_time_to_10pct_s": 0.164,
+-  "version": 1,
++  "version": 2,
+   "walk_speed_m_per_s": 6.3
+ }
+diff --git a/content/source/testlines-table.json b/content/source/testlines-table.json
+index f4dd85fe..f227a41b 100644
+--- a/content/source/testlines-table.json
++++ b/content/source/testlines-table.json
+@@ -111,6 +111,109 @@
+       "old_game": "T.adsMoveMult",
+       "unit": "times",
+       "what": "walking speed while aiming"
++    },
++    {
++      "export": "measured.soldier_height_m",
++      "field": "body_height_m",
++      "old_game": "none (walls and houses endlessly high: no headroom)",
++      "unit": "m",
++      "what": "his height, for headroom and the head bump"
++    },
++    {
++      "field": "foot_radius_m",
++      "old_game": "none (the old game stands him on the point under his centre: shamble-game.js:2539)",
++      "sandbox": "src/movement.ts:59-60, used :163, :194, :199",
++      "unit": "m",
++      "value": 0.15,
++      "what": "the small circle round his centre that he stands on, so he holds a little past an edge"
++    },
++    {
++      "field": "pull_share_per_step",
++      "old_game": "none (no pull: he rises once his centre crosses the step's edge, shamble-game.js:2539-2540)",
++      "sandbox": "src/movement.ts:61-62, used :186-190",
++      "unit": "share",
++      "value": 0.5,
++      "what": "after a step-up, the share of the carry onto the step left that he gets each step"
++    },
++    {
++      "field": "pull_done_under_m",
++      "old_game": "none (no pull)",
++      "sandbox": "src/movement.ts:63, used :186",
++      "unit": "m",
++      "value": 0.03,
++      "what": "a carry left shorter than this is given all at once"
++    },
++    {
++      "field": "pull_to_foot_pct",
++      "old_game": "none (no pull)",
++      "sandbox": "src/movement.ts:172 (0.9 x the foot radius)",
++      "unit": "%",
++      "value": 90,
++      "what": "the carry brings his centre this share of his foot circle short of the step's edge"
++    },
++    {
++      "field": "step_allowance_m",
++      "old_game": "none (a surface more than T.stepUp above his feet is refused, no allowance: shamble-game.js:2533-2535)",
++      "sandbox": "src/yard.ts:38-39, used :219, :245, :265, :309",
++      "unit": "m",
++      "value": 0.005,
++      "what": "how far above the step-up a top may be and still be walked onto"
++    },
++    {
++      "field": "snap_down_m",
++      "old_game": "none (no snap: he falls in small hops, shamble-game.js:2537-2540)",
++      "sandbox": "src/movement.ts:64-65, used :199 with the slope term",
++      "unit": "m",
++      "value": 0.2,
++      "what": "a drop he walks down instead of falling, plus the slope under his foot"
++    },
++    {
++      "field": "push_height_gap_m",
++      "old_game": "none (no such rule)",
++      "sandbox": "src/push.ts:10-11, used :43",
++      "unit": "m",
++      "value": 1,
++      "what": "two soldiers whose feet are this far apart in height or more do not push"
++    },
++    {
++      "field": "push_sideways_share",
++      "old_game": "none (no such rule)",
++      "sandbox": "src/push.ts:12-13, used :71-72",
++      "unit": "share",
++      "value": 0.7,
++      "what": "how far a head-on push turns sideways, so the two slide round each other"
++    },
++    {
++      "field": "push_keep_going_share",
++      "old_game": "none (no such rule)",
++      "sandbox": "src/push.ts:14-15, used :99-104",
++      "unit": "share",
++      "value": 0.5,
++      "what": "the most of his own step forward a push may undo"
++    },
++    {
++      "field": "push_most_m_per_step",
++      "old_game": "none (no such rule)",
++      "sandbox": "src/push.ts:16-17, used :106-110",
++      "unit": "m",
++      "value": 0.25,
++      "what": "the most one step's push may move him"
++    },
++    {
++      "field": "push_head_on_gate_m_per_s",
++      "old_game": "none (no such rule)",
++      "sandbox": "src/push.ts:65",
++      "unit": "m/s",
++      "value": 0.2,
++      "what": "the push turns sideways only when the two close faster than this"
++    },
++    {
++      "field": "push_keep_going_gate_m_per_s",
++      "old_game": "none (no such rule)",
++      "sandbox": "src/push.ts:95-96",
++      "unit": "m/s",
++      "value": 0.1,
++      "what": "the keep-going limit applies only when he moves faster than this"
+     }
+   ],
+   "version": 1
+diff --git a/crates/content/src/bundle.rs b/crates/content/src/bundle.rs
+index 9d91966b..903082a5 100644
+--- a/crates/content/src/bundle.rs
++++ b/crates/content/src/bundle.rs
+@@ -163,8 +163,9 @@ pub fn load(bytes: &[u8]) -> Result<ContentSet, Error> {
+         ));
+     }
+     let (line, col) = (top.line, top.col);
++    // The newest version only, as every kind's typed read (read.rs's `header`): an older one is migrated first.
+     bundle
+-        .whole("version", 1, VERSION)
++        .whole("version", VERSION, VERSION)
+         .map_err(|error| match error.kind {
+             Kind::NotAWholeNumber { bits } => Error::at(
+                 error.line,
+@@ -463,16 +464,17 @@ mod tests {
+         let error = load(write(&[("movement/test-soldier.json", &broken)]).as_bytes())
+             .expect_err("out of range");
+         assert_eq!(error.file.as_deref(), Some("movement/test-soldier.json"));
++        // `step_up_m` stands on the test text's line 29 since its version 2 (thirteen fields sort before it).
+         assert_eq!(
+             (error.line, error.col, error.path.as_str()),
+-            (16, 16, "step_up_m")
++            (29, 16, "step_up_m")
+         );
+         // A file that is valid but not canonical: refused, with the place of its first wrong byte.
+-        let loose = TEST_TEXT.replace("\"version\": 1,", "\"version\": 1 ,");
++        let loose = TEST_TEXT.replace("\"version\": 2,", "\"version\": 2 ,");
+         let error = load_file("movement/test-soldier.json", loose.as_bytes())
+             .expect_err("a space before a comma");
+         assert!(matches!(error.kind, Kind::NotCanonical { .. }));
+-        assert_eq!((error.line, error.col), (18, 15));
++        assert_eq!((error.line, error.col), (31, 15));
+         assert_eq!(error.file.as_deref(), Some("movement/test-soldier.json"));
+     }
+ 
+diff --git a/crates/content/src/movement.rs b/crates/content/src/movement.rs
+index 1297f30f..d5798f53 100644
+--- a/crates/content/src/movement.rs
++++ b/crates/content/src/movement.rs
+@@ -1,21 +1,25 @@
+ //! The movement table: how a soldier walks, sprints, jumps and tires (`content/movement/<id>.json`).
+ //!
+ //! Its fields carry the names and units of Mustafa's Testlines Export, so the check between the two is plain
+-//! equality (the values come from his Export and from nothing else: his point 8, 2026-11-25). The ranges are wide
+-//! bounds that keep a typing mistake out of the simulation; they are no tuning. The simulation works out its own
+-//! constants from these once, when a match starts.
++//! equality (the values come from his Export and from nothing else: his point 8, 2026-11-25). Since version 2, twelve
++//! fields hold numbers his sandbox keeps in its code and not in its Export, each a row of the hand-over table that
++//! names its place in his sandbox (his NO-SOURCE (b), 2026-11-28: "not from his Export"), and one more comes from his
++//! Export's measured block (`body_height_m`). The ranges are wide bounds that keep a typing mistake out of the
++//! simulation; they are no tuning. The simulation works out its own constants from these once, when a match starts.
+ 
+ use crate::error::Error;
+ use crate::json::Node;
+ use crate::read::{Field, Object, Range};
+ 
+-/// The `format` of a movement file, and the newest `version` this build reads.
++/// The `format` of a movement file, and its `version`: the one version the typed read takes (an older file is
++/// migrated before it, ADR 0005's CD-4; version 1, without the thirteen fields of version 2, has no migration: no such
++/// file exists outside the repository's history).
+ pub const FORMAT: &str = "shamble-movement";
+-pub const VERSION: u32 = 1;
++pub const VERSION: u32 = 2;
+ 
+ /// The fields, in the order of [`Movement`]'s own.
+ #[rustfmt::skip]
+-pub const FIELDS: [Field; 15] = [
++pub const FIELDS: [Field; 28] = [
+     Field { name: "walk_speed_m_per_s", unit: "m/s", range: Range::above(0.0, 20.0) },
+     Field { name: "sprint_multiplier", unit: "times", range: Range::closed(1.0, 3.0) },
+     Field { name: "speed_up_time_to_90pct_s", unit: "s", range: Range::above(0.0, 5.0) },
+@@ -31,6 +35,19 @@ pub const FIELDS: [Field; 15] = [
+     Field { name: "push_strength_per_s", unit: "1/s", range: Range::closed(0.0, 100.0) },
+     Field { name: "push_radius_m", unit: "m", range: Range::closed(0.1, 2.0) },
+     Field { name: "ads_speed_multiplier", unit: "times", range: Range::above(0.0, 1.0) },
++    Field { name: "body_height_m", unit: "m", range: Range::closed(0.5, 4.0) },
++    Field { name: "foot_radius_m", unit: "m", range: Range::closed(0.01, 2.0) },
++    Field { name: "pull_share_per_step", unit: "share", range: Range::above(0.0, 1.0) },
++    Field { name: "pull_done_under_m", unit: "m", range: Range::closed(0.0, 1.0) },
++    Field { name: "pull_to_foot_pct", unit: "%", range: Range::closed(0.0, 100.0) },
++    Field { name: "step_allowance_m", unit: "m", range: Range::closed(0.0, 0.1) },
++    Field { name: "snap_down_m", unit: "m", range: Range::closed(0.0, 1.5) },
++    Field { name: "push_height_gap_m", unit: "m", range: Range::closed(0.0, 5.0) },
++    Field { name: "push_sideways_share", unit: "share", range: Range::closed(0.0, 1.0) },
++    Field { name: "push_keep_going_share", unit: "share", range: Range::closed(0.0, 1.0) },
++    Field { name: "push_most_m_per_step", unit: "m", range: Range::closed(0.0, 2.0) },
++    Field { name: "push_head_on_gate_m_per_s", unit: "m/s", range: Range::closed(0.0, 20.0) },
++    Field { name: "push_keep_going_gate_m_per_s", unit: "m/s", range: Range::closed(0.0, 20.0) },
+ ];
+ 
+ /// One movement table, read and checked.
+@@ -53,6 +70,19 @@ pub struct Movement {
+     pub push_strength_per_s: f64,
+     pub push_radius_m: f64,
+     pub ads_speed_multiplier: f64,
++    pub body_height_m: f64,
++    pub foot_radius_m: f64,
++    pub pull_share_per_step: f64,
++    pub pull_done_under_m: f64,
++    pub pull_to_foot_pct: f64,
++    pub step_allowance_m: f64,
++    pub snap_down_m: f64,
++    pub push_height_gap_m: f64,
++    pub push_sideways_share: f64,
++    pub push_keep_going_share: f64,
++    pub push_most_m_per_step: f64,
++    pub push_head_on_gate_m_per_s: f64,
++    pub push_keep_going_gate_m_per_s: f64,
+ }
+ 
+ /// Reads a movement file's tree: its header, each field inside its range, and no key beyond them.
+@@ -80,6 +110,19 @@ pub fn read(top: &Node) -> Result<Movement, Error> {
+         push_strength_per_s,
+         push_radius_m,
+         ads_speed_multiplier,
++        body_height_m,
++        foot_radius_m,
++        pull_share_per_step,
++        pull_done_under_m,
++        pull_to_foot_pct,
++        step_allowance_m,
++        snap_down_m,
++        push_height_gap_m,
++        push_sideways_share,
++        push_keep_going_share,
++        push_most_m_per_step,
++        push_head_on_gate_m_per_s,
++        push_keep_going_gate_m_per_s,
+     ] = values;
+     Ok(Movement {
+         id,
+@@ -98,13 +141,26 @@ pub fn read(top: &Node) -> Result<Movement, Error> {
+         push_strength_per_s,
+         push_radius_m,
+         ads_speed_multiplier,
++        body_height_m,
++        foot_radius_m,
++        pull_share_per_step,
++        pull_done_under_m,
++        pull_to_foot_pct,
++        step_allowance_m,
++        snap_down_m,
++        push_height_gap_m,
++        push_sideways_share,
++        push_keep_going_share,
++        push_most_m_per_step,
++        push_head_on_gate_m_per_s,
++        push_keep_going_gate_m_per_s,
+     })
+ }
+ 
+ /// A valid movement file's text with made-up values, for this crate's tests and the tools' (never a content file:
+ /// no value of the game rests on it).
+ #[doc(hidden)]
+-pub const TEST_TEXT: &str = "{\n  \"ads_speed_multiplier\": 0.5,\n  \"air_control_pct\": 100,\n  \"body_radius_m\": 0.5,\n  \"format\": \"shamble-movement\",\n  \"gravity_m_per_s2\": 20,\n  \"id\": \"test-soldier\",\n  \"jump_reach_m\": 3,\n  \"push_radius_m\": 0.5,\n  \"push_strength_per_s\": 10,\n  \"speed_up_time_to_90pct_s\": 0.25,\n  \"sprint_multiplier\": 1.5,\n  \"sprint_returns_at_pct\": 25,\n  \"sprint_time_from_full_s\": 8,\n  \"stamina_refill_time_s\": 4,\n  \"step_up_m\": 0.5,\n  \"stop_time_to_10pct_s\": 0.25,\n  \"version\": 1,\n  \"walk_speed_m_per_s\": 6\n}\n";
++pub const TEST_TEXT: &str = "{\n  \"ads_speed_multiplier\": 0.5,\n  \"air_control_pct\": 100,\n  \"body_height_m\": 1.75,\n  \"body_radius_m\": 0.5,\n  \"foot_radius_m\": 0.2,\n  \"format\": \"shamble-movement\",\n  \"gravity_m_per_s2\": 20,\n  \"id\": \"test-soldier\",\n  \"jump_reach_m\": 3,\n  \"pull_done_under_m\": 0.05,\n  \"pull_share_per_step\": 0.25,\n  \"pull_to_foot_pct\": 80,\n  \"push_head_on_gate_m_per_s\": 0.3,\n  \"push_height_gap_m\": 0.75,\n  \"push_keep_going_gate_m_per_s\": 0.15,\n  \"push_keep_going_share\": 0.4,\n  \"push_most_m_per_step\": 0.2,\n  \"push_radius_m\": 0.5,\n  \"push_sideways_share\": 0.6,\n  \"push_strength_per_s\": 10,\n  \"snap_down_m\": 0.25,\n  \"speed_up_time_to_90pct_s\": 0.25,\n  \"sprint_multiplier\": 1.5,\n  \"sprint_returns_at_pct\": 25,\n  \"sprint_time_from_full_s\": 8,\n  \"stamina_refill_time_s\": 4,\n  \"step_allowance_m\": 0.01,\n  \"step_up_m\": 0.5,\n  \"stop_time_to_10pct_s\": 0.25,\n  \"version\": 2,\n  \"walk_speed_m_per_s\": 6\n}\n";
+ 
+ #[cfg(test)]
+ mod tests {
+@@ -143,7 +199,7 @@ mod tests {
+                 .kind
+         };
+         assert!(matches!(
+-            kind(&TEST_TEXT.replace("\"version\": 1", "\"version\": 1,\n  \"vigour\": 2")),
++            kind(&TEST_TEXT.replace("\"version\": 2", "\"version\": 2,\n  \"vigour\": 2")),
+             Kind::UnknownKey { .. }
+         ));
+         assert_eq!(
+@@ -164,6 +220,55 @@ mod tests {
+         ));
+     }
+ 
++    /// The typed read takes version 2 and no other (the advisor agent's VERSION-RULE ruling, 2026-11-28): version 1
++    /// lacks the thirteen fields of version 2 and has no migration, so it is refused as a version, not read as 2.
++    #[test]
++    fn version_2_is_read_and_every_other_version_is_refused_as_a_version() {
++        let kind = |version: &str| {
++            let text = TEST_TEXT.replace("\"version\": 2", &format!("\"version\": {version}"));
++            read(&parse(text.as_bytes()).expect("valid text"))
++                .expect_err("refused")
++                .kind
++        };
++        assert!(read(&parse(TEST_TEXT.as_bytes()).expect("valid text")).is_ok());
++        for version in ["1", "3", "0", "1.5", "-1"] {
++            assert!(
++                matches!(kind(version), Kind::WrongVersion { newest: 2, .. }),
++                "version {version}"
++            );
++        }
++    }
++
++    /// The thirteen fields of version 2 read as their own: each field's value lands in its own member.
++    #[test]
++    fn the_fields_of_version_2_each_land_in_their_own_member() {
++        let movement =
++            read(&parse(TEST_TEXT.as_bytes()).expect("valid text")).expect("a movement table");
++        assert_eq!(
++            [
++                movement.body_height_m,
++                movement.foot_radius_m,
++                movement.pull_share_per_step,
++                movement.pull_done_under_m,
++                movement.pull_to_foot_pct,
++                movement.step_allowance_m,
++                movement.snap_down_m,
++            ],
++            [1.75, 0.2, 0.25, 0.05, 80.0, 0.01, 0.25]
++        );
++        assert_eq!(
++            [
++                movement.push_height_gap_m,
++                movement.push_sideways_share,
++                movement.push_keep_going_share,
++                movement.push_most_m_per_step,
++                movement.push_head_on_gate_m_per_s,
++                movement.push_keep_going_gate_m_per_s,
++            ],
++            [0.75, 0.6, 0.4, 0.2, 0.3, 0.15]
++        );
++    }
++
+     #[test]
+     fn every_field_has_finite_bounds_and_its_own_name() {
+         // PM-0005-5's and the loader's premise: no number field without a finite range (a number such as 1e300 is
+diff --git a/crates/content/src/read.rs b/crates/content/src/read.rs
+index a6f92fdd..b5f0fbf7 100644
+--- a/crates/content/src/read.rs
++++ b/crates/content/src/read.rs
+@@ -255,7 +255,9 @@ impl<'a> Object<'a> {
+         Object::of(node, &path)
+     }
+ 
+-    /// Every file starts the same way: its kind's `format`, a `version` this build reads, and its `id`.
++    /// Every file starts the same way: its kind's `format`, its `version`, and its `id`. The typed read takes the
++    /// kind's newest version only: a file of an older version is migrated to the newest before it is read (ADR 0005's
++    /// CD-4), so a version under the newest is refused here as a version, never read as the newest.
+     pub fn header(&mut self, format: &'static str, newest: u32) -> Result<&'a str, Error> {
+         let (node, path) = self.take("format")?;
+         match &node.value {
+@@ -270,7 +272,7 @@ impl<'a> Object<'a> {
+             _ => return Err(wrong_type(node, &path, "a string")),
+         }
+         let (node, path) = self.take("version")?;
+-        whole_in(node, &path, 1, newest).map_err(|error| match error.kind {
++        whole_in(node, &path, newest, newest).map_err(|error| match error.kind {
+             // A version is refused as a version: the file's own number, and the newest this build reads.
+             Kind::NotAWholeNumber { bits } => Error::at(
+                 error.line,
+diff --git a/crates/content/src/schema.rs b/crates/content/src/schema.rs
+index 84a03681..afe9d717 100644
+--- a/crates/content/src/schema.rs
++++ b/crates/content/src/schema.rs
+@@ -50,6 +50,19 @@ const DESCRIPTIONS: &[(&str, &str, &str)] = &[
+     ("movement", "push_strength_per_s", "How stiffly two soldiers push apart, per second."),
+     ("movement", "push_radius_m", "Body size for pushing: its radius, in metres."),
+     ("movement", "ads_speed_multiplier", "Walking speed while aiming, in times the walking speed."),
++    ("movement", "body_height_m", "His height, for headroom and the head bump, in metres."),
++    ("movement", "foot_radius_m", "The small circle round his centre that he stands on, so he holds a little past an edge: its radius, in metres."),
++    ("movement", "pull_share_per_step", "After a step-up, the share of the carry onto the step left that he gets each step, from 0 to 1."),
++    ("movement", "pull_done_under_m", "A carry left shorter than this is given all at once, in metres."),
++    ("movement", "pull_to_foot_pct", "The carry brings his centre this share of his foot circle short of the step's edge, in percent."),
++    ("movement", "step_allowance_m", "How far above the step-up a top may be and still be walked onto, in metres."),
++    ("movement", "snap_down_m", "A drop he walks down instead of falling, plus the slope under his foot, in metres."),
++    ("movement", "push_height_gap_m", "Two soldiers whose feet are this far apart in height or more do not push, in metres."),
++    ("movement", "push_sideways_share", "How far a head-on push turns sideways, so the two slide round each other, from 0 to 1."),
++    ("movement", "push_keep_going_share", "The most of his own step forward a push may undo, from 0 to 1."),
++    ("movement", "push_most_m_per_step", "The most one step's push may move him, in metres."),
++    ("movement", "push_head_on_gate_m_per_s", "The push turns sideways only when the two close faster than this, in metres per second."),
++    ("movement", "push_keep_going_gate_m_per_s", "The keep-going limit applies only when he moves faster than this, in metres per second."),
+     ("map", "format", "The file's kind: shamble-map."),
+     ("map", "version", "The version of the map format the file is written in."),
+     ("map", "id", "The map's id, which is its file's name."),
+diff --git a/crates/devtools/recordings/first-loop.content.json b/crates/devtools/recordings/first-loop.content.json
+index 915f6ad0..8f96e68a 100644
+--- a/crates/devtools/recordings/first-loop.content.json
++++ b/crates/devtools/recordings/first-loop.content.json
+@@ -6,7 +6,7 @@
+     },
+     {
+       "path": "movement/soldier.json",
+-      "text": "{\n  \"ads_speed_multiplier\": 0.55,\n  \"air_control_pct\": 100,\n  \"body_radius_m\": 0.4,\n  \"format\": \"shamble-movement\",\n  \"gravity_m_per_s2\": 24,\n  \"id\": \"soldier\",\n  \"jump_reach_m\": 3.071,\n  \"push_radius_m\": 0.4,\n  \"push_strength_per_s\": 8,\n  \"speed_up_time_to_90pct_s\": 0.164,\n  \"sprint_multiplier\": 1.52,\n  \"sprint_returns_at_pct\": 30,\n  \"sprint_time_from_full_s\": 7,\n  \"stamina_refill_time_s\": 5,\n  \"step_up_m\": 0.55,\n  \"stop_time_to_10pct_s\": 0.164,\n  \"version\": 1,\n  \"walk_speed_m_per_s\": 6.3\n}\n"
++      "text": "{\n  \"ads_speed_multiplier\": 0.55,\n  \"air_control_pct\": 100,\n  \"body_height_m\": 1.8,\n  \"body_radius_m\": 0.4,\n  \"foot_radius_m\": 0.15,\n  \"format\": \"shamble-movement\",\n  \"gravity_m_per_s2\": 24,\n  \"id\": \"soldier\",\n  \"jump_reach_m\": 3.071,\n  \"pull_done_under_m\": 0.03,\n  \"pull_share_per_step\": 0.5,\n  \"pull_to_foot_pct\": 90,\n  \"push_head_on_gate_m_per_s\": 0.2,\n  \"push_height_gap_m\": 1,\n  \"push_keep_going_gate_m_per_s\": 0.1,\n  \"push_keep_going_share\": 0.5,\n  \"push_most_m_per_step\": 0.25,\n  \"push_radius_m\": 0.4,\n  \"push_sideways_share\": 0.7,\n  \"push_strength_per_s\": 8,\n  \"snap_down_m\": 0.2,\n  \"speed_up_time_to_90pct_s\": 0.164,\n  \"sprint_multiplier\": 1.52,\n  \"sprint_returns_at_pct\": 30,\n  \"sprint_time_from_full_s\": 7,\n  \"stamina_refill_time_s\": 5,\n  \"step_allowance_m\": 0.005,\n  \"step_up_m\": 0.55,\n  \"stop_time_to_10pct_s\": 0.164,\n  \"version\": 2,\n  \"walk_speed_m_per_s\": 6.3\n}\n"
+     }
+   ],
+   "format": "shamble-content-bundle",
+diff --git a/crates/devtools/recordings/first-loop.hashes b/crates/devtools/recordings/first-loop.hashes
+index e5c3dcd4..67b48586 100644
+--- a/crates/devtools/recordings/first-loop.hashes
++++ b/crates/devtools/recordings/first-loop.hashes
+@@ -1,4 +1,4 @@
+-shamble-hashes 1 200a793d997df58c77a7c26a76575c743a844c9ce887c8535eb6162388dee0df 1800
++shamble-hashes 1 30f80fde9f1d33b4dc605a4f957e99e80c187282275418c80d21b5de5b3eba11 1800
+ 1 182a0a1491f2cc04 a1bbde435996207a
+ 2 3783d3ad69946447 90f9cc5e5f691829
+ 3 5967550e978d921e 1af0824c6c125560
+diff --git a/crates/devtools/recordings/first-loop.rec b/crates/devtools/recordings/first-loop.rec
+index 0156d6129e52ba74c28c057a1dc688c1c8115f23..869a0800cebc909c24e730377193d4f703aba44f 100644
+GIT binary patch
+delta 48
+zcmV-00MGw{y$6B42aqx#@CiFtBH%1sQ(P%|#6nz)J0<f|8rM(hjLiq{@hNcXfl{?n
+G0WaR^BNaLT
+
+delta 48
+zcmV-00MGw{y$6B42aqx#xsV&l;3P`!h=}}_QiQ_(l`6c8IHa6rA=P!?j?I75fl{?n
+G0WaQCUKr5;
+
+diff --git a/crates/devtools/recordings/manifest.txt b/crates/devtools/recordings/manifest.txt
+index 454a5e1c..8d723690 100644
+--- a/crates/devtools/recordings/manifest.txt
++++ b/crates/devtools/recordings/manifest.txt
+@@ -1,4 +1,4 @@
+-first-loop.content.json: bytes 8375  sha256 b9901bc9e0244aee8888fc965284c2fe952abc8b38a49c6621d575df8ecd7fd3
+-first-loop.rec: bytes 122497  sha256 200a793d997df58c77a7c26a76575c743a844c9ce887c8535eb6162388dee0df
+-first-loop.hashes: bytes 69180  sha256 18fbc3a8f07cd25dec051087fd7bf9ff053cd634c1b3b611dc4c2490b8dc099b
++first-loop.content.json: bytes 8794  sha256 f0093b5722e02c5c535c2979c4425c8b3b25f3531ad74fe98ccd07eff12970ea
++first-loop.rec: bytes 122497  sha256 30f80fde9f1d33b4dc605a4f957e99e80c187282275418c80d21b5de5b3eba11
++first-loop.hashes: bytes 69180  sha256 b5ba765302f0b4c950df2542e0d94318fe21ea5127b8348985f887f9cac87b06
+ first-loop.vector.txt: bytes 249  sha256 b766f0c1af1634e9c336208dc512ad99e3e19d49070ad7613e07d69d848c9a6f
+diff --git a/crates/devtools/src/content_proofs.rs b/crates/devtools/src/content_proofs.rs
+index 770cdb9c..526e1a00 100644
+--- a/crates/devtools/src/content_proofs.rs
++++ b/crates/devtools/src/content_proofs.rs
+@@ -273,7 +273,7 @@ impl File {
+         let mut members = vec![
+             ("format".to_owned(), text(movement::FORMAT)),
+             ("id".to_owned(), text(&id)),
+-            ("version".to_owned(), "1".to_owned()),
++            ("version".to_owned(), movement::VERSION.to_string()),
+         ];
+         let mut read = format!("Movement {{ id: {id:?}");
+         for field in &FIELDS {
+@@ -535,7 +535,7 @@ const BAD_NUMBERS: [(&str, usize, &str); 24] = [
+     ("12345678901234567890123456", 0, "NumberTooLong { len: 26, cap: 25 }"),
+ ];
+ 
+-/// A `version` no build reads, with the double it is.
++/// A bundle `version` no build reads, with the double it is.
+ const VERSIONS: [(&str, f64); 5] = [
+     ("2", 2.0),
+     ("0", 0.0),
+@@ -544,6 +544,17 @@ const VERSIONS: [(&str, f64); 5] = [
+     ("4294967296", 4_294_967_296.0),
+ ];
+ 
++/// A movement file's `version` the typed read does not take (its newest only, `movement::VERSION`, 2), with the double
++/// it is: version 1 among them, which lacks version 2's thirteen fields and has no migration.
++const MOVEMENT_VERSIONS: [(&str, f64); 6] = [
++    ("1", 1.0),
++    ("3", 3.0),
++    ("0", 0.0),
++    ("1.5", 1.5),
++    ("-1", -1.0),
++    ("4294967296", 4_294_967_296.0),
++];
++
+ /// One case of a class: a valid file, changed in one way, with the verdict that change must get. Laid out as a
+ /// table, one way of breaking a file to a line where it fits, like the tables above.
+ #[rustfmt::skip]
+@@ -802,9 +813,9 @@ fn case(class: &str, rng: &mut Rng) -> Case {
+                 let kind = format!("WrongFormat {{ found: {found}, expected: \"shamble-movement\" }}");
+                 return refuse(put(at, &format!("\"{other}\"")), at + 2, 13, "format", kind);
+             }
+-            let (text, value) = VERSIONS[rng.below(5)];
++            let (text, value) = MOVEMENT_VERSIONS[rng.below(MOVEMENT_VERSIONS.len())];
+             let at = place_of("version").unwrap_or(0);
+-            let kind = format!("WrongVersion {:016x} 1", value.to_bits());
++            let kind = format!("WrongVersion {:016x} {}", value.to_bits(), movement::VERSION);
+             refuse(put(at, text), at + 2, 14, "version", kind)
+         }
+         // The text as the file has it, and the id it is read as (the last holds a line feed, written as its escape).
+diff --git a/crates/devtools/vectors/content-verdicts.txt b/crates/devtools/vectors/content-verdicts.txt
+index 9b4169b5..2dabbaa7 100644
+--- a/crates/devtools/vectors/content-verdicts.txt
++++ b/crates/devtools/vectors/content-verdicts.txt
+@@ -1,39 +1,39 @@
+ shamble-content-verdicts 1 20261126 500
+-a valid file|500|a63056b5420a0d80
+-a refused word|500|700d9bd595af15fb
+-a byte-order mark|500|06bbf2089e9db361
+-a forbidden byte between values|500|8d4fab7b913f7519
+-a tab or a carriage return|500|645c0fc85c537c18
+-a comment|500|fd98e076e6b66cb1
+-a number that is no number|500|110649927ba8c8e5
+-a forbidden byte in a string|500|823f764479d4bfe5
+-an escape the content does not use|500|a7de19ffa58fcb86
+-a text that ends early|500|9a4c7cbd7045a237
+-a comma or a colon out of place|500|01e25f29e1af44f2
+-brackets that do not match|500|fcba4476c8c6c974
+-nesting past the cap|500|8f58c6174932867e
+-a key that is there twice|500|c809899d68cfbb51
+-a key that is no key|500|06d13b7fcbc76dab
+-more values than a document holds|50|e098d7df25f00fea
+-a file past the byte cap|50|1eff1324df8a7f82
+-a key the kind does not have|500|a3c25f24f0abced7
+-a key that is missing|500|2129d5ccd20088bb
+-a value of the wrong type|500|5305d12220df5a4e
+-a number outside its range|500|5a1d79ede1ad6d2f
+-another format or version|500|aa8383b7a899f0b0
+-an id that is no id|500|892bc5b0c1a74239
+-an id that is not the file's name|500|cf7bdf90d631880e
+-a text not in canonical form|500|ed42affbb16753c6
+-a valid map|500|b60f1e1a29a18686
+-a map's list too long or a word it does not know|500|da9f5d55eb2b0e53
+-a map's box off its grid, too thin or outside the bounds|500|f4dc7eed11a7595a
+-a map past the aim's reach, with no spawn or an id twice|500|804874907c017bcf
+-a valid bundle|500|ea7d76ca6d16950b
+-a path that is no content path|500|4872004d4dcf3136
+-paths out of order|500|3c93c65592b2c42d
+-more files than a bundle holds|500|e47b7f010e5d1b2c
+-a bundle with a key too many or too few|500|7b3cc68d551bf4c7
+-another bundle format or version|500|2aa70bf03a69ee0e
+-a bundle past a byte cap|50|4f0c9bfce549af81
+-a file refused, in a bundle|500|abafe2a03688b110
+-the fuzz run's first inputs|2000|bdc06de36c1d328c
++a valid file|500|06a1c54690a0d6d9
++a refused word|500|bd55cf8db11aca8f
++a byte-order mark|500|653f19a3ccabda2b
++a forbidden byte between values|500|7920b78cdf2cda7c
++a tab or a carriage return|500|05b0c39f26872b7f
++a comment|500|da52741f3358b32b
++a number that is no number|500|36d26dcbe448a13b
++a forbidden byte in a string|500|fbb31302e76245c7
++an escape the content does not use|500|bd2af7f739c2cd9f
++a text that ends early|500|73ead2145dc774eb
++a comma or a colon out of place|500|a15888c1d7cc1093
++brackets that do not match|500|475ac8fd7f8ccaa5
++nesting past the cap|500|72c846c078b5beb7
++a key that is there twice|500|8f1ed9f0c476f9f3
++a key that is no key|500|9c203c241f2bd85e
++more values than a document holds|50|19392f75cb8ddab4
++a file past the byte cap|50|89500207bc0e3f13
++a key the kind does not have|500|50d9b37951fdd9cc
++a key that is missing|500|d1ad44c12c0d0393
++a value of the wrong type|500|e97f03058a2a856f
++a number outside its range|500|a3221aec96adc3af
++another format or version|500|a406e2a82f365e4a
++an id that is no id|500|062f5c23a530a05b
++an id that is not the file's name|500|c73634abb34d0a25
++a text not in canonical form|500|75abf81f24757185
++a valid map|500|d2f7c554592d1919
++a map's list too long or a word it does not know|500|b9d65867101b67dd
++a map's box off its grid, too thin or outside the bounds|500|abd50e00e2c10a84
++a map past the aim's reach, with no spawn or an id twice|500|721666aaa71082d3
++a valid bundle|500|68dee2ac04ae896d
++a path that is no content path|500|92614a3ec30db37b
++paths out of order|500|9bfbe0fa14ef97e0
++more files than a bundle holds|500|54cc7bf70cd8d21f
++a bundle with a key too many or too few|500|5ba4430ae2af07b1
++another bundle format or version|500|166e71d7c495f9bc
++a bundle past a byte cap|50|bb6dd82ed798f627
++a file refused, in a bundle|500|4d272cdeb987823a
++the fuzz run's first inputs|2000|ed78d3fe5f74fded
+diff --git a/packages/client/scripts/testlines.mjs b/packages/client/scripts/testlines.mjs
+index 741d459e..1525fd2e 100644
+--- a/packages/client/scripts/testlines.mjs
++++ b/packages/client/scripts/testlines.mjs
+@@ -39,7 +39,8 @@ export const PATHS = {
+ export const EXPORT_SHA256 = "a9d47785ed8f70d895d10480d180c9bba5a67f7e955e0c460c0c1bef7718c4ab";
+ 
+ /** The header of the file `write` makes: the movement kind's format and version, and the table's id. */
+-export const HEADER = { format: "shamble-movement", id: "soldier", version: 1 };
++// The version is the movement kind's newest (crates/content/src/movement.rs's VERSION; a test ties the two).
++export const HEADER = { format: "shamble-movement", id: "soldier", version: 2 };
+ /** The most bytes one read takes: far above any of these files. */
+ export const MAX_READ_BYTES = 1024 * 1024;
+ 
+@@ -130,30 +131,51 @@ export function readSource({ exportText, manifestText, tableText }, pinned = EXP
+   return { exp, table };
+ }
+ 
+-/** A row's keys: where the value stands in the Export, then either the field it fills or the value it must have. */
+-const ROW_KEYS = ["export", "field", "must_be", "old_game", "unit", "what"];
++/**
++ * A row's keys: where the value stands in the Export, then either the field it fills or the value it must have; or,
++ * for a number his sandbox keeps in its code and not in its Export (his NO-SOURCE (b) of 2026-11-28), no place in
++ * the Export but the field, its `value` and its place in his sandbox (`sandbox`: file and lines).
++ */
++const ROW_KEYS = ["export", "field", "must_be", "old_game", "sandbox", "unit", "value", "what"];
+ 
+-/** The value at `values.<group>.<name>` of the Export, or nothing when the Export has no such place. */
++/**
++ * The value at `values.<group>.<name>` of the Export, or at `measured.<name>` (his Export's block of what it measured
++ * on screen), or nothing when the Export has no such place. While the Export's values hold a group named `measured`
++ * too, no `measured.` place is read at all: a place names one value or none.
++ */
+ function exportValue(exp, place) {
+   const steps = typeof place === "string" ? place.split(".") : [];
+-  return steps.length === 2 ? own(own(own(exp, "values"), steps[0]), steps[1]) : undefined;
++  if (steps.length !== 2) return undefined;
++  if (steps[0] !== "measured") return own(own(own(exp, "values"), steps[0]), steps[1]);
++  return own(own(exp, "values"), "measured") === undefined ? own(own(exp, "measured"), steps[1]) : undefined;
+ }
+ 
++/** Where a filled value comes from, as the check's lines name it: whose it is, and its place there. */
++const fromWhere = ({ place, sandbox }) =>
++  place === null ? ["his sandbox", sandbox] : ["his Export", place.startsWith("measured.") ? place : `values.${place}`];
++
+ /**
+- * The table's rows, read strictly: `fills` (field, place and value, for the rows that fill a field of the content
+- * file) and one line in `problems` for everything a row may not be. A row has only the keys of `ROW_KEYS`; it
+- * names a place the Export has; it fills a field, named as a key is (never a path), with a finite number, or it
+- * holds the Export to one value (`must_be`: the step rate, stamina being on); no field is filled twice.
++ * The table's rows, read strictly: `fills` (field, place or sandbox line, and value, for the rows that fill a field
++ * of the content file) and one line in `problems` for everything a row may not be. A row has only the keys of
++ * `ROW_KEYS`. A row with a place in the Export names a place the Export has, holds no value or sandbox line of its
++ * own, and fills a field, named as a key is (never a path), with a finite number, or holds the Export to one value
++ * (`must_be`: the step rate, stamina being on). A row with no place in the Export fills a field with its own finite
++ * `value` and names its place in his sandbox. No field is filled twice.
+  */
+ export function readRows(exp, table) {
+   const fills = [];
+   const problems = [];
+   for (const [at, row] of table.rows.entries()) {
+-    const said = `row ${at + 1} (${JSON.stringify(own(row, "export"))})`;
+-    const value = exportValue(exp, own(row, "export"));
++    const fromSandbox = isObject(row) && !Object.hasOwn(row, "export");
++    const said = fromSandbox ? `row ${at + 1} (his sandbox's ${JSON.stringify(own(row, "field"))})` : `row ${at + 1} (${JSON.stringify(own(row, "export"))})`;
++    const value = fromSandbox ? own(row, "value") : exportValue(exp, own(row, "export"));
+     const extra = isObject(row) ? Object.keys(row).filter((key) => !ROW_KEYS.includes(key)) : ["not an object"];
+     if (extra.length > 0) problems.push(`${said}: a row holds ${ROW_KEYS.join(", ")} and nothing else, not ${extra.join(", ")}`);
+-    else if (value === undefined) problems.push(`${said}: his Export has no such value`);
++    else if (fromSandbox && (typeof row.sandbox !== "string" || row.sandbox.trim() === "" || Object.hasOwn(row, "must_be") || !Object.hasOwn(row, "field"))) {
++      problems.push(`${said}: a row with no place in his Export fills a field with its own value and names its place in his sandbox`);
++    } else if (!fromSandbox && (Object.hasOwn(row, "value") || Object.hasOwn(row, "sandbox"))) {
++      problems.push(`${said}: a row with a place in his Export takes its value from there, with no value or sandbox line of its own`);
++    } else if (value === undefined) problems.push(fromSandbox ? `${said}: it has no value` : `${said}: his Export has no such value`);
+     else if (Object.hasOwn(row, "must_be") === Object.hasOwn(row, "field")) problems.push(`${said}: a row fills a field or holds the Export to a value, one of the two`);
+     else if (Object.hasOwn(row, "must_be")) {
+       if (!Object.is(value, row.must_be)) problems.push(`${said}: his Export has ${JSON.stringify(value)}, and the game is built for ${JSON.stringify(row.must_be)}`);
+@@ -161,7 +183,7 @@ export function readRows(exp, table) {
+       problems.push(`${said}: ${JSON.stringify(row.field)} is not a field's name`);
+     } else if (typeof value !== "number" || !Number.isFinite(value)) problems.push(`${said}: ${JSON.stringify(value)} is not a number a content file can hold`);
+     else if (fills.some((fill) => fill.field === row.field)) problems.push(`${said}: the field ${row.field} is filled twice`);
+-    else fills.push({ field: row.field, place: row.export, value });
++    else fills.push({ field: row.field, place: fromSandbox ? null : row.export, sandbox: fromSandbox ? row.sandbox : null, value });
+   }
+   return { fills, problems };
+ }
+@@ -194,9 +216,11 @@ export function checkProblems(exp, table, text) {
+   for (const [key, value] of Object.entries(HEADER)) {
+     if (!Object.is(own(content, key), value)) lines.push(`${PATHS.target}: ${key} is ${JSON.stringify(own(content, key))}, not ${JSON.stringify(value)}`);
+   }
+-  for (const { field, place, value } of fills) {
+-    if (!Object.hasOwn(content, field)) lines.push(`${PATHS.target} has no ${field} (his Export's values.${place})`);
+-    else if (!Object.is(content[field], value)) lines.push(`${PATHS.target}: ${field} is ${shown(content[field])}, and his Export has ${shown(value)} (values.${place})`);
++  for (const fill of fills) {
++    const { field, value } = fill;
++    const [whose, where] = fromWhere(fill);
++    if (!Object.hasOwn(content, field)) lines.push(`${PATHS.target} has no ${field} (${whose}'s ${where})`);
++    else if (!Object.is(content[field], value)) lines.push(`${PATHS.target}: ${field} is ${shown(content[field])}, and ${whose} has ${shown(value)} (${where})`);
+   }
+   for (const key of Object.keys(content)) {
+     if (!Object.hasOwn(HEADER, key) && !fills.some(({ field }) => field === key)) lines.push(`${PATHS.target}: no row of the table fills ${key}`);
+@@ -237,9 +261,11 @@ export function tableMarkdown(exp, table) {
+   const cell = (value) => (value === undefined ? "" : String(value).replaceAll("|", "\\|"));
+   const rows = table.rows.map((row) => {
+     const goes = Object.hasOwn(row, "field") ? `\`${row.field}\`` : `must be ${JSON.stringify(row.must_be)}`;
+-    return `| \`${cell(row.export)}\` | ${cell(row.unit)} | ${cell(row.old_game)} | ${cell(row.what)} | ${goes} | ${cell(JSON.stringify(exportValue(exp, row.export)))} |`;
++    const where = Object.hasOwn(row, "export") ? `\`${cell(row.export)}\`` : `his sandbox: ${cell(row.sandbox)}`;
++    const value = Object.hasOwn(row, "export") ? exportValue(exp, row.export) : row.value;
++    return `| ${where} | ${cell(row.unit)} | ${cell(row.old_game)} | ${cell(row.what)} | ${goes} | ${cell(JSON.stringify(value))} |`;
+   });
+-  return ["| His Export (`values.`...) | Unit | The old game's name | What it is | In `movement/soldier.json` | His value |", "|---|---|---|---|---|---|", ...rows].join("\n");
++  return ["| His Export (`values.`... or `measured.`...), or his sandbox | Unit | The old game's name | What it is | In `movement/soldier.json` | His value |", "|---|---|---|---|---|---|", ...rows].join("\n");
+ }
+ 
+ /** One mode of the script on the files of `paths` under `base`. Returns what to print; throws what stops it. */
+@@ -256,12 +282,18 @@ export function run(mode, base = root, paths = PATHS, pinned = EXPORT_SHA256) {
+   if (mode === "write") {
+     if (problems.length > 0) throw new Error(`the table is refused, nothing is written:\n  ${problems.join("\n  ")}`);
+     writePlain(path.join(base, paths.target), contentText(fills), base);
+-    return `${paths.target}: ${fills.length} values from his Export (sha256 ${pinned.slice(0, 8)}...), written`;
++    return `${paths.target}: ${counted(fills, pinned)}, written`;
+   }
+   if (mode !== "--check") throw new Error("usage: testlines.mjs --check | write | compare-old | table");
+   const lines = checkProblems(exp, table, read("target"));
+-  if (lines.length > 0) throw new Error(`the content is not his Export's:\n  ${lines.join("\n  ")}`);
+-  return `${paths.target}: ${fills.length} values, each his Export's (sha256 ${pinned.slice(0, 8)}...)`;
++  if (lines.length > 0) throw new Error(`the content is not his Export's and his sandbox's as the table names them:\n  ${lines.join("\n  ")}`);
++  return `${paths.target}: ${counted(fills, pinned)}, each as the table names it`;
++}
++
++/** How many values a file holds, and from where: his Export (by its sha256) and his sandbox. */
++function counted(fills, pinned) {
++  const fromSandbox = fills.filter(({ place }) => place === null).length;
++  return `${fills.length} values, ${fills.length - fromSandbox} from his Export (sha256 ${pinned.slice(0, 8)}...) and ${fromSandbox} from his sandbox`;
+ }
+ 
+ if (process.argv[1] !== undefined && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+diff --git a/packages/client/scripts/testlines.test.mjs b/packages/client/scripts/testlines.test.mjs
+index 09f35df5..b3e3a80a 100644
+--- a/packages/client/scripts/testlines.test.mjs
++++ b/packages/client/scripts/testlines.test.mjs
+@@ -38,7 +38,7 @@ const CONTENT = `{
+   "id": "soldier",
+   "sprint_multiplier": 1.5,
+   "stamina_refill_time_s": 4,
+-  "version": 1,
++  "version": 2,
+   "walk_speed_m_per_s": 5.25
+ }
+ `;
+@@ -51,7 +51,67 @@ describe("the hand-over's rules", () => {
+     expect(fills().map(({ field }) => field)).toEqual(["walk_speed_m_per_s", "sprint_multiplier", "body_radius_m", "stamina_refill_time_s"]);
+     expect(contentText(fills())).toBe(CONTENT);
+     expect(checkProblems(EXPORT, TABLE, CONTENT)).toEqual([]);
+-    expect(HEADER).toEqual({ format: "shamble-movement", id: "soldier", version: 1 });
++    expect(HEADER).toEqual({ format: "shamble-movement", id: "soldier", version: 2 });
++  });
++
++  // The converter writes the movement kind's newest version, the one the loader's typed read takes (the advisor
++  // agent's VERSION-RULE ruling, 2026-11-28): its HEADER is tied to movement.rs's own VERSION and FORMAT.
++  test("the header's format and version are the movement kind's own in the loader's source", () => {
++    const source = readFileSync(path.join(import.meta.dirname, "../../../crates/content/src/movement.rs"), "utf8");
++    expect(/^pub const FORMAT: &str = "([^"]+)";$/m.exec(source)?.[1]).toBe(HEADER.format);
++    expect(Number(/^pub const VERSION: u32 = (\d+);$/m.exec(source)?.[1])).toBe(HEADER.version);
++  });
++
++  test("a row with no place in his Export fills its field with its own value and names its place in his sandbox", () => {
++    const sandboxRow = { field: "foot_radius_m", value: 0.15, sandbox: "src/movement.ts:59-60", unit: "m", what: "his foot" };
++    const table = rows((list) => [...list, sandboxRow]);
++    const { fills: made, problems } = readRows(EXPORT, table);
++    expect(problems).toEqual([]);
++    expect(made.at(-1)).toEqual({ field: "foot_radius_m", place: null, sandbox: "src/movement.ts:59-60", value: 0.15 });
++    const text = contentText(made);
++    expect(JSON.parse(text).foot_radius_m).toBe(0.15);
++    expect(checkProblems(EXPORT, table, text)).toEqual([]);
++    expect(checkProblems(EXPORT, table, text.replace('"foot_radius_m": 0.15', '"foot_radius_m": 0.2'))).toEqual([
++      `${PATHS.target}: foot_radius_m is 0.2, and his sandbox has 0.15 (src/movement.ts:59-60)`,
++    ]);
++    expect(checkProblems(EXPORT, table, text.replace('  "foot_radius_m": 0.15,\n', ""))).toEqual([`${PATHS.target} has no foot_radius_m (his sandbox's src/movement.ts:59-60)`]);
++    expect(tableMarkdown(EXPORT, table).split("\n").at(-1)).toBe("| his sandbox: src/movement.ts:59-60 | m |  | his foot | `foot_radius_m` | 0.15 |");
++  });
++
++  test("a sandbox row without its value, its place or its field, and an Export row with a value of its own, are refused", () => {
++    const refused = (row, why) => {
++      const { problems } = readRows(EXPORT, rows((list) => [...list, row]));
++      expect(problems, JSON.stringify(row)).toHaveLength(1);
++      expect(problems[0], JSON.stringify(row)).toContain(why);
++    };
++    const sandboxRule = "a row with no place in his Export fills a field with its own value and names its place in his sandbox";
++    refused({ field: "foot_radius_m", value: 0.15 }, sandboxRule);
++    refused({ field: "foot_radius_m", value: 0.15, sandbox: "  " }, sandboxRule);
++    refused({ field: "foot_radius_m", value: 0.15, sandbox: 7 }, sandboxRule);
++    refused({ value: 0.15, sandbox: "src/movement.ts:59" }, sandboxRule);
++    refused({ must_be: 0.15, sandbox: "src/movement.ts:59" }, sandboxRule);
++    refused({ field: "foot_radius_m", sandbox: "src/movement.ts:59" }, "it has no value");
++    refused({ field: "foot_radius_m", value: "0.15", sandbox: "src/movement.ts:59" }, '"0.15" is not a number a content file can hold');
++    refused({ field: "foot_radius_m", value: Number.NaN, sandbox: "src/movement.ts:59" }, "is not a number a content file can hold");
++    refused({ field: "walk_speed_m_per_s", value: 6, sandbox: "src/movement.ts:1" }, "the field walk_speed_m_per_s is filled twice");
++    const exportRule = "a row with a place in his Export takes its value from there, with no value or sandbox line of its own";
++    refused({ export: "movement.walk_speed_m_per_s", field: "speed", value: 6 }, exportRule);
++    refused({ export: "movement.walk_speed_m_per_s", field: "speed", sandbox: "src/movement.ts:1" }, exportRule);
++  });
++
++  test("his Export's measured block is read by a measured. place, and by none while the values hold a group of that name", () => {
++    const exp = { ...structuredClone(EXPORT), measured: { soldier_height_m: 1.8 } };
++    const table = rows((list) => [...list, { export: "measured.soldier_height_m", field: "body_height_m", unit: "m", what: "his height" }]);
++    const { fills: made, problems } = readRows(exp, table);
++    expect(problems).toEqual([]);
++    expect(made.at(-1)).toEqual({ field: "body_height_m", place: "measured.soldier_height_m", sandbox: null, value: 1.8 });
++    const text = contentText(made);
++    expect(checkProblems(exp, table, text.replace('"body_height_m": 1.8', '"body_height_m": 1.9'))).toEqual([
++      `${PATHS.target}: body_height_m is 1.9, and his Export has 1.8 (measured.soldier_height_m)`,
++    ]);
++    expect(readRows(EXPORT, table).problems).toEqual(['row 6 ("measured.soldier_height_m"): his Export has no such value']);
++    const clash = { ...exp, values: { ...exp.values, measured: { soldier_height_m: 1.7 } } };
++    expect(readRows(clash, table).problems).toEqual(['row 6 ("measured.soldier_height_m"): his Export has no such value']);
+   });
+ 
+   test("the check finds a value one step of a double away, a field nobody fills, a field that is gone, and a form that differs", () => {
+@@ -88,7 +148,7 @@ describe("the hand-over's rules", () => {
+     for (const field of ["../.claude/settings.json", "/etc/passwd", "content/source/x.json", "soldier.json", "", "Walk", "__proto__", "format", "id", "version", 7]) {
+       refused((list) => [...list.slice(0, 4), { ...list[4], field }], `${JSON.stringify(field)} is not a field's name`);
+     }
+-    refused((list) => [...list, { export: "movement.walk_speed_m_per_s", field: "speed", file: "../x" }], "a row holds export, field, must_be, old_game, unit, what and nothing else, not file");
++    refused((list) => [...list, { export: "movement.walk_speed_m_per_s", field: "speed", file: "../x" }], "a row holds export, field, must_be, old_game, sandbox, unit, value, what and nothing else, not file");
+     refused((list) => [...list, "movement.walk_speed_m_per_s"], "not an object");
+     // A place his Export does not have, in each way a place can be missing.
+     for (const place of ["movement.jump_m", "weapons.walk_speed_m_per_s", "movement", "movement.walk_speed_m_per_s.x", "__proto__.constructor", "toString.name", 5]) {
+@@ -144,7 +204,7 @@ describe("the hand-over's rules", () => {
+ 
+   test("the table people read is printed from the rows and the Export's own values", () => {
+     expect(tableMarkdown(EXPORT, TABLE).split("\n")).toEqual([
+-      "| His Export (`values.`...) | Unit | The old game's name | What it is | In `movement/soldier.json` | His value |",
++      "| His Export (`values.`... or `measured.`...), or his sandbox | Unit | The old game's name | What it is | In `movement/soldier.json` | His value |",
+       "|---|---|---|---|---|---|",
+       "| `stamina.stamina_on` |  |  | the game has stamina on | must be true | true |",
+       "| `movement.walk_speed_m_per_s` | m/s | T.moveSpeed | walking speed | `walk_speed_m_per_s` | 5.25 |",
+@@ -183,10 +243,10 @@ describe("the hand-over's files", () => {
+   test("write, then the check: the file holds his values; a second write gives the same bytes", () => {
+     const folder = tree("clean");
+     expect(() => run("--check", folder, PATHS, pinned)).toThrow("ENOENT");
+-    expect(run("write", folder, PATHS, pinned)).toBe(`${PATHS.target}: 4 values from his Export (sha256 ${pinned.slice(0, 8)}...), written`);
++    expect(run("write", folder, PATHS, pinned)).toBe(`${PATHS.target}: 4 values, 4 from his Export (sha256 ${pinned.slice(0, 8)}...) and 0 from his sandbox, written`);
+     expect(readFileSync(path.join(folder, PATHS.target), "utf8")).toBe(CONTENT);
+     expect(readdirSync(path.join(folder, "content/movement"))).toEqual(["soldier.json"]);
+-    expect(run("--check", folder, PATHS, pinned)).toBe(`${PATHS.target}: 4 values, each his Export's (sha256 ${pinned.slice(0, 8)}...)`);
++    expect(run("--check", folder, PATHS, pinned)).toBe(`${PATHS.target}: 4 values, 4 from his Export (sha256 ${pinned.slice(0, 8)}...) and 0 from his sandbox, each as the table names it`);
+     run("write", folder, PATHS, pinned);
+     expect(readFileSync(path.join(folder, PATHS.target), "utf8")).toBe(CONTENT);
+   });
+@@ -288,8 +348,8 @@ describe("the hand-over's files", () => {
+ });
+ 
+ describe("his Export and the game's first movement table, the repository's own files", () => {
+-  test("the check holds content/movement/soldier.json to his saved Export through the table: every value, bit for bit, in the writer's form", () => {
+-    expect(run("--check")).toBe(`${PATHS.target}: 15 values, each his Export's (sha256 ${EXPORT_SHA256.slice(0, 8)}...)`);
++  test("the check holds content/movement/soldier.json to his saved Export and his sandbox through the table: every value, bit for bit, in the writer's form", () => {
++    expect(run("--check")).toBe(`${PATHS.target}: 28 values, 16 from his Export (sha256 ${EXPORT_SHA256.slice(0, 8)}...) and 12 from his sandbox, each as the table names it`);
+   });
+ 
+   // The check above reads the values through the table, so a row sent to the wrong field would pass it, whatever
+@@ -297,18 +357,37 @@ describe("his Export and the game's first movement table, the repository's own f
+   // is the last step of its Export name, but for the one rename named here, so no two rows can trade fields. And
+   // its group is one of the soldier's, so no row reads another unit's entry of the same name (his Export also holds
+   // the hornet's body radius and step: test-engineer's round 2).
+-  test("every row of the table sends its Export value to the field of the same name, but for one named rename", () => {
+-    const RENAMED = { "stamina.refill_time_from_empty_s": "stamina_refill_time_s" };
+-    const GROUPS = ["movement", "jump", "stamina", "pushing", "aim_down_sights"];
++  test("every row of the table sends its Export value to the field of the same name, but for two named renames", () => {
++    const RENAMED = { "stamina.refill_time_from_empty_s": "stamina_refill_time_s", "measured.soldier_height_m": "body_height_m" };
++    const GROUPS = ["movement", "jump", "stamina", "pushing", "aim_down_sights", "measured"];
+     const { rows } = JSON.parse(readFileSync(path.join(import.meta.dirname, "../../..", PATHS.table), "utf8"));
+-    const filled = rows.filter((row) => row.field !== undefined);
+-    expect(filled).toHaveLength(15);
++    const filled = rows.filter((row) => row.field !== undefined && row.export !== undefined);
++    expect(filled).toHaveLength(16);
+     for (const { export: name, field } of filled) {
+       expect(field, name).toBe(RENAMED[name] ?? name.split(".").at(-1));
+       expect(GROUPS, name).toContain(name.split(".")[0]);
+     }
+-    // The rename stands in the table once, and every field once: the rule above leaves no row out.
+-    expect(filled.filter(({ export: name }) => name in RENAMED)).toHaveLength(1);
+-    expect(new Set(filled.map(({ field }) => field)).size).toBe(15);
++    // Each rename stands in the table once, and every field once: the rule above leaves no row out.
++    expect(filled.filter(({ export: name }) => name in RENAMED)).toHaveLength(2);
++    expect(new Set(filled.map(({ field }) => field)).size).toBe(16);
++  });
++
++  // His NO-SOURCE (b) of 2026-11-28: the numbers his sandbox keeps in its code fill the twelve fields named here, each
++  // with its place in his sandbox, and no other; together with the sixteen Export rows they are the movement kind's
++  // 28 fields, each filled once.
++  test("the twelve sandbox rows fill the twelve fields his sandbox keeps in its code, each with its place there", () => {
++    const SANDBOX_FIELDS = [
++      "foot_radius_m", "pull_share_per_step", "pull_done_under_m", "pull_to_foot_pct", "step_allowance_m", "snap_down_m",
++      "push_height_gap_m", "push_sideways_share", "push_keep_going_share", "push_most_m_per_step", "push_head_on_gate_m_per_s",
++      "push_keep_going_gate_m_per_s",
++    ];
++    const { rows } = JSON.parse(readFileSync(path.join(import.meta.dirname, "../../..", PATHS.table), "utf8"));
++    const fromSandbox = rows.filter((row) => row.export === undefined);
++    expect(fromSandbox.map(({ field }) => field)).toEqual(SANDBOX_FIELDS);
++    for (const row of fromSandbox) {
++      expect(Number.isFinite(row.value), row.field).toBe(true);
++      expect(row.sandbox, row.field).toMatch(/^src\/[a-z]+\.ts:\d+/);
++    }
++    expect(new Set(rows.map(({ field }) => field).filter(Boolean)).size).toBe(28);
+   });
+ });
+diff --git a/packages/client/src/app/content.test.ts b/packages/client/src/app/content.test.ts
+index d4c5fabd..844a0bde 100644
+--- a/packages/client/src/app/content.test.ts
++++ b/packages/client/src/app/content.test.ts
+@@ -3,7 +3,9 @@ import {
+   CONTENT_URL,
+   type ContentLink,
+   fetchContent,
++  MAP_VERSION,
+   type MessageLink,
++  MOVEMENT_VERSION,
+   NOT_A_BUNDLE,
+   NOT_THE_MAP,
+   type Outcome,
+@@ -122,7 +124,7 @@ const READ_MAP = { id: MAP.id, bounds: MAP.bounds, spawns: MAP.spawns, shapes: M
+ /** A copy of `MAP`'s tree, to change one thing in. */
+ const tree = (): Record<string, unknown> => JSON.parse(JSON.stringify(MAP)) as Record<string, unknown>;
+ /** A movement file's head, all the page reads of it. */
+-const MOVEMENT_TEXT = '{\n  "format": "shamble-movement",\n  "id": "soldier",\n  "version": 1\n}\n';
++const MOVEMENT_TEXT = '{\n  "format": "shamble-movement",\n  "id": "soldier",\n  "version": 2\n}\n';
+ /** A whole bundle the loader would take, from its files in path order. */
+ const bundleOf = (files: readonly { path: string; text: string }[]): string =>
+   `${JSON.stringify({ files, format: "shamble-content-bundle", version: 1 }, null, 2)}\n`;
+@@ -179,7 +181,7 @@ test("a Worker that answers ready: the copy is read once and delivered once, the
+     picture: { map: READ_MAP },
+     files: [
+       { path: "maps/test-scene.json", format: "shamble-map", version: 1 },
+-      { path: "movement/soldier.json", format: "shamble-movement", version: 1 },
++      { path: "movement/soldier.json", format: "shamble-movement", version: 2 },
+     ],
+   });
+ });
+@@ -375,6 +377,20 @@ test("the bundle's files: each folder's kind, format and version, and the local
+   expect(readContent(encode(bundleOf([{ path: "maps/test-scene.json", text: "not json" }])))).toEqual({ ok: false, problem: NOT_A_BUNDLE });
+ });
+ 
++test("each kind is read at its newest version only: a movement file at version 1 or 3 is refused", () => {
++  // The loader's typed read takes the newest version only (an older file is migrated first, ADR 0005's CD-4), and so
++  // does the page: version 1 of the movement kind lacks version 2's thirteen fields.
++  const mapText = `${JSON.stringify(MAP, null, 2)}\n`;
++  const withMovement = (text: string) => readContent(encode(bundleOf([{ path: "maps/test-scene.json", text: mapText }, { path: "movement/soldier.json", text }])));
++  const read = withMovement(MOVEMENT_TEXT);
++  if (!read.ok) throw new Error(read.problem);
++  expect(read.value.files.map((file) => file.version)).toEqual([MAP_VERSION, MOVEMENT_VERSION]);
++  expect(MOVEMENT_VERSION).toBe(2);
++  for (const version of ['"version": 1', '"version": 3', '"version": 0', '"version": 1.5', '"version": "2"']) {
++    expect(withMovement(MOVEMENT_TEXT.replace('"version": 2', version)), version).toEqual({ ok: false, problem: NOT_A_BUNDLE });
++  }
++});
++
+ test("the link the content starts is the page's own link type", () => {
+   // `WorkerLink` gives what `PageContent` and the page's handling need of a link: this does not compile if they drift.
+   const link: ContentLink = new WorkerLink({ postMessage: () => undefined, terminate: () => undefined }, () => 0);
+diff --git a/packages/client/src/app/content.ts b/packages/client/src/app/content.ts
+index 853013b6..52b7db73 100644
+--- a/packages/client/src/app/content.ts
++++ b/packages/client/src/app/content.ts
+@@ -37,12 +37,13 @@ export const NOT_THE_MAP = "the map the game's loader took does not read as a ma
+ 
+ /**
+  * Each content kind's `format` and newest `version`, as the loader writes and reads them (crates/content/src/map.rs,
+- * movement.rs; tied by `content-ties.test.mjs`), and the bundle's folder for each (bundle.rs, `FOLDERS`).
++ * movement.rs; tied by `content-ties.test.mjs`), and the bundle's folder for each (bundle.rs, `FOLDERS`). The loader's
++ * typed read takes the newest version only (an older file is migrated first, ADR 0005's CD-4), and so does the page.
+  */
+ export const MAP_FORMAT = "shamble-map";
+ export const MAP_VERSION = 1;
+ export const MOVEMENT_FORMAT = "shamble-movement";
+-export const MOVEMENT_VERSION = 1;
++export const MOVEMENT_VERSION = 2;
+ export const CONTENT_KINDS: ReadonlyMap<string, { readonly format: string; readonly newest: number }> = new Map([
+   ["maps", { format: MAP_FORMAT, newest: MAP_VERSION }],
+   ["movement", { format: MOVEMENT_FORMAT, newest: MOVEMENT_VERSION }],
+@@ -233,7 +234,7 @@ export function readContent(kept: Uint8Array): Outcome<ReadContent> {
+     }
+     const format = isObject(tree) ? own(tree, "format") : undefined;
+     const version = isObject(tree) ? own(tree, "version") : undefined;
+-    if (format !== kind.format || typeof version !== "number" || !Number.isInteger(version) || version < 1 || version > kind.newest) return fault;
++    if (format !== kind.format || version !== kind.newest) return fault;
+     files.push({ path, format: kind.format, version });
+     if (path === `maps/${LOCAL_MAP}.json`) {
+       const read = readMap(tree);
+diff --git a/packages/client/src/overlay/report.test.ts b/packages/client/src/overlay/report.test.ts
+index c608efb7..eaebabf0 100644
+--- a/packages/client/src/overlay/report.test.ts
++++ b/packages/client/src/overlay/report.test.ts
+@@ -43,7 +43,7 @@ const DATA: ReportData = {
+   worker: null,
+   content: [
+     { path: "maps/test-scene.json", format: "shamble-map", version: 1 },
+-    { path: "movement/soldier.json", format: "shamble-movement", version: 1 },
++    { path: "movement/soldier.json", format: "shamble-movement", version: 2 },
+   ],
+   scene: { map: "test-scene", boxes: 17, ramps: 6, regions: 6 },
+ };
+@@ -54,7 +54,7 @@ test("the readout names the backend, the ticks, the errors, the last pause and t
+     "ticks: 900 at 30 a second · blocks: 900 of 44 bytes",
+     "frames: 60.0 a second · frame time 16.67 ms (p99 17.20 ms)",
+     "messages: sent 899 · received 900 · refused 0",
+-    "content: maps/test-scene.json shamble-map 1 · movement/soldier.json shamble-movement 1",
++    "content: maps/test-scene.json shamble-map 1 · movement/soldier.json shamble-movement 2",
+     "scene: test-scene · 17 boxes · 6 ramps · 6 regions",
+     "presses: 12 made · 12 echoed · 0 lost · 0 doubled",
+     "errors: 0",
+@@ -131,12 +131,12 @@ test("the report is plain text with one named value per line", () => {
+ test("the content and the scene: each file with its own format and version, the copy's states in words, the scene's counts", () => {
+   const lines = (data: Partial<ReportData>): string[] => readoutLines({ ...DATA, ...data }).slice(4, 6);
+   expect(lines({})).toEqual([
+-    "content: maps/test-scene.json shamble-map 1 · movement/soldier.json shamble-movement 1",
++    "content: maps/test-scene.json shamble-map 1 · movement/soldier.json shamble-movement 2",
+     "scene: test-scene · 17 boxes · 6 ramps · 6 regions",
+   ]);
+-  // Each file's version is its own, never the other file's.
+-  const mixed = lines({ content: [{ path: "maps/test-scene.json", format: "shamble-map", version: 1 }, { path: "movement/soldier.json", format: "shamble-movement", version: 2 }] });
+-  expect(mixed[0]).toBe("content: maps/test-scene.json shamble-map 1 · movement/soldier.json shamble-movement 2");
++  // Each file's version is its own, never the other file's: the two swapped read swapped.
++  const mixed = lines({ content: [{ path: "maps/test-scene.json", format: "shamble-map", version: 2 }, { path: "movement/soldier.json", format: "shamble-movement", version: 1 }] });
++  expect(mixed[0]).toBe("content: maps/test-scene.json shamble-map 2 · movement/soldier.json shamble-movement 1");
+   expect(lines({ content: "holding", scene: null })).toEqual(["content: waiting for the loader", "scene: empty"]);
+   expect(lines({ content: "none", scene: null })).toEqual(["content: not read, the match stopped first", "scene: empty"]);
+   // The page's own refusal reads as such, as the notice says it (step S's review, EA-5), not as nothing read.
+@@ -145,7 +145,7 @@ test("the content and the scene: each file with its own format and version, the
+   const report = formatReport(DATA).split("\n");
+   for (const expected of [
+     "content.maps/test-scene.json: shamble-map 1",
+-    "content.movement/soldier.json: shamble-movement 1",
++    "content.movement/soldier.json: shamble-movement 2",
+     "scene.map: test-scene",
+     "scene.boxes: 17",
+     "scene.ramps: 6",
+diff --git a/packages/e2e/tests/skeleton/skeleton.spec.ts b/packages/e2e/tests/skeleton/skeleton.spec.ts
+index c384902d..f647afc1 100644
+--- a/packages/e2e/tests/skeleton/skeleton.spec.ts
++++ b/packages/e2e/tests/skeleton/skeleton.spec.ts
+@@ -109,7 +109,7 @@ for (const [name, query] of [["the default backend", ""], ["the forced WebGL 2 f
+     expect(data.scene).toEqual({ map: map.id, boxes: 17, ramps: 6, regions: 6 });
+     expect(data.content).toEqual([
+       { path: "maps/test-scene.json", format: "shamble-map", version: 1 },
+-      { path: "movement/soldier.json", format: "shamble-movement", version: 1 },
++      { path: "movement/soldier.json", format: "shamble-movement", version: 2 },
+     ]);
+     await expect(page.locator("#overlay pre")).toContainText("scene: test-scene · 17 boxes · 6 ramps · 6 regions");
+     // The test scene's render counts are the committed ones for this backend: a missed freeing of the empty floor
+diff --git a/packages/types/src/generated/content/Movement.ts b/packages/types/src/generated/content/Movement.ts
+index dfa1f1b2..7cc062c3 100644
+--- a/packages/types/src/generated/content/Movement.ts
++++ b/packages/types/src/generated/content/Movement.ts
+@@ -3,4 +3,4 @@
+ /**
+  * One movement table, read and checked.
+  */
+-export type Movement = { id: string, walk_speed_m_per_s: number, sprint_multiplier: number, speed_up_time_to_90pct_s: number, stop_time_to_10pct_s: number, air_control_pct: number, body_radius_m: number, jump_reach_m: number, gravity_m_per_s2: number, step_up_m: number, sprint_time_from_full_s: number, stamina_refill_time_s: number, sprint_returns_at_pct: number, push_strength_per_s: number, push_radius_m: number, ads_speed_multiplier: number, };
++export type Movement = { id: string, walk_speed_m_per_s: number, sprint_multiplier: number, speed_up_time_to_90pct_s: number, stop_time_to_10pct_s: number, air_control_pct: number, body_radius_m: number, jump_reach_m: number, gravity_m_per_s2: number, step_up_m: number, sprint_time_from_full_s: number, stamina_refill_time_s: number, sprint_returns_at_pct: number, push_strength_per_s: number, push_radius_m: number, ads_speed_multiplier: number, body_height_m: number, foot_radius_m: number, pull_share_per_step: number, pull_done_under_m: number, pull_to_foot_pct: number, step_allowance_m: number, snap_down_m: number, push_height_gap_m: number, push_sideways_share: number, push_keep_going_share: number, push_most_m_per_step: number, push_head_on_gate_m_per_s: number, push_keep_going_gate_m_per_s: number, };
+diff --git a/packages/types/src/generated/content/schema/movement.schema.json b/packages/types/src/generated/content/schema/movement.schema.json
+index 29ec225f..4e1a6edf 100644
+--- a/packages/types/src/generated/content/schema/movement.schema.json
++++ b/packages/types/src/generated/content/schema/movement.schema.json
+@@ -27,12 +27,24 @@
+       "minimum": 0,
+       "type": "number"
+     },
++    "body_height_m": {
++      "description": "His height, for headroom and the head bump, in metres.",
++      "maximum": 4,
++      "minimum": 0.5,
++      "type": "number"
++    },
+     "body_radius_m": {
+       "description": "His body against walls and ledges: its radius, in metres.",
+       "maximum": 2,
+       "minimum": 0.1,
+       "type": "number"
+     },
++    "foot_radius_m": {
++      "description": "The small circle round his centre that he stands on, so he holds a little past an edge: its radius, in metres.",
++      "maximum": 2,
++      "minimum": 0.01,
++      "type": "number"
++    },
+     "format": {
+       "const": "shamble-movement",
+       "description": "The file's kind: shamble-movement."
+@@ -53,18 +65,78 @@
+       "minimum": 0,
+       "type": "number"
+     },
++    "pull_done_under_m": {
++      "description": "A carry left shorter than this is given all at once, in metres.",
++      "maximum": 1,
++      "minimum": 0,
++      "type": "number"
++    },
++    "pull_share_per_step": {
++      "description": "After a step-up, the share of the carry onto the step left that he gets each step, from 0 to 1.",
++      "exclusiveMinimum": 0,
++      "maximum": 1,
++      "type": "number"
++    },
++    "pull_to_foot_pct": {
++      "description": "The carry brings his centre this share of his foot circle short of the step's edge, in percent.",
++      "maximum": 100,
++      "minimum": 0,
++      "type": "number"
++    },
++    "push_head_on_gate_m_per_s": {
++      "description": "The push turns sideways only when the two close faster than this, in metres per second.",
++      "maximum": 20,
++      "minimum": 0,
++      "type": "number"
++    },
++    "push_height_gap_m": {
++      "description": "Two soldiers whose feet are this far apart in height or more do not push, in metres.",
++      "maximum": 5,
++      "minimum": 0,
++      "type": "number"
++    },
++    "push_keep_going_gate_m_per_s": {
++      "description": "The keep-going limit applies only when he moves faster than this, in metres per second.",
++      "maximum": 20,
++      "minimum": 0,
++      "type": "number"
++    },
++    "push_keep_going_share": {
++      "description": "The most of his own step forward a push may undo, from 0 to 1.",
++      "maximum": 1,
++      "minimum": 0,
++      "type": "number"
++    },
++    "push_most_m_per_step": {
++      "description": "The most one step's push may move him, in metres.",
++      "maximum": 2,
++      "minimum": 0,
++      "type": "number"
++    },
+     "push_radius_m": {
+       "description": "Body size for pushing: its radius, in metres.",
+       "maximum": 2,
+       "minimum": 0.1,
+       "type": "number"
+     },
++    "push_sideways_share": {
++      "description": "How far a head-on push turns sideways, so the two slide round each other, from 0 to 1.",
++      "maximum": 1,
++      "minimum": 0,
++      "type": "number"
++    },
+     "push_strength_per_s": {
+       "description": "How stiffly two soldiers push apart, per second.",
+       "maximum": 100,
+       "minimum": 0,
+       "type": "number"
+     },
++    "snap_down_m": {
++      "description": "A drop he walks down instead of falling, plus the slope under his foot, in metres.",
++      "maximum": 1.5,
++      "minimum": 0,
++      "type": "number"
++    },
+     "speed_up_time_to_90pct_s": {
+       "description": "How fast he reaches his speed: the time to 90 percent of it, in seconds.",
+       "exclusiveMinimum": 0,
+@@ -95,6 +167,12 @@
+       "maximum": 120,
+       "type": "number"
+     },
++    "step_allowance_m": {
++      "description": "How far above the step-up a top may be and still be walked onto, in metres.",
++      "maximum": 0.1,
++      "minimum": 0,
++      "type": "number"
++    },
+     "step_up_m": {
+       "description": "What he walks onto without jumping: the highest step, in metres.",
+       "maximum": 1.5,
+@@ -108,7 +186,7 @@
+       "type": "number"
+     },
+     "version": {
+-      "const": 1,
++      "const": 2,
+       "description": "The version of the movement format the file is written in."
+     },
+     "walk_speed_m_per_s": {
+@@ -121,18 +199,31 @@
+   "required": [
+     "ads_speed_multiplier",
+     "air_control_pct",
++    "body_height_m",
+     "body_radius_m",
++    "foot_radius_m",
+     "format",
+     "gravity_m_per_s2",
+     "id",
+     "jump_reach_m",
++    "pull_done_under_m",
++    "pull_share_per_step",
++    "pull_to_foot_pct",
++    "push_head_on_gate_m_per_s",
++    "push_height_gap_m",
++    "push_keep_going_gate_m_per_s",
++    "push_keep_going_share",
++    "push_most_m_per_step",
+     "push_radius_m",
++    "push_sideways_share",
+     "push_strength_per_s",
++    "snap_down_m",
+     "speed_up_time_to_90pct_s",
+     "sprint_multiplier",
+     "sprint_returns_at_pct",
+     "sprint_time_from_full_s",
+     "stamina_refill_time_s",
++    "step_allowance_m",
+     "step_up_m",
+     "stop_time_to_10pct_s",
+     "version",
