@@ -335,7 +335,9 @@ in this folder.)
   Export's sizes it can happen: walking along the top of a 3.0 m wall with a window in it (the sill at 0.9 m, the
   opening 1.2 m), he is stopped 0.4 m before the stretch over the window, and landing on that stretch puts him off the
   wall. In the game, with upper floors, every low block under an upper floor would become an invisible wall for
-  anyone walking on that floor. **Needed before the soldier's movement step** (the rest of 4c is built meanwhile).
+  anyone walking on that floor. **Not blocking:** until he answers, the game is built with (b), his sandbox's rule,
+  behind a switch (below), and nothing in the test scene differs between the two; his answer is wanted by the early
+  look. (This line said "Needed before the soldier's movement step" until the advisor agent's G7 of 2026-11-28.)
 - **Options:** (a) the game never counts a top at or below his feet as a wall (rust-reviewer's clause: one condition,
   no number); he could then walk along that wall top over the window; (b) the game does exactly what his sandbox
   does.
