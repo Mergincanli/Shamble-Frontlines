@@ -1,0 +1,38 @@
+# Y' head read: the brief for B6 (advisor-stopb-plan.md's author), Q4 (f) of its "Ruling on the dist difference"
+Status: DRAFT 02:3x UTC on 11-28; filled and sent after build 2' ends (its <TO FILL> lines then).
+
+## The brief (to B6: resumed if it answers, else a new advisor agent with this file as its whole brief)
+Your Q4 (f): the head read of Y' with both new builds. Read by SHA only.
+- Y' = commit <TO FILL: Y' SHA> ("Stop B Y'"), pushed under the card save <TO FILL>; Y = 652e9513 (void, STOPB-8);
+  Y0 = 87cb8677.
+- The change: spikes/netcode-proof/ops/runs/r1-dist.sha256 line 10, the Wasm line, from
+  2a97394b023c5f52e7c2dcbcbb28204dd9bcf23bc4c0acaaf5f3c9191e4c4551 to
+  901a649231dc9c217204b121a2800641c3c6aa9cd3cb9d42eb5657452b0a0e77, in place.
+- The bars as printed (done lines in stopb-plan.md, section C, "Y' DONE"): `git diff --numstat 652e9513 <Y'> --
+  spikes/netcode-proof` = "1 1" on the list file alone; `git diff --numstat 87cb8677 <Y'> -- spikes/netcode-proof` = "7
+  0" on the list file alone; Y''s non-comment lines cmp-equal to .gate/stopb/build1p-dist.sha256; the advisor tool's
+  extra bar: `git grep -n 2a97394b -- spikes/ docs/` prints nothing at Y'; the counted run
+  .gate/stopb/yp-counted.log (`--only self,ops,redact,refs`, its diff hash = Y''s diff over the spike folder); the gate.
+- Build 1' (.gate/stopb/build1p.log; worktree .gate/stopb-a at Y 652e9513, the tree before MAIN-70; cargo base
+  scratchpad/npt-dist-a) and build 2' (.gate/stopb/build2p.log; worktree .gate/stopb-b at Y', the tree after MAIN-70's
+  merge 2d379d9c; cargo base scratchpad/npt-dist-b), each with your Q2 prints: the GIT_* names printed and unset; `git
+  rev-parse HEAD` failing in the cargo base and in wasm-bindgen-shared-0.2.130's registry folder; `producers` reading
+  "wasm-bindgen 0.2.130"; and the lists: build1p-dist.sha256 and build2p-dist.sha256 equal byte for byte and equal to Y''s
+  non-comment lines. The two builds sit on different trees (inside your ruling: Y or Y0 for build 1', Y' for build 2'),
+  so their equality also shows MAIN-70's #79 is no dist input.
+- Your Q4 (e) triggers, both cleared: MAIN-70 changed nothing under spikes/ (M70-3's third bar,
+  `git diff --name-only e646ee59 2d379d9c -- spikes/ docs/design/ .checkpoints/` prints nothing:
+  main-70-plan.md "Steps 2-5, done"), and main's 107 paths hold no kit or CI path (`.gate/main-70/main-names.txt`, a
+  printing grep for `.claude/`, `.github/`, `tools/gate`, CLAUDE.md, AGENTS.md: nothing). So Y0 stands and X takes in no
+  kit file.
+- CI on Y''s save: <TO FILL: four runs>.
+- One correction asked of you: advisor-stopb-plan.md:623 says every list so far carried a hash, "build 1, build 2, and
+  U7's run 4". U7's run 4 Wasm is 901a649231dc9c217204b121a2800641c3c6aa9cd3cb9d42eb5657452b0a0e77 (u7-report.md:141),
+  build 1''s plain value, so run 4 carried none. Correct that line in your file (a dated correction note under it),
+  and say whether run 4 counts as a third agreeing build (made by another builder on another path and day) for the
+  report.
+Rule: Y' stands (STOPB-8 resolved by the method), or what is owed. Write your blocks into advisor-stopb-plan.md under a
+new heading "## Y' head read" (your plan first, then each block as it is done); end with "Decisions needed" and "For
+Mustafa", then the last line `Status: COMPLETE <date and UTC time>`.
+The same tool rules as before: Write and Edit only for files; git first, one git per call, no `git -C`; printing forms
+only; his full-paths rule; names of environment variables only, never values; no GitHub writes.
