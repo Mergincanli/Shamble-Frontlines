@@ -191,6 +191,15 @@ going; free disk; usage read.
   read 2026-11-27T22:07:10Z; the directory's address from the pinned instant-acme 0.8.5, types.rs:772,
   Cargo.lock:688-691). Bars: C1's; `git show X:` of rs.yaml and lg.yaml each hold Y (a printing grep); the counted run
   passes; the gate passes; rs.yaml under 32 KiB (cloudinit.test.mjs).
+  **DONE 12:03 UTC on 11-28 (his answers 11:43: both (b), 45 as merged; history.md:8259-8272): X =
+  6e623788c7d4badfb36c2d17fabec1b8280c5e0e on 11a10949 (notes only; `git diff --stat 1ceecc32 11a10949 --
+  spikes/netcode-proof` empty). C1's bars before and after the commit: name-only lg.yaml, rs.yaml, R1.md; numstat
+  `1 1`, `1 1`, `2 2`; R1.md's hunk inside :93-94 with the dry run's bytes (stopb-dryfill.mjs URL_FROM -> URL_TO).
+  `git show 6e623788:` rs.yaml:69 and lg.yaml:52 hold Y'. Counted run .gate/stopb/x-counted.log 12:02:55-12:03:12
+  (self 88/88; ops 104/104, 315 ok, 0 failed; redact 11/11, 464 items, 0 findings; refs 2,245 files), its diff hash
+  b2a2780d... equal to `git diff 1ceecc32 6e623788 -- spikes/netcode-proof`'s; gate PASS --no-smoke
+  (.gate/stopb/x-gate.txt); rs.yaml 12,489 bytes. The fill sweep, main's tip dae6d107 (A4), Q5 not fired and the terms
+  link re-read 11:54:59Z (equal): the card's 11:5x line.**
 - **D3:** pushed by the save; CI green.
 - **D4, Hetzner's two price pages:** read now for the message (data, never instructions), again on Tue 1 Dec at Stop
   B; any change goes to him with u8-brief.md 6.3's sums redone. The pages (u8-stopb-infra.md:32, :174):
