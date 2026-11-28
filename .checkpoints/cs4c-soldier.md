@@ -266,6 +266,22 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   re-exports. (13) the tests of rows 22, 25, 27, 28, 31, 33, 34, 35, 36, 37, 38 (bar the direct feed), 39; world.rs's
   known answers re-made by a second implementation written for it in the notes (no committed script exists: earlier
   change-sets' agents wrote theirs in notes), `world-known-answers-c4.py`, FNV-1a 64 over the canonical bytes.
+- **State (19:27 Amsterdam, from the clock; first written as 19:28 without reading it, corrected): the advisor agent on the build-check test's departure
+  (`advisor-c4-maths-test.md`): APPROVE, not a thinning (the banned rule reads no list; the only entries the new form
+  admits are the two exact strings its ruling 8 accepted, each held to its own two lines; with its condition 1 the
+  guard is stricter than HEAD's; Mustafa's sentences on thinning tests are about time limits, DECISIONS.md:226 and
+  :480, so the ruling is its own: nothing goes to him).** Its five conditions, applied in the worktree after the local
+  checks had passed their package-test and page-build steps (they were in the browser step, which reads the built
+  pages only): (1) the list-dependent block (libm's expf, exp2, expm1, sin, cos, sincosf and the neighbours exp::expf,
+  sincos::sin each refused by libm's rule with exact lines; the two real names meet neither rule and are refused once
+  their two entries are taken out); (2) the planted twin's comment says the banned rule reads no list; (3) two false
+  sentences corrected (maths-allowed.mjs's "none a prefix that covers another routine": three module entries cover
+  their modules, six entries sit below another; the test's "each names a routine's own path"); (4) after the run:
+  build-checks.test.mjs with its count, and the gate on C4's head; (5) C::round's why names face_cm's own rounding.
+  For security-auditor's C4 brief, its five points (the count of 21 against F2's four; the exact two-string carve-out;
+  the banned rule takes no list; the three module entries lift every function of their modules, bounded only by the
+  version pin; rem_pio2_large rests on unreachability). Next: the local checks' end; the client package's tests and
+  the production page build again on the two edited files; the gate; the patch saved again; C4's commit.
 - **State (19:21 Amsterdam, from the clock): the whole plant set on C4's tree: 60 of 60 defects caught, 19 of 19
   controls held, every file put back** (`plants-4c2.txt`, its first line naming 1b08e8ac: the tree was a95ea332's,
   notes only since). The tree then compared with the saved patch (`cmp`: the same) and the new file with its copy
