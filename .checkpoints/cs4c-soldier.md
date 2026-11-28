@@ -10,7 +10,7 @@
   `/home/user/Shamble-Frontlines` is never switched.
 - **Base:** origin/main dae6d107fdbe942567104bcf1c9a2cbc6b3a1e0f (pull request #79's merge commit), taken in by
   fast-forward from b7145273.
-- **Last update:** 2026-11-28 01:15 Amsterdam (from the clock; an earlier save said 01:08, a time written without
+- **Last update:** 2026-11-28 01:24 Amsterdam (from the clock; an earlier save said 01:08, a time written without
   reading the clock: it was 00:57)
 
 ## Steps done
@@ -43,9 +43,25 @@
    applied; the question file gained DEPART-4C, STREET-GREY restated, SIZE-4C's branch consequence and the scene's new
    hold.
 
+7. **rust-reviewer's body re-run** (DONE, its block 5): the sandbox's own body passes every run, with the pull (3a)
+   and without it (3b); BODY-SHAPE's evidence is in the question file (04646ca3).
+
 ## Current step
 **Step S, the scene: the build** (by the sheet's section D, revision 2). The branch rule (condition 2): until he
 answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and prototypes only.
+- **Code not yet committed is saved as a patch:** `.checkpoints/cs4c-soldier/step-s-wip.patch` (from `git diff`, the
+  new files marked with `git add -N`; the old scene file's removal unstaged so no commit carries half-built code).
+  A new seat applies it with `git apply` on this branch's head. Written so far (01:24 Amsterdam): the interface file
+  (`PictureContent`, `SceneObject`, `setContent`, `inventory`), `render/scene.ts` (the empty floor moved; the map's
+  floor with flat faces turned outward; greys by height; the grid; disposal; the overview), `render/inventory.ts`,
+  three-picture.ts's `setContent` and `inventory`, boot's `__shambleScene`, the two markers.
+- **First proof, done (the advisor tool's item 1):** both pages built from that code (`.gate/dist-production-4c`,
+  `.gate/dist-development-4c`, exit 0 with the build's own checks): the production page holds `inventory(){return
+  null}` and neither marker; the development page holds both. So the inventory's cut by the build flag holds, and
+  no dynamic import is needed.
+- **Next:** the map's reading in content.ts (and `LOCAL_MAP` from a module of its own in the Worker's package, since
+  recording.ts is test-only), the hand-off in boot.ts, the readout's rows, the tests (T1 to T10, S1 to S7, R1, E1 to
+  E5), the counts' timing check in both orders, render-counts.json measured; the count after each piece.
 
 ## Next steps
 1. **The plan sheet** `.checkpoints/cs4c-soldier/reread-sheet.md`, revision 1, against main dae6d107: step 0 (the first
@@ -115,6 +131,6 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   - engine-architect: DONE (block 4, 4B-WORLD-ROOM, folded into the sheet's E3 to E5).
   - game-designer (`game-designer-read.md`): DONE.
   - the advisor agent (`advisor-reread-4c.md`): DONE (its verdict above).
-  - **rust-reviewer, resumed** (its block 5 in `rust-reviewer-read.md`): the prototype re-run with the sandbox's body
-    (the 0.15 m foot, the pull, the 0.2 m snap), on the steps, the ledges, the ramps, the roofs and edges: running.
+  - rust-reviewer's re-run (its block 5 in `rust-reviewer-read.md`): DONE.
+  - No agent runs now.
 - The scene's before picture: `.gate/scene-before-4c.png` (main's page, 3 draw calls), by `shot-4c.mjs`.
