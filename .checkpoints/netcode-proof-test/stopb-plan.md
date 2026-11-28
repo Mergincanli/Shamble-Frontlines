@@ -116,6 +116,11 @@ going; free disk; usage read.
   "(87cb8677d)"). Build 1' at Y (or Y0), then Y' = the list's Wasm line replaced in place (`1 1` against Y, `7 0`
   against Y0), then build 2' at Y' itself, equal; the six other lines equal Y's. Y' after MAIN-70. A follow-up after R1
   (B6's Q3): web/build.mjs refuses a hashed `producers` entry, with a test and a plant (the next change to build.mjs).
+- **Build 1' DONE 02:15 UTC on 11-28** at Y (.gate/stopb-a; cargo base scratchpad/npt-dist-a; build1p.log): every bar
+  met (git fails in the cargo base and in wasm-bindgen-shared-0.2.130's folder; 11 GIT_ names printed and unset;
+  `producers: wasm-bindgen 0.2.130`); Wasm 901a649231dc9c217204b121a2800641c3c6aa9cd3cb9d42eb5657452b0a0e77, which is
+  U7's run-4 value (u7-report.md:141), made by another builder on another path and day; the six other lines equal Y's
+  (diff: line 6 only). Y' (this list) waits for MAIN-70.
 - **Y DONE (void, STOPB-8): 652e9513ce2c1369d8d6146e84109feadf021a55** (22:50): r1-dist.sha256 gains build 1's list byte for byte
   (cmp), numstat `7 0` against Y0, counted run .gate/stopb/y-counted.log PASS; pushed by the save f49a7ba.
 - **C1, the order** [C1]: Y0 -> build 1 at Y0 (worktree A, CARGO_HOME A) -> Y = Y0 plus r1-dist.sha256's seven lines

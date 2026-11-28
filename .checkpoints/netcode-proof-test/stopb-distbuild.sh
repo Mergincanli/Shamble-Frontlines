@@ -26,7 +26,7 @@ done
 if env | cut -d= -f1 | grep -Eq '^CARGO_(BUILD|PROFILE)_'; then echo "STOP: a CARGO_BUILD_ or CARGO_PROFILE_ variable is set"; exit 3; fi
 gitvars=$(env | cut -d= -f1 | grep -E '^GIT_' || true)
 for v in $gitvars; do echo "unset: $v (name only)"; unset "$v"; done
-echo "GIT_ variables: ${gitvars:+unset above}${gitvars:-none set}"
+if [ -n "$gitvars" ]; then echo "GIT_ variables: $(echo "$gitvars" | wc -l) unset above"; else echo "GIT_ variables: none set"; fi
 if [ -n "${RUSTUP_HOME+x}" ]; then echo "build variables: none set; RUSTUP_HOME is set (the container toolchain home)"; else echo "build variables: none set"; fi
 export CARGO_HOME=$X/cargo
 echo "tools: $(rustup --version 2>/dev/null | head -1); node $(node --version); npm $(npm --version)"
