@@ -140,8 +140,13 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
    The advisor agent is asked to approve steps 1 to 7 only after his answers on BODY-SHAPE, SWEEP-ROUTE and the slope.
 
 ## What leaves first if the count runs high (his SIZE-4B point 2, applied to 4c; confirmed in the sheet)
-- The plan's own ladder: at 13,150 written lines the far-corner map (PM-0004-39) moves to 4d, and he is told before
-  it moves. Nothing else moves; at the stop line the chat stops and he decides.
+- **For 4c-2 (the advisor agent's Q3, 2026-11-28):** at about 14,960 written lines the far-corner map (PM-0004-39,
+  step 6c) moves to 4d, and he is told before it moves (first in the next report). Nothing else moves. His stop line
+  for 4c-2 is 18,700: if the count reaches it before the early look is ready, two lines to him and the build goes on
+  to the early look; past it, nothing after the early look starts without his word (his SIZE-4C (b)). Until 4c-1's
+  merge is on main, 4c-2 is counted against 946fef73; afterwards from the merge-base with main (Q4, condition 8).
+- Earlier, for 4c as one (kept): the plan's own ladder: at 13,150 written lines the far-corner map (PM-0004-39) moves
+  to 4d, and he is told before it moves. Nothing else moves; at the stop line the chat stops and he decides.
 - The stop line with the scene inside is his (SIZE-4C). Until he answers, the scene is held to about 1,665 written
   lines (the advisor agent's item 2: the plan's rule on the recount, 740 x 1.8 x 1.25); one sentence to him before
   the count passes 1,420; the two-thirds sentence at about 1,110; at 1,665 the build stops. What leaves the scene first,
@@ -176,7 +181,10 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
 - 4c by the designs' count: 7,315 (steps 1 to 7, the plan's section 6) and about 630 for the scene with the map's
   reading (230 / 260 by 4b's sheet, and 60 to 80 more with as many in tests) = about 7,950. At the measured rates:
   about 17,250 to 21,450 written lines. The plan's stop line for 4c: 16,450, set before the scene moved in.
-- Ladder rung: 13,150 (the far-corner map). Two thirds of the stop line: told to him in one sentence.
+- Ladder rung: **about 14,960** written lines (the advisor agent's Q3 ruling of 2026-11-28 on steps 1 to 7: 18,700 /
+  1.25; the far-corner map, step 6c, moves to 4d there, and he is told in the next report, before it moves); it was
+  13,150, the planned size under the 16,450 line he did not take. Two thirds of his 18,700: about 12,470, told to him in
+  one sentence. Past 18,700 at step 5's end, nothing after the early look starts without his word.
 
 ## Decisions taken
 - **His answers of 2026-11-28, 12:10 Amsterdam** (sent 11:43:45 UTC; saved by script, whole, as
@@ -212,7 +220,18 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   `/home/user/Shamble-Frontlines/.gate/cs4b-2`. A session of another account works on its own branch from this
   branch's head and never pushes here (his Lanes rule). SEAT-OUT from him: stop at a whole point and report the last
   commit's id.
-- **State (14:55 Amsterdam, from the clock): 4c-1 closed, 4c-2 open.** 4c-1's final head 946fef73 (the advisor
+- **State (15:09 Amsterdam, from the clock): the advisor agent APPROVES steps 1 to 7 with conditions**
+  (`advisor-steps1to7.md`): Q1 the plan, with F1 to F6 as conditions; Q2 HEADROOM-FEET's default **(b), his sandbox's
+  rule** (its ruling), with test 15 per mode and a re-run of blocks 5, 6, 9, 10 and 12 under (b) before step 1's
+  movement code; Q3 the rung at about 14,960; Q4 the plan's order on nine conditions; Q5 the information lines agreed.
+  **Before step 1's code:** F1 (where the world's rules, statics and spawns live: engine-architect's ruling, "Not in
+  World", against block 11.6) answered in writing by both agents; Q2's re-run. **Before step 1 counts as done:** F2
+  (PM-0004-20's and -35's new wording drafted, old and new side by side, keeping the three things it lists), F3 (test
+  21's faces and misses, green). Before each of steps 2 to 7: its symbol table, confirmed by its owner (F5). His
+  checklist with every expected result (F4); security-auditor on the dependency commit, engine-architect on step 1's
+  boundary (F9). The Lows F7 applied (the sheet's 3.05 m ledge and 0.069 m, 6b's line, the card's rung); F8 (the ray
+  counts and sweep proof) placed at step 6. Question 13 gains the two lines (the default (b); the flicker under (b)).
+  Earlier state (14:55), kept: **4c-1 closed, 4c-2 open.** 4c-1's final head 946fef73 (the advisor
   agent APPROVE; CI green; the zip sent to him); the notes back (the revert commit); next: the advisor agent on steps 1
   to 7 (`advisor-steps1to7-brief.md`: Q1 the plan, Q2 HEADROOM-FEET's default, Q3 the rung, Q4 the order, Q5 the
   information lines), then step 1 by rust-reviewer's block 11 with block 12. His Brave check of 946fef73 and his go are

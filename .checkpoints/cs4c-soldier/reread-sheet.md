@@ -359,8 +359,10 @@ The read holds every symbol with today's file:line and each test with its plante
   for the advisor agent**); one home for the bounds (the aim's centimetres and the movement's metres, built once);
   the room's and endpoint's tests get a world through `content` as a dev-dependency (engine-architect's block 4); the
   jump's rule J1 to J5 counted once (it sits in both reads); the soft push is in no recording (one slot), so its
-  sameness across targets needs a WebAssembly run of its own; 6b's spec waits for the CI Builder's answer to
-  4B-CHROMIUM-TIME; **three readings not in DEPART-4's fourteen, for his word**: PM-0004-60 at 2,000,000 commands in
+  sameness across targets needs a WebAssembly run of its own; 6b's spec ~~waits for the CI Builder's answer to
+  4B-CHROMIUM-TIME~~ (answered by his CHROME-TIME, 2026-11-28: the CI Builder raises the Chromium run's limit after
+  Tuesday 1 December, 20:00; until then no test is cut or thinned; a run stopped at the limit is re-run once, and a
+  second stop is told to him in two lines; marked by the advisor agent's F7); **three readings not in DEPART-4's fourteen, for his word**: PM-0004-60 at 2,000,000 commands in
   CI's release line (not 10 million nightly through a fuzzer); PM-0002-14 met in its ray half only until change-set 8
   brings the view time; PM-0004-20's hash half on `walk` (one soldier), its flag-off timing not runnable.
 
@@ -836,8 +838,9 @@ the build goes on. A head that goes to the advisor agent needs a green run.
   0.035 m at every speed, 13.27 m/s included (game-designer's prediction holds); block 5 still 69 of 69; the set-back's
   speed removal and standing with no speed test change no printed result; with the old switches it reproduces block
   9 byte for byte. **The swept wall pass is not "no change at his speeds"** (compared tick by tick on bits): bit-equal
-  in the open and on every face contact; at 6.3 m/s 4 of 341 block 6 runs differ, all one push case rounding the 3.10 m
-  ledge's corner, by up to 0.063 m; at 9.576 m/s the six roof jumps differ in path by up to 0.51 m with the same outcome,
+  in the open and on every face contact; at 6.3 m/s 4 of 341 block 6 runs differ, all one push case rounding the 3.05 m
+  ledge's corner, by up to 0.069 m (corrected by rust-reviewer's block 12: first written "the 3.10 m ledge" and
+  "0.063 m", the largest one-axis difference); at 9.576 m/s the six roof jumps differ in path by up to 0.51 m with the same outcome,
   and one landing grazing a corner by 4 micrometres. **The report says so, with these numbers** (his DEPART-4C (a)
   took our own sweeps; this is how they differ from the sandbox's push-out at corners). At 13.27 m/s the sweep closes
   all three holes (ramps from the side 306 of 306, against 264 with the push-out; the high-end case stops 0.40 m out

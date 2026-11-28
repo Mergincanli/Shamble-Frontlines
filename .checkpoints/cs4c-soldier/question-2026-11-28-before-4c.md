@@ -341,6 +341,12 @@ in this folder.)
   does.
 - **Recommended: (a).** It is a difference from what he played, so it is his; his sandbox's metrics room has the case
   at his Export's sizes (the window wall above), and the game's maps with upper floors would have it under every floor.
+- **Until he answers, the game is built with (b), his sandbox's rule** (the advisor agent's ruling of 2026-11-28 on
+  steps 1 to 7: his MOVE-RULES (a) takes the sandbox's rows as the starting rules); a switch flips it to (a) only on
+  his word, and both ways are tested.
+- **What (b) does in one more case**, by the prototype's model of his sandbox (not tried in his sandbox itself): a
+  soldier standing on a 0.55 m step with a beam 1 m into it, over its edge, drops off and steps back up 6 to 12 times
+  in 40 ticks (a flicker); under (a) he stands still.
 - Not his, and so not asked (game-designer's blocks 7 and 8: none is a rule of his): the pull clipped where a wall
   stands in its reach (no step at his sizes has one; it changes nothing where no wall is in reach); the wall test as a
   sweep of the body's circle (row 3 as the game builds it: it matches his sandbox's push-out in the open and on every
