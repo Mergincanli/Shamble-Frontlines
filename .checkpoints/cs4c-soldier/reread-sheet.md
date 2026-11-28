@@ -810,6 +810,19 @@ the build goes on. A head that goes to the advisor agent needs a green run.
   for (3a) about +70 / +100. Open for game-designer (its block 7, asked): the slope-head window; whether a top at or
   below the feet can be a wall by headroom; whether clipping the pull, the swept wall pass and G6's guard are rules
   of his.
+- **game-designer's block 7 (DONE):** the slope-head window is his radius (0.4 x grade, yard.ts:264), but its top also
+  adds the step-up, feet + 0.55 + 0.4 x grade + 0.005 (:265), which the prototype leaves out (Medium: narrower than
+  the sandbox; a re-run to confirm its predicted 0.0175 / 0.035 m seam rise at 13.27 m/s); the last slope test is
+  "slope height at the box's nearest point >= box top - 0.55" (:281, Low). **A top at or below his feet can be a wall
+  by the sandbox's headroom test** (it ignores the feet: :185-194, :306-309), and he can meet it at his Export's sizes
+  (a 3.0 m wall with a window: stopped 0.4 m before the stretch over it): rust-reviewer's "never a wall at or below his
+  feet" is kept as recommended but is a difference from his sandbox, so it is his: **HEADROOM-FEET**, the question
+  file's question 13 (his item 18). Not rules of his: the pull's clip (on condition the carry stays bit-equal wherever
+  no wall is in reach), the swept wall pass (his DEPART-4C (a); "no change at his speeds" not yet measured for the
+  walk), G6's guard. Two of block 9's assumptions differ from the code (Low): the set-back removes his speed up the
+  slope (movement.ts:147-157); standing has no test on upward speed (movement.ts:195). **Next for step 1:** rust-
+  reviewer's block 10 (the 0.55 in the slope-head window, the swept wall pass measured at 6.3 and 9.576 m/s, the two
+  assumptions corrected), then the advisor agent on steps 1 to 7 with HEADROOM-FEET open.
 
 ### I6. What the advisor agent is asked, for steps 1 to 7 (after the Testlines read is folded in)
 Its item 10's thirteen points stand as section H's table, with his answers on (1) BODY-SHAPE, (3) SWEEP-ROUTE and

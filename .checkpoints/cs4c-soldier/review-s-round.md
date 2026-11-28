@@ -79,6 +79,17 @@ How to run the aspect-0 plant (its note): Vitest's per-test timeout does not sto
 needs an outer timeout (or a worker thread with a deadline). Not verified by it: whether the browser specs catch
 TE-1's plants; WebGPU.
 
+## Round 2, on what changed (2b2f44c2; the review budget's second round)
+- **graphics-engineer: APPROVE** (`review-s2-graphics-engineer.md`): GE-F1 closed (at most 20 distances tried, the
+  largest 524,288 m inside the probe's far plane; the real `overview` run at aspect 0, NaN, Infinity, 1e-300 and 1/4320:
+  null; at 1, 16:9 and 1920: framed, on a test-scene-sized map and the largest; each call under 3 ms; `frameCamera`
+  leaves the camera on null; the resize clamps the width); GE-F5 closed (the volume from a point off every face's
+  plane; the edge pairing catches the doubled floor, plant F8). Nothing new at Critical, High or Medium. Its notes:
+  a window a few pixels wide still frames at a great distance with near 0.1 (depth fighting on a floor about a pixel
+  wide), folded into the deferred GE-F2; and the resize comment's "held at one pixel" was true of the aspect only:
+  **reworded** in the next code commit (a comment, no code). Not verified: a canvas 0 wide on WebGPU (no adapter).
+- **test-engineer:** running.
+
 ## The fix pass (one, after all six; then the verifier)
 - **Fixed:** the Medium found four times (GE-F1, EA-1, P-1, S-1) and TE-1; the Lows G-3/EA-2, GE-F5, TE-2 to TE-8,
   EA-3 to EA-6, S-2 (cheap, in the same files); S-note by docs-keeper in the docs pass (`place-4c.mjs fix-16`); AD-1 in

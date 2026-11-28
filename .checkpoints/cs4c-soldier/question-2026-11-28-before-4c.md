@@ -327,6 +327,25 @@ in this folder.)
   word (his Never list forbids a rewrite or a force-push otherwise).
 - **Recommended: (a).**
 
+## Added on 2026-11-28, while he is away (his item 18: "A new question that needs me goes into your question file with your recommendation, and you move on to the work of 4c that does not hang on it")
+### 13. HEADROOM-FEET: may the game differ from his sandbox where a block's top at or below his feet would count as a wall? (new)
+- **Why it matters:** reading his sandbox's code for the soldier's step (game-designer's block 7, by his TESTLINES
+  yes), the headroom rule ("a top counts as reachable only with 1.8 m of room above it") ignores where his feet are.
+  So a top at or below his feet can stop him like a wall when a block above leaves less than 1.8 m of room. At his
+  Export's sizes it can happen: walking along the top of a 3.0 m wall with a window in it (the sill at 0.9 m, the
+  opening 1.2 m), he is stopped 0.4 m before the stretch over the window, and landing on that stretch puts him off the
+  wall. In the game, with upper floors, every low block under an upper floor would become an invisible wall for
+  anyone walking on that floor. **Needed before the soldier's movement step** (the rest of 4c is built meanwhile).
+- **Options:** (a) the game never counts a top at or below his feet as a wall (rust-reviewer's clause: one condition,
+  no number); he could then walk along that wall top over the window; (b) the game does exactly what his sandbox
+  does.
+- **Recommended: (a).** It is a difference from what he played, so it is his; the sandbox's maps never met it, and
+  the game's maps with floors would.
+- Not his, and so not asked (game-designer's block 7: none is a rule of his): the pull clipped where a wall stands in
+  its reach (no step at his sizes has one; it changes nothing where no wall is in reach), the wall test as a sweep of
+  the body's circle (already his DEPART-4C (a)), and the guard on a ramp met from beyond its high end (a case no map
+  of his has).
+
 ## One line, no question
 STEP12-GO is in the register already (`docs/DECISIONS.md:183`, since 4b-2's docs pass), so it is not written again.
 Only his go for 4b-2's merge, his word on merging and his design notes (and his message of 23:59, by BOARD-WORDS) go
