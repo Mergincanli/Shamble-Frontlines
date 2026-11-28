@@ -221,7 +221,20 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   `/home/user/Shamble-Frontlines/.gate/cs4b-2`. A session of another account works on its own branch from this
   branch's head and never pushes here (his Lanes rule). SEAT-OUT from him: stop at a whole point and report the last
   commit's id.
-- **State (17:36 Amsterdam, from the clock): C3 is built whole; next its full local checks, its plants run, the
+- **State (17:48 Amsterdam, from the clock): C3 committed and pushed after this notes commit (CI then runs on its
+  code head); security-auditor reads it next (F9).** The plants' whole run on 4b5f922c plus C3 (`plants-4c2.txt`):
+  **29 of 29 defects caught** (C1's 2, C2's 13, C3's P1 to P10 and PV1 to PV4), every file put back; 10 of 12 controls
+  held at once, the other two (RC4, PVC1) exited 0 but with wrong expected words of mine (layering has 4 tests now;
+  the Node run is 6 files and 41 tests): corrected and re-run by name, both HELD. Notable: PV1 (one bit of every exp
+  output flipped on wasm32 only) turned Node red while PV1n, the same plant run natively, stayed green: the per-target
+  compare bites. The tree compared with every saved copy before the commit: the same. `c3-wip.patch` and `c3-wip/`
+  leave the notes in this commit (C3 is in the code commit after it). Earlier state (17:45), kept: C3's full local checks PASSED (`.gate/local-checks-c3.log`: the Node
+  boundary tests 41 of 41, two more for the libm vectors in both profiles; the browser tests 29 of 29 in 214 s; the
+  players' file 58548ac7..., 258,488 bytes in both builds, 33 more than C2's d16cb57d..., not traced: rust-reviewer
+  measured no libm routine linked, and the built-file check passed) and the gate PASS with smoke
+  (`.gate/gate-c3.log`). The plants' whole run on 4b5f922c plus C3 is running; then the tree compared with the
+  saved patch, C3's commit, its push (CI), and security-auditor on the commit (brief in the scratchpad).** Earlier
+  state (17:36), kept: **C3 is built whole; next its full local checks, its plants run, the
   gate and its commit, then security-auditor on the commit (F9).** Saved as `c3-wip.patch` (tracked files) and
   `c3-wip/` (the new files: fmath.rs, rules.rs, marking.rs, layering.rs, libm_ops.rs, libm_vectors.rs,
   make_libm_vectors.py, libm-expected.txt; `libm-inputs.bin`, 1,077,304 bytes, is what `make_libm_vectors.py` writes,

@@ -1,4 +1,4 @@
-plants on e5da290e293d7acb8a5ed16d15d37a36a77abc90-with-C2
+plants on 4b5f922cd8d79b1ba30e4ca6aef797d16706d603-with-C3
 R1 CAUGHT (defect): a spawn that does not raise the slot's generation: an id despawned before resolves again: exit 101, found 1 of 1 wanted texts
 R2 CAUGHT (defect): a despawn that leaves the row occupied: the despawned id still resolves: exit 101, found 1 of 1 wanted texts
 RC1 HELD (control): the clean tree: the soldier table's tests: exit 0, found 1 of 1 wanted texts
@@ -15,9 +15,30 @@ S4 CAUGHT (defect): the converter reads no measured block: the body height row f
 T1 CAUGHT (defect): the real table's planted row: the body height row claims a place his Export does not have: exit 1, found 1 of 1 wanted texts
 T2 CAUGHT (defect): the real table: a sandbox row with its place in his sandbox emptied: exit 1, found 1 of 1 wanted texts
 T3 CAUGHT (defect): the real content file: a sandbox value one hundredth away from his sandbox's: exit 1, found 1 of 1 wanted texts
+P1 CAUGHT (defect): the stop's easing taken from the speed-up time: exit 101, found 1 of 1 wanted texts
+P2 CAUGHT (defect): one refusal removed: a foot wider than the body plays: exit 101, found 1 of 1 wanted texts
+P3 CAUGHT (defect): a quarter turn negated with -v: 90 degrees faces (1, -0): exit 101, found 1 of 1 wanted texts
+P4 CAUGHT (defect): no quarter turns taken out: 90 degrees gives a cosine of 6.1e-17: exit 101, found 1 of 1 wanted texts
+P5 CAUGHT (defect): the spawn table in the file's order: exit 101, found 1 of 1 wanted texts
+P6 CAUGHT (defect): the libm rule switched to a name list: the grouped import and a routine in another function pass: exit 101, found 1 of 1 wanted texts
+P7 CAUGHT (defect): the marking takes a mark at any depth: a macro's or a nested module's mark hides content: exit 101, found 1 of 1 wanted texts
+P8 CAUGHT (defect): the layering rule reads path heads only: `extern crate content as c;` passes: exit 101, found 1 of 1 wanted texts
+P9 CAUGHT (defect): the marking without the visibility allowance: content's pub(crate) tests module read as shipped: exit 101, found 1 of 1 wanted texts
+P10 CAUGHT (defect): the root's libm line loosened from =0.2.16 to 0.2.16 (the lockfile still holds 0.2.16): exit 101, found 1 of 1 wanted texts
+PV1 CAUGHT (defect): one bit of every exp output flipped on wasm32 only: Node's check goes red: exit 1, found 2 of 2 wanted texts
+PV1n HELD (control): the same plant natively: the native check stays green (the change is the wasm32 target's alone): exit 0, found 1 of 1 wanted texts
+PV2 CAUGHT (defect): the recorded exp digest moved one step: the native check goes red: exit 101, found 2 of 2 wanted texts
+PV3 CAUGHT (defect): the header names other inputs (its sha256 moved): named as such before anything is worked out: exit 101, found 2 of 2 wanted texts
+PV4 CAUGHT (defect): the generator moved one grid step: its --check refuses the committed inputs: exit 1, found 1 of 1 wanted texts
+PVC1 DID NOT HOLD (control): the clean tree: the test-only module built again and the rule tests under Node: exit 0, found 1 of 2 wanted texts; missing ['Test Files  1 passed']
+PVC2 HELD (control): the clean tree: the native vectors and the generator's check: exit 0, found 1 of 1 wanted texts
+RC2 HELD (control): the clean tree: sim's unit tests: exit 0, found 1 of 1 wanted texts
+RC3 HELD (control): the clean tree: the rule scan: exit 0, found 1 of 1 wanted texts
+RC4 DID NOT HOLD (control): the clean tree: layering and the dependency rules: exit 0, found 0 of 1 wanted texts; missing ['test result: ok. 3 passed']
+RC5 HELD (control): the clean tree: the dependency rules: exit 0, found 1 of 1 wanted texts
 VC1 HELD (control): the clean tree: the content crate's tests: exit 0, found 1 of 1 wanted texts
 VC2 HELD (control): the clean tree: the page's content tests: exit 0, found 2 of 2 wanted texts
 VC3 HELD (control): the clean tree: the converter's tests: exit 0, found 1 of 1 wanted texts
 VC4 HELD (control): the clean tree: the converter's check on the real table and content file: exit 0, found 1 of 1 wanted texts
-DEFECT CHECKS: 15 caught, 0 not caught. CONTROLS: 5 held, 0 did not hold.
-EVERY FILE PUT BACK (sha256 of 8 files as at the start): yes
+DEFECT CHECKS: 29 caught, 0 not caught. CONTROLS: 10 held, 2 did not hold.
+EVERY FILE PUT BACK (sha256 of 17 files as at the start): yes

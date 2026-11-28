@@ -70,6 +70,15 @@ FMATH_TESTS = cargo_test("sim", "fmath::tests")
 SCAN_TESTS = ("cargo", "test", "-p", "sim", "--locked", "--test", "rules_scan")
 LAYERING_TESTS = ("cargo", "test", "-p", "devtools", "--locked", "--test", "layering")
 DEPENDENCY_TESTS = ("cargo", "test", "-p", "devtools", "--locked", "--test", "dependency_rules")
+LIBM_OPS = "crates/devtools/src/rules/libm_ops.rs"
+LIBM_EXPECTED = "crates/devtools/vectors/libm-expected.txt"
+LIBM_GENERATOR = "crates/devtools/vectors/make_libm_vectors.py"
+LIBM_TESTS = ("cargo", "test", "-p", "devtools", "--locked", "--test", "libm_vectors")
+LIBM_CHECK = ("python3", "-I", "-B", f"{ROOT}/{LIBM_GENERATOR}", "--check")
+# The test-only module built again from the tree as it stands, then the rule tests under Node (local-checks.sh's lines).
+NODE_RULES = ("bash", "-c", f"node {ROOT}/packages/client/scripts/build.mjs --wasm-only && node {ROOT}/node_modules/vitest/vitest.mjs run --root {ROOT}/packages/sim-worker --dir {ROOT}/packages/sim-worker/boundary")
+WASM_FLIP = ("        exp_bytes.extend_from_slice(&exp_of(*x).to_bits().to_le_bytes());",
+             "        exp_bytes.extend_from_slice(&(exp_of(*x).to_bits() ^ u64::from(cfg!(target_arch = \"wasm32\"))).to_le_bytes());")
 
 # name, kind, what the defect is, the edits (file, text there once, its replacement), the command, the words its output must hold
 PLANTS = [
@@ -163,9 +172,26 @@ PLANTS = [
     ("P10", "defect", "the root's libm line loosened from =0.2.16 to 0.2.16 (the lockfile still holds 0.2.16)",
      [(ROOT_MANIFEST, "libm = \"=0.2.16\"", "libm = \"0.2.16\"")],
      DEPENDENCY_TESTS, ["the root Cargo.toml's libm line is the batch's"]),
+    # C3's vectors (PM-0004-22; rust-reviewer's blocks 17 and 18): a one-target change, a changed record, a changed header,
+    # a changed generator; the last plant here leaves the built module planted, so the control after it builds it again.
+    ("PV1", "defect", "one bit of every exp output flipped on wasm32 only: Node's check goes red",
+     [(LIBM_OPS, *WASM_FLIP)], NODE_RULES, ["libm's exponential and sine-and-cosine give the outputs the native build recorded", "failed"]),
+    ("PV1n", "control", "the same plant natively: the native check stays green (the change is the wasm32 target's alone)",
+     [(LIBM_OPS, *WASM_FLIP)], LIBM_TESTS, ["test result: ok. 2 passed"]),
+    ("PV2", "defect", "the recorded exp digest moved one step: the native check goes red",
+     [(LIBM_EXPECTED, "exp 33646 551ff1fa383a1f22", "exp 33646 551ff1fa383a1f23")],
+     LIBM_TESTS, ["test libm_s_two_routines_give_the_recorded_outputs ... FAILED", "not the committed outputs: exp 33646 551ff1fa383a1f22 where the file has exp 33646 551ff1fa383a1f23"]),
+    ("PV3", "defect", "the header names other inputs (its sha256 moved): named as such before anything is worked out",
+     [(LIBM_EXPECTED, " 0ee2be59b56e571b7de333113116fce5160b7a3e0f828bb45f9d9da62ccdd052", " 1ee2be59b56e571b7de333113116fce5160b7a3e0f828bb45f9d9da62ccdd052")],
+     LIBM_TESTS, ["test libm_s_two_routines_give_the_recorded_outputs ... FAILED", "the inputs are not the ones the expected file's header names"]),
+    ("PV4", "defect", "the generator moved one grid step: its --check refuses the committed inputs",
+     [(LIBM_GENERATOR, "    ex = [-((LN_10 / (k / 1000)) * DT) for k in range(1, 5001)]", "    ex = [-((LN_10 / (k / 1000)) * DT) for k in range(2, 5002)]")],
+     LIBM_CHECK, ["libm-inputs.bin is not what this script makes"]),
+    ("PVC1", "control", "the clean tree: the test-only module built again and the rule tests under Node", [], NODE_RULES, ["Test Files  6 passed (6)", "Tests  41 passed (41)"]),
+    ("PVC2", "control", "the clean tree: the native vectors and the generator's check", [], LIBM_TESTS, ["test result: ok. 2 passed"]),
     ("RC2", "control", "the clean tree: sim's unit tests", [], SOLDIER_TESTS_ALL, ["test result: ok. 46 passed"]),
     ("RC3", "control", "the clean tree: the rule scan", [], SCAN_TESTS, ["test result: ok. 9 passed"]),
-    ("RC4", "control", "the clean tree: layering and the dependency rules", [], LAYERING_TESTS, ["test result: ok. 3 passed"]),
+    ("RC4", "control", "the clean tree: layering", [], LAYERING_TESTS, ["test result: ok. 4 passed"]),
     ("RC5", "control", "the clean tree: the dependency rules", [], DEPENDENCY_TESTS, ["test result: ok. 3 passed"]),
     ("VC1", "control", "the clean tree: the content crate's tests", [], CONTENT_TESTS, ["test result: ok. 46 passed"]),
     ("VC2", "control", "the clean tree: the page's content tests", [], PAGE_TESTS, ["Tests  ", " passed"]),
