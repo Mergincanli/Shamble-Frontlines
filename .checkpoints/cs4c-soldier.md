@@ -10,7 +10,7 @@
   `/home/user/Shamble-Frontlines` is never switched.
 - **Base:** origin/main dae6d107fdbe942567104bcf1c9a2cbc6b3a1e0f (pull request #79's merge commit), taken in by
   fast-forward from b7145273.
-- **Last update:** 2026-11-28 12:48 Amsterdam (from the clock; an earlier save said 01:08, a time written without
+- **Last update:** 2026-11-28 13:21 Amsterdam (from the clock; an earlier save said 01:08, a time written without
   reading the clock: it was 00:57; an edit at 02:04 wrote "02:06", also unread, corrected here)
 
 ## Steps done
@@ -190,8 +190,15 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   `/home/user/Shamble-Frontlines/.gate/cs4b-2`. A session of another account works on its own branch from this
   branch's head and never pushes here (his Lanes rule). SEAT-OUT from him: stop at a whole point and report the last
   commit's id.
-- **State (12:48 Amsterdam, from the clock): his answers are in (12:10; "Decisions taken"), and he is away until
-  Sunday 29 November, 12:00.** Now: step S's six reviews (three running: graphics-engineer, perf-auditor,
+- **State (13:21 Amsterdam, from the clock): step S's fix pass, in the worktree, not yet committed** (saved as
+  `fix-s-wip.patch` at 18454538; a new seat applies it with `git apply` on the branch's head if the worktree is lost).
+  Step 0 landed (af789ef3 and the next commit). The review round is complete (`review-s-round.md`: six reviews, the
+  Medium found four times and TE-1 fixed with the Lows; four Lows and AD-4 deferred). Type checks and the unit tests
+  pass on the fix (the page's 176, the Worker's 53); the full local checks run (`.gate/local-checks-fix-s.log`); then
+  the whole plant set on the fix (`plants-4c.py`, 17 new plants F1 to F17 beside the 31, a timeout for F1's hang; the
+  anchors 0 wrong), the code commit, CI, the verifier. game-designer's Testlines read resumed after the restart (N16
+  to N19 done: FALL-STEP (a) by the code, the head bump, the headroom rule). Earlier state, kept: **his answers are in
+  (12:10; "Decisions taken"), and he is away until Sunday 29 November, 12:00.** Now: step S's six reviews (three running: graphics-engineer, perf-auditor,
   engine-architect, each writing `review-s-<agent>.md`), step 0 (the register by `decisions-4c.mjs`; LOOP_V2's section
   14, the pointers, the header sentence, EDITOR_V2's pointer and the register line placed by docs-keeper, his item 2),
   then the fix pass, the verifier, the docs pass, the report with the pull request's title and text, the notes out of

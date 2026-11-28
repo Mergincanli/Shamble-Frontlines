@@ -12,7 +12,7 @@ the caller also shows `git status --porcelain -- crates packages` empty before a
 plant counts as caught only when the command fails AND its output holds the check's own words for that defect.
 Not part of the product: notes.
 """
-import hashlib, os, subprocess, sys
+import hashlib, os, signal, subprocess, sys
 
 ROOT = "/home/user/Shamble-Frontlines/.gate/cs4b-2"
 os.chdir(ROOT)
@@ -25,13 +25,21 @@ SCHEMA_TEST = "packages/types/src/content-schema.test.mjs"
 DEV_PLANT = f"{ROOT}/.gate/dist-plant-dev-4c"
 PROD_PLANT = f"{ROOT}/.gate/dist-plant-prod-4c"
 
-def run(*command, env=None, cwd=None):
-    done = subprocess.run(command, capture_output=True, text=True, env=env or ENV, cwd=cwd or ROOT)
-    text = done.stdout + done.stderr
-    LOG.write(f"\n$ {' '.join(command)}\n{text}\n[exit {done.returncode}]\n"); LOG.flush()
-    return done.returncode, text
+def run(*command, env=None, cwd=None, timeout=None):
+    # Its own process group, so that a timeout ends Vitest's workers too (test-engineer, step S's review: killing only
+    # the vitest process left its worker spinning). A run stopped by its timeout reads as exit 124 with a note.
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, env=env or ENV, cwd=cwd or ROOT, start_new_session=True)
+    try:
+        text, _ = process.communicate(timeout=timeout)
+        code = process.returncode
+    except subprocess.TimeoutExpired:
+        os.killpg(process.pid, signal.SIGKILL)
+        text, _ = process.communicate()
+        code, text = 124, (text or "") + f"\nTIMED OUT after {timeout} s: the run's whole process group was ended\n"
+    LOG.write(f"\n$ {' '.join(command)}\n{text}\n[exit {code}]\n"); LOG.flush()
+    return code, text
 
-def vitest(package, *files): return ("VITEST", package, files)
+def vitest(package, *files, timeout=None): return ("VITEST", package, files, timeout)
 def page_build(production): return ("node", f"{ROOT}/packages/client/scripts/build.mjs", *(["--production"] if production else []), "--out-dir", PROD_PLANT if production else DEV_PLANT)
 def chromium(*specs): return ("node", f"{ROOT}/node_modules/@playwright/test/cli.js", "test", "-c", f"{ROOT}/packages/e2e/playwright.config.ts", "--project=chromium", "--workers=1", "--retries=0", "--trace", "off", "--reporter=list", *specs)
 BROWSER_ENV = dict(ENV, SHAMBLE_DIST=DEV_PLANT, SHAMBLE_CHROMIUM="/opt/pw-browsers/chromium")
@@ -133,7 +141,59 @@ PLANTS = [
     ("E4", "defect", "the inventory called outside the build flag: development code in the players' file",
      [(PICTURE, "      return __SHAMBLE_DEVTOOLS__ ? readInventory(floor) : null;", "      return readInventory(floor);")],
      page_build(True), ["development code in a production build", "the scene inventory met an object it does not know"]),
-    ("C1", "control", "the clean tree: the page's reading and scene tests", [], vitest("client", "src/app/content.test.ts", "src/app/content-map.test.mjs", "src/render/scene.test.ts", "src/overlay/report.test.ts"), []),
+    # The fix pass after step S's review round (2026-11-28; `review-s-round.md`): each new test shown red on its defect.
+    ("F1", "defect", "the overview's search with no limit (GE-F1): at aspect 0 it never ends, so the run hangs until its outer timeout",
+     [(SCENE, "    if (doubled === MOST_DOUBLINGS) return null;\n", "")],
+     vitest("client", "src/render/scene.test.ts", timeout=90), ["TIMED OUT"]),
+    ("F2", "defect", "the framing without its no-view check (TE-7)",
+     [(SCENE, "  if (view === null) return false;\n", "")],
+     SCENE_TESTS, ["the camera takes the overview"]),
+    ("F3", "defect", "the far plane left at 500 m whatever the distance (TE-7)",
+     [(SCENE, "  camera.far = Math.max(500, 4 * camera.position.distanceTo(new THREE.Vector3(...view.target)));", "  camera.far = 500;")],
+     SCENE_TESTS, ["the camera takes the overview"]),
+    ("F4", "defect", "every floor piece facing down, unseen from above (TE-1)",
+     [(SCENE, "  const positions = [x0, y, z0, x0, y, z1, x1, y, z1, x0, y, z0, x1, y, z1, x1, y, z0];", "  const positions = [x0, y, z0, x1, y, z1, x0, y, z1, x0, y, z0, x1, y, z0, x1, y, z1];")],
+     SCENE_TESTS, ["the ground and each patch lie flat"]),
+    ("F5", "defect", "the ground drawn at y 0, not at the bounds' bottom (G-3)",
+     [(SCENE, '  floor.add(mark(new THREE.Mesh(floorQuad(minX, minZ, maxX, maxZ, floorY), material(MAP_GROUND, 2)), "ground", "ground"));', '  floor.add(mark(new THREE.Mesh(floorQuad(minX, minZ, maxX, maxZ, 0), material(MAP_GROUND, 2)), "ground", "ground"));')],
+     SCENE_TESTS, ["the ground and each patch lie flat"]),
+    ("F6", "defect", "each patch over half its depth (TE-1)",
+     [(SCENE, "  const [x1, z1] = region.max;", "  const [x1, z1full] = region.max;\n  const z1 = (z0 + z1full) / 2;")],
+     SCENE_TESTS, ["the ground and each patch lie flat"]),
+    ("F7", "defect", "the map's ground the empty floor's 30 m, not its bounds (TE-1)",
+     [(SCENE, '  floor.add(mark(new THREE.Mesh(floorQuad(minX, minZ, maxX, maxZ, floorY), material(MAP_GROUND, 2)), "ground", "ground"));', '  floor.add(mark(new THREE.Mesh(floorQuad(-15, -15, 15, 15, floorY), material(MAP_GROUND, 2)), "ground", "ground"));')],
+     SCENE_TESTS, ["the ground and each patch lie flat"]),
+    ("F8", "defect", "a box's floor drawn as one triangle twice, which keeps the volume (TE-2, GE-F5)",
+     [(SCENE, "      [0, 1, 2, 3],\n      [4, 5, 6, 7],", "      [0, 1, 2, 1],\n      [4, 5, 6, 7],")],
+     SCENE_TESTS, ["every triangle of every solid faces outward", "drawn 2 times"]),
+    ("F9", "defect", "the grid's lines along z starting at z 0 (TE-4)",
+     [(SCENE, "  for (let x = Math.ceil(minX); x <= maxX; x += 1) points.push(x, y, minZ, x, y, maxZ);", "  for (let x = Math.ceil(minX); x <= maxX; x += 1) points.push(x, y, 0, x, y, maxZ);")],
+     SCENE_TESTS, ["the grid: one line per whole metre"]),
+    ("F10", "defect", "four greys in place of every level (TE-5)",
+     [(SCENE, "  const level = Math.round(BLOCK_LOW + share * (BLOCK_HIGH - BLOCK_LOW));", "  const level = Math.round(BLOCK_LOW + (Math.round(share * 3) / 3) * (BLOCK_HIGH - BLOCK_LOW));")],
+     SCENE_TESTS, ["the greys: neutral, a higher top never darker"]),
+    ("F11", "defect", "the camera ten times farther than fits (TE-3)",
+     [(SCENE, "  const position = target.clone().addScaledVector(VIEW_DIRECTION, far);", "  const position = target.clone().addScaledVector(VIEW_DIRECTION, far * 10);")],
+     SCENE_TESTS, ["the overview shows the whole floor at 16:9"]),
+    ("F12", "defect", "a copy through Object.assign before the key check drops an own __proto__ key (S-2)",
+     [(CONTENT, "  return Object.keys(object).length === keys.length && keys.every((key) => Object.hasOwn(object, key));", "  const copy = Object.assign({}, object);\n  return Object.keys(copy).length === keys.length && keys.every((key) => Object.hasOwn(copy, key));")],
+     READ_TESTS, ["an own key named __proto__"]),
+    ("F13", "defect", "the page's own refusal not remembered: the readout would say nothing was read (EA-5)",
+     [(CONTENT, "      this.#refused = true;\n", "")],
+     READ_TESTS, ["on the Worker's ready the page reads its copy once"]),
+    ("F14", "defect", "the readout's words for the page's refusal missing (EA-5)",
+     [(REPORT, '  if (content === "refused") return "read and refused by the page, the notice says why";\n', "")],
+     vitest("client", "src/overlay/report.test.ts"), ["the content and the scene: each file with its own format and version"]),
+    ("F15", "defect", "a ground word the page knows and the loader does not (EA-3)",
+     [(CONTENT, 'export const MAP_GROUNDS = ["street", "grass"] as const;', 'export const MAP_GROUNDS = ["street", "grass", "water"] as const;')],
+     vitest("client", "src/app/content-ties.test.mjs"), ["the map's fixed words the page reads are the loader's own"]),
+    ("F16", "defect", "the inventory reading any material, not the floor's own (EA-4)",
+     [(INVENTORY, " || !(object.material instanceof THREE.MeshStandardNodeMaterial)", "")],
+     SCENE_TESTS, ["the inventory reads what is drawn, not the map"]),
+    ("F17", "defect", "the +z ramps' tops on the -z side: the browser's every-corner compare (TE-6)",
+     [(SCENE, '    case "+z":\n      return [...floor, [x0, y1, z1], [x1, y1, z1]];', '    case "+z":\n      return [...floor, [x0, y1, z0], [x1, y1, z0]];')],
+     browser(SKELETON, "-g", "the first page on the default backend"), ["the first page on the default backend", "street_house_a_roof_north"]),
+    ("C1", "control", "the clean tree: the page's reading and scene tests", [], vitest("client", "src/app/content.test.ts", "src/app/content-map.test.mjs", "src/app/content-ties.test.mjs", "src/render/scene.test.ts", "src/overlay/report.test.ts"), []),
     ("C2", "control", "the clean tree: a development page built and its first page shown on the default backend", [], browser(SKELETON, "-g", "the first page on the default backend"), []),
     ("C3", "control", "the clean tree: the production page with its marker check", [], page_build(True), []),
 ]
@@ -147,8 +207,8 @@ def digest(path): return hashlib.sha256(open(path, "rb").read()).hexdigest() if 
 
 def execute(command):
     if command[0] == "VITEST":
-        _, package, files = command
-        return run("node", f"{ROOT}/node_modules/vitest/vitest.mjs", "run", *files, cwd=f"{ROOT}/packages/{package}")
+        _, package, files, timeout = command
+        return run("node", f"{ROOT}/node_modules/vitest/vitest.mjs", "run", *files, cwd=f"{ROOT}/packages/{package}", timeout=timeout)
     if command[0] == "CHAIN":
         code, text = 0, ""
         for env, part in command[1:]:
