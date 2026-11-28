@@ -66,7 +66,7 @@ write_files:
   - path: /etc/npt/commit
     permissions: '0644'
     content: |
-      0000000000000000000000000000000000000000
+      1ceecc321eaf194d59568fdab56644d1e9eb4f05
   - path: /etc/npt/role
     permissions: '0644'
     content: |
