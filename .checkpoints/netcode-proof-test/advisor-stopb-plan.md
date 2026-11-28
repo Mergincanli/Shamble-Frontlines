@@ -954,4 +954,137 @@ the Status line. File writes by the Edit tool only, which his item 7 allows; no 
 
 Status: COMPLETE 2026-11-28 12:08 UTC
 
+## nbg1 plan read
+Plan: launch-nbg1-read.md is the whole brief; nbg1-plan.md DRAFT 0.1 is the plan; his 18:33 "Continue" is at
+history.md:8274-8288. Then, by X's SHA (the spike is unchanged since X), one git call each:
+- a case-blind `git grep` for fsn1, then nbg1, location, Falkenstein and Nuremberg, over spikes/netcode-proof;
+- the cloud-init files, ops/firewall/, ops/operator/, npt-cert, r1.sh's location uses and R1.md's Once list;
+- the judge's location rule (figures.rs:939-950), and marks.json's fsn1 lines, to see whether any is a check rather
+  than a note.
+
+Then the dry run's logs (.gate/nbg1/) with Read and Grep. Then items 1-6 in turn, the verdict, Decisions needed, For
+Mustafa and the Status line. Edit tool only, for this file; no spikes/ edit; no GitHub writes.
+
+### Notes (one line per check)
+- launch-nbg1-read.md (Read whole): six items to judge. nbg1-plan.md (Read whole, 66 lines): five lines in three files;
+  "Left as they are"; a four-step chain; the held question; the dry run. history.md:8274-8288: his "Continue", which
+  answers no cut and picks no location (the main session's reading).
+- `git grep -n -i -e fsn1 -e nbg1 -e falkenstein -e nuremberg -e nürnberg 6e623788 -- spikes/netcode-proof
+  ":(exclude)…/judge/fixtures"`:
+  - test data: load_tests.rs:16, engine.rs:92, log lib.rs:815 and :825;
+  - marks.json:11310 and :11369 (both `"notes"`);
+  - R1.md:63, :114, :135;
+  - r1.sh:34;
+  - r1sh.test.mjs:199;
+  - wrappers.test.sh:132.
+  - That is exactly the plan's set: its five lines plus its "Left as they are" list. Nothing else names a location.
+- `git grep -n -i -e location -e datacenter -e fsn -e nbg 6e623788 --` cloud-init, firewall, operator, sbin, systemd
+  and browser:
+  - config.mjs:149 (the laptop's `location: "home"`);
+  - three package-lock integrity strings (base64 noise);
+  - npt-lib.sh:197 and :227, the machine_location field r1.sh fills.
+  - No location in rs.yaml, lg.yaml, ops/firewall/, PROMPT-R1.md, settings.json, rules.md or npt-cert.
+- r1.sh's uses (grep): only :34 (the fill), :265 (RS's npt-super header) and :327 (LG's npt-load settings). Both are
+  labels.
+- The judge: figures.rs:938-953 (Read). machine_named asks only that location is "not empty", beside the other header
+  texts.
+- marks.json's six "location" hits (Grep -o):
+  - :7313, :12129, :12147, :12164 are "allocation" text;
+  - :11259 is the check name "RS named: type, location, …";
+  - :11314 is the title "The round trip to the test servers' location".
+  - No check selects or compares the value fsn1. fsn1 appears only in the two notes.
+- R1.md:58-67 (Read): the Once list's step 3 creates the Primary IPv4s, the `A` record and the firewall objects
+  "there", in whichever location is confirmed. Step 2's Limits tab is per project. R1.md:135 binds the kept addresses
+  to `fsn1` by name, and the plan changes that line.
+- The dry run's logs (Read and Grep):
+  - t0-base.log: `# tests 23`, `# pass 23`, `# fail 0`.
+  - t1-red.log: 22 of 23. "not ok 3 - item 5: npt-load's settings carry …" (test at :184), with the actual `location:
+    'nbg1'` against the expected `'fsn1'`, at r1sh.test.mjs:199:12.
+  - t2-green.log: 23 of 23.
+  - dry-counted.log: self 88 of 88; ops 104 of 104 with "315 ok, 0 failed"; redact 464 items, 0 findings; refs 2245.
+    It was run in the worktree, so it has no main-run.sh header.
+  - dry-show.txt: "HEAD 6e623788…", numstat R1.md `3 3`, r1.sh `1 1`, r1sh.test.mjs `1 1`, "diff sha256 f75d8e48…
+    (5557 bytes)", status of the three files M.
+  - npm-ci.log: "added 167 packages".
+  - nbg1-dry.mjs:53-55 hashes `git diff HEAD -- spikes/netcode-proof`, the same text main-run.sh:42 hashes from the
+    spike folder.
+- D4's rendered read (stopb-plan.md :185-191, read at the X head read): CAX21's row lists NBG1 and HEL1; CCX23's lists
+  NBG1, HEL1, HIL1, ASH1 and SIN1; no price figure rendered.
+
+### Items 1-6
+- **1. Completeness: yes, for R1's day.**
+  - The five lines are every place R1's files bind to the location. The grep finds nothing else in ops/.
+  - Nothing in rs.yaml, lg.yaml, the firewall lists, PROMPT-R1.md, settings.json, rules.md or npt-cert names one.
+  - r1.sh uses LOCATION only as a label, and the judge asks only that it is non-empty.
+  - What the location binds besides files is the console's: the two Primary IPv4s (location-bound), and so the `A`
+    record's target and the addresses typed into fw-rs and fw-lg. R1.md:64-67 already creates those "there", in the
+    chosen location, and the plan's step 4 tells him.
+  - One assumption to make explicit (NB-3): R1.md:63's "at the same prices". D4 read no figure, so his create form's
+    nbg1 prices are the read. If they differ, u8-brief.md 6.3's cap is re-summed before his OK.
+- **2. Y = N with no list commit: sound.**
+  - N changes r1.sh, r1sh.test.mjs and R1.md. None is a dist input: build.mjs reads no ops/ path and no git state, and
+    STOPB-8's leak is closed by the cargo base outside every repository.
+  - Y′'s list is already in N's tree.
+  - Its bar replaces C1's "Y0..Y the list alone": `git diff --name-only 1ceecc32 N -- spikes/netcode-proof` prints
+    exactly the three files. Then both builds at N are cmp-equal to the committed non-comment lines.
+  - Two builds are more than my Q5 trigger (1) asked (build 2 redone at the new Y). They are accepted: about three
+    minutes each, and they repeat the two-path proof at the commit that will run.
+- **3. The bars: as strong as C1-D3 and the Y′ lines, with three additions (conditions below).**
+  - The dry run's diff sha256 as N's bar is right. N's spike is X's (no spike commit since), so the same five lines give
+    the same blobs and the same `git diff HEAD -- spikes/netcode-proof` text (nbg1-dry.mjs:54 hashes exactly that),
+    which main-run.sh's diff line prints.
+  - X″'s fetch of both raw links (200, equal to `git show X″:`) is a bar X itself did not have. Good.
+- **4. "Left as they are": they may stay, named in R1's report as stale words.**
+  - marks.json's two notes: no check reads them, and a marks.json edit would need its own reviewer's read
+    (C62H-REVIEW) for no change in any verdict.
+  - The test data: no run reads it.
+  - The ADR and SPIKE_PLAN lines: decision docs that record his 2026-11-03 answer. This lane edits none. His nbg1 pick
+    is his own word, recorded in history.md and, by the docs lane, in DECISIONS.md.
+  - No edit and no other word of his is needed before R1.
+- **5. The held question: keep it held, but write its options and costs now.** If his look reports it, the answer is
+  then one message away, while he is away until Sunday 12:00. Its wording is fine. The options:
+  - (a) R1 waits for CAX21 capacity, day by day; R2, R3, R5 and the close move with it.
+  - (b) LG on an x86 type in RS's location.
+    - lg.yaml's aarch64 rustup archive and its pinned sha256 change (lg.yaml:137-138), and so does r1sh.test.mjs:199's
+      `plan: "CAX21"`. That is a server file, so a new Y, two builds and a new X.
+    - R1.md's LG rows and the cap are re-summed at that type's price.
+    - A new plan, with its own check.
+  - (c) Both servers in another location that offers both types (D4's rows list HEL1 for both). That is the nbg1 chain
+    with another name, plus his addresses made there. His home path (-36, the ping) is read farther away; those are
+    rough readings that judge nothing. R1.md:63 names only nbg1, so a third location is his word.
+  - A lean, conditional and labelled as such: (c) if his look finds both types offered somewhere at the listed prices,
+    since it is labels only; else (a) for up to two days, then (b). Final once his look and the prices are read.
+- **6. The dry run's logs hold.**
+  - Red first: one failure, the pin, at :199:12, `nbg1` against `fsn1`. Green with the pin.
+  - The counted set passes 4 of 4 with the base counts.
+  - The numstat and the hash are printed, at HEAD 6e623788.
+  - Not shown in a log: the undo and the worktree's removal. The plan's word, and nothing depends on them. Its counted
+    log lacks main-run.sh's header, since it ran directly in the worktree; dry-show.txt carries HEAD and the hash.
+
+### Verdict
+**APPROVE WITH CONDITIONS** (all Low). It runs only on his nbg1 word, as the plan says.
+- **NB-1:**
+  - Each build log prints `git rev-parse HEAD` from inside its worktree at the top (YPH-1).
+  - N's location grep is repeated at N: `git grep -n -i fsn1 N -- spikes/netcode-proof/ops` shows only r1.sh:34's
+    comment, R1.md:63's procedure and wrappers.test.sh:132.
+- **NB-2:**
+  - X″'s bars add the kit compare (`git diff --name-only X″ origin/main -- CLAUDE.md .claude .github` empty) and main's
+    tip (A4).
+  - My head read covers N, both builds and X″ in one read, before the two links go to him.
+- **NB-3:** his create form's nbg1 prices are recorded. If they differ from the listed ones, the cap is re-summed before
+  his OK.
+- **NB-4:** the held question carries item 5's options and costs and the conditional lean, kept held until his look
+  reports it.
+
+### Decisions needed
+- None now.
+- If his look shows fsn1 cannot host both servers, "nbg1" is his pick, already asked in Stop B's message (For Mustafa
+  2). The held question goes only if no location offers CAX21, with item 5's options and lean.
+
+### For Mustafa
+- Nothing to act on.
+
+Status: COMPLETE 2026-11-28 18:57 UTC
+
+
 

@@ -214,6 +214,17 @@ going; free disk; usage read.
   a hidden tooltip: not confirmed). FSN1, which R1.md plans for both VMs, is not listed in either row. Not concluded:
   his Hetzner console decides at Stop B (u8-report.md:68-69's "fsn1 stock" day-of read); it goes into his Stop B
   message as an early warning, with the price figures still to read.
+  **Fourth read 18:55 UTC on 11-28, the method that works** (stopb-prices.mjs; .gate/stopb/hz-read5.json; the two
+  answers also saved whole, hz-api-ccx23.json sha256 5a1dea06…, hz-api-cax21.json 8eec593f…): each row's own
+  `product-key` (CCX23 `CLOUD_148+CLOUD_21`, CAX21 `CLOUD_112+CLOUD_21`) and the page's own price-service answers for
+  it (website-price-api.hetzner.com/api/v1/products/<key>); the figures sit in a web component that the row's innerText
+  does not show, hence the three empty reads. CCX23 EUR 0.1386 an hour (86.49 a month) in FSN1 and NBG1; CAX21 EUR
+  0.0176 (10.99 a month) in FSN1, NBG1 and HEL1: equal to R1.md:127-128's figures, so the planned 0.62 and the cap 0.80
+  stand, and nbg1's prices equal fsn1's (R1.md:63). Locations not concluded: the price service marks FSN1 active for
+  both, but the pages' own lists and detail prices name no FSN1 (CCX23: NBG1, HEL1, HIL1, ASH1, SIN1; CAX21: NBG1,
+  HEL1) and CAX21 keeps its "not available" label; his create form decides. Tuesday's one-shot (step 3) runs
+  `node /home/user/Shamble-Frontlines/.checkpoints/netcode-proof-test/stopb-prices.mjs
+  /home/user/Shamble-Frontlines/.gate/stopb/hz-read-tue.json` and compares with this read.
 
 ## E. Review and the message
 - **E1:** B6's head reads, not rounds: Y0 with Y (notes, stand-ins and red logs, the closing-list edit, both builds'
