@@ -860,3 +860,13 @@ the build goes on. A head that goes to the advisor agent needs a green run.
 Its item 10's thirteen points stand as section H's table, with his answers on (1) BODY-SHAPE, (3) SWEEP-ROUTE and
 (6) the slope now in; the asks: APPROVE or REVISE steps 1 to 7 as revised here; the rung (I1); and the order inside
 4c-2 (its item 7's six conditions, now that SIZE-4C is answered and 4c-2 sits on top of 4c-1's final head).
+**Added 2026-11-28, 14:15 Amsterdam (the advisor tool's check of 14:05; the time first written as "14:20" without
+reading the clock, corrected from it):** (a) step 1's design is rust-reviewer's
+block 11 with block 12 (`rust-reviewer-read.md`: the tick's order, the 60-byte row, every rule, `Rules::take`'s 28
+fields, exp and sincos with the batch, the symbols by file, 25 tests each with its plant, about 1,510 / 1,840);
+(b) **HEADROOM-FEET's switch default, asked explicitly:** block 11 has it at (a), a difference from his sandbox he
+has not answered; **this chat proposes (b), his sandbox's rule, until he answers** (his MOVE-RULES (a) "all rows, as
+the game's starting rules"; his FALL-STEP (c) "The game does what my sandbox does"), with both ways tested (block
+11's test 15); (c) the swept wall pass goes to him as information, not a question (game-designer's block 8), and
+4c-2's report shows it with PM-0004-20's and PM-0004-35's old and new wording side by side (his DEPART-4C (a));
+(d) the ridge's one-tick hold: a STATUS follow-up (rust-reviewer's block 12), not built.
