@@ -32,7 +32,7 @@ export interface Report {
     maxTicksInOneWake: number;
     crossOriginIsolated: boolean;
   } | null;
-  content: "holding" | "none" | { path: string; format: string; version: number }[];
+  content: "holding" | "none" | "refused" | { path: string; format: string; version: number }[];
   scene: { map: string; boxes: number; ramps: number; regions: number } | null;
 }
 

@@ -182,7 +182,7 @@ export function greyOf(top: number, lowest: number, tallest: number): number {
   return level * 0x010101;
 }
 
-/** A patch of ground's grey by its kind (his STREET-GREY, default (b): two neutral greys, both darker than every block). */
+/** A patch of ground's grey by its kind (his STREET-GREY (b), 2026-11-28: two neutral greys, both darker than every block). */
 export function groundGrey(kind: Ground): number {
   return PATCH_GREYS[kind];
 }
@@ -253,13 +253,22 @@ export function disposeFloor(floor: Floor): void {
 /** The camera's way of looking: today's, from the side and above at the same angle, at the floor's middle. */
 const VIEW_DIRECTION = new THREE.Vector3(0, 14, 16).normalize();
 /** How far into the picture's edges the floor's corners may come, as a share of the half-width (and half-height). */
-const VIEW_MARGIN = 0.92;
+export const VIEW_MARGIN = 0.92;
+/**
+ * The most times the overview's search doubles its distance: 2^19 m, about 524 km, still inside its probe camera's far
+ * plane of 1e6 m. A floor that does not fit by then is not framed: a window with no width, or a few pixels against
+ * thousands (step S's review, GE-F1: with no limit the search never ended at an aspect of 0 or NaN, and the page froze).
+ */
+const MOST_DOUBLINGS = 19;
+
+/** Where the overview puts the camera, or `null` when the floor cannot be framed at this aspect. */
+export type Overview = { position: [number, number, number]; target: [number, number, number] } | null;
 
 /**
  * Where the camera stands to show the whole map: on today's line of sight to the floor's middle, as near as lets the
  * floor's four corners lie inside the picture at this aspect. Every grid line then lies in front of the camera.
  */
-export function overview(bounds: Bounds, aspect: number, fovDeg = 50): { position: [number, number, number]; target: [number, number, number] } {
+export function overview(bounds: Bounds, aspect: number, fovDeg = 50): Overview {
   const [minX, y, minZ] = bounds.min;
   const [maxX, , maxZ] = bounds.max;
   const target = new THREE.Vector3((minX + maxX) / 2, y, (minZ + maxZ) / 2);
@@ -280,10 +289,14 @@ export function overview(bounds: Bounds, aspect: number, fovDeg = 50): { positio
       return Math.abs(projected.x) <= VIEW_MARGIN && Math.abs(projected.y) <= VIEW_MARGIN && projected.z < 1;
     });
   };
-  // The nearest distance that fits, by halving: a fixed number of steps, so the same bounds give the same camera.
+  // A distance that fits, by doubling at most MOST_DOUBLINGS times; then the nearest one, by halving: a fixed number of
+  // steps, so the same bounds give the same camera.
   let near = 0;
   let far = 1;
-  while (!fits(far)) far *= 2;
+  for (let doubled = 0; !fits(far); doubled += 1) {
+    if (doubled === MOST_DOUBLINGS) return null;
+    far *= 2;
+  }
   for (let step = 0; step < 40; step += 1) {
     const middle = (near + far) / 2;
     if (fits(middle)) far = middle;
@@ -291,4 +304,19 @@ export function overview(bounds: Bounds, aspect: number, fovDeg = 50): { positio
   }
   const position = target.clone().addScaledVector(VIEW_DIRECTION, far);
   return { position: [position.x, position.y, position.z], target: [target.x, target.y, target.z] };
+}
+
+/**
+ * Puts the camera at the overview of these bounds, at its own aspect and field of view, with its far plane well
+ * beyond the floor's middle. When the floor cannot be framed at this aspect the camera is left as it is, and `false`
+ * says so: the picture draws on, and the next resize frames it again.
+ */
+export function frameCamera(camera: THREE.PerspectiveCamera, bounds: Bounds): boolean {
+  const view = overview(bounds, camera.aspect, camera.fov);
+  if (view === null) return false;
+  camera.position.set(...view.position);
+  camera.lookAt(...view.target);
+  camera.far = Math.max(500, 4 * camera.position.distanceTo(new THREE.Vector3(...view.target)));
+  camera.updateProjectionMatrix();
+  return true;
 }

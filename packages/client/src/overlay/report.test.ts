@@ -139,6 +139,8 @@ test("the content and the scene: each file with its own format and version, the 
   expect(mixed[0]).toBe("content: maps/test-scene.json shamble-map 1 · movement/soldier.json shamble-movement 2");
   expect(lines({ content: "holding", scene: null })).toEqual(["content: waiting for the loader", "scene: empty"]);
   expect(lines({ content: "none", scene: null })).toEqual(["content: not read, the match stopped first", "scene: empty"]);
+  // The page's own refusal reads as such, as the notice says it (step S's review, EA-5), not as nothing read.
+  expect(lines({ content: "refused", scene: null })).toEqual(["content: read and refused by the page, the notice says why", "scene: empty"]);
   // The copy report holds the same, one named value per line.
   const report = formatReport(DATA).split("\n");
   for (const expected of [
@@ -154,6 +156,7 @@ test("the content and the scene: each file with its own format and version, the 
   const empty = formatReport({ ...DATA, content: "none", scene: null }).split("\n");
   expect(empty).toContain("content: none");
   expect(empty).toContain("scene: (empty)");
+  expect(formatReport({ ...DATA, content: "refused", scene: null }).split("\n")).toContain("content: refused");
 });
 
 test("a value that rounds to zero prints as zero, never with a minus sign", () => {

@@ -10,7 +10,9 @@ import type { Floor } from "./scene.ts";
 /** Said when the floor holds an object the inventory does not know: the floor and this reader have drifted apart. */
 export const INVENTORY_UNKNOWN = "the scene inventory met an object it does not know";
 
-const KINDS: readonly string[] = ["ground", "box", "ramp", "region"];
+/** The kinds an inventory reports: each one `SceneObject`'s own (step S's review, EA-4), so no other crosses the interface. */
+const KINDS = ["ground", "box", "ramp", "region"] as const satisfies readonly SceneObject["kind"][];
+const isKind = (kind: unknown): kind is SceneObject["kind"] => typeof kind === "string" && (KINDS as readonly string[]).includes(kind);
 
 /** The floor's drawn objects, but for its grid, in the floor's order. */
 export function readInventory(floor: Floor): SceneObject[] {
@@ -20,7 +22,7 @@ export function readInventory(floor: Floor): SceneObject[] {
   for (const object of floor.children) {
     const kind: unknown = object.userData["kind"];
     if (kind === "grid" && object instanceof THREE.LineSegments) continue;
-    if (!(object instanceof THREE.Mesh) || typeof kind !== "string" || !KINDS.includes(kind)) throw new Error(INVENTORY_UNKNOWN);
+    if (!(object instanceof THREE.Mesh) || !isKind(kind) || !(object.material instanceof THREE.MeshStandardNodeMaterial)) throw new Error(INVENTORY_UNKNOWN);
     const position = object.geometry.getAttribute("position");
     const seen = new Map<string, [number, number, number]>();
     for (let i = 0; i < position.count; i += 1) {
@@ -28,8 +30,7 @@ export function readInventory(floor: Floor): SceneObject[] {
       seen.set(`${point.x},${point.y},${point.z}`, [point.x, point.y, point.z]);
     }
     const points = [...seen.values()].sort((a, b) => a[0] - b[0] || a[1] - b[1] || a[2] - b[2]);
-    const material = object.material as THREE.MeshStandardNodeMaterial;
-    objects.push({ id: object.name, kind: kind as SceneObject["kind"], points, grey: material.color.getHex() });
+    objects.push({ id: object.name, kind, points, grey: object.material.color.getHex() });
   }
   return objects;
 }

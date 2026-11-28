@@ -208,21 +208,24 @@ test("however the match ends before the Worker's ready, the page lets its copy o
   expect(refused.content.holding).toBe(true);
   const said = "the content is refused: a key that is not a field of this kind";
   expect(takeWorkerMessage(refused.link, refused.content, { data: { type: "error", message: said } })).toBe(said);
-  expect([refused.content.holding, refused.readings.length, refused.delivered.length]).toEqual([false, 0, 0]);
+  // Never read, so not refused by the page: the readout says nothing was read (step S's review, EA-5).
+  expect([refused.content.holding, refused.readings.length, refused.delivered.length, refused.content.refused]).toEqual([false, 0, 0, false]);
   // The Worker's own error event (a script that did not load): the same.
   const failed = await wired();
   expect(takeWorkerError(failed.link, failed.content, undefined)).toBe("the Worker failed");
-  expect([failed.content.holding, failed.readings.length, failed.delivered.length]).toEqual([false, 0, 0]);
+  expect([failed.content.holding, failed.readings.length, failed.delivered.length, failed.content.refused]).toEqual([false, 0, 0, false]);
   // A message the page does not know.
   const unknown = await wired();
   expect(takeWorkerMessage(unknown.link, unknown.content, { data: { type: "surprise" } })).toBe("the Worker sent a message the page does not know");
-  expect([unknown.content.holding, unknown.delivered.length]).toEqual([false, 0]);
+  expect([unknown.content.holding, unknown.delivered.length, unknown.content.refused]).toEqual([false, 0, false]);
 });
 
 test("on the Worker's ready the page reads its copy once and lets it go; a copy that reads as no bundle ends the match", async () => {
   const ready = await wired();
   expect(takeWorkerMessage(ready.link, ready.content, { data: { type: "ready", blockBytes: 44, tickHz: 30 } })).toBe("");
   expect([ready.content.holding, ready.readings.length, ready.delivered.length, ready.link.failure]).toEqual([false, 1, 1, ""]);
+  // Read and delivered: not refused (step S's review, EA-5: the readout tells the page's own refusal apart).
+  expect(ready.content.refused).toBe(false);
   // Later messages read and deliver nothing again.
   takeWorkerMessage(ready.link, ready.content, { data: { type: "ready", blockBytes: 44, tickHz: 30 } });
   expect([ready.readings.length, ready.delivered.length]).toEqual([1, 1]);
@@ -232,14 +235,14 @@ test("on the Worker's ready the page reads its copy once and lets it go; a copy 
   if (!fetched.ok) throw new Error(fetched.problem);
   content.start(fetched.value, link, 0);
   expect(takeWorkerMessage(link, content, { data: { type: "ready", blockBytes: 44, tickHz: 30 } })).toBe(NOT_A_BUNDLE);
-  expect([content.holding, link.failure]).toEqual([false, NOT_A_BUNDLE]);
+  expect([content.holding, link.failure, content.refused]).toEqual([false, NOT_A_BUNDLE, true]);
   // A bundle whose map does not read: the match ends in the map's fixed words, and nothing is delivered.
   const noMap = started(() => Promise.resolve(new Response(encode(bundleOf([{ path: "movement/soldier.json", text: MOVEMENT_TEXT }])))));
   const noMapFetched = await fetchContent(noMap.fetchOnce);
   if (!noMapFetched.ok) throw new Error(noMapFetched.problem);
   noMap.content.start(noMapFetched.value, noMap.link, 0);
   expect(takeWorkerMessage(noMap.link, noMap.content, { data: { type: "ready", blockBytes: 44, tickHz: 30 } })).toBe(NOT_THE_MAP);
-  expect([noMap.content.holding, noMap.delivered.length, noMap.link.failure]).toEqual([false, 0, NOT_THE_MAP]);
+  expect([noMap.content.holding, noMap.delivered.length, noMap.link.failure, noMap.content.refused]).toEqual([false, 0, NOT_THE_MAP, true]);
 });
 
 test("the map reads field by field from own properties into the generated type, every object kind", () => {
@@ -266,6 +269,31 @@ test("one key more in any object of the map gives the map's fixed sentence", () 
   const less = tree();
   delete less["regions"];
   expect(readMap(less)).toEqual({ ok: false, problem: NOT_THE_MAP });
+});
+
+test("an own key named __proto__, as JSON.parse makes one, is one key more in any object of the map (step S's review, S-2)", () => {
+  // An own field named `__proto__` sets no prototype: a copy through Object.assign would drop it unseen, the key check
+  // must not.
+  const ownProto = (target: Record<string, unknown>): void => {
+    Object.defineProperty(target, "__proto__", { value: { extra: 1 }, enumerable: true, configurable: true, writable: true });
+  };
+  const at: ((map: Record<string, unknown>) => Record<string, unknown>)[] = [
+    (map) => map,
+    (map) => map["bounds"] as Record<string, unknown>,
+    (map) => (map["spawns"] as Record<string, unknown>[])[0]!,
+    (map) => (map["shapes"] as Record<string, unknown>[])[0]!,
+    (map) => (map["shapes"] as Record<string, unknown>[])[1]!,
+    (map) => (map["regions"] as Record<string, unknown>[])[0]!,
+  ];
+  for (const pick of at) {
+    const map = tree();
+    ownProto(pick(map));
+    expect(readMap(map)).toEqual({ ok: false, problem: NOT_THE_MAP });
+  }
+  // From the text, as JSON.parse makes it: the same.
+  const parsed: unknown = JSON.parse(`{"__proto__": {"extra": 1}, ${JSON.stringify(MAP).slice(1)}`);
+  expect(Object.hasOwn(parsed as object, "__proto__")).toBe(true);
+  expect(readMap(parsed)).toEqual({ ok: false, problem: NOT_THE_MAP });
 });
 
 test("a member of the wrong kind gives the map's fixed sentence", () => {

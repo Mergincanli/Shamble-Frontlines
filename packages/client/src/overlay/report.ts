@@ -9,8 +9,11 @@ export interface ContentFileRow {
   readonly version: number;
 }
 
-/** The page's content: its copy still held for the loader's answer, let go unread (the match ended first), or read. */
-export type ContentRows = "holding" | "none" | readonly ContentFileRow[];
+/**
+ * The page's content: its copy still held for the loader's answer, let go unread (the match ended first), read and
+ * refused by the page itself (the notice says why), or read.
+ */
+export type ContentRows = "holding" | "none" | "refused" | readonly ContentFileRow[];
 
 /** The drawn scene, counted once when the map was drawn: the map's id and its blocks and patches of ground. */
 export interface SceneRows {
@@ -77,6 +80,7 @@ export interface ReportData {
 function contentWords(content: ContentRows): string {
   if (content === "holding") return "waiting for the loader";
   if (content === "none") return "not read, the match stopped first";
+  if (content === "refused") return "read and refused by the page, the notice says why";
   return content.map(({ path, format, version }) => `${path} ${format} ${version}`).join(" · ");
 }
 

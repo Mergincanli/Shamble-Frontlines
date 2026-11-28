@@ -163,7 +163,7 @@ export async function boot(): Promise<void> {
       pauses: link.pauses,
       lastPause: link.lastPause,
       worker: link.stats,
-      content: delivered !== null ? delivered.files : content.holding ? "holding" : "none",
+      content: delivered !== null ? delivered.files : content.holding ? "holding" : content.refused ? "refused" : "none",
       scene: delivered?.scene ?? null,
     });
     const overlay = new Overlay(document.body, () => formatReport(data()));

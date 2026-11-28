@@ -7,13 +7,44 @@ import { drawn, needsBuild, open, report, scene, wasmCalls } from "./report.ts";
 const counts = JSON.parse(readFileSync(new URL("./render-counts.json", import.meta.url), "utf8")) as Record<string, Record<string, unknown>>;
 const baseline = counts["test-scene"] ?? {};
 
+type BuiltShape = { id: string; min: number[]; max: number[]; type: string; rises_toward?: string };
+type BuiltMap = {
+  id: string;
+  bounds: { min: number[]; max: number[] };
+  shapes: BuiltShape[];
+  regions: { id: string; min: number[]; max: number[] }[];
+};
+
 /** The local match's map as the build put it beside the page: the content bundle's file, parsed. */
-function builtMap(): { id: string; shapes: { id: string; min: number[]; max: number[]; type: string }[]; regions: { id: string }[] } {
+function builtMap(): BuiltMap {
   const bundle = JSON.parse(readFileSync(path.join(needsBuild(), "content.json"), "utf8")) as { files: { path: string; text: string }[] };
   const file = bundle.files.find((entry) => entry.path === "maps/test-scene.json");
   if (file === undefined) throw new Error("the built bundle holds no test scene");
-  return JSON.parse(file.text) as ReturnType<typeof builtMap>;
+  return JSON.parse(file.text) as BuiltMap;
 }
+
+/**
+ * Where a solid's corners are, worked out here from the map's own numbers and not by the page's code (step S's review,
+ * TE-6): a box's eight; a ramp's floor's four and the two top corners on the side it rises toward. Rounded to f32 as
+ * drawn, distinct, in the inventory's order.
+ */
+function cornersOf(shape: BuiltShape): number[][] {
+  const three = (values: number[]): [number, number, number] => [Math.fround(values[0]!), Math.fround(values[1]!), Math.fround(values[2]!)];
+  const [x0, y0, z0] = three(shape.min);
+  const [x1, y1, z1] = three(shape.max);
+  const floor = [[x0, y0, z0], [x1, y0, z0], [x1, y0, z1], [x0, y0, z1]];
+  const tops: Record<string, number[][]> = {
+    box: [[x0, y1, z0], [x1, y1, z0], [x1, y1, z1], [x0, y1, z1]],
+    "+x": [[x1, y1, z0], [x1, y1, z1]],
+    "-x": [[x0, y1, z0], [x0, y1, z1]],
+    "+z": [[x0, y1, z1], [x1, y1, z1]],
+    "-z": [[x0, y1, z0], [x1, y1, z0]],
+  };
+  const top = tops[shape.type === "box" ? "box" : (shape.rises_toward ?? "")];
+  if (top === undefined) throw new Error(`${shape.id}: not a box or a ramp toward a side`);
+  return inOrder([...floor, ...top] as number[][]);
+}
+const inOrder = (points: number[][]): number[][] => [...points].sort((a, b) => a[0]! - b[0]! || a[1]! - b[1]! || a[2]! - b[2]!);
 
 test.beforeAll(() => void needsBuild());
 
@@ -59,11 +90,15 @@ for (const [name, query] of [["the default backend", ""], ["the forced WebGL 2 f
     const solids = objects.filter((object) => object.kind === "box" || object.kind === "ramp");
     expect(solids.map((object) => `${object.kind}:${object.id}`).sort()).toEqual(map.shapes.map((shape) => `${shape.type}:${shape.id}`).sort());
     expect(objects.filter((object) => object.kind === "region").map((object) => object.id).sort()).toEqual(map.regions.map((region) => region.id).sort());
-    for (const shape of map.shapes) {
-      const drawnShape = solids.find((object) => object.id === shape.id);
-      const xs = new Set(drawnShape?.points.map((point) => point[0]));
-      expect([...xs].sort((a, b) => a - b), shape.id).toEqual([Math.fround(shape.min[0]!), Math.fround(shape.max[0]!)]);
-      expect(Math.max(...(drawnShape?.points.map((point) => point[1]) ?? [])), shape.id).toBe(Math.fround(shape.max[1]!));
+    // Every corner of every solid where the map puts it (TE-6: x, y and z, the bottom too, and the side a ramp rises
+    // toward), and the ground and each patch flat at the bounds' bottom at their own corners.
+    for (const shape of map.shapes) expect(solids.find((object) => object.id === shape.id)?.points, shape.id).toEqual(cornersOf(shape));
+    const floorY = Math.fround(map.bounds.min[1]!);
+    const flat = (x0: number, z0: number, x1: number, z1: number): number[][] =>
+      inOrder([[x0, floorY, z0], [x0, floorY, z1], [x1, floorY, z0], [x1, floorY, z1]].map((point) => point.map(Math.fround)));
+    expect(objects.find((object) => object.kind === "ground")?.points, "ground").toEqual(flat(map.bounds.min[0]!, map.bounds.min[2]!, map.bounds.max[0]!, map.bounds.max[2]!));
+    for (const region of map.regions) {
+      expect(objects.find((object) => object.id === region.id)?.points, region.id).toEqual(flat(region.min[0]!, region.min[1]!, region.max[0]!, region.max[1]!));
     }
     const top = (id: string): number => map.shapes.find((shape) => shape.id === id)?.max[1] ?? 0;
     // A higher top is never darker (one grey level spans about 4 cm of height, so the yard's 0.55 m and 0.56 m steps

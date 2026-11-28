@@ -47,6 +47,14 @@ export const CONTENT_KINDS: ReadonlyMap<string, { readonly format: string; reado
   ["maps", { format: MAP_FORMAT, newest: MAP_VERSION }],
   ["movement", { format: MOVEMENT_FORMAT, newest: MOVEMENT_VERSION }],
 ]);
+/**
+ * The map's fixed words, as the loader reads them (crates/content/src/map.rs, `FORMS`, `TOWARDS`, `GROUNDS`; tied by
+ * `content-ties.test.mjs`, step S's review EA-3): a word the loader gains and the page lacks is caught there, not by a
+ * page that refuses every map with it.
+ */
+export const MAP_FORMS = ["box", "ramp"] as const;
+export const MAP_TOWARDS = ["+x", "-x", "+z", "-z"] as const;
+export const MAP_GROUNDS = ["street", "grass"] as const;
 
 /** A file of the bundle as the readout names it: its path, its kind's format and its version. */
 export interface ContentFile {
@@ -179,13 +187,13 @@ export function readMap(tree: unknown): Outcome<MapDocument> {
     const shapeId = text(own(entry, "id"));
     const min = corner(own(entry, "min"), 3);
     const max = corner(own(entry, "max"), 3);
-    const type = word(own(entry, "type"), ["box", "ramp"] as const);
+    const type = word(own(entry, "type"), MAP_FORMS);
     if (shapeId === null || min === null || max === null || type === null) return fault;
     if (type === "box") {
       if (!closed(entry, ["id", "min", "max", "type"])) return fault;
       shapes.push({ id: shapeId, min, max, type: "box" });
     } else {
-      const toward = word(own(entry, "rises_toward"), ["+x", "-x", "+z", "-z"] as const);
+      const toward = word(own(entry, "rises_toward"), MAP_TOWARDS);
       if (!closed(entry, ["id", "min", "max", "type", "rises_toward"]) || toward === null) return fault;
       shapes.push({ id: shapeId, min, max, type: "ramp", rises_toward: toward });
     }
@@ -193,7 +201,7 @@ export function readMap(tree: unknown): Outcome<MapDocument> {
   const regions: Region[] = [];
   for (const entry of regionTrees) {
     const regionId = text(own(entry, "id"));
-    const kind = word(own(entry, "kind"), ["street", "grass"] as const);
+    const kind = word(own(entry, "kind"), MAP_GROUNDS);
     const min = corner(own(entry, "min"), 2);
     const max = corner(own(entry, "max"), 2);
     if (!closed(entry, ["id", "kind", "min", "max"]) || regionId === null || kind === null || min === null || max === null) return fault;
@@ -277,6 +285,7 @@ export function takeWorkerError(link: MessageLink, content: PageContent, message
  */
 export class PageContent {
   #kept: Uint8Array | null = null;
+  #refused = false;
   readonly #deliver: (read: ReadContent) => void;
   readonly #read: (kept: Uint8Array) => Outcome<ReadContent>;
 
@@ -289,6 +298,14 @@ export class PageContent {
   /** Whether the page still holds its copy of the bundle: from the start to the Worker's first answer. */
   get holding(): boolean {
     return this.#kept !== null;
+  }
+
+  /**
+   * Whether the page read the bundle and refused it itself (the loader took it, the page's reading did not): the
+   * readout then says so, as the notice does, and not that nothing was read (step S's review, EA-5).
+   */
+  get refused(): boolean {
+    return this.#refused;
   }
 
   /** Starts the Worker on the fetched bundle: its bytes are transferred, and the page's copy stays here. */
@@ -308,7 +325,10 @@ export class PageContent {
     const kept = this.#kept;
     this.#kept = null;
     const read = this.#read(kept);
-    if (!read.ok) return read.problem;
+    if (!read.ok) {
+      this.#refused = true;
+      return read.problem;
+    }
     this.#deliver(read.value);
     return "";
   }

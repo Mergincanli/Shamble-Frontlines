@@ -1,7 +1,7 @@
 import * as THREE from "three/webgpu";
 import type { Picture, PictureInfo, RenderCounters } from "../picture.ts";
 import { readInventory } from "./inventory.ts";
-import { buildEmptyScene, buildMapFloor, disposeFloor, overview } from "./scene.ts";
+import { buildEmptyScene, buildMapFloor, disposeFloor, frameCamera } from "./scene.ts";
 
 // Written into the code by the build (vite.config.mjs, `define`): the literal `false` in a production build, which
 // cuts the development inventory out of it (the production scan checks that).
@@ -44,12 +44,8 @@ export function createThreePicture(): Picture {
   // The map's bounds as numbers, for the overview at each aspect: no reference to the document is kept.
   let framed: { min: [number, number, number]; max: [number, number, number] } | null = null;
   const frame = (): void => {
-    if (framed === null) return;
-    const view = overview(framed, camera.aspect, camera.fov);
-    camera.position.set(...view.position);
-    camera.lookAt(...view.target);
-    camera.far = Math.max(500, 4 * camera.position.distanceTo(new THREE.Vector3(...view.target)));
-    camera.updateProjectionMatrix();
+    // A floor that cannot be framed at this aspect leaves the camera as it is (scene.ts, `frameCamera`).
+    if (framed !== null) frameCamera(camera, framed);
   };
   let renderer: THREE.WebGPURenderer | null = null;
   return {
@@ -97,7 +93,8 @@ export function createThreePicture(): Picture {
     resize(width, height, devicePixelRatio): void {
       renderer?.setPixelRatio(Math.min(devicePixelRatio, MAX_PIXEL_RATIO));
       renderer?.setSize(width, height, false);
-      camera.aspect = width / Math.max(1, height);
+      // A window of no width is held at one pixel, as one of no height is: the aspect stays a positive number.
+      camera.aspect = Math.max(1, width) / Math.max(1, height);
       camera.updateProjectionMatrix();
       frame();
     },

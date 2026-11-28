@@ -4,7 +4,18 @@
 // module: the page's packages have no Node types.
 import { readFileSync } from "node:fs";
 import { expect, test } from "vitest";
-import { BUNDLE_FORMAT, BUNDLE_VERSION, CONTENT_KINDS, MAP_FORMAT, MAP_VERSION, MOVEMENT_FORMAT, MOVEMENT_VERSION } from "./content.ts";
+import {
+  BUNDLE_FORMAT,
+  BUNDLE_VERSION,
+  CONTENT_KINDS,
+  MAP_FORMAT,
+  MAP_FORMS,
+  MAP_GROUNDS,
+  MAP_TOWARDS,
+  MAP_VERSION,
+  MOVEMENT_FORMAT,
+  MOVEMENT_VERSION,
+} from "./content.ts";
 
 /** A Rust file of the content crate. */
 const rust = (file) => readFileSync(new URL(`../../../../crates/content/src/${file}`, import.meta.url), "utf8");
@@ -18,6 +29,19 @@ function formatOf(file) {
   expect(version, `VERSION in crates/content/src/${file}`).not.toBeNull();
   return [format?.[1], Number(version?.[1])];
 }
+
+/** One of the map's word lists in map.rs (`pub(crate) const NAME: [&str; n] = [...];`), as the loader reads it. */
+function wordsOf(name) {
+  const found = new RegExp(`^pub\\(crate\\) const ${name}: \\[&str; \\d+\\] = \\[([^\\]]*)\\];$`, "m").exec(rust("map.rs"));
+  expect(found, `${name} in crates/content/src/map.rs`).not.toBeNull();
+  return [...(found?.[1] ?? "").matchAll(/"([^"]+)"/g)].map((match) => match[1]);
+}
+
+test("the map's fixed words the page reads are the loader's own, in its order (step S's review, EA-3)", () => {
+  expect([...MAP_FORMS]).toEqual(wordsOf("FORMS"));
+  expect([...MAP_TOWARDS]).toEqual(wordsOf("TOWARDS"));
+  expect([...MAP_GROUNDS]).toEqual(wordsOf("GROUNDS"));
+});
 
 test("the bundle's format and version the page reads are the loader's own", () => {
   expect(formatOf("bundle.rs")).toEqual([BUNDLE_FORMAT, BUNDLE_VERSION]);
