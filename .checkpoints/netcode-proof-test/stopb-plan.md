@@ -133,6 +133,14 @@ going; free disk; usage read.
   nothing), so Y0 stands and X takes in no kit file. Build 1' ran on Y's tree (before MAIN-70), build 2' runs on Y'
   (after it): inside B6's ruling, and their equality also shows #79 is no dist input; if they differ, `producers` is read
   first (plain means main's root files are the suspect, not the commit leak), both lists go to B6, X stays blocked.
+- **Build 2' DONE 02:47:25 UTC on 11-28, EQUAL** at Y' (worktree .gate/stopb-b at 1ceecc32, detached; cargo base
+  scratchpad/npt-dist-b; log .gate/stopb/build2p.log, list .gate/stopb/build2p-dist.sha256; exit 0, 02:45:57-02:47:25):
+  git fails in the cargo base and in wasm-bindgen-shared-0.2.130's registry folder (both "ok" lines); 11 GIT_ names
+  printed and unset; `producers: wasm-bindgen 0.2.130`; wasm-bindgen-cli built fresh (1m 15s), the client crates from
+  the worktree's own path (182 Compiling lines; build.mjs "measured dist, 7 files"); `cmp` build1p-dist.sha256 with
+  build2p-dist.sha256: exit 0; `cmp` of Y''s committed non-comment lines (`git show 1ceecc32:...`) with
+  build2p-dist.sha256: exit 0. Build 1' ran at Y (652e9513, before MAIN-70) and build 2' at Y' (after it): equal, so
+  neither the commit nor #79 is a dist input. Free after 5,846 MiB. STOPB-8 resolved by the method, for B6's read.
 - **Y DONE (void, STOPB-8): 652e9513ce2c1369d8d6146e84109feadf021a55** (22:50): r1-dist.sha256 gains build 1's list byte for byte
   (cmp), numstat `7 0` against Y0, counted run .gate/stopb/y-counted.log PASS; pushed by the save f49a7ba.
 - **C1, the order** [C1]: Y0 -> build 1 at Y0 (worktree A, CARGO_HOME A) -> Y = Y0 plus r1-dist.sha256's seven lines

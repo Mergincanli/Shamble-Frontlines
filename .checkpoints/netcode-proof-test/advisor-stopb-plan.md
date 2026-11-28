@@ -621,6 +621,10 @@ single git commands.
   - So WBG_VERSION stays unset on RS, and `producers` reads plain "wasm-bindgen 0.2.130". This is reasoned from the
     code and rs.yaml, not run on RS.
   - Every list made so far carried a hash: build 1, build 2, and U7's run 4. None of them would equal RS's dist.
+    - **Correction (2026-11-28 03:0x UTC, at the Y' head read):** U7's run 4 carried no hash. Its Wasm is 901a6492…
+      (u7-report.md:141), the plain value build 1′ and build 2′ produce. I repeated stopb-dist-diff.md:32's "differs
+      the same way" without checking it. Only build 1 and build 2, plus build 2's re-run and the third build at Y0,
+      carried our commit's name.
 
 ### Findings
 - **STOPB-8 (High; caught before X by C1's bar, and resolved by the method below):**
@@ -697,3 +701,20 @@ single git commands.
 - Q2's one line goes into Stop B's message.
 
 Status: COMPLETE 2026-11-28 02:14 UTC
+
+## Y' head read
+Plan: read launch-yp-head.md's brief. Then, by SHA only, one git call each:
+- Y′ 1ceecc32: its subject and parents;
+- `git diff --numstat` against Y (652e9513) and Y0 (87cb8677) over spikes/netcode-proof, with the hunk;
+- `git show 1ceecc32:…/r1-dist.sha256`;
+- a printing `git grep` for 2a97394b beside 901a6492;
+- the name list of 652e9513..1ceecc32, for MAIN-70's paths, checking no kit or CI path and nothing under spikes/ but the
+  list.
+
+Then, with Read and Grep: build1p.log and build2p.log (Q2's three prints, exit codes, the trees), build1p-dist.sha256
+and build2p-dist.sha256 against Y′'s non-comment lines and against u7-report.md:134-141, yp-counted.log, and the
+gate's log. Then the verdict, with CI's state as read, the line-623 correction (done above), Decisions needed, For
+Mustafa and the Status line. Nothing run or built; no GitHub writes.
+
+### Notes (one line per check)
+

@@ -1,10 +1,10 @@
 # Y' head read: the brief for B6 (advisor-stopb-plan.md's author), Q4 (f) of its "Ruling on the dist difference"
-Status: DRAFT 02:3x UTC on 11-28; filled and sent after build 2' ends (its <TO FILL> lines then).
+Status: SENT 02:5x UTC on 11-28 after build 2' ended equal (CI on Y''s save still running then).
 
 ## The brief (to B6: resumed if it answers, else a new advisor agent with this file as its whole brief)
 Your Q4 (f): the head read of Y' with both new builds. Read by SHA only.
-- Y' = commit <TO FILL: Y' SHA> ("Stop B Y'"), pushed under the card save <TO FILL>; Y = 652e9513 (void, STOPB-8);
-  Y0 = 87cb8677.
+- Y' = commit 1ceecc321eaf194d59568fdab56644d1e9eb4f05 ("Stop B Y'"), pushed under the card save
+  232cc8c9b53bb4216e7cf97d7b9baeb25928e24f; Y = 652e9513 (void, STOPB-8); Y0 = 87cb8677.
 - The change: spikes/netcode-proof/ops/runs/r1-dist.sha256 line 10, the Wasm line, from
   2a97394b023c5f52e7c2dcbcbb28204dd9bcf23bc4c0acaaf5f3c9191e4c4551 to
   901a649231dc9c217204b121a2800641c3c6aa9cd3cb9d42eb5657452b0a0e77, in place.
@@ -25,7 +25,10 @@ Your Q4 (f): the head read of Y' with both new builds. Read by SHA only.
   main-70-plan.md "Steps 2-5, done"), and main's 107 paths hold no kit or CI path (`.gate/main-70/main-names.txt`, a
   printing grep for `.claude/`, `.github/`, `tools/gate`, CLAUDE.md, AGENTS.md: nothing). So Y0 stands and X takes in no
   kit file.
-- CI on Y''s save: <TO FILL: four runs>.
+- CI on Y''s save 232cc8c9: running at sending (02:5x UTC); the main session appends the four runs' lines here and
+  tells you by message when they end. Write every other block meanwhile; your verdict line names CI's state as read.
+- Build 2' as done: stopb-plan.md section C, "Build 2' DONE" (exit 0 02:45:57-02:47:25; both lists equal; producers
+  plain; the two git lines "ok"; 11 GIT_ names unset).
 - One correction asked of you: advisor-stopb-plan.md:623 says every list so far carried a hash, "build 1, build 2, and
   U7's run 4". U7's run 4 Wasm is 901a649231dc9c217204b121a2800641c3c6aa9cd3cb9d42eb5657452b0a0e77 (u7-report.md:141),
   build 1''s plain value, so run 4 carried none. Correct that line in your file (a dated correction note under it),
