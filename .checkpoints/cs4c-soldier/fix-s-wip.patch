@@ -1,0 +1,760 @@
+diff --git a/packages/client/src/app/boot.ts b/packages/client/src/app/boot.ts
+index 05a85091..7de78988 100644
+--- a/packages/client/src/app/boot.ts
++++ b/packages/client/src/app/boot.ts
+@@ -163,7 +163,7 @@ export async function boot(): Promise<void> {
+       pauses: link.pauses,
+       lastPause: link.lastPause,
+       worker: link.stats,
+-      content: delivered !== null ? delivered.files : content.holding ? "holding" : "none",
++      content: delivered !== null ? delivered.files : content.holding ? "holding" : content.refused ? "refused" : "none",
+       scene: delivered?.scene ?? null,
+     });
+     const overlay = new Overlay(document.body, () => formatReport(data()));
+diff --git a/packages/client/src/app/content-ties.test.mjs b/packages/client/src/app/content-ties.test.mjs
+index c009a27e..67621e8b 100644
+--- a/packages/client/src/app/content-ties.test.mjs
++++ b/packages/client/src/app/content-ties.test.mjs
+@@ -4,7 +4,18 @@
+ // module: the page's packages have no Node types.
+ import { readFileSync } from "node:fs";
+ import { expect, test } from "vitest";
+-import { BUNDLE_FORMAT, BUNDLE_VERSION, CONTENT_KINDS, MAP_FORMAT, MAP_VERSION, MOVEMENT_FORMAT, MOVEMENT_VERSION } from "./content.ts";
++import {
++  BUNDLE_FORMAT,
++  BUNDLE_VERSION,
++  CONTENT_KINDS,
++  MAP_FORMAT,
++  MAP_FORMS,
++  MAP_GROUNDS,
++  MAP_TOWARDS,
++  MAP_VERSION,
++  MOVEMENT_FORMAT,
++  MOVEMENT_VERSION,
++} from "./content.ts";
+ 
+ /** A Rust file of the content crate. */
+ const rust = (file) => readFileSync(new URL(`../../../../crates/content/src/${file}`, import.meta.url), "utf8");
+@@ -19,6 +30,19 @@ function formatOf(file) {
+   return [format?.[1], Number(version?.[1])];
+ }
+ 
++/** One of the map's word lists in map.rs (`pub(crate) const NAME: [&str; n] = [...];`), as the loader reads it. */
++function wordsOf(name) {
++  const found = new RegExp(`^pub\\(crate\\) const ${name}: \\[&str; \\d+\\] = \\[([^\\]]*)\\];$`, "m").exec(rust("map.rs"));
++  expect(found, `${name} in crates/content/src/map.rs`).not.toBeNull();
++  return [...(found?.[1] ?? "").matchAll(/"([^"]+)"/g)].map((match) => match[1]);
++}
++
++test("the map's fixed words the page reads are the loader's own, in its order (step S's review, EA-3)", () => {
++  expect([...MAP_FORMS]).toEqual(wordsOf("FORMS"));
++  expect([...MAP_TOWARDS]).toEqual(wordsOf("TOWARDS"));
++  expect([...MAP_GROUNDS]).toEqual(wordsOf("GROUNDS"));
++});
++
+ test("the bundle's format and version the page reads are the loader's own", () => {
+   expect(formatOf("bundle.rs")).toEqual([BUNDLE_FORMAT, BUNDLE_VERSION]);
+ });
+diff --git a/packages/client/src/app/content.test.ts b/packages/client/src/app/content.test.ts
+index 2605e76a..d4c5fabd 100644
+--- a/packages/client/src/app/content.test.ts
++++ b/packages/client/src/app/content.test.ts
+@@ -208,21 +208,24 @@ test("however the match ends before the Worker's ready, the page lets its copy o
+   expect(refused.content.holding).toBe(true);
+   const said = "the content is refused: a key that is not a field of this kind";
+   expect(takeWorkerMessage(refused.link, refused.content, { data: { type: "error", message: said } })).toBe(said);
+-  expect([refused.content.holding, refused.readings.length, refused.delivered.length]).toEqual([false, 0, 0]);
++  // Never read, so not refused by the page: the readout says nothing was read (step S's review, EA-5).
++  expect([refused.content.holding, refused.readings.length, refused.delivered.length, refused.content.refused]).toEqual([false, 0, 0, false]);
+   // The Worker's own error event (a script that did not load): the same.
+   const failed = await wired();
+   expect(takeWorkerError(failed.link, failed.content, undefined)).toBe("the Worker failed");
+-  expect([failed.content.holding, failed.readings.length, failed.delivered.length]).toEqual([false, 0, 0]);
++  expect([failed.content.holding, failed.readings.length, failed.delivered.length, failed.content.refused]).toEqual([false, 0, 0, false]);
+   // A message the page does not know.
+   const unknown = await wired();
+   expect(takeWorkerMessage(unknown.link, unknown.content, { data: { type: "surprise" } })).toBe("the Worker sent a message the page does not know");
+-  expect([unknown.content.holding, unknown.delivered.length]).toEqual([false, 0]);
++  expect([unknown.content.holding, unknown.delivered.length, unknown.content.refused]).toEqual([false, 0, false]);
+ });
+ 
+ test("on the Worker's ready the page reads its copy once and lets it go; a copy that reads as no bundle ends the match", async () => {
+   const ready = await wired();
+   expect(takeWorkerMessage(ready.link, ready.content, { data: { type: "ready", blockBytes: 44, tickHz: 30 } })).toBe("");
+   expect([ready.content.holding, ready.readings.length, ready.delivered.length, ready.link.failure]).toEqual([false, 1, 1, ""]);
++  // Read and delivered: not refused (step S's review, EA-5: the readout tells the page's own refusal apart).
++  expect(ready.content.refused).toBe(false);
+   // Later messages read and deliver nothing again.
+   takeWorkerMessage(ready.link, ready.content, { data: { type: "ready", blockBytes: 44, tickHz: 30 } });
+   expect([ready.readings.length, ready.delivered.length]).toEqual([1, 1]);
+@@ -232,14 +235,14 @@ test("on the Worker's ready the page reads its copy once and lets it go; a copy
+   if (!fetched.ok) throw new Error(fetched.problem);
+   content.start(fetched.value, link, 0);
+   expect(takeWorkerMessage(link, content, { data: { type: "ready", blockBytes: 44, tickHz: 30 } })).toBe(NOT_A_BUNDLE);
+-  expect([content.holding, link.failure]).toEqual([false, NOT_A_BUNDLE]);
++  expect([content.holding, link.failure, content.refused]).toEqual([false, NOT_A_BUNDLE, true]);
+   // A bundle whose map does not read: the match ends in the map's fixed words, and nothing is delivered.
+   const noMap = started(() => Promise.resolve(new Response(encode(bundleOf([{ path: "movement/soldier.json", text: MOVEMENT_TEXT }])))));
+   const noMapFetched = await fetchContent(noMap.fetchOnce);
+   if (!noMapFetched.ok) throw new Error(noMapFetched.problem);
+   noMap.content.start(noMapFetched.value, noMap.link, 0);
+   expect(takeWorkerMessage(noMap.link, noMap.content, { data: { type: "ready", blockBytes: 44, tickHz: 30 } })).toBe(NOT_THE_MAP);
+-  expect([noMap.content.holding, noMap.delivered.length, noMap.link.failure]).toEqual([false, 0, NOT_THE_MAP]);
++  expect([noMap.content.holding, noMap.delivered.length, noMap.link.failure, noMap.content.refused]).toEqual([false, 0, NOT_THE_MAP, true]);
+ });
+ 
+ test("the map reads field by field from own properties into the generated type, every object kind", () => {
+@@ -268,6 +271,31 @@ test("one key more in any object of the map gives the map's fixed sentence", ()
+   expect(readMap(less)).toEqual({ ok: false, problem: NOT_THE_MAP });
+ });
+ 
++test("an own key named __proto__, as JSON.parse makes one, is one key more in any object of the map (step S's review, S-2)", () => {
++  // An own field named `__proto__` sets no prototype: a copy through Object.assign would drop it unseen, the key check
++  // must not.
++  const ownProto = (target: Record<string, unknown>): void => {
++    Object.defineProperty(target, "__proto__", { value: { extra: 1 }, enumerable: true, configurable: true, writable: true });
++  };
++  const at: ((map: Record<string, unknown>) => Record<string, unknown>)[] = [
++    (map) => map,
++    (map) => map["bounds"] as Record<string, unknown>,
++    (map) => (map["spawns"] as Record<string, unknown>[])[0]!,
++    (map) => (map["shapes"] as Record<string, unknown>[])[0]!,
++    (map) => (map["shapes"] as Record<string, unknown>[])[1]!,
++    (map) => (map["regions"] as Record<string, unknown>[])[0]!,
++  ];
++  for (const pick of at) {
++    const map = tree();
++    ownProto(pick(map));
++    expect(readMap(map)).toEqual({ ok: false, problem: NOT_THE_MAP });
++  }
++  // From the text, as JSON.parse makes it: the same.
++  const parsed: unknown = JSON.parse(`{"__proto__": {"extra": 1}, ${JSON.stringify(MAP).slice(1)}`);
++  expect(Object.hasOwn(parsed as object, "__proto__")).toBe(true);
++  expect(readMap(parsed)).toEqual({ ok: false, problem: NOT_THE_MAP });
++});
++
+ test("a member of the wrong kind gives the map's fixed sentence", () => {
+   const wrong: ((map: Record<string, unknown>) => void)[] = [
+     (map) => (map["id"] = 7),
+diff --git a/packages/client/src/app/content.ts b/packages/client/src/app/content.ts
+index c7de99ba..853013b6 100644
+--- a/packages/client/src/app/content.ts
++++ b/packages/client/src/app/content.ts
+@@ -47,6 +47,14 @@ export const CONTENT_KINDS: ReadonlyMap<string, { readonly format: string; reado
+   ["maps", { format: MAP_FORMAT, newest: MAP_VERSION }],
+   ["movement", { format: MOVEMENT_FORMAT, newest: MOVEMENT_VERSION }],
+ ]);
++/**
++ * The map's fixed words, as the loader reads them (crates/content/src/map.rs, `FORMS`, `TOWARDS`, `GROUNDS`; tied by
++ * `content-ties.test.mjs`, step S's review EA-3): a word the loader gains and the page lacks is caught there, not by a
++ * page that refuses every map with it.
++ */
++export const MAP_FORMS = ["box", "ramp"] as const;
++export const MAP_TOWARDS = ["+x", "-x", "+z", "-z"] as const;
++export const MAP_GROUNDS = ["street", "grass"] as const;
+ 
+ /** A file of the bundle as the readout names it: its path, its kind's format and its version. */
+ export interface ContentFile {
+@@ -179,13 +187,13 @@ export function readMap(tree: unknown): Outcome<MapDocument> {
+     const shapeId = text(own(entry, "id"));
+     const min = corner(own(entry, "min"), 3);
+     const max = corner(own(entry, "max"), 3);
+-    const type = word(own(entry, "type"), ["box", "ramp"] as const);
++    const type = word(own(entry, "type"), MAP_FORMS);
+     if (shapeId === null || min === null || max === null || type === null) return fault;
+     if (type === "box") {
+       if (!closed(entry, ["id", "min", "max", "type"])) return fault;
+       shapes.push({ id: shapeId, min, max, type: "box" });
+     } else {
+-      const toward = word(own(entry, "rises_toward"), ["+x", "-x", "+z", "-z"] as const);
++      const toward = word(own(entry, "rises_toward"), MAP_TOWARDS);
+       if (!closed(entry, ["id", "min", "max", "type", "rises_toward"]) || toward === null) return fault;
+       shapes.push({ id: shapeId, min, max, type: "ramp", rises_toward: toward });
+     }
+@@ -193,7 +201,7 @@ export function readMap(tree: unknown): Outcome<MapDocument> {
+   const regions: Region[] = [];
+   for (const entry of regionTrees) {
+     const regionId = text(own(entry, "id"));
+-    const kind = word(own(entry, "kind"), ["street", "grass"] as const);
++    const kind = word(own(entry, "kind"), MAP_GROUNDS);
+     const min = corner(own(entry, "min"), 2);
+     const max = corner(own(entry, "max"), 2);
+     if (!closed(entry, ["id", "kind", "min", "max"]) || regionId === null || kind === null || min === null || max === null) return fault;
+@@ -277,6 +285,7 @@ export function takeWorkerError(link: MessageLink, content: PageContent, message
+  */
+ export class PageContent {
+   #kept: Uint8Array | null = null;
++  #refused = false;
+   readonly #deliver: (read: ReadContent) => void;
+   readonly #read: (kept: Uint8Array) => Outcome<ReadContent>;
+ 
+@@ -291,6 +300,14 @@ export class PageContent {
+     return this.#kept !== null;
+   }
+ 
++  /**
++   * Whether the page read the bundle and refused it itself (the loader took it, the page's reading did not): the
++   * readout then says so, as the notice does, and not that nothing was read (step S's review, EA-5).
++   */
++  get refused(): boolean {
++    return this.#refused;
++  }
++
+   /** Starts the Worker on the fetched bundle: its bytes are transferred, and the page's copy stays here. */
+   start(fetched: FetchedContent, link: ContentLink, padBytes: number): void {
+     this.#kept = fetched.kept;
+@@ -308,7 +325,10 @@ export class PageContent {
+     const kept = this.#kept;
+     this.#kept = null;
+     const read = this.#read(kept);
+-    if (!read.ok) return read.problem;
++    if (!read.ok) {
++      this.#refused = true;
++      return read.problem;
++    }
+     this.#deliver(read.value);
+     return "";
+   }
+diff --git a/packages/client/src/overlay/report.test.ts b/packages/client/src/overlay/report.test.ts
+index 640017e6..c608efb7 100644
+--- a/packages/client/src/overlay/report.test.ts
++++ b/packages/client/src/overlay/report.test.ts
+@@ -139,6 +139,8 @@ test("the content and the scene: each file with its own format and version, the
+   expect(mixed[0]).toBe("content: maps/test-scene.json shamble-map 1 · movement/soldier.json shamble-movement 2");
+   expect(lines({ content: "holding", scene: null })).toEqual(["content: waiting for the loader", "scene: empty"]);
+   expect(lines({ content: "none", scene: null })).toEqual(["content: not read, the match stopped first", "scene: empty"]);
++  // The page's own refusal reads as such, as the notice says it (step S's review, EA-5), not as nothing read.
++  expect(lines({ content: "refused", scene: null })).toEqual(["content: read and refused by the page, the notice says why", "scene: empty"]);
+   // The copy report holds the same, one named value per line.
+   const report = formatReport(DATA).split("\n");
+   for (const expected of [
+@@ -154,6 +156,7 @@ test("the content and the scene: each file with its own format and version, the
+   const empty = formatReport({ ...DATA, content: "none", scene: null }).split("\n");
+   expect(empty).toContain("content: none");
+   expect(empty).toContain("scene: (empty)");
++  expect(formatReport({ ...DATA, content: "refused", scene: null }).split("\n")).toContain("content: refused");
+ });
+ 
+ test("a value that rounds to zero prints as zero, never with a minus sign", () => {
+diff --git a/packages/client/src/overlay/report.ts b/packages/client/src/overlay/report.ts
+index 51e723a8..a1c7f534 100644
+--- a/packages/client/src/overlay/report.ts
++++ b/packages/client/src/overlay/report.ts
+@@ -9,8 +9,11 @@ export interface ContentFileRow {
+   readonly version: number;
+ }
+ 
+-/** The page's content: its copy still held for the loader's answer, let go unread (the match ended first), or read. */
+-export type ContentRows = "holding" | "none" | readonly ContentFileRow[];
++/**
++ * The page's content: its copy still held for the loader's answer, let go unread (the match ended first), read and
++ * refused by the page itself (the notice says why), or read.
++ */
++export type ContentRows = "holding" | "none" | "refused" | readonly ContentFileRow[];
+ 
+ /** The drawn scene, counted once when the map was drawn: the map's id and its blocks and patches of ground. */
+ export interface SceneRows {
+@@ -77,6 +80,7 @@ export interface ReportData {
+ function contentWords(content: ContentRows): string {
+   if (content === "holding") return "waiting for the loader";
+   if (content === "none") return "not read, the match stopped first";
++  if (content === "refused") return "read and refused by the page, the notice says why";
+   return content.map(({ path, format, version }) => `${path} ${format} ${version}`).join(" · ");
+ }
+ 
+diff --git a/packages/client/src/render/inventory.ts b/packages/client/src/render/inventory.ts
+index cf9f0b03..bb82c1d6 100644
+--- a/packages/client/src/render/inventory.ts
++++ b/packages/client/src/render/inventory.ts
+@@ -10,7 +10,9 @@ import type { Floor } from "./scene.ts";
+ /** Said when the floor holds an object the inventory does not know: the floor and this reader have drifted apart. */
+ export const INVENTORY_UNKNOWN = "the scene inventory met an object it does not know";
+ 
+-const KINDS: readonly string[] = ["ground", "box", "ramp", "region"];
++/** The kinds an inventory reports: each one `SceneObject`'s own (step S's review, EA-4), so no other crosses the interface. */
++const KINDS = ["ground", "box", "ramp", "region"] as const satisfies readonly SceneObject["kind"][];
++const isKind = (kind: unknown): kind is SceneObject["kind"] => typeof kind === "string" && (KINDS as readonly string[]).includes(kind);
+ 
+ /** The floor's drawn objects, but for its grid, in the floor's order. */
+ export function readInventory(floor: Floor): SceneObject[] {
+@@ -20,7 +22,7 @@ export function readInventory(floor: Floor): SceneObject[] {
+   for (const object of floor.children) {
+     const kind: unknown = object.userData["kind"];
+     if (kind === "grid" && object instanceof THREE.LineSegments) continue;
+-    if (!(object instanceof THREE.Mesh) || typeof kind !== "string" || !KINDS.includes(kind)) throw new Error(INVENTORY_UNKNOWN);
++    if (!(object instanceof THREE.Mesh) || !isKind(kind) || !(object.material instanceof THREE.MeshStandardNodeMaterial)) throw new Error(INVENTORY_UNKNOWN);
+     const position = object.geometry.getAttribute("position");
+     const seen = new Map<string, [number, number, number]>();
+     for (let i = 0; i < position.count; i += 1) {
+@@ -28,8 +30,7 @@ export function readInventory(floor: Floor): SceneObject[] {
+       seen.set(`${point.x},${point.y},${point.z}`, [point.x, point.y, point.z]);
+     }
+     const points = [...seen.values()].sort((a, b) => a[0] - b[0] || a[1] - b[1] || a[2] - b[2]);
+-    const material = object.material as THREE.MeshStandardNodeMaterial;
+-    objects.push({ id: object.name, kind: kind as SceneObject["kind"], points, grey: material.color.getHex() });
++    objects.push({ id: object.name, kind, points, grey: object.material.color.getHex() });
+   }
+   return objects;
+ }
+diff --git a/packages/client/src/render/scene.test.ts b/packages/client/src/render/scene.test.ts
+index b5ed0b4f..3696cd9b 100644
+--- a/packages/client/src/render/scene.test.ts
++++ b/packages/client/src/render/scene.test.ts
+@@ -1,8 +1,8 @@
+ import * as THREE from "three/webgpu";
+-import type { MapDocument, Shape } from "@shamble/types";
++import type { Bounds, MapDocument, Shape } from "@shamble/types";
+ import { expect, test } from "vitest";
+ import { INVENTORY_UNKNOWN, readInventory } from "./inventory.ts";
+-import { buildEmptyScene, buildMapFloor, disposeFloor, greyOf, groundGrey, overview, solidPoints } from "./scene.ts";
++import { VIEW_MARGIN, buildEmptyScene, buildMapFloor, disposeFloor, frameCamera, greyOf, groundGrey, overview, solidPoints } from "./scene.ts";
+ 
+ // The scene's floors in plain Node: three's objects are made and read without a renderer.
+ 
+@@ -33,6 +33,22 @@ const MAP: MapDocument = {
+   ],
+ };
+ 
++/**
++ * The made map raised 2 m: its bounds' bottom, and so its ground, patches and solids' floors, off the plane y = 0
++ * (step S's review: G-3, a ground drawn at 0 and not at the bounds' bottom; GE-F5, faces on a plane through the origin
++ * add nothing to the enclosed volume).
++ */
++const up = (point: readonly number[]): [number, number, number] => [point[0]!, point[1]! + 2, point[2]!];
++const RAISED: MapDocument = {
++  ...MAP,
++  id: "raised",
++  bounds: { min: up(MAP.bounds.min), max: up(MAP.bounds.max) },
++  spawns: MAP.spawns.map((spawn) => ({ ...spawn, at: up(spawn.at) })),
++  shapes: MAP.shapes.map((shape) => ({ ...shape, min: up(shape.min), max: up(shape.max) })),
++};
++/** The largest floor the loader allows: the aim's reach each way, its height to the aim's top (map.rs:316-330). */
++const LARGEST: Bounds = { min: [-327.67, 0, -327.67], max: [327.67, 655.35, 327.67] };
++
+ const f = Math.fround;
+ const sorted = (points: readonly (readonly number[])[]): number[][] =>
+   points.map((point) => [...point]).sort((a, b) => a[0]! - b[0]! || a[1]! - b[1]! || a[2]! - b[2]!);
+@@ -66,9 +82,13 @@ test("each solid is drawn at its own corners, rounded to f32 as the simulation's
+   expect(drawn.get("ramp_mz")?.kind).toBe("ramp");
+ });
+ 
+-test("every triangle of every solid faces outward, and its normal is the face's: a box and a ramp toward each side", () => {
+-  const floor = buildMapFloor(MAP);
+-  for (const shape of MAP.shapes) {
++test("every triangle of every solid faces outward, and its normal is the face's: a box and a ramp toward each side, on the made map and on it raised", () => {
++  for (const map of [MAP, RAISED]) solidsFaceOutward(map);
++});
++
++function solidsFaceOutward(map: MapDocument): void {
++  const floor = buildMapFloor(map);
++  for (const shape of map.shapes) {
+     const geometry = meshOf(floor, shape.id).geometry;
+     const position = geometry.getAttribute("position");
+     const normal = geometry.getAttribute("normal");
+@@ -78,15 +98,33 @@ test("every triangle of every solid faces outward, and its normal is the face's:
+     const [a, b, c, n, ab, ac] = [0, 0, 0, 0, 0, 0].map(() => new THREE.Vector3());
+     // The triangles close the solid exactly: the volume they enclose (each outward triangle's signed share) is the
+     // solid's own, a box's whole and a ramp's half of its box. Faces that cut through the solid, or leave a hole, do not.
++    // Measured from a point off every face's plane, so that every face counts (GE-F5: from the origin, a face on a plane
++    // through it adds nothing).
++    const from = new THREE.Vector3(-1000.5, -1000.25, -1000.125);
+     let volume = 0;
+     for (let i = 0; i < position.count; i += 3) {
+-      a!.fromBufferAttribute(position, i);
+-      b!.fromBufferAttribute(position, i + 1);
+-      c!.fromBufferAttribute(position, i + 2);
++      a!.fromBufferAttribute(position, i).sub(from);
++      b!.fromBufferAttribute(position, i + 1).sub(from);
++      c!.fromBufferAttribute(position, i + 2).sub(from);
+       volume += a!.dot(new THREE.Vector3().crossVectors(b!, c!)) / 6;
+     }
+     const [dx, dy, dz] = [0, 1, 2].map((axis) => Math.fround(shape.max[axis]!) - Math.fround(shape.min[axis]!));
+-    expect(volume, `${shape.id} volume`).toBeCloseTo((dx! * dy! * dz!) / (shape.type === "box" ? 1 : 2), 3);
++    expect(volume, `${map.id} ${shape.id} volume`).toBeCloseTo((dx! * dy! * dz!) / (shape.type === "box" ? 1 : 2), 3);
++    // Closed: every edge is shared by exactly two triangles, once each way (TE-2: a face drawn twice, or one missing,
++    // leaves edges unpaired, which the volume alone can miss).
++    const edges = new Map<string, number>();
++    const at = (i: number): string => `${position.getX(i)},${position.getY(i)},${position.getZ(i)}`;
++    for (let i = 0; i < position.count; i += 3) {
++      for (let e = 0; e < 3; e += 1) {
++        const edge = `${at(i + e)}>${at(i + ((e + 1) % 3))}`;
++        edges.set(edge, (edges.get(edge) ?? 0) + 1);
++      }
++    }
++    for (const [edge, times] of edges) {
++      const [start, end] = edge.split(">");
++      expect(times, `${map.id} ${shape.id} edge ${edge} drawn ${times} times`).toBe(1);
++      expect(edges.get(`${end}>${start}`), `${map.id} ${shape.id} edge ${edge} has no partner`).toBe(1);
++    }
+     for (let i = 0; i < position.count; i += 3) {
+       a!.fromBufferAttribute(position, i);
+       b!.fromBufferAttribute(position, i + 1);
+@@ -101,6 +139,35 @@ test("every triangle of every solid faces outward, and its normal is the face's:
+       }
+     }
+   }
++}
++
++test("the ground and each patch lie flat at the bounds' bottom, at their own corners, facing up: on the made map and on it raised (step S's review, TE-1, G-3)", () => {
++  for (const map of [MAP, RAISED]) {
++    const floor = buildMapFloor(map);
++    const drawn = readInventory(floor);
++    const y = map.bounds.min[1];
++    const flat = (id: string, x0: number, z0: number, x1: number, z1: number): void => {
++      const corners = [[x0, y, z0], [x0, y, z1], [x1, y, z0], [x1, y, z1]];
++      expect(drawn.find((object) => object.id === id)?.points, `${map.id} ${id} corners`).toEqual(sorted(corners.map((point) => point.map(f))));
++      const position = meshOf(floor, id).geometry.getAttribute("position");
++      const normal = meshOf(floor, id).geometry.getAttribute("normal");
++      expect(position.count, `${map.id} ${id}`).toBe(6);
++      const [a, b, c, n] = [0, 0, 0, 0].map(() => new THREE.Vector3());
++      for (let i = 0; i < position.count; i += 3) {
++        a!.fromBufferAttribute(position, i);
++        b!.fromBufferAttribute(position, i + 1);
++        c!.fromBufferAttribute(position, i + 2);
++        // Up by the right-hand rule, so it is seen from above, and its normal up.
++        const face = new THREE.Vector3().subVectors(b!, a!).cross(new THREE.Vector3().subVectors(c!, a!)).normalize();
++        expect(face.y, `${map.id} ${id} triangle ${i / 3} faces up`).toBeCloseTo(1, 9);
++        for (let v = 0; v < 3; v += 1) expect(n!.fromBufferAttribute(normal, i + v).y, `${map.id} ${id} normal`).toBe(1);
++      }
++    };
++    const [minX, , minZ] = map.bounds.min;
++    const [maxX, , maxZ] = map.bounds.max;
++    flat("ground", minX, minZ, maxX, maxZ);
++    for (const region of map.regions) flat(region.id, region.min[0], region.min[1], region.max[0], region.max[1]);
++  }
+ });
+ 
+ test("each shape and patch is drawn once, by its id; the floor holds nothing else but its ground and its grid; no spawn is drawn", () => {
+@@ -126,13 +193,24 @@ test("the greys: neutral, a higher top never darker, the tallest the lightest, e
+   // over the test scene's 0.55 to 4.7 m): 1 cm apart may share a grey, 1 m apart may not.
+   expect(greyOf(0.56, 0.55, 4.7)).toBe(greyOf(0.55, 0.55, 4.7));
+   expect(greyOf(1.55, 0.55, 4.7)).toBeGreaterThan(greyOf(0.55, 0.55, 4.7));
++  // Over the whole range in 1 cm steps: never darker, and every grey level from the lowest's to the tallest's taken
++  // (TE-5: a version with a few greys passes a check at one pair of heights).
++  const levels = new Set<number>();
++  let last = 0;
++  for (let cm = 55; cm <= 470; cm += 1) {
++    const level = greyOf(cm / 100, 0.55, 4.7) & 0xff;
++    expect(level, `${cm} cm`).toBeGreaterThanOrEqual(last);
++    last = level;
++    levels.add(level);
++  }
++  expect(levels.size).toBe(0xd8 - 0x70 + 1);
+   const lightest = Math.max(...blocks.map((object) => object.grey & 0xff));
+   expect(drawn.find((object) => object.id === "ramp_mz")!.grey & 0xff).toBe(lightest);
+   const darkestBlock = Math.min(...blocks.map((object) => object.grey & 0xff));
+   for (const object of drawn.filter((object) => object.kind === "region" || object.kind === "ground")) {
+     expect(object.grey & 0xff, object.id).toBeLessThan(darkestBlock);
+   }
+-  // STREET-GREY, the default (b) until he says otherwise: the two kinds of ground take two greys.
++  // His STREET-GREY (b), 2026-11-28: the two kinds of ground take two greys.
+   expect(groundGrey("street")).not.toBe(groundGrey("grass"));
+   // The colour read back from each material is the colour written: what the inventory reports is what was authored.
+   expect(drawn.find((object) => object.id === "wall")!.grey).toBe(greyOf(2.55, 0.55, 4.7));
+@@ -140,13 +218,24 @@ test("the greys: neutral, a higher top never darker, the tallest the lightest, e
+   expect(greyOf(0.55, 0.55, 4.7)).toBe(0x707070);
+ });
+ 
+-test("the grid: one line per whole metre over the bounds, both ways (113 and 49 over the test scene's bounds)", () => {
+-  const grid = buildMapFloor(MAP).children.find((object) => object.userData["kind"] === "grid");
+-  if (!(grid instanceof THREE.LineSegments)) throw new Error("no grid");
+-  const position = grid.geometry.getAttribute("position");
+-  expect(position.count / 2).toBe(113 + 49);
+-  // Every line lies on the floor and spans the bounds.
+-  for (let i = 0; i < position.count; i += 1) expect(position.getY(i)).toBe(0);
++test("the grid: one line per whole metre over the bounds, both ways (113 and 49 over the test scene's bounds), each on the floor from edge to edge", () => {
++  for (const map of [MAP, RAISED]) {
++    const grid = buildMapFloor(map).children.find((object) => object.userData["kind"] === "grid");
++    if (!(grid instanceof THREE.LineSegments)) throw new Error("no grid");
++    const position = grid.geometry.getAttribute("position");
++    expect(position.count / 2).toBe(113 + 49);
++    const [minX, y, minZ] = map.bounds.min.map(f);
++    const [maxX, , maxZ] = map.bounds.max.map(f);
++    // Every line lies on the floor, the bounds' bottom (G-3), and runs from one edge of the bounds to the other
++    // (TE-4): a line along z ends at the bounds' two z edges, a line along x at its two x edges.
++    for (let i = 0; i < position.count; i += 2) {
++      expect([position.getY(i), position.getY(i + 1)], `${map.id} line ${i / 2}`).toEqual([y, y]);
++      const alongZ = position.getX(i) === position.getX(i + 1);
++      const ends = alongZ ? [position.getZ(i), position.getZ(i + 1)] : [position.getX(i), position.getX(i + 1)];
++      expect(ends, `${map.id} line ${i / 2}`).toEqual(alongZ ? [minZ, maxZ] : [minX, maxX]);
++      if (!alongZ) expect(position.getZ(i), `${map.id} line ${i / 2}`).toBe(position.getZ(i + 1));
++    }
++  }
+ });
+ 
+ test("the swap frees each geometry and material of the old floor once, and two floors share none", () => {
+@@ -178,21 +267,31 @@ test("the swap frees each geometry and material of the old floor once, and two f
+   expect([...map.disposed.values()].every((times) => times === 1)).toBe(true);
+ });
+ 
+-test("the overview shows the whole floor at 16:9, 4:3 and 1:1, with every corner in front of the camera", () => {
++test("the overview shows the whole floor at 16:9, 4:3 and 1:1, with every corner in front of the camera, as near as that lets it", () => {
+   for (const aspect of [16 / 9, 4 / 3, 1]) {
+     const view = overview(MAP.bounds, aspect);
+-    const camera = new THREE.PerspectiveCamera(50, aspect, 0.1, 1e6);
+-    camera.position.set(...view.position);
+-    camera.lookAt(...view.target);
+-    camera.updateMatrixWorld(true);
++    if (view === null) throw new Error(`no overview at ${aspect}`);
+     const [minX, y, minZ] = MAP.bounds.min;
+     const [maxX, , maxZ] = MAP.bounds.max;
+-    for (const [x, z] of [[minX, minZ], [maxX, minZ], [maxX, maxZ], [minX, maxZ]] as const) {
+-      const p = new THREE.Vector3(x, y, z).project(camera);
+-      expect(Math.abs(p.x), `${aspect} ${x} ${z}`).toBeLessThanOrEqual(1);
+-      expect(Math.abs(p.y), `${aspect} ${x} ${z}`).toBeLessThanOrEqual(1);
+-      expect(p.z, `${aspect} ${x} ${z}`).toBeLessThan(1);
+-    }
++    const corners = [[minX, minZ], [maxX, minZ], [maxX, maxZ], [minX, maxZ]].map(([x, z]) => new THREE.Vector3(x, y, z));
++    /** The farthest any corner reaches toward the picture's edge, with the camera at `share` of the overview's distance. */
++    const reach = (share: number): number => {
++      const camera = new THREE.PerspectiveCamera(50, aspect, 0.1, 1e6);
++      const target = new THREE.Vector3(...view.target);
++      camera.position.copy(target).addScaledVector(new THREE.Vector3(...view.position).sub(target), share);
++      camera.lookAt(target);
++      camera.updateMatrixWorld(true);
++      return Math.max(
++        ...corners.map((corner) => {
++          const p = corner.clone().project(camera);
++          expect(p.z, `${aspect} in front`).toBeLessThan(1);
++          return Math.max(Math.abs(p.x), Math.abs(p.y));
++        }),
++      );
++    };
++    // Every corner inside the picture's margin; and as near as fits (TE-3): a little nearer, some corner is past it.
++    expect(reach(1), `${aspect}`).toBeLessThanOrEqual(VIEW_MARGIN + 1e-9);
++    expect(reach(0.99), `${aspect}`).toBeGreaterThan(VIEW_MARGIN);
+     // Seen from today's side and angle: from above, from the near side (+z), straight at the floor's middle.
+     expect(view.target).toEqual([24, 0, 0]);
+     expect(view.position[0]).toBeCloseTo(24, 9);
+@@ -200,6 +299,34 @@ test("the overview shows the whole floor at 16:9, 4:3 and 1:1, with every corner
+   }
+ });
+ 
++// A search with no end blocks the runner itself: Vitest's timeout cannot stop a synchronous loop, so the plant that
++// takes the limit away is run under an outer timeout (`.checkpoints/cs4c-soldier/plants-4c.py`).
++test("the overview frames nothing it cannot: at an aspect of 0 or NaN it gives none, and on the largest floor the loader allows its search always ends (step S's review, GE-F1)", () => {
++  expect(overview(MAP.bounds, 0)).toBeNull();
++  expect(overview(MAP.bounds, Number.NaN)).toBeNull();
++  expect(overview(LARGEST, 16 / 9)).not.toBeNull();
++  // A window a thousand times taller than it is wide: no view, and the search ended.
++  expect(overview(LARGEST, 0.001)).toBeNull();
++});
++
++test("the camera takes the overview, with its far plane well beyond the floor's middle, or stays as it was when the floor cannot be framed (step S's review, TE-7)", () => {
++  const camera = new THREE.PerspectiveCamera(50, 16 / 9, 0.1, 500);
++  expect(frameCamera(camera, MAP.bounds)).toBe(true);
++  const view = overview(MAP.bounds, 16 / 9)!;
++  expect(camera.position.toArray()).toEqual(view.position);
++  const distance = new THREE.Vector3(...view.position).distanceTo(new THREE.Vector3(...view.target));
++  expect(camera.far).toBe(Math.max(500, 4 * distance));
++  // The largest floor: the far plane follows the distance, past 500 m.
++  const far = new THREE.PerspectiveCamera(50, 16 / 9, 0.1, 500);
++  expect(frameCamera(far, LARGEST)).toBe(true);
++  expect(far.far).toBeGreaterThan(500);
++  // A window of no width: the camera is left exactly as it was.
++  const before = [camera.position.toArray(), camera.quaternion.toArray(), camera.far];
++  camera.aspect = 0;
++  expect(frameCamera(camera, MAP.bounds)).toBe(false);
++  expect([camera.position.toArray(), camera.quaternion.toArray(), camera.far]).toEqual(before);
++});
++
+ test("the inventory reads what is drawn, not the map: a corner moved after the build is reported moved, an unknown object stops it", () => {
+   const floor = buildMapFloor(MAP);
+   const position = meshOf(floor, "wall").geometry.getAttribute("position");
+diff --git a/packages/client/src/render/scene.ts b/packages/client/src/render/scene.ts
+index 88686ac1..75c396c7 100644
+--- a/packages/client/src/render/scene.ts
++++ b/packages/client/src/render/scene.ts
+@@ -182,7 +182,7 @@ export function greyOf(top: number, lowest: number, tallest: number): number {
+   return level * 0x010101;
+ }
+ 
+-/** A patch of ground's grey by its kind (his STREET-GREY, default (b): two neutral greys, both darker than every block). */
++/** A patch of ground's grey by its kind (his STREET-GREY (b), 2026-11-28: two neutral greys, both darker than every block). */
+ export function groundGrey(kind: Ground): number {
+   return PATCH_GREYS[kind];
+ }
+@@ -253,13 +253,22 @@ export function disposeFloor(floor: Floor): void {
+ /** The camera's way of looking: today's, from the side and above at the same angle, at the floor's middle. */
+ const VIEW_DIRECTION = new THREE.Vector3(0, 14, 16).normalize();
+ /** How far into the picture's edges the floor's corners may come, as a share of the half-width (and half-height). */
+-const VIEW_MARGIN = 0.92;
++export const VIEW_MARGIN = 0.92;
++/**
++ * The most times the overview's search doubles its distance: 2^19 m, about 524 km, still inside its probe camera's far
++ * plane of 1e6 m. A floor that does not fit by then is not framed: a window with no width, or a few pixels against
++ * thousands (step S's review, GE-F1: with no limit the search never ended at an aspect of 0 or NaN, and the page froze).
++ */
++const MOST_DOUBLINGS = 19;
++
++/** Where the overview puts the camera, or `null` when the floor cannot be framed at this aspect. */
++export type Overview = { position: [number, number, number]; target: [number, number, number] } | null;
+ 
+ /**
+  * Where the camera stands to show the whole map: on today's line of sight to the floor's middle, as near as lets the
+  * floor's four corners lie inside the picture at this aspect. Every grid line then lies in front of the camera.
+  */
+-export function overview(bounds: Bounds, aspect: number, fovDeg = 50): { position: [number, number, number]; target: [number, number, number] } {
++export function overview(bounds: Bounds, aspect: number, fovDeg = 50): Overview {
+   const [minX, y, minZ] = bounds.min;
+   const [maxX, , maxZ] = bounds.max;
+   const target = new THREE.Vector3((minX + maxX) / 2, y, (minZ + maxZ) / 2);
+@@ -280,10 +289,14 @@ export function overview(bounds: Bounds, aspect: number, fovDeg = 50): { positio
+       return Math.abs(projected.x) <= VIEW_MARGIN && Math.abs(projected.y) <= VIEW_MARGIN && projected.z < 1;
+     });
+   };
+-  // The nearest distance that fits, by halving: a fixed number of steps, so the same bounds give the same camera.
++  // A distance that fits, by doubling at most MOST_DOUBLINGS times; then the nearest one, by halving: a fixed number of
++  // steps, so the same bounds give the same camera.
+   let near = 0;
+   let far = 1;
+-  while (!fits(far)) far *= 2;
++  for (let doubled = 0; !fits(far); doubled += 1) {
++    if (doubled === MOST_DOUBLINGS) return null;
++    far *= 2;
++  }
+   for (let step = 0; step < 40; step += 1) {
+     const middle = (near + far) / 2;
+     if (fits(middle)) far = middle;
+@@ -292,3 +305,18 @@ export function overview(bounds: Bounds, aspect: number, fovDeg = 50): { positio
+   const position = target.clone().addScaledVector(VIEW_DIRECTION, far);
+   return { position: [position.x, position.y, position.z], target: [target.x, target.y, target.z] };
+ }
++
++/**
++ * Puts the camera at the overview of these bounds, at its own aspect and field of view, with its far plane well
++ * beyond the floor's middle. When the floor cannot be framed at this aspect the camera is left as it is, and `false`
++ * says so: the picture draws on, and the next resize frames it again.
++ */
++export function frameCamera(camera: THREE.PerspectiveCamera, bounds: Bounds): boolean {
++  const view = overview(bounds, camera.aspect, camera.fov);
++  if (view === null) return false;
++  camera.position.set(...view.position);
++  camera.lookAt(...view.target);
++  camera.far = Math.max(500, 4 * camera.position.distanceTo(new THREE.Vector3(...view.target)));
++  camera.updateProjectionMatrix();
++  return true;
++}
+diff --git a/packages/client/src/render/three-picture.ts b/packages/client/src/render/three-picture.ts
+index 444af37e..4908ec12 100644
+--- a/packages/client/src/render/three-picture.ts
++++ b/packages/client/src/render/three-picture.ts
+@@ -1,7 +1,7 @@
+ import * as THREE from "three/webgpu";
+ import type { Picture, PictureInfo, RenderCounters } from "../picture.ts";
+ import { readInventory } from "./inventory.ts";
+-import { buildEmptyScene, buildMapFloor, disposeFloor, overview } from "./scene.ts";
++import { buildEmptyScene, buildMapFloor, disposeFloor, frameCamera } from "./scene.ts";
+ 
+ // Written into the code by the build (vite.config.mjs, `define`): the literal `false` in a production build, which
+ // cuts the development inventory out of it (the production scan checks that).
+@@ -44,12 +44,8 @@ export function createThreePicture(): Picture {
+   // The map's bounds as numbers, for the overview at each aspect: no reference to the document is kept.
+   let framed: { min: [number, number, number]; max: [number, number, number] } | null = null;
+   const frame = (): void => {
+-    if (framed === null) return;
+-    const view = overview(framed, camera.aspect, camera.fov);
+-    camera.position.set(...view.position);
+-    camera.lookAt(...view.target);
+-    camera.far = Math.max(500, 4 * camera.position.distanceTo(new THREE.Vector3(...view.target)));
+-    camera.updateProjectionMatrix();
++    // A floor that cannot be framed at this aspect leaves the camera as it is (scene.ts, `frameCamera`).
++    if (framed !== null) frameCamera(camera, framed);
+   };
+   let renderer: THREE.WebGPURenderer | null = null;
+   return {
+@@ -97,7 +93,8 @@ export function createThreePicture(): Picture {
+     resize(width, height, devicePixelRatio): void {
+       renderer?.setPixelRatio(Math.min(devicePixelRatio, MAX_PIXEL_RATIO));
+       renderer?.setSize(width, height, false);
+-      camera.aspect = width / Math.max(1, height);
++      // A window of no width is held at one pixel, as one of no height is: the aspect stays a positive number.
++      camera.aspect = Math.max(1, width) / Math.max(1, height);
+       camera.updateProjectionMatrix();
+       frame();
+     },
+diff --git a/packages/e2e/tests/skeleton/report.ts b/packages/e2e/tests/skeleton/report.ts
+index 0e004a6b..d99981e6 100644
+--- a/packages/e2e/tests/skeleton/report.ts
++++ b/packages/e2e/tests/skeleton/report.ts
+@@ -32,7 +32,7 @@ export interface Report {
+     maxTicksInOneWake: number;
+     crossOriginIsolated: boolean;
+   } | null;
+-  content: "holding" | "none" | { path: string; format: string; version: number }[];
++  content: "holding" | "none" | "refused" | { path: string; format: string; version: number }[];
+   scene: { map: string; boxes: number; ramps: number; regions: number } | null;
+ }
+ 
+diff --git a/packages/e2e/tests/skeleton/skeleton.spec.ts b/packages/e2e/tests/skeleton/skeleton.spec.ts
+index 1f5dbf00..c384902d 100644
+--- a/packages/e2e/tests/skeleton/skeleton.spec.ts
++++ b/packages/e2e/tests/skeleton/skeleton.spec.ts
+@@ -7,13 +7,44 @@ import { drawn, needsBuild, open, report, scene, wasmCalls } from "./report.ts";
+ const counts = JSON.parse(readFileSync(new URL("./render-counts.json", import.meta.url), "utf8")) as Record<string, Record<string, unknown>>;
+ const baseline = counts["test-scene"] ?? {};
+ 
++type BuiltShape = { id: string; min: number[]; max: number[]; type: string; rises_toward?: string };
++type BuiltMap = {
++  id: string;
++  bounds: { min: number[]; max: number[] };
++  shapes: BuiltShape[];
++  regions: { id: string; min: number[]; max: number[] }[];
++};
++
+ /** The local match's map as the build put it beside the page: the content bundle's file, parsed. */
+-function builtMap(): { id: string; shapes: { id: string; min: number[]; max: number[]; type: string }[]; regions: { id: string }[] } {
++function builtMap(): BuiltMap {
+   const bundle = JSON.parse(readFileSync(path.join(needsBuild(), "content.json"), "utf8")) as { files: { path: string; text: string }[] };
+   const file = bundle.files.find((entry) => entry.path === "maps/test-scene.json");
+   if (file === undefined) throw new Error("the built bundle holds no test scene");
+-  return JSON.parse(file.text) as ReturnType<typeof builtMap>;
++  return JSON.parse(file.text) as BuiltMap;
++}
++
++/**
++ * Where a solid's corners are, worked out here from the map's own numbers and not by the page's code (step S's review,
++ * TE-6): a box's eight; a ramp's floor's four and the two top corners on the side it rises toward. Rounded to f32 as
++ * drawn, distinct, in the inventory's order.
++ */
++function cornersOf(shape: BuiltShape): number[][] {
++  const three = (values: number[]): [number, number, number] => [Math.fround(values[0]!), Math.fround(values[1]!), Math.fround(values[2]!)];
++  const [x0, y0, z0] = three(shape.min);
++  const [x1, y1, z1] = three(shape.max);
++  const floor = [[x0, y0, z0], [x1, y0, z0], [x1, y0, z1], [x0, y0, z1]];
++  const tops: Record<string, number[][]> = {
++    box: [[x0, y1, z0], [x1, y1, z0], [x1, y1, z1], [x0, y1, z1]],
++    "+x": [[x1, y1, z0], [x1, y1, z1]],
++    "-x": [[x0, y1, z0], [x0, y1, z1]],
++    "+z": [[x0, y1, z1], [x1, y1, z1]],
++    "-z": [[x0, y1, z0], [x1, y1, z0]],
++  };
++  const top = tops[shape.type === "box" ? "box" : (shape.rises_toward ?? "")];
++  if (top === undefined) throw new Error(`${shape.id}: not a box or a ramp toward a side`);
++  return inOrder([...floor, ...top] as number[][]);
+ }
++const inOrder = (points: number[][]): number[][] => [...points].sort((a, b) => a[0]! - b[0]! || a[1]! - b[1]! || a[2]! - b[2]!);
+ 
+ test.beforeAll(() => void needsBuild());
+ 
+@@ -59,11 +90,15 @@ for (const [name, query] of [["the default backend", ""], ["the forced WebGL 2 f
+     const solids = objects.filter((object) => object.kind === "box" || object.kind === "ramp");
+     expect(solids.map((object) => `${object.kind}:${object.id}`).sort()).toEqual(map.shapes.map((shape) => `${shape.type}:${shape.id}`).sort());
+     expect(objects.filter((object) => object.kind === "region").map((object) => object.id).sort()).toEqual(map.regions.map((region) => region.id).sort());
+-    for (const shape of map.shapes) {
+-      const drawnShape = solids.find((object) => object.id === shape.id);
+-      const xs = new Set(drawnShape?.points.map((point) => point[0]));
+-      expect([...xs].sort((a, b) => a - b), shape.id).toEqual([Math.fround(shape.min[0]!), Math.fround(shape.max[0]!)]);
+-      expect(Math.max(...(drawnShape?.points.map((point) => point[1]) ?? [])), shape.id).toBe(Math.fround(shape.max[1]!));
++    // Every corner of every solid where the map puts it (TE-6: x, y and z, the bottom too, and the side a ramp rises
++    // toward), and the ground and each patch flat at the bounds' bottom at their own corners.
++    for (const shape of map.shapes) expect(solids.find((object) => object.id === shape.id)?.points, shape.id).toEqual(cornersOf(shape));
++    const floorY = Math.fround(map.bounds.min[1]!);
++    const flat = (x0: number, z0: number, x1: number, z1: number): number[][] =>
++      inOrder([[x0, floorY, z0], [x0, floorY, z1], [x1, floorY, z0], [x1, floorY, z1]].map((point) => point.map(Math.fround)));
++    expect(objects.find((object) => object.kind === "ground")?.points, "ground").toEqual(flat(map.bounds.min[0]!, map.bounds.min[2]!, map.bounds.max[0]!, map.bounds.max[2]!));
++    for (const region of map.regions) {
++      expect(objects.find((object) => object.id === region.id)?.points, region.id).toEqual(flat(region.min[0]!, region.min[1]!, region.max[0]!, region.max[1]!));
+     }
+     const top = (id: string): number => map.shapes.find((shape) => shape.id === id)?.max[1] ?? 0;
+     // A higher top is never darker (one grey level spans about 4 cm of height, so the yard's 0.55 m and 0.56 m steps
