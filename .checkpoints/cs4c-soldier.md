@@ -221,7 +221,24 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   `/home/user/Shamble-Frontlines/.gate/cs4b-2`. A session of another account works on its own branch from this
   branch's head and never pushes here (his Lanes rule). SEAT-OUT from him: stop at a whole point and report the last
   commit's id.
-- **State (17:52 Amsterdam, from the clock): C3 = d7e260f7c1c903719023ff4424a92a5130a54975, pushed; CI: gate and
+- **State (18:04 Amsterdam, from the clock; first written as 18:06 without reading it, corrected): C3 is green in CI
+  (gate and smoke run 46167247237, toolchain run 46167247231, finished 17:04:20 UTC, 14 min 18 s). security-auditor on C3 (`security-auditor-c3.md`): REVISE on one
+  Medium; the batch's approval stands (the five digests exact, no sixth file); items 1 to 5 MET but for M1; its three
+  points: (a) a visibility before `mod` is within its ruling, (b) the libm conditions hold with the raw-name rule,
+  (c) the recorded vectors raise no concern (its "correctly rounded" condition superseded by block 18).** Findings and
+  the fix pass (in the worktree, its local checks running, `.gate/local-checks-c3b.log`): **M1 (Medium)** marking.rs
+  read `'\''` to the escaped quote, so `['\'','{']` (no space, as under `#[rustfmt::skip]` or in a macro) opened a
+  brace: fixed (an escape's closing quote is looked for after the escaped character), with three bites (two in
+  layering, one in the content scan); **L1** three libm bites added (`libm::expf`, `::libm::exp` outside its site,
+  `extern crate libm as m`); **L3** a backslash outside comments refused in every crate manifest and the root
+  (dependency_rules.rs) and in layering's manifest half, each with a bite; **L4** the raw-name walk now takes every
+  crate but sim and devtools (the three of today asserted among them), and the sim half counts a `pub type` alias;
+  and its item-2 remark (dependency_rules.rs:335 compared a string with an edited copy of itself): now `maths_lines`
+  is a function the main test uses and three planted root texts fail. **L5** (CI runs no `make_libm_vectors.py
+  --check`, toolchain.yml:165-166): a `.github` edit, not this chat's: a request for the CI Builder (parked until
+  Tuesday 1 December), deferred by name. Plants of the fix pass: P11 and P11b (M1 put back) CAUGHT, P13 CAUGHT, P12
+  first NOT CAUGHT (my escaped-name bite also wrote `path = "../content"`, which the content check caught anyway),
+  the bite narrowed to the escape alone, then CAUGHT; RC3 to RC5 held. Earlier state (17:52), kept: C3 = d7e260f7c1c903719023ff4424a92a5130a54975, pushed; CI: gate and
   smoke green (run 46167247237), toolchain running (46167247231, started 16:50:02 UTC); security-auditor reading the
   commit (its notes `security-auditor-c3.md`; brief: items 1 to 5 of its conditions and the three flagged points: the
   visibility before `mod`, the raw-name rule, the recorded vectors). 4c-2: 2,953 written lines against 946fef73 (C1
