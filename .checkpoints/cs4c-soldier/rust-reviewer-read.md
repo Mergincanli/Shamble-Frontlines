@@ -799,3 +799,227 @@ DONE
 Not run: the sandbox itself; Node or browsers; the clip and the sweep in the push pass together with a pull (the push has its own sweep, block 6); four or more soldiers.
 
 DONE
+
+## Block 11. Step 1, consolidated: every symbol, rule, test and count, against the branch head (2026-11-28)
+### Plan
+1. Gather: my blocks 1 and 5 to 10; netcode-architect-read blocks 7 and 8 (record (i), the bounds' one home, "no aim yet"); engine-architect-read blocks 5 and 6 (GROUND, FACING-SPAWN (a), the world with no aim box); the sheet's E1, the record rule, the batch's commit order, I2 and I4b; dependency-check.md.
+2. Read today's code at the branch head (2fe2c9c6: main dae6d107 plus 4c-1, which touches no Rust): crates/sim/src (lib 48, world 477, collision 954, vec 24, time 17, rng 317, state_hash 78 lines), content's movement.rs, the callers.
+3. Write one block: the tick's order; the row and `visit_shared`; the sweep and every rule; `Rules::take`; exp and sincos with the batch; symbols by file; tests with their plants; pins re-made; count; what it supersedes. 4. DONE.
+
+### Notes
+- [B11-1] The branch head's Rust is main's: `git log` shows 4c-1's commits are page and notes only, so every file:line below is dae6d107's. Today's facts used: `PlayerCommand { buttons: u16, presses: [u8; 16] }` (world.rs:40-43); `SHARED_STATE_BYTES = 4 + 2 + 16` (:18); `StateSink` has `u16`, `u32`, `bytes`, `authority` and `secret`, with no float method (:57-66); `World { tick, player, seed }` (:112-117); `World::new` is `const fn` (:122); `authority_step` (:149); `visit_shared` (:177); the known answers at :401-415 (0x9c1e_17d4_0d7a_14dd and six more); `StaticWorld` (collision.rs:95), `narrow` (:103), `enter_box` (:114), `enter_ramp` (:152), `build` (:212), `cast_ray` (:300); content's `FIELDS: [Field; 15]` (movement.rs:17-33) and `Movement` (:37-54); recordings `crates/devtools/recordings/first-loop.{content.json,hashes,rec,vector.txt}` and `manifest.txt`.
+
+### 11.1 The tick (`World::authority_step`, in this order; slot order throughout, no hash map, no clock)
+1. **The command fold** (room side, then world): the slot's commands for the tick are applied oldest first. The newest one's buttons and presses become the record, as today (world.rs:150-152). Each command's move goes into the row's `held_move`. Each command with a real aim sets the row's `aim_cm`; `AimCm::NONE` leaves it. A tick with no command keeps all three (world.rs:143-145's rule, extended to the row).
+2. **Per soldier, in slot order:**
+   a. Wish: `held_move` over 127 (integer length at most 127, clamped by the room); sprint and stamina in integers (block 1.2); the speed = walk or sprint.
+   b. Jump: at most one per tick when the presses counter passed the record's base and he is grounded (3B-ONE-PER-TICK, J1 to J5).
+   c. **The vertical phase first** (the sandbox's order, movement.ts:104-139): the exact arc; the test feet are the end-of-tick feet on every falling tick, and the arc's top on the tick that holds it (G3). The head bump comes next: at the tick's start position, the lowest underside over the 0.4 m circle, no lower than the head at the tick's start less 1 mm, caps the feet at underside - body height. His upward speed goes to 0; a downward one is kept (N18). The bounds' top counts as an underside. The landing crossing follows: a top under the foot crossed inside this falling tick lands him on it, in this phase, before the walls (G9; a fix, not a rule of his).
+   d. **The horizontal move:** the easing toward the wish (`ease_up` or `ease_stop` a tick, times `air_share` while airborne; rest under 1e-4 m/s sets 0, a stated tolerance the sandbox lacks), then move = velocity x dt.
+   e. **The one sweep** (11.3) of the move against what is a wall at the tick's start, with one slide; then the set-back pass for ramps whose width holds his centre (11.3); the bounds' four sides are walls, and the speed into them is dropped (MOVE-RULES row 8).
+   f. **The step-up** (11.3) from the feet after the arc; on a hit: feet = top, upward speed 0, grounded, and the pull fixed.
+   g. **The pull** (G1): the fixed vector left, half a tick (all of it under 0.03 m), moved by the same sweep (so clipped by walls); dropped when his velocity points against it.
+   h. **Standing:** on the 0.4 m circle while the pull runs, else on the 0.15 m foot: the highest top within feet + 0.55 + 0.005. Landing needs no test on upward speed (movement.ts:195). **The snap:** a drop of at most 0.2 + (the tick's whole displacement + 0.15) x the steepest ramp under the foot circle at any height (G8); else a fall from rest.
+   i. **The facing:** if `aim_cm == AimCm::NONE`, unchanged bit for bit; else toward the aim's metres (cm / 100) when more than 2 cm away horizontally.
+3. **The push** (game-designer-read block 3, on each mover's velocity, G10): pairs i < j in slot order; skipped when the feet are 1.0 m or more apart or the pair is not within 0.8 m; head-on turn above 0.2 m/s of relative speed; share 1 - exp(-8/30); sums applied after the pairs; keep-going above 0.1 m/s; cap 0.25 m a tick; the pushed move goes through the same sweep. Two soldiers on one spot: n = +x from the lower soldier id (the sandbox's per-pair angle is trigonometry). Standing is not run again.
+4. The tick counter, as today (world.rs:153-156).
+
+### 11.2 The Soldier row, the record and `visit_shared`
+- **Row** (soldiers.rs, `Soldier`, 60 bytes as hashed, little-endian, in this order):
+  | Field | Type | Bytes | Note |
+  |---|---|---|---|
+  | `generation` | u16 | 2 | stale ids (PM-0004-15) |
+  | `flags` | u8 | 1 | bit 0 occupied, 1 alive, 2 grounded, 3 sprinting, 4 sprint locked |
+  | `team` | u8 | 1 | |
+  | `position` | V3 (f32 x 3) | 12 | the feet, as content's spawn `at` (map.rs:92) |
+  | `velocity` | V3 (f32 x 3) | 12 | horizontal (eased) and vertical |
+  | `stamina` | u64 | 8 | integer units (block 1.2) |
+  | `facing` | [f32; 2] | 8 | FACING-SPAWN (a)'s direction from spawn; quarter turns exact, no -0.0 (B7-3) |
+  | `held_move` | [i8; 2] | 2 | netcode-architect 7.2 |
+  | `aim_cm` | AimCm (i16, u16, i16) | 6 | `AimCm::NONE` = (-32,768, 0, 0) from spawn (block 8) |
+  | `pull` | [f32; 2] | 8 | the fixed pull's remainder; (0, 0) none (block 9, replaces B6-R's `pull: u16`) |
+  Not in step 1's row: block 1.1's `since_sprint` (the sprint-to-fire delay, 4d) and `aim: V3` (replaced by `aim_cm`).
+- **The record** stays `PlayerCommand`'s buttons and presses for the one player (world.rs:115; record (i)).
+- **`visit_shared` writes:** tick (u32); the record's buttons (u16) and presses (16 bytes), as today; then the 48 rows in slot order, every field above, floats by their bits (`f32::to_bits`, LE), i8 and i16 through their two's-complement bits. `SHARED_STATE_BYTES` = 22 + 48 x 60 = 2,902. `StateSink` gains `fn f32(&mut self, name, value: f32)`; u64 goes through `bytes::<8>`. `visit` names every field in its pattern, as today (:166-170).
+
+### 11.3 The one sweep and every rule (the 2.5D form; block 10's measured form)
+- **`sweep_circle`** (new `body.rs`; our own, no library: SWEEP-ROUTE): a 0.4 m circle swept by (dx, dz) against the footprints of the shapes that are walls at the tick's start, found through the tree's candidates for the swept box (allocation-free, the tree's inline stack). Contacts: touching within 0.1 mm and moving along or away is no hit; a start exactly on the grown face is a contact (the slab test's "a >= t0"); a face contact puts the contact axis exactly on the grown face (push-out's own bits); a corner uses the radial normal; no skin; one slide; the speed into the wall is removed. Ramps: a ramp whose width holds his centre is swept only when he comes from beyond its exposed high end; otherwise it is left to the set-back. Its sides are swept like any wall. Ties go to the lower shape index.
+- **Is a wall** (for him, at test feet f; N19, N20, G5): skip a shape whose bottom is at or above f + 1.8 - 1e-6; skip a top at or below f (HEADROOM-FEET (a), a flag: `HeadroomFeet::OwnTopNeverWall` default, `SandboxTest` the other); not a wall if the height nearest his centre <= f + 0.55 + 0.005 with headroom (no floating underside strictly inside top .. top + 1.8 over the 0.4 m circle less 1e-6) and its bottom <= f + 1e-6; nor at a slope's head.
+- **The slope-head rule** (G4, yard.ts:264-281 as game-designer reads it): a resting box, level within 1 cm with the top of a ramp under the 0.4 m circle whose height near him lies in f - 0.05 .. f + 0.55 + 0.4 x grade + 0.005, and where the ramp's height at the box's nearest point is >= box top - 0.55, is neither a wall nor a step target.
+- **The set-back** (N20, G6): a ramp that is a wall with his centre within its width and over the slope: set back along the slope to where its height is f + 0.55 (from the ramp's own low height; no 5 mm), only if he is further up; his speed up the slope is removed (movement.ts:147-157). Beyond the high end, the sweep has already stopped him (G6's guard is the sweep's ramp rule).
+- **The step-up** (N17, G2): the 0.4 m circle overlaps; the top is above the feet after the arc (+1e-6) and <= test feet + 0.55 + 0.005; headroom; bottom <= feet + 1e-6; not at a slope's head; his velocity points toward the shape's nearest point **or his centre is already over its footprint**; the highest such top wins. On a hit the pull is fixed: toward the shape's nearest point, length distance - 0.9 x 0.15.
+- **The floor** (GROUND, engine-architect 5.2): the plane at `bounds_m`'s lower y beside the tree, not a 513th solid; the standing search starts at it.
+
+### 11.4 `Rules::take(&content::movement::Movement) -> Result<Rules, RulesError>` (rules.rs)
+- **From his Export** (today's 15 fields, movement.rs:17-33), each derived once in f64 and then narrowed: walk; sprint = walk x multiplier; ads (4d; carried); `ease_up` and `ease_stop` a tick = 1 - exp(-ln 10 x dt / T) (fmath); air share; radius; step-up; g dt and g dt^2 / 2; take-off = sqrt(2 g (reach - step-up)); the stamina's integers; push strength, giving the share 1 - exp(-strength x dt) (fmath); push reach = 2 x push radius.
+- **NO-SOURCE (b) rows, each a new content field marked "not from his Export"** (the movement kind's FIELDS grows from 15 to 28, each with its version rule, 4B-FIRST-DEFAULT; the Testlines table takes rows with a `field` and no `export`):
+  - `body_height_m` 1.8 (his Export's measured `soldier_height_m`, so its row says "his Export, measured block");
+  - `foot_radius_m` 0.15;
+  - `pull_share_per_step` 0.5 (a share a step at his 30 steps, G11, not a time);
+  - `pull_done_under_m` 0.03;
+  - `pull_to_foot_pct` 90;
+  - `step_allowance_m` 0.005;
+  - `snap_down_m` 0.2;
+  - `push_height_gap_m` 1.0;
+  - `push_sideways_share` 0.7;
+  - `push_keep_going_share` 0.5;
+  - `push_most_m_per_step` 0.25;
+  - `push_head_on_gate_m_per_s` 0.2;
+  - `push_keep_going_gate_m_per_s` 0.1.
+  - The tolerances stay code constants, not content: the slope head's 1 cm and 5 cm, the head's 1 mm, the 1e-6 shrinks, the 0.1 mm touch.
+- **Refusals** (`RulesError`, each with `message()`):
+  - a reach below the step-up (a negative under the root);
+  - a sprint or refill time that rounds to 0 units;
+  - a body height under 2 x the radius;
+  - a foot radius over the body radius;
+  - a pull share outside (0, 1];
+  - a step allowance or snap outside [0, step-up].
+- **`HEADROOM_FEET`**: a `rules.rs` const (default (a)); `Rules` carries it, and a test-only constructor runs (b).
+
+### 11.5 exp and sincos, and the dependency batch (one commit)
+- `crates/sim/src/fmath.rs`, the one file that names `libm`, by full path only:
+  - `share_per_tick(t_s: f64, dt_s: f64) -> f32` uses `libm::exp`, called by `Rules::take` three times per match.
+  - `facing_of(deg: f64) -> [f32; 2]` uses `libm::sincos` once per spawn point at match start: whole quarter turns taken out by three compares, r x K with K = PI / 180 (bits 3f91df46a2529d39, pinned by a test), narrowed with `as f32`, the turn written `0.0 - v`, and r canonicalised with `+ 0.0`.
+- **The commit that first calls them also holds:**
+  - `deps-4c-v2.diff` applied (its five digests, dependency-check.md);
+  - F1, the tightened `crates/devtools/tests/dependency_rules.rs`;
+  - F2, `crates/devtools/tests/layering.rs`;
+  - the scan's stricter libm rule in `crates/sim/tests/rules_scan.rs` (B7-1: named in fmath.rs only, never imported, two allowances, (share_per_tick, exp) and (facing_of, sincos), every other libm path refused);
+  - `packages/client/scripts/maths-allowed.mjs` entries for what the players' real build prints (expected `libm::math::exp`, `libm::math::sincos`, `libm::math::rem_pio2`, `libm::math::rem_pio2_large`), with :9-10 rewritten;
+  - the exp and sincos vectors (`crates/devtools/vectors/`);
+  - world.rs's known answers and first-loop re-made (11.8).
+
+### 11.6 Symbols to add, change and remove, by file
+- **sim, new files:**
+  - `ids.rs`: `SoldierId { slot: u16, generation: u16 }`, `to_bits`, `from_bits`, `NONE`.
+  - `soldiers.rs`: `MAX_SOLDIERS = 48`, `Soldier` (11.2), its flag constants, `Soldiers { slots, count }`, `spawn`, `despawn`, `resolve`, `resolve_mut`, `iter`.
+  - `rules.rs`: `Rules`, `Rules::take`, `RulesError` and its `message`, `HeadroomFeet`, `HEADROOM_FEET`.
+  - `fmath.rs`: `share_per_tick`, `facing_of`, `DEG_TO_RAD`, plus 3A-SCAN-HELPERS' float helpers (block 1.3).
+  - `aim.rs`: `AimCm`, `AimCm::NONE`.
+  - `body.rs`: `sweep_circle`, `is_wall`, `headroom`, `at_slope_head`, `set_back`, `step_up_target`, `standing_height`, `steepest_under_foot`, `QueryCounts`.
+  - `movement.rs`: `step_soldier` and its phases (11.1 2a to 2i), `push_pass`.
+- **sim, changed:**
+  - `vec.rs`: V3's `add`, `sub`, `scale`, `dot`, `length_sq`.
+  - `collision.rs`: `StaticWorld` gains `bounds_m`, `bounds_cm`, `floor_y()`, `candidates(min, max, visit)`, `holds_cm`, `clamp_cm`; `build` derives both bounds from the f64 face (netcode-architect 7.3); `WorldError::Bounds`.
+  - `world.rs`: `PlayerCommand` gains `move_x`, `move_y: i8` and `aim: AimCm` (its `NONE` takes `AimCm::NONE`); `World` gains `soldiers` and the match's constants (`rules`, `statics`, `spawns`), which are not state; `World::new` stops being `const`; `authority_step` (11.1); `visit` and `visit_shared` (11.2); `SHARED_STATE_BYTES` and `STATE_BYTES`; `StateSink::f32` with its implementors `Canonical` (:89) and the test sinks (:313, :360).
+  - `lib.rs`: the new modules.
+- **content:**
+  - `movement.rs`: FIELDS 15 → 28 and `Movement` (11.4), with the schema, generated types and test text.
+  - `map.rs`: `on_grid` made `pub`; GROUND's words (engine-architect 5.2); the aim's "floor" words.
+  - `content/movement/soldier.json`: the 13 new values.
+  - `content/source/testlines-table.json` rows with `packages/client/scripts/testlines.mjs --check`.
+- **Callers:**
+  - `room/src/lib.rs`: `Room::new` takes the constants; the fold with its NONE case and `holds_cm` (counted `refused_aim`); :219 and `queue.rs:137` (literals).
+  - `room/tests/any_bytes.rs` (the generator: NONE taken, any other x of -32,768 refused).
+  - sim-wasm: `lib.rs` builds the constants; `local_match.rs` loses `LocalMatch.world` and its doc (:48-50); `tests/step_alloc.rs`.
+  - `protocol/src/messages.rs`: `AimPoint::NONE` and the aim doc's sentence.
+  - `client-endpoint/src/endpoint.rs:258`: writes NONE.
+  - devtools: `replay.rs:181` (`Lines` gains `f32`); `tests/hash_cost.rs:40`.
+  - `sim/tests/state_hash_alloc.rs:70-94`.
+- **Removed:** `LocalMatch.world`; `World::new`'s `const`; block 7.3's first aim (never built); netcode-architect's "off the grid is refused".
+- **New tests:**
+  - `crates/sim/tests/step_alloc.rs`;
+  - `crates/sim/tests/movement_yard.rs` (the yard's cases);
+  - the restore test in world.rs's test module;
+  - the oracle in collision.rs's test module (it alone may name parry3d).
+
+### 11.7 Tests, each with its planted defect (red when the plant is in)
+| # | Test | Plant |
+|---|---|---|
+| 1 | ids: 10,000 seeded cases of up to 1,000 spawns and despawns on a 64-slot table (PM-0004-15) | spawn without raising the generation; despawn leaving `occupied` |
+| 2 | `Rules::take`: each field reaches its own rule; each refusal by name; the shares against a decimal reference within 1 ulp | `ease_stop` from the speed-up time; one refusal removed |
+| 3 | `facing_of`: 0, 90, 180, 270 by bits with no -0.0; 45, 120, 240 and the largest double under 360 against the reference; K's bits | `-v` for `0.0 - v`; no quarter turns (90 gives 6.1e-17) |
+| 4 | vectors (PM-0004-22): exp and sincos, 10,000+ inputs each, bit-equal natively, in Node and in each browser engine, and correctly rounded (sincos's f32 0 off over 90,000, B7-2) | one output moved one ulp on one target |
+| 5 | scan: the libm rule's bites (`libm::expm1(` and `libm::sincos(` in another function, `libm::sincosf(`, `use libm::{exp};` with a bare `exp(`, `use libm::*;`, libm in a second file) and its two controls | the rule switched to a name list (the grouped import passes) |
+| 6 | the yard: 0.55 gained and 0.56 stopped, 9 runs each (PM-0004-30); 3.05 caught and 3.10 refused (PM-0004-59, the true top against `jump_reach_m` as read); slow walks; stop at touch; both ramps up and down; walk-offs; thin wall at 13.27 m/s, 0 of 10,000 past (block 5's cases, 69) | the 5 mm allowance dropped (0.555 line); the old order of the two sums (180 mm, DEPART-4) |
+| 7 | the sweep, start on a face (made map: the 3.10 m ledge's x 40 face alone): from push-out's own spot (40 - 0.4), walking into it 30 ticks at 6.3, 9.576 and 13.27 m/s, the circle is 0 m into the wall right after the sweep, before any push-out, and ends on push-out's spot to the bit (first-sweep bug 1; block 12) | the slab test without "a >= t0" and a 1e-6 touch: 0.21 / 0.32 / 0.40 m into the wall right after the sweep |
+| 8 | the sweep, a raised ramp, off the roofs (made map: a 2.6 m block x 70..76, z -10..-4, with a 25 % ramp on it, x 70..76, z -10..-6, 2.6 to 3.6 m, its low end at the block's edge): a running jump from 0.5, 1.0 and 1.5 m out gains the edge and walks up the ramp, at 6.3, 9.576 and 13.27 m/s, 9 of 9 (first-sweep bug 2; block 12) | the ramp swept at its low end: the edge not gained, 0 of 9 |
+| 9 | ramps from the side, 306 runs, every speed (block 6 A); off a ramp's side, 24 | push-out with no sweep (42 fail at 13.27) |
+| 10 | G6: beyond an exposed high end he stops 0.40 m out at every speed; a fall from 8 to 16 m onto a slope lands on it (21 of 21); a 300 % ramp rises at most 0.55 m a tick | the set-back with no guard (7.4 m through) |
+| 11 | the pull: the carry at the 0.55 step bit-equal to the unclipped pull (the yard's steps, every speed); before a wall 0.2 m beyond a step, 0 ticks inside | the pull moved with no sweep (3 ticks inside, 5 cm) |
+| 12 | G2: the 36 ledge jumps spend 0 ticks inside | "toward" without "or already over it" (1 to 3 ticks inside at 13.27) |
+| 13 | G3: off the 0.55 step toward the 0.56 step, caught in 3 of 30 phases at 6.3, 30 of 30 at 9.576 | test feet at the tick's start (caught at walk too) |
+| 14 | G4: the x 45 seams rise at most 0.0175 / 0.035 m at every speed | the window without the 0.55 (0.125 at 13.27) |
+| 15 | G5 and HEADROOM-FEET: a step with a beam over its edge is a wall; a floating plank is a wall from the ground; the window wall walked whole under (a), stopped 0.40 m short under (b); the floor over a crate likewise | headroom ignoring the feet under (a) (the flicker on the step under the beam: 6 to 12 falls in 40 ticks) |
+| 16 | the head bump: a jump under a 2.0 m beam stops the feet at 0.20 m, upward speed 0, then a fall | the bump at the tick's end position |
+| 17 | landings: 240 runs, no bounce, no fall after landing; the high drop onto a 2.0 m top lands 21 of 21 | the crossing in standing, after the walls (4 of 21 miss) |
+| 18 | the snap: down both ramps at three speeds, 0 airborne ticks; the 0.55 step a fall (0.55 > 0.2) | the snap's slope from the centre's ramp only |
+| 19 | easing from rest at the steps and ledges (72 runs) | `air_share` applied on the ground |
+| 20 | the push: 16 cases (block 6 F) on velocities; slot orders bit-identical bar the one-spot case, its tie by id | the push applied in place in pair order (a slot swap changes the bits) |
+| 21 | the oracle (DEPART-4C (a) (1)): every form pair, the circle against a box and against a ramp, swept horizontally at seeded heights, our contact t against parry3d's cast of a Cylinder against a Cuboid and against the ramp's ConvexPolyhedron, within 1e-5 | the ramp's side taken at its high end's height |
+| 22 | the record and NONE: netcode-architect's restore (P1 to P3), the room's pin, N-1 to N-3; my S-1 to S-3 (block 8); one room test on a world wholly past the reach (engine-architect 6.2) | each of theirs as written; NONE turning the facing (S-1); a `clamp_cm` that unwraps an empty box |
+| 23 | GROUND T1: on a map whose bounds start at y 2, a soldier spawned 1 m up lands at exactly 2 | the floor at y 0 |
+| 24 | no allocation: a counting allocator around `authority_step`, 1,800 ticks of 12 scripted soldiers (walk, sprint, jump, step, push, starts inside shapes) | 64 bytes allocated per tick; a sweep collecting into a `Vec` |
+| 25 | `visit_shared` names every field (the pattern), 2,902 shared bytes, the row's order | a row field left out (`held_move: _`) |
+
+### 11.8 The pins, re-made in the same commit
+The commit that first puts a soldier in the hashed state (the batch's commit, 11.5) re-makes:
+- world.rs's known answers (:401-415), by the second implementation (a script) writing them again;
+- the committed first recording: `crates/devtools/recordings/first-loop.*` and `manifest.txt`, through its script, with `crates/devtools/tests/recordings.rs` (:24, :29) green on the new files.
+
+CI is green at that commit (the advisor agent's item 7, condition 4). Step 2 then moves no first-loop hash, since NONE lands whole here (block 8).
+
+### 11.9 The count (written lines, code / tests, estimates, plus or minus 30 %)
+| Piece | Code / tests |
+|---|---|
+| ids, soldiers (the row of 11.2) | 165 / 150 |
+| rules, with NO-SOURCE's derivations, the refusals and HEADROOM-FEET | 155 / 140 |
+| vec, fmath (exp and sincos), the scan's libm rule | 110 / 165 |
+| body.rs and movement.rs: the sweep and every rule of 11.3, wish, easing, stamina, jump, facing, the push | 720 / 850 |
+| world and the callers | 170 / 110 |
+| allocation test | 0 / 90 |
+| exp and sincos vectors, maths-allowed entries | 100 / 60 |
+| the record, NONE, the bounds' one home (netcode-architect 7 and 8, engine-architect 5 and 6) | 30 / 205 |
+| content's 13 fields, the table rows, `--check` | 60 / 60 |
+| **Step 1** | **about 1,510 / 1,840 (3,350 lines; block 12 adds the two made maps, +10 tests)** |
+The movement row (720 / 850) is block 1's sweeps plus movement (690 / 680) re-made as block 10's 2.5D form: blocks 5, 6, 9 and 10. It agrees with the sheet's "about 3,350 in all" (I4b). Not in it: block 2's ray counts and sweep proof (90 / 70, step 1 or 6, the sheet's call).
+
+### 11.10 What this supersedes
+- **In block 1:**
+  - 1.0's BODY-SHAPE (decided (3a)) and SWEEP-ROUTE (decided: ours, DEPART-4C (a)); route Library is dropped.
+  - 1.4 whole: 3D sweeps of a cylinder or capsule become 11.3's 2.5D swept circle.
+  - 1.5:
+    - the up/across/down step-up becomes 11.3's step-up;
+    - the snap by the step-up becomes 0.2 + the slope term;
+    - the steepest grade goes: none, row 9 open;
+    - the horizontal-then-vertical order becomes vertical first;
+    - the in-air step from the tick's start becomes end-of-tick feet;
+    - the head stop is kept as the bump.
+  - 1.1's `aim: V3` and `since_sprint`.
+  - 1.6's "move and aim of the record".
+  - 1.8's exp-only list (sincos joins).
+  - 1.10's counts.
+- **In blocks 6 to 9:**
+  - B6-5's "toward from the tick's start" (G2);
+  - block 6's C1 and C3;
+  - B6-R's `pull: u16`;
+  - block 9's push-out wall pass, unswept pull and slope-head window without the 0.55.
+- **Still standing:** blocks 1.2 (except its sincos-free maths), 1.3, 1.7, 1.9, 1.11, block 2, block 3's NO-SOURCE table (now 11.4's rows), block 4's risks 4 to 13.
+
+DONE
+
+## Block 12. game-designer's block 8 (N28 to N32): tests off the roofs, the ridge seam, a corner corrected (2026-11-28)
+### Plan
+1. Re-place 11.7's test 8 (and any other row that needs a roof) on a made gentle raised ramp; show each plant still red there, test 7's included, with the sweep run alone (no push-out after it).
+2. The ridge seam (N32): what reading a slope's height past a seam would take, run once as a switch, its cost, now or later.
+3. Correct block 10's corner and say what my 0.063 m measures.
+4. 11.9's count if it moves. 5. DONE.
+
+### Notes
+- [B12-1] Block 10's corner, corrected: the four differing walk runs round the **3.05 m** ledge's corner (x 38, z -4; the 3.05 m ledge spans x 35..38). Block 10 said "the 3.10 m ledge's corner", which is wrong. The paths part at tick 8 at (38.030, -4.399), 0.40 m from that corner. My 0.063 m is the largest per-axis difference (x, z or feet) over the run's ticks. Measured the other way, as the largest horizontal (x, z) distance between the two runs at one tick, it is 0.069 m, game-designer's figure.
+- [B12-2] Tests 7 and 8 were re-placed on made maps and run (rr-body-proto-7.rs, group "b12"; the sweep and clip on; plants PLANT_SLAB and PLANT_LOWEND):
+  - Test 7, start on a face: the 3.10 m ledge's x 40 face alone, 30 ticks walking into it from push-out's own spot. Right after the sweep, before any push-out, the circle is 0 m into the wall at all three speeds, ending at x 39.599998, push-out's spot to the bit. With the first sweep's slab (no "a >= t0", 1e-6 touch) it is 0.210 / 0.319 / 0.400 m in: red.
+  - Test 8, a raised ramp: a 2.6 m block with a 25 % ramp on it (2.6 to 3.6 m, its low end at the block's edge). A running jump from 0.5, 1.0 and 1.5 m out gains the edge and walks up the ramp in 9 of 9 runs, 0 ticks inside. With the ramp swept at its low end: 0 of 9 gained: red.
+  - The two rows of 11.7 are rewritten so. No other row needs a roof: test 6 is the yard, 9 the yard's ramps, 10 and 11 made maps, 14 the x 45 seams, 15 to 23 the yard, made maps or the street.
+- [B12-3] The ridge (N32), run as a switch (RIDGE_FIX): a ramp's high end counts as exposed only if no other shape meets that edge along the ramp's width with its top within 1 cm of the ramp's top; a high end that another shape continues is left to the set-back and push-out, as the sandbox reads it.
+  - With it, block 5's six roof runs at 9.576 m/s are bit-equal to the push-out (were 6 differing, up to 0.51 m). Blocks 5 and 6 are otherwise unchanged against block 10's sweep: ramps from the side 306 of 306, the G6 freestanding ramp still stopped 0.40 m out at every speed.
+  - Where the hold can happen at all: it needs a start more than 0.555 / grade from the seam and a move that reaches within 0.4 m. That is a grade above about 0.555 / (0.4 + move): about 91 % at walk and 77 % at sprint, roof grades only. A gentle made ridge never shows it, so its test needs a steep made ridge, which row 9's undecided slope limit could make a wall.
+  - Cost: one bool per ramp worked out once in `StaticWorld::build` (`high_end_open`), about 15 code / 20 tests (a made steep ridge, bit-equal to the push-out; plant: the bool forced true, the one-tick hold back).
+
+### Block 12's answers
+1. **Tests off the roofs:** test 8 moves to a made 25 % raised ramp (low end 2.6 m) and test 7 to a lone wall face (B12-2); both plants are red there, run. No other row of 11.7 stands on a roof.
+2. **The ridge:** reading a slope's height past a seam it can cross takes one bool per ramp, "high end open", worked out once at build, and the sweep leaves a high end that another shape continues to the set-back and push-out. It is measured: the roof runs become bit-equal to his sandbox's push-out, and nothing else moves. It costs about 15 / 20. **Recommended: a follow-up** (STATUS), not now. It bites only on ramp-to-ramp seams steeper than about 77 to 91 %, the roofs' grades today, which MOVE-RULES row 9 keeps open; a slope limit of his could make those ramps walls and the fix moot; and its test would need a steep made ridge whose meaning row 9 decides. It is taken when row 9 is answered, or when the first ramp-to-ramp seam under 77 % appears in a map.
+3. **The corner, corrected:** the 3.05 m ledge's corner (x 38, z -4), not the 3.10 m one. 0.063 m is my largest per-axis difference; the largest horizontal distance at one tick is 0.069 m, as game-designer measured (B12-1).
+4. **The count:** 11.9 moves to about 1,510 / 1,840 (+10 tests for the two made maps); with the ridge fix, if taken later, +15 / +20.
+
+DONE

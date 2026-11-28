@@ -151,7 +151,10 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   F2's 8,295 to 8,395 is superseded), about 18,550 to 23,100 written lines at the measured rates; **his stop line for
   4c-2: 18,700** (SIZE-4C (b)), two thirds about 12,470; the early look (steps 1 to 5, about 7,080 by the designs'
   count) at about 15,360 to 19,110 written lines.
-- 4c-1 as built: 1,564 written lines with the fix pass (the hold 1,665; he was told when it passed 1,420).
+- 4c-1 as built: 1,565 written lines at 0645432f (`count-4c.mjs` against dae6d107: 1,564 at the fix pass 2b2f44c2,
+  plus one comment line in 0645432f; the hold 1,665; he was told when it passed 1,420).
+- Step 1 by rust-reviewer's block 11 with block 12: about 1,510 / 1,840 (code / tests), 3,350 in all; the ridge flag
+  (block 12, a STATUS follow-up, not now) would add 15 / 20.
 - Measured written lines against the designs' count: 4a 2.4 times, 4b-1 2.17, 4b-2 2.7.
 - 4c by the designs' count: 7,315 (steps 1 to 7, the plan's section 6) and about 630 for the scene with the map's
   reading (230 / 260 by 4b's sheet, and 60 to 80 more with as many in tests) = about 7,950. At the measured rates:
@@ -192,7 +195,15 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   `/home/user/Shamble-Frontlines/.gate/cs4b-2`. A session of another account works on its own branch from this
   branch's head and never pushes here (his Lanes rule). SEAT-OUT from him: stop at a whole point and report the last
   commit's id.
-- **State (13:50 Amsterdam, from the clock): 4c-1's code is done and reviewed.** The fix pass is committed (2b2f44c2,
+- **State (14:03 Amsterdam, from the clock): 4c-1's docs pass is committed (9283d302**, docs-keeper's, its checks
+  passing; STATUS's quotes of his item 12 b and c compared byte for byte with his saved message by
+  `quote-check-12bc.mjs` in the scratchpad: both exact). CI green on 0645432f (gate, smoke, toolchain 9 min 3 s;
+  Chromium 3.6 min). Question 13 corrected at 13:58 (game-designer's block 8: "the sandbox's maps never met it" was
+  wrong; the swept wall pass's numbers as information, no question 14) and posted on the board as needs-musti at
+  37776da1 before the correction. rust-reviewer's block 11 (step 1's consolidated table, 25 tests) and block 12 (tests
+  7 and 8 off the roofs, each plant still caught; the ridge flag as a follow-up; the 3.05 m ledge, 0.069 m) are done.
+  **Next:** the report's draft and the pull request's text in the notes, then the verifier on them. Earlier state
+  (13:50), kept: **4c-1's code is done and reviewed.** The fix pass is committed (2b2f44c2,
   CI green: gate, smoke, toolchain 9 min 53 s) with one comment reworded (0645432f, CI running); `fix-s-wip.patch` is
   stale (its code is in 2b2f44c2). The review: two rounds, round 2 APPROVE from graphics-engineer and test-engineer
   (`review-s-round.md`); the plant run on 2b2f44c2 caught 45 of 45 with 3 of 3 controls (`plants-4c.txt`). Running:

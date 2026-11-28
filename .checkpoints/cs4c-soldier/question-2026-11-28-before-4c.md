@@ -339,12 +339,19 @@ in this folder.)
 - **Options:** (a) the game never counts a top at or below his feet as a wall (rust-reviewer's clause: one condition,
   no number); he could then walk along that wall top over the window; (b) the game does exactly what his sandbox
   does.
-- **Recommended: (a).** It is a difference from what he played, so it is his; the sandbox's maps never met it, and
-  the game's maps with floors would.
-- Not his, and so not asked (game-designer's block 7: none is a rule of his): the pull clipped where a wall stands in
-  its reach (no step at his sizes has one; it changes nothing where no wall is in reach), the wall test as a sweep of
-  the body's circle (already his DEPART-4C (a)), and the guard on a ramp met from beyond its high end (a case no map
-  of his has).
+- **Recommended: (a).** It is a difference from what he played, so it is his; his sandbox's metrics room has the case
+  at his Export's sizes (the window wall above), and the game's maps with upper floors would have it under every floor.
+- Not his, and so not asked (game-designer's blocks 7 and 8: none is a rule of his): the pull clipped where a wall
+  stands in its reach (no step at his sizes has one; it changes nothing where no wall is in reach); the wall test as a
+  sweep of the body's circle (row 3 as the game builds it: it matches his sandbox's push-out in the open and on every
+  face; at corners it differs by up to 0.069 m at his walk (one case, a soldier rounding the 3.05 m ledge's corner
+  while pushing another), 4 micrometres at his sprint, and on the roofs it holds him one tick at the ridge (paths up to 0.51 m
+  apart, the same result); told to him as information, not asked: rust-reviewer's block 10, game-designer's block 8);
+  and the guard on a ramp met from beyond its high end (a case no map of his has).
+- **Corrected at 13:58 Amsterdam (from the clock), after it was posted at 37776da1:** the recommendation said "the
+  sandbox's maps never met it", which is wrong (his metrics room's window wall, game-designer's block 8); and the
+  sweep's line said "already his DEPART-4C (a)", a reason game-designer withdrew (that answer compared our sweeps with
+  the collision library's, not with his sandbox's push-out). The question and its options are unchanged.
 
 ## One line, no question
 STEP12-GO is in the register already (`docs/DECISIONS.md:183`, since 4b-2's docs pass), so it is not written again.

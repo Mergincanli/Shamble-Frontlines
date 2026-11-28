@@ -710,7 +710,15 @@ His message is saved by script (`.checkpoints/cs4-walk/mustafa-2026-11-28-answer
   tick's step allows, as his sandbox does, and **nothing is built that depends on roofs being walkable or not** (no
   test, recording route, mark or readout asserts that a roof is or is not walked; the yard's and street's tests stay
   off the roofs; the walk recording's route keeps off them). He decides a slope limit after he has walked the roofs in
-  the early look.
+  the early look. **Applied 2026-11-28, 14:03 Amsterdam (game-designer's block 8, Medium):** netcode-architect's
+  "a roof edge (2.6 m) by a jump" in the walk recording's route (`netcode-architect-read.md:355`) and `walk_reaches.rs`'s
+  "a roof edge gained by a jump" (`:430`) were written before his answer and are superseded by this line: the route and
+  its reach list keep off the roofs (row 5's real heights are shown by the 1.0 m cover wall and the ledges); step 1's
+  tests 7 and 8 (rust-reviewer's 11.7, rewritten by its block 12) stand on a lone wall face and on a made 2.6 m block
+  with a 25 % ramp, each plant still caught there (8: 9 of 9 gained, 0 of 9 with the plant; 7: on push-out's spot to
+  the bit, 0.21 to 0.40 m into the wall with the plant). The ridge's one-tick hold (the sweep at a ramp-to-ramp seam,
+  where his sandbox's push-out carries him over): rust-reviewer's "high end open" flag, about 15 / 20, a STATUS
+  follow-up, not built now (roof grades only, row 9 open).
 - **BODY-SHAPE (3a):** his sandbox's body: the 0.4 m body for walls and the step trigger, the 0.15 m foot for standing,
   the pull, the 0.2 m snap down with its slope term (rust-reviewer's blocks 5 and 6; the 2.5D form honestly counted at
   about 205 / 265, the head test and the stood-on slope included). The two model holes are fixed in step 1, one

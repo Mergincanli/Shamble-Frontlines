@@ -124,7 +124,7 @@ struct S {
     cfg: Cfg, vx: f32, vz: f32, lvx: f32, lvz: f32, fall_from: Option<f32>, flickers: u32, head_hits: u32,
     max_drop: f32, wall_hits: u32, y_moved: f32, below_top: f32,
     // block 9
-    pullv: Option<(f32, f32)>, pull_carry: f32, setbacks: u32, max_setback: f32, max_rise: f32,
+    pullv: Option<(f32, f32)>, pull_carry: f32, setbacks: u32, max_setback: f32, max_rise: f32, pen_after_sweep: f32,
 }
 
 fn eps(body: Body) -> f32 { if body == Body::Cyl { 0.0 } else { 0.005 } }
@@ -136,6 +136,9 @@ const TINY: f32 = 1e-6;
 // Block 10's switches: on = as game-designer's block 7 reads the code (OLD_HEAD=1, OLD_SETBACK=1, OLD_LANDING=1 give
 // block 9's forms back); WALK_SWEEP=1 sweeps the walk's wall pass; PULL_CLIP=1 sweeps the pull.
 static TRACE_BITS: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+static PLANT_SLAB: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+static PLANT_LOWEND: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+static RIDGE_FIX: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
 static OLD_HEAD: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
 static OLD_SETBACK: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
 static OLD_LANDING: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
@@ -293,6 +296,14 @@ fn tick(world: &[Block], s: &mut S, _body: Body, wish: (f32, f32), speed: f32, j
     if WALK_SWEEP.load(std::sync::atomic::Ordering::Relaxed) {
         let (mx, mz) = (s.vx * DT, s.vz * DT);
         sweep_walk(world, s, mx, mz, test_feet, true);
+        // Test 7's measure: right after the sweep, before any push-out, how far the circle is into a wall.
+        for b in world {
+            if b.ramp.is_some() || b.min[1] >= test_feet + BODY_H - TINY { continue; }
+            let h = height_near(b, s.x, s.z);
+            if h <= test_feet + STEP + 0.005 { continue; }
+            let pen = R - dist2(b, s.x, s.z).sqrt();
+            if pen > s.pen_after_sweep { s.pen_after_sweep = pen; }
+        }
     } else {
         s.x += s.vx * DT;
         s.z += s.vz * DT;
@@ -391,7 +402,15 @@ fn sweep_walk(world: &[Block], s: &mut S, mut mx: f32, mut mz: f32, test_feet: f
                 let (p, q) = if ax == 0 { (s.x, s.z) } else { (s.z, s.x) };
                 let within_width = q > b.min[o] && q < b.max[o];
                 let beyond_high = if up { p >= b.max[ax] } else { p <= b.min[ax] };
-                if within_width && !beyond_high { continue; }
+                if PLANT_LOWEND.load(std::sync::atomic::Ordering::Relaxed) {
+                    // The first sweep's form: any ramp swept from outside its footprint, its low end included.
+                    if s.x > b.min[0] && s.x < b.max[0] && s.z > b.min[2] && s.z < b.max[2] { continue; }
+                } else {
+                    if within_width && !beyond_high { continue; }
+                    // The ridge fix (switch): a high end that another shape continues at its height (within 1 cm) is no
+                    // exposed end, so it is left to the set-back and the push-out, as the sandbox reads it.
+                    if within_width && beyond_high && RIDGE_FIX.load(std::sync::atomic::Ordering::Relaxed) && !exposed_high_end(world, b) { continue; }
+                }
             }
             if std::env::var("TRACE9").is_ok() && !slide_speed { println!("        sweep cand {i} from {:.4} by {mx:.4}: {:?}", s.x, sweep_rect0(b, s.x, s.z, mx, mz)); }
             if let Some((t, nx, nz)) = sweep_rect0(b, s.x, s.z, mx, mz) { if best.is_none_or(|bb| t < bb.0) { best = Some((t, nx, nz, i)); } }
@@ -412,12 +431,26 @@ fn sweep_walk(world: &[Block], s: &mut S, mut mx: f32, mut mz: f32, test_feet: f
     }
 }
 
+/// Whether a ramp's high end is exposed: no other shape whose top lies within 1 cm of the ramp's top meets the
+/// high-end edge along its width.
+fn exposed_high_end(world: &[Block], r: &Block) -> bool {
+    let Some((a, up)) = r.ramp else { return false };
+    let o = 2 - a;
+    let edge = if up { r.max[a] } else { r.min[a] };
+    !world.iter().any(|b| {
+        if std::ptr::eq(b, r) { return false; }
+        let top_at_edge = match b.ramp { None => b.max[1], Some(_) => { let (mut px, mut pz) = (0.0, 0.0); if a == 0 { px = edge; pz = (r.min[2] + r.max[2]) * 0.5; } else { pz = edge; px = (r.min[0] + r.max[0]) * 0.5; } height_at(b, px, pz) } };
+        let meets = b.min[a] <= edge + TINY && b.max[a] >= edge - TINY && b.min[o] < r.max[o] && b.max[o] > r.min[o];
+        meets && (top_at_edge - r.max[1]).abs() <= 0.01
+    })
+}
+
 /// Block 6's swept circle against a footprint with no skin: touching (within 0.1 mm, so push-out's own spot counts) and moving along or away is no hit.
 fn sweep_rect0(b: &Block, px: f32, pz: f32, dx: f32, dz: f32) -> Option<(f32, f32, f32)> {
     let (qx, qz) = nearest(b, px, pz);
     let (ex, ez) = (px - qx, pz - qz);
     let d0 = (ex * ex + ez * ez).sqrt();
-    if d0 <= R + 1e-4 {
+    if d0 <= R + if PLANT_SLAB.load(std::sync::atomic::Ordering::Relaxed) { TINY } else { 1e-4 } {
         if d0 > 0.0 {
             // On a face, the face's own normal (axis-aligned), so the slide is exact; at a corner, the radial one.
             let (nx, nz) = if ex == 0.0 { (0.0, ez.signum()) } else if ez == 0.0 { (ex.signum(), 0.0) } else { (ex / d0, ez / d0) };
@@ -433,7 +466,7 @@ fn sweep_rect0(b: &Block, px: f32, pz: f32, dx: f32, dz: f32) -> Option<(f32, f3
         if d[k] == 0.0 { if p[k] < lo[k] || p[k] > hi[k] { return None; } continue; }
         let (mut a, mut c) = ((lo[k] - p[k]) / d[k], (hi[k] - p[k]) / d[k]);
         if a > c { std::mem::swap(&mut a, &mut c); }
-        if a > t0 || (axis == 2 && a >= t0) { t0 = a; axis = k; }
+        if a > t0 || (axis == 2 && a >= t0 && !PLANT_SLAB.load(std::sync::atomic::Ordering::Relaxed)) { t0 = a; axis = k; }
         if c < t1 { t1 = c; }
         if t0 > t1 { return None; }
     }
@@ -474,7 +507,7 @@ fn start(x: f32, z: f32, y: f32) -> S {
     if TRACE_BITS.load(std::sync::atomic::Ordering::Relaxed) { eprintln!("S"); }
     S { x, z, y, vy: 0.0, grounded: true, pull: None, stepped: None, steps: 0, falls_unjumped: 0, airborne_ticks: 0, max_float: 0.0, open_float: 0.0, fall_at: None,
         cfg: Cfg { land_prev: LAND_PREV_ALL.load(std::sync::atomic::Ordering::Relaxed), ..Cfg::default() }, vx: 0.0, vz: 0.0, lvx: 0.0, lvz: 0.0, fall_from: None, flickers: 0, head_hits: 0, max_drop: 0.0, wall_hits: 0, y_moved: 0.0, below_top: 0.0,
-        pullv: None, pull_carry: 0.0, setbacks: 0, max_setback: 0.0, max_rise: 0.0 }
+        pullv: None, pull_carry: 0.0, setbacks: 0, max_setback: 0.0, max_rise: 0.0, pen_after_sweep: 0.0 }
 }
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -1120,10 +1153,38 @@ fn block9(world: &[Block], body: Body, v0: f32) {
     }
 }
 
+/// Block 12: test 7 (a start exactly on a face) and test 8 (a raised ramp) on made cases, off the roofs.
+fn block12(_world: &[Block], body: Body, v0: f32) {
+    let speeds = [6.3_f32, 9.576, 13.27];
+    // Test 7: the 3.10 m ledge's x 40 face; he starts at push-out's own spot (40 - 0.4) and walks into it 30 ticks.
+    let face = vec![bx([40.0, 0.0, -4.0], [43.0, 3.1, -1.0])];
+    for sp in speeds {
+        let mut s = start(40.0 - R, -2.5, 0.0);
+        let mut worst = 0.0_f32;
+        for _ in 0..30 { tick(&face, &mut s, body, (1.0, 0.0), sp, false, v0); worst = worst.max(s.pen_after_sweep); s.pen_after_sweep = 0.0; }
+        println!("test 7 at {sp}: x {:.6} (push-out's spot {:.6}), deepest into the wall right after the sweep {worst:.6} m", s.x, 40.0_f32 - R);
+    }
+    // Test 8: a made raised ramp of 25 %: a 2.6 m block x 70..76, z -10..-4, and on it a ramp x 70..76, z -10..-6
+    // rising toward +z from 2.6 to 3.6 m (its low end at the block's edge, z -10). A running jump at the edge.
+    let raised = vec![bx([70.0, 0.0, -10.0], [76.0, 2.6, -4.0]), rp([70.0, 2.6, -10.0], [76.0, 3.6, -6.0], 2, true)];
+    for sp in speeds { for d in [0.5_f32, 1.0, 1.5] {
+        let mut s = start(73.0, -10.0 - R - d, 0.0);
+        let (mut gained, mut highest, mut emb) = (false, 0.0_f32, 0);
+        for t in 0..60 {
+            tick(&raised, &mut s, body, (0.0, 1.0), sp, t == 0, v0);
+            emb += u32::from(embedded(&raised, &s, body));
+            if s.grounded && s.y >= 2.6 { gained = true; }
+            if s.grounded { highest = highest.max(s.y); }
+            if s.z >= -6.5 { break; }
+        }
+        println!("test 8 at {sp} jump {d} m out: edge gained {gained}, highest standing {highest:.4} (the ramp's top 3.6), ticks inside {emb}");
+    }}
+}
+
 fn main() {
     let body = match std::env::args().nth(1).as_deref() { Some("3a") => Body::A3, Some("3b") => Body::B3, Some("3x") => Body::X3, _ => Body::Cyl };
     if std::env::args().nth(1).as_deref() == Some("2w") { WALL_DISC.store(true, std::sync::atomic::Ordering::Relaxed); }
-    for (k, f) in [("OLD_HEAD", &OLD_HEAD), ("OLD_SETBACK", &OLD_SETBACK), ("OLD_LANDING", &OLD_LANDING), ("WALK_SWEEP", &WALK_SWEEP), ("PULL_CLIP", &PULL_CLIP), ("TRACE_BITS", &TRACE_BITS)] {
+    for (k, f) in [("OLD_HEAD", &OLD_HEAD), ("OLD_SETBACK", &OLD_SETBACK), ("OLD_LANDING", &OLD_LANDING), ("WALK_SWEEP", &WALK_SWEEP), ("PULL_CLIP", &PULL_CLIP), ("TRACE_BITS", &TRACE_BITS), ("PLANT_SLAB", &PLANT_SLAB), ("PLANT_LOWEND", &PLANT_LOWEND), ("RIDGE_FIX", &RIDGE_FIX)] {
         if std::env::var(k).is_ok() { f.store(true, std::sync::atomic::Ordering::Relaxed); }
     }
     if std::env::var("HEADROOM_ON_OWN_TOP").is_ok() { OWN_TOP.store(true, std::sync::atomic::Ordering::Relaxed); }
@@ -1133,5 +1194,5 @@ fn main() {
     if std::env::var("FIX_TOWARD").is_ok() { TOWARD_START.store(true, std::sync::atomic::Ordering::Relaxed); }
     let world = scene();
     let v0 = (2.0 * G * (REACH - STEP)).sqrt();
-    match std::env::args().nth(2).as_deref() { Some("b5") => block5(&world, body, v0), Some("b9") => block9(&world, body, v0), _ => block6(&world, body, v0) }
+    match std::env::args().nth(2).as_deref() { Some("b5") => block5(&world, body, v0), Some("b9") => block9(&world, body, v0), Some("b12") => block12(&world, body, v0), _ => block6(&world, body, v0) }
 }
