@@ -822,5 +822,10 @@ Mustafa and the Status line. Nothing run or built; no GitHub writes.
   RS will build it; a first list carried our commit's name and was voided before the fill. Three builds now agree on
   every file: build 1′, build 2′, and U7's run 4 by another builder.
 
-Status: COMPLETE 2026-11-28 02:51 UTC
+- **2026-11-28 02:59 UTC: the CI condition is met.** All four runs on the save 232cc8c9 were success at attempt 1: gate
+  push 46099627026 and pull request 46099631890; toolchain push 46099627427 and pull request 46099631886
+  (check_suite.completed 02:59:03; the main session's message, its lines at launch-yp-head.md:30-32, read here). Not
+  read by me with gh, which this brief does not allow. The verdict stands as APPROVE WITH FINDINGS on Y′.
+
+Status: COMPLETE 2026-11-28 02:59 UTC
 
