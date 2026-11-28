@@ -10,8 +10,8 @@
   `/home/user/Shamble-Frontlines` is never switched.
 - **Base:** origin/main dae6d107fdbe942567104bcf1c9a2cbc6b3a1e0f (pull request #79's merge commit), taken in by
   fast-forward from b7145273.
-- **Last update:** 2026-11-28 01:59 Amsterdam (from the clock; an earlier save said 01:08, a time written without
-  reading the clock: it was 00:57)
+- **Last update:** 2026-11-28 02:10 Amsterdam (from the clock; an earlier save said 01:08, a time written without
+  reading the clock: it was 00:57; an edit at 02:04 wrote "02:06", also unread, corrected here)
 
 ## Steps done
 1. **4b-2 merged and main taken in** (2026-11-27). Pull request #79 merged by merge commit dae6d107 at 23:12:04 UTC,
@@ -49,9 +49,9 @@
 ## Current step
 **Step S, the scene: the build** (by the sheet's section D, revision 2). The branch rule (condition 2): until he
 answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and prototypes only.
-- **Code not yet committed is saved as a patch:** `.checkpoints/cs4c-soldier/step-s-wip.patch` (from `git diff`, the
-  new files marked with `git add -N`; the old scene file's removal unstaged so no commit carries half-built code).
-  A new seat applies it with `git apply` on this branch's head. Written so far (01:24 Amsterdam): the interface file
+- **The code is committed (bc7720f3, c1de41e5); `step-s-wip.patch` is stale and is not applied by anyone** (it was
+  the build's saved state before bc7720f3; it goes with the notes at 4c-1's end). How the build went, kept for the
+  record: written by 01:24 Amsterdam: the interface file
   (`PictureContent`, `SceneObject`, `setContent`, `inventory`), `render/scene.ts` (the empty floor moved; the map's
   floor with flat faces turned outward; greys by height; the grid; disposal; the overview), `render/inventory.ts`,
   three-picture.ts's `setContent` and `inventory`, boot's `__shambleScene`, the two markers.
@@ -104,20 +104,24 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   saved beside it). Only notes and prototypes go on the branch until SIZE-4C is answered (condition 2).
 
 ## Next steps
-1. **The plan sheet** `.checkpoints/cs4c-soldier/reread-sheet.md`, revision 1, against main dae6d107: step 0 (the first
-   docs commit) and step S (the scene, 4b's old step 12) with their exact symbols, for the advisor agent's APPROVE
-   now; steps 1 to 7 held for three reads against today's code (engine-architect: the page, the block's layout, the
-   camera; netcode-architect: the command path, the snapshot and block, the recordings; rust-reviewer: the movement
-   on today's collision world, the float helpers, 4B-RAY-WASM and 4B-RAY-COUNTS), each written to this folder. A
-   column per step names which of his questions it waits for. Building a step out of the plan's order while his
-   answers are out (the command path or the block before the movement) is put to the advisor agent, never done on
-   my own reading.
-2. **Step 0, the first docs commit** (after the advisor agent's APPROVE; it waits for PASTE-BREAKS and BOARD-WORDS,
-   since nothing in the scene needs it): his go for 4b-2's merge, his word on merging and his design notes into
-   `docs/DECISIONS.md` by script; LOOP_V2's new section 14 and its pointers placed by docs-keeper from the saved
-   message (`chat-words.mjs part`, never typed); the register line in `docs/adr/README.md`. STEP12-GO is in the
-   register already (since 4b-2's docs pass), so it is not written again.
-3. **Step S, the scene**, then the steps his answers free.
+(The sheet, revision 2, and step S are done; the old items 1 to 3 are in "Steps done" and "Current step".)
+1. **His answers** (the question file's eleven; the Testlines read and the CI Builder's request in the chat). On each:
+   step 0 when PASTE-BREAKS, BOARD-WORDS and DESIGN-CLASH are in (condition 8; BOARD-WORDS (b)'s method written first,
+   condition 7); step S's six reviews by SIZE-4C; STREET-GREY before 4c-1 merges.
+2. **The dependency batch: answered** (APPROVE, 2026-11-28; `dependency-check.md` written by its form, the five
+   digests checked again with `sha256sum` against the scratch worktree). The batch is applied only in the step that
+   first needs it, after SIZE-4C, in one commit with F1's test and F2's layering test; FACING-SPAWN is settled before,
+   since its option (a) would change the root comment the auditor answered on (then a new answer). For rust-reviewer
+   when exp is first called: the answer's item 3 (one named allowance in `rules_scan.rs`, the exact paths in
+   `maths-allowed.mjs`, PM-0004-22's vectors, the feature pin, one exhaustive native run).
+3. **The advisor agent's item 10, as notes and prototypes only (condition 2):** rust-reviewer's block 6 (the bodies
+   3a, 3b and 2 on block 5's "not run" list: ramp sides with the set-back, a ceiling on a made map, landing, the push
+   with two soldiers; what the 2.5D form does with a shape whose bottom is above the ground; its yes or no on the
+   record rule); engine-architect's block 5 (GROUND against map.rs:39, map.rs:325 and the height scene.ts draws the
+   ground at; FACING-SPAWN's options, any pick that narrows a map file going to him); netcode-architect's written yes
+   on the record rule when a slot is free; the sheet's revision 3 (item 6 applied with its confirmations outstanding;
+   the recount of steps 1 to 7 with both the 2.5D and the 3D sweep counts until block 6 answers; section G per step).
+   The advisor agent is asked to approve steps 1 to 7 only after his answers on BODY-SHAPE, SWEEP-ROUTE and the slope.
 
 ## What leaves first if the count runs high (his SIZE-4B point 2, applied to 4c; confirmed in the sheet)
 - The plan's own ladder: at 13,150 written lines the far-corner map (PM-0004-39) moves to 4d, and he is told before
@@ -154,11 +158,18 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   `/home/user/Shamble-Frontlines/.gate/cs4b-2`. A session of another account works on its own branch from this
   branch's head and never pushes here (his Lanes rule). SEAT-OUT from him: stop at a whole point and report the last
   commit's id.
-- **State:** nothing of 4c is built; no file outside `.checkpoints/` differs from main. Three reads run (see
-  "Running work"); no saver runs (the main session commits and pushes the notes by hand, at least every 25 minutes).
-  If this seat ends while they run, their files hold whatever blocks they finished: a new read continues after the
-  last complete block.
-- **Next:** this card's "Next steps", in that order.
+- **State (02:10 Amsterdam, from the clock):** step S is built and proven on the branch: code commits bc7720f3 (the
+  scene) and c1de41e5 (the volume check). **CI on 8bee8365 (the head holding both): gate, smoke and toolchain green**
+  (the toolchain 01:00:03 to 01:10:04 UTC). Step 0 is not written (it waits for his answers). The dependency batch for
+  the later steps (libm in `sim`, `content` in the tests of `room` and `client-endpoint`) is a patch in the notes, NOT
+  applied: `deps-4c.diff` with its digests `deps-4c.sha256`, made in the scratch worktree `.gate/deps-4c`.
+  **security-auditor: APPROVE** on exactly those five digests (`security-auditor-deps-4c.md`), with two conditions on
+  the commit that applies it (F1 Medium: devtools' `dependency_rules.rs` updated and tightened in the same commit; F2
+  Low: `tests/layering.rs` lands in the same commit), both written in `dependency-check.md`. No saver runs: the main
+  session commits and pushes the notes by hand, at least every 25 minutes, and holds notes pushes while a code head's
+  toolchain run is going.
+- **Next:** wait for his answers (the question file's eleven, and the two asks in the chat); meanwhile only notes and
+  prototypes (condition 2): the advisor agent's item 10 before steps 1 to 7.
 
 ## Running work
 - Design reads against main dae6d107 (at most three agents at a time), each writing only its own file in
@@ -172,5 +183,7 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   - game-designer (`game-designer-read.md`): DONE.
   - the advisor agent (`advisor-reread-4c.md`): DONE (its verdict above).
   - rust-reviewer's re-run (its block 5 in `rust-reviewer-read.md`): DONE.
-  - No agent runs now.
+  - security-auditor (`security-auditor-deps-4c.md`): the dependency hold's answer on the batch `deps-4c.diff`, by
+    the digests in `deps-4c.sha256` (started just before 02:04 Amsterdam, the clock read right after it): DONE,
+    APPROVE with F1 and F2.
 - The scene's before picture: `.gate/scene-before-4c.png` (main's page, 3 draw calls), by `shot-4c.mjs`.
