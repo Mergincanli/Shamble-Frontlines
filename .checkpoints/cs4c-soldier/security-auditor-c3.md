@@ -148,3 +148,40 @@ Items: 1 MET; 2 MET; 3 rule MET, three named plants NOT MET (L1); 4 MET on the l
 Any of these left open keeps the PR needs-mustafa until fixed or explicitly deferred.
 
 DONE
+
+## Round 2 (fix commit 9e9a1cc8, against d7e260f7; only what changed)
+- [x] M1 FIXED. marking.rs@9e9a1cc8:90 `end = if escaped { open + 3 } else { open + 2 }`: the closing quote is sought
+  after the escaped character; `'\\'`, `'\n'` and `'\u{7b}'` traced: still end at their own last quote. Bites:
+  layering.rs:287 (`['\'','{']` in a tests module, then content) and :288 (strip! with `['\'','}']` before its mark);
+  rules_scan.rs:932 CONTENT_BITES (the same tests module, then x.unwrap(), "2: `unwrap`"). Probe re-run on the fixed
+  marking.rs (.gate/sa-c3-probe, rustc 1.99.1): both former false passes now read `content` as shipped; every earlier
+  control unchanged (a real top-level tests module still marked).
+- [x] L1 FIXED. rules_scan.rs LATER_BITES 37 -> 40, :715-717: `libm::expf` in exp_of, `::libm::exp` in facing_of
+  (named by routine and function), `extern crate libm as m;` in lib.rs (outside fmath.rs).
+- [x] L3 FIXED. dependency_rules.rs:246-252: no backslash on a non-comment line of the root (names) or of any
+  crates/* manifest (askers walks them all); bite :358-362 (`libm` rename). layering.rs:65-73: any backslash line
+  refused in the manifest half, before the table logic; bite :337 (`content` with no other word naming content).
+  A trailing `#` comment holding a backslash would read red: the safe side.
+- [x] L4 FIXED. layering.rs:197-221: walks every crates/* with a Cargo.toml except sim and devtools (so content and
+  protocol too, each must have a lib.rs: a later binary-only crate reads red, the safe side), and asserts room,
+  client-endpoint and sim-wasm among them. handed_on counts `pub type` (:135), plant :366-374 (`pub type` counted,
+  private `type` not); the real tree's HANDED_ON unchanged (no pub type naming content in sim/src).
+- [x] Item-2 remark FIXED. dependency_rules.rs:153-160 maths_lines is the function the real check uses (:213-217);
+  plants :346-356: control root_with(MATHS) == [MATHS]; loosened `0.2.16`, a features table, and a second `libm-x`
+  line each differ.
+- [x] RUN at 9e9a1cc8 (worktree head = 9e9a1cc8, clean but my notes): `cargo test --offline --locked -p devtools --test
+  layering --test dependency_rules`: 3 + 4 passed; `-p sim --test rules_scan`: 9 passed. So the real trees pass and
+  every plant in those three targets is found.
+- [x] L5 deferral acceptable, on three conditions: it is named as an open item (the CI Builder request, the exact line
+  `python3 -I -B crates/devtools/vectors/make_libm_vectors.py --check` after toolchain.yml:166) in STATUS or the PR
+  report, so the PR shows it as explicitly deferred; local-checks.sh:26 keeps running it before every push until then;
+  and any change to libm-inputs.bin before the CI line lands comes back to me. Why acceptable: the inputs are test
+  data only, the header binds their length and sha256, and a change shows as a binary diff plus a header diff.
+- New findings: none.
+
+## Verdict (round 2): APPROVE
+M1, L1, L3, L4 and the item-2 remark fixed (above, with the run); L5 explicitly deferred on the three conditions. The
+batch's five digests unchanged by this commit (no manifest or lock in its diff). Not checked: nothing else re-run
+(no clippy, gate, Node or browser); my memory neither read nor updated.
+
+DONE

@@ -221,6 +221,13 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   `/home/user/Shamble-Frontlines/.gate/cs4b-2`. A session of another account works on its own branch from this
   branch's head and never pushes here (his Lanes rule). SEAT-OUT from him: stop at a whole point and report the last
   commit's id.
+- **security-auditor's round 2 on C3's fix 9e9a1cc8: APPROVE** (`security-auditor-c3.md`, "Round 2"): M1, L1, L3, L4
+  and its item-2 remark FIXED (its probe re-run on the fixed marking; the three changed test targets passed at
+  9e9a1cc8); no new finding. **L5's deferral is accepted on three conditions, which travel to 4c-2's report and
+  STATUS:** (1) the report or STATUS names the exact CI line as open (toolchain.yml:165-166 runs the chacha8 and f32
+  generators' `--check`, not `make_libm_vectors.py --check`: a request for the CI Builder); (2) local-checks.sh keeps
+  running the generator's `--check` before every push until that CI line lands; (3) any change to libm-inputs.bin
+  before then goes back to security-auditor. C3 closes when CI on 9e9a1cc8 is green.
 - **C4's order of work (written 18:16 Amsterdam, from the clock; the design's pointers are in the 17:52 state
   below):** (1) sim world.rs: `PLAYER_SLOT`, `PLAYER_TEAM`, `MOVE_REACH`, `move_in_reach`; `PlayerCommand` gains
   `move_x`, `move_y: i8` and `aim: AimCm` (NONE with `AimCm::NONE`); `PlayerRecord { buttons, presses }` and `NONE`;
