@@ -121,6 +121,18 @@ going; free disk; usage read.
   `producers: wasm-bindgen 0.2.130`); Wasm 901a649231dc9c217204b121a2800641c3c6aa9cd3cb9d42eb5657452b0a0e77, which is
   U7's run-4 value (u7-report.md:141), made by another builder on another path and day; the six other lines equal Y's
   (diff: line 6 only). Y' (this list) waits for MAIN-70.
+- **Y' DONE 02:4x UTC on 11-28: 1ceecc321eaf194d59568fdab56644d1e9eb4f05** (after MAIN-70's merge 2d379d9c, pushed in
+  8d1306fe, and its four CI runs all success): r1-dist.sha256 line 10 replaced in place, 2a97394b... -> 901a6492...;
+  bars, each alone: `git diff --numstat 652e9513 HEAD -- spikes/netcode-proof` "1 1" on the list alone; against
+  87cb8677 "7 0" on the list alone; the non-comment lines cmp-equal to .gate/stopb/build1p-dist.sha256 (exit 0); the
+  advisor tool's added bar `git grep -n 2a97394b -- spikes/ docs/` prints nothing (exit 1); counted run
+  .gate/stopb/yp-counted.log 02:44:12-25 (self 88/88; ops 104/104, 315 ok, 0 failed; redact 11/11, 464 items, 0
+  findings; refs 2241; diff a8182b1e..., re-read equal before the commit; untracked empty); gate
+  .gate/stopb/yp-gate.txt PASS. B6's Q4 (e) triggers, both cleared: MAIN-70 changed nothing under spikes/ (M70-3's
+  third bar printed nothing) and main's 107 paths hold no kit or CI path (.gate/main-70/main-names.txt, a printing grep:
+  nothing), so Y0 stands and X takes in no kit file. Build 1' ran on Y's tree (before MAIN-70), build 2' runs on Y'
+  (after it): inside B6's ruling, and their equality also shows #79 is no dist input; if they differ, `producers` is read
+  first (plain means main's root files are the suspect, not the commit leak), both lists go to B6, X stays blocked.
 - **Y DONE (void, STOPB-8): 652e9513ce2c1369d8d6146e84109feadf021a55** (22:50): r1-dist.sha256 gains build 1's list byte for byte
   (cmp), numstat `7 0` against Y0, counted run .gate/stopb/y-counted.log PASS; pushed by the save f49a7ba.
 - **C1, the order** [C1]: Y0 -> build 1 at Y0 (worktree A, CARGO_HOME A) -> Y = Y0 plus r1-dist.sha256's seven lines

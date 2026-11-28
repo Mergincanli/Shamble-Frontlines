@@ -1,5 +1,5 @@
 # MAIN-70 step 7: the brief for the advisor agent's read of the pushed head (written 02:3x UTC on 11-28)
-Status: WRITTEN, not sent; the CI lines below are filled when the two toolchain runs end.
+Status: SENT 02:4x UTC on 11-28 to a new advisor agent (background), after all four runs on 8d1306fe read success.
 
 ## The brief (sent as written, to a new advisor agent)
 The head read of one pushed head: MAIN-70, the take-in of main dae6d107fdbe942567104bcf1c9a2cbc6b3a1e0f (#79, cs4b-2
@@ -33,8 +33,16 @@ no cargo, no npm, no git write, no fetch), read and rule:
    message alone. Rule on it: stands, or what is owed (amending would rewrite a commit; it is not an option).
 
 CI on 8d1306fe (read 02:3x UTC):
-- push: gate 46098323772 success (02:29:31-02:30:14), toolchain 46098323769 <TO FILL>;
-- pull request: gate 46098326092 success (02:29:33-02:30:55), toolchain 46098326060 <TO FILL>.
+- push: gate 46098323772 success (02:29:31-02:30:14), toolchain 46098323769 success, job 140834773863 (02:29:33-02:40:22,
+  about 10 min 49 s against 25; its steps 11-12, #74's two, skipped as on every push);
+- pull request: gate 46098326092 success (02:29:33-02:30:55), toolchain 46098326060 success, job 140834781212
+  (02:29:35-02:42:20, about 12 min 45 s against 25; step 11 success, printing "6 files, 1105896 bytes" at its log line
+  2535; step 12 success; the artifact listing shows "preview-site", 330777 bytes, created 02:42:18, expires 2026-12-05).
+- The three toolchain job logs, saved by the main session through the GitHub tools (this session uses gh only for
+  search; read these files, do not fetch): /home/user/Shamble-Frontlines/.gate/main-70/main-job-140780125932.log
+  (main's baseline, 221437 bytes), /home/user/Shamble-Frontlines/.gate/main-70/push-job-140834773863.log (222538 bytes),
+  /home/user/Shamble-Frontlines/.gate/main-70/pr-job-140834781212.log (226516 bytes). A first count by the main session:
+  120 "test result: ok." lines in each, 0 "test result: FAILED"; the line-for-line comparison is yours.
 
 Rule: APPROVE, or what is owed. Write .checkpoints/netcode-proof-test/advisor-main-70-head.md (your plan first, then each
 block as it is done, a notes line after each finding); end with "Decisions needed" and "For Mustafa", then, once every
