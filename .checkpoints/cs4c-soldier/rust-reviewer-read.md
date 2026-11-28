@@ -1191,3 +1191,100 @@ DONE
 5. Answers, count delta, DONE.
 
 ### Notes
+- [B17-1, measured] Scratch .gate/rr17/ (make_inputs.py, dump.rs, dumpwasm.rs, runwasm.mjs, ref.py, twin.py), rr7's libm 0.2.16 rlibs, rustc 1.99.1, Node 22. Inputs as share_per_tick and facing_of form them: exp 33,648 (his two values; easing T = k/1000 on (0, 5]; push s = k/100 on [0, 100]; push 2^(-e/4) down to 2^-1074; easing T from 5 down by 2^(-1/4); 10,000 seeded; exp.rs's branch edges 0x3e300000, 0x3fd62e42/43, 0x3ff0a2b2, 0x4086232b, -708.396..., -745.133..., +-0, -inf, each with its neighbours), sincos 100,017 (the 0.001 grid on [0, 90) x K, 10,000 seeded facings through the quarter turns, sincos.rs's and rem_pio2.rs's edges 0x3e46a09e, 0x3fe921fb/fc, 0x3ff921fb (medium path) and its neighbour, 45 x K, the rests of the doubles just under 90, 180, 270 and 360, the smallest subnormal and normal). Native against wasm32 in Node, the caller at -O and at opt-level 0: **0 of 33,648 exp and 0 of 200,034 sin/cos outputs differ (cmp, byte-equal files).**
+- [B17-2, measured] Against the correctly rounded f64 (Python decimal, 60 digits): exp 1,788 of 33,648 off, largest 0.8148 ulp (x = -3.081); sin 3,064 and cos 3,093 of 100,017 off, largest 0.7539 and 0.7178 ulp. Narrowed to f32: 0 of 200,034 off the correctly rounded f32 of the double's sine and cosine (the route's reference, the coordinator's point). So libm is not correctly rounded in f64 (its own doc: "less than 1 ulp"): an expected file cannot be the reference's bits as f32-expected.txt's are, and per-case pins would be about 7,900 lines.
+- [B17-3, measured] A Python twin of libm 0.2.16's exp (exp.rs:84-155, with math.ldexp for scalbn) and sincos (sincos.rs, k_sin.rs, k_cos.rs, rem_pio2.rs's fast and medium paths; rem_pio2_large not twinned, out of the domain) in CPython floats (each + - * / rounded once, no contraction): **133,665 of 133,665 inputs bit-equal to libm native** (twin.py, 0.2 s). A standard-library generator can therefore derive the expected bits itself, and `--check` can rebuild both files byte for byte.
+- [B17-4, Q4 measured] Shares (1.0 - libm::exp(x)) as f32 against the correctly rounded f32 of 1 - e^x: easing T = k/1000 (5,000) 0 off, largest 0.4998 ulp; easing T from 5 down to 1e-300 (4,300) 0 off; push s = k/100 on [0, 100] (10,001) 0 off, largest 0.4999 ulp; his values: ease 3ebf5c1e (0.1011 ulp), push 3e6fb07b (0.3069 ulp), both the reference's bits. Toward zero (push 2^(-e/4)): 467 cases at or over 1 ulp, the largest |x| among them 2.953e-10, a strength of 8.86e-9 per second; above that edge 19,409 cases, 10 off, largest 0.8633 ulp. Strength 0 gives x = -0.0, exp 1, share exactly 0. Cause: under |x| = 2^-28 libm returns 1 + x (exp.rs:145-148), so 1 - exp(-x) is x on a 2^-53 grid.
+- [B17-5, measured] Players' twins, built offline with build.mjs's own cargo line (`cargo build --locked --release|dev --target wasm32-unknown-unknown -p sim-wasm`) from a copy of the worktree's C3 work in progress (uncommitted, 2026-11-28 16:2x) with fmath.rs put into Q1's form (exp_of, sincos_of; share_per_tick and facing_of naming no libm), read by build-checks.mjs's own `twinProblems` and MATHS_ALLOWED (scratch twins.mjs): release 400 functions, 0 libm names, 0 problems; dev 2,874 functions, 11 names that end in libm's crate (core generics instantiated for it, no libm path), 0 problems. HEAD 14538bd7 (git archive) gives the same: 400 / 0 and 2,874 / 11, 0 problems. **In C3 the players' file links no libm routine; the maths list needs no entry.** Positive control (an exported sim-wasm function calling share_per_tick and facing_of): release 4 problems (`libm::math::exp::exp`, `sincos::sincos`, `rem_pio2::rem_pio2`, `rem_pio2_large::rem_pio2_large`), **dev 29 problems** (also k_sin, k_cos, scalbn, generic::scalbn, floor, generic::floor (+ floor_status), get_high_word, rem_pio2::medium, rem_pio2_large::floor, support::int_traits, support::float_traits, support::env).
+- [B17-6, C4 flag, Medium] So C4's "expected four entries" is the release twin only: build.mjs:189-199 reads both twins, and the dev twin needs about 14 entries by the list's prefix rule (build-checks.mjs:777-778): libm::math::exp, ::sincos, ::rem_pio2 (covers ::medium), ::rem_pio2_large (covers ::floor), ::k_sin, ::k_cos, ::scalbn, ::generic::scalbn, ::floor, ::generic::floor, ::get_high_word, ::support::int_traits, ::support::float_traits, ::support::env; each with its reason. Not C3's.
+- [B17-7, measured] Clippy (`cargo clippy --workspace --all-targets --locked -- -D warnings`) on that copy: exit 0, no warning. `cargo fmt --all -- --check` on it: not clean in the work in progress (rules.rs 23 hunks, devtools/tests/dependency_rules.rs 4, soldiers.rs 1): a `cargo fmt` before the commit, nothing else.
+- [B17-8] RR4 corrected: for x = r x K in (pi/4, pi/2) sincos takes rem_pio2's |x| <= 3pi/4 fast path (rem_pio2.rs:93-99), not the medium one; medium only when the high word is 0x3ff921fb (rem_pio2.rs:89-91), i.e. r above about 89.9999991 degrees, which the 0.001 grid never reaches. The edges reach it (0x3ff921fb00000000, (just under 90) x K, and the rests of the doubles just under 90, 180, 270 and 360), and the latter run medium's second and third rounds. rem_pio2_large is reached only by |x| >= 2^20 pi/2: never by facing_of on [0, 360), but by a raw sincos on any double, and by facing_of on a degree far outside [0, 360) (content refuses those, map.rs:66).
+- [B17-9] The coordinator's reference point: confirmed. libm's own output at rest(just under 360) gives x = a688d313, z = 3f800000 (my dump). The vectors' reference is sin and cos of the double the routine receives (the route's), and that is what B17-2's "0 of 200,034 narrowed off" measures; B7-2's "0 off" was against the true angle on the 0.001 grid, where both agree. RR3 stands; the vectors' edges already hold that case.
+- [B17-10] Row 2's planted defect ("ease_stop from the speed-up time") cannot bite on either table today: soldier.json:23,30 has 0.164 and 0.164, movement.rs:163 TEST_TEXT has 0.25 and 0.25. Row 2 needs a table with the two times apart (e.g. TEST_TEXT with one changed in the test's own copy), or the plant survives.
+- [B17-11] Q3's fact: testlines-table.json:109-113 says ads_speed_multiplier is "walking speed while aiming" (old game T.adsMoveMult); the old game sets the speed factor to adsMoveMult in place of the sprint factor (shamble-game.js:2774): walk x multiplier, as sprint = walk x its multiplier.
+
+### Answers
+**Q1 (the vectors' form): YES, on one condition: the raw-name rule below goes into the scan in C3.** No batch change: devtools already depends on sim (crates/devtools/Cargo.toml `sim = { path = "../sim" }`), `fmath` is `pub mod` (lib.rs WIP), and devtools names `sim::fmath::exp_of`, never `libm`, so F1 ("only sim names libm") holds. The vectors then compare libm's own f64 bits, which PM-0004-22 asks ("for each libm function the sim uses ... bit-identical outputs (to_bits)"). The f32 route would compare narrowed results only. That asks less (B17-2: 6,157 of sincos's f64 outputs are off the correctly rounded value and 0 are after narrowing, so a one-target difference in the low bits could hide under the narrowing), so it would be a departure.
+- Symbols (fmath.rs):
+  - `pub fn exp_of(x: f64) -> f64 { libm::exp(x) }`, doc: "libm 0.2.16's exponential, its own result; called by `share_per_tick` and, outside the simulation, by the vectors (PM-0004-22) only".
+  - `pub fn sincos_of(x: f64) -> (f64, f64) { libm::sincos(x) }`, the same doc with `facing_of`.
+  - `share_per_tick` calls `exp_of`; `facing_of` calls `sincos_of`.
+  - `facing_of`'s doc names its domain [0, 360), as map.rs:66 guarantees: outside it, the rest leaves [0, 90) and could reach rem_pio2_large (B17-8).
+- The scan (rules_scan.rs), with its WIP names:
+  - `MATHS_CALLS` becomes `[("exp_of", "exp"), ("sincos_of", "sincos")]`.
+  - A new `RAW: [(&str, &str); 2] = [("exp_of", "share_per_tick"), ("sincos_of", "facing_of")]` with the wording: "libm's two routines as the simulation reaches them, by their own names: each name may stand only in `fmath.rs`, and there only in its own `fn` and in the body of its one caller. A name counts wherever it stands as a whole token (a call, a path, `use`, `as`, `pub use`, a function pointer, a macro's argument), test code included, so no file but `fmath.rs` reaches them and no other function there does. Outside `src/` the vectors call them (crates/devtools), and nothing else may; `layering.rs` holds that for the crates that build the simulation's callers."
+- Bites (each red):
+  - `exp_of(` in `facing_of`;
+  - `sincos_of(` in `share_per_tick`;
+  - `crate::fmath::exp_of(1.0)` in world.rs;
+  - `use crate::fmath::exp_of as e;` in rules.rs;
+  - `use crate::fmath::{sincos_of};` in soldiers.rs;
+  - `pub use fmath::exp_of;` in lib.rs;
+  - `let f: fn(f64) -> f64 = crate::fmath::exp_of;` in collision.rs;
+  - `use crate::fmath::*;` plus a bare `sincos_of(x)` in world.rs;
+  - `exp_of` in a `#[cfg(test)] mod tests` of fmath.rs;
+  - `libm::exp(` moved back into `share_per_tick` (now outside `MATHS_CALLS`);
+  - the old B7-1 bites (`libm::expm1(`, `libm::sincosf(`, `use libm::{exp};` with a bare `exp(`, `use libm::*;`, libm in a second file).
+- Controls (passing):
+  - the real tree;
+  - each raw function's own definition and its one caller's call;
+  - the names in a comment and in a string;
+  - `exp_offset` and `my_exp_of` (whole-token compare).
+- Outside sim's src (C4, Medium): from C4 the maths list holds exp and sincos, so the built-file check no longer stops a call from sim-wasm, room or client-endpoint. In C4, `layering.rs` refuses the tokens `exp_of` and `sincos_of` in those three crates' `src/` (it already walks room's and the endpoint's; add sim-wasm). Its plant: one call in room's src.
+- Optional, Low (the "once per match" reason up one level): `share_per_tick` only in `Rules::take`, and `facing_of` only in `spawn_points`, test-only code (marking.rs) exempt.
+- The players' file in C3 (B17-5, measured): release 0 libm names and dev 0 libm paths, 0 problems, the same as HEAD. The positive control is red. So the maths list stays at its 2 entries in C3.
+- `maths-allowed.mjs:9` ("The simulation itself calls no maths routine") reads false at source level from C3. Reword it in C3 (Low) to: "the simulation's two (fmath.rs, exp and sincos) are not linked into the players' file until its constructor calls them (change-set 4c's C4)". C4's entries: about 14, not 4 (B17-6).
+
+**Q2 (rate signature): YES.** `push_strength_per_s` is a rate, closed at 0 (movement.rs:35). A time signature has no finite T for strength 0, while the rate form gives x = -0.0, exp 1, share exactly 0 (B17-4). The easing's rate LN_10 / T stays finite for every T in (0, 5] that is not subnormal; a subnormal T gives inf, then x = -inf, exp 0, share 1, no NaN (measured, the "T from 5 down" sweep). The argument's rounding order, (LN_10 / T) x dt rather than LN_10 x dt / T, is a choice. Row 2's reference uses the code's own double x, as the route's reference does for sincos.
+
+**Q3 (ads as a speed): YES.** The table's row says "walking speed while aiming" (testlines-table.json:109-113), and the old game puts adsMoveMult in place of the sprint factor (shamble-game.js:2774). So `ads = (walk x ads_speed_multiplier) as f32` in f64, as sprint is. It is a `pub` field with no reader until 4d, and it draws no lint (B16-3). 4d's rules (ADS while sprinting, the old game's banzai and shield factors) stay 4d's. Row 2 checks its bits.
+
+**Q4 (the shares' 1 ulp domain), measured (B17-4).** On the code's own x, against the correctly rounded f32 of 1 - e^x (decimal, 60 digits):
+- the easing over T in (0, 5] (x <= -LN_10 / 150): 0 off over 9,300 cases;
+- the push over strengths 0 and [0.01, 100] (10,001 cases): 0 off, largest 0.4999 ulp;
+- his values: 3ebf5c1e (ease) and 3e6fb07b (push), each the reference's bits;
+- toward zero, the push stays under 1 ulp for strengths above 8.86e-9 per second (|x| > 2.953e-10): above that edge 10 off and largest 0.8633 ulp over 19,409 cases; at or below it, 467 cases at 1 ulp or more. The cause is exp.rs:145-148 (1 + x under 2^-28).
+- Row 2's words: "within 1 ulp of f32 for every easing time in (0, 5] and for a push strength of 0 or above 1e-8 per second; correctly rounded (0 off) on his values and on both grids". Below 1e-8 the share is still the same bits on every target, only less exact: no refusal is needed.
+
+**Q5 (the vector files).** Generator `crates/devtools/vectors/make_libm_vectors.py`: Python standard library only (struct, random, math, decimal, hashlib, pathlib), run with `-I -B`, with `--check` (byte for byte) and `--full <routine>`.
+- It holds a twin of libm 0.2.16's exp and sincos: exp.rs, sincos.rs, k_sin.rs and k_cos.rs, and rem_pio2.rs's fast and medium paths. It is twin.py, measured bit-equal on all 133,665 inputs (B17-3). So the expected bits are derived, not recorded. A twin miss fails natively on the first run.
+- Inputs: `libm-inputs.bin`, f64 LE, 1,069,320 bytes.
+  - exp, 33,648: his two values; easing T = k/1000; push s = k/100; push 2^(-e/4) to 2^-1074; T from 5 down; 10,000 seeded; exp.rs's branch edges 0x3e300000, 0x3fd62e42/43, 0x3ff0a2b2, 0x4086232b, -708.396..., -745.133..., +-0, -inf, each with its neighbours.
+  - then sincos, 100,017: the 0.001 grid x K; 10,000 seeded facings through the quarter turns; the edges 0x3e46a09e, 0x3fe921fb/fc, 0x3ff921fb00000000 and its neighbour, 45 x K, (just under 45) x K, (just under 90) x K, the rests of the doubles just under 90, 180, 270 and 360, the smallest subnormal and normal.
+  - Add 1,000 seeded rests in (89.9999991, 90) for medium's rounds (B17-8).
+  - No NaN.
+- Expected file: `libm-expected.txt`.
+  - Its first line: the inputs' byte count and sha256, as f32-expected.txt:1.
+  - One line per routine with its case count and the FNV-1a 64 of all outputs' LE bits in order: `exp 33648 <digest>`, `sincos 100017 <digest>` (sin and cos interleaved, as the routine returns them).
+  - `report` lines, recomputed by `--check` against decimal at 60 digits: exp 1,788 off the correctly rounded f64, largest 0.8148 ulp; sin 3,064, 0.7539; cos 3,093, 0.7178; narrowed to f32, 0 of 200,034 off the route's reference (the double's sin and cos). PM-0004-22's "largest error in ulp" is reported, not pinned.
+  - No pin lines: native = wasm measured (0 of 233,682 outputs differ, B17-1).
+- Rust: `crates/devtools/src/rules/libm_ops.rs` (`EXP_CASES`, `SINCOS_CASES`, `check(inputs, expected) -> Result<(), String>`, through `sim::fmath::exp_of` / `sincos_of` and `sim::state_hash::fnv1a_64`; a NaN input or a wrong length is refused). The other entries:
+  - `wasm.rs`: `#[wasm_bindgen] pub fn libm_vectors(inputs: &[u8], expected: &str) -> String`;
+  - native: `crates/devtools/tests/libm_vectors.rs`;
+  - Node: `rules.test.mjs`, beside :16-31, with its changed-input control;
+  - browsers: `wasm-rules.spec.ts:11`'s VECTORS gains the two files, and the outcome gains `libm: ""` and `libmChanged`;
+  - `local-checks.sh`'s generator line gains `make_libm_vectors.py --check`, and CI's line the same.
+- Planted defect (PM-0004-22's bite): in libm_ops.rs, `if cfg!(target_arch = "wasm32") && case == 0 { bits ^= 1 }`. Node and each browser go red, naming `exp`, and the native test stays green. That shows the per-target comparison catches a one-target 1-ulp move. Second plant: the twin's exp loses its `1.0 + x` branch, and `--check` goes red.
+
+**Count delta (code / tests, against 11.9's "exp and sincos vectors, maths-allowed entries 100 / 60"):**
+- fmath +12 / 0;
+- scan's raw rule 0 / +45;
+- libm_ops.rs and wasm.rs +75 / 0;
+- native, Node and browser tests 0 / +55;
+- generator 0 / +230;
+- maths-allowed moves to C4 at about 14 entries (+45 there);
+- C4's layering.rs addition 0 / +10.
+- C3 net: about -13 / +270 against that row, plus two data files (1,069,320 bytes of inputs; about 8 lines of expected).
+
+**Anything that blocks C3's commit:**
+1. Row 2's ease_stop plant cannot bite on either table (B17-10, High if left: a surviving plant). The test needs the two times apart.
+2. `cargo fmt` (B17-7).
+3. The raw-name rule must be in the scan with Q1 (or keep libm in share_per_tick and facing_of, and the vectors become a departure).
+4. Row 2's 1 ulp words need Q4's domain.
+
+Clippy -D warnings is clean (B17-7). Not run:
+- browsers (Node only);
+- the real build.mjs (its cargo line was run by hand, without the path remap flag, which does not change names);
+- libm's cost against std's (PM-0004-22's "reported" cost).
+
+DONE

@@ -82,19 +82,34 @@ pub struct Rules {
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum RulesError {
     /// The jump's reach is below the step-up: the take-off speed would be the root of a negative.
-    ReachBelowStepUp { reach_m: f64, step_up_m: f64 },
+    ReachBelowStepUp {
+        reach_m: f64,
+        step_up_m: f64,
+    },
     /// A sprint time or a refill time that is no whole number of units above zero (`None`: it rounds to none).
     SprintTime(Option<DurationError>),
     RefillTime(Option<DurationError>),
     /// A body shorter than twice its radius.
-    BodyTooShort { height_m: f64, radius_m: f64 },
+    BodyTooShort {
+        height_m: f64,
+        radius_m: f64,
+    },
     /// A foot wider than the body.
-    FootTooWide { foot_m: f64, radius_m: f64 },
+    FootTooWide {
+        foot_m: f64,
+        radius_m: f64,
+    },
     /// A pull share outside 0 to 1 (1 included, 0 not).
     PullShare(f64),
     /// A step allowance or a snap outside 0 to the step-up.
-    StepAllowance { allowance_m: f64, step_up_m: f64 },
-    SnapDown { snap_m: f64, step_up_m: f64 },
+    StepAllowance {
+        allowance_m: f64,
+        step_up_m: f64,
+    },
+    SnapDown {
+        snap_m: f64,
+        step_up_m: f64,
+    },
 }
 
 impl RulesError {
@@ -103,19 +118,34 @@ impl RulesError {
     pub fn message(&self) -> String {
         match self {
             Self::ReachBelowStepUp { reach_m, step_up_m } => {
-                format!("the jump's reach ({reach_m} m) is below the step-up ({step_up_m} m): no jump could reach it")
+                format!(
+                    "the jump's reach ({reach_m} m) is below the step-up ({step_up_m} m): no jump could reach it"
+                )
             }
-            Self::SprintTime(_) => "the sprint time from full is no whole number of units above zero".to_owned(),
-            Self::RefillTime(_) => "the stamina's refill time is no whole number of units above zero".to_owned(),
+            Self::SprintTime(_) => {
+                "the sprint time from full is no whole number of units above zero".to_owned()
+            }
+            Self::RefillTime(_) => {
+                "the stamina's refill time is no whole number of units above zero".to_owned()
+            }
             Self::BodyTooShort { height_m, radius_m } => {
-                format!("the body is {height_m} m tall with a radius of {radius_m} m: it must be at least twice its radius")
+                format!(
+                    "the body is {height_m} m tall with a radius of {radius_m} m: it must be at least twice its radius"
+                )
             }
             Self::FootTooWide { foot_m, radius_m } => {
                 format!("the foot's radius ({foot_m} m) is above the body's ({radius_m} m)")
             }
-            Self::PullShare(share) => format!("the pull's share a step ({share}) is outside 0 to 1"),
-            Self::StepAllowance { allowance_m, step_up_m } => {
-                format!("the step allowance ({allowance_m} m) is outside 0 to the step-up ({step_up_m} m)")
+            Self::PullShare(share) => {
+                format!("the pull's share a step ({share}) is outside 0 to 1")
+            }
+            Self::StepAllowance {
+                allowance_m,
+                step_up_m,
+            } => {
+                format!(
+                    "the step allowance ({allowance_m} m) is outside 0 to the step-up ({step_up_m} m)"
+                )
             }
             Self::SnapDown { snap_m, step_up_m } => {
                 format!("the snap down ({snap_m} m) is outside 0 to the step-up ({step_up_m} m)")
@@ -141,13 +171,22 @@ impl Rules {
     pub fn take(m: &Movement) -> Result<Self, RulesError> {
         let (reach, step_up) = (m.jump_reach_m, m.step_up_m);
         if reach < step_up {
-            return Err(RulesError::ReachBelowStepUp { reach_m: reach, step_up_m: step_up });
+            return Err(RulesError::ReachBelowStepUp {
+                reach_m: reach,
+                step_up_m: step_up,
+            });
         }
         if m.body_height_m < 2.0 * m.body_radius_m {
-            return Err(RulesError::BodyTooShort { height_m: m.body_height_m, radius_m: m.body_radius_m });
+            return Err(RulesError::BodyTooShort {
+                height_m: m.body_height_m,
+                radius_m: m.body_radius_m,
+            });
         }
         if m.foot_radius_m > m.body_radius_m {
-            return Err(RulesError::FootTooWide { foot_m: m.foot_radius_m, radius_m: m.body_radius_m });
+            return Err(RulesError::FootTooWide {
+                foot_m: m.foot_radius_m,
+                radius_m: m.body_radius_m,
+            });
         }
         let pull_in_range = m.pull_share_per_step > 0.0 && m.pull_share_per_step <= 1.0;
         if !pull_in_range {
@@ -155,14 +194,22 @@ impl Rules {
         }
         let allowance_in_range = m.step_allowance_m >= 0.0 && m.step_allowance_m <= step_up;
         if !allowance_in_range {
-            return Err(RulesError::StepAllowance { allowance_m: m.step_allowance_m, step_up_m: step_up });
+            return Err(RulesError::StepAllowance {
+                allowance_m: m.step_allowance_m,
+                step_up_m: step_up,
+            });
         }
         let snap_in_range = m.snap_down_m >= 0.0 && m.snap_down_m <= step_up;
         if !snap_in_range {
-            return Err(RulesError::SnapDown { snap_m: m.snap_down_m, step_up_m: step_up });
+            return Err(RulesError::SnapDown {
+                snap_m: m.snap_down_m,
+                step_up_m: step_up,
+            });
         }
-        let sprint_units = u64::from(units(m.sprint_time_from_full_s).map_err(RulesError::SprintTime)?);
-        let refill_units = u64::from(units(m.stamina_refill_time_s).map_err(RulesError::RefillTime)?);
+        let sprint_units =
+            u64::from(units(m.sprint_time_from_full_s).map_err(RulesError::SprintTime)?);
+        let refill_units =
+            u64::from(units(m.stamina_refill_time_s).map_err(RulesError::RefillTime)?);
         // Two u32 multiplied fit a u64; the content's ranges keep `full` far below 2^53, where the double is exact.
         let stamina_full = sprint_units * refill_units;
         let g = m.gravity_m_per_s2;
@@ -206,7 +253,10 @@ impl Rules {
     #[cfg(test)]
     #[must_use]
     pub fn with_headroom_feet(self, headroom_feet: HeadroomFeet) -> Self {
-        Self { headroom_feet, ..self }
+        Self {
+            headroom_feet,
+            ..self
+        }
     }
 }
 
@@ -216,7 +266,8 @@ mod tests {
 
     /// The made-up movement table of the content crate's tests (never his values).
     fn table() -> Movement {
-        let tree = content::json::parse(content::movement::TEST_TEXT.as_bytes()).expect("the test text parses");
+        let tree = content::json::parse(content::movement::TEST_TEXT.as_bytes())
+            .expect("the test text parses");
         content::movement::read(&tree).expect("the test text is a movement table")
     }
 
@@ -291,7 +342,14 @@ mod tests {
             ("push_most_per_step", float(push_most_per_step)),
             ("push_head_on_gate", float(push_head_on_gate)),
             ("push_keep_going_gate", float(push_keep_going_gate)),
-            ("headroom_feet", if *headroom_feet == HeadroomFeet::SandboxTest { 0.0 } else { 1.0 }),
+            (
+                "headroom_feet",
+                if *headroom_feet == HeadroomFeet::SandboxTest {
+                    0.0
+                } else {
+                    1.0
+                },
+            ),
         ]
     }
 
@@ -334,13 +392,20 @@ mod tests {
         let base = numbers(&Rules::take(&table()).expect("the test table plays"));
         let mut named: Vec<&str> = moves.iter().map(|(field, _, _)| *field).collect();
         named.sort_unstable();
-        let mut fields: Vec<&str> = content::movement::FIELDS.iter().map(|field| field.name).collect();
+        let mut fields: Vec<&str> = content::movement::FIELDS
+            .iter()
+            .map(|field| field.name)
+            .collect();
         fields.sort_unstable();
-        assert_eq!(named, fields, "every field of the movement kind is moved once");
+        assert_eq!(
+            named, fields,
+            "every field of the movement kind is moved once"
+        );
         for (field, change, uses) in moves {
             let mut moved = table();
             change(&mut moved);
-            let rules = Rules::take(&moved).unwrap_or_else(|error| panic!("{field}: {}", error.message()));
+            let rules =
+                Rules::take(&moved).unwrap_or_else(|error| panic!("{field}: {}", error.message()));
             let changed: Vec<&str> = numbers(&rules)
                 .iter()
                 .zip(&base)
@@ -363,52 +428,97 @@ mod tests {
         let plays = |change: Move| refused(change).is_ok();
         assert_eq!(
             refused(|m| m.jump_reach_m = 0.4),
-            Err(RulesError::ReachBelowStepUp { reach_m: 0.4, step_up_m: 0.5 })
+            Err(RulesError::ReachBelowStepUp {
+                reach_m: 0.4,
+                step_up_m: 0.5
+            })
         );
         assert!(plays(|m| m.jump_reach_m = m.step_up_m));
-        assert_eq!(refused(|m| m.sprint_time_from_full_s = 1e-9), Err(RulesError::SprintTime(None)));
-        assert_eq!(refused(|m| m.stamina_refill_time_s = 1e-9), Err(RulesError::RefillTime(None)));
+        assert_eq!(
+            refused(|m| m.sprint_time_from_full_s = 1e-9),
+            Err(RulesError::SprintTime(None))
+        );
+        assert_eq!(
+            refused(|m| m.stamina_refill_time_s = 1e-9),
+            Err(RulesError::RefillTime(None))
+        );
         assert_eq!(
             refused(|m| m.stamina_refill_time_s = f64::INFINITY),
             Err(RulesError::RefillTime(Some(DurationError::NotFinite)))
         );
         assert_eq!(
             refused(|m| m.body_height_m = 0.9),
-            Err(RulesError::BodyTooShort { height_m: 0.9, radius_m: 0.5 })
+            Err(RulesError::BodyTooShort {
+                height_m: 0.9,
+                radius_m: 0.5
+            })
         );
         assert!(plays(|m| m.body_height_m = 1.0));
         assert_eq!(
             refused(|m| m.foot_radius_m = 0.6),
-            Err(RulesError::FootTooWide { foot_m: 0.6, radius_m: 0.5 })
+            Err(RulesError::FootTooWide {
+                foot_m: 0.6,
+                radius_m: 0.5
+            })
         );
         assert!(plays(|m| m.foot_radius_m = m.body_radius_m));
-        assert_eq!(refused(|m| m.pull_share_per_step = 0.0), Err(RulesError::PullShare(0.0)));
-        assert_eq!(refused(|m| m.pull_share_per_step = 1.5), Err(RulesError::PullShare(1.5)));
+        assert_eq!(
+            refused(|m| m.pull_share_per_step = 0.0),
+            Err(RulesError::PullShare(0.0))
+        );
+        assert_eq!(
+            refused(|m| m.pull_share_per_step = 1.5),
+            Err(RulesError::PullShare(1.5))
+        );
         assert!(plays(|m| m.pull_share_per_step = 1.0));
         assert_eq!(
             refused(|m| m.step_allowance_m = 0.6),
-            Err(RulesError::StepAllowance { allowance_m: 0.6, step_up_m: 0.5 })
+            Err(RulesError::StepAllowance {
+                allowance_m: 0.6,
+                step_up_m: 0.5
+            })
         );
         assert_eq!(
             refused(|m| m.step_allowance_m = -0.1),
-            Err(RulesError::StepAllowance { allowance_m: -0.1, step_up_m: 0.5 })
+            Err(RulesError::StepAllowance {
+                allowance_m: -0.1,
+                step_up_m: 0.5
+            })
         );
         assert!(plays(|m| m.step_allowance_m = m.step_up_m));
         assert_eq!(
             refused(|m| m.snap_down_m = 0.6),
-            Err(RulesError::SnapDown { snap_m: 0.6, step_up_m: 0.5 })
+            Err(RulesError::SnapDown {
+                snap_m: 0.6,
+                step_up_m: 0.5
+            })
         );
         assert!(plays(|m| m.snap_down_m = 0.0));
         // Each refusal says what is wrong in its own words.
         let errors = [
-            RulesError::ReachBelowStepUp { reach_m: 0.4, step_up_m: 0.5 },
+            RulesError::ReachBelowStepUp {
+                reach_m: 0.4,
+                step_up_m: 0.5,
+            },
             RulesError::SprintTime(None),
             RulesError::RefillTime(None),
-            RulesError::BodyTooShort { height_m: 0.9, radius_m: 0.5 },
-            RulesError::FootTooWide { foot_m: 0.6, radius_m: 0.5 },
+            RulesError::BodyTooShort {
+                height_m: 0.9,
+                radius_m: 0.5,
+            },
+            RulesError::FootTooWide {
+                foot_m: 0.6,
+                radius_m: 0.5,
+            },
             RulesError::PullShare(0.0),
-            RulesError::StepAllowance { allowance_m: 0.6, step_up_m: 0.5 },
-            RulesError::SnapDown { snap_m: 0.6, step_up_m: 0.5 },
+            RulesError::StepAllowance {
+                allowance_m: 0.6,
+                step_up_m: 0.5,
+            },
+            RulesError::SnapDown {
+                snap_m: 0.6,
+                step_up_m: 0.5,
+            },
         ];
         let mut messages: Vec<String> = errors.iter().map(RulesError::message).collect();
         messages.sort_unstable();
@@ -436,14 +546,22 @@ mod tests {
             moved.speed_up_time_to_90pct_s = time;
             moved.stop_time_to_10pct_s = time;
             let rules = Rules::take(&moved).expect("plays");
-            assert!(step(rules.ease_up, reference) <= 1, "{time}: {:08x}", rules.ease_up.to_bits());
+            assert!(
+                step(rules.ease_up, reference) <= 1,
+                "{time}: {:08x}",
+                rules.ease_up.to_bits()
+            );
             assert_eq!(rules.ease_up.to_bits(), rules.ease_stop.to_bits(), "{time}");
         }
         for (strength, reference) in push {
             let mut moved = table();
             moved.push_strength_per_s = strength;
             let rules = Rules::take(&moved).expect("plays");
-            assert!(step(rules.push_share, reference) <= 1, "{strength}: {:08x}", rules.push_share.to_bits());
+            assert!(
+                step(rules.push_share, reference) <= 1,
+                "{strength}: {:08x}",
+                rules.push_share.to_bits()
+            );
         }
     }
 
@@ -458,7 +576,10 @@ mod tests {
         assert_eq!(rules.returns_at, rules.stamina_full / 4);
         assert_eq!(rules.headroom_feet, HEADROOM_FEET);
         assert_eq!(
-            rules.clone().with_headroom_feet(HeadroomFeet::OwnTopNeverWall).headroom_feet,
+            rules
+                .clone()
+                .with_headroom_feet(HeadroomFeet::OwnTopNeverWall)
+                .headroom_feet,
             HeadroomFeet::OwnTopNeverWall
         );
     }

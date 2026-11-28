@@ -221,7 +221,23 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   `/home/user/Shamble-Frontlines/.gate/cs4b-2`. A session of another account works on its own branch from this
   branch's head and never pushes here (his Lanes rule). SEAT-OUT from him: stop at a whole point and report the last
   commit's id.
-- **State (17:14 Amsterdam, from the clock): C2 is green in CI; C3 is being built in the worktree.** C2 =
+- **State (17:25 Amsterdam, from the clock): C3 built but for the vectors (waiting on rust-reviewer's block 17).**
+  Saved again as `c3-wip.patch` (tracked files) and `c3-wip/` (the four new files: fmath.rs, rules.rs, marking.rs, layering.rs; the
+  new files' homes: `crates/sim/src/`, `crates/sim/tests/support/marking.rs`, `crates/devtools/tests/layering.rs`).
+  Added since 17:14: **the libm rule** in `rules_scan.rs` (`MATHS`, `MATHS_FILE`, `MATHS_CALLS` with the two allowed
+  pairs; `maths_breach` with `enclosing_fn` and `is_name`; the float rule leaves every `libm` path to it; a fused
+  multiply-add by its libm name stays the fused rule's, so 4b-2's `libm::fma` bite still finds one breach; 11 bites and
+  3 controls); **the shared narrow marking** `crates/sim/tests/support/marking.rs` (its own tokenizer, raw names kept
+  apart from keywords; test-only only a `#![cfg(test)]` file or a top-level `#[cfg(test)] [#[..]] mod NAME {..}`),
+  the content panic scan switched to it and the old `in_tests` and `TEST_ITEMS` removed; two content controls became
+  bites by the narrow rule (a top-level `#[cfg(test)]` const and fn), F5's `r#fn` bite added. **A finding for
+  security-auditor (F9):** its shape (ii) names only `mod`; content's `map.rs:415` is `#[cfg(test)] pub(crate) mod tests`,
+  so the marking takes a `pub` with or without its reach before `mod` (a visibility changes nothing of a cfg(test)
+  module; the real content tree went red without it); a control covers the form. **layering.rs** (devtools): the
+  manifests' half, the sources' half (both `lib.rs` found; 19 bites, 5 controls, T-G's line in a copy of a room and an
+  endpoint file), the simulation's half (one handed-on constant). rustfmt run on the five files by full path; fmt
+  clean; clippy `-D warnings` clean on the workspace; sim's 46 unit tests, the scan's 9, layering's 3 and the
+  dependency rules' 3 pass. Earlier state (17:14), kept: **C2 is green in CI; C3 is being built in the worktree.** C2 =
   **14538bd74c029f3beab4bbb05006be8e8889a38a** (notes 411d8e96 before it): gate and smoke run 46162913451, toolchain run
   46162913429 (finished 16:13:28 UTC, 12 min 2 s). C3 so far (saved as `cs4c-soldier/c3-wip.patch` for the tracked
   files and `cs4c-soldier/c3-wip/` for the new ones, on the head this notes commit makes): the batch applied
