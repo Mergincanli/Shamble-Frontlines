@@ -199,7 +199,18 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
     toward the held aim; the restore test plants 30 command-less ticks; step 2 moves no first-loop hash on four named
     conditions), the bounds' one home YES (the loader's own grid rule, its "off the grid is refused" withdrawn), the
     zero ray YES (Z1, Z2); step 2 rises to about 340 / 675, step 1 gains about 10 / 100; whether `Room::new` and
-    `Endpoint::new` refuse a world with no aim area is engine-architect's call. The other two running.
+    `Endpoint::new` refuse a world with no aim area is engine-architect's call.
+    engine-architect DONE (block 5, N27 to N41, 5.1 to 5.8): **GROUND** reconciled (the three statements agree on
+    every map that exists, all starting at y 0; G-1 Low: map.rs:39, schema.rs:146-147 and aim_reach.rs:45 call y 0
+    "the floor" though map.rs:325 lets it sit higher; G-2 Medium if built as written: netcode-architect's aim
+    fallback to the plane y 0; G-3 Low, step S's evidence: no test tells the bounds' bottom from y 0,
+    scene.test.ts:149 checks the literal 0) and ruled: the bounds' bottom is solid ground (its words in step 1's
+    commit; tests T1 to T3). **FACING-SPAWN:** recommended (a), one `libm::sincos` per spawn at the match's start,
+    quarter turns exact; it changes the batch's root comment, so the patch is reworded before it is applied and
+    security-auditor answers once more; nothing to him under (a) (FACING-QUARTER only if a reviewer wants (b)). The held
+    aim at spawn: the spawn point in whole centimetres. Questions RR1 to RR5 for rust-reviewer (RR1 Medium: the scan
+    refuses std's names only, so `libm::sincos(` and `libm::expm1(` pass today) and NA1 to NA3 for netcode-architect,
+    sent after rust-reviewer's block 6. rust-reviewer running.
 - **The sheet's revision 3** (from 02:14 Amsterdam): the record rule applied with its confirmations outstanding, the
   recount F2 with each option's stop line, section G for steps 1 to 7 with his checklist as a draft, section H's table
   of item 10's thirteen points.

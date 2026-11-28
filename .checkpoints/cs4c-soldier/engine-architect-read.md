@@ -587,8 +587,8 @@ Started 2026-11-28 on branch cs/4c-soldier at 3ab59bd7. Read only; this file is 
 - N34. EDITOR_V2.md:37-38 ([DEFAULT]): rotation snaps "to the grid and to 15° / 45° / 90°"; :43-44 ([DEFAULT]) and :70-76 ([DECIDED], his B.1 of 2026-11-03): three-team mirroring, "the others follow at 120°". A spawn facing 90 mirrored at 120° faces 210 and 330: no quarter turn. EDITOR_V2 says nothing else on how a spawn faces. The test scene's 8 spawns all face 90.
 - N35. Pointer only, not 4c's: the same 120° mirror cannot keep a box axis-aligned (map.rs:4-5, "all axis-aligned: no angle enters the static world"); the map kind and the editor's mirroring meet at editor slice 6 (EDITOR_V2.md:108).
 - N36. ADR 0004:275 "a degree value becomes radians by one multiply with a pinned constant"; :283 "Transcendental maths only through the pure-Rust `libm` crate, pinned; no std `sin`, `cos` ..."; :286 "No sim value is computed in TypeScript." map.rs:63-64 asks for no sine or cosine "of the standard library": libm's is the ADR's own route.
-- N37. The source scan is keyed to std's 79 method names (rules_scan.rs:52-62) and the fused ones (:102-110): a path call is refused only when its last name is one of std's (:386-387). std's is `sin_cos`; libm's `sincos`, `sincosf`, `sinf`, `cosf`, `expf`, `atan2f` are not in the list, so `libm::sincos(` and `libm::expf(` pass the scan today (read, not run). The built-file check (build-checks.mjs:776-789) lists any libm routine it sees against the reviewed list, but an inlined routine prints no name (security-auditor-deps-4c.md item 3).
-- N38. What `sincos` brings (cargo cache, read): k_sin, k_cos, rem_pio2 (sincos.rs:13); rem_pio2 uses rem_pio2_large (rem_pio2.rs:13, called :185 for a large argument only), which uses scalbn (rem_pio2_large.rs:14) and its own `extern "C" fn floor` over libm's floor (:229-232); libm's floor has an arch path only under `intrinsics_enabled` on wasm32 (floor.rs:15-20), set by `unstable-intrinsics` alone (configure.rs:81-88), which the batch keeps off. How many of these the built file prints is not known until it is built.
+- N37. The source scan is keyed to std's 79 method names (rules_scan.rs:52-62) and the fused ones (:102-110): a path call is refused only when its last name is one of std's (:386-387). std's is `sin_cos`; libm's `sincos`, `sincosf`, `sinf`, `cosf`, `expf`, `atan2f` are not in the list, nor `expm1` (std's spelling is `exp_m1`, :56), so `libm::sincos(`, `libm::expf(` and `libm::expm1(` pass the scan today (read, not run). The built-file check (build-checks.mjs:776-789) lists any libm routine it sees against the reviewed list, but an inlined routine prints no name (security-auditor-deps-4c.md item 3).
+- N38. What `sincos` brings (cargo cache, read): k_sin, k_cos, rem_pio2 (sincos.rs:13); rem_pio2 uses rem_pio2_large (rem_pio2.rs:13, called :185 for a large argument only), which uses scalbn (rem_pio2_large.rs:14) and its own `extern "C" fn floor` over libm's floor (:229-232); libm's floor has an arch path only under `intrinsics_enabled` on wasm32 (floor.rs:15-20), set only when `unstable-intrinsics` is on and `force-soft-floats` off (configure.rs:85-89); the batch keeps both off. How many of these the built file prints is not known until it is built.
 - N39. His words on spawns, facing and ground (grep of DECISIONS.md, LOOP_V2.md, main's EDITOR_V2 in editor-v2-main.md, which differs from the worktree's in no line): LOOP_V2.md:24 ([DECIDED]) "Everyone spawns inside their own barracks, in front of the buy terminal"; :153 ([DEFAULT]) "Rotational symmetry at 120°, with each base on its own lobe"; nothing on a facing's unit or steps, nothing on the ground under the bounds. DECISIONS.md's "ground" lines (:406, :437) are about what stays visible.
 - N40. My own row (engine-architect-cs4.md:512, carried into block 3.2 above): `yaw` f32, radians, "the convention (0 toward +z, positive toward +x, or legacy's) is stated in the layout's doc and pinned by a test"; map.rs:58-62 shows the two are one (legacy turns by `atan2(dir.x, dir.z)`). Who computes it is step 3's open route: the endpoint with libm's arc tangent (my design :404-405) or the page's `Math.atan2` (rust-reviewer-read 1.8, :293-295).
 - N41. The held aim at spawn is open and tied to this point: netcode-architect-read.md:648-649 ("the held aim is whatever FACING-SPAWN picks"); its 7.3 (2) gives `Endpoint::new` a first aim of `clamp_cm` of (0, 0, 0), and its zero-ray rule keeps the endpoint's last aim until a ray arrives. So, before any ray, commands carry the map's origin as the aim: on the test scene the yard's spawns (x 25 to 27, facing 90, +x) would turn toward -x on the first command, whatever FACING-SPAWN gives (inferred from the read, not run).
@@ -628,12 +628,12 @@ tests, plus or minus 30 %.
 
 ### 5.2 GROUND: the rule
 - **Ruling (owner of the map kind): the bounds' bottom is solid ground**, flat and walkable, under the whole of the
-  bounds' x and z: a soldier with no shape under him stands on it; a fall ends on it, landing as on any walkable top;
-  a ray going down stops on it, as on the old game's ground plane beside its statics (shamble-core.js:1507, :1516).
-  Regions are drawn on it (map.rs:383 already: "A region lies on the ground"). The four sides are MOVE-RULES row 8's
+  bounds' x and z: a soldier with no shape under him stands on it; a fall ends on it, landing as on any walkable top.
+  The aim's crossing of it is NA1's question; whether the ray cast (`cast_ray`, 4d's shots) stops on it is RR5's, not
+  ruled or counted here. Regions are drawn on it (map.rs:383 already: "A region lies on the ground"). The four sides are MOVE-RULES row 8's
   (his question: "the map's edge is the map's own bounds"); the top is the movement's (rust-reviewer-read F11: a
   ceiling); neither is ruled here. No word of his changes: none of his rules names the bottom (N30, N39), and the old
-  game's soldiers stand on a ground plane at 0 under every map.
+  game's ray and aim already end on a ground plane at 0 (shamble-core.js:1507, :1516; shamble-game.js:1110).
 - **Not taken: a ground shape in every map** (rust-reviewer-read 1.4 item 2, option (b)). A shape lies inside the
   bounds and is at least 1 cm thick (map.rs:11-12), so its top stands at least 1 cm above the drawn ground and step S
   would draw it as a block over the ground and every region, hiding them; a fall still needs an end below it; and it
@@ -647,7 +647,7 @@ tests, plus or minus 30 %.
   3. The check: no change. It is a meaning, not a range; the bottom stays any whole centimetre from 0 up.
   4. One home: the floor is the lower y of `bounds_m`, derived once in `StaticWorld::build` (netcode-architect-read
      7.3); the sweeps and the aim read it there; the page reads `bounds.min[1]` from the map (step S); the two are tied
-     as block 1.2 ties the corners (Math.fround of the map's number equals the simulation's f32).
+     as N6 shows for the corners (Math.fround of the map's number equals the simulation's f32).
 - **Tests, each with its plant (each plant must turn its test red):**
   - T1 (sim, step 1): on a made map whose bounds start at y 2, with no shape under the spawn, a soldier spawned 1 m
     above the floor falls and lands at exactly y 2 (grounded, vertical speed 0); on the test scene at 0 (step 1's own
@@ -670,7 +670,7 @@ Today `facing_deg` is any degree in [0, 360) (map.rs:58-66); the soldier keeps h
 | Maths | one routine, `libm::sincos` (N31); degrees to radians by one multiply with a pinned constant (ADR 0004:275; K's f64 bits 3f91df46a2529d39) | none | none in the simulation; the endpoint's yaw from degrees is degrees x K, one multiply (the two conventions are one: N40) |
 | Quarter turns exact | only if whole quarter turns are taken out first (N32; RR3); else 90 gives (1, 6.1e-17) | yes | yes |
 | What a map file may say | unchanged | narrowed: every degree but four refused (no committed file is: N34) | unchanged |
-| The guards | the scan names `sincos` and `sincosf` with a bite (they pass it today: N37), then one allowance at the one call site; maths-allowed.mjs gains `libm::math::sincos` and whatever the built file prints of N38's candidates (1 to 6 entries: rust-reviewer's count); PM-0004-22's vectors (at least 10,000 inputs, natively, in Node and in each browser engine) | none | none |
+| The guards | the scan names `sincos` and `sincosf` with a bite (they pass it today: N37), then one allowance at the one call site; maths-allowed.mjs gains `libm::math::sincos` and whatever the built file prints of N38's candidates (one entry or more: rust-reviewer's count); PM-0004-22's vectors (at least 10,000 inputs, natively, in Node and in each browser engine) | none | none |
 | The manifest batch | no manifest line; the root comment names only the exponential (N33), so it must change, its digest moves, and the batch goes to security-auditor again (5.6) | unchanged | unchanged |
 | State, wire, block, recordings | one direction from the first tick: rust-reviewer's Soldier, netcode-architect's OwnSoldier (its 2.1: "the facing as step 1 holds it") and my row unchanged | as (a) | two forms of one field (5.4) |
 | Count (estimate) | about 25 (the routine with its quarter turns 15, the scan 5, the comment 2, the vectors' generator 3 beyond its exp lines), plus the list's entries / about 45 (quarter turns exact, 45 and 120 by bits against a reference, the scan's bite and control, the vectors' run) | about 30 / 30 (a refusal kind and its sentence, the schema's four values, content_proofs' generator and a refusal case, the table) | about 35 / 60 |
@@ -706,8 +706,8 @@ Today `facing_deg` is any degree in [0, 360) (map.rs:58-66); the soldier keeps h
   could face a main direction (engine-architect's reading of the two briefs, not a word of his on spawns).
   *Recommended:* (a).
 - Pointer only (N35): the same 120° turn cannot keep a box axis-aligned; the map kind and the editor's mirroring meet
-  at editor slice 6, not in 4c. It weakens the 120° point as an argument against (b) (the kind cannot follow that
-  turn today either), so it supports the case against (b) without deciding it.
+  at editor slice 6, not in 4c. The 120° point still supports the case against (b), but does not decide it: the kind
+  cannot follow that turn today either.
 
 ### 5.6 Recommendation
 - **(a): `libm::sincos`, once per spawn point in the match-start constructor, exact on quarter turns.** It is ADR
@@ -728,9 +728,11 @@ Today `facing_deg` is any degree in [0, 360) (map.rs:58-66); the soldier keeps h
 
 ### 5.7 Questions for rust-reviewer (the maths), answered in its own file
 - RR1. The scan refuses std's names only (N37): `libm::sincos(` passes it today, and so do `libm::expf(`, `sinf`,
-  `cosf` and `atan2f`. Should the refused names gain libm's own (at least `sincos` and `sincosf`, and `expf` and
-  `exp2f` beside the exponential's planned bites) before any allowance? My severity: Medium (the guard does not hold
-  for libm's own spellings; the built-file check covers a routine only when it is not inlined).
+  `cosf`, `atan2f` and `libm::expm1(` (std's spelling is `exp_m1`). Should the refused names gain libm's own (at least
+  `sincos` and `sincosf`, and `expf`, `exp2f` and `expm1` for the exponential) before any allowance? It reaches the
+  exponential's planned guard too: security-auditor-deps-4c.md item 3 lists `libm::expm1` among the bites "still
+  refused", which would not bite as the scan stands, so it touches an answer already given. My severity: Medium (the
+  guard does not hold for libm's own spellings; the built-file check covers a routine only when it is not inlined).
 - RR2. One routine, `libm::sincos` in f64 and then `as f32`, rather than `sin` and `cos`, or `sincosf`; and K's f64
   bits pinned by a test?
 - RR3. Exact quarter turns by taking them out first (three compares give q; deg - 90 q is exact by Sterbenz's lemma;
@@ -738,7 +740,8 @@ Today `facing_deg` is any degree in [0, 360) (map.rs:58-66); the soldier keeps h
 - RR4. Which of N38's candidates the built file prints, and so the reviewed list's entries (the count is yours), and
   the vectors' domain (the remainder's [0, 90) x K and its edges).
 - RR5. The floor as the plane at `bounds_m`'s lower y beside the tree, not a 513th solid (the 512 cap and the tree's
-  committed bytes would move); T1 and its plant in step 1.
+  committed bytes would move); T1 and its plant in step 1. And does `cast_ray` stop on it (the old game's ray does,
+  shamble-core.js:1507), now or with 4d's shots, and which world proofs would that move?
 
 ### 5.8 Questions for netcode-architect (the row, the state, the recordings), answered in its own file
 - NA1. The aim's ground crossing (netcode-architect-read.md:62-63) at the floor, `bounds_m`'s lower y, instead of the

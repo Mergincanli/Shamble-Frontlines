@@ -29,6 +29,7 @@ const HEAD_ON_GATE: f32 = 0.2;
 const KEEP_GATE: f32 = 0.1;
 const SKIN: f32 = 0.001;
 static TOWARD_START: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+static LAND_PREV_ALL: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
 static WALL_DISC: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
 
 #[derive(Clone, Copy, PartialEq, Debug)]
@@ -277,7 +278,7 @@ fn embedded(world: &[Block], s: &S, body: Body) -> bool {
 
 fn start(x: f32, z: f32, y: f32) -> S {
     S { x, z, y, vy: 0.0, grounded: true, pull: None, stepped: None, steps: 0, falls_unjumped: 0, airborne_ticks: 0, max_float: 0.0, open_float: 0.0, fall_at: None,
-        cfg: Cfg::default(), vx: 0.0, vz: 0.0, lvx: 0.0, lvz: 0.0, fall_from: None, flickers: 0, head_hits: 0, max_drop: 0.0, wall_hits: 0, y_moved: 0.0, below_top: 0.0 }
+        cfg: Cfg { land_prev: LAND_PREV_ALL.load(std::sync::atomic::Ordering::Relaxed), ..Cfg::default() }, vx: 0.0, vz: 0.0, lvx: 0.0, lvz: 0.0, fall_from: None, flickers: 0, head_hits: 0, max_drop: 0.0, wall_hits: 0, y_moved: 0.0, below_top: 0.0 }
 }
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -765,6 +766,8 @@ fn block6(world: &[Block], body: Body, v0: f32) {
         P { name: "both standing 0.3 m apart", starts: vec![(60.0, 0.0, 0.0), (60.3, 0.0, 0.0)], wishes: vec![(0.0, 0.0), (0.0, 0.0)], speed: 6.3, ticks: 60 },
         P { name: "both standing on one spot", starts: vec![(60.0, 0.0, 0.0), (60.0, 0.0, 0.0)], wishes: vec![(0.0, 0.0), (0.0, 0.0)], speed: 6.3, ticks: 60 },
         P { name: "into a wall (3.10 ledge face x 40)", starts: vec![(37.0, -2.5, 0.0), (39.6, -2.5, 0.0)], wishes: vec![(1.0, 0.0), (0.0, 0.0)], speed: 6.3, ticks: 60 },
+        P { name: "into a wall, mate 0.15 m clear", starts: vec![(37.0, -2.5, 0.0), (39.45, -2.5, 0.0)], wishes: vec![(1.0, 0.0), (0.0, 0.0)], speed: 6.3, ticks: 60 },
+        P { name: "into a wall corner, mate 0.1 m clear of the corner", starts: vec![(37.0, -4.6, 0.0), (39.55, -4.45, 0.0)], wishes: vec![(0.9806, 0.1961), (0.0, 0.0)], speed: 6.3, ticks: 60 },
         P { name: "into a wall, glancing", starts: vec![(37.0, -2.2, 0.0), (39.6, -2.5, 0.0)], wishes: vec![(1.0, 0.0), (0.0, 0.0)], speed: 6.3, ticks: 60 },
         P { name: "across the 0.55 step, walker below", starts: vec![(28.0, -9.0, 0.0), (30.3, -9.0, 0.55)], wishes: vec![(1.0, 0.0), (0.0, 0.0)], speed: 6.3, ticks: 40 },
         P { name: "across the 0.55 step, walker above", starts: vec![(31.5, -9.0, 0.55), (29.6, -9.0, 0.0)], wishes: vec![(-1.0, 0.0), (0.0, 0.0)], speed: 6.3, ticks: 40 },
@@ -774,6 +777,7 @@ fn block6(world: &[Block], body: Body, v0: f32) {
         P { name: "three into a wall", starts: vec![(37.0, -2.5, 0.0), (39.6, -2.5, 0.0), (38.8, -2.5, 0.0)], wishes: vec![(1.0, 0.0), (0.0, 0.0), (0.0, 0.0)], speed: 6.3, ticks: 60 },
     ];
     let perms: [[usize; 3]; 6] = [[0, 1, 2], [0, 2, 1], [1, 0, 2], [1, 2, 0], [2, 0, 1], [2, 1, 0]];
+    let mut po_digest = 0u64;
     for c in &cases {
         for rule in [WallRule::PushOut, WallRule::Sweep] {
             let n = c.starts.len();
@@ -811,7 +815,10 @@ fn block6(world: &[Block], body: Body, v0: f32) {
                 }
             }
             let same = finals.iter().all(|f| *f == finals[0]);
-            println!("push {} [{}]: {} | slot orders {} bit-identical: {same}", c.name, if rule == WallRule::PushOut { "push-out" } else { "sweep" }, first.unwrap(), finals.len());
+            let mut h: u64 = 0xcbf2_9ce4_8422_2325;
+            for &(a, b, c3) in &finals[0] { for w in [a, b, c3] { h ^= u64::from(w); h = h.wrapping_mul(0x0100_0000_01b3); } }
+            if rule == WallRule::PushOut { po_digest = h; } else { println!("push {} push-out vs sweep final bits equal: {}", c.name, po_digest == h); }
+            println!("push {} [{}]: {} | slot orders {} bit-identical: {same} | final-bits digest {h:016x}", c.name, if rule == WallRule::PushOut { "push-out" } else { "sweep" }, first.unwrap(), finals.len());
         }
     }
     println!("# tally (case group: runs, passes)");
@@ -821,6 +828,7 @@ fn block6(world: &[Block], body: Body, v0: f32) {
 fn main() {
     let body = match std::env::args().nth(1).as_deref() { Some("3a") => Body::A3, Some("3b") => Body::B3, Some("3x") => Body::X3, _ => Body::Cyl };
     if std::env::args().nth(1).as_deref() == Some("2w") { WALL_DISC.store(true, std::sync::atomic::Ordering::Relaxed); }
+    if std::env::var("FIX_LAND").is_ok() { LAND_PREV_ALL.store(true, std::sync::atomic::Ordering::Relaxed); }
     if std::env::var("FIX_TOWARD").is_ok() { TOWARD_START.store(true, std::sync::atomic::Ordering::Relaxed); }
     let world = scene();
     let v0 = (2.0 * G * (REACH - STEP)).sqrt();
