@@ -266,11 +266,21 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   re-exports. (13) the tests of rows 22, 25, 27, 28, 31, 33, 34, 35, 36, 37, 38 (bar the direct feed), 39; world.rs's
   known answers re-made by a second implementation written for it in the notes (no committed script exists: earlier
   change-sets' agents wrote theirs in notes), `world-known-answers-c4.py`, FNV-1a 64 over the canonical bytes.
-- **State (18:13 Amsterdam, from the clock): C3's fix pass committed after this notes commit (the code head, so CI
+- **State (18:29 Amsterdam, from the clock): C3 is closed. CI on 9e9a1cc8 green** (gate and smoke run 46169331291,
+  toolchain run 46169331285, finished 17:25:23 UTC), so the advisor agent's first GO condition for C4 is met. **C4 in
+  the worktree, not committed, saved as `c4-wip.patch`** (`git diff --binary HEAD -- crates packages content` on
+  f22b07b7; no new file yet; 40,535 bytes): items (1), (2) and (12) done (world.rs rewritten: the soldier rows in the
+  state, `PlayerCommand`'s move and aim, `PlayerRecord`, the fold, `StateSink::f32` and `row`, 48 rows of 60 bytes;
+  soldiers.rs's `occupied_mut`, `rows`, the test-only `from_rows`; lib.rs's re-exports). **sim's 51 unit tests pass
+  and every known answer came out as predicted** (`world-known-answers-c4.py`, ten of ten). Item (4) begun: map.rs's
+  `on_grid` made `pub` (one rule for content and sim). `cargo build --workspace --all-targets` fails in room (its
+  `World::new` call and its `PlayerCommand` literal at room/src/lib.rs:219): item (5). Next: item (3), collision.rs's
+  bounds in whole centimetres (netcode-architect-read.md 7.3), then (5) to (11) and (13).
+  Earlier state (18:13 Amsterdam, from the clock): C3's fix pass committed after this notes commit (the code head, so CI
   runs on it); its full local checks passed (`.gate/local-checks-c3b.log`: the players' file 58548ac7..., unchanged;
   Node 41 of 41; the browser tests 29 of 29 in 212 s), the gate PASS (`.gate/gate-c3b.log`), the tree byte for byte
   the saved `c3b-wip.patch` (removed in this commit). Next: CI on it, then security-auditor's round 2 on what changed
-  (brief in the scratchpad), then C4.** Earlier state (18:04 Amsterdam, from the clock; first written as 18:06 without reading it, corrected): C3 is green in CI
+  (brief in the scratchpad), then C4. Earlier state (18:04 Amsterdam, from the clock; first written as 18:06 without reading it, corrected): C3 is green in CI
   (gate and smoke run 46167247237, toolchain run 46167247231, finished 17:04:20 UTC, 14 min 18 s). security-auditor on C3 (`security-auditor-c3.md`): REVISE on one
   Medium; the batch's approval stands (the five digests exact, no sixth file); items 1 to 5 MET but for M1; its three
   points: (a) a visibility before `mod` is within its ruling, (b) the libm conditions hold with the raw-name rule,
