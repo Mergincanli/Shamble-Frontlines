@@ -855,10 +855,11 @@ Asked 2026-11-28 on head 3ab59bd7 by the main session. Read only; this block is 
   limit, as the old game's plane had none (`intersectPlane`, N6).
 - It is the same rule as before on every map that exists (all start at y 0, B8-N1), so no recording and no hash moves.
   The page draws the same face (step S, `bounds.min[1]`), so the cursor's floor point and the aim agree.
-- **T3** (sim/aim.rs tests, about 12 lines, part of T2-3): on a loaded map whose bounds start at y 2 (the loader takes
-  any whole centimetre from 0 up, map.rs:325), with no shape on the ray's path, a ray from (0, 22, -20) with direction
-  (0, -1, 1) ends at exactly (0, 200, 0) cm; the same ray from (0, 20, -20) on the test scene (floor 0) ends at
-  (0, 0, 0), unchanged from the old rule; a ray from below the floor keeps no point (`rays_missed`). **Plant:** the
+- **T3** (sim/aim.rs tests, about 12 lines, part of T2-3), on two loaded maps with no shapes, bounds x -10 to 10 and
+  z -30 to 30: one from y 2 (the loader takes any whole centimetre from 0 up, map.rs:325) and one from y 0. On the
+  raised map a ray from (0, 22, -20) with direction (0, -1, 1) ends at exactly (0, 200, 0) cm. On the other, the same
+  ray lowered by 2 m, from (0, 20, -20), ends at (0, 0, 0), as under the old rule. A ray from below the floor gives no
+  point (`rays_missed`). **Plant:** the
   plane at y 0. The raised map's ray then crosses 2 m farther, at z 2, and the clamp lifts only its y: (0, 200, 200),
   red.
 - Whether `cast_ray` itself stops on the floor (4d's shots) is rust-reviewer's RR5, not this.
