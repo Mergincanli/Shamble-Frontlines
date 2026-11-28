@@ -96,6 +96,42 @@ the one conflict (main-68-plan.md:89-99).
 - One line to him (MAIN-52's record): "main dae6d107 taken in (#79 cs4b-2: the world, 107 files, code and docs; the
   STATUS.md conflict resolved by MAIN-68's rule), plan first (MAIN-70)."
 
+## Step 1, done 02:2x UTC on 11-28
+- Resume line on the card (M70-4), usage 0.26, go; its save is H0 = e646ee5999e9c3bfdcee6577cee0adf45e9339fa. The saver
+  stopped (`pgrep -c -f checkpoint.mjs` 0). `git fetch origin`: origin/main dae6d107fdbe942567104bcf1c9a2cbc6b3a1e0f
+  (unchanged; only another lane's branch moved). `df -m`: 6,833 MiB free (M70-7's 4,096 bar met); `pgrep -a -f
+  'cargo|rustc|build.mjs'`: nothing.
+- The anchor T = 9a0f9ea18df656a8270e066eebbfdcf92131529e (`git merge-tree --write-tree --name-only H0 origin/main`):
+  exit 1, one tree line, the conflicted-file line docs/STATUS.md, exactly one CONFLICT line (STATUS.md, content),
+  auto-merge lines for DECISIONS.md, REPO_MAP.md, STATUS.md and STATUS_ARCHIVE.md. C68B-4's preconditions on T, each
+  alone: `git diff --numstat b8f02b0 H0 -- docs/STATUS.md` "1 1", its -U0 the two #40 rows only; main's #40 row unchanged
+  since b8f02b0 (empty); `git grep -c` one marker block; the only markers STATUS.md's :33, :38, :41; every line between
+  them a table row (0 lines without `|`).
+
+## Steps 2-5, done 02:2x UTC on 11-28 (each command alone, printing forms; logs in /home/user/Shamble-Frontlines/.gate/main-70/)
+- Step 2: `git rev-parse origin/main` dae6d107...; `git merge origin/main`: exit 1, "CONFLICT (content): Merge conflict in
+  docs/STATUS.md", "Automatic merge failed"; staged A 44, M 62, `UU docs/STATUS.md` (as expected).
+- Step 3: the block (:33-:41) became main's side with main's #40 row replaced by H0's #40 row byte for byte, by two Edits
+  after a Read; no marker left.
+- Step 4, after `git add docs/STATUS.md`, each alone: no marker (grep, and `git grep -c` on HEAD after the commit: both
+  print nothing); 120 lines; `--numstat origin/main` "1 1", -U0 main's #40 row out and H0's in; `--cached --name-only H0`
+  = main's 107 paths (cached-names.txt = main-names.txt by diff, 107 each); M70-2: `--diff-filter=U` nothing; "106 files
+  changed, 10824 insertions(+), 393 deletions(-)"; spikes/ and .checkpoints/ nothing; against T only docs/STATUS.md.
+- The commit: 2d379d9c7922deedf4e7fefe08d6eb04c6843afe, parents H0 e646ee59... and dae6d107...; `git diff --shortstat H0
+  HEAD` "107 files changed, 10839 insertions(+), 408 deletions(-)" (as M70-2 expected). Departure (Low, recorded): the
+  message is git's own with its "# Conflicts:" lines (as MAIN-68's 6b4a0d3) plus the two attribution lines by `--trailer`;
+  M70-9 named git's message alone. Not undone: amending would rewrite a commit.
+- Step 5: GATE PASS (--no-smoke, base dae6d10; gate.log); "repo map OK: 273 entries cover 111 required paths";
+  checkpoint tests 33 of 33, 0 fail; `git rev-parse HEAD^1 HEAD^2` H0 then dae6d107; `git diff --name-only H0 HEAD` = the
+  107 (head-names.txt = main-names.txt); the stat line outside STATUS.md "106 files changed, 10824 insertions(+), 393
+  deletions(-)" = b8f02b0..origin/main's; against T only docs/STATUS.md; M70-3: outside spikes/, .checkpoints/ and docs/
+  nothing; docs/ the usual six; H0..HEAD over spikes/, docs/design/, .checkpoints/ nothing. d: light.log 02:27:10-16,
+  exit 0: refs 2239 = 2195 + 44, marks 81 (drafts at 626df678...), self 88 of 88, redact 11 of 11 with 464 items and 0
+  findings: all equal to light-base.log but HEAD and refs.
+- Step 6 so far: main's CI on dae6d107 re-read, both success at attempt 1 (gate 46081134384 23:12:08-23:12:51, toolchain
+  46081134408 23:12:08-23:22:01); the card 200 lines; DEP-HOLD's line alone prints nothing. Next: the card save pushes
+  the merge; CI on the pushed head; the saver restarts; step 7.
+
 ## Order
 - MAIN-70 runs while the dist ruling waits (stopb-dist-diff.md): no build or counted run of mine runs during steps 1-6
   (no build may run during steps 1-6). Worktree .gate/stopb-a (at Y 652e9513, build 1''s tree) stays (M70-8: stopb-b
