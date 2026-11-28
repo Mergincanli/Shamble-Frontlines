@@ -85,6 +85,7 @@ roof house b 89% speed 9.576 jump 1.5 m out: edge gained true, highest standing 
 roof house b 89% speed 13.27 jump 0.5 m out: edge gained true, highest standing 4.300 m (ridge 4.3), float open 0.3579 / seams 0.3579, unjumped-falls 1
 roof house b 89% speed 13.27 jump 1 m out: edge gained true, highest standing 4.300 m (ridge 4.3), float open 0.3579 / seams 0.3579, unjumped-falls 1
 roof house b 89% speed 13.27 jump 1.5 m out: edge gained true, highest standing 4.300 m (ridge 4.3), float open 0.3579 / seams 0.3579, unjumped-falls 1
+thin wall at 13.27 m/s: 0 of 10000 past the mid-plane
 off platform 1.0 m speed 6.3: fell (centre past the edge when it started: Some(0.519989) m), feet now 0.667
 off platform 1.0 m speed 9.576: fell (centre past the edge when it started: Some(0.55358887) m), feet now 0.880
 off platform 1.0 m speed 13.27: fell (centre past the edge when it started: Some(0.6539993) m), feet now 0.947

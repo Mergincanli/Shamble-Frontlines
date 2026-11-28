@@ -473,4 +473,77 @@ the two numbers that exist, with the guards off).
 12. Low: the u16 generation wraps after 65,536 reuses of one slot (an old id resolves again): stated, tested, accepted.
 13. Low: without the 1e-4 m/s rest rule a stopping soldier's speed never reaches 0: v - v x 0.37375 stops changing once v x k rounds to nothing, at the smallest subnormals (about 190 ticks in), so the state never settles and x86 runs those ticks slowly (arithmetic, not run).
 
+## Block 5. The sandbox's own body, run (the coordinator's follow-up, 2026-11-28) (DONE)
+**What ran.** `rr-body-proto.rs` beside this file (rustc 1.99.1 -O, f32; outputs `rr-body-proto-3a.txt`, `-3b.txt`,
+`-2.txt`, `-3x.txt`; sha256 of the source 8ba37c11...4b14e). It is the sandbox's body as game-designer-read.md block 1
+reads it (be608cad), in the sandbox's own 2.5D form: a 0.4 m body circle for walls and the step trigger (a top above
+the feet and at most step-up + 5 mm above the test feet, while moving toward it: the rise is instant), a 0.15 m foot
+circle for standing at the height nearest the centre, the snap down 0.2 m + (move + 0.15) x slope, else a fall from
+rest; the exact arc with the tick's true top as the test feet in the air (block 1, 1.5 item 5); the test scene's 17
+shapes of the yard and the street. Bodies: **(3a)** foot plus the pull (0.5 of what is left a tick, all of it under
+0.03 m, to 0.9 x foot); **(3b)** foot plus the full body on the step just taken until the foot reaches it; **(2)** my
+cylinder in the same 2.5D form (stands on the highest point under its 0.4 m disc, snap = step-up, no 5 mm); and, to
+check the model against game-designer's N5, **(3x)** the foot with neither bridge. Runs: three speeds (6.3, 9.576 and
+13.27 m/s) x three starts, as before; plus slow walks (1 and 2 m/s, the easing's first ticks) and walks that stop the
+tick the step fires. Pass needs the outcome and no fall without a jump ("unjumped falls", the flicker).
+
+| Case (runs) | (3a) | (3b) | (2) | (3x), check only |
+|---|---|---|---|---|
+| 0.55 m step gained (9) | 9 pass, 0 falls | 9, 0 | 9, 0 | 1 pass: 8 runs fall once for 1 tick after the rise |
+| 0.56 m step stopped on the ground (9) | 9 (x 33.6000 = face - 0.4) | 9 | 9 | 9 |
+| slow walk on, 1 and 2 m/s (6) | 6, 0 falls | 6, 0 | 6, 0 | 0: 3 to 8 falls a run |
+| stop the tick the step fires (9) | 9: stands on the top, centre pulled to 0.135 m short of the face | 9: stands on the top, centre 0.21 to 0.40 m short | 9: same as (3b) | 0: drops back to the ground |
+| 3.05 m ledge caught by a jump (9) | 9, top at tick 12 or 13, 0 falls | 9 | 9 | 6: 3 runs fall once after catching |
+| 3.10 m ledge refused (9) | 9 | 9 | 9 | 9 |
+| ramps 25 % and 50 %, up and down (18) | 18, 0 airborne ticks | 18 | 18 | 18 |
+| float on the open slope (centre over the ramp, a body radius from its ends) | 0.000 m | 0.000 | 0.100 (25 %) and 0.200 (50 %) | 0.000 |
+| float at a slope's seam (the body touches the platform or the ridge and rises at once) | up to 0.18 m (ramps), 0.31 (roofs), for 1 to 2 ticks | the same | 0.10 / 0.20 / 0.36 / 0.38 throughout | smaller (it falls back) |
+| roofs 95 % and 89 % after the 2.6 m edge (9 each) | edge gained and the ridge stood on in 18 of 18 | 18 | 18; on house b at 13.27 m/s all 3 runs fall once (1 tick) at the roof | 18; 6 runs fall once |
+| walking off an edge | falls once the foot leaves it: centre 0.21 to 0.33 m past (0.15 plus up to one tick's move); falls from 0.55 and 1.0 m | the same | centre 0.52 to 0.65 m past (0.4 plus a tick); snaps down the 0.55 m step (snap = step-up), falls from 1.0 m | as (3a) |
+| thin wall 0.2 m at 13.27 m/s (10,000) | 0 past its mid-plane | 0 | 0 | 0 |
+Reading: (3x) reproduces game-designer's N5 (the flicker without a bridge), so the model behaves as its reading says;
+(3a) and (3b) pass every run of every case with no fall; (2) passes every pass/fail case, and flickers once (1 tick)
+on house b's roof in the 3 runs at 13.27 m/s. (3a) and (3b) give the same numbers in every walking run at a steady
+speed (the walk alone carries the centre within 0.135 m of the face in one tick at these speeds, so the pull ends
+without moving him); they differ only when he stops at the step: (3a) is pulled onto it, (3b) stays where he stopped,
+standing on the step with his centre up to 0.4 m short of it. The roofs are walked to the ridge by every body because
+the sandbox has no slope limit (game-designer N3): that is a NO-SOURCE and MOVE-RULES row 5 matter, not a body one.
+**Not run, said plainly:** the sandbox itself (this is a re-implementation of a reading); easing (steady speeds, with
+the slow runs standing in for its first ticks); ramps approached from their sides, and the sandbox's "set back along
+the slope" (yard.ts:318-334); ceilings; the push; two soldiers; the far corner. The wall rule is a push-out after the
+move with no sweep: 0 tunnellings at 13.27 m/s through 0.2 m holds by 6 cm of margin (0.44 m a tick against the
+0.5 m from the nearest legal start to the mid-plane); a faster move or a thinner wall would pass through, so the
+game's version sweeps the body circle against the footprints (a 2D form of 1.4's grown box and vertical cylinders).
+
+**2. The pull at 30 against 60 steps a second.** The sandbox's pull is per step (half of what is left each step,
+movement.ts:61-63), not per second, so its time depends on the rate: about 0.17 s at 30 steps, 0.08 s at 60.
+His Export says 30 (game-designer N2: `step_rate_hz` 30, the sandbox's start rate 30) and his STEP-60 (a) is "I play
+the sandbox at 30 steps and export again", so at our 30 ticks the three numbers stand as they are: nothing to work
+out again. To keep it from depending on the rate in content: the share as a half time, `pull_half_time_s` = 1/30 s,
+which the time unit holds exactly (100 units); the share a tick is 1 - 0.5^(units a tick / half-time units): exactly
+0.5 at 30 Hz with no routine (a whole power); at 60 Hz 1 - 0.5^0.5 = 0.2929, through the easing's exp once per match.
+The 0.03 m stop and the 0.9 x foot target are lengths and do not depend on the rate. Of the other numbers: the 0.2 m
+snap and the 5 mm allowance are lengths (rate-free); the snap's slope term uses the tick's move, which is physical.
+
+**3. What each body changes in step 1's counts (code / tests, against Block 1's route Ours 1,300 / 1,260) and in
+NO-SOURCE.**
+- The form: all three bodies run here in the sandbox's 2.5D form, which is exact for the map kind's only forms (boxes
+  and four-way ramps, all axis-aligned). Built so, the sweeps become a swept body circle against footprints plus
+  heights from footprints and the tree's candidates: about 170 / 200 in place of 260 / 260 (no edge cylinders in
+  3D, no grown prisms). The 3D sweeps of 1.4 stay the route if a later form (a rotated box, a mesh) needs them.
+- **(3a):** movement +30 / +50 (the pull, the stop-at-touch and slow tests, the flicker count), the step-up simpler
+  (-20): step 1 about 1,220 / 1,250. NO-SOURCE: `body_height_m`; `foot_radius_m` (m, (0, body_radius_m]; 0.15);
+  `pull_half_time_s` (s, [1/3,000, 1]; 1/30); `pull_done_under_m` (m, [0, 0.5]; 0.03); `pull_to_foot_pct` (%,
+  [0, 100]; 90); `step_allowance_m` (m, [0, 0.05]; 0.005, or 0 by game-designer's "no allowance"); `snap_down_m` (m,
+  [0, step_up_m]; 0.2). The steepest slope: none (the sandbox has none), so that row leaves NO-SOURCE under (3a).
+- **(3b):** movement +15 / +40 (the stepped block stood on with the full body): about 1,205 / 1,240. NO-SOURCE: as
+  (3a) without the pull's three numbers.
+- **(2):** in 2.5D about 1,190 / 1,210; in Block 1's 3D sweeps 1,300 / 1,260. NO-SOURCE: `body_height_m`, and
+  `snap_down_m` if he takes the sandbox's 0.2 m (my design snapped by the step-up, which drops him off the 0.55 m step
+  at once, game-designer N8); the steepest slope only if a limit is wanted (the sandbox has none).
+- Every body keeps 1.2, 1.3, 1.6 to 1.9 and Block 2 as they are; the in-air step-up and the true top (1.5 items 5
+  and 7) hold for each (the ledges above).
+BODY-SHAPE stays his; game-designer's condition for (3a) (every run passes, vertical motion, ledges and ramps
+included) is met in this prototype, with the "not run" list above as its limit.
+
 DONE

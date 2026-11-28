@@ -276,6 +276,20 @@ fn main() {
                 highest, s.open_float, s.max_float, s.falls_unjumped);
         }}
     }
+    // 6. The thin wall (x 30 to 30.2, z 4 to 10) at 13.27 m/s, 10,000 seeded starts: the 2.5D push-out runs after the
+    // move, with no sweep, so this counts the centres that end past the wall's mid-plane (x 30.1).
+    let (mut seed, mut through) = (0x9e37_79b9_u32, 0);
+    for _ in 0..10_000 {
+        let mut next = || { seed ^= seed << 13; seed ^= seed >> 17; seed ^= seed << 5; seed };
+        let x = 29.0 + (next() % 600) as f32 / 1000.0;
+        let z = 4.5 + (next() % 5000) as f32 / 1000.0;
+        let side = (next() % 1000) as f32 / 1000.0 - 0.5;
+        let len = (1.0 + side * side).sqrt();
+        let mut s = start(x, z, 0.0);
+        tick(&world, &mut s, body, (1.0 / len, side / len), 13.27, false, v0);
+        if s.x > 30.1 { through += 1; }
+    }
+    println!("thin wall at 13.27 m/s: {through} of 10000 past the mid-plane");
     // 5. Walking off an edge: the gentle platform's far side (x 49, 1.0 m drop) and the 0.55 step's far side (x 32).
     for (name, x0, z, y, edge) in [("platform 1.0 m", 47.0_f32, 6.0_f32, 1.0_f32, 49.0_f32), ("step 0.55 m", 31.0, -9.0, 0.55, 32.0)] {
         for sp in speeds {

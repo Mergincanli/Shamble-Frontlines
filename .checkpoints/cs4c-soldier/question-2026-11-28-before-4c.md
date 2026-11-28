@@ -203,8 +203,17 @@ holds.
   exactly what he played; (3b) the same without the pull, standing on his whole body on a step he has just taken until
   his foot reaches it.
 - **Recommended: (3a)**, if rust-reviewer's prototype, run again with the foot and the pull, passes every run (the two
-  steps, the 3.05 and 3.10 m ledges, the ramps); the run is going on now, and its result comes with the next update.
-  Fallback (2), with its overhang and float said to him before his Brave check.
+  steps, the 3.05 and 3.10 m ledges, the ramps). Fallback (2), with its overhang and float said to him before his Brave
+  check.
+- **The re-run's result** (`rust-reviewer-read.md`, block 5; its own re-implementation of the sandbox's code as read,
+  not the sandbox itself): **(3a) and (3b) pass every run with no fall**: 9 of 9 each for the 0.55 m step gained, the
+  0.56 m step stopped, the 3.05 m ledge caught by a jump and the 3.10 m ledge refused; 6 of 6 slow walks, 9 of 9 stops at
+  the step, 18 of 18 runs up and down the ramps. They differ only when he stops at a step: (3a) pulls his centre to
+  0.135 m short of the step's face, (3b) leaves it 0.21 to 0.40 m short. Walking off an edge, both fall once the foot
+  leaves (his centre 0.21 to 0.33 m past). **(2), the cylinder, passes every pass-or-fail case** but hovers 0.10 and
+  0.20 m over the yard's ramps and 0.36 to 0.38 m over the roofs all the time, and flickers once on a roof at a sprint.
+  Every body reaches both roofs' ridges, since the sandbox has no slope limit: that is MOVE-RULES row 9's question.
+  Not run: ramps met from the side, ceilings, the push, two soldiers. **So the recommendation stands: (3a).**
 
 ## Added at 01:15 Amsterdam (from the clock), after the advisor agent's verdict on the plan sheet (`advisor-reread-4c.md`)
 The advisor agent approved the first docs commit and the scene, with conditions, and holds the soldier's steps until
