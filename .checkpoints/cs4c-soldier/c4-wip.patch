@@ -6518,7 +6518,7 @@ index d75b4a38..a03ad1bf 100644
      pub fn iter(&self) -> impl Iterator<Item = (SoldierId, &Soldier)> {
          self.slots
 diff --git a/crates/sim/src/world.rs b/crates/sim/src/world.rs
-index 28a50a56..7de42cf4 100644
+index 28a50a56..2d7f8572 100644
 --- a/crates/sim/src/world.rs
 +++ b/crates/sim/src/world.rs
 @@ -1,8 +1,12 @@
@@ -6783,7 +6783,20 @@ index 28a50a56..7de42cf4 100644
          }
          self.tick = self
              .tick
-@@ -166,6 +315,7 @@ impl World {
+@@ -157,15 +306,17 @@ impl World {
+     }
+ 
+     /// Hands the whole state to `sink`, field by field in its one fixed order (ADR 0004 part 9). The shared state
+-    /// comes first (the tick, then the player's buttons and the 16 press counters), then `authority()`, then the
+-    /// authority's own part (the seed, as a secret; the random streams' positions join it when a system first
+-    /// draws). Each field that joins the state joins here or in `visit_shared`, in the same change.
++    /// comes first (the tick, then the player's buttons and the 16 press counters, then the soldier table's 48 rows),
++    /// then `authority()`, then the authority's own part (the seed, as a secret; the random streams' positions join it
++    /// when a system first draws). Each field that joins the state joins here or in `visit_shared`, in the same change
++    /// (`tests/state_rule.rs` holds that from the source).
+     pub fn visit(&self, sink: &mut impl StateSink) {
+         // Every field is named here too: one added to the struct later does not compile until it is handed over
+         // here, or left to `visit_shared` in plain sight.
          let Self {
              tick: _,
              player: _,
@@ -6791,7 +6804,7 @@ index 28a50a56..7de42cf4 100644
              seed,
          } = self;
          self.visit_shared(sink);
-@@ -173,18 +323,25 @@ impl World {
+@@ -173,18 +324,25 @@ impl World {
          sink.secret("seed", seed);
      }
  
@@ -6819,7 +6832,7 @@ index 28a50a56..7de42cf4 100644
      }
  
      /// Writes the canonical bytes of the whole state into `out`, replacing what it held: the shared state's bytes,
-@@ -227,6 +384,9 @@ impl World {
+@@ -227,6 +385,9 @@ impl World {
  #[cfg(test)]
  mod tests {
      use super::*;
@@ -6829,7 +6842,7 @@ index 28a50a56..7de42cf4 100644
  
      /// The seed 0, 1, ..., 31.
      fn counting_seed(first: u8) -> [u8; SEED_BYTES] {
-@@ -237,14 +397,35 @@ mod tests {
+@@ -237,14 +398,35 @@ mod tests {
          seed
      }
  
@@ -6856,20 +6869,20 @@ index 28a50a56..7de42cf4 100644
 +    fn world(first: u8, start_tick: u32) -> World {
 +        let (rules, spawns) = constants();
 +        World::new(&setup(first, start_tick), &rules, &spawns)
-     }
- 
--    /// Buttons 0x8001 and the counters 1, 2, ..., 16.
++    }
++
 +    /// A match on a map with no spawn: no soldier.
 +    fn empty_world(first: u8, start_tick: u32) -> World {
 +        let (rules, _) = constants();
 +        World::new(&setup(first, start_tick), &rules, &[])
-+    }
-+
+     }
+ 
+-    /// Buttons 0x8001 and the counters 1, 2, ..., 16.
 +    /// Buttons 0x8001 and the counters 1, 2, ..., 16; no move and no aim.
      fn pressed() -> PlayerCommand {
          let mut presses = [0; BUTTONS];
          for (counter, value) in presses.iter_mut().zip(1..) {
-@@ -253,14 +434,33 @@ mod tests {
+@@ -253,14 +435,33 @@ mod tests {
          PlayerCommand {
              buttons: 0x8001,
              presses,
@@ -6904,7 +6917,7 @@ index 28a50a56..7de42cf4 100644
          at_zero.authority_step(&[]);
          at_zero.authority_step(&[]);
          assert_eq!(at_zero.tick(), 2);
-@@ -276,37 +476,248 @@ mod tests {
+@@ -276,37 +477,248 @@ mod tests {
          let older = PlayerCommand {
              buttons: 2,
              presses: [9; BUTTONS],
@@ -7161,7 +7174,7 @@ index 28a50a56..7de42cf4 100644
      #[derive(Default)]
      struct Names(Vec<(&'static str, usize)>);
  
-@@ -319,6 +730,14 @@ mod tests {
+@@ -319,6 +731,14 @@ mod tests {
              self.0.push((name, 4));
          }
  
@@ -7176,7 +7189,7 @@ index 28a50a56..7de42cf4 100644
          fn bytes<const N: usize>(&mut self, name: &'static str, _: &[u8; N]) {
              self.0.push((name, N));
          }
-@@ -332,26 +751,37 @@ mod tests {
+@@ -332,26 +752,37 @@ mod tests {
          }
      }
  
@@ -7226,7 +7239,7 @@ index 28a50a56..7de42cf4 100644
      }
  
      /// A reader of the shared state that stops the test when it is handed anything of the authority's part.
-@@ -362,6 +792,8 @@ mod tests {
+@@ -362,6 +793,8 @@ mod tests {
  
          fn u32(&mut self, _: &'static str, _: u32) {}
  
@@ -7235,7 +7248,7 @@ index 28a50a56..7de42cf4 100644
          fn bytes<const N: usize>(&mut self, _: &'static str, _: &[u8; N]) {}
  
          fn authority(&mut self) {
-@@ -373,82 +805,122 @@ mod tests {
+@@ -373,82 +806,122 @@ mod tests {
          }
      }
  
@@ -7403,7 +7416,7 @@ index 28a50a56..7de42cf4 100644
      }
  
      #[test]
-@@ -474,4 +946,78 @@ mod tests {
+@@ -474,4 +947,78 @@ mod tests {
      fn the_tick_counter_stops_loudly_and_never_wraps() {
          world(0, u32::MAX).authority_step(&[]);
      }
@@ -7543,10 +7556,10 @@ index 3c46fd1c..f489d74f 100644
          black_box(world.shared_hash());
          last = black_box(world.state_hash());
 diff --git a/packages/client/scripts/build-checks.test.mjs b/packages/client/scripts/build-checks.test.mjs
-index 012c0e0f..7b529699 100644
+index 012c0e0f..240d904e 100644
 --- a/packages/client/scripts/build-checks.test.mjs
 +++ b/packages/client/scripts/build-checks.test.mjs
-@@ -760,15 +760,29 @@ describe("the built-file check", () => {
+@@ -760,15 +760,42 @@ describe("the built-file check", () => {
      expect(libmProblems([SQRTF_LEGACY, BUILTINS_ROUND, "roundf", ...NOT_MATHS], allowed)).toEqual([]);
      const beside = ["_RNvNtNtCs8f6xQ2mK1pZ_4libm4math6sqrtf26sqrtf2", SQRT_GENERIC, "_RNvNtNtNtCs4WfqS6F5PNm_17compiler_builtins4math9libm_math6roundf6roundf", "round", ACOSF];
      expect(libmProblems(beside, allowed)).toHaveLength(5);
@@ -7554,15 +7567,29 @@ index 012c0e0f..7b529699 100644
 -    // its reason.
 +    // Today's list holds the two routines the content loader brings and the 21 paths the build check prints for
 +    // libm's exp and sincos and what they call (change-set 4c's C4), and whatever joins it is a whole routine with its
-+    // reason. No libm entry is a bare module (`libm::math` and the like): each names a routine's own path.
++    // reason. No libm entry is a bare module (`libm::math` and the like): each names a routine's own path. No entry
++    // names a fused multiply-add, and none names a banned function, but for two: libm's own exp and sincos, by the
++    // pinned crate's path, whose steps are the banned C names `exp` and `sincos` (each twice, the module and the
++    // routine). Exactly those two, and nothing else of the banned list in them; the C functions of those names stay
++    // refused whatever this list says (below).
++    const own = new Map([["libm::math::exp::exp", "exp"], ["libm::math::sincos::sincos", "sincos"]]);
++    const banned = (name) => `${name}: a maths function whose result is not the same on every target (ADR 0004 part 7)`;
      for (const entry of MATHS_ALLOWED) {
        expect(entry.routine).toMatch(/^(libm|compiler_builtins|C)(::[A-Za-z_][A-Za-z0-9_]*)+$/);
        expect(entry.why.length).toBeGreaterThan(20);
        expect(fusedMultiplyAddProblems(entry.routine.split("::"))).toEqual([]);
-       expect(bannedMathsProblems(entry.routine.split("::"))).toEqual([]);
+-      expect(bannedMathsProblems(entry.routine.split("::"))).toEqual([]);
++      const name = own.get(entry.routine);
++      expect(bannedMathsProblems(entry.routine.split("::"))).toEqual(name ? [banned(name), banned(name)] : []);
 +      expect(["libm", "libm::math", "libm::math::generic", "libm::math::support", "compiler_builtins::math"]).not.toContain(entry.routine);
      }
 -    expect(MATHS_ALLOWED.map(({ routine }) => routine)).toEqual(["C::round", "C::__multi3"]);
++    expect([...own.keys()].every((routine) => MATHS_ALLOWED.some((entry) => entry.routine === routine))).toBe(true);
++    // With today's whole list, a twin that holds the C functions exp and sincos (and sin, cos, expf) is refused for
++    // each of them by the banned rule, and the list lifts none of it.
++    const plain = ["exp", "sincos", "sin", "cos", "expf"];
++    const planted = twin({ bodies: [fn(), fn(), ...plain.map(() => fn())], names: [OURS, CORE, ...plain] });
++    expect(twinProblems(planted, "the release twin", MATHS_ALLOWED)).toEqual(plain.map((name) => `the release twin: ${banned(name)}`));
 +    expect(new Set(MATHS_ALLOWED.map(({ routine }) => routine)).size).toBe(MATHS_ALLOWED.length);
 +    // prettier-ignore
 +    expect(MATHS_ALLOWED.map(({ routine }) => routine)).toEqual([
@@ -7580,10 +7607,10 @@ index 012c0e0f..7b529699 100644
  
    test("a function of a crate the players' file is built without is refused: its own, and the standard library's as it used it", () => {
 diff --git a/packages/client/scripts/maths-allowed.mjs b/packages/client/scripts/maths-allowed.mjs
-index 9a390936..8879c828 100644
+index 9a390936..34f4c1f1 100644
 --- a/packages/client/scripts/maths-allowed.mjs
 +++ b/packages/client/scripts/maths-allowed.mjs
-@@ -4,13 +4,30 @@
+@@ -4,22 +4,126 @@
  // reason its result is the same bits on every target; a fused multiply-add and the functions of BANNED_MATHS are
  // refused whatever this list says.
  //
@@ -7621,7 +7648,12 @@ index 9a390936..8879c828 100644
  
  /** @type {{ routine: string, why: string }[]} */
  export const MATHS_ALLOWED = [
-@@ -22,4 +39,91 @@ export const MATHS_ALLOWED = [
+   {
+     routine: "C::round",
+-    why: "f64::round, rounding to a whole number with halves away from zero. Called when a bundle loads, never per tick: the map's grid check (crates/content/src/map.rs, on_grid: a coordinate times its steps per metre, rounded, must divide back to the same double), once per box corner. The operation is exact (IEEE 754 roundToIntegralTiesToAway): every double that is not a NaN has one answer, the sign of zero included, so any correct routine gives the same bits, natively, in every browser and on a server. The toolchain's routine here is one f64.add of x and 0.5 - 2^-54 with x's sign (f64.copysign), then a cut to a whole number by integer bit masks: no multiply, no fused multiply-add, no vector instruction, and WebAssembly's f64.add rounds to nearest on every engine. A NaN's bits are not promised; no NaN reaches it (on_grid's value is a finite parsed number, its scale 100 or 1,000). rust-reviewer, 2026-11-27: the twin's own body in Node 22 (V8) and native x86_64 f64::round gave the same bits on 4,006,064 inputs, none off an exact reference.",
++    why: "f64::round, rounding to a whole number with halves away from zero. Called when a bundle loads, never per tick: the map's grid check (crates/content/src/map.rs, on_grid: a coordinate times its steps per metre, rounded, must divide back to the same double), once per box corner; and from change-set 4c's C4 also while a match is set up: the static world's bounds in whole centimetres (crates/sim/src/collision.rs, face_cm: on_grid once for each of the bounds' six faces, and once more for a face off the grid, which only a document built in code has), never per tick. The operation is exact (IEEE 754 roundToIntegralTiesToAway): every double that is not a NaN has one answer, the sign of zero included, so any correct routine gives the same bits, natively, in every browser and on a server. The toolchain's routine here is one f64.add of x and 0.5 - 2^-54 with x's sign (f64.copysign), then a cut to a whole number by integer bit masks: no multiply, no fused multiply-add, no vector instruction, and WebAssembly's f64.add rounds to nearest on every engine. A NaN's bits are not promised; no NaN reaches it (on_grid's value is a finite parsed number, its scale 100 or 1,000; face_cm's is a face of bounds that StaticWorld::build has first held finite as an f32, refusing the map otherwise). rust-reviewer, 2026-11-27: the twin's own body in Node 22 (V8) and native x86_64 f64::round gave the same bits on 4,006,064 inputs, none off an exact reference.",
+   },
+   {
      routine: "C::__multi3",
      why: "The toolchain's 128-bit integer multiply (the low 128 bits of a product), which WebAssembly has no instruction for. Called by the loader's number reading and writing, when a bundle loads, never per tick: core's f64 from text (dec2flt, Eisel-Lemire's 64 x 64-bit products), core's shortest and exact texts of an f64 (flt2dec, Grisu: crates/content/src/number.rs, number_text, and the refusal sentences of crates/content/src/error.rs), core's text of a u128, and the tie rule for number texts (number.rs, even_of_a_tie: 5 to the decimals times the odd mantissa, checked). Integer arithmetic: the product modulo 2^128 is one number on every target, and Rust defines checked_mul's overflow, so the bits are the same natively, in every browser and on a server. The routine here is 64-bit integer multiplies, additions, shifts and compares only, no float. rust-reviewer, 2026-11-27: the twin's own body in Node 22 (V8) matched BigInt's product on 900,144 operand pairs.",
    },

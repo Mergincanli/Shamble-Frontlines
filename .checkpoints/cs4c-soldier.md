@@ -266,6 +266,26 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   re-exports. (13) the tests of rows 22, 25, 27, 28, 31, 33, 34, 35, 36, 37, 38 (bar the direct feed), 39; world.rs's
   known answers re-made by a second implementation written for it in the notes (no committed script exists: earlier
   change-sets' agents wrote theirs in notes), `world-known-answers-c4.py`, FNV-1a 64 over the canonical bytes.
+- **State (19:18 Amsterdam, from the clock): the advisor tool's check of C4 taken; the whole plant set running
+  (`.gate/plants-whole-c4.log`; its first line names 1b08e8ac, the head before this card's last notes commit
+  a95ea332, which changed notes only); the advisor agent asked to rule on one departure
+  (`advisor-c4-maths-test.md`, running).** The advisor tool's points and what was done: (1) build-checks.test.mjs,
+  edited but not run: run, RED at its line 770 (`bannedMathsProblems` over every entry's segments: `exp` and `sincos`
+  are banned C names, and libm's own entries hold them as segments). Not dropped: the check kept for every entry with
+  an exact expected result (`[]` for 21, and exactly two lines of their own name for `libm::math::exp::exp` and
+  `libm::math::sincos::sincos`), a check that those two are listed, and a new planted twin holding the plain C exp,
+  sincos, sin, cos and expf refused for each under today's whole list; green, 59 of 59. **A departure for the advisor
+  agent's ruling** (Mustafa's rule: no test cut or thinned), and for security-auditor's C4 brief. (2) `C::round`'s why
+  now names face_cm as its second caller (match setup, finite by the bounds check). (3) `visit`'s doc names the 48
+  rows. (4) The TypeScript fixtures that reach the players' module carry one movement document each (the repository's
+  content, first-loop's frozen bundle); no Node or browser test pins a hash. (5) **The count** (`count-4c.mjs` on
+  `git diff --numstat 946fef73 -- crates packages`, the new file marked with `git add -N` and unmarked after): **4c-2
+  at 6,142 written lines** (at C3's fix head 3,038: C4 is 3,104, of which 865 are first-loop.vector.txt, which
+  make_recordings writes but the rule's left-out list does not name; without it C4 is 2,239). Under the two-thirds
+  line (about 12,470) and the stop line (18,700); C5 (the movement) and steps 2 to 7 still to come, so the count is
+  watched at every commit. Next, in order: the advisor agent's ruling; the whole plant set's result; the full local
+  checks and the gate on this tree; the tree compared with the patch; this card; C4's commit; CI; security-auditor on
+  the commit (condition (d), with the six covered entries and the test's departure named).
 - **State (19:12 Amsterdam, from the clock): C4 written whole; its plants run; saved again** (`c4-wip.patch`, 341,240
   bytes, the tracked files; `c4-wip/state_rule.rs`, the one new file, its sha256 equal to the tree's). Since 19:02:
   T-A (`crates/sim/tests/state_rule.rs`: world.rs and soldiers.rs read with the shared tokenizer; every World field
