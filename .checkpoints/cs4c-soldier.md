@@ -266,6 +266,26 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   re-exports. (13) the tests of rows 22, 25, 27, 28, 31, 33, 34, 35, 36, 37, 38 (bar the direct feed), 39; world.rs's
   known answers re-made by a second implementation written for it in the notes (no committed script exists: earlier
   change-sets' agents wrote theirs in notes), `world-known-answers-c4.py`, FNV-1a 64 over the canonical bytes.
+- **State (19:57 Amsterdam, from the clock): C4's fix b84d856c pushed (CI: gate and smoke green, run 46177656513;
+  toolchain running, 46177656478); C4's own toolchain run 46176393620 green. C5 begun in the worktree, saved as
+  `c5-wip.patch` (tracked files) and `c5-wip/body.rs` (the new file).** The advisor tool's check of C5's approach
+  (taken): the walk's wall pass is the sweep then the ramps' set-back, no push-out of boxes (11.1 2e, block 10, test
+  15's plant); the oracle (test 21) straight after the sweep; the move's axes from the picture's camera (scene.ts:69-70:
+  the camera at (0, 14, 16) looks at the origin, so the screen's up is -z, as content's FACING doc has it): wish =
+  (move_x / 127, -move_y / 127) on (x, z); no prototype constant survives (all from `Rules`, the sandbox's two
+  slope-head literals named); the ground is `floor_y`, not 0; candidates sorted, a box covering the tick's reach, a test
+  of the step with candidates against the step with every shape; the jump's edge against the record before the fold;
+  mode (a) only in `cfg(test)` (tests 15 and T-C as unit tests); rows 11.7 may lack (the stamina per tick, the bounds'
+  sides and top) added with plants and told to the advisor agent; `authority_step` wired last, after the geometry tests
+  and the oracle; the pins predicted before they are made again. rust-reviewer asked the four points (block 19,
+  running). Done so far: collision.rs `bounds_m`, `floor_y`, `candidates` (17 collision tests pass: 7.3's part (c), the
+  candidates against every shape on 6,000 boxes); body.rs written whole (the 2.5D form: `Near`, `headroom`,
+  `at_slope_head`, `is_wall`, the footprint sweep, `sweep_circle` with the bounds' four sides as walls, `set_back` with
+  the guard, `step_up_target`, `pull_toward`, `standing_height` from the floor, `steepest_under_foot`,
+  `ceiling_for_feet` with the bounds' top, `landing_crossed` with the floor counted as a top), building clean. A reading
+  to put to rust-reviewer at review: the landing crossing counts the floor as a top (GROUND: "a fall ends on it,
+  landing as on any walkable top"), where the prototype left the floor to standing. Next: test 21 (the oracle), then
+  movement.rs, the wiring, the tests, the pins.
 - **State (19:45 Amsterdam, from the clock): security-auditor on C4's commit fb2030ed (`security-auditor-c4.md`):
   APPROVE, two Lows, no Critical, High or Medium.** It built both twins itself from the commit (byte for byte the ones
   in `target/`: release 6fd915ed..., dev a024fe70...; the evidence file named an earlier pair of 17:56, the same result):

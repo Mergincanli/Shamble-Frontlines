@@ -1,0 +1,165 @@
+diff --git a/crates/sim/src/collision.rs b/crates/sim/src/collision.rs
+index 608f2857..9e3ad212 100644
+--- a/crates/sim/src/collision.rs
++++ b/crates/sim/src/collision.rs
+@@ -104,6 +104,7 @@ pub struct StaticWorld {
+     solids: Vec<Solid>,
+     tree: Bvh,
+     depth: u32,
++    bounds_m: [[f32; 3]; 2],
+     bounds_cm: Option<[[i32; 3]; 2]>,
+ }
+ 
+@@ -316,10 +317,58 @@ impl StaticWorld {
+             solids,
+             tree,
+             depth,
++            bounds_m: [low, high],
+             bounds_cm,
+         })
+     }
+ 
++    /// The map's bounds as the simulation holds them: each face of the document narrowed once to `f32` by the shapes'
++    /// own rule (`narrow`; never from the centimetres), its lower corner and then its upper one. The movement reads
++    /// them: the bottom is the ground, the four sides are walls, the top is an underside.
++    #[must_use]
++    pub const fn bounds_m(&self) -> [[f32; 3]; 2] {
++        self.bounds_m
++    }
++
++    /// The ground: the bounds' lower y, solid under the whole box (content's map.rs: "a soldier with nothing under him
++    /// stands on it, and a fall ends on it").
++    #[must_use]
++    pub const fn floor_y(&self) -> f32 {
++        self.bounds_m[0][1]
++    }
++
++    /// The shapes whose stored box meets the box from `min` to `max` (touching counts), their indices in rising order,
++    /// written into `found`, which holds every shape a world may have. The tree's walk prunes each node whose box
++    /// misses the query; the order the walk visits the leaves in is the tree's, so the indices are sorted after it,
++    /// and a caller's ties go to the lower index whatever the layout. A query with a corner that is no number finds
++    /// nothing. It allocates nothing.
++    pub fn candidates<'f>(
++        &self,
++        min: [f32; 3],
++        max: [f32; 3],
++        found: &'f mut [u32; MAX_SHAPES],
++    ) -> &'f [u32] {
++        let meets = |low: [f32; 3], high: [f32; 3]| {
++            (0..3).all(|axis| low[axis] <= max[axis] && min[axis] <= high[axis])
++        };
++        let mut count = 0;
++        self.tree.traverse(|node| {
++            if !meets(node.mins().to_array(), node.maxs().to_array()) {
++                return TraversalAction::Prune;
++            }
++            if let Some(shape) = node.leaf_data()
++                && let Some(place) = found.get_mut(count)
++            {
++                *place = shape;
++                count += 1;
++            }
++            TraversalAction::Continue
++        });
++        let found = &mut found[..count];
++        found.sort_unstable();
++        found
++    }
++
+     /// The map's bounds in whole centimetres, held to the aim's reach: the box [`StaticWorld::holds_cm`] reads, its
+     /// lower corner and then its upper one (x, y, z), both faces inside it. `None` when no whole centimetre of the
+     /// reach lies within the bounds on some axis, which only a document built in code can give: then no aim is held.
+@@ -876,6 +925,81 @@ mod tests {
+         assert!(!past.holds_cm(aim(32_767, 0, 0)) && !past.holds_cm(aim(0, 0, 0)));
+     }
+ 
++    /// Netcode-architect's 7.3 (c): each face in metres is the shapes' own narrowing of the document's number, on the
++    /// grid and off it, and never the centimetres over 100 (an off-grid face would move by up to 1 cm); a code-built
++    /// minus zero leaves no sign. The floor is the lower y.
++    #[test]
++    fn the_bounds_in_metres_are_the_documents_own_numbers_narrowed_once() {
++        #[rustfmt::skip]
++        let cases = [
++            (SCENE.0, SCENE.1),
++            ([-32.004, 0.005, -24.0], [80.004, 20.001, 24.0]),
++            ([0.55, 2.0, -0.55], [1.0, 3.0, 1.0]),
++            ([-0.0, -0.0, -0.0], [1.0, 1.0, 1.0]),
++        ];
++        for (min, max) in cases {
++            let built = StaticWorld::build(&bounded(min, max)).expect("a world");
++            let held = built.bounds_m();
++            assert_eq!(held[0].map(f32::to_bits), narrow(min).map(f32::to_bits), "{min:?}");
++            assert_eq!(held[1].map(f32::to_bits), narrow(max).map(f32::to_bits), "{max:?}");
++            assert_eq!(built.floor_y().to_bits(), narrow(min)[1].to_bits());
++        }
++        // Off the grid the metres are the document's, not the centimetres': -32.004 m against -3,200 cm.
++        let off = StaticWorld::build(&bounded([-32.004, 0.0, 0.0], [1.0, 1.0, 1.0])).expect("a world");
++        assert_eq!(off.bounds_m()[0][0], -32.004_f32);
++        assert_eq!(off.bounds_cm().map(|held| held[0][0]), Some(-3_200));
++        assert_eq!(StaticWorld::build(&bounded([-0.0; 3], [1.0; 3])).expect("a world").floor_y().to_bits(), 0);
++    }
++
++    /// The tree's candidates for a box are exactly the shapes whose stored box meets it (faces touching count), in
++    /// rising index order, whatever the tree's layout: against every shape tried in turn, on the yard, on a scattered
++    /// world of 512 shapes and on the deep chain, for 2,000 seeded query boxes each, faces and corners included.
++    #[test]
++    fn the_trees_candidates_are_every_shape_that_meets_the_box_in_rising_order() {
++        let scattered: Vec<Shape> = (0..512_u32)
++            .map(|at| {
++                let x = f64::from(at % 23) * 11.0 - 120.0;
++                let z = f64::from(at / 23) * 9.0 - 100.0;
++                let side = 0.5 + f64::from(at % 5);
++                cube(&format!("s{at:03}"), [x, 0.0, z], [x + side, side, z + side])
++            })
++            .collect();
++        let mut seed = 0x2545_F491_4F6C_DD1D_u64;
++        let mut random = |range: f32| {
++            seed ^= seed << 13;
++            seed ^= seed >> 7;
++            seed ^= seed << 17;
++            (((seed >> 40) as f32) / (1_u64 << 24) as f32 - 0.5) * range
++        };
++        let mut found = [0; MAX_SHAPES];
++        for shapes in [yard(), scattered, chain(31)] {
++            let built = world(shapes);
++            let corners = built.solids().iter().flat_map(|solid| [solid.min, solid.max]).collect::<Vec<_>>();
++            for case in 0..2_000 {
++                // Half the boxes start on a shape's own corner, so faces and corners touch exactly.
++                let anchor = corners[case % corners.len()];
++                let low = if case % 2 == 0 {
++                    anchor
++                } else {
++                    [random(300.0), random(10.0) + 2.0, random(300.0)]
++                };
++                let size = [random(8.0) + 4.0, random(4.0) + 2.0, random(8.0) + 4.0];
++                let high = [low[0] + size[0], low[1] + size[1], low[2] + size[2]];
++                let expected: Vec<u32> = (0..built.solids().len() as u32)
++                    .filter(|&at| {
++                        let solid = built.solids()[at as usize];
++                        (0..3).all(|axis| solid.min[axis] <= high[axis] && low[axis] <= solid.max[axis])
++                    })
++                    .collect();
++                assert_eq!(built.candidates(low, high, &mut found), expected.as_slice(), "{low:?} {high:?}");
++            }
++        }
++        // A query that is no number finds nothing; a world with no shape finds nothing.
++        let built = world(yard());
++        assert!(built.candidates([f32::NAN, 0.0, 0.0], [1.0; 3], &mut found).is_empty());
++        assert!(world(Vec::new()).candidates([-1e6; 3], [1e6; 3], &mut found).is_empty());
++    }
++
+     #[test]
+     fn bounds_that_are_not_finite_or_flat_are_refused() {
+         let refused = |min, max| StaticWorld::build(&bounded(min, max)).expect_err("no world");
+diff --git a/crates/sim/src/lib.rs b/crates/sim/src/lib.rs
+index a65dc5c6..0c976759 100644
+--- a/crates/sim/src/lib.rs
++++ b/crates/sim/src/lib.rs
+@@ -16,6 +16,7 @@ compile_error!(
+ );
+ 
+ pub mod aim;
++pub mod body;
+ pub mod collision;
+ pub mod fmath;
+ pub mod ids;
