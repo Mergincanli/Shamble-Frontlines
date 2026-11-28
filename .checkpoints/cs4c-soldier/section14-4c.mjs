@@ -11,9 +11,13 @@
 //     Reads docs/LOOP_V2.md: the text to place (the mended one, or the as-pasted one under PASTE-BREAKS (b)) stands
 //     there once, whole, as the file's last section, after section 13 and one blank line; and its words and signs are
 //     the message's item 8, in order.
+import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
 
 const HERE = '.checkpoints/cs4c-soldier/';
+/** The cut text's own size and digest, as `chat-words.mjs part` wrote them when it cut lines 61 to 128 (the advisor agent's F-S0-3). */
+const PASTED_BYTES = 3063;
+const PASTED_SHA256 = '2bd82216e21f819b172b816ca256700c173ac98c2f4c0c0384036b293703a945';
 const PASTED = HERE + 'section14-as-pasted.md';
 const MENDED = HERE + 'section14-mended.md';
 const LOOP = 'docs/LOOP_V2.md';
@@ -26,6 +30,8 @@ function pasted() {
   if (at < 0) throw new Error(`${PASTED}: no "---" line`);
   const text = all.slice(at + 5).replace(/\n$/, '');
   if (!text.startsWith(FIRST + '\n')) throw new Error(`${PASTED}: it does not begin with "${FIRST}"`);
+  const digest = createHash('sha256').update(text).digest('hex');
+  if (Buffer.byteLength(text) !== PASTED_BYTES || digest !== PASTED_SHA256) throw new Error(`${PASTED}: not the ${PASTED_BYTES} bytes with sha256 ${PASTED_SHA256} cut from his message`);
   return text;
 }
 /** Words and signs in order, white space aside. */

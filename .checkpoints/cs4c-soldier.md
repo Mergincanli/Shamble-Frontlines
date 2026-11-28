@@ -82,8 +82,16 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   - allocation on main's page and the scene's: 100 and 85 bytes per frame, 572 and 553 per block, 18,166 and 17,536
     a second (the sampling profiler's noise; both pass);
   - the after picture: `.gate/scene-after-4c.png` (not committed: a binary).
-- **Running now:** the full local checks (`local-checks.sh` in this folder, 4b's with full paths), then the count, the
-  gate, and the code commit (no `[skip ci]`).
+- **The code commit: bc7720f3** (00:47 UTC, no `[skip ci]`): 1,277 written lines by the count (`count-4c.mjs` against
+  dae6d107; under the 1,420 he hears about first, and the 1,665 hold); the gate PASS with smoke
+  (`PLAYWRIGHT_BROWSERS_PATH=/home/user/Shamble-Frontlines/.gate/cs4b-2/.gate/pw-1194 node tools/gate.mjs`: the gate's
+  Playwright asks for build 1194's headless shell, which `.gate/pw-1194` links to this machine's 1243). CI on bc7720f3:
+  gate and smoke green; the toolchain run started 00:47:49 UTC. Notes are held local until it ends (a push cancels it).
+- **Running now:** the full local checks on that tree (all steps green up to the browser tests, which run now).
+- **Next, tonight:** the plants run for step S (`plants-4c.py`, 28 planted defects and 3 controls; anchors checked:
+  0 wrong), once the local checks end; then step S waits for his SIZE-4C answer (its reviews) and STREET-GREY; step 0
+  for PASTE-BREAKS, BOARD-WORDS and DESIGN-CLASH (its checks are written: `section14-4c.mjs` now tied to the cut text's
+  digest, `loop-check-4c.mjs` byte for byte against main's two design docs saved beside it).
 
 ## Next steps
 1. **The plan sheet** `.checkpoints/cs4c-soldier/reread-sheet.md`, revision 1, against main dae6d107: step 0 (the first
