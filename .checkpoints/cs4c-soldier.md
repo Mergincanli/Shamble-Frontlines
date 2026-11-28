@@ -266,6 +266,23 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   re-exports. (13) the tests of rows 22, 25, 27, 28, 31, 33, 34, 35, 36, 37, 38 (bar the direct feed), 39; world.rs's
   known answers re-made by a second implementation written for it in the notes (no committed script exists: earlier
   change-sets' agents wrote theirs in notes), `world-known-answers-c4.py`, FNV-1a 64 over the canonical bytes.
+- **State (19:34 Amsterdam, from the clock): C4 = fb2030ed69db48c20c733f145fab26ec06b51ba3, pushed; CI: gate and
+  smoke green (run 46176393621), toolchain running (46176393620, started 18:32:15 UTC); security-auditor reading the
+  commit (`security-auditor-c4.md`; brief in the scratchpad, `c4-security-brief-final.txt`); board posted (200).
+  Notes pushes held until the toolchain run ends.** **C5's order of work** (step1-build-order.md C5; rust-reviewer-read
+  11.1, 11.3, 11.6, 11.7 rows 6 to 21, 23, 24, 26, 29, 30, 36's moving half, 38's direct feed, 40; the prototype
+  `rr-body-proto-7.rs`, body (3a) in the 2.5D form, with block 10's settings: the walk's wall pass swept, the pull
+  swept, the head bump, set-back and landing in their new forms, the landing crossing in the vertical phase, the ridge
+  flag a follow-up; HEADROOM-FEET (b), the sandbox's test, the default, (a) only through the test-only constructor):
+  (1) collision.rs `bounds_m`, `floor_y()`, `candidates(min, max, visit)`; (2) new body.rs (`QueryCounts`,
+  `sweep_circle`, `is_wall`, `headroom`, `at_slope_head`, `set_back`, `step_up_target`, `standing_height`,
+  `steepest_under_foot`); (3) new movement.rs (`step_soldier` 2a to 2i with the wish's cap, `push_pass`); (4)
+  `World::authority_step(&mut self, &Rules, &StaticWorld, &mut QueryCounts, commands)` in 11.1's order; (5) room:
+  `rules: Rules` owned, `query_counts`, `Room::new` taking `Rules`, `Room::query_counts()`, the step lending the three;
+  (6) `LocalMatch::new` taking `Rules`; (7) the tests with their plants, test 21 (the oracle against parry3d) green; (8)
+  the pins made again (world.rs's known answers by a second implementation; the recordings); (9) PM-0004-20's and
+  -35's new wording drafted (`pm-wording-4c2.md`, F2, G6), old and new side by side. C5's code is not committed
+  before security-auditor's verdict on C4 (a fix first, in its own commit).
 - **State (19:31 Amsterdam, from the clock): C4 proven and committed after this notes commit (the code head, so CI
   runs on it).** The full local checks on the tree with the plants put back: **ALL LOCAL CHECKS PASSED**
   (`.gate/local-checks-c4.log`: fmt, clippy `-D warnings`, cargo test twice with the generated types unchanged when
