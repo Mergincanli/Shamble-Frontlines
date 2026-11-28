@@ -26,6 +26,18 @@ outward, the normals, the depth offsets on both backends, the grid, the old floo
 | EA-4 | Low | The inventory's kind list is untyped (`inventory.ts:13`, casts at `:31`, `:32`), so a new kind can cross the interface outside `SceneObject.kind` (`picture.ts:26`). | **Fix:** type the list as `SceneObject["kind"]` |
 | EA-5 | Low | When the page itself refuses the content, the readout says "not read, the match stopped first" (`boot.ts:166`, `report.ts:79`), which contradicts the NOT_THE_MAP notice. | **Fix** if the wording change is small; else follow-up |
 | EA-6 | Low | `scene.ts:185` and `scene.test.ts:135` still call STREET-GREY (b) a default; he answered (b) on 2026-11-28. | **Fix:** the comments |
-Checked correct by it: the boundary as designed; `readMap` member for member against map.rs; `LOCAL_MAP` without
+## perf-auditor: REVISE (only for P-1)
+| Id | Severity | Finding | Disposition |
+|---|---|---|---|
+| P-1 | Medium | = GE-F1 and EA-1, measured on the built page: in Node `overview(bounds, 0)` was killed by a 20 s timeout; in Chromium, innerWidth forced to 0 with a resize gave no answer in 15 s, innerWidth 1 answered. Reached from resize (`three-picture.ts:100` clamps only the height) and from `setContent` after an earlier 0-wide resize. Whether Brave ever reports innerWidth 0: unshown. | **Fix** (with GE-F1): `Math.max(1, width)` at the resize as well as the cap and the guard in `overview`; a test that `overview(bounds, 0)` gives finite numbers or none |
+| P-2 | Low | One object per shape and per region: the loader's largest map (512 shapes, 64 regions) gives 578 objects, 109 materials, about 579 draw calls (inferred from the test scene's 31 objects and 32 draws, not measured); ADR 0003's draft leaves about 216 under the Low cap of 800 once 48 soldiers are drawn; no such map exists yet. | Follow-up (STATUS), with GE-F3: merge the floor by material before maps grow |
+Measured by it: each drawn object costs about 85 to 140 B a frame inside three.js; the whole page +4.1 KB a frame with
+the test scene (base 41.7 KB, head 45.4 to 46.3 KB, 3 runs each), all in three's per-object render code, none in the
+change's own code; the hand-off unchanged at about 93 B a frame; the camera fit about 22 µs a resize; each floor swap
+frees 578 of 578 geometries and 109 of 109 materials; the counts 32 / 267 / 162 / 32 / 3 / 6 in both orders (its own
+re-run); the WebAssembly file unchanged at 257,421 B; the development bundle +7,344 B raw, +2,649 B gzip. Not verified:
+WebGPU counts, real-GPU frame times, the base production bundle's size, the one-time hitch when the map arrives.
+
+Checked correct by engine-architect: the boundary as designed; `readMap` member for member against map.rs; `LOCAL_MAP` without
 recording.ts; the production page's `inventory(){return null}` and no development marker; 4B-TYPES-READER,
 4B-MEMBER-KINDS and 4B-BOOT-CALLS met; nothing per frame; nothing no VISION §6 item needs. Not run: a browser.
