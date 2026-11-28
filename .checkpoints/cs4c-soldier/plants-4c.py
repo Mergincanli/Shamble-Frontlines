@@ -80,9 +80,12 @@ PLANTS = [
     ("S1b", "defect", "the faces left as listed, never turned outward",
      [(SCENE, "      if (dot(n, sub(p, centre)) < 0) {", "      if (dot(n, sub(p, centre)) < -Infinity) {")],
      SCENE_TESTS, ["every triangle of every solid faces outward"]),
-    ("S1c", "defect", "the -z ramp's faces drawn with the +z ramp's list",
-     [(SCENE, ': shape.rises_toward === "+z" ? [3, 2, 0, 1] : [0, 1, 3, 2];', ': [3, 2, 0, 1];')],
-     SCENE_TESTS, ["every triangle of every solid faces outward"]),
+    # Run 1's S1c put the +z ramp's list on the -z ramp: the same faces under the other names (the high wall and the
+    # slope trade places), so no defect at all, and rightly not caught. Its place: the +x ramp's list, whose faces cut
+    # through the -z wedge.
+    ("S1c", "defect", "the -z ramp's faces drawn with the +x ramp's list",
+     [(SCENE, ': shape.rises_toward === "+z" ? [3, 2, 0, 1] : [0, 1, 3, 2];', ': shape.rises_toward === "+z" ? [3, 2, 0, 1] : [1, 2, 0, 3];')],
+     SCENE_TESTS, ["every triangle of every solid faces outward", "ramp_mz volume"]),
     ("S2", "defect", "the last shape skipped",
      [(SCENE, "  for (const shape of map.shapes) {\n    const mesh", "  for (const shape of map.shapes.slice(0, -1)) {\n    const mesh")],
      SCENE_TESTS, ["each shape and patch is drawn once"]),

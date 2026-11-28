@@ -1,0 +1,49 @@
+plants on acd7d4f9de08ac78e385846bb2a114000a0aeff6
+T1 CAUGHT (defect): the map's reading leaves its patches of ground out: exit 1, found 2 of 2 wanted texts
+T2 CAUGHT (defect): no key-set check: a key more is let through: exit 1, found 1 of 1 wanted texts
+T3 CAUGHT (defect): the parsed tree cast to the generated type, read no further: exit 1, found 1 of 1 wanted texts
+T4 CAUGHT (defect): rises_toward let through on a box: exit 1, found 1 of 1 wanted texts
+T5 CAUGHT (defect): no key-set check, and fields read through the prototype: exit 1, found 1 of 1 wanted texts
+T6 CAUGHT (defect): a refusal that names what it met: exit 1, found 1 of 1 wanted texts
+T7 CAUGHT (defect): the bundle's first map taken, not the local match's: exit 1, found 1 of 1 wanted texts
+T8 CAUGHT (defect): the copy kept after its reading: a second message reads and delivers again: exit 1, found 1 of 1 wanted texts
+T9 CAUGHT (defect): the map's format word not the loader's: exit 1, found 1 of 1 wanted texts
+T10 CAUGHT (defect): the member-kind compare that finds nothing: exit 1, found 1 of 1 wanted texts
+S1 CAUGHT (defect): the -x ramp built with the +x rule: exit 1, found 1 of 1 wanted texts
+S1b CAUGHT (defect): the faces left as listed, never turned outward: exit 1, found 1 of 1 wanted texts
+S1c NOT CAUGHT (defect): the -z ramp's faces drawn with the +z ramp's list: exit 0, found 0 of 1 wanted texts; missing ['every triangle of every solid faces outward']
+S2 CAUGHT (defect): the last shape skipped: exit 1, found 1 of 1 wanted texts
+S3 CAUGHT (defect): the greys turned upside down: exit 1, found 1 of 1 wanted texts
+S3b CAUGHT (defect): the empty floor's blue grey kept for the map's ground: exit 1, found 1 of 1 wanted texts
+S4 CAUGHT (defect): the empty floor's 30 m grid kept for the map: exit 1, found 1 of 1 wanted texts
+S5 CAUGHT (defect): the old floor's materials not freed: exit 1, found 1 of 1 wanted texts
+S5b CAUGHT (defect): one material cache shared by every floor: exit 1, found 1 of 1 wanted texts
+S6 CAUGHT (defect): today's fixed camera kept: exit 1, found 1 of 1 wanted texts
+S7 CAUGHT (defect): an inventory that lists the corners the builder wrote beside the meshes: exit 1, found 1 of 1 wanted texts
+S7b CAUGHT (defect): an unknown object skipped, never said: exit 1, found 1 of 1 wanted texts
+R1 CAUGHT (defect): every file's version printed from the first file: exit 1, found 1 of 1 wanted texts
+E1 CAUGHT (defect): boot taking the Worker's messages through the link alone: no map is drawn (4B-BOOT-CALLS): exit 1, found 1 of 1 wanted texts
+E1b CAUGHT (defect): the swap without freeing the empty floor (its geometries stay counted): exit 1, found 2 of 2 wanted texts
+E2 CAUGHT (defect): the map read and drawn before the Worker's ready: exit 1, found 1 of 1 wanted texts
+E3 CAUGHT (defect): boot taking the Worker's error through the link alone: the copy stays held (4B-BOOT-CALLS): exit 1, found 1 of 1 wanted texts
+E4 CAUGHT (defect): the inventory called outside the build flag: development code in the players' file: exit 1, found 2 of 2 wanted texts
+C1 HELD (control): the clean tree: the page's reading and scene tests: exit 0, found 0 of 0 wanted texts
+C2 HELD (control): the clean tree: a development page built and its first page shown on the default backend: exit 0, found 0 of 0 wanted texts
+C3 HELD (control): the clean tree: the production page with its marker check: exit 0, found 0 of 0 wanted texts
+DEFECT CHECKS: 27 caught, 1 not caught. CONTROLS: 3 held, 0 did not hold.
+EVERY FILE PUT BACK (sha256 of 7 files as at the start): yes
+
+Run 1's one miss, read (the main session, 2026-11-28): S1c put the +z ramp's face list on the -z ramp, which gives the
+same faces under other names (the high wall and the slope trade places): no defect, rightly not caught. Its
+replacement in the script, the +x ramp's list, builds faces that cut through the -z wedge; the scene test then held
+each solid's enclosed volume (commit c1de41e5), because without that check the replacement passes all 8 scene tests
+(a one-off run with the volume line taken out: exit 0, 8 passed; both files put back). The re-run of the face plants
+and the clean control on acd7d4f with the volume check in, as printed:
+S1 CAUGHT (defect): the -x ramp built with the +x rule: exit 1, found 1 of 1 wanted texts
+S1b CAUGHT (defect): the faces left as listed, never turned outward: exit 1, found 1 of 1 wanted texts
+S1c CAUGHT (defect): the -z ramp's faces drawn with the +x ramp's list: exit 1, found 2 of 2 wanted texts
+C1 HELD (control): the clean tree: the page's reading and scene tests: exit 0, found 0 of 0 wanted texts
+DEFECT CHECKS: 3 caught, 0 not caught. CONTROLS: 1 held, 0 did not hold.
+EVERY FILE PUT BACK (sha256 of 7 files as at the start): yes
+So, with the replacement: 28 of 28 planted defects caught, 3 of 3 controls held. The whole run is made again on the
+step's final code before its reviews.
