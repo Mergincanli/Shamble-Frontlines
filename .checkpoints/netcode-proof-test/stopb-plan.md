@@ -222,7 +222,9 @@ going; free disk; usage read.
   terms link re-read on Stop B's day with the price pages; a change means a new X with only R1.md's link. XH-2 (Low,
   for E2): fsn1 unlisted; nbg1 would change r1.sh:34 and r1sh.test.mjs:199's pin, so trigger (1): a new Y (same list),
   build 2 redone, a new X, his addresses and firewalls there: his choice, about an hour, no money. Both in E2 0.4.**
-- **E2, his message** [C7]: one screen, LEAN-MODE B's three asks (history.md:7868-7871): each piece on the lane (U4k,
+- **E2, his message** [C7]: **DONE 12:2x UTC on 11-28: msg-stopb-e2.md 0.6, after the advisor tool's reads of 0.4
+  and 0.5, sent as his one message (read from Sun 29 Nov 12:00), with the needs-musti board line; Stop B's day re-reads
+  set as trig_01HzoZVyVnwnoTP5w1qJr3wo (Tue 1 Dec 06:40 UTC).** One screen, LEAN-MODE B's three asks (history.md:7868-7871): each piece on the lane (U4k,
   U6d, U6e) with its estimate, its likely size at about 3.3 times and whether R2, R3, R5 and the 18 Dec close hold;
   what (a), (b) and (c) would each save in lines and days; my lean on each in one line. Then his 19:14 item 2: per
   piece Builder 2 could build alone, its folder fence, planned size and what it waits for. One line each: the list

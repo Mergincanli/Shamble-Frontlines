@@ -5,11 +5,16 @@ early, nbg1's cost and what it voids, the terms link re-read by me); STANDINS a 
 (seven merges of main since Mon 23 Nov: `git log --first-parent --merges --since=2026-11-23`). Checked 12:1x: both raw
 links fetched (200) and equal to `git show 6e623788:` (rs a8acc63c, lg ee40b9d0); PR #40's description read back (only
 the two entries and the dated line changed). CI on 53346e55 green, all four at attempt 1 (to 12:18:47): X stands.
+0.6 after the advisor tool's last read (12:2x): STANDINS dropped as a decision (settled: his stop counts net,
+u8-f1-brief.md:13-14; UM-4's three were counted 0 net, um4-report.md:30-31; the in-place opt-out stood in
+msg-2026-11-28.md For Mustafa 4 and he did not take it); "not confirmed" in the risk line; that message's open action
+(the Builder 2 paste, its For Mustafa 1) carried; its two asks were answered at 11:43; B6's block ends COMPLETE 12:08.
 
 ---
 **Stop B: R1's run plan is ready for your review (R1 stays Thursday 3 December).**
 One risk to that date: Hetzner's public pages list no FSN1, R1's location, for either server type, and mark CAX21, the
-load machine's type, "not available" (For Mustafa 2).
+load machine's type, "not available" (not confirmed: the same pages rendered no prices; your create form decides:
+For Mustafa 2).
 R1's path is built and merged (U6a, U6b, U6c, U7, U8, with U8-F1 and UM-4). Stop B's fills are in: your two security
 notes, the browser build's expected file hashes, and X: the run commit in both cloud-init files and Let's Encrypt's
 terms link in R1.md. Main was taken in seven times this week, last on Sat 28 Nov; PR #40 holds no kit, CI or
@@ -46,7 +51,8 @@ With CUT-A: B3 alone. Without it: B3, and H3 once its server change lands on my 
 - If bring-up finds the tick core shared (`alone` 0), the DelayStream self-test is skipped (r1.sh:38, R1.md:242-246):
   its clock thread never runs on the tick core; whether its numbers lean on the tick thread is a follow-up after R1.
 - The count: your two notes add 2 lines to U8's files, so U8 stands at 6,284, your stop; the fills sit outside it, as
-  you ruled; Y0 also rewrote two test lines in place, 0 net (STANDINS below).
+  you ruled; Y0's two test lines rewritten in place count 0 net, like UM-4's three (your stop is counted net; the
+  opt-out in the day message of Sat 28 Nov covers them too).
 - The page host, as you answered on Sat 28 Nov: the connection limits go to the security baseline; the five sandbox
   settings to R8, at the latest the baseline; the R1 security reading is dropped. Both stay open in PR #40's closing
   list with those takers and go into R1's report as its known limits; npm ci stays as merged (45); no file the run
@@ -75,11 +81,6 @@ With CUT-A: B3 alone. Without it: B3, and H3 once its server change lands on my 
     stop for your word.
   - Options: yes; no (6,000 stays, and each piece's size is reported against its estimate at its merge).
   - **Lean: no.**
-- **STANDINS: do Y0's two in-place test rewrites count against U8's stop of 6,284?** They change what two tests expect
-  of the filled files (r1sh.test.mjs, browser.test.mjs), one line each, 0 net; without them the fills fail their own
-  tests.
-  - Options: no (U8 stays at 6,284); yes (U8 is at 6,286, past your stop: your +2 for them).
-  - **Lean: no:** they change only what two tests expect, nothing the run server runs.
 
 **For Mustafa**
 1. Review R1's run plan (spikes/netcode-proof/ops/runs/R1.md): its cap EUR 0.80 (planned 0.62) and its delete-by
@@ -96,5 +97,6 @@ With CUT-A: B3 alone. Without it: B3, and H3 once its server change lands on my 
 4. The Cloud config for R1's day, at X 6e623788c7d4badfb36c2d17fabec1b8280c5e0e:
    https://raw.githubusercontent.com/Mergincanli/Shamble-Frontlines/6e623788c7d4badfb36c2d17fabec1b8280c5e0e/spikes/netcode-proof/ops/cloud-init/rs.yaml
    https://raw.githubusercontent.com/Mergincanli/Shamble-Frontlines/6e623788c7d4badfb36c2d17fabec1b8280c5e0e/spikes/netcode-proof/ops/cloud-init/lg.yaml
-5. Answer CUT-A, CUT-B, CUT-C and STANDINS. The day you do, I hand Builder 2 its pieces (section 2).
-6. Nothing to check in Brave.
+5. Answer CUT-A, CUT-B and CUT-C. The day you do, I hand Builder 2 its pieces (section 2).
+6. If not done yet: paste the L1 to L4 and T-6 to T-9 blocks into Builder 2's chat (the day message of Sat 28 Nov).
+7. Nothing to check in Brave.
