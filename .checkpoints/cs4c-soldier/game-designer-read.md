@@ -357,3 +357,12 @@ DONE
 2. Row 9: three stale or misplaced dependencies, Medium: the walk route's roof edge and walk_reaches.rs (netcode :355, :430; I2 already overrides them: edit), and block 10's two plants red on the roof case (move to a made gentle raised ramp). Nothing else (word-bounded search over every plan note).
 
 DONE (block 8, with corrections)
+
+## Block 9. Where the one local soldier starts: engine-architect's B4 default (the lowest-id spawn) (2026-11-28)
+### Plan
+1. engine-architect-read.md block 7, B4: the proposal's words.
+2. His sandbox at be608cad: where the soldier starts (main.ts, movement.ts newMover), by git show.
+3. His words: answers of 2026-11-28, design notes of 2026-11-27, LOOP_V2, VISION_V2 (grep spawn/start).
+4. The old game's player spawn (legacy/shamble-game.js).
+5. The test scene's spawns (content/maps/test-scene.json). 6. Ruling, DONE.
+### Notes
