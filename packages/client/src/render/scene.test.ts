@@ -76,6 +76,17 @@ test("every triangle of every solid faces outward, and its normal is the face's:
     const centre = new THREE.Vector3(...[0, 1, 2].map((axis) => points.reduce((sum, point) => sum + point[axis]!, 0) / points.length));
     expect(position.count, shape.id).toBe(shape.type === "box" ? 36 : 24);
     const [a, b, c, n, ab, ac] = [0, 0, 0, 0, 0, 0].map(() => new THREE.Vector3());
+    // The triangles close the solid exactly: the volume they enclose (each outward triangle's signed share) is the
+    // solid's own, a box's whole and a ramp's half of its box. Faces that cut through the solid, or leave a hole, do not.
+    let volume = 0;
+    for (let i = 0; i < position.count; i += 3) {
+      a!.fromBufferAttribute(position, i);
+      b!.fromBufferAttribute(position, i + 1);
+      c!.fromBufferAttribute(position, i + 2);
+      volume += a!.dot(new THREE.Vector3().crossVectors(b!, c!)) / 6;
+    }
+    const [dx, dy, dz] = [0, 1, 2].map((axis) => Math.fround(shape.max[axis]!) - Math.fround(shape.min[axis]!));
+    expect(volume, `${shape.id} volume`).toBeCloseTo((dx! * dy! * dz!) / (shape.type === "box" ? 1 : 2), 3);
     for (let i = 0; i < position.count; i += 3) {
       a!.fromBufferAttribute(position, i);
       b!.fromBufferAttribute(position, i + 1);
