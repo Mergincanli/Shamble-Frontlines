@@ -180,6 +180,239 @@ queued item leaves "Queued" when the change-set that carries it out merges._
     his words stand in `docs/EDITOR_V2.md` §3, "Decided 2026-11-05".
 
 ## Decisions, newest first
+- **Taken by Mustafa, 2026-11-28, 11:43:45 UTC: his answers to the thirteen questions before change-set 4c's steps
+  (MOVE-RULES (a) as starting rules, with row 9 open; NO-SOURCE (b); RESUME-FLASH (b); TUNE-HOME (b); SIZE-4C (b), the
+  soldier's stop line at 18,700; BOARD-WORDS (b); PASTE-BREAKS (a); DESIGN-CLASH (a), with his own pointer at
+  LOOP_V2's silo line; STREET-GREY (b); BODY-SHAPE (3a); DEPART-4C (a) on his terms; FALL-STEP (c) by reading the
+  sandbox, else (a); DIGEST-NOTE (a)), how the scene and the soldier share one branch, his yes to reading his
+  Testlines repository, the no-aim-yet rule, the Chromium time until the CI Builder's return, and his rules while he
+  is away** (the builder chat he calls Builder V6, lane 1 of the build, session_01WLuqnt1v3UNwSqbJsJre7u, a Claude
+  Code chat on his second personal account; message e5c77df2-375c-4f7b-8084-ec59ef7c41ff, whole; copied by script from
+  the chat's saved file `.checkpoints/cs4-walk/mustafa-2026-11-28-answers.md` (readable at commit
+  d1f1288f800986754d669e70aabfe63e51779625 of the branch `claude/ecstatic-wozniak-5cbdzs`), which the chat copied by
+  script from its transcript). What it answers, in the chat's words (not his): the thirteen questions of Builder V6
+  (the question file .checkpoints/cs4c-soldier/question-2026-11-28-before-4c.md at 28690f1c: MOVE-RULES, NO-SOURCE,
+  RESUME-FLASH, TUNE-HOME, SIZE-4C, BOARD-WORDS, PASTE-BREAKS, DESIGN-CLASH, STREET-GREY, BODY-SHAPE, DEPART-4C,
+  FALL-STEP, DIGEST-NOTE) and its three asks in the chat (reading his Testlines repository, the CI Builder's Chromium
+  time, the no-aim-yet line he may veto). The transcript holds the same 4,516 bytes twice, 37 seconds apart with the
+  same parent entry (uuids 17b6bde5 at 11:43:08 UTC and e5c77df2 at 11:43:45 UTC): one message handed to the chat
+  twice when the session restarted; the first led to no action, and this is the second, the one the chat answered.
+  Copied by script (4516 bytes, sha256 3b14fb63513e01f0aa15e0325a6813978f8a78608af2df1110575eecb7043f02):
+> FOR BUILDER V6. From Mustafa, 28 November, 12:10 Amsterdam (written with my Advisor). My answers to your 13 questions. I am away until Sunday 29 November, 12:00. Build on without me.
+>
+> 1. MOVE-RULES: (a), all rows, as the game's starting rules. Each one stays mine to change after I have played. Rows 6 and 7 are confirmed again at 4d. Row 9 (he walks any slope, the roofs included): as my sandbox for now, recorded as open and not as decided. I decide a slope limit after I have walked the roofs in the early look. Build nothing that depends on roofs being walkable or not.
+> 2. NO-SOURCE: (b). The game starts from my sandbox's numbers, each marked "not from his Export". I may make them sliders in Testlines later, and a later Export then replaces them the same way.
+> 3. RESUME-FLASH: (b).
+> 4. TUNE-HOME: (b).
+> 5. SIZE-4C: (b). The scene alone first, then the soldier as one pull request with the early look inside it. The soldier's stop line is 18,700. If the count reaches it before the early look is ready, do not stop: tell me in two lines in your next report and build on to the early look. Past the line, nothing after the early look starts without my word.
+> 6. HOW (b) WORKS WITH YOUR ONE BRANCH, so that you never wait for me:
+>    a. Finish the scene now: its reviews, the verifier, its docs commit, the report, the notes out of the head, the advisor agent on that head. Put the pull request's title and text in the notes. Tell me the scene's final head with its full id, and the steps to see the scene in Brave.
+>    b. Then build the soldier on the same branch, on top of that head, and push as usual.
+>    c. On Sunday my Advisor points a branch of its own at exactly the scene's final head and opens the scene's pull request from that branch. Your pushes then do not move that pull request's head. I do my Brave check on that head and give my go for it.
+>    d. If I want something changed in the scene after my Brave check, it goes into the soldier's pull request. When the scene's merge is on main, take main in once.
+> 7. BOARD-WORDS: (b).
+> 8. PASTE-BREAKS: (a).
+> 9. DESIGN-CLASH: (a) at both lines. At LOOP_V2's "uplinks replace silos" line the pointer reads: "(2026-11-27: §14's resource silo is a different thing, a part of the harvester building with a small passive income; see §14)".
+> 10. STREET-GREY: (b). I look at it at the scene's Brave check.
+> 11. BODY-SHAPE: (3a).
+> 12. DEPART-4C: (a), all three, on these terms.
+>    a. SWEEP-ROUTE: yes. The collision library stays the check on our own sweeps for every shape the game uses, the ramp included, before the movement step counts as done. The report shows the old and the new wording of PM-0004-20 and PM-0004-35 side by side, and the new wording asks no less than the old about what the players' file does.
+>    b. PM-0004-60: 2,000,000 per CI run now. The mark is not met by that: it stays open in STATUS until the nightly job runs its 10 million, named with the change-set that brings it.
+>    c. PM-0004-20's 48-soldier run: not met by the one-soldier recording. It stays open in STATUS, named with the first build that can show it.
+> 13. FALL-STEP: (c), by reading. The game does what my sandbox does. If the sandbox's code does not settle it, take (a).
+> 14. DIGEST-NOTE: (a), leave it. No history is rewritten.
+> 15. TESTLINES: yes, you may read my Testlines repository by its public address, read only. Copy no code from it: numbers and behaviour only. Do not attach it to this chat as a second repository. That also settles the head bump and the ramp met from the side.
+> 16. "No aim yet" for a new soldier: fine. I look at it in the early look.
+> 17. CHROME-TIME: the CI Builder is parked until Tuesday 1 December, 20:00, and raises the Chromium run's limit then. Until then never cut or thin a test to fit the 5 minutes. If a run stops at the limit, re-run it once. If it stops again, tell me in two lines and build on. A head that goes to the advisor agent needs a green run.
+> 18. WHILE I AM AWAY: save and push at least every 25 minutes. A new question that needs me goes into your question file with your recommendation, and you move on to the work of 4c that does not hang on it. The advisor agent decides what it may decide.
+> 19. Rules unchanged: git and gh always start their own command, with no other program in front of them, one git per shell call. In a shell command, spell out every file you write with its full path: no variable, substitution or wildcard in the name of a file that is written, moved, copied or deleted, or use the Write and Edit tools.
+- **Taken by Mustafa, 2026-11-27, 23:00:39 UTC: his merge route for change-set 4b-2 (MERGE-ROUTE (a): his Advisor
+  opened pull request #79 from the chat's text and merged it by merge commit at head b7145273), and how change-set 4c
+  starts: its plan sheet, the advisor agent's review, then the build, with the page's scene as its first building
+  step** (the builder chat he calls Builder V6, lane 1 of the build, session_01WLuqnt1v3UNwSqbJsJre7u, a Claude Code
+  chat on his second personal account; message d6bbd42a-5df6-4d6e-be95-a6ac8bc1103a, without its line 5 of 8, left out
+  because it names his board (his BOARD-WORDS (b), 2026-11-28) (the whole message is in the chat's transcript, by this
+  id); copied by script from the chat's saved file `.checkpoints/cs4-walk/mustafa-2026-11-27-merge-route.md` (readable
+  at commit d1f1288f800986754d669e70aabfe63e51779625 of the branch `claude/ecstatic-wozniak-5cbdzs`), which the chat
+  copied by script from its transcript). What it answers, in the chat's words (not his): Builder V6's MERGE-ROUTE (who
+  opens and merges pull request #79 at b7145273, since the chat cannot write to GitHub: (a) his Advisor from the
+  chat's finished text, or (b) a GitHub connector and a new session; asked at 22:53:47 and again at 22:58:56 UTC), and
+  how 4c begins once main holds the merge. Copied by script (1284 bytes, sha256
+  91b6783abeeaa2064911174dda829e82fabd4ce771344b6413237f832086947d):
+> FOR BUILDER V6. From Mustafa, 27 November, 23:59 Amsterdam (written with my Advisor).
+>
+> 1. MERGE-ROUTE: (a). My Advisor ran its merge check on b7145273fdaff2b2ee6eccafaf5e358840bc3572, opened pull request #79 from your text (base main, head your branch), and merges it by merge commit at exactly that head when #79's own gate, smoke and toolchain runs are green. My go for that head stands.
+> 2. Push nothing to your branch until main holds that merge. A push would move the head I approved.
+> 4. 4c starts as 4b did: its plan sheet, the advisor agent's review, then the build, with the page's scene (the old step 12) as its first building step. My go for 4b-2's merge and my STEP12-GO go into DECISIONS at 4c's first docs commit, by script.
+> 5. The four questions the plan lists before 4c (MOVE-RULES, NO-SOURCE, RESUME-FLASH, TUNE-HOME): put them to me in your next report, each in plain words with your recommendation, and build meanwhile everything that does not hang on them.
+> 6. Rules unchanged: git and gh always start their own command, with no other program in front of them. In a shell command, spell out every file you write with its full path: no variable, substitution or wildcard in the name of a file that is written, moved, copied or deleted, or use the Write and Edit tools.
+- **Taken by Mustafa, 2026-11-27, 22:58:25 UTC: his design direction for the economy and base repair: resource points
+  and repair bots, with decided and open lines and every number a placeholder until playtests, nothing of it built in
+  Slice 1; and where it goes in the docs (LOOP_V2's new section 14 with his text, dated pointers at its lines on the
+  open fields, one sentence in its header, one line in the ADR register)** (the builder chat he calls Builder V6, lane
+  1 of the build, session_01WLuqnt1v3UNwSqbJsJre7u, a Claude Code chat on his second personal account; message
+  20d8ea82-0a9e-4420-86fc-0e6903b1728c, whole; copied by script from the chat's saved file
+  `.checkpoints/cs4-walk/mustafa-2026-11-27-design-notes.md` (readable at commit
+  d1f1288f800986754d669e70aabfe63e51779625 of the branch `claude/ecstatic-wozniak-5cbdzs`), which the chat copied by
+  script from its transcript). What it answers, in the chat's words (not his): nothing the chat asked: his design
+  direction for the economy and base repair, from his walk of 27 November, with what goes where in the docs (his items
+  1 to 9). It came after the docs pass of 4b-2 had run, so by his item 6 it goes in with the first docs commit of 4c.
+  Copied by script (7117 bytes, sha256 7ad747cb3fbf7c5ec1712ff2909e10a80378eae213984f2371b426bd24fd5253):
+> Did I paste this earlier btw? I might have forgotten it. 
+>
+> FOR BUILDER V6. From Mustafa, 27 November, 22:15 Amsterdam (written with my Advisor). Design notes for the docs. No code. It rides with 4b-2's docs pass and must not hold 4b-2.
+> 1. 
+> WHAT THIS IS: my design direction for the economy and base repair, from my walk of 27 November. The notes under item 7 are mine, word for word. Save this message by script like my other messages. It goes into DECISIONS at your docs pass.
+> 2. 
+> WHERE IT GOES: docs/LOOP_V2.md gets a new section 14 after section 13, with exactly the text under item 8. docs-keeper places that text and writes no design of its own.
+> 3. 
+> POINTERS, so the loop doc does not say two things: at each line of LOOP_V2's sections 1, 3, 9 and 11 that speaks of the harvest field in the centre or of the safe field near each base, add the dated pointer "(2026-11-27: resource points replace open fields, see §14)". Keep the old text for the history. The header's "Updated" line gets one sentence that names §14. Change nothing else in the design docs and rewrite no ADR. The register (docs/adr/README.md) gets one dated line that names §14.
+> 4. 
+> NOTHING IS BUILT FROM THIS in Slice 1. Every number is a placeholder until playtests.
+> 5. 
+> If a line of mine clashes with something in the docs that item 3 does not cover, do not resolve it. List it in the report under "Decisions needed".
+> 6. 
+> TIMING: if your docs pass has already run when this arrives, do not reopen 4b-2 for it. Tell me in one line, and it goes in with 4c's first docs commit.
+> 7. 
+> MY NOTES, word for word:
+> Design notes from Mustafa, 27 Nov – economy and base repair
+> This is my design direction, not loose ideas. Numbers are placeholders until playtests. Add them to the game design docs; change no code.
+> Resource points (decided)
+> - 
+> Resource points sit symmetrically around the map. Teams capture them for their harvesters, RTS-style, instead of open ore fields.
+> - 
+> Each team starts with a resource silo on its harvester building: a small passive income (about 1 to 2 credits a second, to tune).
+> - 
+> A support vehicle drives out and sets up the harvest station on a point. Players drive it and place it themselves.
+> - 
+> The first station is free. Each next one costs more the further a team expands, so growing is an investment and snowballing isn't free.
+> - 
+> Enemies can destroy a station and build their own on that point, which costs them too.
+> - 
+> Points run low but never hit zero: once depleted they still pay about 10 to 20% per run.
+> Resource points (open, to test)
+> - 
+> Depleted points: slowly refill (longer matches) or stay low (shorter matches). A dial for playtests.
+> - 
+> If points or objectives move, spawn them in fair sets at equal distance from each base, so no team gets the close one.
+> - 
+> Should a station be free again when a team has none left?
+> - 
+> Placeholder starting money: about 300.
+> Repair bots (decided)
+> - 
+> Why: in Renegade, a base under siege pulls half the team inside to repair, so they can't fight back.
+> - 
+> Built only at a dedicated repair station inside the base: the player holds E for 5 seconds. 300 credits each.
+> - 
+> Each bot repairs at half a player's speed. Max 4 per building, so a full set equals 2 players repairing.
+> - 
+> They sit against the walls inside buildings. Attackers must push inside to destroy them; they can't be hit from outside.
+> Repair bots (open)
+> - 
+> Should bots pause for a few seconds after a big hit, so a small attack can still crack a base?
+> - 
+> Engineer repair values for vehicles and buildings are still to design.
+> Player experience goal
+> - 
+> Tearing down a team's station and putting up your own should feel dominant: bragging rights and banter after the match.
+> 8. 
+> THE TEXT FOR LOOP_V2, SECTION 14 (place it as it stands):
+> ## 14. Resource points and repair bots
+> Added 2026-11-27. Mustafa's design direction for the economy and base repair, from his notes of 2026-11-27 (word for
+> word in DECISIONS.md): "This is my design direction, not loose ideas. Numbers are placeholders until playtests." Where
+> a line here differs from §1, §3, §9 or §11, this section wins. Nothing here is built in Slice 1.
+> ### Resource points
+> - 
+> `[DECIDED]` Resource points sit symmetrically around the map. Teams capture them for their harvesters, RTS-style,
+>   
+> instead of open ore fields. (2026-11-27)
+> - 
+> `[DECIDED]` Each team starts with a resource silo on its harvester building: a small passive income (about 1 to 2
+>   
+> credits a second, to tune). (2026-11-27)
+> - 
+> `[DECIDED]` A support vehicle drives out and sets up the harvest station on a point. Players drive it and place it
+>   
+> themselves. (2026-11-27)
+> - 
+> `[DECIDED]` The first station is free. Each next one costs more the further a team expands, so growing is an
+>   
+> investment and snowballing isn't free. (2026-11-27)
+> - 
+> `[DECIDED]` Enemies can destroy a station and build their own on that point, which costs them too. (2026-11-27)
+> - 
+> `[DECIDED]` Points run low but never hit zero: once depleted they still pay about 10 to 20% per run. (2026-11-27)
+> - 
+> `[OPEN]` Depleted points: slowly refill (longer matches) or stay low (shorter matches). A dial for playtests.
+> - 
+> `[OPEN]` If points or objectives move, spawn them in fair sets at equal distance from each base, so no team gets the
+>   
+> close one.
+> - 
+> `[OPEN]` Should a station be free again when a team has none left?
+> - 
+> `[OPEN]` Placeholder starting money: about 300. (§3's $300 stays the starting value until a playtest changes it.)
+> ### Repair bots
+> - 
+> Why (Mustafa): in Renegade, a base under siege pulls half the team inside to repair, so they can't fight back.
+> - 
+> `[DECIDED]` Built only at a dedicated repair station inside the base: the player holds E for 5 seconds. 300 credits
+>   
+> each. (2026-11-27)
+> - 
+> `[DECIDED]` Each bot repairs at half a player's speed. Max 4 per building, so a full set equals 2 players
+>   
+> repairing. (2026-11-27)
+> - 
+> `[DECIDED]` They sit against the walls inside buildings. Attackers must push inside to destroy them; they can't be
+>   
+> hit from outside. (2026-11-27)
+> - 
+> `[OPEN]` Should bots pause for a few seconds after a big hit, so a small attack can still crack a base?
+> - 
+> `[OPEN]` Engineer repair values for vehicles and buildings are still to design.
+> ### Player experience goal
+> - 
+> Tearing down a team's station and putting up your own should feel dominant: bragging rights and banter after the
+>   
+> match. (Mustafa, 2026-11-27)
+> ### Open, noted by the Advisor (not Mustafa's words; his to answer before any of this is built)
+> - 
+> `[OPEN]` The silo's income: paid to every player, like a delivery (§3), or one sum for the team?
+> - 
+> `[OPEN]` Who pays for a station after the first, and for a repair bot: the player who places it, or the team in
+>   
+> shares, like a harvester rebuild (§3)?
+> - 
+> `[OPEN]` Does the raised centre (§9) keep a richer point, or are all points equal?
+> 9. 
+> Rules unchanged: git and gh always start their own command, with no other program in front of them. In a shell command, spell out every file you write with its full path: no variable, substitution or wildcard in the name of a file that is written, moved, copied or deleted, or use the Write and Edit tools.
+- **Taken by Mustafa, 2026-11-27, 22:52:26 UTC: his word that the chat may merge 4b-2 itself; the chat could not, its
+  GitHub access being read-only, and his Advisor merged it** (the builder chat he calls Builder V6, lane 1 of the
+  build, session_01WLuqnt1v3UNwSqbJsJre7u, a Claude Code chat on his second personal account; message
+  0b6e856d-a471-4f5b-b9b4-68fe667c3493, whole; copied by script from the chat's saved file
+  `.checkpoints/cs4-walk/mustafa-2026-11-27-may-merge.md` (readable at commit d1f1288f800986754d669e70aabfe63e51779625
+  of the branch `claude/ecstatic-wozniak-5cbdzs`), which the chat copied by script from its transcript). What it
+  answers, in the chat's words (not his): Builder V6 said at 22:51 UTC that his go was received for the merge of 4b-2
+  at b7145273fdaff2b2ee6eccafaf5e358840bc3572 and that this chat cannot open or merge a pull request, so his Advisor
+  would. The chat then answered that it cannot merge: its GitHub access is read-only (the guard: gh api is read-only
+  here, and the session has no GitHub tool that writes). His Advisor opened #79 and merged it at that head. Copied by
+  script (16 bytes, sha256 1cc724429fb13288ee24ad38f8e585c485922dc0a2c5556ca3cf17583f6d37e4):
+> You can merge it
+- **Taken by Mustafa, 2026-11-27, 22:50:52 UTC: his go for the merge of change-set 4b-2, "The world", at head
+  b7145273fdaff2b2ee6eccafaf5e358840bc3572 (his Advisor then opened it as pull request #79 and merged it by merge
+  commit at that head)** (the builder chat he calls Builder V6, lane 1 of the build, session_01WLuqnt1v3UNwSqbJsJre7u,
+  a Claude Code chat on his second personal account; message 15a9b95d-36bc-49ec-9944-07ba243d4d9b, whole; copied by
+  script from the chat's saved file `.checkpoints/cs4-walk/mustafa-2026-11-27-go-merge-79.md` (readable at commit
+  d1f1288f800986754d669e70aabfe63e51779625 of the branch `claude/ecstatic-wozniak-5cbdzs`), which the chat copied by
+  script from its transcript). What it answers, in the chat's words (not his): Builder V6 asked his go for the merge
+  of change-set 4b-2 at head b7145273fdaff2b2ee6eccafaf5e358840bc3572, which the advisor agent approved (the question:
+  `.checkpoints/cs4b-content/question-2026-11-27-merge-go.md`, readable at 59f6cc7f14e44e40eb98dfafa28a7264e6811b03;
+  the chat said at 22:44 UTC that 4b-2 was still waiting for his go on that head). His Advisor opened that pull
+  request as #79 afterwards. Copied by script (14 bytes, sha256
+  d36642f4b335e546ab4cc677a56546389de59d2950da7fc0778635e1d11c2bb3):
+> you have my go
 - **Taken by Mustafa, 2026-11-27, 20:03:18 UTC: STEP12-GO (a): the page's scene (4b-2's step 12), with the map's
   reading field by field, moves to the start of change-set 4c, and 4b-2 closes with its steps 6 to 11** (the builder
   chat he calls Builder V6, lane 1 of the build, session_01WLuqnt1v3UNwSqbJsJre7u, a Claude Code chat on his second
