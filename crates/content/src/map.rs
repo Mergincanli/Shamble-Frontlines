@@ -1,7 +1,8 @@
 //! The map: the static world of a match, and where its soldiers start (`content/maps/<id>.json`).
 //!
-//! `bounds` is the playable box. `spawns` (at most 16) are the places soldiers start at, each with the way it faces.
-//! `shapes` (at most 512) are the solid pieces, each a box or a ramp inside its box, all axis-aligned: no angle
+//! `bounds` is the playable box; its bottom is solid ground under the whole box: a soldier with nothing under him
+//! stands on it, and a fall ends on it. `spawns` (at most 16) are the places soldiers start at, each with the way it
+//! faces. `shapes` (at most 512) are the solid pieces, each a box or a ramp inside its box, all axis-aligned: no angle
 //! enters the static world. `regions` (at most 64) are patches of ground that are only drawn. Lengths are metres and
 //! y is up.
 //!
@@ -36,7 +37,8 @@ pub const MAX_REGIONS: u32 = 64;
 /// height to the aim point's own field types, and fails when a field widens.
 pub const AIM_REACH_CM: i32 = 32_767;
 const AIM_REACH_MIN_CM: i32 = -AIM_REACH_CM;
-/// How high an aim point reaches, in centimetres above the floor at 0 (an unsigned 16-bit count): 655.35 m.
+/// How high an aim point reaches, in centimetres above y 0 (the aim's zero; the bounds' bottom, the ground, lies at
+/// or above it), as an unsigned 16-bit count: 655.35 m.
 pub const AIM_HEIGHT_MAX_CM: i32 = 65_535;
 
 /// A grid: its steps a metre, and the least thickness of a box on it, 1 cm, in those steps.
@@ -242,8 +244,10 @@ fn refuse(path: String, kind: Kind) -> Result<(), Error> {
 }
 
 /// A coordinate's place on a grid, or `None` when it lies between two steps: the
-/// count of steps, rounded, must give the same double back when it is divided again.
-fn on_grid(value: f64, grid: Grid) -> Option<i64> {
+/// count of steps, rounded, must give the same double back when it is divided again. The simulation reads a map's
+/// bounds as whole centimetres by this same rule (sim's `StaticWorld::build`: one rule, no copy of it).
+#[must_use]
+pub fn on_grid(value: f64, grid: Grid) -> Option<i64> {
     let per_metre = f64::from(grid.per_metre);
     let steps = (value * per_metre).round();
     (steps / per_metre == value).then_some(steps as i64)

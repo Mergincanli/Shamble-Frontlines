@@ -4,6 +4,8 @@
  * The world point the player aims at (ADR 0001 part 5: "at most 80 bits"). Provisional as a whole: the step of
  * 1 cm and the widths are borrowed from the snapshot encoding of entity positions (part 6, E3); the codec sets them
  * under PM-0001-51. The encoder clamps to the map: E3's height is 12 bits (0 to 40.95 m), and `y` here holds more.
+ * x -32,768 with y 0 and z 0 means "no aim in this command" ([`AimPoint::NONE`]): a room takes it without asking the
+ * map's bounds, and refuses any other aim outside them.
  */
 export type AimPoint = { 
 /**

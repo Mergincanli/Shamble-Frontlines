@@ -19,18 +19,37 @@ pub mod queue;
 
 use protocol::codec::{Control, decode_control, decode_input, encode_control, encode_snapshot};
 use protocol::messages::{
-    Input, JoinAccepted, JoinRejected, OwnState, PROTOCOL_VERSION, RejectReason, Snapshot,
+    AimPoint, Input, JoinAccepted, JoinRejected, OwnState, PROTOCOL_VERSION, RejectReason, Snapshot,
 };
 use protocol::wrap::{press_edges, seq_ahead, seq_newer, ticks_after};
 use queue::{CommandQueue, Inserted, Queued};
-use sim::{BUTTONS, MatchSetup, PlayerCommand, TICK_HZ, World};
+use sim::aim::AimCm;
+use sim::collision::StaticWorld;
+use sim::rules::Rules;
+use sim::{
+    BUTTONS, MatchSetup, PLAYER_SLOT, PLAYER_TEAM, PlayerCommand, SpawnPoint, TICK_HZ, World,
+    move_in_reach,
+};
 
 const _: () = assert!(protocol::messages::BUTTONS == BUTTONS);
+// "No aim yet" has one form, on the wire and in the simulation.
+const _: () = assert!(
+    AimPoint::NONE.x == AimCm::NONE.x
+        && AimPoint::NONE.y == AimCm::NONE.y
+        && AimPoint::NONE.z == AimCm::NONE.z
+);
 
 /// The tick rate as the join answer carries it.
 const TICK_RATE: u8 = {
     assert!(TICK_HZ <= 255);
     TICK_HZ as u8
+};
+
+/// The one player's slot as the join answer carries it: the world's own (`sim::PLAYER_SLOT`), which must fit a byte.
+const JOIN_SLOT: u8 = {
+    let [low, high] = PLAYER_SLOT.to_le_bytes();
+    assert!(high == 0, "the join answer carries a slot in one byte");
+    low
 };
 
 /// How far ahead of the tick being run a command's tick may lie; one further ahead is dropped.
@@ -52,10 +71,13 @@ pub struct RoomCounters {
     /// Inputs dropped whole: an ack of a snapshot the room never sent.
     pub refused_ack: u32,
     /// Commands dropped: for a tick too far ahead; not for a later tick than the command run before; a press
-    /// counter that moved by more than one press per tick since the command run before.
+    /// counter that moved by more than one press per tick since the command run before; a move longer than the
+    /// wire's reach (`sim::MOVE_REACH`); an aim that is not "no aim yet" and lies outside the map's bounds.
     pub refused_ahead: u32,
     pub refused_not_newer: u32,
     pub refused_presses: u32,
+    pub refused_move: u32,
+    pub refused_aim: u32,
     /// Commands that came again, came after a newer one had run, or found the queue full: dropped, not refused.
     pub duplicates: u32,
     pub stale: u32,
@@ -72,9 +94,11 @@ impl RoomCounters {
     #[must_use]
     pub const fn refused(&self) -> u32 {
         let commands = self.refused_ahead.wrapping_add(self.refused_not_newer);
+        let wishes = self.refused_move.wrapping_add(self.refused_aim);
         let messages = self.decode_errors.wrapping_add(self.refused_ack);
         commands
             .wrapping_add(self.refused_presses)
+            .wrapping_add(wishes)
             .wrapping_add(messages)
     }
 }
@@ -86,6 +110,8 @@ fn count(counter: &mut u32) {
 /// One match's server side: the world, the one player's slot and that player's commands.
 pub struct Room {
     world: World,
+    /// The match's static world, built once from its map: the aim check reads its bounds.
+    statics: StaticWorld,
     content_hash: [u8; 32],
     /// The world's tick when the one slot was taken.
     joined_at: Option<u32>,
@@ -97,15 +123,28 @@ pub struct Room {
     newest_received: Option<u16>,
     newest_sent: Option<u32>,
     counters: RoomCounters,
+    /// How many commands the last tick handed the world, for the room's own tests: a tick whose queue gives nothing
+    /// due hands none, and no older command is fed again.
+    #[cfg(test)]
+    handed: usize,
 }
 
 impl Room {
-    /// A room for one match on the content with this hash.
+    /// A room for one match on the content with this hash, with the match's rules, its static world and its spawn
+    /// table. The world's start reads the rules and the table (his soldier at the first spawn); the room keeps the
+    /// static world and neither of the others.
     #[must_use]
-    pub fn new(setup: &MatchSetup, content_hash: [u8; 32]) -> Self {
+    pub fn new(
+        setup: &MatchSetup,
+        content_hash: [u8; 32],
+        rules: &Rules,
+        statics: StaticWorld,
+        spawns: &[SpawnPoint],
+    ) -> Self {
         let (acks, commands) = (Vec::new(), Vec::new());
         Self {
-            world: World::new(setup),
+            world: World::new(setup, rules, spawns),
+            statics,
             content_hash,
             joined_at: None,
             queue: CommandQueue::default(),
@@ -114,12 +153,20 @@ impl Room {
             newest_received: None,
             newest_sent: None,
             counters: RoomCounters::default(),
+            #[cfg(test)]
+            handed: 0,
         }
     }
 
     #[must_use]
     pub const fn world(&self) -> &World {
         &self.world
+    }
+
+    /// The match's static world: the map's shapes, and its bounds in whole centimetres.
+    #[must_use]
+    pub const fn statics(&self) -> &StaticWorld {
+        &self.statics
     }
 
     /// The hash of the world's shared state as it stands: the one number a replay compares tick by tick, the same
@@ -158,8 +205,8 @@ impl Room {
             count(&mut self.counters.joins);
             self.joined_at = Some(self.world.tick());
             Control::JoinAccepted(JoinAccepted {
-                slot: 0,
-                team: 0,
+                slot: JOIN_SLOT,
+                team: PLAYER_TEAM,
                 squad: 0,
                 mode_id: MODE_ID.to_owned(),
                 mode_hash: [0; 32],
@@ -174,12 +221,13 @@ impl Room {
 
     /// Takes a datagram: an `Input`. Its commands go to the queue, the oldest first.
     ///
-    /// Checked here and in `admit`: the acks, the lead, a strictly later tick and the press pace. Not checked yet,
-    /// each with what brings it: the length of the move and the aim inside the map (the soldier and the map,
-    /// change-set 4); the view time (lag compensation); presses against cooldowns and ammunition (weapons); how
-    /// many messages a client may send, the join's deadline and its token (the connection, Slice 3); a lower
-    /// bound on an ack's tick; and how late a command may still run, so that a client cannot save ticks up and
-    /// spend them two a tick (decided with the command timing, ADR 0001's open question 6, before online play).
+    /// Checked here and in `admit`: the acks, the lead, the move's length (at most `sim::MOVE_REACH`), the aim
+    /// inside the map's bounds in whole centimetres or "no aim yet", a strictly later tick and the press pace. Not
+    /// checked yet, each with what brings it: the aim's reach against a weapon (change-set 8); the view time (lag
+    /// compensation); presses against cooldowns and ammunition (weapons); how many messages a client may send, the
+    /// join's deadline and its token (the connection, Slice 3); a lower bound on an ack's tick; and how late a
+    /// command may still run, so that a client cannot save ticks up and spend them two a tick (decided with the
+    /// command timing, ADR 0001's open question 6, before online play).
     pub fn on_datagram(&mut self, bytes: &[u8]) {
         if self.joined_at.is_none() || decode_input(bytes, &mut self.input).is_err() {
             count(&mut self.counters.decode_errors);
@@ -213,12 +261,29 @@ impl Room {
                 count(&mut self.counters.refused_ahead);
                 continue;
             }
+            if !move_in_reach(command.move_x, command.move_y) {
+                count(&mut self.counters.refused_move);
+                continue;
+            }
+            let aim = AimCm {
+                x: command.aim.x,
+                y: command.aim.y,
+                z: command.aim.z,
+            };
+            // "No aim yet" asks no bounds; any other aim lies inside the map's, the faces included.
+            if aim != AimCm::NONE && !self.statics.holds_cm(aim) {
+                count(&mut self.counters.refused_aim);
+                continue;
+            }
             let queued = Queued {
                 sequence,
                 tick: command.tick,
                 command: PlayerCommand {
                     buttons: command.buttons,
                     presses: command.presses,
+                    move_x: command.move_x,
+                    move_y: command.move_y,
+                    aim,
                 },
             };
             match self.queue.insert(queued) {
@@ -279,7 +344,12 @@ impl Room {
             self.last_run = Some(next);
             ran = ran.saturating_add(1);
         }
-        self.world.authority_step(run.get(..ran).unwrap_or(&[]));
+        let handed = run.get(..ran).unwrap_or(&[]);
+        #[cfg(test)]
+        {
+            self.handed = handed.len();
+        }
+        self.world.authority_step(handed);
         if self.joined_at.is_none() {
             return false;
         }
@@ -304,14 +374,58 @@ impl Room {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use content::map::{Bounds, MapDocument, Spawn};
     use protocol::codec::{decode_snapshot, encode_input};
-    use protocol::messages::{AimPoint, Command, Join, SnapshotAck, ViewTime};
+    use protocol::messages::{Command, Join, REDUNDANCY_CAP, SnapshotAck, ViewTime};
+    use sim::soldiers::{OCCUPIED, Soldier, spawn_points};
 
     const HASH: [u8; 32] = [0xC4; 32];
 
+    /// The test bundle's rules and its map (content's made-up test texts: bounds -50 to 50 m on x and z and 0 to 20 m
+    /// up, one spawn "a" at (0, 0, -5) facing 90).
+    fn test_bundle() -> (Rules, MapDocument) {
+        let set = content::load(content::bundle::test_bundle().as_bytes())
+            .expect("the test bundle loads");
+        let rules = Rules::take(&set.movements()[0]).expect("its movement table plays");
+        (rules, set.map("test-scene").expect("its map").clone())
+    }
+
+    /// A room for one match on this map, with the test bundle's rules.
+    fn room_on(setup: &MatchSetup, map: &MapDocument) -> Room {
+        let (rules, _) = test_bundle();
+        let statics = StaticWorld::build(map).expect("the map builds");
+        Room::new(setup, HASH, &rules, statics, &spawn_points(map))
+    }
+
     fn room(start_tick: u32) -> Room {
         let seed = [7; sim::SEED_BYTES];
-        Room::new(&MatchSetup { seed, start_tick }, HASH)
+        room_on(&MatchSetup { seed, start_tick }, &test_bundle().1)
+    }
+
+    /// A map built in code with these bounds and one spawn "a" at `spawn`, facing 0, and no shape.
+    fn bounded(min: [f64; 3], max: [f64; 3], spawn: [f64; 3]) -> MapDocument {
+        MapDocument {
+            id: "bounded".to_owned(),
+            bounds: Bounds { min, max },
+            spawns: vec![Spawn {
+                id: "a".to_owned(),
+                at: spawn,
+                facing_deg: 0.0,
+            }],
+            shapes: Vec::new(),
+            regions: Vec::new(),
+        }
+    }
+
+    /// The player's soldier's row.
+    fn row(room: &Room) -> Soldier {
+        room.world().soldiers().rows()[usize::from(PLAYER_SLOT)]
+    }
+
+    /// The same command with this move and this aim.
+    fn wishing(mut command: Command, move_x: i8, move_y: i8, aim: AimPoint) -> Command {
+        (command.move_x, command.move_y, command.aim) = (move_x, move_y, aim);
+        command
     }
 
     fn join(protocol_version: u16, content_hash: [u8; 32]) -> Vec<u8> {
@@ -332,14 +446,30 @@ mod tests {
         replied.then(|| decode_control(&reply).expect("the room writes a valid answer"))
     }
 
-    /// A room at `start_tick` with its player joined.
-    fn joined(start_tick: u32) -> Room {
-        let mut room = room(start_tick);
+    /// The room with its player joined.
+    fn with_player(mut room: Room) -> Room {
         assert!(matches!(
             answer(&mut room, &join(PROTOCOL_VERSION, HASH)),
             Some(Control::JoinAccepted(_))
         ));
         room
+    }
+
+    /// A room at `start_tick` with its player joined.
+    fn joined(start_tick: u32) -> Room {
+        with_player(room(start_tick))
+    }
+
+    /// A room on this map at tick 0 with its player joined.
+    fn joined_on(map: &MapDocument) -> Room {
+        let seed = [7; sim::SEED_BYTES];
+        with_player(room_on(
+            &MatchSetup {
+                seed,
+                start_tick: 0,
+            },
+            map,
+        ))
     }
 
     /// A command whose buttons are its sequence and whose every press counter is `presses`.
@@ -647,12 +777,13 @@ mod tests {
     #[test]
     fn the_shared_hash_is_the_world_s_and_covers_no_seed_byte() {
         let seeds = [[0x5A; sim::SEED_BYTES], [0xA5; sim::SEED_BYTES]];
+        let map = test_bundle().1;
         let [mut a, mut b] = seeds.map(|seed| {
             let setup = MatchSetup {
                 seed,
                 start_tick: 3,
             };
-            Room::new(&setup, HASH)
+            room_on(&setup, &map)
         });
         let mut snapshot = Vec::new();
         for _ in 0..40 {
@@ -665,5 +796,229 @@ mod tests {
             assert!(!b.step(&mut snapshot));
         }
         assert_eq!(a.world().tick(), 43);
+    }
+
+    /// The move's length and the aim inside the map (netcode-architect's T2-6): a move up to the wire's reach is
+    /// taken and a longer one refused; an aim on a face of the map's bounds is taken and one 1 cm past it refused;
+    /// each refusal is counted by its own counter and in `refused()`. A refused command never runs, and its sequence
+    /// counts as missing when the next command runs.
+    #[test]
+    fn a_move_past_the_reach_and_an_aim_outside_the_map_are_refused_and_counted() {
+        let mut room = joined(0);
+        step(&mut room);
+        let aim = |x, y, z| AimPoint { x, y, z };
+        let none = AimPoint::NONE;
+        // The test bundle's bounds in whole centimetres: -5,000 to 5,000 on x and z, 0 to 2,000 up.
+        #[rustfmt::skip]
+        let cases = [
+            (127, 0, none.clone(), true), (90, 90, none.clone(), false), (0, -127, none.clone(), true),
+            (-128, 0, none.clone(), false), (89, 89, none.clone(), true), (127, 127, none.clone(), false),
+            (-89, -89, none.clone(), true),
+            (0, 0, aim(-5_000, 0, 0), true), (0, 0, aim(-5_001, 0, 0), false),
+            (0, 0, aim(5_000, 2_000, 5_000), true), (0, 0, aim(5_001, 0, 0), false), (0, 0, aim(0, 2_001, 0), false),
+            (0, 0, aim(0, 0, -5_000), true), (0, 0, aim(0, 0, -5_001), false), (0, 0, aim(0, 0, 5_001), false),
+            (0, 0, aim(i16::MIN, 1, 0), false), (0, 0, none, true),
+        ];
+        let (mut moves, mut aims, mut held) = (0, 0, AimCm::NONE);
+        for (at, (move_x, move_y, aim, taken)) in cases.into_iter().enumerate() {
+            let (sequence, tick) = (at as u16, 2 + at as u32);
+            let sent = wishing(command(sequence, tick, 0), move_x, move_y, aim.clone());
+            offer(&mut room, &[sent], None);
+            let ran = step(&mut room).last_processed_command == Some(sequence);
+            assert_eq!(ran, taken, "{move_x} {move_y} {aim:?}");
+            let real = AimCm {
+                x: aim.x,
+                y: aim.y,
+                z: aim.z,
+            };
+            if !taken && sim::move_in_reach(move_x, move_y) {
+                aims += 1;
+            } else if !taken {
+                moves += 1;
+            } else {
+                assert_eq!(row(&room).held_move, [move_x, move_y]);
+                if real != AimCm::NONE {
+                    held = real;
+                }
+            }
+            assert_eq!(row(&room).aim_cm, held);
+        }
+        let counters = *room.counters();
+        assert_eq!((counters.refused_move, counters.refused_aim), (3, 6));
+        assert_eq!((moves, aims), (3, 6));
+        assert_eq!(counters.refused(), 9);
+        // Each refused command's sequence was skipped by the next one that ran.
+        assert_eq!((counters.missing, counters.commands_run), (9, 8));
+        assert_eq!(row(&room).held_move, [0, 0]);
+    }
+
+    /// "No aim yet" (netcode-architect's N-1): on a map whose bounds leave the origin out, a command that carries it
+    /// is never refused, and an aim with x -32,768 and any other y or z is refused and counted. A tick that runs an
+    /// aim A and then "no aim yet" leaves the row on A, and a later "no aim yet" alone keeps it.
+    #[test]
+    fn no_aim_yet_is_taken_on_any_map_and_keeps_the_aim_the_row_holds() {
+        let map = bounded([10.0, 0.0, 10.0], [20.0, 5.0, 20.0], [15.0, 0.0, 15.0]);
+        let mut room = joined_on(&map);
+        assert!(!room.statics().holds_cm(AimCm { x: 0, y: 0, z: 0 }));
+        for _ in 0..4 {
+            step(&mut room);
+        }
+        // Tick 5 runs two commands: 0 (late, for tick 4) aims at A, then 1 carries no aim.
+        let (a, held) = (
+            AimPoint {
+                x: 1_500,
+                y: 100,
+                z: 1_600,
+            },
+            AimCm {
+                x: 1_500,
+                y: 100,
+                z: 1_600,
+            },
+        );
+        let none = |sequence, tick| wishing(command(sequence, tick, 0), 0, 0, AimPoint::NONE);
+        offer(
+            &mut room,
+            &[none(1, 5), wishing(command(0, 4, 0), 0, 0, a)],
+            None,
+        );
+        assert_eq!(step(&mut room).last_processed_command, Some(1));
+        assert_eq!(row(&room).aim_cm, held);
+        offer(&mut room, &[none(2, 6)], None);
+        assert_eq!(step(&mut room).last_processed_command, Some(2));
+        assert_eq!(row(&room).aim_cm, held);
+        // Two aims with the least x that are not "no aim yet": refused, counted, never run.
+        for (sequence, tick, y, z) in [(3, 7, 1, 0), (4, 8, 0, 5)] {
+            let malformed = AimPoint { x: i16::MIN, y, z };
+            let sent = wishing(command(sequence, tick, 0), 0, 0, malformed);
+            offer(&mut room, &[sent], None);
+            assert_eq!(step(&mut room).last_processed_command, Some(2));
+        }
+        let counters = *room.counters();
+        let counted = (counters.refused_aim, counters.refused());
+        assert_eq!((counted, counters.commands_run), ((2, 2), 3));
+        assert_eq!(row(&room).aim_cm, held);
+    }
+
+    /// His soldier exists from the room's start, before anyone joins, and stands (netcode-architect's W-3, the half
+    /// of it before the movement): ten ticks with no join leave his row as the start made it, the join's slot and
+    /// team are that row's, and thirty inputs with the move (127, 0) and no aim reach the row's held move and leave
+    /// its aim as it was.
+    #[test]
+    fn his_soldier_stands_before_the_join_and_the_wire_s_move_reaches_his_row() {
+        let mut room = room(0);
+        let start = row(&room);
+        assert_ne!(start.flags & OCCUPIED, 0);
+        let mut bytes = Vec::new();
+        for _ in 0..10 {
+            assert!(!room.step(&mut bytes));
+        }
+        assert_eq!(row(&room), start);
+        let Some(Control::JoinAccepted(accepted)) =
+            answer(&mut room, &join(PROTOCOL_VERSION, HASH))
+        else {
+            panic!("the join is accepted");
+        };
+        let occupied = |soldier: &Soldier| soldier.flags & OCCUPIED != 0;
+        let rows = room.world().soldiers().rows();
+        assert_eq!(
+            rows.iter().position(occupied),
+            Some(usize::from(accepted.slot))
+        );
+        assert_eq!(rows.iter().filter(|soldier| occupied(soldier)).count(), 1);
+        assert_eq!(
+            (u16::from(accepted.slot), accepted.team),
+            (PLAYER_SLOT, PLAYER_TEAM)
+        );
+        for at in 0..30u16 {
+            let tick = 11 + u32::from(at);
+            let sent = wishing(command(at, tick, 0), 127, 0, AimPoint::NONE);
+            offer(&mut room, &[sent], None);
+            step(&mut room);
+        }
+        let now = row(&room);
+        assert_eq!((now.held_move, now.aim_cm), ([127, 0], AimCm::NONE));
+        assert_eq!(room.counters().commands_run, 30);
+        assert_eq!((now.position, now.facing), (start.position, start.facing));
+    }
+
+    /// The room's pin (netcode-architect's 7.2): commands for ticks 1 to 30 with the move (127, 0), then the
+    /// datagrams for ticks 31 to 33 lost, so nothing is due at those ticks, and tick 34's datagram repeats them late.
+    /// At the starved ticks the world is handed no command at all (no older command fed again) and his row keeps
+    /// its held move; when the late ones run, `late` counts them and the newest's move is taken.
+    #[test]
+    fn a_starved_tick_hands_the_world_no_command_and_the_row_keeps_the_held_move() {
+        let mut room = joined(0);
+        let mut sent: Vec<Command> = Vec::new();
+        for tick in 1..=34u32 {
+            let move_x = if tick == 34 { -127 } else { 127 };
+            let sequence = tick as u16;
+            sent.insert(
+                0,
+                wishing(command(sequence, tick, 0), move_x, 0, AimPoint::NONE),
+            );
+            sent.truncate(REDUNDANCY_CAP);
+            if !(31..=33).contains(&tick) {
+                offer(&mut room, &sent, None);
+            }
+            let ran_before = room.counters().commands_run;
+            step(&mut room);
+            let ran = room.counters().commands_run - ran_before;
+            let expected = match tick {
+                31..=33 => 0,
+                34 => 2,
+                _ => 1,
+            };
+            assert_eq!(
+                (room.handed, ran as usize),
+                (expected, expected),
+                "tick {tick}"
+            );
+            assert_eq!(row(&room).held_move, [127, 0], "tick {tick}");
+        }
+        // Tick 35 runs the two left, 33 and then 34: the newest's move is the row's.
+        step(&mut room);
+        assert_eq!(room.handed, 2);
+        assert_eq!(row(&room).held_move, [-127, 0]);
+        let counters = *room.counters();
+        assert_eq!(
+            (counters.late, counters.missing, counters.refused()),
+            (4, 0, 0)
+        );
+        assert_eq!(counters.commands_run, 34);
+    }
+
+    /// A world built in code wholly past the aim's reach on x (engine-architect's 6.2): the room still starts, its
+    /// static world holds no box for the aim, every real aim is refused and counted, and "no aim yet" runs.
+    #[test]
+    fn on_a_world_past_the_aim_s_reach_every_real_aim_is_refused_and_no_aim_yet_runs() {
+        let map = bounded([400.0, 0.0, 0.0], [500.0, 10.0, 10.0], [450.0, 0.0, 5.0]);
+        let mut room = joined_on(&map);
+        assert_eq!(room.statics().bounds_cm(), None);
+        assert_ne!(row(&room).flags & OCCUPIED, 0);
+        step(&mut room);
+        let aims = [
+            AimPoint {
+                x: 32_767,
+                y: 0,
+                z: 5,
+            },
+            AimPoint { x: 0, y: 0, z: 0 },
+            AimPoint {
+                x: -32_767,
+                y: 65_535,
+                z: 32_767,
+            },
+        ];
+        for (at, aim) in aims.into_iter().enumerate() {
+            let sent = wishing(command(at as u16, 2 + at as u32, 0), 0, 0, aim);
+            offer(&mut room, &[sent], None);
+            assert_eq!(step(&mut room).last_processed_command, None);
+        }
+        let none = wishing(command(3, 5, 0), 0, 0, AimPoint::NONE);
+        offer(&mut room, &[none], None);
+        assert_eq!(step(&mut room).last_processed_command, Some(3));
+        let counters = *room.counters();
+        assert_eq!((counters.refused_aim, counters.commands_run), (3, 1));
     }
 }

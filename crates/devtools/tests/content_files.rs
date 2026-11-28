@@ -469,3 +469,32 @@ fn five_of_his_values_reach_the_loader_by_a_second_route() {
         );
     }
 }
+
+/// The three bundles a match is made on today each make a match on their one movement document (B5 (c),
+/// rust-reviewer's row 33): the content crate's test bundle, the repository's own `content/`, and the first
+/// recording's frozen bundle. His soldier stands in slot 0 with that document's full stamina.
+#[test]
+fn the_three_bundles_of_today_each_make_a_match_on_their_one_movement_document() {
+    let files = walk(&repository().join("content")).unwrap_or_else(|why| panic!("{why}"));
+    let ours = bundle(&files).unwrap_or_else(|why| panic!("{why}"));
+    let recordings = Path::new(env!("CARGO_MANIFEST_DIR")).join("recordings");
+    let frozen =
+        read_plain(&recordings, "first-loop.content.json").unwrap_or_else(|why| panic!("{why}"));
+    let bundles = [
+        (
+            "the test bundle",
+            content::bundle::test_bundle().into_bytes(),
+        ),
+        ("the repository's content", ours.into_bytes()),
+        ("first-loop's frozen bundle", frozen),
+    ];
+    for (name, bytes) in bundles {
+        let set = content::load(&bytes).unwrap_or_else(|why| panic!("{name}: {}", why.message()));
+        assert_eq!(set.movements().len(), 1, "{name}");
+        let rules = sim::rules::Rules::take(&set.movements()[0]).expect("its movement table plays");
+        let made = sim_wasm::Sim::create(&[7; sim::SEED_BYTES], sim_wasm::MODE_LOCAL, 0, &bytes);
+        let sim = made.unwrap_or_else(|why| panic!("{name}: {}", why.message()));
+        let row = sim.local().room().world().soldiers().rows()[usize::from(sim::PLAYER_SLOT)];
+        assert_eq!(row.stamina, rules.stamina_full, "{name}");
+    }
+}

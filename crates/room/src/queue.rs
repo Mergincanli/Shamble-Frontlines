@@ -137,6 +137,7 @@ mod tests {
         let command = PlayerCommand {
             buttons: sequence,
             presses: [0; sim::BUTTONS],
+            ..PlayerCommand::NONE
         };
         Queued {
             sequence,

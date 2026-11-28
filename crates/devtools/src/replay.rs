@@ -167,14 +167,21 @@ pub fn replay(recording: &Recording, bundle: &[u8]) -> Result<Vec<TickHashes>, R
     Ok(Replay::new(recording, bundle)?.collect())
 }
 
-/// A reader of the state that writes one `name = value` line per field. The seed's bytes are never written.
-struct Lines(String);
+/// A reader of the state that writes one `name = value` line per field; a field of the soldier table's row `slot`
+/// is named `row <slot> <name>`, so that every line's name is its own. The seed's bytes are never written.
+struct Lines {
+    text: String,
+    row: Option<u16>,
+}
 
 impl Lines {
     fn line(&mut self, name: &str, value: fmt::Arguments<'_>) {
         use fmt::Write;
         // Writing into a `String` cannot fail.
-        let _ = writeln!(self.0, "{name} = {value}");
+        let _ = match self.row {
+            Some(slot) => writeln!(self.text, "row {slot} {name} = {value}"),
+            None => writeln!(self.text, "{name} = {value}"),
+        };
     }
 }
 
@@ -187,12 +194,23 @@ impl StateSink for Lines {
         self.line(name, format_args!("{value}"));
     }
 
+    /// The value as Rust writes it (the shortest decimal that reads back as the same `f32`) and its bits, which say
+    /// what the decimal cannot: a zero's sign and a NaN's payload.
+    fn f32(&mut self, name: &'static str, value: f32) {
+        self.line(name, format_args!("{value} (bits {:08x})", value.to_bits()));
+    }
+
+    fn row(&mut self, slot: u16) {
+        self.row = Some(slot);
+    }
+
     fn bytes<const N: usize>(&mut self, name: &'static str, value: &[u8; N]) {
         self.line(name, format_args!("{value:?}"));
     }
 
     fn authority(&mut self) {
-        self.0.push_str("-- the authority's part --\n");
+        self.row = None;
+        self.text.push_str("-- the authority's part --\n");
     }
 
     fn secret<const N: usize>(&mut self, name: &'static str, _: &[u8; N]) {
@@ -203,9 +221,12 @@ impl StateSink for Lines {
 /// The state as lines, one field each, in the state's own order.
 #[must_use]
 pub fn state_lines(world: &World) -> String {
-    let mut lines = Lines(String::new());
+    let mut lines = Lines {
+        text: String::new(),
+        row: None,
+    };
     world.visit(&mut lines);
-    lines.0
+    lines.text
 }
 
 /// Replays until the world is at `tick` and hands it to `read`; `None` when the recording never reaches that tick.
@@ -421,11 +442,39 @@ mod tests {
         let lines = state_at(&recording, &bundle(), 3)
             .expect("it replays")
             .expect("tick 3 is reached");
-        // Two commands have run by tick 3 (the first step carried the join), each with one press of button 0.
+        // Two commands have run by tick 3 (the first step carried the join), each with one press of button 0. His
+        // soldier stands in row 0 at the test map's one spawn, (0, 0, -5), facing +x (its 90 degrees), occupied,
+        // alive and grounded (flags 7), with full stamina (the test movement's 8 s of sprint: 288,000,000 units,
+        // 0x112a8800 in little-endian bytes), no move and no aim yet (x -32,768 by its bits); the other 47 rows hold
+        // no soldier.
+        let row = |slot: usize, values: [&str; 18]| {
+            #[rustfmt::skip]
+            const NAMES: [&str; 18] = [
+                "generation", "flags", "team", "position.x", "position.y", "position.z", "velocity.x", "velocity.y",
+                "velocity.z", "stamina", "facing.x", "facing.z", "held_move", "aim_cm.x", "aim_cm.y", "aim_cm.z",
+                "pull.x", "pull.z",
+            ];
+            let line = |(name, value)| format!("row {slot} soldier.{name} = {value}\n");
+            NAMES.into_iter().zip(values).map(line).collect::<String>()
+        };
+        let zero = "0 (bits 00000000)";
+        #[rustfmt::skip]
+        let his = row(0, [
+            "1", "[7]", "[0]", zero, zero, "-5 (bits c0a00000)", zero, zero, zero, "[0, 136, 42, 17, 0, 0, 0, 0]",
+            "1 (bits 3f800000)", zero, "[0, 0]", "32768", "0", "0", zero, zero,
+        ]);
+        #[rustfmt::skip]
+        let empty = [
+            "0", "[0]", "[0]", zero, zero, zero, zero, zero, zero, "[0, 0, 0, 0, 0, 0, 0, 0]", zero, zero, "[0, 0]", "0",
+            "0", "0", zero, zero,
+        ];
+        let others: String = (1..48).map(|slot| row(slot, empty)).collect();
         assert_eq!(
             lines,
-            "tick = 3\nplayer.buttons = 1\nplayer.presses = [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]\n\
-             -- the authority's part --\nseed = (32 bytes, never shown)\n"
+            format!(
+                "tick = 3\nplayer.buttons = 1\nplayer.presses = [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]\n\
+                 {his}{others}-- the authority's part --\nseed = (32 bytes, never shown)\n"
+            )
         );
         // No byte of the seed is in the text: not as letters, not as numbers.
         let seed_as_numbers = format!("{:?}", &TEST_SEED_MARK[..]);
@@ -439,11 +488,20 @@ mod tests {
             .expect("the start");
         assert!(start.starts_with("tick = 0\nplayer.buttons = 0\n"));
         assert_eq!(state_at(&recording, &bundle(), 13), Ok(None));
-        // The shared bytes: the tick, the buttons, the sixteen counts.
+        // The shared bytes: the tick, the buttons, the sixteen counts, then the 48 rows of 60 bytes, his first.
         let bytes = shared_bytes_at(&recording, &bundle(), 3)
             .expect("it replays")
             .expect("tick 3 is reached");
-        assert_eq!(bytes, [&[3, 0, 0, 0, 1, 0, 2][..], &[0; 15]].concat());
+        assert_eq!(bytes.len(), sim::SHARED_STATE_BYTES);
+        assert_eq!(bytes[..22], [&[3, 0, 0, 0, 1, 0, 2][..], &[0; 15]].concat());
+        #[rustfmt::skip]
+        let his_row = [
+            &[1, 0, 7, 0][..], &[0; 8], &[0x00, 0x00, 0xa0, 0xc0], &[0; 12], &[0, 136, 42, 17, 0, 0, 0, 0],
+            &[0x00, 0x00, 0x80, 0x3f], &[0; 4], &[0, 0], &[0x00, 0x80, 0, 0, 0, 0], &[0; 8],
+        ]
+        .concat();
+        assert_eq!(bytes[22..82], his_row);
+        assert!(bytes[82..].iter().all(|byte| *byte == 0));
         // Two runs that differ in one held button differ in that field, by name.
         let mut other = small("a");
         other.steps[2].held = 3;

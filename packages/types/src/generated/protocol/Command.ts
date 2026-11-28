@@ -15,7 +15,8 @@ tick: number,
  */
 sequence: number, 
 /**
- * The move vector's x; the vector's length is at most 1. Provisional: its scale and width.
+ * The move vector's x; the vector's length is at most 1, and a room refuses a longer one. Provisional: its scale
+ * and width.
  */
 move_x: number, 
 /**

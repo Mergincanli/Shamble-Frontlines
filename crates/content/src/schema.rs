@@ -66,7 +66,7 @@ const DESCRIPTIONS: &[(&str, &str, &str)] = &[
     ("map", "format", "The file's kind: shamble-map."),
     ("map", "version", "The version of the map format the file is written in."),
     ("map", "id", "The map's id, which is its file's name."),
-    ("map", "bounds", "The box every spawn, shape and region lies in."),
+    ("map", "bounds", "The box every spawn, shape and region lies in; its bottom is the ground."),
     ("map", "spawns", "Where soldiers start: at least one."),
     ("map", "shapes", "The solid pieces of the world."),
     ("map", "regions", "Patches of ground that are only drawn."),
@@ -157,7 +157,8 @@ fn corner(len: usize) -> Vec<(&'static str, Node)> {
 }
 
 /// The bounds' corner on one side: each axis inside `COORDINATE` and the aim's reach on that side (map.rs's `check`:
-/// x and z within `AIM_REACH_CM`, y from the floor at 0 up to `AIM_HEIGHT_MAX_CM`).
+/// x and z within `AIM_REACH_CM`, y from 0 up to `AIM_HEIGHT_MAX_CM`: y 0 is the aim's zero; the bounds' bottom, the
+/// ground, lies at or above it).
 fn bounds_corner(lowest: bool) -> Vec<(&'static str, Node)> {
     let reach = f64::from(AIM_REACH_CM) / 100.0;
     let height = f64::from(AIM_HEIGHT_MAX_CM) / 100.0;

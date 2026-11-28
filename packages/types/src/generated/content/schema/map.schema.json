@@ -19,7 +19,7 @@
       "additionalProperties": {
         "not": {}
       },
-      "description": "The box every spawn, shape and region lies in.",
+      "description": "The box every spawn, shape and region lies in; its bottom is the ground.",
       "properties": {
         "max": {
           "description": "The highest corner, x, y and z, in metres: on whole centimetres, above the lowest on every axis, inside the aim's reach.",

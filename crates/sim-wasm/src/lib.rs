@@ -14,7 +14,9 @@ pub mod panic;
 use client_endpoint::post::Post;
 use local_match::{LocalMatch, loopback};
 use sim::collision::{StaticWorld, WorldError};
-use sim::{MatchSetup, SEED_BYTES, TICK_HZ};
+use sim::rules::{Rules, RulesError};
+use sim::soldiers::spawn_points;
+use sim::{MatchSetup, SEED_BYTES, SpawnPoint, TICK_HZ};
 use wasm_bindgen::prelude::*;
 
 /// Local play: the client endpoint and a local server in one Worker (ADR 0002 part 6). The only mode so far.
@@ -42,8 +44,12 @@ pub enum CreateError {
     Content(content::Error),
     /// The content holds no map with the id `LOCAL_MAP`.
     MapMissing,
+    /// The content holds this many movement documents, and a local match plays exactly one: its soldier's.
+    Soldier { found: usize },
     /// The map makes no static collision world: why.
     World(WorldError),
+    /// The movement document makes no rules a match can play: why.
+    Rules(RulesError),
     /// More padding than the block writer takes.
     PadBytes(u32),
 }
@@ -66,9 +72,20 @@ impl CreateError {
                     "the content holds no map \"{LOCAL_MAP}\", the map a local match is played on"
                 )
             }
+            Self::Soldier { found } => {
+                format!(
+                    "the content holds {found} movement documents, and a local match plays exactly one, its soldier's"
+                )
+            }
             Self::World(error) => {
                 format!(
                     "the map \"{LOCAL_MAP}\" makes no collision world: {}",
+                    error.message()
+                )
+            }
+            Self::Rules(error) => {
+                format!(
+                    "the content's movement document makes no rules a match can play: {}",
                     error.message()
                 )
             }
@@ -79,10 +96,22 @@ impl CreateError {
     }
 }
 
-/// The static collision world of the local match's map, built once from the content the loader took.
-fn local_world(set: &content::ContentSet) -> Result<StaticWorld, CreateError> {
+/// What a local match is made of, from the content the loader took, each once and checked in this order: its map
+/// (`LOCAL_MAP`), its one movement document, the map's static collision world, that document's rules, and the map's
+/// spawn table. A mode that names its soldier comes with the change-set that brings a second movement document, as
+/// one that names its map does. None of it is the match's state: the world's start reads the rules and the table, and
+/// the room keeps the static world.
+fn local_constants(
+    set: &content::ContentSet,
+) -> Result<(Rules, StaticWorld, Vec<SpawnPoint>), CreateError> {
     let map = set.map(LOCAL_MAP).ok_or(CreateError::MapMissing)?;
-    StaticWorld::build(map).map_err(CreateError::World)
+    let [movement] = set.movements() else {
+        let found = set.movements().len();
+        return Err(CreateError::Soldier { found });
+    };
+    let statics = StaticWorld::build(map).map_err(CreateError::World)?;
+    let rules = Rules::take(movement).map_err(CreateError::Rules)?;
+    Ok((rules, statics, spawn_points(map)))
 }
 
 /// One local match in the Worker. Its state is the local match's (`local_match`): the client endpoint, the local
@@ -96,12 +125,15 @@ impl Sim {
     /// Checks what the host passed and builds the match at tick 0, its join already on its way. The block is whole
     /// from the start; the host's first `rebase` says when the first tick is due. `bundle` is the match's content
     /// (`content.json`): it crosses once, here, so no call can swap it mid-match; the game's own loader judges it.
-    /// The match holds the static collision world of the content's map `LOCAL_MAP`; nothing of the content enters
-    /// the match's state, and no step queries the world yet (change-set 4c).
+    /// The match is made on the content's map `LOCAL_MAP` and its one movement document (`local_constants`): the room
+    /// keeps the map's static world, whose bounds hold each command's aim, and the world's start puts his soldier at
+    /// the map's first spawn by id with that document's stamina. The content enters the match's state only through that
+    /// start; no step reads a rule yet (the movement comes later in change-set 4c).
     ///
     /// # Errors
     /// A seed of the wrong length, a mode that does not exist, a bundle the loader refuses, a bundle without the map,
-    /// a map that makes no world, or too much padding, checked in that order.
+    /// a bundle without exactly one movement document, a map that makes no world, a movement document that makes no
+    /// rules, or too much padding, checked in that order.
     pub fn create(
         seed: &[u8],
         mode: u32,
@@ -114,12 +146,12 @@ impl Sim {
             return Err(CreateError::Mode(mode));
         }
         let set = content::load(bundle).map_err(CreateError::Content)?;
-        let world = local_world(&set)?;
+        let (rules, statics, spawns) = local_constants(&set)?;
         let setup = MatchSetup {
             seed,
             start_tick: 0,
         };
-        let local = LocalMatch::new(&setup, 0, pad_bytes, loopback(), world);
+        let local = LocalMatch::new(&setup, 0, pad_bytes, loopback(), &rules, statics, &spawns);
         local
             .map(|local| Self { local })
             .ok_or(CreateError::PadBytes(pad_bytes))
@@ -360,11 +392,11 @@ mod tests {
         assert!(refused(&bundle()).is_none());
     }
 
-    /// The six checks run in a fixed order, seed, mode, content, map, world, padding: each case below fails all the
-    /// ones after its own, and only its own is named. (No map a test makes here reaches the world's check: the
-    /// world's own tests make its refusals, and its sentence is held below.)
+    /// The eight checks run in a fixed order, seed, mode, content, map, soldier, world, rules, padding: each case below
+    /// fails all the ones after its own, and only its own is named. (No map a test makes here reaches the world's
+    /// check: the world's own tests make its refusals, and its sentence is held below.)
     #[test]
-    fn the_checks_run_in_the_order_seed_mode_content_map_padding() {
+    fn the_checks_run_in_the_order_seed_mode_content_map_soldier_padding() {
         let bad = b"{}";
         let first = |seed: &[u8], mode, pad, bundle: &[u8]| {
             Sim::create(seed, mode, pad, bundle)
@@ -390,24 +422,84 @@ mod tests {
             first(&SEED, MODE_LOCAL, u32::MAX, mapless.as_bytes()),
             kind(CreateError::MapMissing)
         );
+        // The map with no movement document, and with two of which one makes no rules: the soldier's check comes
+        // before the rules' and the padding's.
+        let map = ("maps/test-scene.json", content::map::TEST_TEXT);
+        let unplayable = content::movement::TEST_TEXT
+            .replace("\"jump_reach_m\": 3,", "\"jump_reach_m\": 0.25,")
+            .replace("\"test-soldier\"", "\"second\"");
+        for files in [
+            vec![map],
+            vec![
+                map,
+                ("movement/second.json", unplayable.as_str()),
+                ("movement/test-soldier.json", content::movement::TEST_TEXT),
+            ],
+        ] {
+            let bundle = content::bundle::write(&files);
+            assert_eq!(
+                first(&SEED, MODE_LOCAL, u32::MAX, bundle.as_bytes()),
+                kind(CreateError::Soldier { found: 0 })
+            );
+        }
         assert_eq!(
             first(&SEED, MODE_LOCAL, u32::MAX, &bundle()),
             kind(CreateError::PadBytes(0))
         );
     }
 
-    /// The match holds the static world of the content's map `LOCAL_MAP`: the same world the map builds on its own.
+    /// The match's room holds the static world of the content's map `LOCAL_MAP`: the same world the map builds on its
+    /// own, its bounds in whole centimetres included.
     #[test]
     fn the_match_holds_the_static_world_of_the_local_map() {
         let sim = Sim::create(&SEED, MODE_LOCAL, 0, &bundle()).expect("a good seed and mode");
         let set = content::load(&bundle()).expect("the test bundle loads");
         let built =
             StaticWorld::build(set.map(LOCAL_MAP).expect("the test map")).expect("it builds");
-        let held = sim.local().static_world();
+        let held = sim.local().room().statics();
         assert_eq!(held.solids().len(), built.solids().len());
         assert_eq!(held.tree_depth(), built.tree_depth());
         assert_eq!(held.tree_bytes(), built.tree_bytes());
-        assert!(!held.solids().is_empty());
+        assert_eq!(held.bounds_cm(), built.bounds_cm());
+        assert!(!held.solids().is_empty() && held.bounds_cm().is_some());
+    }
+
+    /// The match plays the bundle's one movement document: a bundle with none or with two is refused, saying how many
+    /// it found; one whose document makes no rules is refused with the rules' own reason.
+    #[test]
+    fn a_bundle_without_exactly_one_movement_document_or_with_one_that_does_not_play_makes_no_match()
+     {
+        let map = ("maps/test-scene.json", content::map::TEST_TEXT);
+        let movement = ("movement/test-soldier.json", content::movement::TEST_TEXT);
+        let second_text = content::movement::TEST_TEXT.replace("\"test-soldier\"", "\"second\"");
+        assert_ne!(second_text, content::movement::TEST_TEXT);
+        let second = ("movement/second.json", second_text.as_str());
+        for (files, found) in [(vec![map], 0), (vec![map, movement, second], 2)] {
+            let bundle = content::bundle::write(&files);
+            assert!(content::load(bundle.as_bytes()).is_ok(), "{found}");
+            let error = Sim::create(&SEED, MODE_LOCAL, 0, bundle.as_bytes()).err();
+            assert_eq!(error, Some(CreateError::Soldier { found }));
+        }
+        assert_eq!(
+            CreateError::Soldier { found: 2 }.message(),
+            "the content holds 2 movement documents, and a local match plays exactly one, its soldier's"
+        );
+        // A jump that reaches lower than the step-up: every value inside its range, and no rules.
+        let low =
+            content::movement::TEST_TEXT.replace("\"jump_reach_m\": 3,", "\"jump_reach_m\": 0.25,");
+        assert_ne!(low, content::movement::TEST_TEXT);
+        let bundle = content::bundle::write(&[map, ("movement/test-soldier.json", &low)]);
+        let set = content::load(bundle.as_bytes()).expect("the loader takes it");
+        let why = Rules::take(&set.movements()[0]).expect_err("no rules");
+        let error = Sim::create(&SEED, MODE_LOCAL, 0, bundle.as_bytes()).err();
+        assert_eq!(error, Some(CreateError::Rules(why)));
+        assert_eq!(
+            CreateError::Rules(why).message(),
+            format!(
+                "the content's movement document makes no rules a match can play: {}",
+                why.message()
+            )
+        );
     }
 
     /// A bundle whose maps have other ids makes no match, and says which map it looked for; a map that makes no

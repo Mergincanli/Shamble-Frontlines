@@ -255,7 +255,8 @@ impl Endpoint {
                 move_y: 0,
                 buttons: ahead.post.buttons,
                 presses: ahead.post.presses,
-                aim: AimPoint { x: 0, y: 0, z: 0 },
+                // No aim yet: the cursor's ray reaches the command in step 2 of change-set 4c.
+                aim: AimPoint::NONE,
                 view_time: ViewTime {
                     tick: ahead.view_tick,
                     fraction: 0,

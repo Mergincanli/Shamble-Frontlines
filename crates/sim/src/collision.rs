@@ -1,6 +1,7 @@
 //! The static world of a match: the map's solid shapes as the simulation holds them, the tree over them and the ray
-//! cast (ADR 0004 part 10; PM-0004-32). It is built once from the map document when a match starts, never changes
-//! after, and is never part of a snapshot: the same document gives the same world again.
+//! cast (ADR 0004 part 10; PM-0004-32), and the map's bounds in whole centimetres, the box a command's aim must lie
+//! in. It is built once from the map document when a match starts, never changes after, and is never part of a
+//! snapshot: the same document gives the same world again.
 //!
 //! This is the one file that names the collision library (`crates/sim/tests/rules_scan.rs` holds that). What it
 //! takes from the library is the tree: the binned build over the shapes' boxes, the walk over its nodes, and the
@@ -14,11 +15,14 @@
 //! A shape's index is its rank by id (bytes), whatever order the document lists the shapes in: two documents that
 //! hold the same shapes give the same world, byte for byte ([`StaticWorld::tree_bytes`]).
 
-use content::map::{Form, MapDocument, Toward};
+use content::map::{
+    AIM_HEIGHT_MAX_CM, AIM_REACH_CM, BOUNDS_GRID, Form, MapDocument, Toward, on_grid,
+};
 use parry3d::bounding_volume::Aabb;
 use parry3d::math::Vector;
 use parry3d::partitioning::{Bvh, BvhBuildStrategy, TraversalAction};
 
+use crate::aim::AimCm;
 use crate::vec::V3;
 
 /// The most shapes a static world holds: the map kind's own cap (`content::map::MAX_SHAPES`; a test ties the two).
@@ -42,6 +46,9 @@ pub const MAX_TREE_DEPTH: u32 = 31;
 pub enum WorldError {
     /// More shapes than [`MAX_SHAPES`]: this many.
     TooManyShapes(usize),
+    /// The map's bounds have a corner that is no finite `f32`, or no thickness on some axis once their corners are
+    /// `f32`: the checks a shape gets.
+    Bounds,
     /// The shape at this place in the document's list has a corner that is no finite `f32`.
     NotFinite(usize),
     /// The shape at this place in the document's list has no thickness on some axis once its corners are `f32`.
@@ -60,6 +67,7 @@ impl WorldError {
                     "the map holds {found} shapes, and a static world holds at most {MAX_SHAPES}"
                 )
             }
+            Self::Bounds => "the map's bounds have a corner that is not a finite number, or no thickness on one of their axes".to_owned(),
             Self::NotFinite(place) => {
                 format!("shape {place} of the map has a corner that is not a finite number")
             }
@@ -96,6 +104,7 @@ pub struct StaticWorld {
     solids: Vec<Solid>,
     tree: Bvh,
     depth: u32,
+    bounds_cm: Option<[[i32; 3]; 2]>,
 }
 
 /// A corner as the simulation holds it: narrowed once, here, and a zero without its sign (a file cannot hold a
@@ -106,6 +115,52 @@ pub(crate) fn narrow(corner: [f64; 3]) -> [f32; 3] {
         let value = value as f32;
         if value == 0.0 { 0.0 } else { value }
     })
+}
+
+/// One face of the map's bounds in whole centimetres, from the document's own number (never from its `f32`): on the
+/// bounds' grid its count by the loader's own rule (content's `on_grid`: 0.55 gives 55, where a plain rounding up of
+/// 0.55 x 100 gives 56), and off that grid, which only a document built in code can be, the next whole centimetre
+/// inward: up for a lower face (`lower`), down for an upper one. Off the grid the count over 100 is never the number
+/// itself (that is what off the grid means), so each comparison is strict. A face beyond `i64` saturates; the aim's
+/// reach holds it after.
+fn face_cm(value: f64, lower: bool) -> i64 {
+    if let Some(steps) = on_grid(value, BOUNDS_GRID) {
+        return steps;
+    }
+    let per_metre = f64::from(BOUNDS_GRID.per_metre);
+    let nearest = (value * per_metre).round();
+    let steps = nearest as i64;
+    if lower && nearest / per_metre < value {
+        steps.saturating_add(1)
+    } else if !lower && nearest / per_metre > value {
+        steps.saturating_sub(1)
+    } else {
+        steps
+    }
+}
+
+/// The map's bounds in whole centimetres, held to the aim's reach (x and z within `AIM_REACH_CM` either way, y from 0
+/// up to `AIM_HEIGHT_MAX_CM`: content's map.rs), as its lower corner and then its upper one. Every map the loader takes
+/// lies inside the reach already, so there this is the bounds themselves; a map built in code past the reach keeps the
+/// part inside it. `None` when that part holds no whole centimetre on some axis.
+fn aim_box(min: [f64; 3], max: [f64; 3]) -> Option<[[i32; 3]; 2]> {
+    let reach = [
+        (-AIM_REACH_CM, AIM_REACH_CM),
+        (0, AIM_HEIGHT_MAX_CM),
+        (-AIM_REACH_CM, AIM_REACH_CM),
+    ];
+    let mut held = [[0; 3]; 2];
+    for (axis, (least, most)) in reach.into_iter().enumerate() {
+        let low = i64::max(face_cm(min[axis], true), i64::from(least));
+        let high = i64::min(face_cm(max[axis], false), i64::from(most));
+        if low > high {
+            return None;
+        }
+        // Both lie within the reach now, which `i32` holds exactly.
+        held[0][axis] = low as i32;
+        held[1][axis] = high as i32;
+    }
+    Some(held)
 }
 
 /// Where a ray enters a box, between `t = 0` and `limit`, or nothing when it misses it there. One subtraction and
@@ -209,11 +264,21 @@ impl StaticWorld {
     /// its bounds, its ids); these are the checks a document needs whoever made it, a test included.
     ///
     /// # Errors
-    /// Too many shapes, a corner that is not finite, a shape without thickness, or a tree that is too deep.
+    /// Too many shapes, bounds that are not finite or have no thickness, a corner that is not finite, a shape without
+    /// thickness, or a tree that is too deep.
     pub fn build(map: &MapDocument) -> Result<Self, WorldError> {
         if map.shapes.len() > MAX_SHAPES {
             return Err(WorldError::TooManyShapes(map.shapes.len()));
         }
+        // The bounds get the checks a shape gets, on their corners as `f32`; the box an aim must lie in is taken
+        // from the document's own numbers.
+        let (low, high) = (narrow(map.bounds.min), narrow(map.bounds.max));
+        if !low.iter().chain(&high).all(|corner| corner.is_finite())
+            || (0..3).any(|axis| low[axis] >= high[axis])
+        {
+            return Err(WorldError::Bounds);
+        }
+        let bounds_cm = aim_box(map.bounds.min, map.bounds.max);
         let mut order: Vec<usize> = (0..map.shapes.len()).collect();
         order.sort_by(|a, b| {
             map.shapes[*a]
@@ -251,6 +316,25 @@ impl StaticWorld {
             solids,
             tree,
             depth,
+            bounds_cm,
+        })
+    }
+
+    /// The map's bounds in whole centimetres, held to the aim's reach: the box [`StaticWorld::holds_cm`] reads, its
+    /// lower corner and then its upper one (x, y, z), both faces inside it. `None` when no whole centimetre of the
+    /// reach lies within the bounds on some axis, which only a document built in code can give: then no aim is held.
+    #[must_use]
+    pub const fn bounds_cm(&self) -> Option<[[i32; 3]; 2]> {
+        self.bounds_cm
+    }
+
+    /// Whether an aim lies in [`StaticWorld::bounds_cm`], both faces included: never on a world with no such box, and
+    /// never "no aim yet" ([`AimCm::NONE`]), whose x lies past the aim's reach on every map.
+    #[must_use]
+    pub fn holds_cm(&self, aim: AimCm) -> bool {
+        let at = [i32::from(aim.x), i32::from(aim.y), i32::from(aim.z)];
+        self.bounds_cm.is_some_and(|[low, high]| {
+            (0..3).all(|axis| low[axis] <= at[axis] && at[axis] <= high[axis])
         })
     }
 
@@ -341,7 +425,7 @@ impl StaticWorld {
 
 #[cfg(test)]
 mod tests {
-    use content::map::{Bounds, Shape};
+    use content::map::{Bounds, Shape, Spawn};
     use parry3d::query::{Ray, RayCast};
     use parry3d::shape::ConvexPolyhedron;
 
@@ -600,6 +684,227 @@ mod tests {
         assert_eq!(
             WorldError::TooManyShapes(513).message(),
             "the map holds 513 shapes, and a static world holds at most 512"
+        );
+    }
+
+    /// A document with these bounds, one spawn at their lower corner and no shape: the loader's own rules
+    /// (`content::map::check`) can judge it.
+    fn bounded(min: [f64; 3], max: [f64; 3]) -> MapDocument {
+        MapDocument {
+            id: "bounded".to_owned(),
+            bounds: Bounds { min, max },
+            spawns: vec![Spawn {
+                id: "a".to_owned(),
+                at: min,
+                facing_deg: 0.0,
+            }],
+            shapes: Vec::new(),
+            regions: Vec::new(),
+        }
+    }
+
+    fn box_of(map: &MapDocument) -> Option<[[i32; 3]; 2]> {
+        StaticWorld::build(map).expect("a world").bounds_cm()
+    }
+
+    /// The committed test scene's bounds (content/maps/test-scene.json), in metres and in centimetres.
+    const SCENE: ([f64; 3], [f64; 3]) = ([-32.0, 0.0, -24.0], [80.0, 20.0, 24.0]);
+    const SCENE_CM: [[i32; 3]; 2] = [[-3_200, 0, -2_400], [8_000, 2_000, 2_400]];
+
+    #[test]
+    fn bounds_on_the_grid_are_their_own_count_of_whole_centimetres() {
+        // The made-up test map as the loader reads it.
+        let set = content::load(content::bundle::test_bundle().as_bytes())
+            .expect("the test bundle loads");
+        let loaded = set.map("test-scene").expect("its map");
+        assert_eq!(
+            box_of(loaded),
+            Some([[-5_000, 0, -5_000], [5_000, 2_000, 5_000]])
+        );
+        // The test scene's bounds, the reach's own edges, and lower faces at 0.55 and -0.55: 0.55 x 100 is not 55 to
+        // the last bit, so a plain rounding up would put the face on 56.
+        let face = 0.55_f64;
+        assert_eq!((face * 100.0).ceil(), 56.0);
+        #[rustfmt::skip]
+        let cases = [
+            (SCENE.0, SCENE.1, SCENE_CM),
+            ([-327.67, 0.0, -327.67], [327.67, 655.35, 327.67], [[-32_767, 0, -32_767], [32_767, 65_535, 32_767]]),
+            ([0.55, 0.55, -0.55], [1.0, 1.0, 1.0], [[55, 55, -55], [100, 100, 100]]),
+        ];
+        for (min, max, expected) in cases {
+            let map = bounded(min, max);
+            content::map::check(&map).expect("the loader takes it");
+            assert_eq!(box_of(&map), Some(expected), "{min:?} {max:?}");
+            // Each face is the loader's own count, exactly.
+            for axis in 0..3 {
+                let count = |value: f64| on_grid(value, BOUNDS_GRID);
+                assert_eq!(count(min[axis]), Some(i64::from(expected[0][axis])));
+                assert_eq!(count(max[axis]), Some(i64::from(expected[1][axis])));
+            }
+        }
+    }
+
+    #[test]
+    fn bounds_off_the_grid_take_the_next_whole_centimetre_inward() {
+        // Documents built in code, which the loader refuses: every face lies inward of the document's own number by
+        // less than 1 cm, judged in f64 against that number.
+        #[rustfmt::skip]
+        let cases = [
+            ([-32.004, 0.005, -24.0], [80.004, 20.001, 24.0], [[-3_200, 1, -2_400], [8_000, 2_000, 2_400]]),
+            ([-0.015, 0.009, 0.001], [0.019, 0.011, 0.999], [[-1, 1, 1], [1, 1, 99]]),
+        ];
+        let metres = |cm: i32| f64::from(cm) / 100.0;
+        for (min, max, expected) in cases {
+            let map = bounded(min, max);
+            assert!(content::map::check(&map).is_err(), "{min:?} {max:?}");
+            let held = box_of(&map).expect("a box");
+            assert_eq!(held, expected, "{min:?} {max:?}");
+            for axis in 0..3 {
+                let (low, high) = (held[0][axis], held[1][axis]);
+                assert!(
+                    metres(low) >= min[axis] && metres(low - 1) < min[axis],
+                    "{axis}: {low}"
+                );
+                assert!(
+                    metres(high) <= max[axis] && metres(high + 1) > max[axis],
+                    "{axis}: {high}"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn the_aims_box_lies_inside_the_bounds_and_the_reach_and_a_map_past_the_reach_still_builds() {
+        let reach = [
+            [-AIM_REACH_CM, 0, -AIM_REACH_CM],
+            [AIM_REACH_CM, AIM_HEIGHT_MAX_CM, AIM_REACH_CM],
+        ];
+        // A 2 km map built in code (0 to 2,000 m on x and z) builds, and its box is the part inside the reach; so is a
+        // map reaching past the reach on every side, below y 0 included.
+        #[rustfmt::skip]
+        let cases = [
+            ([0.0, 0.0, 0.0], [2_000.0, 20.0, 2_000.0], [[0, 0, 0], [32_767, 2_000, 32_767]]),
+            ([-2_000.0, -5.0, -2_000.0], [2_000.0, 700.0, 2_000.0], reach),
+            ([-32.004, 0.005, -24.0], [80.004, 20.001, 24.0], [[-3_200, 1, -2_400], [8_000, 2_000, 2_400]]),
+            (SCENE.0, SCENE.1, SCENE_CM),
+        ];
+        for (min, max, expected) in cases {
+            let held = box_of(&bounded(min, max)).expect("a box");
+            assert_eq!(held, expected, "{min:?} {max:?}");
+            for axis in 0..3 {
+                let (low, high) = (held[0][axis], held[1][axis]);
+                assert!(reach[0][axis] <= low && low <= high && high <= reach[1][axis]);
+                assert!(
+                    f64::from(low) / 100.0 >= min[axis] && f64::from(high) / 100.0 <= max[axis]
+                );
+            }
+        }
+        // Bounds wholly past the reach on one axis, or holding no whole centimetre on one, give no box, and the world
+        // still builds.
+        for (min, max) in [
+            ([400.0, 0.0, 0.0], [500.0, 10.0, 10.0]),
+            ([0.0, 700.0, 0.0], [1.0, 800.0, 1.0]),
+            ([0.0, 0.0, -0.009], [1.0, 1.0, -0.001]),
+        ] {
+            assert_eq!(box_of(&bounded(min, max)), None, "{min:?} {max:?}");
+        }
+    }
+
+    #[test]
+    fn a_face_moved_by_one_centimetre_moves_that_face_of_the_box_alone() {
+        let metres = |cm: i32| f64::from(cm) / 100.0;
+        for side in 0..2 {
+            for axis in 0..3 {
+                for by in [-1, 1] {
+                    let mut moved_cm = SCENE_CM;
+                    moved_cm[side][axis] += by;
+                    if moved_cm[0][1] < 0 {
+                        continue;
+                    }
+                    let (mut min, mut max) = SCENE;
+                    let face = if side == 0 { &mut min } else { &mut max };
+                    face[axis] = metres(moved_cm[side][axis]);
+                    let map = bounded(min, max);
+                    content::map::check(&map).expect("the loader takes it");
+                    assert_eq!(box_of(&map), Some(moved_cm), "{side} {axis} {by}");
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn an_aim_is_held_on_each_face_of_the_box_and_refused_one_centimetre_past_it() {
+        let build = |min, max| StaticWorld::build(&bounded(min, max)).expect("a world");
+        let aim = |x: i16, y: u16, z: i16| AimCm { x, y, z };
+        let scene = build(SCENE.0, SCENE.1);
+        // Each face and the two far corners are held; one centimetre past each face is not (y 0 has nothing below it
+        // in an aim's type: the raised map below has its lower y face at 2 m).
+        for held in [
+            aim(-3_200, 10, 0),
+            aim(8_000, 10, 0),
+            aim(0, 0, 0),
+            aim(0, 2_000, 0),
+            aim(0, 10, -2_400),
+            aim(0, 10, 2_400),
+            aim(-3_200, 0, -2_400),
+            aim(8_000, 2_000, 2_400),
+        ] {
+            assert!(scene.holds_cm(held), "{held:?}");
+        }
+        for past in [
+            aim(-3_201, 10, 0),
+            aim(8_001, 10, 0),
+            aim(0, 2_001, 0),
+            aim(0, 10, -2_401),
+            aim(0, 10, 2_401),
+        ] {
+            assert!(!scene.holds_cm(past), "{past:?}");
+        }
+        let raised = build([-1.0, 2.0, -1.0], [1.0, 4.0, 1.0]);
+        assert!(raised.holds_cm(aim(0, 200, 0)) && raised.holds_cm(aim(0, 400, 0)));
+        assert!(!raised.holds_cm(aim(0, 199, 0)) && !raised.holds_cm(aim(0, 401, 0)));
+        // "No aim yet", and any aim with the type's least x, is held on no map, the widest one included.
+        let widest = build([-327.67, 0.0, -327.67], [327.67, 655.35, 327.67]);
+        assert!(widest.holds_cm(aim(-32_767, 65_535, 32_767)));
+        for world in [&scene, &raised, &widest] {
+            assert!(!world.holds_cm(AimCm::NONE));
+            assert!(!world.holds_cm(aim(i16::MIN, 10, 0)));
+        }
+        // A world with no box holds no aim at all.
+        let past = build([400.0, 0.0, 0.0], [500.0, 10.0, 10.0]);
+        assert_eq!(past.bounds_cm(), None);
+        assert!(!past.holds_cm(aim(32_767, 0, 0)) && !past.holds_cm(aim(0, 0, 0)));
+    }
+
+    #[test]
+    fn bounds_that_are_not_finite_or_flat_are_refused() {
+        let refused = |min, max| StaticWorld::build(&bounded(min, max)).expect_err("no world");
+        let (min, max) = SCENE;
+        for bad in [f64::NAN, f64::INFINITY, f64::NEG_INFINITY, 1e39, -1e39] {
+            for axis in 0..3 {
+                let (mut low, mut high) = (min, max);
+                low[axis] = bad;
+                assert_eq!(refused(low, max), WorldError::Bounds, "{bad} {axis}");
+                high[axis] = bad;
+                assert_eq!(refused(min, high), WorldError::Bounds, "{bad} {axis}");
+            }
+        }
+        // No thickness: one face twice, the faces the wrong way round, and two doubles one `f32` apart.
+        assert_eq!(
+            refused([0.0, 1.0, 0.0], [1.0, 1.0, 1.0]),
+            WorldError::Bounds
+        );
+        assert_eq!(
+            refused([0.0, 0.0, 2.0], [1.0, 1.0, 1.0]),
+            WorldError::Bounds
+        );
+        assert_eq!(
+            refused([100.0, 0.0, 0.0], [100.000_000_1, 1.0, 1.0]),
+            WorldError::Bounds
+        );
+        assert_eq!(
+            WorldError::Bounds.message(),
+            "the map's bounds have a corner that is not a finite number, or no thickness on one of their axes"
         );
     }
 

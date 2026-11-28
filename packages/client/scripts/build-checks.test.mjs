@@ -760,15 +760,65 @@ describe("the built-file check", () => {
     expect(libmProblems([SQRTF_LEGACY, BUILTINS_ROUND, "roundf", ...NOT_MATHS], allowed)).toEqual([]);
     const beside = ["_RNvNtNtCs8f6xQ2mK1pZ_4libm4math6sqrtf26sqrtf2", SQRT_GENERIC, "_RNvNtNtNtCs4WfqS6F5PNm_17compiler_builtins4math9libm_math6roundf6roundf", "round", ACOSF];
     expect(libmProblems(beside, allowed)).toHaveLength(5);
-    // Today's list holds the two routines the content loader brings, and whatever joins it is a whole routine with
-    // its reason.
+    // Today's list holds the two routines the content loader brings and the 21 paths the build check prints for
+    // libm's exp and sincos and what they call (change-set 4c's C4), and whatever joins it is a whole routine with its
+    // reason. No libm entry is a bare prefix (`libm::math` and the like): each is a path the build printed, a routine's
+    // or, for a trait's methods, its module's. No entry
+    // names a fused multiply-add, and none names a banned function, but for two: libm's own exp and sincos, by the
+    // pinned crate's path, whose steps are the banned C names `exp` and `sincos` (each twice, the module and the
+    // routine). Exactly those two, and nothing else of the banned list in them; the C functions of those names stay
+    // refused whatever this list says (below).
+    const own = new Map([["libm::math::exp::exp", "exp"], ["libm::math::sincos::sincos", "sincos"]]);
+    const banned = (name) => `${name}: a maths function whose result is not the same on every target (ADR 0004 part 7)`;
     for (const entry of MATHS_ALLOWED) {
       expect(entry.routine).toMatch(/^(libm|compiler_builtins|C)(::[A-Za-z_][A-Za-z0-9_]*)+$/);
       expect(entry.why.length).toBeGreaterThan(20);
       expect(fusedMultiplyAddProblems(entry.routine.split("::"))).toEqual([]);
-      expect(bannedMathsProblems(entry.routine.split("::"))).toEqual([]);
+      const name = own.get(entry.routine);
+      expect(bannedMathsProblems(entry.routine.split("::"))).toEqual(name ? [banned(name), banned(name)] : []);
+      expect(["libm", "libm::math", "libm::math::generic", "libm::math::support", "compiler_builtins::math"]).not.toContain(entry.routine);
     }
-    expect(MATHS_ALLOWED.map(({ routine }) => routine)).toEqual(["C::round", "C::__multi3"]);
+    expect([...own.keys()].every((routine) => MATHS_ALLOWED.some((entry) => entry.routine === routine))).toBe(true);
+    // The banned rule reads no list: with today's whole list, a twin that holds the C functions exp and sincos (and sin,
+    // cos, expf) is refused for each of them.
+    const plain = ["exp", "sincos", "sin", "cos", "expf"];
+    const planted = twin({ bodies: [fn(), fn(), ...plain.map(() => fn())], names: [OURS, CORE, ...plain] });
+    expect(twinProblems(planted, "the release twin", MATHS_ALLOWED)).toEqual(plain.map((name) => `the release twin: ${banned(name)}`));
+    // With today's whole list, libm's other routines of the banned names, and a sibling inside exp's and sincos's own
+    // modules, are each refused by libm's rule: the two entries lift exp and sincos alone. The two themselves, by the
+    // names the build prints, meet neither rule, and without their two entries libm's rule refuses them (the advisor
+    // agent's condition 1 of 2026-11-28, advisor-c4-maths-test.md).
+    const LIBM = "_RNvNtNtCs8f6xQ2mK1pZ_4libm4math";
+    const siblings = {
+      "4expf4expf": "expf::expf",
+      "4exp24exp2": "exp2::exp2",
+      "5expm15expm1": "expm1::expm1",
+      "3sin3sin": "sin::sin",
+      "3cos3cos": "cos::cos",
+      "7sincosf7sincosf": "sincosf::sincosf",
+      "3exp4expf": "exp::expf",
+      "6sincos3sin": "sincos::sin",
+    };
+    const outside = (name, routine) => `${name}: ${routine} is a maths routine outside the allow-list (packages/client/scripts/maths-allowed.mjs)`;
+    const names = Object.keys(siblings).map((tail) => LIBM + tail);
+    expect(libmProblems(names, MATHS_ALLOWED)).toEqual(Object.values(siblings).map((path, k) => outside(names[k], `libm::math::${path}`)));
+    const theTwo = [`${LIBM}3exp3exp`, `${LIBM}6sincos6sincos`];
+    expect(libmProblems(theTwo, MATHS_ALLOWED)).toEqual([]);
+    expect(libmProblems(theTwo, MATHS_ALLOWED.filter(({ routine }) => !own.has(routine)))).toHaveLength(2);
+    expect(bannedMathsProblems(theTwo)).toEqual([]);
+    expect(new Set(MATHS_ALLOWED.map(({ routine }) => routine)).size).toBe(MATHS_ALLOWED.length);
+    // prettier-ignore
+    expect(MATHS_ALLOWED.map(({ routine }) => routine)).toEqual([
+      "C::round", "C::__multi3",
+      "libm::math::exp::exp", "libm::math::scalbn::scalbn", "libm::math::generic::scalbn::scalbn",
+      "libm::math::sincos::sincos", "libm::math::k_sin::k_sin", "libm::math::k_cos::k_cos", "libm::math::rem_pio2::rem_pio2",
+      "libm::math::rem_pio2::rem_pio2::medium", "libm::math::rem_pio2_large::rem_pio2_large",
+      "libm::math::rem_pio2_large::rem_pio2_large::floor", "libm::math::floor::floor", "libm::math::generic::floor::floor",
+      "libm::math::generic::floor::floor_status", "libm::math::get_high_word", "libm::math::support::env",
+      "libm::math::support::float_traits", "libm::math::support::float_traits::Float::ex",
+      "libm::math::support::float_traits::Float::exp_unbiased", "libm::math::support::float_traits::Float::from_parts",
+      "libm::math::support::float_traits::Float::is_sign_positive", "libm::math::support::int_traits",
+    ]);
   });
 
   test("a function of a crate the players' file is built without is refused: its own, and the standard library's as it used it", () => {

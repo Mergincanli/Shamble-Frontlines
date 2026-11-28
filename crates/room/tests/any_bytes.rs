@@ -1,8 +1,8 @@
 //! The room takes whatever the link hands it (ADR 0001 part 5): it is fed valid, changed and random messages
 //! between its steps, from a fixed seed, and must not panic, must keep its own rules, and must go on writing valid
 //! snapshots. The decoders have their own, larger test (`protocol/tests/decoder_inputs.rs`); this one is for the
-//! checks behind them: the acks, the queue, the press check and the join. The client endpoint has the same kind
-//! of test against a room that lies (`client-endpoint/tests/any_bytes.rs`).
+//! checks behind them: the acks, the queue, the press check, the move's length, the aim inside the map and the
+//! join. The client endpoint has the same kind of test against a room that lies (`client-endpoint/tests/any_bytes.rs`).
 
 use protocol::codec::{
     Control, KIND_INPUT, decode_control, decode_snapshot, encode_control, encode_input,
@@ -13,7 +13,10 @@ use protocol::messages::{
 };
 use protocol::wrap::press_edges;
 use room::{CATCH_UP_CAP, Room};
-use sim::{BUTTONS, MatchSetup, SEED_BYTES};
+use sim::collision::StaticWorld;
+use sim::rules::Rules;
+use sim::soldiers::spawn_points;
+use sim::{BUTTONS, MatchSetup, SEED_BYTES, SpawnPoint, move_in_reach};
 
 const HASH: [u8; 32] = [0xC4; 32];
 /// Each test runs this many matches of this many calls, about a second in a debug build: a match that a lie has
@@ -85,6 +88,50 @@ impl Random {
             }
         }
     }
+
+    /// A move an honest client sends: any pair within the wire's reach.
+    fn honest_move(&mut self) -> (i8, i8) {
+        loop {
+            let (x, y) = (self.next() as i8, self.next() as i8);
+            if move_in_reach(x, y) {
+                return (x, y);
+            }
+        }
+    }
+
+    /// An aim an honest client sends: one time in four "no aim yet", else a point in `held`, the map's bounds in
+    /// whole centimetres, the faces included.
+    fn honest_aim(&mut self, [low, high]: [[i32; 3]; 2]) -> AimPoint {
+        if self.chance(25) {
+            return AimPoint::NONE;
+        }
+        let mut within = |axis: usize| {
+            let span = (high[axis] - low[axis]) as u64 + 1;
+            low[axis] + self.below(span) as i32
+        };
+        let (x, y, z) = (within(0), within(1), within(2));
+        AimPoint {
+            x: x as i16,
+            y: y as u16,
+            z: z as i16,
+        }
+    }
+
+    /// An aim 1 cm past one face of the bounds (the lower y face has nothing below it in an aim's type).
+    fn aim_past_a_face(&mut self, [low, high]: [[i32; 3]; 2]) -> AimPoint {
+        let (x, y, z) = match self.below(5) {
+            0 => (low[0] - 1, 0, 0),
+            1 => (high[0] + 1, 0, 0),
+            2 => (0, high[1] + 1, 0),
+            3 => (0, 0, low[2] - 1),
+            _ => (0, 0, high[2] + 1),
+        };
+        AimPoint {
+            x: x as i16,
+            y: y as u16,
+            z: z as i16,
+        }
+    }
 }
 
 fn control_bytes(control: &Control) -> Vec<u8> {
@@ -93,12 +140,32 @@ fn control_bytes(control: &Control) -> Vec<u8> {
     bytes
 }
 
+/// The test bundle's rules, static world and spawn table, built once for every match of the run.
+fn constants() -> (Rules, StaticWorld, Vec<SpawnPoint>) {
+    let set =
+        content::load(content::bundle::test_bundle().as_bytes()).expect("the test bundle loads");
+    let map = set.map("test-scene").expect("its map");
+    let rules = Rules::take(&set.movements()[0]).expect("its movement table plays");
+    let statics = StaticWorld::build(map).expect("it builds");
+    (rules, statics, spawn_points(map))
+}
+
+/// The lie a message carries, if it is one the room's move and aim checks see.
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum Lie {
+    Other,
+    Move,
+    Aim,
+}
+
 /// The room against a client that keeps the rules, lies in one message in five (one field of one command, an
 /// ack, or a flood of commands for the ticks ahead), and whose bytes are changed on the way one time in five.
 /// Whatever arrives: every snapshot the room writes is valid and one tick after the last; at most `CATCH_UP_CAP`
 /// commands run in a tick; no command runs twice (in every tick the sequence moves by exactly the commands run
-/// and the ones the room counted as missing in that tick, no more and no less); and no button is pressed more
-/// often than once per tick since the join.
+/// and the ones the room counted as missing in that tick, no more and no less); no button is pressed more often
+/// than once per tick since the join; a message that arrives as it was sent, after the join, raises the counts of
+/// refused moves and refused aims by exactly its own lie (an honest client causes neither); and `refused()` is the
+/// sum of every refusal.
 #[test]
 fn the_room_keeps_its_rules_whatever_arrives() {
     let mut random = Random(0x3B);
@@ -107,14 +174,19 @@ fn the_room_keeps_its_rules_whatever_arrives() {
         protocol_version: PROTOCOL_VERSION,
         content_hash: HASH,
     }));
+    let (rules, statics, spawns) = constants();
+    let held = statics
+        .bounds_cm()
+        .expect("the test map's bounds hold aims");
     let (mut bytes, mut reply, mut written) = (Vec::new(), Vec::new(), Vec::new());
     let (acks, commands) = (Vec::new(), Vec::new());
     let mut input = Input { acks, commands };
-    let (mut totals, mut pressed) = ([0u64; 13], 0u64);
+    let (mut totals, mut pressed) = ([0u64; 15], 0u64);
     for life in 0..MATCHES {
         // The first match crosses a multiple of 65,536 ticks, and the sequences start somewhere else each time.
         let (seed, start_tick) = ([3; SEED_BYTES], 65_000 + 100_000 * life);
-        let mut room = Room::new(&MatchSetup { seed, start_tick }, HASH);
+        let setup = MatchSetup { seed, start_tick };
+        let mut room = Room::new(&setup, HASH, &rules, statics.clone(), &spawns);
         // The client: its newest commands, the newest first, and what the next one continues from.
         let mut sent: Vec<Command> = Vec::new();
         let (mut sequence, mut next_tick) = ((life * 7919) as u16, start_tick);
@@ -131,16 +203,17 @@ fn the_room_keeps_its_rules_whatever_arrives() {
                         *count = count.wrapping_add(u8::from(random.chance(15)));
                     }
                     sent.truncate(REDUNDANCY_CAP - 1);
+                    let (move_x, move_y) = random.honest_move();
                     sent.insert(
                         0,
                         Command {
                             tick: next_tick,
                             sequence,
-                            move_x: random.next() as i8,
-                            move_y: random.next() as i8,
+                            move_x,
+                            move_y,
                             buttons: random.next() as u16,
                             presses,
-                            aim: AimPoint { x: 1, y: 2, z: 3 },
+                            aim: random.honest_aim(held),
                             view_time: ViewTime { tick, fraction: 0 },
                         },
                     );
@@ -153,6 +226,7 @@ fn the_room_keeps_its_rules_whatever_arrives() {
                         .acks
                         .extend(seen.map(|tick| SnapshotAck { group: 0, tick }));
                     let lied = random.below(carried as u64) as usize;
+                    let mut lie = Lie::Other;
                     match (random.below(30), &mut input.commands[lied]) {
                         (0, command) => command.sequence = random.near(sequence.into(), 20) as u16,
                         (1, command) => command.tick = random.near(command.tick, 12),
@@ -178,15 +252,41 @@ fn the_room_keeps_its_rules_whatever_arrives() {
                             }
                             sequence = sequence.wrapping_add(8);
                         }
+                        // A move longer than the wire's reach, an aim 1 cm past a face of the map, and an aim
+                        // with the least x that is not "no aim yet".
+                        (6, command) => (command.move_x, lie) = (-128, Lie::Move),
+                        (7, command) => {
+                            (command.aim, lie) = (random.aim_past_a_face(held), Lie::Aim)
+                        }
+                        (8, command) => {
+                            let malformed = AimPoint {
+                                x: i16::MIN,
+                                y: 1,
+                                z: 0,
+                            };
+                            (command.aim, lie) = (malformed, Lie::Aim);
+                        }
                         _ => {}
                     }
-                    if encode_input(&input, &mut bytes).is_err() {
+                    let mut intact = encode_input(&input, &mut bytes).is_ok();
+                    if !intact {
                         random.fill(&mut bytes, KIND_INPUT);
                     }
                     if random.chance(20) {
                         random.change(&mut bytes);
+                        intact = false;
                     }
+                    let counters = *room.counters();
                     room.on_datagram(&bytes);
+                    if intact && counters.joins > 0 {
+                        let now = room.counters();
+                        let refused = (
+                            now.refused_move - counters.refused_move,
+                            now.refused_aim - counters.refused_aim,
+                        );
+                        let lied = (u32::from(lie == Lie::Move), u32::from(lie == Lie::Aim));
+                        assert_eq!(refused, lied, "match {life}, call {call}");
+                    }
                 }
                 0..=42 => {
                     random.fill(&mut bytes, KIND_INPUT);
@@ -239,6 +339,20 @@ fn the_room_keeps_its_rules_whatever_arrives() {
             }
         }
         let counters = room.counters();
+        let refusals = [
+            counters.decode_errors,
+            counters.refused_ack,
+            counters.refused_ahead,
+            counters.refused_not_newer,
+            counters.refused_presses,
+            counters.refused_move,
+            counters.refused_aim,
+        ];
+        assert_eq!(
+            counters.refused(),
+            refusals.iter().sum::<u32>(),
+            "match {life}"
+        );
         let counted = [
             counters.commands_run,
             counters.late,
@@ -251,6 +365,8 @@ fn the_room_keeps_its_rules_whatever_arrives() {
             counters.refused_ahead,
             counters.refused_not_newer,
             counters.refused_presses,
+            counters.refused_move,
+            counters.refused_aim,
             counters.duplicates,
             counters.stale,
         ];

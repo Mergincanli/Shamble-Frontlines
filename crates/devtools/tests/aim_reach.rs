@@ -42,7 +42,8 @@ fn the_reach_is_what_the_aim_points_fields_hold() {
         (i32::from(high.x), i32::from(high.y), i32::from(high.z)),
         (AIM_REACH_CM, AIM_HEIGHT_MAX_CM, AIM_REACH_CM)
     );
-    // One centimetre past the reach does not fit, upward on every axis and below the floor: a wider field takes it.
+    // One centimetre past the reach does not fit, upward on every axis and below y 0 (the aim's zero; the bounds'
+    // bottom, the ground, lies at or above it): a wider field takes it.
     assert!(
         !fits(|aim| aim.x, AIM_REACH_CM + 1) && !fits(|aim| aim.z, AIM_REACH_CM + 1),
         "{WIDENED}"
@@ -58,4 +59,8 @@ fn the_reach_is_what_the_aim_points_fields_hold() {
         !fits(|aim| aim.x, -AIM_REACH_CM - 2) && !fits(|aim| aim.z, -AIM_REACH_CM - 2),
         "{WIDENED}"
     );
+    // That one centimetre is "no aim in this command" (netcode-architect's block 8.3): its x lies one past the reach,
+    // so no map's bounds can hold it.
+    assert_eq!(i32::from(AimPoint::NONE.x), -(AIM_REACH_CM + 1));
+    assert_eq!((AimPoint::NONE.y, AimPoint::NONE.z), (0, 0));
 }

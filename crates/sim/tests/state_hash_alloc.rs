@@ -14,7 +14,10 @@ use std::cell::Cell;
 use std::hint::black_box;
 
 use content::map::{Bounds, Form, MapDocument, Shape};
+use sim::aim::AimCm;
 use sim::collision::{MAX_TREE_DEPTH, StaticWorld};
+use sim::rules::Rules;
+use sim::soldiers::spawn_points;
 use sim::vec::V3;
 use sim::{BUTTONS, MatchSetup, PlayerCommand, SEED_BYTES, World};
 
@@ -67,10 +70,17 @@ static ALLOCATOR: Counting = Counting;
 
 #[test]
 fn the_state_hashes_take_no_memory() {
-    let mut world = World::new(&MatchSetup {
+    // A match on the test bundle: his soldier in slot 0, so the hash reads a row that holds a soldier and 47 that
+    // hold none.
+    let set =
+        content::load(content::bundle::test_bundle().as_bytes()).expect("the test bundle loads");
+    let rules = Rules::take(&set.movements()[0]).expect("its movement table plays");
+    let spawns = spawn_points(set.map("test-scene").expect("its map"));
+    let setup = MatchSetup {
         seed: [7; SEED_BYTES],
         start_tick: 0,
-    });
+    };
+    let mut world = World::new(&setup, &rules, &spawns);
 
     // The control: the counter sees an allocation when there is one.
     let before = taken();
@@ -87,13 +97,22 @@ fn the_state_hashes_take_no_memory() {
     let first = world.state_hash();
     assert_eq!(taken() - before, 0, "the first call took memory");
 
-    // Ten minutes of ticks at 30 a second, each stepped with a command and hashed twice: not one more.
+    // Ten minutes of ticks at 30 a second, each stepped with a command (its move and its aim into his row) and hashed
+    // twice: not one more.
     let before = taken();
     let mut last = first;
     for tick in 0..18_000_u16 {
+        let [low, _] = tick.to_le_bytes();
         world.authority_step(&[PlayerCommand {
             buttons: tick,
-            presses: [tick.to_le_bytes()[0]; BUTTONS],
+            presses: [low; BUTTONS],
+            move_x: low as i8 / 2,
+            move_y: 50,
+            aim: AimCm {
+                x: i16::from(low),
+                y: tick,
+                z: -7,
+            },
         }]);
         black_box(world.shared_hash());
         last = black_box(world.state_hash());

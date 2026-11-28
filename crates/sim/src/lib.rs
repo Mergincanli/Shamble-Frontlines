@@ -1,7 +1,7 @@
 //! The simulation: state, phases, tick and the navigation runtime (ADR 0002 part 3; ADR 0004). It depends on
-//! `content` and on the collision library only, with no transport, no async runtime and no clock. So far it holds the world (a tick counter, the
-//! one player's applied command and the match seed), its step, its state hash and the generator of its random
-//! streams (foundation step 2.5).
+//! `content`, on the collision library and on the pinned maths routines only, with no transport, no async runtime and
+//! no clock. So far it holds the world (a tick counter, the one player's record, the soldier table and the match
+//! seed), its step, its state hash, the match's movement rules and the generator of its random streams.
 
 // The simulation's native build runs on the instructions every x86-64 processor has. With the fused multiply-add or
 // the wide vector set switched on for a whole build, code in the collision library's tree would compile to other
@@ -28,8 +28,10 @@ pub mod vec;
 pub mod world;
 
 pub use rng::ChaCha8;
+pub use soldiers::SpawnPoint;
 pub use world::{
-    BUTTONS, MatchSetup, PlayerCommand, SEED_BYTES, SHARED_STATE_BYTES, StateSink, TICK_HZ, World,
+    BUTTONS, MOVE_REACH, MatchSetup, PLAYER_SLOT, PLAYER_TEAM, PlayerCommand, PlayerRecord,
+    SEED_BYTES, SHARED_STATE_BYTES, StateSink, TICK_HZ, World, move_in_reach,
 };
 
 #[cfg(test)]

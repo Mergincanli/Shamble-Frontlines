@@ -15,6 +15,8 @@ use std::cell::Cell;
 
 use client_endpoint::post::Post;
 use sim::collision::StaticWorld;
+use sim::rules::Rules;
+use sim::soldiers::spawn_points;
 use sim::{BUTTONS, MatchSetup, SEED_BYTES};
 use sim_wasm::local_match::{LocalMatch, loopback};
 
@@ -77,13 +79,24 @@ fn a_tick_of_the_local_match_takes_no_memory_once_the_match_is_warm() {
         seed,
         start_tick: 0,
     };
-    // The match is made on the content crate's test map, as a local match always holds its map's static world.
+    // The match is made on the content crate's test bundle, as a local match is always made on its content: the
+    // map's static world (the room keeps it and checks each command's aim against its bounds), the movement
+    // document's rules and the map's spawn table (his soldier stands at the first spawn).
     let bundle = content::bundle::test_bundle();
     let set = content::load(bundle.as_bytes()).expect("the test bundle loads");
-    let world =
-        StaticWorld::build(set.map("test-scene").expect("the test map")).expect("it builds");
-    let mut local =
-        LocalMatch::new(&setup, 0, 0, loopback(), world).expect("no padding is allowed");
+    let map = set.map("test-scene").expect("the test map");
+    let statics = StaticWorld::build(map).expect("it builds");
+    let rules = Rules::take(&set.movements()[0]).expect("its movement table plays");
+    let mut local = LocalMatch::new(
+        &setup,
+        0,
+        0,
+        loopback(),
+        &rules,
+        statics,
+        &spawn_points(map),
+    )
+    .expect("no padding is allowed");
     let mut presses = [0u8; BUTTONS];
     let mut step = |local: &mut LocalMatch, number: u32| {
         // A press every tick, round the buttons, and every bit pattern of the held buttons in turn.

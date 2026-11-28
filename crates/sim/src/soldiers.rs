@@ -145,6 +145,26 @@ impl<const N: usize> Soldiers<N> {
             .filter(|row| holds(row, id))
     }
 
+    /// The soldier in `slot`, to change, or none (an empty slot, or one past the table): the one player's fold reaches
+    /// his row by his slot.
+    pub fn occupied_mut(&mut self, slot: u16) -> Option<&mut Soldier> {
+        self.slots
+            .get_mut(usize::from(slot))
+            .filter(|row| row.flags & OCCUPIED != 0)
+    }
+
+    /// Every row in slot order, an empty one too: the rows the shared state holds.
+    #[must_use]
+    pub const fn rows(&self) -> &[Soldier; N] {
+        &self.slots
+    }
+
+    /// A table of these rows, as a restore from the shared bytes rebuilds one (world.rs's restore test, T-F).
+    #[cfg(test)]
+    pub(crate) const fn from_rows(slots: [Soldier; N]) -> Self {
+        Self { slots }
+    }
+
     /// The soldiers there are, in slot order, each with his id.
     pub fn iter(&self) -> impl Iterator<Item = (SoldierId, &Soldier)> {
         self.slots

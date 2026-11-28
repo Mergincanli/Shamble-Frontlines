@@ -114,7 +114,8 @@ pub struct Command {
     pub tick: u32,
     /// Moves forward only and wraps. Provisional: its width (the drafts say 16 bits or narrower).
     pub sequence: u16,
-    /// The move vector's x; the vector's length is at most 1. Provisional: its scale and width.
+    /// The move vector's x; the vector's length is at most 1, and a room refuses a longer one. Provisional: its scale
+    /// and width.
     pub move_x: i8,
     /// The move vector's y. Provisional: its scale and width.
     pub move_y: i8,
@@ -132,6 +133,8 @@ pub struct Command {
 /// The world point the player aims at (ADR 0001 part 5: "at most 80 bits"). Provisional as a whole: the step of
 /// 1 cm and the widths are borrowed from the snapshot encoding of entity positions (part 6, E3); the codec sets them
 /// under PM-0001-51. The encoder clamps to the map: E3's height is 12 bits (0 to 40.95 m), and `y` here holds more.
+/// x -32,768 with y 0 and z 0 means "no aim in this command" ([`AimPoint::NONE`]): a room takes it without asking the
+/// map's bounds, and refuses any other aim outside them.
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[cfg_attr(test, derive(ts_rs::TS))]
 pub struct AimPoint {
@@ -141,6 +144,15 @@ pub struct AimPoint {
     pub y: u16,
     /// In centimetres. Provisional, as the type says.
     pub z: i16,
+}
+
+impl AimPoint {
+    /// No aim in this command: x is its type's least, outside every map's bounds, so no real aim is ever this point.
+    pub const NONE: Self = Self {
+        x: i16::MIN,
+        y: 0,
+        z: 0,
+    };
 }
 
 /// The time the player's view showed: the interpolation tick plus a fraction of a tick.
