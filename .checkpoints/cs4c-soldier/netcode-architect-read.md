@@ -815,6 +815,27 @@ Each older line also carries a "SUPERSEDED by block 7" mark in place; line numbe
 
 DONE (block 7)
 
+## Block 8. engine-architect's NA1 to NA3 (its read, 5.8 :746-755, with G-2 at 5.1 :613 and the GROUND rule at 5.2)
+Asked 2026-11-28 on head 3ab59bd7 by the main session. Read only; this block is my only write.
+
+### 8.0 Plan
+1. Read engine-architect-read block 5 (:596-756) and its N27 to N41 (:580-594); recheck the wire's aim
+   (protocol messages.rs:110-144, codec.rs:205-232), the reach test (devtools/tests/aim_reach.rs:1-60), the legacy
+   facing rule (legacy/shamble-game.js:2708-2709). A notes line per finding.
+2. NA1: the ground crossing at the floor; T3 and its plant.
+3. NA2: the held aim at spawn; `Endpoint::new`'s first aim; how "no aim yet" travels on the wire; tests and plants;
+   what it does to block 7's first-loop answer.
+4. NA3: OwnSoldier (2.1) and the recordings under FACING-SPAWN (a), and whether (c) has a reason.
+5. What block 8 supersedes, by line (marks in place), and the count. Then DONE.
+
+### 8.1 Notes (one line per finding)
+- B8-N1 (G-2 holds): my aim falls back to "the ground plane y = 0" (block 1.1 :62-64), which was the old game's floor (`groundPlane` at 0, N6). engine-architect's GROUND rule (5.2) makes the bounds' bottom the solid ground, and step S draws the ground at `bounds.min[1]` (its N28). On a map whose bounds start at h > 0, the plane at 0 puts the aim h / tan(pitch) beyond the floor point the cursor shows. No map starts above 0 today (its N27), so no recording or hash moves by the fix.
+- B8-N2 (the spawn point turns him back): the facing turns toward the held aim whenever it lies more than 2 cm away horizontally (legacy/shamble-game.js:2708-2709, `fd.lengthSq()>0.0004`, the rule the plan keeps). A held aim at the spawn point holds his facing only while he stands within 2 cm of it; once he walks off, he turns to face his own spawn point and walks on facing backwards. So the spawn point in whole centimetres (engine-architect's N41 and 5.6) is no good held aim.
+- B8-N3 (the origin is worse): `Endpoint::new`'s first aim (block 7.3 (2): (0, 0, 0) clamped into the bounds), which the zero-ray rule keeps until a ray arrives, turns every new soldier toward the map's origin on his first command, whatever FACING-SPAWN gives (its N41: the yard's spawns, which face +x, would turn toward -x). Under SIZE-4C (c) the first part posts no ray at all, and neither does first-loop, so that would be every command of theirs.
+- B8-N4 (a free value on the wire): the aim's x and z are `i16` centimetres (messages.rs:137-144), and the reach is +-32,767 on purpose, "one centimetre short of that type's own negative end (-32,768)" (map.rs:33-37); aim_reach.rs:54-60 pins that -32,768 fits the type and lies outside the reach. So x = -32,768 is the one value of the wire that no map can ever hold: a value for "no aim", with no bit or byte added. The codec takes any `i16` (codec.rs:218-226), and the room's bounds check (step 2) refuses any other aim with x -32,768, because every map's bounds lie inside the reach (map.rs:319-335). So the value has one form, and the codec needs no change.
+- B8-N5 (the fold): with several commands in one tick, "the newest's aim" would drop a real aim that sits in an older command of the same tick (a lost datagram's repeat, run late) whenever the newest carries "no aim". The tick's commands must be folded oldest first: each real aim sets the held aim, and "no aim" leaves it as it is.
+- B8-N6 (OwnSoldier's list): my 2.1 gives OwnSoldier every field of the soldier's movement state "as step 1 makes it", the facing included. Block 7's `held_move` and `aim_cm` are row fields too, so they join it (8 bytes) whatever FACING-SPAWN gives. Under (a) the facing is the row's `[f32; 2]` from the first tick (its 5.3), already carried and already checked for finiteness by my S1.
+- B8-N7 (what the recordings cover): the test scene's eight spawns all face 90 (its N34), and the local match has one slot. So under (a) with whole quarter turns taken out first (its RR3), the recordings run only the quarter-turn path; `sincos`'s general path runs in no recording. Its identity across targets rests on PM-0004-22's vectors (its 5.3: at least 10,000 inputs, natively, in Node and in each browser engine).
 ## For the sheet: overlaps and readings not yet listed (flagged, not resolved)
 1. The post's shape: 13 numbers with the move packed in one word (the plan, the recording's format) against
    engine-architect's design 3.6 (14: `move_x, move_z` as two numbers). I recommend 13 (block 1.1).
