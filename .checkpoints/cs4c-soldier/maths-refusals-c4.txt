@@ -1,0 +1,30 @@
+the release twin: /home/user/Shamble-Frontlines/.gate/cs4b-2/target/wasm32-unknown-unknown/release/sim_wasm.wasm, 318021 bytes, sha256 e03a8eb9739f73684aaddc922336fc50e84262b430c79475d1995c0f9d23d1d1, modified 2026-11-28T17:56:59.213Z
+  4 refusals with the loader's two entries only
+  0 refusals with the whole list
+the dev-profile twin: /home/user/Shamble-Frontlines/.gate/cs4b-2/target/wasm32-unknown-unknown/debug/sim_wasm.wasm, 19609563 bytes, sha256 88ee195280e64f64b399fedae81a57b59eb5aed239edcced995d0ea7bf2ea703, modified 2026-11-28T17:57:01.497Z
+  29 refusals with the loader's two entries only
+  0 refusals with the whole list
+21 unique paths:
+  libm::math::exp::exp  (the release twin, the dev-profile twin; 2 names)
+  libm::math::floor::floor  (the dev-profile twin; 1 names)
+  libm::math::generic::floor::floor  (the dev-profile twin; 1 names)
+  libm::math::generic::floor::floor_status  (the dev-profile twin; 1 names)
+  libm::math::generic::scalbn::scalbn  (the dev-profile twin; 1 names)
+  libm::math::get_high_word  (the dev-profile twin; 1 names)
+  libm::math::k_cos::k_cos  (the dev-profile twin; 1 names)
+  libm::math::k_sin::k_sin  (the dev-profile twin; 1 names)
+  libm::math::rem_pio2::rem_pio2  (the release twin, the dev-profile twin; 2 names)
+  libm::math::rem_pio2::rem_pio2::medium  (the dev-profile twin; 1 names)
+  libm::math::rem_pio2_large::rem_pio2_large  (the release twin, the dev-profile twin; 2 names)
+  libm::math::rem_pio2_large::rem_pio2_large::floor  (the dev-profile twin; 1 names)
+  libm::math::scalbn::scalbn  (the dev-profile twin; 1 names)
+  libm::math::sincos::sincos  (the release twin, the dev-profile twin; 2 names)
+  libm::math::support::env  (the dev-profile twin; 2 names)
+  libm::math::support::float_traits  (the dev-profile twin; 3 names)
+  libm::math::support::float_traits::Float::ex  (the dev-profile twin; 1 names)
+  libm::math::support::float_traits::Float::exp_unbiased  (the dev-profile twin; 1 names)
+  libm::math::support::float_traits::Float::from_parts  (the dev-profile twin; 1 names)
+  libm::math::support::float_traits::Float::is_sign_positive  (the dev-profile twin; 1 names)
+  libm::math::support::int_traits  (the dev-profile twin; 6 names)
+the list's 21 against the refused paths: 0 listed but not refused [], 0 refused but not listed []
+outside libm::math (compiler_builtins or C names): []

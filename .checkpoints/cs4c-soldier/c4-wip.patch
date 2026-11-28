@@ -4702,7 +4702,7 @@ index 3f485643..41e0c6e8 100644
          let mut other = small("a");
          other.steps[2].held = 3;
 diff --git a/crates/devtools/tests/aim_reach.rs b/crates/devtools/tests/aim_reach.rs
-index 9eed1322..873f585d 100644
+index 9eed1322..4357fef3 100644
 --- a/crates/devtools/tests/aim_reach.rs
 +++ b/crates/devtools/tests/aim_reach.rs
 @@ -42,7 +42,8 @@ fn the_reach_is_what_the_aim_points_fields_hold() {
@@ -4715,8 +4715,54 @@ index 9eed1322..873f585d 100644
      assert!(
          !fits(|aim| aim.x, AIM_REACH_CM + 1) && !fits(|aim| aim.z, AIM_REACH_CM + 1),
          "{WIDENED}"
+@@ -58,4 +59,8 @@ fn the_reach_is_what_the_aim_points_fields_hold() {
+         !fits(|aim| aim.x, -AIM_REACH_CM - 2) && !fits(|aim| aim.z, -AIM_REACH_CM - 2),
+         "{WIDENED}"
+     );
++    // That one centimetre is "no aim in this command" (netcode-architect's block 8.3): its x lies one past the reach,
++    // so no map's bounds can hold it.
++    assert_eq!(i32::from(AimPoint::NONE.x), -(AIM_REACH_CM + 1));
++    assert_eq!((AimPoint::NONE.y, AimPoint::NONE.z), (0, 0));
+ }
+diff --git a/crates/devtools/tests/content_files.rs b/crates/devtools/tests/content_files.rs
+index 19f7cba9..ec21e443 100644
+--- a/crates/devtools/tests/content_files.rs
++++ b/crates/devtools/tests/content_files.rs
+@@ -469,3 +469,32 @@ fn five_of_his_values_reach_the_loader_by_a_second_route() {
+         );
+     }
+ }
++
++/// The three bundles a match is made on today each make a match on their one movement document (B5 (c),
++/// rust-reviewer's row 33): the content crate's test bundle, the repository's own `content/`, and the first
++/// recording's frozen bundle. His soldier stands in slot 0 with that document's full stamina.
++#[test]
++fn the_three_bundles_of_today_each_make_a_match_on_their_one_movement_document() {
++    let files = walk(&repository().join("content")).unwrap_or_else(|why| panic!("{why}"));
++    let ours = bundle(&files).unwrap_or_else(|why| panic!("{why}"));
++    let recordings = Path::new(env!("CARGO_MANIFEST_DIR")).join("recordings");
++    let frozen =
++        read_plain(&recordings, "first-loop.content.json").unwrap_or_else(|why| panic!("{why}"));
++    let bundles = [
++        (
++            "the test bundle",
++            content::bundle::test_bundle().into_bytes(),
++        ),
++        ("the repository's content", ours.into_bytes()),
++        ("first-loop's frozen bundle", frozen),
++    ];
++    for (name, bytes) in bundles {
++        let set = content::load(&bytes).unwrap_or_else(|why| panic!("{name}: {}", why.message()));
++        assert_eq!(set.movements().len(), 1, "{name}");
++        let rules = sim::rules::Rules::take(&set.movements()[0]).expect("its movement table plays");
++        let made = sim_wasm::Sim::create(&[7; sim::SEED_BYTES], sim_wasm::MODE_LOCAL, 0, &bytes);
++        let sim = made.unwrap_or_else(|why| panic!("{name}: {}", why.message()));
++        let row = sim.local().room().world().soldiers().rows()[usize::from(sim::PLAYER_SLOT)];
++        assert_eq!(row.stamina, rules.stamina_full, "{name}");
++    }
++}
 diff --git a/crates/devtools/tests/hash_cost.rs b/crates/devtools/tests/hash_cost.rs
-index 615f882e..1235d495 100644
+index 615f882e..6375732f 100644
 --- a/crates/devtools/tests/hash_cost.rs
 +++ b/crates/devtools/tests/hash_cost.rs
 @@ -1,12 +1,15 @@
@@ -4739,12 +4785,17 @@ index 615f882e..1235d495 100644
  
  /// The mean and the 99th percentile of `rounds` timed calls, in nanoseconds.
  fn timed(rounds: usize, mut call: impl FnMut() -> u64) -> (f64, u128, u64) {
-@@ -30,17 +33,23 @@ fn the_state_hash_s_cost_per_tick_is_read_and_printed() {
+@@ -30,17 +33,28 @@ fn the_state_hash_s_cost_per_tick_is_read_and_printed() {
          "release"
      };
      println!("\nstate hash cost, native, {profile} build (a reading):");
 -    for length in [22usize, 54, 4_096, 16_384] {
-+    for length in [SHARED_STATE_BYTES, SHARED_STATE_BYTES + SEED_BYTES, 4_096, 16_384] {
++    for length in [
++        SHARED_STATE_BYTES,
++        SHARED_STATE_BYTES + SEED_BYTES,
++        4_096,
++        16_384,
++    ] {
          let bytes: Vec<u8> = (0..length).map(|at| (at * 31 % 251) as u8).collect();
          let digest = fnv1a_64(&bytes);
          let (mean, p99, _) = timed(20_000, || fnv1a_64(std::hint::black_box(&bytes)));
@@ -4753,8 +4804,8 @@ index 615f882e..1235d495 100644
      }
 -    let mut world = World::new(&MatchSetup {
 +    // Today's world: a match on the test bundle, his soldier in slot 0.
-+    let set = content::load(content::bundle::test_bundle().as_bytes())
-+        .expect("the test bundle loads");
++    let set =
++        content::load(content::bundle::test_bundle().as_bytes()).expect("the test bundle loads");
 +    let rules = Rules::take(&set.movements()[0]).expect("its movement table plays");
 +    let spawns = spawn_points(set.map("test-scene").expect("its map"));
 +    let setup = MatchSetup {
@@ -4806,16 +4857,15 @@ index 85437349..7c20a8e2 100644
  #[derive(Debug, Clone, PartialEq, Eq)]
  #[cfg_attr(test, derive(ts_rs::TS))]
 diff --git a/crates/room/src/lib.rs b/crates/room/src/lib.rs
-index 6f2634ae..e5617087 100644
+index 6f2634ae..391182c9 100644
 --- a/crates/room/src/lib.rs
 +++ b/crates/room/src/lib.rs
-@@ -19,13 +19,26 @@ pub mod queue;
+@@ -19,13 +19,25 @@ pub mod queue;
  
  use protocol::codec::{Control, decode_control, decode_input, encode_control, encode_snapshot};
  use protocol::messages::{
 -    Input, JoinAccepted, JoinRejected, OwnState, PROTOCOL_VERSION, RejectReason, Snapshot,
-+    AimPoint, Input, JoinAccepted, JoinRejected, OwnState, PROTOCOL_VERSION, RejectReason,
-+    Snapshot,
++    AimPoint, Input, JoinAccepted, JoinRejected, OwnState, PROTOCOL_VERSION, RejectReason, Snapshot,
  };
  use protocol::wrap::{press_edges, seq_ahead, seq_newer, ticks_after};
  use queue::{CommandQueue, Inserted, Queued};
@@ -4838,14 +4888,15 @@ index 6f2634ae..e5617087 100644
  
  /// The tick rate as the join answer carries it.
  const TICK_RATE: u8 = {
-@@ -33,6 +46,12 @@ const TICK_RATE: u8 = {
+@@ -33,6 +45,13 @@ const TICK_RATE: u8 = {
      TICK_HZ as u8
  };
  
-+/// The one player's slot as the join answer carries it: the world's own (`sim::PLAYER_SLOT`).
++/// The one player's slot as the join answer carries it: the world's own (`sim::PLAYER_SLOT`), which must fit a byte.
 +const JOIN_SLOT: u8 = {
-+    assert!(PLAYER_SLOT <= 255);
-+    PLAYER_SLOT as u8
++    let [low, high] = PLAYER_SLOT.to_le_bytes();
++    assert!(high == 0, "the join answer carries a slot in one byte");
++    low
 +};
 +
  /// How far ahead of the tick being run a command's tick may lie; one further ahead is dropped.
@@ -5089,7 +5140,7 @@ index 6f2634ae..e5617087 100644
          assert!(matches!(
              answer(&mut room, &join(PROTOCOL_VERSION, HASH)),
              Some(Control::JoinAccepted(_))
-@@ -342,6 +455,17 @@ mod tests {
+@@ -342,6 +455,23 @@ mod tests {
          room
      }
  
@@ -5101,13 +5152,19 @@ index 6f2634ae..e5617087 100644
 +    /// A room on this map at tick 0 with its player joined.
 +    fn joined_on(map: &MapDocument) -> Room {
 +        let seed = [7; sim::SEED_BYTES];
-+        with_player(room_on(&MatchSetup { seed, start_tick: 0 }, map))
++        with_player(room_on(
++            &MatchSetup {
++                seed,
++                start_tick: 0,
++            },
++            map,
++        ))
 +    }
 +
      /// A command whose buttons are its sequence and whose every press counter is `presses`.
      fn command(sequence: u16, tick: u32, presses: u8) -> Command {
          Command {
-@@ -647,12 +771,13 @@ mod tests {
+@@ -647,12 +777,13 @@ mod tests {
      #[test]
      fn the_shared_hash_is_the_world_s_and_covers_no_seed_byte() {
          let seeds = [[0x5A; sim::SEED_BYTES], [0xA5; sim::SEED_BYTES]];
@@ -5122,7 +5179,7 @@ index 6f2634ae..e5617087 100644
          });
          let mut snapshot = Vec::new();
          for _ in 0..40 {
-@@ -666,4 +791,215 @@ mod tests {
+@@ -666,4 +797,228 @@ mod tests {
          }
          assert_eq!(a.world().tick(), 43);
      }
@@ -5250,9 +5307,15 @@ index 6f2634ae..e5617087 100644
 +        };
 +        let occupied = |soldier: &Soldier| soldier.flags & OCCUPIED != 0;
 +        let rows = room.world().soldiers().rows();
-+        assert_eq!(rows.iter().position(occupied), Some(usize::from(accepted.slot)));
++        assert_eq!(
++            rows.iter().position(occupied),
++            Some(usize::from(accepted.slot))
++        );
 +        assert_eq!(rows.iter().filter(|soldier| occupied(soldier)).count(), 1);
-+        assert_eq!((u16::from(accepted.slot), accepted.team), (PLAYER_SLOT, PLAYER_TEAM));
++        assert_eq!(
++            (u16::from(accepted.slot), accepted.team),
++            (PLAYER_SLOT, PLAYER_TEAM)
++        );
 +        for at in 0..30u16 {
 +            let tick = 11 + u32::from(at);
 +            let sent = wishing(command(at, tick, 0), 127, 0, AimPoint::NONE);
@@ -5292,7 +5355,11 @@ index 6f2634ae..e5617087 100644
 +                34 => 2,
 +                _ => 1,
 +            };
-+            assert_eq!((room.handed, ran as usize), (expected, expected), "tick {tick}");
++            assert_eq!(
++                (room.handed, ran as usize),
++                (expected, expected),
++                "tick {tick}"
++            );
 +            assert_eq!(row(&room).held_move, [127, 0], "tick {tick}");
 +        }
 +        // Tick 35 runs the two left, 33 and then 34: the newest's move is the row's.
@@ -5300,7 +5367,10 @@ index 6f2634ae..e5617087 100644
 +        assert_eq!(room.handed, 2);
 +        assert_eq!(row(&room).held_move, [-127, 0]);
 +        let counters = *room.counters();
-+        assert_eq!((counters.late, counters.missing, counters.refused()), (4, 0, 0));
++        assert_eq!(
++            (counters.late, counters.missing, counters.refused()),
++            (4, 0, 0)
++        );
 +        assert_eq!(counters.commands_run, 34);
 +    }
 +
@@ -5351,7 +5421,7 @@ index e5055b5b..a0d31f0b 100644
          Queued {
              sequence,
 diff --git a/crates/room/tests/any_bytes.rs b/crates/room/tests/any_bytes.rs
-index 756ffd89..3c006e52 100644
+index 756ffd89..69601de1 100644
 --- a/crates/room/tests/any_bytes.rs
 +++ b/crates/room/tests/any_bytes.rs
 @@ -1,8 +1,8 @@
@@ -5428,13 +5498,14 @@ index 756ffd89..3c006e52 100644
  }
  
  fn control_bytes(control: &Control) -> Vec<u8> {
-@@ -93,12 +140,31 @@ fn control_bytes(control: &Control) -> Vec<u8> {
+@@ -93,12 +140,32 @@ fn control_bytes(control: &Control) -> Vec<u8> {
      bytes
  }
  
 +/// The test bundle's rules, static world and spawn table, built once for every match of the run.
 +fn constants() -> (Rules, StaticWorld, Vec<SpawnPoint>) {
-+    let set = content::load(content::bundle::test_bundle().as_bytes()).expect("the test bundle loads");
++    let set =
++        content::load(content::bundle::test_bundle().as_bytes()).expect("the test bundle loads");
 +    let map = set.map("test-scene").expect("its map");
 +    let rules = Rules::take(&set.movements()[0]).expect("its movement table plays");
 +    let statics = StaticWorld::build(map).expect("it builds");
@@ -5462,12 +5533,14 @@ index 756ffd89..3c006e52 100644
  #[test]
  fn the_room_keeps_its_rules_whatever_arrives() {
      let mut random = Random(0x3B);
-@@ -107,14 +173,17 @@ fn the_room_keeps_its_rules_whatever_arrives() {
+@@ -107,14 +174,19 @@ fn the_room_keeps_its_rules_whatever_arrives() {
          protocol_version: PROTOCOL_VERSION,
          content_hash: HASH,
      }));
 +    let (rules, statics, spawns) = constants();
-+    let held = statics.bounds_cm().expect("the test map's bounds hold aims");
++    let held = statics
++        .bounds_cm()
++        .expect("the test map's bounds hold aims");
      let (mut bytes, mut reply, mut written) = (Vec::new(), Vec::new(), Vec::new());
      let (acks, commands) = (Vec::new(), Vec::new());
      let mut input = Input { acks, commands };
@@ -5482,7 +5555,7 @@ index 756ffd89..3c006e52 100644
          // The client: its newest commands, the newest first, and what the next one continues from.
          let mut sent: Vec<Command> = Vec::new();
          let (mut sequence, mut next_tick) = ((life * 7919) as u16, start_tick);
-@@ -131,16 +200,17 @@ fn the_room_keeps_its_rules_whatever_arrives() {
+@@ -131,16 +203,17 @@ fn the_room_keeps_its_rules_whatever_arrives() {
                          *count = count.wrapping_add(u8::from(random.chance(15)));
                      }
                      sent.truncate(REDUNDANCY_CAP - 1);
@@ -5503,7 +5576,7 @@ index 756ffd89..3c006e52 100644
                              view_time: ViewTime { tick, fraction: 0 },
                          },
                      );
-@@ -153,6 +223,7 @@ fn the_room_keeps_its_rules_whatever_arrives() {
+@@ -153,6 +226,7 @@ fn the_room_keeps_its_rules_whatever_arrives() {
                          .acks
                          .extend(seen.map(|tick| SnapshotAck { group: 0, tick }));
                      let lied = random.below(carried as u64) as usize;
@@ -5511,14 +5584,16 @@ index 756ffd89..3c006e52 100644
                      match (random.below(30), &mut input.commands[lied]) {
                          (0, command) => command.sequence = random.near(sequence.into(), 20) as u16,
                          (1, command) => command.tick = random.near(command.tick, 12),
-@@ -178,15 +249,39 @@ fn the_room_keeps_its_rules_whatever_arrives() {
+@@ -178,15 +252,41 @@ fn the_room_keeps_its_rules_whatever_arrives() {
                              }
                              sequence = sequence.wrapping_add(8);
                          }
 +                        // A move longer than the wire's reach, an aim 1 cm past a face of the map, and an aim
 +                        // with the least x that is not "no aim yet".
 +                        (6, command) => (command.move_x, lie) = (-128, Lie::Move),
-+                        (7, command) => (command.aim, lie) = (random.aim_past_a_face(held), Lie::Aim),
++                        (7, command) => {
++                            (command.aim, lie) = (random.aim_past_a_face(held), Lie::Aim)
++                        }
 +                        (8, command) => {
 +                            let malformed = AimPoint {
 +                                x: i16::MIN,
@@ -5552,7 +5627,7 @@ index 756ffd89..3c006e52 100644
                  }
                  0..=42 => {
                      random.fill(&mut bytes, KIND_INPUT);
-@@ -239,6 +334,16 @@ fn the_room_keeps_its_rules_whatever_arrives() {
+@@ -239,6 +339,20 @@ fn the_room_keeps_its_rules_whatever_arrives() {
              }
          }
          let counters = room.counters();
@@ -5565,11 +5640,15 @@ index 756ffd89..3c006e52 100644
 +            counters.refused_move,
 +            counters.refused_aim,
 +        ];
-+        assert_eq!(counters.refused(), refusals.iter().sum::<u32>(), "match {life}");
++        assert_eq!(
++            counters.refused(),
++            refusals.iter().sum::<u32>(),
++            "match {life}"
++        );
          let counted = [
              counters.commands_run,
              counters.late,
-@@ -251,6 +356,8 @@ fn the_room_keeps_its_rules_whatever_arrives() {
+@@ -251,6 +365,8 @@ fn the_room_keeps_its_rules_whatever_arrives() {
              counters.refused_ahead,
              counters.refused_not_newer,
              counters.refused_presses,
@@ -5579,7 +5658,7 @@ index 756ffd89..3c006e52 100644
              counters.stale,
          ];
 diff --git a/crates/sim-wasm/src/lib.rs b/crates/sim-wasm/src/lib.rs
-index 4a289e86..f994d82b 100644
+index 4a289e86..dda558d7 100644
 --- a/crates/sim-wasm/src/lib.rs
 +++ b/crates/sim-wasm/src/lib.rs
 @@ -14,7 +14,9 @@ pub mod panic;
@@ -5706,7 +5785,7 @@ index 4a289e86..f994d82b 100644
          let bad = b"{}";
          let first = |seed: &[u8], mode, pad, bundle: &[u8]| {
              Sim::create(seed, mode, pad, bundle)
-@@ -390,24 +422,82 @@ mod tests {
+@@ -390,24 +422,84 @@ mod tests {
              first(&SEED, MODE_LOCAL, u32::MAX, mapless.as_bytes()),
              kind(CreateError::MapMissing)
          );
@@ -5758,7 +5837,8 @@ index 4a289e86..f994d82b 100644
 +    /// The match plays the bundle's one movement document: a bundle with none or with two is refused, saying how many
 +    /// it found; one whose document makes no rules is refused with the rules' own reason.
 +    #[test]
-+    fn a_bundle_without_exactly_one_movement_document_or_with_one_that_does_not_play_makes_no_match() {
++    fn a_bundle_without_exactly_one_movement_document_or_with_one_that_does_not_play_makes_no_match()
++     {
 +        let map = ("maps/test-scene.json", content::map::TEST_TEXT);
 +        let movement = ("movement/test-soldier.json", content::movement::TEST_TEXT);
 +        let second_text = content::movement::TEST_TEXT.replace("\"test-soldier\"", "\"second\"");
@@ -5775,7 +5855,8 @@ index 4a289e86..f994d82b 100644
 +            "the content holds 2 movement documents, and a local match plays exactly one, its soldier's"
 +        );
 +        // A jump that reaches lower than the step-up: every value inside its range, and no rules.
-+        let low = content::movement::TEST_TEXT.replace("\"jump_reach_m\": 3,", "\"jump_reach_m\": 0.25,");
++        let low =
++            content::movement::TEST_TEXT.replace("\"jump_reach_m\": 3,", "\"jump_reach_m\": 0.25,");
 +        assert_ne!(low, content::movement::TEST_TEXT);
 +        let bundle = content::bundle::write(&[map, ("movement/test-soldier.json", &low)]);
 +        let set = content::load(bundle.as_bytes()).expect("the loader takes it");
@@ -5793,7 +5874,7 @@ index 4a289e86..f994d82b 100644
  
      /// A bundle whose maps have other ids makes no match, and says which map it looked for; a map that makes no
 diff --git a/crates/sim-wasm/src/local_match.rs b/crates/sim-wasm/src/local_match.rs
-index 9862fda2..3e8f728b 100644
+index 9862fda2..3e8d02a8 100644
 --- a/crates/sim-wasm/src/local_match.rs
 +++ b/crates/sim-wasm/src/local_match.rs
 @@ -15,7 +15,8 @@ use protocol::loopback::Loopback;
@@ -5873,7 +5954,7 @@ index 9862fda2..3e8f728b 100644
      /// Messages the link did not take; wraps. They are in the block's count of refused messages.
      #[must_use]
      pub const fn unsent(&self) -> u32 {
-@@ -199,18 +193,28 @@ mod tests {
+@@ -199,19 +193,41 @@ mod tests {
      use protocol::wrap::press_edges;
      use sim::BUTTONS;
  
@@ -5893,7 +5974,11 @@ index 9862fda2..3e8f728b 100644
 +    }
 +
 +    /// A match on the test bundle over this link.
-+    fn over<P: TransportPair>(setup: &MatchSetup, pad_bytes: u32, link: P) -> Option<LocalMatch<P>> {
++    fn over<P: TransportPair>(
++        setup: &MatchSetup,
++        pad_bytes: u32,
++        link: P,
++    ) -> Option<LocalMatch<P>> {
 +        let (rules, statics, spawns) = constants();
 +        LocalMatch::new(setup, 0, pad_bytes, link, &rules, statics, &spawns)
      }
@@ -5902,12 +5987,22 @@ index 9862fda2..3e8f728b 100644
          let seed = [7; sim::SEED_BYTES];
          let setup = MatchSetup { seed, start_tick };
 -        LocalMatch::new(&setup, first_sequence, 0, loopback(), world())
+-            .expect("no padding is allowed")
 +        let (rules, statics, spawns) = constants();
-+        LocalMatch::new(&setup, first_sequence, 0, loopback(), &rules, statics, &spawns)
-             .expect("no padding is allowed")
++        LocalMatch::new(
++            &setup,
++            first_sequence,
++            0,
++            loopback(),
++            &rules,
++            statics,
++            &spawns,
++        )
++        .expect("no padding is allowed")
      }
  
-@@ -396,7 +400,7 @@ mod tests {
+     /// A post with these buttons held and button 0 pressed this many times.
+@@ -396,7 +412,7 @@ mod tests {
              start_tick: 0,
          };
          let pad = client_endpoint::block::MAX_PAD_BYTES + 1;
@@ -5916,7 +6011,7 @@ index 9862fda2..3e8f728b 100644
      }
  
      /// A link that takes nothing: nothing panics, the join never arrives, so the room has no player to send to,
-@@ -409,8 +413,7 @@ mod tests {
+@@ -409,8 +425,7 @@ mod tests {
              start_tick: 0,
          };
          // Slots of one byte: no message fits.
@@ -5927,7 +6022,7 @@ index 9862fda2..3e8f728b 100644
          for step in 0..10 {
              local.step(f64::from(step));
 diff --git a/crates/sim-wasm/tests/step_alloc.rs b/crates/sim-wasm/tests/step_alloc.rs
-index 3b6f428e..6ebbae63 100644
+index 3b6f428e..050579d3 100644
 --- a/crates/sim-wasm/tests/step_alloc.rs
 +++ b/crates/sim-wasm/tests/step_alloc.rs
 @@ -15,6 +15,8 @@ use std::cell::Cell;
@@ -5939,7 +6034,7 @@ index 3b6f428e..6ebbae63 100644
  use sim::{BUTTONS, MatchSetup, SEED_BYTES};
  use sim_wasm::local_match::{LocalMatch, loopback};
  
-@@ -77,13 +79,16 @@ fn a_tick_of_the_local_match_takes_no_memory_once_the_match_is_warm() {
+@@ -77,13 +79,24 @@ fn a_tick_of_the_local_match_takes_no_memory_once_the_match_is_warm() {
          seed,
          start_tick: 0,
      };
@@ -5956,13 +6051,21 @@ index 3b6f428e..6ebbae63 100644
 +    let map = set.map("test-scene").expect("the test map");
 +    let statics = StaticWorld::build(map).expect("it builds");
 +    let rules = Rules::take(&set.movements()[0]).expect("its movement table plays");
-+    let mut local = LocalMatch::new(&setup, 0, 0, loopback(), &rules, statics, &spawn_points(map))
-+        .expect("no padding is allowed");
++    let mut local = LocalMatch::new(
++        &setup,
++        0,
++        0,
++        loopback(),
++        &rules,
++        statics,
++        &spawn_points(map),
++    )
++    .expect("no padding is allowed");
      let mut presses = [0u8; BUTTONS];
      let mut step = |local: &mut LocalMatch, number: u32| {
          // A press every tick, round the buttons, and every bit pattern of the held buttons in turn.
 diff --git a/crates/sim/src/collision.rs b/crates/sim/src/collision.rs
-index 60197bed..084ca1f2 100644
+index 60197bed..608f2857 100644
 --- a/crates/sim/src/collision.rs
 +++ b/crates/sim/src/collision.rs
 @@ -1,6 +1,7 @@
@@ -6128,7 +6231,7 @@ index 60197bed..084ca1f2 100644
      use parry3d::query::{Ray, RayCast};
      use parry3d::shape::ConvexPolyhedron;
  
-@@ -603,6 +687,209 @@ mod tests {
+@@ -603,6 +687,227 @@ mod tests {
          );
      }
  
@@ -6159,9 +6262,13 @@ index 60197bed..084ca1f2 100644
 +    #[test]
 +    fn bounds_on_the_grid_are_their_own_count_of_whole_centimetres() {
 +        // The made-up test map as the loader reads it.
-+        let set = content::load(content::bundle::test_bundle().as_bytes()).expect("the test bundle loads");
++        let set = content::load(content::bundle::test_bundle().as_bytes())
++            .expect("the test bundle loads");
 +        let loaded = set.map("test-scene").expect("its map");
-+        assert_eq!(box_of(loaded), Some([[-5_000, 0, -5_000], [5_000, 2_000, 5_000]]));
++        assert_eq!(
++            box_of(loaded),
++            Some([[-5_000, 0, -5_000], [5_000, 2_000, 5_000]])
++        );
 +        // The test scene's bounds, the reach's own edges, and lower faces at 0.55 and -0.55: 0.55 x 100 is not 55 to
 +        // the last bit, so a plain rounding up would put the face on 56.
 +        let face = 0.55_f64;
@@ -6202,8 +6309,14 @@ index 60197bed..084ca1f2 100644
 +            assert_eq!(held, expected, "{min:?} {max:?}");
 +            for axis in 0..3 {
 +                let (low, high) = (held[0][axis], held[1][axis]);
-+                assert!(metres(low) >= min[axis] && metres(low - 1) < min[axis], "{axis}: {low}");
-+                assert!(metres(high) <= max[axis] && metres(high + 1) > max[axis], "{axis}: {high}");
++                assert!(
++                    metres(low) >= min[axis] && metres(low - 1) < min[axis],
++                    "{axis}: {low}"
++                );
++                assert!(
++                    metres(high) <= max[axis] && metres(high + 1) > max[axis],
++                    "{axis}: {high}"
++                );
 +            }
 +        }
 +    }
@@ -6229,7 +6342,9 @@ index 60197bed..084ca1f2 100644
 +            for axis in 0..3 {
 +                let (low, high) = (held[0][axis], held[1][axis]);
 +                assert!(reach[0][axis] <= low && low <= high && high <= reach[1][axis]);
-+                assert!(f64::from(low) / 100.0 >= min[axis] && f64::from(high) / 100.0 <= max[axis]);
++                assert!(
++                    f64::from(low) / 100.0 >= min[axis] && f64::from(high) / 100.0 <= max[axis]
++                );
 +            }
 +        }
 +        // Bounds wholly past the reach on one axis, or holding no whole centimetre on one, give no box, and the world
@@ -6323,8 +6438,14 @@ index 60197bed..084ca1f2 100644
 +            }
 +        }
 +        // No thickness: one face twice, the faces the wrong way round, and two doubles one `f32` apart.
-+        assert_eq!(refused([0.0, 1.0, 0.0], [1.0, 1.0, 1.0]), WorldError::Bounds);
-+        assert_eq!(refused([0.0, 0.0, 2.0], [1.0, 1.0, 1.0]), WorldError::Bounds);
++        assert_eq!(
++            refused([0.0, 1.0, 0.0], [1.0, 1.0, 1.0]),
++            WorldError::Bounds
++        );
++        assert_eq!(
++            refused([0.0, 0.0, 2.0], [1.0, 1.0, 1.0]),
++            WorldError::Bounds
++        );
 +        assert_eq!(
 +            refused([100.0, 0.0, 0.0], [100.000_000_1, 1.0, 1.0]),
 +            WorldError::Bounds
@@ -6339,7 +6460,7 @@ index 60197bed..084ca1f2 100644
      fn a_ray_meets_the_first_shape_on_its_way_and_the_lower_index_of_two_at_one_distance() {
          let built = world(yard());
 diff --git a/crates/sim/src/lib.rs b/crates/sim/src/lib.rs
-index d480ef0c..01a07b80 100644
+index d480ef0c..a65dc5c6 100644
 --- a/crates/sim/src/lib.rs
 +++ b/crates/sim/src/lib.rs
 @@ -1,7 +1,7 @@
@@ -6360,8 +6481,8 @@ index d480ef0c..01a07b80 100644
 +pub use soldiers::SpawnPoint;
  pub use world::{
 -    BUTTONS, MatchSetup, PlayerCommand, SEED_BYTES, SHARED_STATE_BYTES, StateSink, TICK_HZ, World,
-+    BUTTONS, MOVE_REACH, MatchSetup, PLAYER_SLOT, PLAYER_TEAM, PlayerCommand, PlayerRecord, SEED_BYTES,
-+    SHARED_STATE_BYTES, StateSink, TICK_HZ, World, move_in_reach,
++    BUTTONS, MOVE_REACH, MatchSetup, PLAYER_SLOT, PLAYER_TEAM, PlayerCommand, PlayerRecord,
++    SEED_BYTES, SHARED_STATE_BYTES, StateSink, TICK_HZ, World, move_in_reach,
  };
  
  #[cfg(test)]
@@ -6397,7 +6518,7 @@ index d75b4a38..a03ad1bf 100644
      pub fn iter(&self) -> impl Iterator<Item = (SoldierId, &Soldier)> {
          self.slots
 diff --git a/crates/sim/src/world.rs b/crates/sim/src/world.rs
-index 28a50a56..9231c40c 100644
+index 28a50a56..7de42cf4 100644
 --- a/crates/sim/src/world.rs
 +++ b/crates/sim/src/world.rs
 @@ -1,8 +1,12 @@
@@ -6516,7 +6637,7 @@ index 28a50a56..9231c40c 100644
      fn bytes<const N: usize>(&mut self, _: &'static str, value: &[u8; N]) {
          self.0.put(value);
      }
-@@ -108,21 +166,77 @@ impl<B: Bytes> StateSink for Canonical<'_, B> {
+@@ -108,21 +166,93 @@ impl<B: Bytes> StateSink for Canonical<'_, B> {
      }
  }
  
@@ -6546,8 +6667,24 @@ index 28a50a56..9231c40c 100644
 +    sink.u16("soldier.generation", *generation);
 +    sink.bytes("soldier.flags", &[*flags]);
 +    sink.bytes("soldier.team", &[*team]);
-+    point(sink, ["soldier.position.x", "soldier.position.y", "soldier.position.z"], position);
-+    point(sink, ["soldier.velocity.x", "soldier.velocity.y", "soldier.velocity.z"], velocity);
++    point(
++        sink,
++        [
++            "soldier.position.x",
++            "soldier.position.y",
++            "soldier.position.z",
++        ],
++        position,
++    );
++    point(
++        sink,
++        [
++            "soldier.velocity.x",
++            "soldier.velocity.y",
++            "soldier.velocity.z",
++        ],
++        velocity,
++    );
 +    sink.bytes("soldier.stamina", &u64::to_le_bytes(*stamina));
 +    sink.f32("soldier.facing.x", facing_x);
 +    sink.f32("soldier.facing.z", facing_z);
@@ -6600,7 +6737,7 @@ index 28a50a56..9231c40c 100644
              seed: setup.seed,
          }
      }
-@@ -134,21 +248,40 @@ impl World {
+@@ -134,21 +264,40 @@ impl World {
          self.tick
      }
  
@@ -6646,7 +6783,7 @@ index 28a50a56..9231c40c 100644
          }
          self.tick = self
              .tick
-@@ -166,6 +299,7 @@ impl World {
+@@ -166,6 +315,7 @@ impl World {
          let Self {
              tick: _,
              player: _,
@@ -6654,7 +6791,7 @@ index 28a50a56..9231c40c 100644
              seed,
          } = self;
          self.visit_shared(sink);
-@@ -173,18 +307,25 @@ impl World {
+@@ -173,18 +323,25 @@ impl World {
          sink.secret("seed", seed);
      }
  
@@ -6682,15 +6819,17 @@ index 28a50a56..9231c40c 100644
      }
  
      /// Writes the canonical bytes of the whole state into `out`, replacing what it held: the shared state's bytes,
-@@ -227,6 +368,7 @@ impl World {
+@@ -227,6 +384,9 @@ impl World {
  #[cfg(test)]
  mod tests {
      use super::*;
++    use crate::collision::StaticWorld;
 +    use crate::soldiers::{ALIVE, OCCUPIED, spawn_points};
++    use content::map::{Bounds, MapDocument, Spawn};
  
      /// The seed 0, 1, ..., 31.
      fn counting_seed(first: u8) -> [u8; SEED_BYTES] {
-@@ -237,14 +379,34 @@ mod tests {
+@@ -237,14 +397,35 @@ mod tests {
          seed
      }
  
@@ -6699,7 +6838,8 @@ index 28a50a56..9231c40c 100644
 +    /// The test bundle's rules and spawn table (content's made-up test texts: one spawn, "a", at (0, 0, -5) facing
 +    /// 90; 8 s of sprint and 4 s of refill).
 +    fn constants() -> (Rules, Vec<SpawnPoint>) {
-+        let set = content::load(content::bundle::test_bundle().as_bytes()).expect("the test bundle loads");
++        let set = content::load(content::bundle::test_bundle().as_bytes())
++            .expect("the test bundle loads");
 +        let rules = Rules::take(&set.movements()[0]).expect("its movement table plays");
 +        let spawns = spawn_points(set.map("test-scene").expect("its map"));
 +        (rules, spawns)
@@ -6716,27 +6856,27 @@ index 28a50a56..9231c40c 100644
 +    fn world(first: u8, start_tick: u32) -> World {
 +        let (rules, spawns) = constants();
 +        World::new(&setup(first, start_tick), &rules, &spawns)
-+    }
-+
+     }
+ 
+-    /// Buttons 0x8001 and the counters 1, 2, ..., 16.
 +    /// A match on a map with no spawn: no soldier.
 +    fn empty_world(first: u8, start_tick: u32) -> World {
 +        let (rules, _) = constants();
 +        World::new(&setup(first, start_tick), &rules, &[])
-     }
- 
--    /// Buttons 0x8001 and the counters 1, 2, ..., 16.
++    }
++
 +    /// Buttons 0x8001 and the counters 1, 2, ..., 16; no move and no aim.
      fn pressed() -> PlayerCommand {
          let mut presses = [0; BUTTONS];
          for (counter, value) in presses.iter_mut().zip(1..) {
-@@ -253,14 +415,33 @@ mod tests {
+@@ -253,14 +434,33 @@ mod tests {
          PlayerCommand {
              buttons: 0x8001,
              presses,
 +            ..PlayerCommand::NONE
-+        }
-+    }
-+
+         }
+     }
+ 
 +    /// `pressed`, holding the move (127, -3) and the aim (100, 50, -200) cm.
 +    fn moved() -> PlayerCommand {
 +        PlayerCommand {
@@ -6748,9 +6888,9 @@ index 28a50a56..9231c40c 100644
 +                z: -200,
 +            },
 +            ..pressed()
-         }
-     }
- 
++        }
++    }
++
 +    fn row(world: &World, slot: usize) -> Soldier {
 +        world.soldiers().rows()[slot]
 +    }
@@ -6764,7 +6904,7 @@ index 28a50a56..9231c40c 100644
          at_zero.authority_step(&[]);
          at_zero.authority_step(&[]);
          assert_eq!(at_zero.tick(), 2);
-@@ -276,37 +457,130 @@ mod tests {
+@@ -276,37 +476,248 @@ mod tests {
          let older = PlayerCommand {
              buttons: 2,
              presses: [9; BUTTONS],
@@ -6819,21 +6959,135 @@ index 28a50a56..9231c40c 100644
 +        let aim_a = moved().aim;
 +        world.authority_step(&[moved(), pressed()]);
 +        let soldier = row(&world, 0);
-+        assert_eq!(soldier.held_move, [0, 0], "the newest command's move is the one held");
++        assert_eq!(
++            soldier.held_move,
++            [0, 0],
++            "the newest command's move is the one held"
++        );
 +        assert_eq!(soldier.aim_cm, aim_a, "[A, NONE] keeps A");
 +        world.authority_step(&[pressed()]);
-+        assert_eq!(row(&world, 0).aim_cm, aim_a, "[NONE] alone keeps the earlier aim");
++        assert_eq!(
++            row(&world, 0).aim_cm,
++            aim_a,
++            "[NONE] alone keeps the earlier aim"
++        );
 +        world.authority_step(&[moved()]);
 +        world.authority_step(&[]);
 +        let soldier = row(&world, 0);
-+        assert_eq!((soldier.held_move, soldier.aim_cm), ([127, -3], aim_a), "no command keeps them");
++        assert_eq!(
++            (soldier.held_move, soldier.aim_cm),
++            ([127, -3], aim_a),
++            "no command keeps them"
++        );
 +        let other = AimCm { x: -7, y: 0, z: 9 };
-+        world.authority_step(&[PlayerCommand { aim: other, ..moved() }]);
++        world.authority_step(&[PlayerCommand {
++            aim: other,
++            ..moved()
++        }]);
 +        assert_eq!(row(&world, 0).aim_cm, other);
 +    }
 +
 +    /// W-4: a map with no spawn makes no soldier; 30 commands with a move and a real aim still give the record, and
 +    /// every row stays empty (the fold touches no row of an empty slot), with no panic.
++    /// W-2's standing half (netcode-architect's 9.2): on a map built in code whose spawns are listed "c", "a", "b", his
++    /// soldier stands at "a"; with "street_2" and "street_10", at "street_10": the ids are ranked by their bytes, not
++    /// as numbers and not in the file's order.
++    #[test]
++    fn his_soldier_stands_at_the_first_spawn_by_id_whatever_the_file_s_order() {
++        let (rules, _) = constants();
++        let spawn = |id: &str, x: f64| Spawn {
++            id: id.to_owned(),
++            at: [x, 0.0, 1.0],
++            facing_deg: 180.0,
++        };
++        let map = |spawns| MapDocument {
++            id: "made".to_owned(),
++            bounds: Bounds {
++                min: [-10.0, 0.0, -10.0],
++                max: [10.0, 5.0, 10.0],
++            },
++            spawns,
++            shapes: Vec::new(),
++            regions: Vec::new(),
++        };
++        let listed = [
++            (
++                vec![spawn("c", 3.0), spawn("a", 1.0), spawn("b", 2.0)],
++                1.0_f32,
++            ),
++            (vec![spawn("street_2", 2.0), spawn("street_10", 10.0)], 10.0),
++        ];
++        for (spawns, x) in listed {
++            let world = World::new(&setup(0, 0), &rules, &spawn_points(&map(spawns)));
++            let his = row(&world, usize::from(PLAYER_SLOT));
++            assert_eq!(his.position.to_array(), [x, 0.0, 1.0]);
++            assert_eq!(his.facing, [0.0, -1.0]);
++            assert_eq!(world.soldiers().iter().count(), 1);
++        }
++    }
++
++    /// T-B (rust-reviewer's row 28): one bundle loaded and built twice gives the same match. The two loads' rules,
++    /// spawn tables and static worlds are equal (the worlds by their tree's bytes and their bounds), and two worlds
++    /// started from them and stepped with the same 300 commands give the same hashes at every tick.
++    #[test]
++    fn one_bundle_loaded_and_built_twice_gives_the_same_match() {
++        let build = || {
++            let set = content::load(content::bundle::test_bundle().as_bytes())
++                .expect("the test bundle loads");
++            let map = set.map("test-scene").expect("its map");
++            let rules = Rules::take(&set.movements()[0]).expect("its movement table plays");
++            let statics = StaticWorld::build(map).expect("the map builds");
++            (rules, spawn_points(map), statics)
++        };
++        let ((rules_a, spawns_a, statics_a), (rules_b, spawns_b, statics_b)) = (build(), build());
++        assert_eq!(rules_a, rules_b);
++        assert_eq!(format!("{rules_a:?}"), format!("{rules_b:?}"));
++        assert_eq!(spawns_a, spawns_b);
++        let bits = |spawns: &[SpawnPoint]| {
++            let point = |spawn: &SpawnPoint| {
++                let facing = spawn.facing.map(f32::to_bits);
++                (spawn.at.to_array().map(f32::to_bits), facing)
++            };
++            spawns.iter().map(point).collect::<Vec<_>>()
++        };
++        assert_eq!(bits(&spawns_a), bits(&spawns_b));
++        assert_eq!(statics_a.tree_bytes(), statics_b.tree_bytes());
++        assert_eq!(statics_a.bounds_cm(), statics_b.bounds_cm());
++        let mut a = World::new(&setup(5, 0), &rules_a, &spawns_a);
++        let mut b = World::new(&setup(5, 0), &rules_b, &spawns_b);
++        assert_eq!(a.state_hash(), b.state_hash());
++        let mut presses = [0u8; BUTTONS];
++        for tick in 0..300u16 {
++            let [low, _] = u16::to_le_bytes(tick);
++            let button = usize::from(low) % BUTTONS;
++            presses[button] = presses[button].wrapping_add(1);
++            let aim = if tick % 3 == 0 {
++                AimCm::NONE
++            } else {
++                AimCm {
++                    x: i16::from(low) - 100,
++                    y: tick,
++                    z: 7,
++                }
++            };
++            let command = PlayerCommand {
++                buttons: tick,
++                presses,
++                move_x: (low % 120) as i8,
++                move_y: -((low % 90) as i8),
++                aim,
++            };
++            a.authority_step(&[command]);
++            b.authority_step(&[command]);
++            assert_eq!(
++                (a.state_hash(), a.shared_hash()),
++                (b.state_hash(), b.shared_hash()),
++                "tick {tick}"
++            );
++        }
++        assert_eq!(row(&a, 0), row(&b, 0));
++    }
++
 +    #[test]
 +    fn a_map_with_no_spawn_makes_no_soldier_and_the_fold_touches_no_row() {
 +        let mut world = empty_world(0, 0);
@@ -6858,7 +7112,11 @@ index 28a50a56..9231c40c 100644
 +        for step in 0..60 {
 +            let commands = [pressed()];
 +            world.authority_step(if step < 30 { &[] } else { &commands[..] });
-+            assert_eq!(row(&world, 0).facing.map(f32::to_bits), [1.0_f32.to_bits(), 0], "tick {step}");
++            assert_eq!(
++                row(&world, 0).facing.map(f32::to_bits),
++                [1.0_f32.to_bits(), 0],
++                "tick {step}"
++            );
 +        }
 +    }
 +
@@ -6903,7 +7161,7 @@ index 28a50a56..9231c40c 100644
      #[derive(Default)]
      struct Names(Vec<(&'static str, usize)>);
  
-@@ -319,6 +593,14 @@ mod tests {
+@@ -319,6 +730,14 @@ mod tests {
              self.0.push((name, 4));
          }
  
@@ -6918,7 +7176,7 @@ index 28a50a56..9231c40c 100644
          fn bytes<const N: usize>(&mut self, name: &'static str, _: &[u8; N]) {
              self.0.push((name, N));
          }
-@@ -332,26 +614,37 @@ mod tests {
+@@ -332,26 +751,37 @@ mod tests {
          }
      }
  
@@ -6968,7 +7226,7 @@ index 28a50a56..9231c40c 100644
      }
  
      /// A reader of the shared state that stops the test when it is handed anything of the authority's part.
-@@ -362,6 +655,8 @@ mod tests {
+@@ -362,6 +792,8 @@ mod tests {
  
          fn u32(&mut self, _: &'static str, _: u32) {}
  
@@ -6977,7 +7235,7 @@ index 28a50a56..9231c40c 100644
          fn bytes<const N: usize>(&mut self, _: &'static str, _: &[u8; N]) {}
  
          fn authority(&mut self) {
-@@ -373,82 +668,91 @@ mod tests {
+@@ -373,82 +805,122 @@ mod tests {
          }
      }
  
@@ -7014,8 +7272,15 @@ index 28a50a56..9231c40c 100644
 +            assert_eq!(whole[SHARED_STATE_BYTES..], counting_seed(0xA0));
 +            // The hashes are fed field by field with no buffer: they are the function over exactly these bytes.
 +            let over = crate::state_hash::fnv1a_64;
-+            assert_eq!((world.shared_hash(), world.state_hash()), (over(&shared), over(&whole)));
-+            assert!(!shared.windows(SEED_BYTES).any(|window| window == counting_seed(0xA0)));
++            assert_eq!(
++                (world.shared_hash(), world.state_hash()),
++                (over(&shared), over(&whole))
++            );
++            assert!(
++                !shared
++                    .windows(SEED_BYTES)
++                    .any(|window| window == counting_seed(0xA0))
++            );
 +        }
 +        let mut empty = empty_world(0xA0, 7);
 +        empty.authority_step(&[moved()]);
@@ -7104,17 +7369,41 @@ index 28a50a56..9231c40c 100644
 -        assert_ne!(held.shared_hash(), plain);
 -        assert_ne!(counted.shared_hash(), plain);
 +        for (what, command) in [
-+            ("a held button", PlayerCommand { buttons: 1, ..PlayerCommand::NONE }),
-+            ("a press", PlayerCommand { presses, ..PlayerCommand::NONE }),
-+            ("a move", PlayerCommand { move_y: 1, ..PlayerCommand::NONE }),
-+            ("an aim", PlayerCommand { aim: AimCm { x: 0, y: 0, z: 1 }, ..PlayerCommand::NONE }),
++            (
++                "a held button",
++                PlayerCommand {
++                    buttons: 1,
++                    ..PlayerCommand::NONE
++                },
++            ),
++            (
++                "a press",
++                PlayerCommand {
++                    presses,
++                    ..PlayerCommand::NONE
++                },
++            ),
++            (
++                "a move",
++                PlayerCommand {
++                    move_y: 1,
++                    ..PlayerCommand::NONE
++                },
++            ),
++            (
++                "an aim",
++                PlayerCommand {
++                    aim: AimCm { x: 0, y: 0, z: 1 },
++                    ..PlayerCommand::NONE
++                },
++            ),
 +        ] {
 +            assert_ne!(one(command), plain, "{what}");
 +        }
      }
  
      #[test]
-@@ -474,4 +778,75 @@ mod tests {
+@@ -474,4 +946,78 @@ mod tests {
      fn the_tick_counter_stops_loudly_and_never_wraps() {
          world(0, u32::MAX).authority_step(&[]);
      }
@@ -7141,7 +7430,10 @@ index 28a50a56..9231c40c 100644
 +                velocity: V3::new(f32_at(at + 16), f32_at(at + 20), f32_at(at + 24)),
 +                stamina: u64::from_le_bytes(take(at + 28, 8).try_into().expect("8 bytes")),
 +                facing: [f32_at(at + 36), f32_at(at + 40)],
-+                held_move: [i8::from_le_bytes([bytes[at + 44]]), i8::from_le_bytes([bytes[at + 45]])],
++                held_move: [
++                    i8::from_le_bytes([bytes[at + 44]]),
++                    i8::from_le_bytes([bytes[at + 45]]),
++                ],
 +                aim_cm: AimCm {
 +                    x: i16::from_le_bytes([bytes[at + 46], bytes[at + 47]]),
 +                    y: u16_at(at + 48),
@@ -7191,7 +7483,7 @@ index 28a50a56..9231c40c 100644
 +    }
  }
 diff --git a/crates/sim/tests/state_hash_alloc.rs b/crates/sim/tests/state_hash_alloc.rs
-index 3c46fd1c..d0b6183a 100644
+index 3c46fd1c..f489d74f 100644
 --- a/crates/sim/tests/state_hash_alloc.rs
 +++ b/crates/sim/tests/state_hash_alloc.rs
 @@ -14,7 +14,10 @@ use std::cell::Cell;
@@ -7212,8 +7504,8 @@ index 3c46fd1c..d0b6183a 100644
 -    let mut world = World::new(&MatchSetup {
 +    // A match on the test bundle: his soldier in slot 0, so the hash reads a row that holds a soldier and 47 that
 +    // hold none.
-+    let set = content::load(content::bundle::test_bundle().as_bytes())
-+        .expect("the test bundle loads");
++    let set =
++        content::load(content::bundle::test_bundle().as_bytes()).expect("the test bundle loads");
 +    let rules = Rules::take(&set.movements()[0]).expect("its movement table plays");
 +    let spawns = spawn_points(set.map("test-scene").expect("its map"));
 +    let setup = MatchSetup {

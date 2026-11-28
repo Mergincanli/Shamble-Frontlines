@@ -266,6 +266,23 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   re-exports. (13) the tests of rows 22, 25, 27, 28, 31, 33, 34, 35, 36, 37, 38 (bar the direct feed), 39; world.rs's
   known answers re-made by a second implementation written for it in the notes (no committed script exists: earlier
   change-sets' agents wrote theirs in notes), `world-known-answers-c4.py`, FNV-1a 64 over the canonical bytes.
+- **State (19:12 Amsterdam, from the clock): C4 written whole; its plants run; saved again** (`c4-wip.patch`, 341,240
+  bytes, the tracked files; `c4-wip/state_rule.rs`, the one new file, its sha256 equal to the tree's). Since 19:02:
+  T-A (`crates/sim/tests/state_rule.rs`: world.rs and soldiers.rs read with the shared tokenizer; every World field
+  bound in exactly one of visit and visit_shared, visit_shared drops nothing but `seed: _`, visit_row binds all ten
+  Soldier fields; its own planted copies each red), T-B and W-2's standing half (world.rs), row 33's three bundles
+  (devtools content_files.rs: the test bundle, the repository's content and first-loop's frozen bundle each make a
+  match with his full stamina), aim_reach.rs's NONE line (-(AIM_REACH_CM + 1)). rustfmt on the 12 named files, fmt
+  check clean, clippy `-D warnings` clean (one fix: `JOIN_SLOT` by the slot's bytes, clippy's always-true
+  comparison). **The maths list's evidence by the build check's own code** (`maths-refusals-c4.txt`, made by the
+  scratchpad's `c4-maths-refusals.mjs`: the twins as the production build left them, read by `twinProblems` with the
+  loader's two entries only): release twin 4 refusals, dev twin 29, 21 unique paths, the list's 21 equal to them (0
+  extra, 0 missing), none outside `libm::math::`; with the whole list 0 refusals in each. **C4's plants**
+  (`plants-4c2.py`, 27 defects B1 to B5, W1 to W8, RM1 to RM8, AB1, TA1, TB1, SW1, NT1, NT2, and 8 controls, RC2's count
+  now 59): 26 of 27 caught at first; NT2's words were wrong (the wire's NONE moved alone is refused at build time by
+  the tie, NT1, before the reach test runs): rewritten to move both NONEs, still tied: CAUGHT. So 27 of 27, 8 of 8
+  held, every file put back. Next: the whole plant set, the full local checks, the gate, the tree against the patch,
+  C4's commit.
 - **State (19:02 Amsterdam, from the clock): C4 builds whole and every Rust test passes; saved again as
   `c4-wip.patch`.** Since 18:45: the room's tests (T2-6, N-1, W-3's stand-and-join half, the starved-tick pin with a
   test-only count `handed` of the slice handed to the world, the world past the reach: the room's 22 unit tests

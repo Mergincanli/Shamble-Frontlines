@@ -75,6 +75,21 @@ LIBM_EXPECTED = "crates/devtools/vectors/libm-expected.txt"
 LIBM_GENERATOR = "crates/devtools/vectors/make_libm_vectors.py"
 LIBM_TESTS = ("cargo", "test", "-p", "devtools", "--locked", "--test", "libm_vectors")
 LIBM_CHECK = ("python3", "-I", "-B", f"{ROOT}/{LIBM_GENERATOR}", "--check")
+# C4's files and commands.
+COLLISION = "crates/sim/src/collision.rs"
+WORLD = "crates/sim/src/world.rs"
+ROOM = "crates/room/src/lib.rs"
+ANY_BYTES = "crates/room/tests/any_bytes.rs"
+SIM_WASM = "crates/sim-wasm/src/lib.rs"
+PROTOCOL = "crates/protocol/src/messages.rs"
+COLLISION_TESTS = cargo_test("sim", "collision::tests")
+WORLD_TESTS = cargo_test("sim", "world::tests")
+STATE_RULE = ("cargo", "test", "-p", "sim", "--locked", "--test", "state_rule")
+ROOM_TESTS = cargo_test("room")
+ANY_BYTES_TESTS = ("cargo", "test", "-p", "room", "--locked", "--test", "any_bytes")
+SIM_WASM_TESTS = cargo_test("sim-wasm")
+STEP_ALLOC = ("cargo", "test", "-p", "sim-wasm", "--locked", "--test", "step_alloc")
+AIM_REACH = ("cargo", "test", "-p", "devtools", "--locked", "--test", "aim_reach")
 # The test-only module built again from the tree as it stands, then the rule tests under Node (local-checks.sh's lines).
 NODE_RULES = ("bash", "-c", f"node {ROOT}/packages/client/scripts/build.mjs --wasm-only && node {ROOT}/node_modules/vitest/vitest.mjs run --root {ROOT}/packages/sim-worker --dir {ROOT}/packages/sim-worker/boundary")
 WASM_FLIP = ("        exp_bytes.extend_from_slice(&exp_of(*x).to_bits().to_le_bytes());",
@@ -202,7 +217,7 @@ PLANTS = [
     ("P13", "defect", "L4 undone: a pub type alias of a content type is not counted as handed on",
      [(LAYERING, "matches!(token.text.as_str(), \"use\" | \"extern\" | \"type\")", "matches!(token.text.as_str(), \"use\" | \"extern\")")],
      LAYERING_TESTS, ["test each_planted_naming_of_content_is_found_and_the_allowed_ones_pass ... FAILED"]),
-    ("RC2", "control", "the clean tree: sim's unit tests", [], SOLDIER_TESTS_ALL, ["test result: ok. 46 passed"]),
+    ("RC2", "control", "the clean tree: sim's unit tests (59 from C4 on: 46 at C3)", [], SOLDIER_TESTS_ALL, ["test result: ok. 59 passed"]),
     ("RC3", "control", "the clean tree: the rule scan", [], SCAN_TESTS, ["test result: ok. 9 passed"]),
     ("RC4", "control", "the clean tree: layering", [], LAYERING_TESTS, ["test result: ok. 4 passed"]),
     ("RC5", "control", "the clean tree: the dependency rules", [], DEPENDENCY_TESTS, ["test result: ok. 3 passed"]),
@@ -211,6 +226,107 @@ PLANTS = [
     ("VC3", "control", "the clean tree: the converter's tests", [], CONVERTER_TESTS, ["Tests  17 passed (17)"]),
     ("VC4", "control", "the clean tree: the converter's check on the real table and content file", [], CONVERTER_CHECK,
      ["content/movement/soldier.json: 28 values, 16 from his Export (sha256 a9d47785...) and 12 from his sandbox, each as the table names it"]),
+    # C4: the bounds in whole centimetres (netcode-architect's 7.3, its plants P1 to P3), the aim and move checks
+    # (T2-6, N-1), the start (W-1, W-2, W-4), the room's half (W-3, the pin, T-E), T2-7, T-A, T-B, row 25, B5 (c), the
+    # NONE tie (9.3 f, 8.3).
+    ("B1", "defect", "the bounds by plain rounding up and down, with no grid test: a lower face at 0.55 lands on 56",
+     [(COLLISION, "    if let Some(steps) = on_grid(value, BOUNDS_GRID) {\n        return steps;\n    }\n    let per_metre = f64::from(BOUNDS_GRID.per_metre);\n",
+                  "    let per_metre = f64::from(BOUNDS_GRID.per_metre);\n    let _ = on_grid;\n    return (if lower { (value * per_metre).ceil() } else { (value * per_metre).floor() }) as i64;\n")],
+     COLLISION_TESTS, ["test collision::tests::bounds_on_the_grid_are_their_own_count_of_whole_centimetres ... FAILED"]),
+    ("B2", "defect", "off the grid the lower faces rounded outward (floored): -32.004 on -3,201, 1 cm outside the map",
+     [(COLLISION, "    if lower && nearest / per_metre < value {\n        steps.saturating_add(1)", "    if lower && nearest / per_metre > value {\n        steps.saturating_sub(1)")],
+     COLLISION_TESTS, ["test collision::tests::bounds_off_the_grid_take_the_next_whole_centimetre_inward ... FAILED",
+                       "test collision::tests::the_aims_box_lies_inside_the_bounds_and_the_reach_and_a_map_past_the_reach_still_builds ... FAILED"]),
+    ("B3", "defect", "a refusal of bounds past the aim's reach in the build: the 2 km map does not build",
+     [(COLLISION, "        let bounds_cm = aim_box(map.bounds.min, map.bounds.max);\n",
+                  "        let bounds_cm = aim_box(map.bounds.min, map.bounds.max);\n        if map.bounds.max[0] > 327.67 || map.bounds.min[0] < -327.67 {\n            return Err(WorldError::Bounds);\n        }\n")],
+     COLLISION_TESTS, ["test collision::tests::the_aims_box_lies_inside_the_bounds_and_the_reach_and_a_map_past_the_reach_still_builds ... FAILED"]),
+    ("B4", "defect", "an empty box kept: bounds wholly past the reach give a box with its low corner above its high one",
+     [(COLLISION, "        if low > high {\n            return None;\n        }\n", "")],
+     COLLISION_TESTS, ["test collision::tests::the_aims_box_lies_inside_the_bounds_and_the_reach_and_a_map_past_the_reach_still_builds ... FAILED"]),
+    ("B5", "defect", "the aim's lower faces left out of the box (`<` for `<=`)",
+     [(COLLISION, "(0..3).all(|axis| low[axis] <= at[axis] && at[axis] <= high[axis])", "(0..3).all(|axis| low[axis] < at[axis] && at[axis] <= high[axis])")],
+     COLLISION_TESTS, ["test collision::tests::an_aim_is_held_on_each_face_of_the_box_and_refused_one_centimetre_past_it ... FAILED"]),
+    ("W1", "defect", "W-1: his aim at spawn the origin, not \"no aim yet\"",
+     [(SOLDIERS, "            aim_cm: AimCm::NONE,\n            ..Soldier::EMPTY", "            aim_cm: AimCm { x: 0, y: 0, z: 0 },\n            ..Soldier::EMPTY")],
+     WORLD_TESTS, ["test world::tests::a_new_world_holds_his_soldier_at_the_first_spawn_and_nothing_else ... FAILED"]),
+    ("W2", "defect", "W-1: his stamina empty at spawn",
+     [(WORLD, "            row.stamina = rules.stamina_full;\n", "            let _ = rules;\n")],
+     WORLD_TESTS, ["test world::tests::a_new_world_holds_his_soldier_at_the_first_spawn_and_nothing_else ... FAILED"]),
+    ("W3", "defect", "W-1: his soldier in slot 1",
+     [(WORLD, "soldiers.spawn(PLAYER_SLOT, first.at, first.facing)", "soldiers.spawn(1, first.at, first.facing)")],
+     WORLD_TESTS, ["test world::tests::a_new_world_holds_his_soldier_at_the_first_spawn_and_nothing_else ... FAILED"]),
+    ("W4", "defect", "W-1: not grounded at spawn",
+     [(WORLD, "            row.flags |= GROUNDED;\n", "")],
+     WORLD_TESTS, ["test world::tests::a_new_world_holds_his_soldier_at_the_first_spawn_and_nothing_else ... FAILED"]),
+    ("W5", "defect", "W-4: the fold makes his row on a map with no spawn",
+     [(WORLD, "            if let Some(row) = self.soldiers.occupied_mut(PLAYER_SLOT) {\n                row.held_move",
+                  "            let _ = self.soldiers.spawn(PLAYER_SLOT, V3::new(0.0, 0.0, 0.0), [1.0, 0.0]);\n            if let Some(row) = self.soldiers.occupied_mut(PLAYER_SLOT) {\n                row.held_move")],
+     WORLD_TESTS, ["test world::tests::a_map_with_no_spawn_makes_no_soldier_and_the_fold_touches_no_row ... FAILED"]),
+    ("W6", "defect", "N-1: every command's aim taken, \"no aim yet\" too: a tick of [A, no aim] loses A",
+     [(WORLD, "                if command.aim != AimCm::NONE {\n                    row.aim_cm = command.aim;\n                }", "                row.aim_cm = command.aim;")],
+     ROOM_TESTS, ["test tests::no_aim_yet_is_taken_on_any_map_and_keeps_the_aim_the_row_holds ... FAILED"]),
+    ("W7", "defect", "row 25: a row field left out of the shared bytes (the held move)",
+     [(WORLD, "    sink.bytes(\"soldier.held_move\", &[move_x as u8, move_y as u8]);\n", "    let _ = (move_x, move_y);\n")],
+     WORLD_TESTS, ["test world::tests::state_bytes_have_a_fixed_order_and_width ... FAILED"]),
+    ("W8", "defect", "T2-6: the move's reach with `<` for `<=`: (127, 0) refused",
+     [(WORLD, "    x * x + y * y <= MOVE_REACH * MOVE_REACH", "    x * x + y * y < MOVE_REACH * MOVE_REACH")],
+     ROOM_TESTS, ["test tests::a_move_past_the_reach_and_an_aim_outside_the_map_are_refused_and_counted ... FAILED"]),
+    ("RM1", "defect", "T2-6: the aim held to its type's range only: an aim 1 cm past a face is taken",
+     [(ROOM, "            if aim != AimCm::NONE && !self.statics.holds_cm(aim) {", "            if aim != AimCm::NONE && aim.x == i16::MIN {")],
+     ROOM_TESTS, ["test tests::a_move_past_the_reach_and_an_aim_outside_the_map_are_refused_and_counted ... FAILED"]),
+    ("RM2", "defect", "T2-6: `refused_aim` left out of `refused()`",
+     [(ROOM, "        let wishes = self.refused_move.wrapping_add(self.refused_aim);", "        let wishes = self.refused_move;")],
+     ROOM_TESTS, ["test tests::a_move_past_the_reach_and_an_aim_outside_the_map_are_refused_and_counted ... FAILED"]),
+    ("RM3", "defect", "N-1: \"no aim yet\" sent through the bounds: refused on a map that leaves the origin out",
+     [(ROOM, "            if aim != AimCm::NONE && !self.statics.holds_cm(aim) {", "            if !self.statics.holds_cm(aim) {")],
+     ROOM_TESTS, ["test tests::no_aim_yet_is_taken_on_any_map_and_keeps_the_aim_the_row_holds ... FAILED"]),
+    ("RM4", "defect", "N-1: any aim with x -32,768 read as \"no aim yet\": the two malformed aims taken",
+     [(ROOM, "            if aim != AimCm::NONE && !self.statics.holds_cm(aim) {", "            if aim.x != i16::MIN && !self.statics.holds_cm(aim) {")],
+     ROOM_TESTS, ["test tests::no_aim_yet_is_taken_on_any_map_and_keeps_the_aim_the_row_holds ... FAILED"]),
+    ("RM5", "defect", "W-3: the fill with the move (0, 0)",
+     [(ROOM, "                    move_x: command.move_x,\n                    move_y: command.move_y,", "                    move_x: 0,\n                    move_y: 0,")],
+     ROOM_TESTS, ["test tests::his_soldier_stands_before_the_join_and_the_wire_s_move_reaches_his_row ... FAILED"]),
+    ("RM6", "defect", "W-3: the join answer's slot 1",
+     [(ROOM, "                slot: JOIN_SLOT,", "                slot: 1,")],
+     ROOM_TESTS, ["test tests::his_soldier_stands_before_the_join_and_the_wire_s_move_reaches_his_row ... FAILED"]),
+    ("RM7", "defect", "the pin: the last command fed again on a starved tick",
+     [(ROOM, "        let handed = run.get(..ran).unwrap_or(&[]);",
+             "        let refed = [self.last_run.map_or(PlayerCommand::NONE, |last| last.command)];\n        let handed = if ran == 0 && self.last_run.is_some() { &refed[..] } else { run.get(..ran).unwrap_or(&[]) };")],
+     ROOM_TESTS, ["test tests::a_starved_tick_hands_the_world_no_command_and_the_row_keeps_the_held_move ... FAILED"]),
+    ("RM8", "defect", "T-E: the room's static world cloned every tick",
+     [(ROOM, "        let mut run = [PlayerCommand::NONE; CATCH_UP_CAP];", "        let _copy = self.statics.clone();\n        let mut run = [PlayerCommand::NONE; CATCH_UP_CAP];")],
+     STEP_ALLOC, ["test a_tick_of_the_local_match_takes_no_memory_once_the_match_is_warm ... FAILED"]),
+    ("AB1", "defect", "T2-7: an honest move drawn over the whole i8 range: the identity of the refused moves breaks",
+     [(ANY_BYTES, "            if move_in_reach(x, y) {", "            if move_in_reach(x, y) || x == x {")],
+     ANY_BYTES_TESTS, ["test the_room_keeps_its_rules_whatever_arrives ... FAILED"]),
+    ("TA1", "defect", "T-A: a field of the world bound in both visit and visit_shared",
+     [(WORLD, "            tick: _,\n            player: _,", "            tick,\n            player: _,")],
+     STATE_RULE, ["test every_field_of_the_state_is_hashed_once_in_its_own_part ... FAILED"]),
+    ("TB1", "defect", "T-B: a static count in spawn_points moving each later build's spawn by 1 mm",
+     [(SOLDIERS, "            let [x, y, z] = narrow(spawn.at);\n",
+                 "            static BUILDS: std::sync::atomic::AtomicU32 = std::sync::atomic::AtomicU32::new(0);\n            let later = BUILDS.fetch_add(1, std::sync::atomic::Ordering::Relaxed) as f32 * 0.001;\n            let [x, y, z] = narrow(spawn.at);\n            let x = x + later;\n")],
+     WORLD_TESTS, ["test world::tests::one_bundle_loaded_and_built_twice_gives_the_same_match ... FAILED"]),
+    ("SW1", "defect", "B5 (c): the first of several movement documents taken silently",
+     [(SIM_WASM, "    let [movement] = set.movements() else {\n        let found = set.movements().len();\n        return Err(CreateError::Soldier { found });\n    };",
+                 "    let Some(movement) = set.movements().first() else {\n        return Err(CreateError::Soldier { found: 0 });\n    };")],
+     SIM_WASM_TESTS, ["test tests::a_bundle_without_exactly_one_movement_document_or_with_one_that_does_not_play_makes_no_match ... FAILED"]),
+    ("NT1", "defect", "the two NONEs untied: the wire's at x -32,767: the room does not build",
+     [(PROTOCOL, "    pub const NONE: Self = Self {\n        x: i16::MIN,", "    pub const NONE: Self = Self {\n        x: -32_767,")],
+     ROOM_TESTS, ["AimPoint::NONE.x == AimCm::NONE.x"]),
+    # The wire's NONE moved alone is the tie's to refuse (NT1: the room does not build, so neither does this test's
+    # crate); moved with the simulation's, still tied, it lies inside the reach, and the reach test goes red.
+    ("NT2", "defect", "both NONEs at x -32,767, still tied, inside the reach: the reach test goes red",
+     [(PROTOCOL, "    pub const NONE: Self = Self {\n        x: i16::MIN,", "    pub const NONE: Self = Self {\n        x: -32_767,"),
+      ("crates/sim/src/aim.rs", "    pub const NONE: Self = Self {\n        x: i16::MIN,", "    pub const NONE: Self = Self {\n        x: -32_767,")],
+     AIM_REACH, ["test the_reach_is_what_the_aim_points_fields_hold ... FAILED"]),
+    ("C4C1", "control", "the clean tree: the collision tests", [], COLLISION_TESTS, ["test result: ok. 15 passed"]),
+    ("C4C2", "control", "the clean tree: the room's unit tests", [], ROOM_TESTS, ["test result: ok. 22 passed"]),
+    ("C4C3", "control", "the clean tree: the room's fuzz test", [], ANY_BYTES_TESTS, ["test result: ok. 1 passed"]),
+    ("C4C4", "control", "the clean tree: the state rule", [], STATE_RULE, ["test result: ok. 2 passed"]),
+    ("C4C5", "control", "the clean tree: the players' module's unit tests", [], SIM_WASM_TESTS, ["test result: ok. 19 passed"]),
+    ("C4C6", "control", "the clean tree: the local match's allocation count", [], STEP_ALLOC, ["test result: ok. 1 passed"]),
+    ("C4C7", "control", "the clean tree: the aim's reach", [], AIM_REACH, ["test result: ok. 1 passed"]),
 ]
 
 def note(name, kind, ok, what, detail):
