@@ -4,6 +4,7 @@ import { BUTTON_NAMES, KeyboardInput } from "../input/keyboard.ts";
 import { runHeader } from "../harness/run-header.ts";
 import type { ReportData } from "../overlay/report.ts";
 import { createPicture } from "../render/index.ts";
+import { fetchContent, PageContent, takeWorkerError, takeWorkerMessage } from "./content.ts";
 import { installErrorHook } from "./error-hook.ts";
 import { readFlags } from "./flags.ts";
 import { lostAndDoubled } from "./press-tally.ts";
@@ -20,9 +21,11 @@ const COMMIT = __SHAMBLE_COMMIT__;
 const READOUT_EVERY_MS = 250;
 
 /**
- * The app shell's boot order: the picture first (`await renderer.init()` before the first frame), then the Worker,
- * then the frame loop. Each drawn frame posts the newest input once (the keys held and the running press counts)
- * and draws from the two newest blocks. The page never loads or calls the Wasm: the Worker does.
+ * The app shell's boot order: the picture first (`await renderer.init()` before the first frame), then the content
+ * (one fetch; no Worker is made when it fails), then the Worker started on it, then the frame loop. The page reads its
+ * copy of the content only after the Worker's `ready` (content.ts). Each drawn frame posts the newest input once (the
+ * keys held and the running press counts) and draws from the two newest blocks. The page never loads or calls the
+ * Wasm: the Worker does.
  */
 export async function boot(): Promise<void> {
   const notice = document.getElementById("notice");
@@ -48,6 +51,15 @@ export async function boot(): Promise<void> {
   document.documentElement.dataset["backend"] = info.backend;
   document.documentElement.dataset["commit"] = COMMIT;
 
+  // The content, fetched once before any Worker exists: a failure is said on the page in fixed words, and nothing starts.
+  const fetched = await fetchContent((url) => fetch(url));
+  if (!fetched.ok) {
+    errors.note(fetched.problem);
+    fail(`The match did not start: ${fetched.problem}`);
+    return;
+  }
+  const content = new PageContent();
+
   // The clock both sides share.
   const clock = (): number => performance.timeOrigin + performance.now();
   const worker = new SimWorker();
@@ -70,10 +82,11 @@ export async function boot(): Promise<void> {
     errors.note(problem);
     fail(`The match stopped: ${problem}`);
   };
-  // A method with a name of its own, so that a heap profile can charge the listener's whole body to it.
+  // A method with a name of its own, so that a heap profile can charge the listener's whole body to it. The page's
+  // copy of the bundle is read on the Worker's `ready` and let go as soon as the match ends (content.ts).
   const listener = {
     blockArrived(event: MessageEvent<unknown>): void {
-      const problem = link.receive(event);
+      const problem = takeWorkerMessage(link, content, event);
       if (problem !== "") stopped(problem);
     },
   };
@@ -81,10 +94,10 @@ export async function boot(): Promise<void> {
   worker.addEventListener("error", (event) => {
     // A script that does not load gives an event with no message. Cancelled, so the window does not count it again.
     event.preventDefault();
-    const problem = event.message || "the Worker failed";
-    if (link.end(problem)) stopped(problem);
+    const problem = takeWorkerError(link, content, event.message);
+    if (problem !== "") stopped(problem);
   });
-  link.start(flags.padBytes);
+  content.start(fetched.value, link, flags.padBytes);
 
   const frames = __SHAMBLE_DEVTOOLS__ ? new FrameTimes() : null;
   const resize = (): void => picture.resize(window.innerWidth, window.innerHeight, window.devicePixelRatio);

@@ -4,6 +4,8 @@
 //! test-only WebAssembly module. Nothing here is part of what players get.
 
 pub mod compare;
+#[cfg(not(target_arch = "wasm32"))]
+pub mod content_files;
 pub mod content_proofs;
 pub mod files;
 pub mod recording;
@@ -13,3 +15,4 @@ pub mod scripts;
 pub mod sha256;
 pub mod time_report;
 pub mod wasm;
+pub mod world_proofs;

@@ -1,14 +1,16 @@
 //! The committed recordings, natively (ADR 0004's milestone and its foundation line; PM-0004-19): every file is
-//! what its script makes, and every recording replays to its hashes file, in both columns. The same check is
-//! `make_recordings --check`. The files are read from disk when the test runs, never built into the program.
+//! what its script makes from the frozen content beside it, and every recording replays on that content to its
+//! hashes file, in both columns. The same check is `make_recordings --check`. The files are read from disk when the
+//! test runs, never built into the program.
 
 use std::path::{Path, PathBuf};
 
 use devtools::compare::{Column, first_difference};
-use devtools::files::{MANIFEST, check, made, read_plain, vector_text, write};
+use devtools::files::{MANIFEST, check, frozen, frozen_name, made, read_plain, vector_text, write};
 use devtools::recording::{Recording, parse_hashes};
 use devtools::replay::Replay;
 use devtools::scripts::{RECORDINGS, VECTOR_TICK};
+use devtools::sha256::sha256;
 
 fn folder() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("recordings")
@@ -26,18 +28,22 @@ fn every_committed_file_is_what_its_script_makes() {
 #[test]
 fn every_recording_replays_to_its_hashes() {
     let manifest = String::from_utf8(read(MANIFEST)).expect("the manifest is text");
-    for (name, _) in RECORDINGS {
-        // The manifest lists the recording's three files.
-        for suffix in ["rec", "hashes", "vector.txt"] {
+    for (name, map_id, _) in RECORDINGS {
+        // The manifest lists the recording's frozen content and its three files.
+        for suffix in ["content.json", "rec", "hashes", "vector.txt"] {
             let line = format!("{name}.{suffix}: bytes ");
             assert_eq!(manifest.matches(&line).count(), 1, "{line}");
         }
         let bytes = read(&format!("{name}.rec"));
         let recording = Recording::decode(&bytes).expect("a committed recording reads");
+        // Its header names the frozen content beside it, by its sha256, and the map it is played on.
+        let content = frozen(&folder(), name).unwrap_or_else(|why| panic!("{why}"));
+        assert_eq!(recording.header.content_hash, sha256(&content));
+        assert_eq!(recording.header.map_id, map_id);
         let hashes = String::from_utf8(read(&format!("{name}.hashes"))).expect("text");
         let expected = parse_hashes(&bytes, &hashes).expect("its hashes file reads");
         assert_eq!(expected.len(), recording.steps.len());
-        let mut replay = Replay::new(&recording).expect("this build replays it");
+        let mut replay = Replay::new(&recording, &content).expect("this build replays it");
         let got: Vec<_> = replay.by_ref().collect();
         for column in [Column::Shared, Column::Whole] {
             let difference = first_difference(&expected, &got, column);
@@ -55,16 +61,21 @@ fn every_recording_replays_to_its_hashes() {
         );
         // The word-size vector: the shared bytes at its tick, the same on every target.
         let vector = String::from_utf8(read(&format!("{name}.vector.txt"))).expect("text");
-        assert_eq!(vector_text(&recording, VECTOR_TICK), Ok(vector));
+        assert_eq!(vector_text(&recording, &content, VECTOR_TICK), Ok(vector));
     }
 }
 
-/// A copy of the recordings' folder with one thing done to it, in the test run's own scratch folder.
+/// A copy of the recordings' folder with one thing done to it, in the test run's own scratch folder: the frozen
+/// content as it is committed, and every file the scripts make from it.
 fn changed(case: &str, change: impl Fn(&Path)) -> Result<(), String> {
     let copy = Path::new(env!("CARGO_TARGET_TMPDIR")).join(format!("recordings-{case}"));
     let _ = std::fs::remove_dir_all(&copy);
     std::fs::create_dir_all(&copy).expect("a scratch folder");
-    for (name, bytes) in made().expect("the scripts make their files") {
+    for (name, _, _) in RECORDINGS {
+        let content = frozen(&folder(), name).unwrap_or_else(|why| panic!("{why}"));
+        std::fs::write(copy.join(frozen_name(name)), content).expect("a scratch file");
+    }
+    for (name, bytes) in made(&folder()).expect("the scripts make their files") {
         std::fs::write(copy.join(name), bytes).expect("a scratch file");
     }
     change(&copy);
@@ -85,10 +96,26 @@ fn the_check_names_each_file_that_differs_is_missing_or_is_not_listed() {
             std::fs::write(folder.join(name), bytes).expect("the file");
         }
     };
-    // One bit of one step's input.
+    // One bit of one step's input: the header's length is the file's less its 1,800 steps of 68 bytes.
+    let header = read("first-loop.rec").len() - 1_800 * 68;
     let rec =
-        changed("rec", flip("first-loop.rec", 87 + 900 * 68 + 9)).expect_err("a changed .rec");
+        changed("rec", flip("first-loop.rec", header + 900 * 68 + 9)).expect_err("a changed .rec");
     assert_eq!(rec, "first-loop.rec differs");
+    // The frozen content gone, or one bit of it changed: the scripts cannot make the recording on it, by name.
+    let gone = changed("content-gone", |folder| {
+        std::fs::remove_file(folder.join("first-loop.content.json")).expect("the file goes");
+    })
+    .expect_err("no frozen content");
+    assert!(
+        gone.starts_with("first-loop: its frozen content: first-loop.content.json: "),
+        "{gone}"
+    );
+    let content = changed("content", flip("first-loop.content.json", 40))
+        .expect_err("a changed frozen content");
+    assert!(
+        content.starts_with("first-loop: the content is not the recording's: "),
+        "{content}"
+    );
     // One hex digit of the shared hash of step 900: the line is "900 <16 hex> <16 hex>\n".
     let hashes = String::from_utf8(read("first-loop.hashes")).expect("text");
     let line = hashes.find("\n900 ").expect("step 900's line") + 1;
@@ -221,11 +248,28 @@ fn the_committed_recordings_are_read_only_through_the_plain_read() {
     assert_eq!(around, None);
     assert!(own.contains("read_plain(&folder(), name)"));
     let library = source("src/files.rs");
-    let plain_read = library
-        .split_once("pub fn read_plain")
+    // `read_plain` is one call of `read_plain_within` with the folder's own cap; the open is in the second.
+    let wrapper = library
+        .split_once("pub fn read_plain(")
         .and_then(|(_, rest)| rest.split_once("\n}\n"));
-    // One place opens a file, inside `read_plain`; nothing reads a path whole, or opens one another way.
+    assert!(wrapper.is_some_and(|(body, _)| {
+        body.trim_end()
+            .ends_with("read_plain_within(folder, name, MAX_READ_BYTES)")
+    }));
+    let plain_read = library
+        .split_once("pub fn read_plain_within(")
+        .and_then(|(_, rest)| rest.split_once("\n}\n"));
+    // One place opens a file to read it, inside `read_plain_within`; nothing reads a path whole, or opens one
+    // another way. One place makes a file, and only under a name that is not there yet (`replace_plain`).
     let (open, whole) = (["File", "::open("].concat(), format!("{read}("));
+    let made = ["File", "::options()"].concat();
+    assert_eq!(library.matches(&made).count(), 1);
+    assert!(
+        library.split_once(&made).is_some_and(
+            |(_, rest)| rest.contains(".create_new(true)") && !rest.contains(".read(true)")
+        ),
+        "a file made any other way than new"
+    );
     let others = [
         ["read_to", "_string"].concat(),
         ["Open", "Options"].concat(),

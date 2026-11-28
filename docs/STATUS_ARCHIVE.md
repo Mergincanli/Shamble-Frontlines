@@ -349,6 +349,34 @@ _Last updated: 2026-11-26 (change-set 4b-1's docs pass, second part, by lane 1's
   online play; releases worked out, not counted); 4a's (the recording tests still follow a link, 4A-S3-READ; two planted
   divergences only in a stand-in or native form). **Legacy (frozen):** 3a's ranked list (PR #15); bot navigation; the
 
+_Moved from STATUS (2026-11-27, change-set 4b-2's docs pass, by script, byte for byte): under his OLD-LINES (a) of 2026-11-18, the lines about merged pull requests: the rows of MAIN-WALL (merged as #76, 2671595, its T10 record as #77, 47bb79e), of 4b-1 (#75, b9aad01) and of CI-TIME (#78, b8f02b0), the top line (about #78 and MAIN-WALL's docs pass) and "Last merged" as they stood; and lane 1's own lines whose new forms STATUS now holds: "Next" item 2, the two "Waiting on Mustafa" bullets, the "From change-set 4b-1" follow-ups bullet and the last three lines of the "v2" open-risks bullet:_
+
+| PR | Work | Branch | State | Waiting on |
+|---|---|---|---|---|
+| none yet | MAIN-WALL (his words of 2026-11-25 19:36:42 UTC: only his account updates main), by the Guard fix chat: the wall is on by his click ("Phase"); this docs pull request records it | `claude/confident-gates-tbnq38` (stands in for `cs/main-wall`) | risk tier 2; GitHub settings by his clicks, no code or workflow changed; measured on a public throwaway repository, deleted by his click after 17:27 UTC [assumed: his "done" of 17:31:41 UTC]; the plan: the advisor agent APPROVE, security-auditor REVISE (text only, all applied); the results: both APPROVE; report `docs/reports/2026-11-26-main-wall.md` | the advisor agent's review of the pushed head; the merge |
+| #75 (draft) | change-set 4b-1, "Content" (the first of 4b's two pull requests, his SIZE-4B (b)), by lane 1 (the chat he calls Builder V4): the content crate, the time unit, the reader's proofs and fuzz run, the links check (the list: REPO_MAP, ROADMAP) | `claude/cool-pasteur-oiqk1r` (stands in for `cs/4b-content`) | risk tier 1, no browser check; reviewed (two rounds, no Critical or High); the verifier and the advisor agent's verdict on the final head are in its report | his go for the head the advisor agent approves |
+| #78 (draft) | CI-TIME (his CI-TIME (a) of 2026-11-27, 12:50 Amsterdam), by the chat he calls CI Builder: the `toolchain` job's time limit 15 to 25 minutes (`.github/workflows/toolchain.yml:38`), nothing else in the file; report `docs/reports/2026-11-27-ci-time.md` | `claude/keen-tesla-v807cf` | risk tier 2; the advisor agent, security-auditor and infra-engineer approved the change | his go for the head the advisor agent approves, gate, smoke and toolchain green; then the chat marks it ready and merges with that id |
+
+_Last updated: 2026-11-27 (ci-time: the #78 row added, the CI Builder's old 2026-11-26 line dropped as #74 is merged). 2026-11-26 (MAIN-WALL's docs pass, on the lane branch with main 3b949c1a merged in: the wall on main; #73 and #74 merged, their rows, "Waiting on" lines and follow-ups bullets moved to the archive by script; his SPEED-ORDER (b) sets the queue)._
+
+- **Last merged** (read with git, 2026-11-26): #74, ci-preview-handover (3b949c1a); #73, guard-wrappers (4a62873e); #70, 4a (2483e9a, 2026-11-26); #71, ci-after-3a (07d673b); #67 (c1da1bd); #69 (311c048); #68, 3b (3ab9eae).
+
+2. v2: the netcode proof test (#40); step 2.3's chat stays stopped; the first builder chat paused. Walk (his WALK-CUT
+   (a)): 4a merged; **4b-1 reviewed (#75)**; then 4b-2, 4c, 4d, the link simulator, change-set 7 (ROADMAP, "Next / open").
+
+- 4b-1 (#75), reviewed (its report): his go. Answered (`docs/DECISIONS.md`, 2026-11-26, 18:16:35 UTC): SIGHT-FLAG (a), DUR-1 (C), STATUS-LEN (a).
+- Later, from 4a's report: MOVE-RULES, NO-SOURCE, RESUME-FLASH, TUNE-HOME, SPRINT-DELAY-4; `docs/UNITS.md` §0's two lines (his unit walk); DIFF-LIST at 4b-2's data step.
+
+- **From change-set 4b-1** (the archive's block of that name; ids by its docs pass): 4B-AIM-REACH: the loader refuses a playable
+  map beyond the aim's reach (x and z plus or minus 327.67 m, y 0 to 655.35 m). The aim widens in the first change-set whose map
+  leaves that square (none in Slice 1; Slice 2's plan says whether its maps do), at the latest in Slice 3's change-set that sets
+  the command codec for online play (PM-0001-51), beside 3B-ACKS and 3B-OUTAGE-256. No numbered change-set holds it yet. And 16
+  more ids there, among them 4B-SIGHT-MARK (Slice 2's plan adds the mark), 4B-FIRE-RATE, 4B-CI-CONTENT (the CI Builder).
+
+  online play; releases worked out, not counted); 4a's (two planted divergences only in a stand-in or native form);
+  4b-1's (the fuzz run cannot reach the caps, 4B-FUZZ-REACH). **Legacy (frozen):** 3a's ranked list (PR #15); bot
+  navigation; the editor and map bugs; the first-deploy tutorial; the wall-clock reads (an input for ADR 0004 part 4).
+
 ## Targets
 - **v2 (VISION_V2 §3, read with MODES-3 (a): the starting sizes are totals; Mustafa, 2026-10-31):** start with two teams
   with 2–8 players in total (1v1 to 4v4) and three teams with 6–18 in total (2v2v2 to 6v6v6); the goal 12v12v12 or
@@ -2228,6 +2256,52 @@ _Last updated: 2026-11-26 (change-set 4b-1's docs pass, second part, by lane 1's
     before."): for change-set 8 (the guns): a gun's interval is its table value, with the timer's leftover carried
     (ADR 0004 part 4); no value is rewritten to match the old game's rate at 60 frames a second.
   - Closed by 4b-1, at its merge: 4A-S3-READ's read side (the block "From change-set 4a" above, its dated pointer).
+  - Closed by 4b-2 (its docs pass, 2026-11-27, read on the code 914f3b4): 4B-MEMORY-UNIT (`packages/sim-worker/boundary/content.test.mjs:19` now says "49.2 million bytes (46.9 MiB)"), 4B-TIME-REEXPORT (`crates/sim/src/time.rs`: `pub use content::time::UNITS_PER_SECOND`) and 4B-FACING-ZERO (`crates/content/src/map.rs:58`: "0 faces +z, and the degrees grow toward +x") [verified 2026-11-27 at 914f3b4]. In part: 4B-SCAN-CFG-TEST (the source scan now reads a file whose first line is `#![cfg(test)]` as test code, `crates/sim/tests/rules_scan.rs`'s `in_tests`; whether the build lints' hashed-map and clock half covers the content crate is not checked here [assumed: open]) and 4B-PLAN-4B2 (the TypeScript cap `MAX_BUNDLE_BYTES` is tested against the players' constructor in `packages/sim-worker/boundary/sim-wasm.test.mjs`, and `C::round` is on the maths allow-list, `packages/client/scripts/maths-allowed.mjs`; the bundle's outer shape not checked here [assumed: open]).
+- **From change-set 4b-2, "The world"** (lane 1, Builder V4 to step 9's third piece, then the chat he calls Builder V6;
+  branch `claude/ecstatic-wozniak-5cbdzs` standing in for `cs/4b-content`; the pull request is opened by his Advisor;
+  risk tier 1, no browser check; steps 6 to 11, step 12 moved to the start of 4c by his STEP12-GO (a); reviewed, two
+  rounds, every reviewer PASS by the end with Lows left; final code 914f3b4; the planted defects' whole run on it
+  caught 104 of 104 and held 19 controls of 19 (`.checkpoints/cs4b-content/plants-4b2.txt`); report
+  `docs/reports/2026-11-27-cs4b2-world.md`. Written by 4b-2's docs pass, 2026-11-27. The 4B- ids are this docs pass's,
+  not his; each item names who found it. The notes files named here leave the tree at the pull request's close and
+  stay readable at the branch's commits):
+  - 4B-HEAPLESS (security-auditor's dependency read; the card's step 6): the collision library's tree holds heapless
+    0.8.0 and rstar 0.13.1, compiled but kept out of the players' file (the built-file check's `UNLINKED_CRATES`; no
+    `spade` in the lockfile); heapless is fixed from 0.9.4 on: take 0.9.4 or later when rstar or parry3d next move
+    [verified 2026-11-27 at 914f3b4: `crates/devtools/tests/dependency_rules.rs`'s pins and its message].
+  - 4B-LICENCES (security-auditor, `.checkpoints/cs4b-content/security-auditor-deps-4b2.md` lines 105 to 106 and 137):
+    the batch's licences are all permissive; parry3d, simba and approx are Apache-2.0 only and parry3d's archive
+    carries no LICENSE file: the hosted build must ship the licence texts (a hosting change-set's).
+  - 4B-UNIT-COLUMN (the advisor agent's step-11 ruling, `.checkpoints/cs4b-content/advisor-step11.md` lines 13 and 28,
+    a Low): the field tables' `unit` column ships in the players' file and nothing reads it at run time.
+  - 4B-FIRST-DEFAULT (`advisor-step11.md`, Q1, line 27): no `default` column or keyword now; the first field with a
+    default (an additive change, ADR 0005 CD-4) goes to the advisor agent first, with the change to `read.rs`'s
+    "nothing missing" rule.
+  - 4B-QUERY-RECORDING (the advisor agent's re-read, its condition 4): no step queries the static world in 4b-2; the
+    first collision query from the match's step is 4c's, so a recording that covers it is 4c's.
+  - 4B-TYPES-READER (engine-architect, EA-3): the generated content types have no reader in 4b-2 but their tests (the
+    export test, and the tie of the types to the schemas); the map's reading, their one reader, moved to 4c.
+  - 4B-WORLD-ROOM (engine-architect, EA-7): the local match owns the authority's world (`LocalMatch`); when 4c's step
+    queries it inside the room, it moves to the room, and no rule yet keeps `content` out of the room's and the client
+    endpoint's manifests.
+  - 4B-LIMIT-IMPORT (engine-architect, EA-8): 4c's editor panel imports the schema limit function from product code,
+    never a second copy.
+  - 4B-CHROMIUM-TIME (infra-engineer, IE-1; a CI file, so the CI Builder's): CI's Chromium run uses 3.6 to 3.9 of its
+    5 minutes: a split or a new limit before 4c adds a long spec.
+  - 4B-CONTENT-CACHE (infra-engineer, IE-2; a hosting change-set's): `content.json` keeps a fixed name beside hashed
+    files: when hosting is built, serve `index.html` and `content.json` without caching, or hash the bundle's name.
+  - 4B-RAY-COUNTS (test-engineer, TE-4): the per-class minimum counts of the committed rays: 4c, with the casts' first
+    caller.
+  - 4B-RAY-WASM (netcode-architect, round 2): RR-1's three new paths of the ray cast (beyond the reach, a limit cut to
+    it, a ramp that overflows) run natively only: 4c commits one ray of each kind, with 4B-RAY-COUNTS.
+  - 4B-MEMBER-KINDS (engine-architect, round 2): the types-to-schemas test compares keys, corner lengths and words, not
+    a member's kind (number, string or which word list): 4c's reader of the types.
+  - 4B-BOOT-CALLS (engine-architect, round 2): `boot.ts`'s two calls of the page's tested handling
+    (`takeWorkerMessage`, `takeWorkerError`) are read and type-checked, not tested.
+  - 4B-WALLCLOCK (test-engineer, TE-6): `static-world.spec.ts`'s wall-clock bound stays as a backstop; a follow-up
+    only if it ever flakes.
+  - 4B-SERVE-LINKS (security-auditor, round 2, its L2-3; outside 4b-2's diff, from change-set 3a; about 1 line):
+    `packages/client/serve.test.mjs` still skips its two link tests wherever a link cannot be made, CI included.
 
 ## Decisions pending: the rest
 _The advisor agent's rulings (not Mustafa's), the five carry-forwards, and the old ADR and design lines, moved from
@@ -2606,6 +2680,19 @@ _From STATUS's "Routines", moved here on 2026-11-23 by docs-keeper's script, byt
   3. No consumer yet: lane 2's `.github/workflows/preview.yml` is on its own branch, not in this branch's
      `.github/workflows/` (gate.yml and toolchain.yml only [verified 2026-11-26]); a `workflow_run` starts only from
      main's copy, so no preview starts until lane 2's file is on main (infra-engineer).
+- **Change-set 4b-2 of the v2 build plan, "The world"** (2026-11-27, no pull request number yet; the evidence: its
+  report `docs/reports/2026-11-27-cs4b2-world.md`, "Risks"; the follow-ups: the block "From change-set 4b-2" in
+  "Follow-ups"):
+  1. The static collision world is built and held but queried by nothing yet: its first real test is 4c's movement
+     and aim.
+  2. The players' file grew 4.7 times (54,514 bytes on main, 257,421 with the loader and the world's tree), mostly the
+     standard library's number reading and writing; recorded, not gated.
+  3. CI's toolchain run varies with the runner (8 min 48 s to 13 min 2 s on this seat's heads), about 12 minutes under its
+     25-minute limit at the slowest.
+  4. Two risks security-auditor left for acceptance, both on the developer's own computer: a browser that sends no
+     `Sec-Fetch-Site` header is served by the dev server as a tool would be; a folder swapped for a link between the
+     tools' check and their open is followed. Put to the advisor agent with the final head; its answer is not
+     recorded here [assumed: open].
 - **Change-set 4a of the v2 build plan, "The recording"** (2026-11-25, PR #70, a draft; the evidence: the chat's card
   and `round1-fold.md` in `.checkpoints/cs4a-recording/`, folded into 4a's report before the pull request is ready):
   1. The tests that read the recordings still follow a link (4A-S3-READ): CI cannot go green with one, since the folder

@@ -8,6 +8,8 @@ export const MAX_STEPS = 108_000;
 const MAX_MAP_ID_BYTES = 64;
 const MAGIC = "SHMBLREC";
 const TEST_SEED_MARK = "TESTSEED";
+/** The map a local match is played on: `sim_wasm::LOCAL_MAP`'s value (the boundary test reads it from the Rust source). */
+export const LOCAL_MAP = "test-scene";
 
 export interface RecordedStep {
   readonly hostMs: number;
@@ -134,10 +136,23 @@ export function checkReplayable(recording: Recorded): void {
   if (ascii(recording.seed.subarray(0, 8)) !== TEST_SEED_MARK) throw cannot("seed: a replay takes a public test seed only");
   if (recording.startTick !== 0) throw cannot("start tick: a match starts at tick 0");
   if (recording.firstSequence !== 0) throw cannot("first command sequence: a match starts at sequence 0");
-  if (recording.contentHash.some((byte) => byte !== 0) || recording.mapId !== "") throw cannot("content: this build takes none");
+  if (recording.contentHash.every((byte) => byte === 0) || recording.mapId === "") throw cannot("content: its header names none (a match runs on content and a map)");
+  if (recording.mapId !== LOCAL_MAP) throw cannot(`map: a local match is played on ${LOCAL_MAP} alone`);
   if (recording.steps.some((step) => step.movement !== 0)) throw cannot("move: the input call does not take it yet");
   if (recording.steps.some((step) => step.ray.some((word) => word !== 0))) throw cannot("aim: the input call does not take it yet");
   if (recording.steps.some((step) => step.viewTick !== 0 || step.viewFraction !== 0)) throw cannot("view time: the input call does not take it yet");
+}
+
+/**
+ * Holds `bundle` to the content the recording's header names, by its sha256 (WebCrypto, the same in Node and in a
+ * browser), before the match is made: a replay runs on the frozen content its recording ran on, never on another.
+ * Whether the game's loader takes it is the loader's to say, when the match is made.
+ */
+export async function checkContent(recording: Recorded, bundle: Uint8Array): Promise<void> {
+  const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", Uint8Array.from(bundle)));
+  if (digest.length !== recording.contentHash.length || digest.some((byte, at) => byte !== recording.contentHash[at])) {
+    throw new Error("the content is not the recording's: its sha256 is not the content hash the header names");
+  }
 }
 
 /** One step's calls, as the live host makes them, then the one number a replay reads. */

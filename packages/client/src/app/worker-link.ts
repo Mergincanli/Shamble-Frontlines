@@ -1,4 +1,4 @@
-import { isWorkerToPage, Ring, type PageToWorker, type WorkerStats } from "@shamble/sim-worker";
+import { cutText, isWorkerToPage, Ring, type PageToWorker, type WorkerStats } from "@shamble/sim-worker";
 import { BLOCK_BYTES, BLOCK_LAYOUT, checkLayoutHash } from "@shamble/types";
 import { EchoTally } from "./press-tally.ts";
 
@@ -208,8 +208,12 @@ export class WorkerLink {
     return this.#pauses;
   }
 
-  start(padBytes: number): void {
-    this.#port.postMessage({ type: "start", padBytes }, []);
+  /**
+   * Starts the match on the content bundle's bytes. They are transferred, not copied: after this call the page holds
+   * them no more (a copy the page wants to read is made before).
+   */
+  start(padBytes: number, bundle: ArrayBuffer): void {
+    this.#port.postMessage({ type: "start", padBytes, bundle }, [bundle]);
   }
 
   /**
@@ -221,6 +225,17 @@ export class WorkerLink {
     this.#failure = reason === "" ? "no reason was given" : reason;
     this.#port.terminate();
     return true;
+  }
+
+  /**
+   * The Worker's own error event (a script that did not load, a throw outside the Wasm) ends the match. Its text is
+   * the browser's and has no bound of its own: it is cut to the bound the Worker keeps for a thrown text. A script
+   * that did not load gives a plain event, with no text at all. Returns the reason, or an empty string when the match
+   * had already ended.
+   */
+  workerError(message: string | undefined): string {
+    const said = typeof message === "string" && message !== "" ? message : "the Worker failed";
+    return this.end(cutText(said)) ? this.#failure : "";
   }
 
   /** The Worker's message event. Unpacking it is part of the hand-off's cost, so it happens in here, by name. */

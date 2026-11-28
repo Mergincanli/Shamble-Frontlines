@@ -1,0 +1,143 @@
+{
+  "$defs": {
+    "id": {
+      "maxLength": 64,
+      "not": {
+        "pattern": "^(con|prn|aux|nul|com[0-9]|lpt[0-9])$"
+      },
+      "pattern": "^[a-z0-9][a-z0-9_-]*$",
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": {
+    "not": {}
+  },
+  "description": "One movement table (content/movement/<id>.json): how a soldier walks, sprints, jumps and tires.",
+  "properties": {
+    "ads_speed_multiplier": {
+      "description": "Walking speed while aiming, in times the walking speed.",
+      "exclusiveMinimum": 0,
+      "maximum": 1,
+      "type": "number"
+    },
+    "air_control_pct": {
+      "description": "Steering in the air, in percent.",
+      "maximum": 100,
+      "minimum": 0,
+      "type": "number"
+    },
+    "body_radius_m": {
+      "description": "His body against walls and ledges: its radius, in metres.",
+      "maximum": 2,
+      "minimum": 0.1,
+      "type": "number"
+    },
+    "format": {
+      "const": "shamble-movement",
+      "description": "The file's kind: shamble-movement."
+    },
+    "gravity_m_per_s2": {
+      "description": "Gravity, in metres per second squared.",
+      "exclusiveMinimum": 0,
+      "maximum": 100,
+      "type": "number"
+    },
+    "id": {
+      "$ref": "#/$defs/id",
+      "description": "The table's id, which is its file's name."
+    },
+    "jump_reach_m": {
+      "description": "The highest ledge a jump reaches, in metres.",
+      "maximum": 10,
+      "minimum": 0,
+      "type": "number"
+    },
+    "push_radius_m": {
+      "description": "Body size for pushing: its radius, in metres.",
+      "maximum": 2,
+      "minimum": 0.1,
+      "type": "number"
+    },
+    "push_strength_per_s": {
+      "description": "How stiffly two soldiers push apart, per second.",
+      "maximum": 100,
+      "minimum": 0,
+      "type": "number"
+    },
+    "speed_up_time_to_90pct_s": {
+      "description": "How fast he reaches his speed: the time to 90 percent of it, in seconds.",
+      "exclusiveMinimum": 0,
+      "maximum": 5,
+      "type": "number"
+    },
+    "sprint_multiplier": {
+      "description": "Sprint speed as a share of walking, in times the walking speed.",
+      "maximum": 3,
+      "minimum": 1,
+      "type": "number"
+    },
+    "sprint_returns_at_pct": {
+      "description": "When sprint comes back after running dry, in percent of the bar.",
+      "maximum": 100,
+      "minimum": 0,
+      "type": "number"
+    },
+    "sprint_time_from_full_s": {
+      "description": "Sprint time on a full bar, in seconds.",
+      "exclusiveMinimum": 0,
+      "maximum": 60,
+      "type": "number"
+    },
+    "stamina_refill_time_s": {
+      "description": "Time to refill the bar, in seconds.",
+      "exclusiveMinimum": 0,
+      "maximum": 120,
+      "type": "number"
+    },
+    "step_up_m": {
+      "description": "What he walks onto without jumping: the highest step, in metres.",
+      "maximum": 1.5,
+      "minimum": 0,
+      "type": "number"
+    },
+    "stop_time_to_10pct_s": {
+      "description": "How fast he stops: the time down to 10 percent of his speed, in seconds.",
+      "exclusiveMinimum": 0,
+      "maximum": 5,
+      "type": "number"
+    },
+    "version": {
+      "const": 1,
+      "description": "The version of the movement format the file is written in."
+    },
+    "walk_speed_m_per_s": {
+      "description": "Walking speed, in metres per second.",
+      "exclusiveMinimum": 0,
+      "maximum": 20,
+      "type": "number"
+    }
+  },
+  "required": [
+    "ads_speed_multiplier",
+    "air_control_pct",
+    "body_radius_m",
+    "format",
+    "gravity_m_per_s2",
+    "id",
+    "jump_reach_m",
+    "push_radius_m",
+    "push_strength_per_s",
+    "speed_up_time_to_90pct_s",
+    "sprint_multiplier",
+    "sprint_returns_at_pct",
+    "sprint_time_from_full_s",
+    "stamina_refill_time_s",
+    "step_up_m",
+    "stop_time_to_10pct_s",
+    "version",
+    "walk_speed_m_per_s"
+  ],
+  "title": "shamble-movement",
+  "type": "object"
+}
