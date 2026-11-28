@@ -809,8 +809,8 @@ DONE
 ### Notes
 - [B11-1] The branch head's Rust is main's: `git log` shows 4c-1's commits are page and notes only, so every file:line below is dae6d107's. Today's facts used: `PlayerCommand { buttons: u16, presses: [u8; 16] }` (world.rs:40-43); `SHARED_STATE_BYTES = 4 + 2 + 16` (:18); `StateSink` has `u16`, `u32`, `bytes`, `authority` and `secret`, with no float method (:57-66); `World { tick, player, seed }` (:112-117); `World::new` is `const fn` (:122); `authority_step` (:149); `visit_shared` (:177); the known answers at :401-415 (0x9c1e_17d4_0d7a_14dd and six more); `StaticWorld` (collision.rs:95), `narrow` (:103), `enter_box` (:114), `enter_ramp` (:152), `build` (:212), `cast_ray` (:300); content's `FIELDS: [Field; 15]` (movement.rs:17-33) and `Movement` (:37-54); recordings `crates/devtools/recordings/first-loop.{content.json,hashes,rec,vector.txt}` and `manifest.txt`.
 
-### 11.1 The tick (`World::authority_step`, in this order; slot order throughout, no hash map, no clock)
-1. **The command fold** (room side, then world): the slot's commands for the tick are applied oldest first. The newest one's buttons and presses become the record, as today (world.rs:150-152). Each command's move goes into the row's `held_move`. Each command with a real aim sets the row's `aim_cm`; `AimCm::NONE` leaves it. A tick with no command keeps all three (world.rs:143-145's rule, extended to the row).
+### 11.1 The tick (`World::authority_step(&mut self, rules: &Rules, statics: &StaticWorld, counts: &mut QueryCounts, commands: &[PlayerCommand])`, every borrow for the call only, lent by the `Room` (engine-architect block 7, confirmed in block 14); in this order; slot order throughout, no hash map, no clock)
+1. **The command fold** (room side, then world): the slot's commands for the tick are applied oldest first. The newest one's buttons and presses become the record, a `PlayerRecord { buttons, presses }` (engine-architect B1; today world.rs:150-152 copies the whole command). Each command's move goes into the row's `held_move`. Each command with a real aim sets the row's `aim_cm`; `AimCm::NONE` leaves it. A tick with no command keeps all three (world.rs:143-145's rule, extended to the row).
 2. **Per soldier, in slot order:**
    a. Wish: `held_move` over 127 (integer length at most 127, clamped by the room); sprint and stamina in integers (block 1.2); the speed = walk or sprint.
    b. Jump: at most one per tick when the presses counter passed the record's base and he is grounded (3B-ONE-PER-TICK, J1 to J5).
@@ -892,7 +892,7 @@ DONE
 ### 11.6 Symbols to add, change and remove, by file
 - **sim, new files:**
   - `ids.rs`: `SoldierId { slot: u16, generation: u16 }`, `to_bits`, `from_bits`, `NONE`.
-  - `soldiers.rs`: `MAX_SOLDIERS = 48`, `Soldier` (11.2), its flag constants, `Soldiers { slots, count }`, `spawn`, `despawn`, `resolve`, `resolve_mut`, `iter`.
+  - `soldiers.rs`: `MAX_SOLDIERS = 48`, `Soldier` (11.2), its flag constants, `Soldiers { slots, count }`, `spawn`, `despawn`, `resolve`, `resolve_mut`, `iter`; `SpawnPoint { at: V3, facing: [f32; 2] }` and `spawn_points(&MapDocument) -> Vec<SpawnPoint>` (ranked by id, `at` by `narrow`, `facing` by `fmath::facing_of`; built once per match).
   - `rules.rs`: `Rules`, `Rules::take`, `RulesError` and its `message`, `HeadroomFeet`, `HEADROOM_FEET`.
   - `fmath.rs`: `share_per_tick`, `facing_of`, `DEG_TO_RAD`, plus 3A-SCAN-HELPERS' float helpers (block 1.3).
   - `aim.rs`: `AimCm`, `AimCm::NONE`.
@@ -900,23 +900,25 @@ DONE
   - `movement.rs`: `step_soldier` and its phases (11.1 2a to 2i), `push_pass`.
 - **sim, changed:**
   - `vec.rs`: V3's `add`, `sub`, `scale`, `dot`, `length_sq`.
-  - `collision.rs`: `StaticWorld` gains `bounds_m`, `bounds_cm`, `floor_y()`, `candidates(min, max, visit)`, `holds_cm`, `clamp_cm`; `build` derives both bounds from the f64 face (netcode-architect 7.3); `WorldError::Bounds`.
-  - `world.rs`: `PlayerCommand` gains `move_x`, `move_y: i8` and `aim: AimCm` (its `NONE` takes `AimCm::NONE`); `World` gains `soldiers` and the match's constants (`rules`, `statics`, `spawns`), which are not state; `World::new` stops being `const`; `authority_step` (11.1); `visit` and `visit_shared` (11.2); `SHARED_STATE_BYTES` and `STATE_BYTES`; `StateSink::f32` with its implementors `Canonical` (:89) and the test sinks (:313, :360).
-  - `lib.rs`: the new modules.
+  - `collision.rs`: `StaticWorld` gains `bounds_m`, `bounds_cm`, `floor_y()`, `candidates(min, max, visit)`, `holds_cm`, `clamp_cm`; `build` derives both bounds from the f64 face (netcode-architect 7.3); `WorldError::Bounds`; `narrow` (:103) becomes `pub(crate)`.
+  - `world.rs`: `PlayerCommand` gains `move_x`, `move_y: i8` and `aim: AimCm` (its `NONE` takes `AimCm::NONE`); ADD `PlayerRecord { buttons: u16, presses: [u8; BUTTONS] }` with `NONE`, and `World.player: PlayerRecord`, `World::player() -> &PlayerRecord`; `World` gains `soldiers` only (`World { tick, player, soldiers, seed }`; block 14 strikes "and the match's constants (`rules`, `statics`, `spawns`), which are not state"); `World::new(setup: &MatchSetup, rules: &Rules, spawns: &[SpawnPoint])`, no longer `const`, making slot 0's soldier at the lowest-id spawn (B4 (a), its owners' call); `authority_step` (11.1); `visit` and `visit_shared` (11.2); `SHARED_STATE_BYTES` and `STATE_BYTES`; `StateSink::f32` with its implementors `Canonical` (:89) and the test sinks (:313, :360).
+  - `lib.rs`: the new modules; the re-exports gain `PlayerRecord` and `SpawnPoint`.
+  - `body.rs`: `QueryCounts` is a run's tally held by the `Room` and lent `&mut` to the step; block 2's accessor on the world is struck (engine-architect B2).
 - **content:**
   - `movement.rs`: FIELDS 15 → 28 and `Movement` (11.4), with the schema, generated types and test text.
   - `map.rs`: `on_grid` made `pub`; GROUND's words (engine-architect 5.2); the aim's "floor" words.
   - `content/movement/soldier.json`: the 13 new values.
   - `content/source/testlines-table.json` rows with `packages/client/scripts/testlines.mjs --check`.
 - **Callers:**
-  - `room/src/lib.rs`: `Room::new` takes the constants; the fold with its NONE case and `holds_cm` (counted `refused_aim`); :219 and `queue.rs:137` (literals).
+  - `room/src/lib.rs`: `Room` gains `rules: Rules`, `statics: StaticWorld`, `spawns: Vec<SpawnPoint>` and `query_counts: QueryCounts` beside `world` (:87); `Room::new(setup, content_hash, rules, statics, spawns)` (:105), total; ADD `Room::statics()` and `Room::query_counts()`; :282 lends the four; :286-296 reads the `PlayerRecord`; the fold with its NONE case and `holds_cm` (counted `refused_aim`); :219 and `queue.rs:137` (literals); its tests and `tests/any_bytes.rs:117` build the three once from the test bundle (the batch's dev-dependency) and clone them per room.
   - `room/tests/any_bytes.rs` (the generator: NONE taken, any other x of -32,768 refused).
-  - sim-wasm: `lib.rs` builds the constants; `local_match.rs` loses `LocalMatch.world` and its doc (:48-50); `tests/step_alloc.rs`.
+  - sim-wasm: `lib.rs`'s `local_world` (:83-86) becomes `local_constants(set) -> Result<(Rules, StaticWorld, Vec<SpawnPoint>), CreateError>` (the map by `LOCAL_MAP`; the movement as the bundle's one movement document, B5 (c)); `CreateError` gains `Rules(RulesError)` and `Soldier { found }`; its test :401-410 reads `local().room().statics()`; `local_match.rs`: `LocalMatch::new(setup, first_sequence, pad_bytes, link, rules, statics, spawns)`, loses `world` and its doc (:48-50) and `static_world()` (:96-100); its tests (:203-215) build the three; `tests/step_alloc.rs:81-86`.
   - `protocol/src/messages.rs`: `AimPoint::NONE` and the aim doc's sentence.
   - `client-endpoint/src/endpoint.rs:258`: writes NONE.
-  - devtools: `replay.rs:181` (`Lines` gains `f32`); `tests/hash_cost.rs:40`.
-  - `sim/tests/state_hash_alloc.rs:70-94`.
-- **Removed:** `LocalMatch.world`; `World::new`'s `const`; block 7.3's first aim (never built); netcode-architect's "off the grid is refused".
+  - devtools: `replay.rs:181` (`Lines` gains `f32`); `tests/hash_cost.rs:40-46` builds the three and passes them; `tests/layering.rs` (the batch's F2) reads non-test tokens only (rules_scan.rs:695-718's marking reused).
+  - `sim/tests/state_hash_alloc.rs:70-94` builds the three and passes them.
+  - client-endpoint: nothing beyond `endpoint.rs:258` in step 1.
+- **Removed:** `LocalMatch.world` and `LocalMatch::static_world()`; `local_world`; `World.player: PlayerCommand`; `World::new`'s `const`; block 2's query-count accessor on the world; block 7.3's first aim (never built); netcode-architect's "off the grid is refused".
 - **New tests:**
   - `crates/sim/tests/step_alloc.rs`;
   - `crates/sim/tests/movement_yard.rs` (the yard's cases);
@@ -947,16 +949,24 @@ DONE
 | 19 | easing from rest at the steps and ledges (72 runs) | `air_share` applied on the ground |
 | 20 | the push: 16 cases (block 6 F) on velocities; slot orders bit-identical bar the one-spot case, its tie by id | the push applied in place in pair order (a slot swap changes the bits) |
 | 21 | the oracle (DEPART-4C (a) (1); F3): our circle's sweep against parry3d's cast of the 1.8 m Cylinder, horizontal moves at seeded feet heights. Compared: a box's four vertical faces and four vertical edges; a ramp's two side faces, its exposed high-end face and the vertical edges they share; hit times within 1e-5 and **no hit against no hit** (a miss where the library hits fails). Left out, with why: the ramp's low end and its slope face (our sweep never meets them: a ramp met within its width is the set-back's and the step-up's, 11.3), every top and bottom face (vertical motion is the arc's, not the sweep's), and any contact where our wall test and the face's height at the library's contact point fall on opposite sides of feet + 0.555 (a step for us; counted, not compared). Seeded heights include each shape's bottom and top at plus and minus 1e-4 (both hit or both miss); exactly equal heights counted, not compared | the ramp's side taken at its high end's height; a miss reported as no contact where the library hits |
-| 22 | the record and NONE: netcode-architect's restore (P1 to P3), the room's pin, N-1 to N-3; my S-1 to S-3 (block 8); one room test on a world wholly past the reach (engine-architect 6.2) | each of theirs as written; NONE turning the facing (S-1); a `clamp_cm` that unwraps an empty box |
+| 22 | the record and NONE: netcode-architect's restore (P1 to P3) as T-F, with `read_shared(bytes, setup) -> World` and the step lent the same three, the room's pin, N-1 to N-3; my S-1 to S-3 (block 8); one room test on a world wholly past the reach (engine-architect 6.2) | each of theirs as written; NONE turning the facing (S-1); a `clamp_cm` that unwraps an empty box |
 | 23 | GROUND T1: on a map whose bounds start at y 2, a soldier spawned 1 m up lands at exactly 2 | the floor at y 0 |
 | 24 | no allocation: a counting allocator around `authority_step`, 1,800 ticks of 12 scripted soldiers (walk, sprint, jump, step, push, starts inside shapes) | 64 bytes allocated per tick; a sweep collecting into a `Vec` |
 | 25 | `visit_shared` names every field (the pattern), 2,902 shared bytes, the row's order | a row field left out (`held_move: _`) |
 | 26 | J1 to J5, the jump's rule (3B-ONE-PER-TICK; netcode-architect-read.md:162, moved here from its step 2 by the advisor agent's Q4 condition 5): 255 presses in one grounded command make one jump; a press in the air makes none and none is kept for the landing; Space held jumps again at each landing; two commands in one tick, each +1, one jump; a tap shorter than a tick one jump | a jump per press; presses kept for the landing; the held bit read alone |
+| 27 | T-A, the state rule (rules_scan.rs's tokenizer): every field of `struct World` bound by name in exactly one of `visit` and `visit_shared`, no `_` in `visit_shared`'s pattern but `seed: _` | `counts: QueryCounts` in `World` written `counts: _`; `player: PlayerCommand` with `move_x: _, move_y: _, aim: _`; a field bound in both. Control: the built `World` |
+| 28 | T-B, one bundle, two builds: two worlds from two loads and two builds of the test bundle, 300 scripted commands: per-tick hashes, `tree_bytes()`, `Rules` and spawn tables equal | a `static` counter in `spawn_points` moving each later build's spawn 1 mm |
+| 29 | T-C, HEADROOM-FEET on a map with no floating shape (the test bundle's one-box map): equal hashes under both modes at every tick | the mode written into the row at spawn (a `flags` bit) |
+| 30 | T-D, the bundle decides (devtools replay tests through `Sim::create`): bundle Y (X with `jump_reach_m` changed) equals X's hashes until the first jump's tick and differs from it on | `Sim::create` taking its movement from `TEST_TEXT` instead of the bundle |
+| 31 | T-E, built once: sim-wasm's `step_alloc.rs` around `LocalMatch::step` | `self.statics.clone()` in `Room::step` every tick |
+| 32 | T-G, layering: no non-test token under room's and the endpoint's `src/` names `content`; the same line inside `#[cfg(test)] mod tests` passes (control) | `use content::map::MapDocument;` in a copy of room's non-test source |
+| 33 | B5 (c): a bundle with no movement document and one with two are refused by `Sim::create` with `CreateError::Soldier { found }` (0 and 2); the three bundles of today (test, repository, frozen first-loop) each play their one | the first of several taken silently |
 
 ### 11.8 The pins, re-made in the same commit
 The commit that first puts a soldier in the hashed state (the batch's commit, 11.5) re-makes:
 - world.rs's known answers (:401-415), by the second implementation (a script) writing them again;
-- the committed first recording: `crates/devtools/recordings/first-loop.*` and `manifest.txt`, through its script, with `crates/devtools/tests/recordings.rs` (:24, :29) green on the new files.
+- the committed first recording: its frozen bundle first re-frozen (`make_recordings --freeze first-loop`, once content's 13 new values have landed, so the header's hash names the new bundle and the replay builds `Rules` from it; engine-architect block 7 item 4), then the plain run re-making `crates/devtools/recordings/first-loop.*` and `manifest.txt`, with `crates/devtools/tests/recordings.rs` (:24, :29) green on the new files.
+- world.rs's known answers now also rest on the test bundle (its spawn and its stamina): a change to the test bundle or a derivation re-makes them in that commit.
 
 CI is green at that commit (the advisor agent's item 7, condition 4). Step 2 then moves no first-loop hash, since NONE lands whole here (block 8).
 
@@ -972,7 +982,7 @@ CI is green at that commit (the advisor agent's item 7, condition 4). Step 2 the
 | exp and sincos vectors, maths-allowed entries | 100 / 60 |
 | the record, NONE, the bounds' one home (netcode-architect 7 and 8, engine-architect 5 and 6) | 30 / 205 |
 | content's 13 fields, the table rows, `--check` | 60 / 60 |
-| **Step 1** | **about 1,520 / 1,945 (3,465 lines; block 12's two made maps +10 tests; block 13: J1 to J5 +10 / +80, test 15 both modes +10, test 21's faces +15)** |
+| **Step 1** | **about 1,560 / 2,075 (3,635 lines; block 14: the placement +40 / +130; block 12's two made maps +10 tests; block 13: J1 to J5 +10 / +80, test 15 both modes +10, test 21's faces +15)** |
 The movement row (720 / 850) is block 1's sweeps plus movement (690 / 680) re-made as block 10's 2.5D form: blocks 5, 6, 9 and 10. It agrees with the sheet's "about 3,350 in all" (I4b). Not in it: block 2's ray counts and sweep proof (90 / 70, step 1 or 6, the sheet's call).
 
 ### 11.10 What this supersedes
@@ -1056,5 +1066,47 @@ DONE
 4. **J1 to J5** are row 26 of 11.7, +10 / +80 in 11.9; step 2's count drops them.
 5. **The recordings:** walk and lane-walk run on the test scene, which holds no case where (b) can bite (B13-3), so their hashes are identical under both modes. A flip to (a) moves no committed pin, only test 15's expected numbers; test 15 checks the two routes' hashes under both modes, so a later map that breaks this shows at once.
 6. **The count:** 11.9 moves to about **1,520 / 1,945** (3,465 lines): J1 to J5 +10 / +80, test 15's both modes +10, test 21's faces +15. 11.6's placement of `rules`, `statics` and `spawns` is untouched (block 14).
+
+DONE
+
+## Block 14. engine-architect's block 7 (WORLD-ROOM, the advisor agent's F1): confirmation (2026-11-28)
+### Plan
+1. Read block 7 (Part A, B1 to B5, items 1 to 6); check its citations against today's code. 2. Confirm or dispute Part A, the 17 changes and B5. 3. Rewrite 11.1, 11.6, 11.7, 11.8 and 11.9 to the placement. 4. DONE.
+
+### Notes
+- [B14-1] Citations checked against dae6d107:
+  - room/src/lib.rs:85-99: `Room { world, content_hash, joined_at, queue, input, last_run, newest_received, newest_sent, counters }`. :282 is `self.world.authority_step(run.get(..ran).unwrap_or(&[]))`; :286-296 reads `player.buttons` and `player.presses` into `OwnState`.
+  - sim-wasm/src/lib.rs:25: `LOCAL_MAP = "test-scene"`, with its doc "A mode that names its map comes with a later change-set" (:23-24). :83-86: `local_world`, the one map lookup and `StaticWorld::build`.
+  - local_match.rs:48-50 holds `world: StaticWorld` ("No step queries it yet"); :96-100 `static_world()`.
+  - collision.rs:101-108: `narrow`, private today.
+  - content's bundle.rs:53 and :65: `movements: Vec<Movement>` and `movements()`, so (c)'s "the one movement document" reads a list that exists.
+  - All as block 7 says.
+
+### Answers
+1. **Part A: YES, A1 to A5.**
+   - A constant inside `World` would either be hashed with content the digest already names or ride every copy unhashed. Lending it per call keeps `World` free of a lifetime, and the room's disjoint field borrows (`&self.rules`, `&self.statics`, `&mut self.world`) need no unsafe and no `RefCell`.
+   - The plain form (A5) is enough: three fields, three arguments, and `LocalMatch::new` at 7 arguments sits at clippy's `too_many_arguments` limit (it fires above 7), not over it.
+   - **The 17 changes: YES to each, none disputed:** (1) to (3), (4) the step's signature, (5) `SpawnPoint` and `spawn_points` (the `Vec` is built once in `Sim::create`, not in the step, so 11.7's test 24 stays clean), (6) `narrow` as `pub(crate)`, (7) `QueryCounts` in the room, (8) the re-exports, (9) to (12) the room, sim-wasm and the three test callers, (13) and (14) nothing more, (15) layering.rs on non-test tokens, (16) the rows, (17) the superseded lines (1.6's "into the room's `World`" and block 2's accessor here; netcode-architect's `read_shared(bytes, setup)` is its own).
+   - **One addition from item 4, taken into 11.8:** the frozen first-loop bundle is re-frozen (`make_recordings --freeze first-loop`) once content's 13 new values land, before the plain run, in the same commit.
+2. **B5 (c): YES.**
+   - The match plays the bundle's one movement document and refuses none or several with `CreateError::Soldier { found }`.
+   - It works on all three bundles of today with no edit to the 49 "test-soldier" lines, no change to the recording's format, and no batch file; it follows `LOCAL_MAP`'s own rule (a mode that names its soldier comes with the second movement document).
+   - Test: 11.7 row 33, with its plant.
+3. **11.1, 11.6 and 11.8 are rewritten** in place:
+   - the step's signature;
+   - `PlayerRecord` (it changes no byte `visit_shared` writes: the record's buttons and presses as before, so 11.2 stands);
+   - `SpawnPoint` and `spawn_points`;
+   - the room's four fields and two accessors;
+   - `local_constants` and `CreateError`'s two variants;
+   - `LocalMatch::new`;
+   - the removals;
+   - the re-freeze.
+   - Superseded: 11.6's earlier "the match's constants ... which are not state" in `World`, block 1.6's "into the room's `World`", block 2's accessor on the world.
+4. **11.7:**
+   - T-A, T-B, T-C, T-D, T-E and T-G are new rows 27 to 32, with their plants; B5 (c) is row 33.
+   - T-F is my row 22 (netcode-architect's restore), now with `read_shared(bytes, setup)` and the step lent the same three.
+   - My row 24 (allocation around `authority_step`) stays beside T-E: they see different layers.
+   - Row 26 (J1 to J5) is back in its place.
+5. **11.9:** about **1,560 / 2,075 (3,635 lines)**, with the placement's +40 / +130.
 
 DONE
