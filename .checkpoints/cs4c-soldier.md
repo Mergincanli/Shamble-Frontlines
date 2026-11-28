@@ -221,7 +221,18 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   `/home/user/Shamble-Frontlines/.gate/cs4b-2`. A session of another account works on its own branch from this
   branch's head and never pushes here (his Lanes rule). SEAT-OUT from him: stop at a whole point and report the last
   commit's id.
-- **State (15:32 Amsterdam, from the clock): F1's written answer is engine-architect's block 7** (the room owns
+- **State (15:49 Amsterdam, from the clock; the container restarted before 15:48, the first clock read after it; the
+  worktree re-entered by its own `cd`): F1 closed** (engine-architect's block 7, confirmed by rust-reviewer's block 14; B5 (c) confirmed);
+  **game-designer's block 9:** the lowest-id spawn is a build default, not his (the early look's step 1 names
+  `street_1` as a stand-in); **security-auditor's third answer:** REVISE on layering.rs's wording only, the batch's
+  approval standing (a narrow test-only marking with its plants, in `step1-build-order.md` C3; its F5 and F6, Lows);
+  **netcode-architect's block 9** (written whole before the restart, committed after it at f63d7eb0): B4 yes with three
+  conditions and tests W-1 to W-4; step 1 carries the wire's move and aim through the room with both checks (a plan
+  delta: T2-6 and T2-7 from step 2 to step 1); Q-1 (the step only writes its query counts). **Running:**
+  rust-reviewer's block 15 (folds all of it into 11.1, 11.6, 11.7, 11.9; grounded at spawn; the panic scan's leak; the
+  spawn ranking). **Next:** the advisor agent on the plan delta (F5's rule: a table that departs from its read comes
+  back to it), then the advisor tool on the build order, then C1. Earlier state (15:32), kept: **F1's written answer is
+  engine-architect's block 7** (the room owns
   rules, statics and spawns; `World` holds the tick, a `PlayerRecord`, the soldiers and the seed; 17 changes to
   rust-reviewer's 11.6; B5, the bundle's one movement document, blocks step 1's code until confirmed; B4, slot 0's
   soldier at the lowest-id spawn, a default). Q2's re-run is done (rust-reviewer's block 13: the test scene and every
