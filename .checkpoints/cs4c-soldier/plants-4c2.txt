@@ -1,4 +1,4 @@
-plants on 4b5f922cd8d79b1ba30e4ca6aef797d16706d603-with-C3
+plants on 1b08e8ac1f90b446c6181812bb896dc867e05469
 R1 CAUGHT (defect): a spawn that does not raise the slot's generation: an id despawned before resolves again: exit 101, found 1 of 1 wanted texts
 R2 CAUGHT (defect): a despawn that leaves the row occupied: the despawned id still resolves: exit 101, found 1 of 1 wanted texts
 RC1 HELD (control): the clean tree: the soldier table's tests: exit 0, found 1 of 1 wanted texts
@@ -30,15 +30,53 @@ PV1n HELD (control): the same plant natively: the native check stays green (the 
 PV2 CAUGHT (defect): the recorded exp digest moved one step: the native check goes red: exit 101, found 2 of 2 wanted texts
 PV3 CAUGHT (defect): the header names other inputs (its sha256 moved): named as such before anything is worked out: exit 101, found 2 of 2 wanted texts
 PV4 CAUGHT (defect): the generator moved one grid step: its --check refuses the committed inputs: exit 1, found 1 of 1 wanted texts
-PVC1 DID NOT HOLD (control): the clean tree: the test-only module built again and the rule tests under Node: exit 0, found 1 of 2 wanted texts; missing ['Test Files  1 passed']
+PVC1 HELD (control): the clean tree: the test-only module built again and the rule tests under Node: exit 0, found 2 of 2 wanted texts
 PVC2 HELD (control): the clean tree: the native vectors and the generator's check: exit 0, found 1 of 1 wanted texts
-RC2 HELD (control): the clean tree: sim's unit tests: exit 0, found 1 of 1 wanted texts
+P11 CAUGHT (defect): M1 put back: an escaped quote's character ends at the escaped quote, so `['\'','{']` opens a brace (layering): exit 101, found 1 of 1 wanted texts
+P11b CAUGHT (defect): M1 put back, seen by the content crate's panic scan: exit 101, found 1 of 1 wanted texts
+P12 CAUGHT (defect): L3 undone: a manifest line with an escape is read as written: exit 101, found 1 of 1 wanted texts
+P13 CAUGHT (defect): L4 undone: a pub type alias of a content type is not counted as handed on: exit 101, found 1 of 1 wanted texts
+RC2 HELD (control): the clean tree: sim's unit tests (59 from C4 on: 46 at C3): exit 0, found 1 of 1 wanted texts
 RC3 HELD (control): the clean tree: the rule scan: exit 0, found 1 of 1 wanted texts
-RC4 DID NOT HOLD (control): the clean tree: layering and the dependency rules: exit 0, found 0 of 1 wanted texts; missing ['test result: ok. 3 passed']
+RC4 HELD (control): the clean tree: layering: exit 0, found 1 of 1 wanted texts
 RC5 HELD (control): the clean tree: the dependency rules: exit 0, found 1 of 1 wanted texts
 VC1 HELD (control): the clean tree: the content crate's tests: exit 0, found 1 of 1 wanted texts
 VC2 HELD (control): the clean tree: the page's content tests: exit 0, found 2 of 2 wanted texts
 VC3 HELD (control): the clean tree: the converter's tests: exit 0, found 1 of 1 wanted texts
 VC4 HELD (control): the clean tree: the converter's check on the real table and content file: exit 0, found 1 of 1 wanted texts
-DEFECT CHECKS: 29 caught, 0 not caught. CONTROLS: 10 held, 2 did not hold.
-EVERY FILE PUT BACK (sha256 of 17 files as at the start): yes
+B1 CAUGHT (defect): the bounds by plain rounding up and down, with no grid test: a lower face at 0.55 lands on 56: exit 101, found 1 of 1 wanted texts
+B2 CAUGHT (defect): off the grid the lower faces rounded outward (floored): -32.004 on -3,201, 1 cm outside the map: exit 101, found 2 of 2 wanted texts
+B3 CAUGHT (defect): a refusal of bounds past the aim's reach in the build: the 2 km map does not build: exit 101, found 1 of 1 wanted texts
+B4 CAUGHT (defect): an empty box kept: bounds wholly past the reach give a box with its low corner above its high one: exit 101, found 1 of 1 wanted texts
+B5 CAUGHT (defect): the aim's lower faces left out of the box (`<` for `<=`): exit 101, found 1 of 1 wanted texts
+W1 CAUGHT (defect): W-1: his aim at spawn the origin, not "no aim yet": exit 101, found 1 of 1 wanted texts
+W2 CAUGHT (defect): W-1: his stamina empty at spawn: exit 101, found 1 of 1 wanted texts
+W3 CAUGHT (defect): W-1: his soldier in slot 1: exit 101, found 1 of 1 wanted texts
+W4 CAUGHT (defect): W-1: not grounded at spawn: exit 101, found 1 of 1 wanted texts
+W5 CAUGHT (defect): W-4: the fold makes his row on a map with no spawn: exit 101, found 1 of 1 wanted texts
+W6 CAUGHT (defect): N-1: every command's aim taken, "no aim yet" too: a tick of [A, no aim] loses A: exit 101, found 1 of 1 wanted texts
+W7 CAUGHT (defect): row 25: a row field left out of the shared bytes (the held move): exit 101, found 1 of 1 wanted texts
+W8 CAUGHT (defect): T2-6: the move's reach with `<` for `<=`: (127, 0) refused: exit 101, found 1 of 1 wanted texts
+RM1 CAUGHT (defect): T2-6: the aim held to its type's range only: an aim 1 cm past a face is taken: exit 101, found 1 of 1 wanted texts
+RM2 CAUGHT (defect): T2-6: `refused_aim` left out of `refused()`: exit 101, found 1 of 1 wanted texts
+RM3 CAUGHT (defect): N-1: "no aim yet" sent through the bounds: refused on a map that leaves the origin out: exit 101, found 1 of 1 wanted texts
+RM4 CAUGHT (defect): N-1: any aim with x -32,768 read as "no aim yet": the two malformed aims taken: exit 101, found 1 of 1 wanted texts
+RM5 CAUGHT (defect): W-3: the fill with the move (0, 0): exit 101, found 1 of 1 wanted texts
+RM6 CAUGHT (defect): W-3: the join answer's slot 1: exit 101, found 1 of 1 wanted texts
+RM7 CAUGHT (defect): the pin: the last command fed again on a starved tick: exit 101, found 1 of 1 wanted texts
+RM8 CAUGHT (defect): T-E: the room's static world cloned every tick: exit 101, found 1 of 1 wanted texts
+AB1 CAUGHT (defect): T2-7: an honest move drawn over the whole i8 range: the identity of the refused moves breaks: exit 101, found 1 of 1 wanted texts
+TA1 CAUGHT (defect): T-A: a field of the world bound in both visit and visit_shared: exit 101, found 1 of 1 wanted texts
+TB1 CAUGHT (defect): T-B: a static count in spawn_points moving each later build's spawn by 1 mm: exit 101, found 1 of 1 wanted texts
+SW1 CAUGHT (defect): B5 (c): the first of several movement documents taken silently: exit 101, found 1 of 1 wanted texts
+NT1 CAUGHT (defect): the two NONEs untied: the wire's at x -32,767: the room does not build: exit 101, found 1 of 1 wanted texts
+NT2 CAUGHT (defect): both NONEs at x -32,767, still tied, inside the reach: the reach test goes red: exit 101, found 1 of 1 wanted texts
+C4C1 HELD (control): the clean tree: the collision tests: exit 0, found 1 of 1 wanted texts
+C4C2 HELD (control): the clean tree: the room's unit tests: exit 0, found 1 of 1 wanted texts
+C4C3 HELD (control): the clean tree: the room's fuzz test: exit 0, found 1 of 1 wanted texts
+C4C4 HELD (control): the clean tree: the state rule: exit 0, found 1 of 1 wanted texts
+C4C5 HELD (control): the clean tree: the players' module's unit tests: exit 0, found 1 of 1 wanted texts
+C4C6 HELD (control): the clean tree: the local match's allocation count: exit 0, found 1 of 1 wanted texts
+C4C7 HELD (control): the clean tree: the aim's reach: exit 0, found 1 of 1 wanted texts
+DEFECT CHECKS: 60 caught, 0 not caught. CONTROLS: 19 held, 0 did not hold.
+EVERY FILE PUT BACK (sha256 of 24 files as at the start): yes

@@ -266,6 +266,11 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   re-exports. (13) the tests of rows 22, 25, 27, 28, 31, 33, 34, 35, 36, 37, 38 (bar the direct feed), 39; world.rs's
   known answers re-made by a second implementation written for it in the notes (no committed script exists: earlier
   change-sets' agents wrote theirs in notes), `world-known-answers-c4.py`, FNV-1a 64 over the canonical bytes.
+- **State (19:21 Amsterdam, from the clock): the whole plant set on C4's tree: 60 of 60 defects caught, 19 of 19
+  controls held, every file put back** (`plants-4c2.txt`, its first line naming 1b08e8ac: the tree was a95ea332's,
+  notes only since). The tree then compared with the saved patch (`cmp`: the same) and the new file with its copy
+  (the same). The full local checks running on it (`.gate/local-checks-c4.log`); the advisor agent's ruling still
+  running.
 - **State (19:18 Amsterdam, from the clock): the advisor tool's check of C4 taken; the whole plant set running
   (`.gate/plants-whole-c4.log`; its first line names 1b08e8ac, the head before this card's last notes commit
   a95ea332, which changed notes only); the advisor agent asked to rule on one departure
