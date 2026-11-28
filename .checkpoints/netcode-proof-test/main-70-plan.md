@@ -1,5 +1,11 @@
-# MAIN-70: take main dae6d107 (#79 cs4b-2, "The world") into the lane: the plan (rev 0.1, DRAFT for the check)
-Status: DRAFT, 2026-11-28 02:0x UTC, for the advisor agent's check. Nothing below runs before it, except read-only reads.
+# MAIN-70: take main dae6d107 (#79 cs4b-2, "The world") into the lane: the plan (rev 0.2, as checked)
+Status: as checked: APPROVE WITH CONDITIONS M70-1 to M70-9 (advisor-main-70.md, "Status: COMPLETE 2026-11-28T02:18Z"),
+for main's tip dae6d107fdbe942567104bcf1c9a2cbc6b3a1e0f. The conditions apply word for word as advisor-main-70.md:110-177
+gives them (with its "Corrections and slips" block, :232-264): M70-1 step 1's anchor bar and C68B-4's preconditions on T;
+M70-2 step 4's four extra bars and the expected shortstat after the commit; M70-3 M69-1's three whole-tree bars at step 5;
+M70-4 the resume line on the card word for word; M70-5 a further move of main; M70-6 step 7's baseline (toolchain job
+140780125932); M70-7 `df -m` at least 4,096 MiB and no build running at step 1; M70-8 the fact fixes below; M70-9 on
+record (main's dependency findings stay main's; the merge keeps git's message by `git commit --no-edit`).
 Form: main-68-plan.md rev 4's steps 1-7 as main-69-plan.md uses them, only what differs; MAIN-68's STATUS.md rule for
 the one conflict (main-68-plan.md:89-99).
 
@@ -23,7 +29,8 @@ the one conflict (main-68-plan.md:89-99).
 - `git diff --raw --no-renames b8f02b0 origin/main`: 107 paths, every new mode 100644 (A 44, M 63; no link, submodule,
   mode change or deletion); `--shortstat`: "107 files changed, 10839 insertions(+), 408 deletions(-)". By area:
   crates/devtools 28, packages/client 15, packages/types 13, packages/sim-worker 13, crates/sim 8, crates/content 8,
-  packages/e2e 4, crates/sim-wasm 4, content/source 3, docs 7.
+  packages/e2e 4, crates/sim-wasm 4, content/source 3, docs 7, Cargo.toml 1, Cargo.lock 1, content/maps 1,
+  content/movement 1 (107; M70-8).
 - No kit, CI or gate path: `git diff --stat b8f02b0 origin/main -- CLAUDE.md .claude .github tools AGENTS.md
   CLAUDE.local.md` prints nothing. No spikes/ path. No design or look doc (light-takein-recipe.md E3's list prints
   nothing). No mark row: `git diff --no-renames --name-only -G'^[|] PM-' b8f02b0 origin/main -- docs/` prints nothing.
@@ -50,7 +57,7 @@ the one conflict (main-68-plan.md:89-99).
     origin/main -- docs/STATUS.md`: 15/15.
 - Main's CI on dae6d107, its push runs, attempt 1, both success: gate 46081134384 (23:12:08-23:12:51) and toolchain
   46081134408 (23:12:08-23:22:01).
-- The refs step (check.mjs:2695-2700) counts `git ls-files`: +44 added paths, so step 5d's refs = N0 + 44. The marks,
+- The refs step (check.mjs:2729-2735 at HEAD; M70-8) counts `git ls-files`: +44 added paths, so step 5d's refs = N0 + 44. The marks,
   self and redact steps read none of the 107 paths (no spikes/ path, no mark row).
 
 ## Steps (main-68-plan.md rev 4's steps 1-7; only what differs; each command its own call, printing forms)
@@ -91,8 +98,9 @@ the one conflict (main-68-plan.md:89-99).
 
 ## Order
 - MAIN-70 runs while the dist ruling waits (stopb-dist-diff.md): no build or counted run of mine runs during steps 1-6
-  (the path-A rebuild of the diagnosis finishes first). Worktrees .gate/stopb-a and .gate/stopb-b stay (they are at Y and
-  unaffected); no worktree removal between steps 1 and 6.
+  (no build may run during steps 1-6). Worktree .gate/stopb-a (at Y 652e9513, build 1''s tree) stays (M70-8: stopb-b
+  and stopb-c, named at the check, were removed at 02:1x after their dist copies were kept); no worktree add or removal
+  between steps 1 and 6.
 
 ## Questions for the checker
 - Q1: step 4's whole-tree bar: is `git diff --cached --name-only H0` = main's 107 paths the right one (main-68's form)?

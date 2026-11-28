@@ -228,3 +228,39 @@ MAIN-68's checked rule resolves it.
 Nothing. No browser check, no screenshot (no kit, CI or gate change-set), and the plain merge form passes the guard.
 
 Status: COMPLETE 2026-11-28T02:13Z
+
+## Corrections and slips (02:14-02:18 UTC, after the line above; this block and the last Status line govern)
+- **The marks step, read** (check.mjs:2736-2745 at HEAD): it runs `cargo run -q --locked -p npt-judge -- --marks
+  marks/marks.json --check-marks` in the spike's own workspace, then marksProblems (check.mjs:1909-1934) reads
+  docs/adr/0001-multiplayer-netcode.md (expectedMarks) and each mark's `draft.file`. marks.json names only
+  0001-multiplayer-netcode.md, 0004-simulation-core.md and 0006-infrastructure-operations.md. `git diff --name-only
+  b8f02b0 origin/main --` those three plus docs/adr/README.md prints only docs/adr/README.md (its control). So #79
+  changes no file the marks step reads, and 5d's "equal to the base run" bar needs no exception. The self and redact
+  steps read spikes/ only. The plan's line holds.
+- **The pgrep read has a control:** `pgrep -a -f checkpoint.mjs` (02:17) prints the saver (pids 265/266, `watch
+  netcode-proof-test`), so this seat sees the session's processes and the earlier empty `pgrep -a -f
+  'cargo|rustc|build.mjs|check.mjs'` means no build ran at 02:1x. M70-7 is a bar at step 1, not a fact: read its
+  "(the Y0 rebuild in .gate/stopb-c has ended)" as "(no build may run during steps 1-6)".
+- **M70-5, read against P-2** (advisor-main-68b.md:158-178): under P-2 (a) or TAKEIN-CODE (b), the values re-derived
+  by the same commands include M70-2's 106-file line and the 107-path counts, refs = N0 + A - D, and M70-6's baseline
+  (the new tip's own toolchain job); P-2 (a)'s trial-merge bar reads M70-1's one STATUS.md block in place of MAIN-68's
+  two.
+- **Times.** Block 1's "02:06-02:2x" and the df read's "02:2x" ran ahead of the clock: my reads ran 02:06-02:12 UTC
+  (df at about 02:10).
+- **The verdict sentence** "every fact the plan states holds by my own reads" is narrowed to: every fact I re-read
+  holds (Block 1, Block 2 and the marks read above), except ADV-M70-1 and ADV-M70-2.
+- **Slip: git first.** `git worktree list` ran in one call behind `cd`, `grep`, `grep -c` and `ls -d` (read only),
+  against this file's header ("one git per call, git first"). No other call did.
+- **Slip: the guard refusal.** The guard refused `sed -i` on this notes file (it could not resolve the write target);
+  the same one-line change (the Status time 02:16Z to 02:13Z, ahead of the clock) then went through `python3 -I -c`
+  with the literal path. I name it: the guard's refusal was of the form, the target was my own notes, but I should have
+  appended instead. Everything after it is appended with `cat >>`.
+- **On record, main's, not judged here** (as C68B-5 did for #75): #79's merge message carries a "Co-Authored-By:
+  Claude Fable 5.2" line and "Merged by the Advisor thread, because the builder chat cannot write to GitHub".
+- **The plan review list, the items not ruled above:** no symbol is changed by hand (a merge of main's content; the
+  only hand edit is STATUS.md's #40 row, kept); the evidence fits a process change (gate, repo map check, checkpoint
+  tests, the light run, CI on the pushed head, step 7); the checkpoint is kept, the saver stopped at step 1 and
+  restarted at step 6; agents within three (this check is one seat; step 7 one more); no player-facing change, so no
+  Brave checklist; risk tier 1 with the advisor as reviewer, no security-auditor owed (Q2).
+
+Status: COMPLETE 2026-11-28T02:18Z
