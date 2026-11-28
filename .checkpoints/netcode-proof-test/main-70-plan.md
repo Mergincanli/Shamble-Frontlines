@@ -71,9 +71,8 @@ the one conflict (main-68-plan.md:89-99).
 4. The bars, after `git add docs/STATUS.md`, each alone (main-68-plan.md:95-99): `git grep -c -E
    '^(<<<<<<<|=======|>>>>>>>)' -- docs/STATUS.md` prints nothing; `wc -l docs/STATUS.md` = 120; `git diff --cached
    --numstat origin/main -- docs/STATUS.md` prints "1 1" and `-U0` shows main's #40 row out and H0's in; `git diff
-   --cached --name-status origin/main` lists only docs/STATUS.md... (no: the branch's own files differ from main too;
-   the bar is `git diff --cached --name-only H0` = main's 107 paths exactly, STATUS.md among them). Then `git commit
-   --no-edit` (git's merge message).
+   --cached --name-only H0` prints exactly main's 107 paths (STATUS.md among them; the branch's own files differ from
+   main, so the whole-tree bar is against H0, not origin/main). Then `git commit --no-edit` (git's merge message).
 5. a-c as MAIN-69's: GATE PASS (`node tools/gate.mjs --no-smoke`); "repo map OK" with its two numbers (#79 changes
    REPO_MAP.md); the checkpoint tests pass, 0 fail (no .claude/scripts/ file changes). The content checks, each alone:
    `git rev-parse HEAD^1 HEAD^2` prints H0 then dae6d107...; `git diff --name-only H0 HEAD` prints exactly main's 107
