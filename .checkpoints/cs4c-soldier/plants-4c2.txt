@@ -1,0 +1,6 @@
+plants on 94005f15f6e83a4527f89f2a7dd1ea193e4d10d2-with-C1
+R1 CAUGHT (defect): a spawn that does not raise the slot's generation: an id despawned before resolves again: exit 101, found 1 of 1 wanted texts
+R2 CAUGHT (defect): a despawn that leaves the row occupied: the despawned id still resolves: exit 101, found 1 of 1 wanted texts
+RC1 HELD (control): the clean tree: the soldier table's tests: exit 0, found 1 of 1 wanted texts
+DEFECT CHECKS: 2 caught, 0 not caught. CONTROLS: 1 held, 0 did not hold.
+EVERY FILE PUT BACK (sha256 of 1 files as at the start): yes
