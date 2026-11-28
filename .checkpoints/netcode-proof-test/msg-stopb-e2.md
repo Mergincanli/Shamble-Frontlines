@@ -1,4 +1,4 @@
-# E2: Stop B's message to him (DRAFT 0.5, 12:2x UTC on 11-28; one screen; his one message, read from Sun 29 Nov 12:00)
+# E2: Stop B's message to him (0.6, SENT 12:2x UTC on 11-28 as the chat reply, saved 3120790; one screen; read from Sun 29 Nov 12:00)
 Status: 0.5 after the advisor tool's read of 0.4 (12:1x): the date risk under the headline; the price re-read owed and
 unrendered; Sat 28 Nov for "today"; "no file the run server installs"; For Mustafa split (the create-form look offered
 early, nbg1's cost and what it voids, the terms link re-read by me); STANDINS a decision; the take-in count corrected
