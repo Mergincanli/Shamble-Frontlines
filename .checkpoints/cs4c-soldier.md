@@ -221,9 +221,21 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   `/home/user/Shamble-Frontlines/.gate/cs4b-2`. A session of another account works on its own branch from this
   branch's head and never pushes here (his Lanes rule). SEAT-OUT from him: stop at a whole point and report the last
   commit's id.
-- **State (16:43 Amsterdam, from the clock): C2 is written and its tests pass; its plants run next, then the full
-  local checks, the gate and C2's commit.** Saved as `cs4c-soldier/c2-wip.patch` (`git diff --binary HEAD -- crates
-  packages content` on 43897d29: 20 files; apply with `git apply` on 43897d29 if the worktree is lost). Done since 16:32:
+- **State (16:50 Amsterdam, from the clock): C2's plants passed once (14 of 14 caught, 5 of 5 held, every file put
+  back: `plants-4c2.txt` on f21bf71e plus C2); the first full local run stopped at the types package's type check (its
+  `index.test.ts` built a movement table of 15 fields: fixed, 13 made-up values as in `TEST_TEXT`, its key count 29);
+  the ruling's header-level test added (`read.rs`, `the_header_takes_the_newest_version_only`, header at newest 2:
+  2 read, 1, 3, 0, 1.5, -1 refused; its plant V1b). Next: the plants' whole run again, the full local checks, the gate,
+  the tree compared with the patch once more, then C2's commit.** The patch is now 21 files, written again on
+  f21bf71e (apply with `git apply` on f21bf71e; the notes commit changed no source). The advisor tool's checks on C2,
+  done: the verdicts file's 38 digests all moved because `case()` draws a whole movement file first for every class,
+  maps and bundles too (`content_proofs.rs:561-562`; 28 fields draw more), while each case is still held to its own
+  class's verdict at every regeneration and check (`content_proofs.rs:1117`): a per-kind count would differ from the
+  new draws alone, so the per-case hold is the check; the nine VERSION-RULE conditions ticked against the diff (the
+  schema's `"const": 2` at `movement.schema.json:189`; `testlines.test.mjs`'s remaining `version: 1` is the hand-over
+  table's own format version; content.test.ts's and report.test.ts's are the map's or the bundle's; the mixed case is
+  map 2 with movement 1). Earlier state (16:43), kept: C2 is written and its tests pass. Saved as
+  `cs4c-soldier/c2-wip.patch` (`git diff --binary HEAD -- crates packages content` on 43897d29: 20 files). Done since 16:32:
   the proofs' committed digests (`content-verdicts.txt` written again by `SHAMBLE_WRITE_VERDICTS=1`); the frozen bundle
   re-frozen (`make_recordings --freeze first-loop`: only `movement/soldier.json` differs, version 1 to 2 and the
   thirteen new fields; the map the same) and the recordings made again: **`first-loop.rec` differs in 32 bytes only,
