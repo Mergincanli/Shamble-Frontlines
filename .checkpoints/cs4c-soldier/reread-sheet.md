@@ -767,6 +767,36 @@ is cut or thinned to fit the 5 minutes; a run stopped at the limit is re-run onc
 repos/mergincanli/shamble-frontlines/actions/runs/<run>/rerun-failed-jobs`); stopped again, he is told in two lines and
 the build goes on. A head that goes to the advisor agent needs a green run.
 
+### I4b. The Testlines read's result (game-designer's block 6, 2026-11-28; read at be608cad, the branch unmoved)
+- **FALL-STEP is (a), by the sandbox's code:** a fall without a jump steps up onto a top no more than 0.555 m above
+  his feet. The sandbox tests the feet at the end of a falling tick (movement.ts:131), so walking off the 0.55 m step
+  he reaches the 0.56 m step 2 m away only about 1 time in 10 at 6.3 m/s, and every time at 9.576 and 13.27 m/s
+  (rust-reviewer's block 6 row 597, "caught at all 3 speeds", is overturned). PM-0004-30 holds as worded.
+- **The head bump is rust-reviewer's C2:** while airborne, the lowest underside over his 0.4 m circle at the tick's
+  start caps his feet at that underside less 1.8 m; the upward speed goes to 0, a downward one is kept; a top with
+  less than 1.8 m of room above it is a wall.
+- **A ramp met from its side:** with his centre outside the slope's width, he is pushed straight out where the
+  slope's height at the side point nearest his centre is above feet + 0.555, and steps onto it below that; with his
+  centre within the width, he is set back along the slope to the height feet + 0.55 (yard.ts:318-334).
+- **The numbers:** none differs from I2's list. The pull's 0.5 is a share of what is left per tick, not a time
+  (movement.ts:62; so "a half time of 1/30 s" is a rewording, G11); the 5 mm allowance is not used in the set-back
+  (yard.ts:325). Tolerances, not tuning: the slope-head rule's 1 cm and 5 cm (yard.ts:280, :265), the jump's 0.01 m
+  minimum (movement.ts:105, a guard), the 1 mm head allowance and the 1e-6 shrinks.
+- **Where the prototype is not the sandbox** (its findings; each for step 1's design, nothing in step S): **G1 (High)**
+  the sandbox fixes the pull when he steps up and adds it on top of his walk from that tick (each step-up carries him
+  0.055 to 0.265 m further, movement.ts:169-192), the prototype recomputed it each tick; **G2 (Medium)** the sandbox's
+  own "moving toward it" clause (a centre already over the footprint counts, yard.ts:251-252) makes rust-reviewer's
+  B6-5 fix unneeded: build the sandbox's clause; **G3 (Medium)** end-of-tick feet on falling ticks; **G4 (Medium)** the
+  slope-head rule (a rise of at most 0.04 or 0.08 m at the x 45 seams, not the prototype's 0.18 m float); **G5
+  (Medium)** headroom and no step onto a block whose bottom is above his feet; **G6 (Medium)** the set-back, copied as
+  written, would carry him through a ramp met from beyond its high end (no such ramp in the sandbox or the test scene):
+  recommended, set back only while his centre is over the slope (a guard for a case the sandbox never meets: for the
+  advisor agent to rule whether that is his); Lows G7 to G11 (the head bump's tolerances, the snap's slope term, the
+  landing fix, which game-designer says is no rule of his, the push using each soldier's own velocity, the pull's
+  wording), the push's height test (feet less than 1.0 m apart) and the 1e-4 m/s rest speed.
+- **Next:** rust-reviewer's block 9 re-runs the prototype for body (3a) on G1 to G6 and the head bump, before the
+  advisor agent is asked for steps 1 to 7.
+
 ### I6. What the advisor agent is asked, for steps 1 to 7 (after the Testlines read is folded in)
 Its item 10's thirteen points stand as section H's table, with his answers on (1) BODY-SHAPE, (3) SWEEP-ROUTE and
 (6) the slope now in; the asks: APPROVE or REVISE steps 1 to 7 as revised here; the rung (I1); and the order inside
