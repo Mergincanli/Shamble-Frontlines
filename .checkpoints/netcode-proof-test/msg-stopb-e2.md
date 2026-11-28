@@ -1,4 +1,4 @@
-# E2: Stop B's message to him (DRAFT 0.3, 06:4x UTC on 11-28; sent after X, B6's read of X first; one screen)
+# E2: Stop B's message to him (DRAFT 0.3, 06:3x UTC on 11-28; sent after X, B6's read of X first; one screen)
 Status: 0.3 after the advisor tool's read of 06:3x: the three cuts said once, in Decisions needed (his B.2 and B.3),
 with codes of their own (a bare "(b)" would collide with HOST-LIMITS (b)); section 1 on R1.md's own dates (:267-282);
 every cite re-printed 06:3x (R1.md:93-94, :242-246, :267-282, :323; r1.sh:38; rs.yaml:69, lg.yaml:52; plan.md:410).
