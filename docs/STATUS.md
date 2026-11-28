@@ -2,7 +2,7 @@
 _Mustafa and the Advisor read this first. At most 120 lines (Mustafa's STATUS-DIET, 2026-11-10): the phase, in flight,
 next, waiting on Mustafa, the routines' state, pointers. His decisions, word for word, newest first:
 `docs/DECISIONS.md`. The rest: `docs/STATUS_ARCHIVE.md`. Kept current by docs-keeper after every change-set._
-_Last updated: 2026-11-27 (change-set 4b-2's docs pass, by lane 1's docs-keeper, on code 914f3b4: 4b-2 built and reviewed, its row and follow-ups; his VISION-RULE addition as pointers; the merged #75 to #78's rows, the old top line and "Last merged" moved to the archive by script under OLD-LINES, with lane 1's own replaced lines)._
+_Last updated: 2026-11-28 (change-set 4c-1's docs pass, by lane 1's docs-keeper, on code 0645432f: 4c-1, the page's scene, built and reviewed in two rounds, its row and follow-ups; his two open marks of 2026-11-28, quoted by script; HEADROOM-FEET open; #79 (4b-2) merged, its row, the old top line, "Last merged" and lane 1's replaced lines moved to the archive by script under OLD-LINES)._
 
 ## Phase
 - **v2 phase 0** (`docs/V2_PHASE0_BRIEF.md`; the rebuild: `docs/VISION_V2.md`): the process upgrades (kit-v3-0 to
@@ -10,7 +10,7 @@ _Last updated: 2026-11-27 (change-set 4b-2's docs pass, by lane 1's docs-keeper,
   `docs/ENGINE_OVERVIEW.md` and `docs/SPIKE_PLAN.md`) are the basis for the spikes and stay Proposed (the stop's
   answers, 2026-11-03: `docs/DECISIONS.md`), but for his SCOPE (a) of 2026-11-10: "I accept ADR 0002's part 1 alone
   (the repository layout, with the legacy constraints applying to legacy/ only)", recorded in ADR 0002 by 2.1b (#51).
-- **Last merged** (read with git, 2026-11-27): #78, ci-time (b8f02b0); #75, 4b-1 (b9aad01); #77 and #76, main-wall (47bb79e, 2671595); #74, ci-preview-handover (3b949c1a); #73, guard-wrappers (4a62873e); #70, 4a (2483e9a); #71, ci-after-3a (07d673b).
+- **Last merged** (read with git, 2026-11-28): #79, 4b-2 (dae6d107, 2026-11-27 23:12:03 UTC); #78, ci-time (b8f02b0); #75, 4b-1 (b9aad01); #77 and #76, main-wall (47bb79e, 2671595); #74, ci-preview-handover (3b949c1a); #73, guard-wrappers (4a62873e); #70, 4a (2483e9a).
 - **The kit:** KIT-FREEZE-2, FREEZE-FDN, his exceptions and additions, and his words of 2026-11-13 for step 2.3 (on kit,
   gate and CI edits): `docs/DECISIONS.md`; the bullet that quoted them whole: the archive's "Phase", at its end.
 - **The day guard, after guard-wrappers** (merged as #73, 4a62873e, by his R4-END (1) and his go of 14:56 UTC): every
@@ -31,20 +31,20 @@ _Last updated: 2026-11-27 (change-set 4b-2's docs pass, by lane 1's docs-keeper,
 | PR | Work | Branch | State | Waiting on |
 |---|---|---|---|---|
 | #40 | the netcode proof test (SPIKE_PLAN item 1; a throwaway spike, `spikes/netcode-proof/`) | `claude/netcode-proof-test-plan-hcky5g` | draft; U1-U3 done; U4: U4d2 merged, U4r's build on its fourth builder copy; main 4d21c1a merged in (7685b2b) (its checkpoint at d0d1cfd, read 2026-11-14 01:05 UTC) | its units, runs and report; his OK of each run's plan and cost cap |
-| none yet | change-set 4b-2, "The world" (the second of 4b's two pull requests, his SIZE-4B (b)), by lane 1 (Builder V4, then the chat he calls Builder V6): steps 6 to 11; step 12 moved to 4c by his STEP12-GO (a) (the list: REPO_MAP, ROADMAP); report `docs/reports/2026-11-27-cs4b2-world.md` | `claude/ecstatic-wozniak-5cbdzs` (stands in for `cs/4b-content`) | risk tier 1, no browser check; built (steps 6 to 11) and reviewed (two rounds); the verifier PASS (its report); the advisor agent's verdict on the final head comes in the builder chat | his go for the head the advisor agent approves; his Advisor opens the pull request |
+| none yet | change-set 4c-1, "The page's scene" (the first of 4c's two pull requests, his SIZE-4C (b)), by lane 1 (the chat he calls Builder V6): step 0 (his words of 2026-11-27 and 2026-11-28 in the register by script; LOOP_V2's §14 with its dated pointers, EDITOR_V2's pointer) and step S (the page reads the test scene's map field by field and draws it in greys by height under an overview camera; the readout's content and scene rows) | `claude/ecstatic-wozniak-5cbdzs` (stands in for `cs/4c-soldier`); his Advisor opens the pull request from a branch of its own at the scene's final head (his item 6 c) | risk tier 1, needs-mustafa (his Brave check; LOOP_V2 and the register are decision docs); built; reviewed in two rounds (six reviewers, then graphics-engineer and test-engineer on what changed, both APPROVE); planted defects 45 of 45 caught, 3 of 3 controls held (on 2b2f44c2); next: the verifier, the report, the advisor agent on the final head | his Brave check on Sunday 29 November on that head, then his go; 4c-2 (the soldier, steps 1 to 7) is built on top meanwhile (his item 6 b) |
 
 ## Next
 1. In his order (ORDER (b), 2026-11-10): his unit walk of 2026-11-09 (a docs change-set: UNITS.md §0 and LOOP_V2),
    then the Slice 1 note of 2026-11-10, each in a fresh chat. His words: `docs/DECISIONS.md`, "Queued".
 2. v2: the netcode proof test (#40); step 2.3's chat stays stopped; the first builder chat paused. Walk (his WALK-CUT
-   (a)): 4a and 4b-1 merged; **4b-2 reviewed**; then 4c (first the page's scene, moved from 4b-2), 4d, the link simulator, change-set 7 (ROADMAP, "Next / open").
+   (a)): 4a, 4b-1 and 4b-2 merged; **4c-1, the page's scene, reviewed**; then 4c-2 (the soldier, on the same branch), 4d, the link simulator, change-set 7 (ROADMAP, "Next / open").
 3. Lane 2 (Builder V2), his order of 2026-11-25: #66 and #67 (ADR 0006's revision) merged (09faefa, c1da1bd);
    step 2.6's plan (its first edit after his go on the revised row); the carry of his look decisions when
    his block comes; one plan for the look test page and the model-check tool (EARLY-LOOK (a)), built after his go.
 4. The Guard fix chat (`docs/DECISIONS.md`, "Queued"): MAIN-WALL done but T10 ("Phase"); then, by his SPEED-ORDER (b) of 2026-11-26, 17:37:10 UTC, the review tracks with SOURCE-GO (a), then one guard change-set with R4-1's fix and GUARD-KIT; each plan first.
 
 ## Waiting on Mustafa
-- 4b-2, built and reviewed (its report): his go. Later, from 4a's report: MOVE-RULES, NO-SOURCE, RESUME-FLASH, TUNE-HOME, SPRINT-DELAY-4; `docs/UNITS.md` §0's two lines (his unit walk).
+- 4c-1, the page's scene: his Brave check on Sunday 29 November (art-director's six steps, about 6 minutes, come with its final head), then his go for that head. Open, needed before 4c-2's movement step: HEADROOM-FEET (question 13 of 4c's question file): may the game differ from his sandbox where the top of a block at or below the soldier's feet would stop him like a wall? Answered on 2026-11-28 (`docs/DECISIONS.md`, 11:43:45 UTC): MOVE-RULES (its row 9, the slopes, recorded there as open), NO-SOURCE, RESUME-FLASH, TUNE-HOME. Still open from 4a's report: SPRINT-DELAY-4; `docs/UNITS.md` §0's two lines (his unit walk).
 - His accounts, his words (2026-11-26, 17:11:23 UTC, `docs/DECISIONS.md`): "My first personal account (I have two) and 1 enterprise (university), so I have 3 accounts working on the project" (ACCT-3, below).
 - His to give: ACCT-3's roles and CLAUDE.md line (his third account, counted like the other two); his go before anything
   goes to the Rust project (3A-RUST-REPORT); ADR 0004 part 7's pointer sentence, shown first (3A-PART7-POINTER).
@@ -94,13 +94,13 @@ _Last updated: 2026-11-27 (change-set 4b-2's docs pass, by lane 1's docs-keeper,
   R2-INT-OQ5's cost measurement at 48 players becomes due; part 9 (f): shots and their traces reach every player who can
   have them on screen, hidden shooter or not), of ADR 0004 part 13 and of ADR 0003's cutaway rule."
   His addition (`docs/DECISIONS.md`, 2026-11-27, 13:57:21 UTC, item 9; it sharpens version 2's point 2c; no code now) leaves open, his words: "the exact eye height, which reaches the game through my Export, and which points of an enemy's body the line is tested against".
-- **From change-sets 4b-1 and 4b-2** (the archive's blocks of those names): 4B-AIM-REACH: the loader refuses a playable map beyond
-  the aim's reach (x and z plus or minus 327.67 m, y 0 to 655.35 m). The aim widens in the first change-set whose map leaves that
-  square (none in Slice 1; Slice 2's plan says whether its maps do), at the latest in Slice 3's change-set that sets the command
-  codec for online play (PM-0001-51), beside 3B-ACKS and 3B-OUTAGE-256. No numbered change-set holds it yet. 13 more of 4b-1's,
-  4B-SIGHT-MARK among them (4b-2 closed three). 4b-2's: for 4c, 4B-QUERY-RECORDING, 4B-RAY-WASM, 4B-RAY-COUNTS, 4B-WORLD-ROOM,
-  4B-LIMIT-IMPORT, 4B-TYPES-READER, 4B-MEMBER-KINDS; the CI Builder's 4B-CHROMIUM-TIME; hosting's 4B-CONTENT-CACHE, 4B-LICENCES;
-  4B-HEAPLESS; the advisor agent's 4B-FIRST-DEFAULT, 4B-UNIT-COLUMN; 4B-WALLCLOCK, 4B-SERVE-LINKS, 4B-BOOT-CALLS.
+- **From change-sets 4b-1 and 4b-2** (the archive's blocks of those names): 4B-AIM-REACH (the loader refuses a playable map
+  beyond the aim's reach; the aim widens at the latest in Slice 3's change-set that sets the command codec, PM-0001-51; no
+  numbered change-set holds it yet) and 13 more of 4b-1's, 4B-SIGHT-MARK among them. 4b-2's: for 4c, 4B-QUERY-RECORDING,
+  4B-RAY-WASM, 4B-RAY-COUNTS, 4B-WORLD-ROOM, 4B-LIMIT-IMPORT; the CI Builder's 4B-CHROMIUM-TIME; hosting's 4B-CONTENT-CACHE,
+  4B-LICENCES; 4B-HEAPLESS; the advisor agent's 4B-FIRST-DEFAULT, 4B-UNIT-COLUMN; 4B-WALLCLOCK, 4B-SERVE-LINKS. Met by 4c-1, closed when it merges: 4B-TYPES-READER (for the keys), 4B-MEMBER-KINDS, 4B-BOOT-CALLS.
+- **From change-set 4c-1** (the archive's block of that name; each owned by the reviewer who found it): GE-F2 (graphics-engineer: the depth range, with its round 2 note on a window a few pixels wide; for the first large map); GE-F3 with P-2 (graphics-engineer, perf-auditor: draw calls on the largest map, merge the floor by material; with the look's change-set); GE-F4 (graphics-engineer: the WebGPU pipelines built when the map arrives; no change-set named); AD-4 (art-director: the readout over a short window; at 4c-2's step 4, where the overview leaves); TE2-1 to TE2-5 (test-engineer: five gaps in the scene's tests; no change-set named).
+- **His two open marks of 2026-11-28** (his DEPART-4C terms, items 12 b and c, quoted by script from his saved message, as in `docs/DECISIONS.md:220-221`): "PM-0004-60: 2,000,000 per CI run now. The mark is not met by that: it stays open in STATUS until the nightly job runs its 10 million, named with the change-set that brings it." and "PM-0004-20's 48-soldier run: not met by the one-soldier recording. It stays open in STATUS, named with the first build that can show it." Neither is named yet: no plan names the change-set that brings the nightly 10 million or the first build that can show 48 soldiers. The build plan's rows (`docs/reports/2026-11-17-build-plan-slice-1.md`, read 2026-11-28) give PM-0004-60's later clause as "its nightly run is CI work" (:654) and PM-0004-20's as "the stress scene's form at Slice 6" (:626); neither names a change-set or a build (whether that stress scene is the 48-soldier run is not settled here [assumed: open]).
 
 ## Open risks (their text: `docs/STATUS_ARCHIVE.md`, "Open bugs and risks", a live section)
 - **Kit:** kit-v3-5's merge-check limits (Windows names, gitignored names, case-only twins, symlinks, more than 100
@@ -113,7 +113,7 @@ _Last updated: 2026-11-27 (change-set 4b-2's docs pass, by lane 1's docs-keeper,
 - **v2:** the decision drafts' risks (the asset pipeline and several LOOK_V2 techniques not researched); R1-R6's (R3-R6
   spot-checked; unread sources); change-set 3a's (MUL-ADD first); 3b's (no bound yet on how late a command runs, before
   online play; releases worked out, not counted); 4a's (two planted divergences only in a stand-in or native form); 4b-1's (the fuzz run
-  cannot reach the caps, 4B-FUZZ-REACH); 4b-2's (four, in its report and the archive). **Legacy (frozen):** 3a's ranked list (PR #15); bot
+  cannot reach the caps, 4B-FUZZ-REACH); 4b-2's (four, in its report and the archive); 4c-1's (two, in the archive: nothing seen on WebGPU; the browser run's time). **Legacy (frozen):** 3a's ranked list (PR #15); bot
   navigation; the editor and map bugs; the first-deploy tutorial; the wall-clock reads (an input for ADR 0004 part 4).
 - **Preview hosting (lane 2):** PHC-HEADER (the header mark; revised by #67, merged); PHC-PROBE-MAIL.
 

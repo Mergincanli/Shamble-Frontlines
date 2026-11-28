@@ -376,6 +376,31 @@ _Last updated: 2026-11-27 (ci-time: the #78 row added, the CI Builder's old 2026
   4b-1's (the fuzz run cannot reach the caps, 4B-FUZZ-REACH). **Legacy (frozen):** 3a's ranked list (PR #15); bot
   navigation; the editor and map bugs; the first-deploy tutorial; the wall-clock reads (an input for ADR 0004 part 4).
 
+_Moved from STATUS (2026-11-28, change-set 4c-1's docs pass, by script, byte for byte): under his OLD-LINES (a) of 2026-11-18, the lines about merged pull requests: the row of 4b-2 (merged as #79, merge commit dae6d107, 2026-11-27 23:12:03 UTC by the merge commit's date, read with git), the top line and "Last merged" as they stood; and lane 1's own lines this pass replaced in STATUS, so their words stay on record: "Next" item 2, the "Waiting on Mustafa" bullet on 4b-2, the follow-ups bullet "From change-sets 4b-1 and 4b-2", and the "Open risks" line that 4c-1's risks joined._
+
+| PR | Work | Branch | State | Waiting on |
+|---|---|---|---|---|
+| none yet | change-set 4b-2, "The world" (the second of 4b's two pull requests, his SIZE-4B (b)), by lane 1 (Builder V4, then the chat he calls Builder V6): steps 6 to 11; step 12 moved to 4c by his STEP12-GO (a) (the list: REPO_MAP, ROADMAP); report `docs/reports/2026-11-27-cs4b2-world.md` | `claude/ecstatic-wozniak-5cbdzs` (stands in for `cs/4b-content`) | risk tier 1, no browser check; built (steps 6 to 11) and reviewed (two rounds); the verifier PASS (its report); the advisor agent's verdict on the final head comes in the builder chat | his go for the head the advisor agent approves; his Advisor opens the pull request |
+
+_Last updated: 2026-11-27 (change-set 4b-2's docs pass, by lane 1's docs-keeper, on code 914f3b4: 4b-2 built and reviewed, its row and follow-ups; his VISION-RULE addition as pointers; the merged #75 to #78's rows, the old top line and "Last merged" moved to the archive by script under OLD-LINES, with lane 1's own replaced lines)._
+
+- **Last merged** (read with git, 2026-11-27): #78, ci-time (b8f02b0); #75, 4b-1 (b9aad01); #77 and #76, main-wall (47bb79e, 2671595); #74, ci-preview-handover (3b949c1a); #73, guard-wrappers (4a62873e); #70, 4a (2483e9a); #71, ci-after-3a (07d673b).
+
+2. v2: the netcode proof test (#40); step 2.3's chat stays stopped; the first builder chat paused. Walk (his WALK-CUT
+   (a)): 4a and 4b-1 merged; **4b-2 reviewed**; then 4c (first the page's scene, moved from 4b-2), 4d, the link simulator, change-set 7 (ROADMAP, "Next / open").
+
+- 4b-2, built and reviewed (its report): his go. Later, from 4a's report: MOVE-RULES, NO-SOURCE, RESUME-FLASH, TUNE-HOME, SPRINT-DELAY-4; `docs/UNITS.md` §0's two lines (his unit walk).
+
+- **From change-sets 4b-1 and 4b-2** (the archive's blocks of those names): 4B-AIM-REACH: the loader refuses a playable map beyond
+  the aim's reach (x and z plus or minus 327.67 m, y 0 to 655.35 m). The aim widens in the first change-set whose map leaves that
+  square (none in Slice 1; Slice 2's plan says whether its maps do), at the latest in Slice 3's change-set that sets the command
+  codec for online play (PM-0001-51), beside 3B-ACKS and 3B-OUTAGE-256. No numbered change-set holds it yet. 13 more of 4b-1's,
+  4B-SIGHT-MARK among them (4b-2 closed three). 4b-2's: for 4c, 4B-QUERY-RECORDING, 4B-RAY-WASM, 4B-RAY-COUNTS, 4B-WORLD-ROOM,
+  4B-LIMIT-IMPORT, 4B-TYPES-READER, 4B-MEMBER-KINDS; the CI Builder's 4B-CHROMIUM-TIME; hosting's 4B-CONTENT-CACHE, 4B-LICENCES;
+  4B-HEAPLESS; the advisor agent's 4B-FIRST-DEFAULT, 4B-UNIT-COLUMN; 4B-WALLCLOCK, 4B-SERVE-LINKS, 4B-BOOT-CALLS.
+
+  cannot reach the caps, 4B-FUZZ-REACH); 4b-2's (four, in its report and the archive). **Legacy (frozen):** 3a's ranked list (PR #15); bot
+
 ## Targets
 - **v2 (VISION_V2 §3, read with MODES-3 (a): the starting sizes are totals; Mustafa, 2026-10-31):** start with two teams
   with 2–8 players in total (1v1 to 4v4) and three teams with 6–18 in total (2v2v2 to 6v6v6); the goal 12v12v12 or
@@ -2300,6 +2325,38 @@ _Last updated: 2026-11-27 (ci-time: the #78 row added, the CI Builder's old 2026
     only if it ever flakes.
   - 4B-SERVE-LINKS (security-auditor, round 2, its L2-3; outside 4b-2's diff, from change-set 3a; about 1 line):
     `packages/client/serve.test.mjs` still skips its two link tests wherever a link cannot be made, CI included.
+  - Met by 4c-1 (engine-architect's review of step S, `.checkpoints/cs4c-soldier/review-s-engine-architect.md` lines 29, 31, 41 and 50 to 51), closed when 4c-1 merges: 4B-TYPES-READER, met for the keys (`readMap` gives `Outcome<MapDocument>` from typed literals, `packages/client/src/app/content.ts:163`), 4B-MEMBER-KINDS (each member's kind compared, `packages/types/src/content-schema.test.mjs:152`) and 4B-BOOT-CALLS (the plants E1 and E3 caught, `.checkpoints/cs4c-soldier/plants-4c.txt` lines 25 and 28) [verified 2026-11-28 at 0645432f].
+- **From change-set 4c-1, "The page's scene"** (lane 1, the chat he calls Builder V6; branch `claude/ecstatic-wozniak-5cbdzs`
+  standing in for `cs/4c-soldier`; his Advisor opens the pull request from a branch of its own at the scene's final head,
+  his item 6 c; risk tier 1, needs-mustafa; step 0 and step S; reviewed in two rounds, six reviewers, then
+  graphics-engineer and test-engineer on what changed, both APPROVE; code head 0645432f; the planted defects' whole run
+  on 2b2f44c2 caught 45 of 45 and held 3 controls of 3, `.checkpoints/cs4c-soldier/plants-4c.txt`. Written by 4c-1's
+  docs pass, 2026-11-28, from `.checkpoints/cs4c-soldier/review-s-round.md`: the fix pass's "Deferred" and round 2. The
+  ids are the reviewers'; each item's owner is the reviewer who found it. The notes files leave the tree at the pull
+  request's close and stay readable at the branch's commits):
+  - GE-F2 (graphics-engineer, Low; for the first large map): `near` stays 0.1 m while `far` follows the camera's
+    distance, so on the largest map the loader allows a 24-bit depth step is 0.3 to 1.4 m and the grid shows through
+    blocks under about half a metre (the test scene's step: 8 mm). Its round 2 note, folded in here: a window a few
+    pixels wide still frames at a great distance with near 0.1 (depth fighting on a floor about a pixel wide).
+  - GE-F3 with P-2 (graphics-engineer and perf-auditor, Low; with the look's change-set, before maps grow): one object
+    per shape and per patch gives about 579 draw calls on the loader's largest map (512 shapes, 64 regions; inferred
+    from the test scene's 31 objects and 32 draws, not measured), 2.9 times the world's share of 202 in ADR 0003's
+    draft; merge the floor by material (which breaks the inventory's rule of one buffer per object).
+  - GE-F4 (graphics-engineer, Low; no change-set named): the first frame after `setContent` builds two new WebGPU
+    pipelines (one per new depth offset), a one-time hitch at the match's start; `compileAsync` before the swap would
+    avoid it. Not measured (no WebGPU adapter in the container).
+  - AD-4 (art-director, Medium, deferred; at 4c-2's step 4): the readout panel, see-through near-black, ends at 213 px
+    in every window size tried, so in a window under about 600 px tall it lies over the houses and the yard's back row
+    and darkens them. The overview camera is the scene's alone and leaves at step 4, where the follow camera replaces
+    it; his Brave steps ask for a maximised window meanwhile.
+  - TE2-1 to TE2-5 (test-engineer, Low, round 2, measured on a scratch copy; no change-set named; scene changes after
+    his Brave check go into 4c-2, his item 6 d): TE2-1, `frameCamera` may drop the turn toward the map
+    (`packages/client/src/render/scene.ts:318`) or the projection update (`:320`) with all 11 scene tests passing;
+    TE2-2, the search's limit is tested from one side only (at 10 in place of 19 every test passes, yet a 9:16 window
+    on the largest map gets no camera); TE2-3, the readout's "refused" wiring (`packages/client/src/app/boot.ts:166`)
+    is reached by no test; TE2-4, the grid test checks its lines' count and ends, not where they stand; TE2-5, the
+    overview's aim height is never checked on the raised map (`scene.ts:274`) [the lines verified 2026-11-28 at
+    0645432f].
 
 ## Decisions pending: the rest
 _The advisor agent's rulings (not Mustafa's), the five carry-forwards, and the old ADR and design lines, moved from
@@ -2682,6 +2739,17 @@ _From STATUS's "Routines", moved here on 2026-11-23 by docs-keeper's script, byt
      `Sec-Fetch-Site` header is served by the dev server as a tool would be; a folder swapped for a link between the
      tools' check and their open is followed. Put to the advisor agent with the final head; its answer is not
      recorded here [assumed: open].
+- **Change-set 4c-1 of the v2 build plan, "The page's scene"** (2026-11-28, no pull request number yet; the evidence:
+  `.checkpoints/cs4c-soldier/review-s-round.md` and the card `.checkpoints/cs4c-soldier.md`, folded into its report
+  before the pull request is ready; the follow-ups: the block "From change-set 4c-1" in "Follow-ups"):
+  1. Nothing was seen on WebGPU: the container's Chromium has no WebGPU adapter, so the WebGPU render counts
+     (`packages/e2e/tests/skeleton/render-counts.json` holds null for them), the pipelines built when the map arrives
+     (GE-F4) and a canvas 0 wide on WebGPU are unmeasured; every picture is the WebGL 2 fallback on a software
+     renderer. His Brave check is final.
+  2. The container's whole browser run took 217 s on bc7720f3 (the card) and 232 s on the fix pass 2b2f44c2; CI's own
+     Chromium run took 3.6 minutes on 0645432f (run 46146007608, 12:47:44 to 12:51:18 UTC), against CI's 5-minute Chromium limit
+     (4B-CHROMIUM-TIME); by his CHROME-TIME (`docs/DECISIONS.md`, 2026-11-28) the CI Builder raises it after Tuesday
+     1 December, 20:00, and until then no test is cut or thinned to fit.
 - **Change-set 4a of the v2 build plan, "The recording"** (2026-11-25, PR #70, a draft; the evidence: the chat's card
   and `round1-fold.md` in `.checkpoints/cs4a-recording/`, folded into 4a's report before the pull request is ready):
   1. The tests that read the recordings still follow a link (4A-S3-READ): CI cannot go green with one, since the folder
@@ -2778,6 +2846,7 @@ _From STATUS's "Routines", moved here on 2026-11-23 by docs-keeper's script, byt
 | Gate | on main 8675367: full gate PASS in 26 s (Advisor's independent run), all 8 checks (1-4, 5a-5d); core 134 / game 691 / editor 349, 44 editor refs guarded (re-measured on main + kit-v1-2), smoke 8/8 + 5/5 steps | 2026-10-14 | gate.mjs |
 | v2, the first page (change-set 2, PR #61, merged 2026-11-19; his Brave and Firefox readings: `docs/reports/2026-11-19-cs2-browser-check.md`): the Wasm's size, the Worker's tick pacing, the hand-off's cost per block size, the page's allocation per frame and per block, the backend | in its report, from the container's headless Chromium on the WebGL 2 fallback with software rendering (no WebGPU adapter, no real GPU here): readings, not judged; the final numbers are the ready head's | 2026-11-19 | docs/reports/2026-11-19-cs2-first-page.md |
 | MAIN-WALL: main's rulesets | two Active: "Shamble Ruleset 1" (pull request; `gate` and `smoke` required; no deletion; no force push; no bypass; not opened at the click) and "main-wall (only the owner updates main)" (default branch; only Restrict updates; bypass the Repository admin role, mode Exempt); no repository secrets, one environment secret in "preview" (SA-MW-9 by names) | 2026-11-26 | his screenshots at click 12, as the chat's checkpoint (step 17) and the plan record them; not read by docs-keeper [assumed] |
+| Change-set 4c-1 (no pull request yet): the page drawing the test scene | render counts on the WebGL 2 fallback (the container's Chromium, a software renderer): the empty floor 3 draw calls, 3 triangles, 62 lines; the test scene 32 draw calls, 267 triangles, 162 lines, 32 geometries, 3 textures, 6 programs (`packages/e2e/tests/skeleton/render-counts.json` [verified 2026-11-28 at 0645432f]); WebGPU's not measured (no adapter); the whole page's allocation +4.1 KB a frame with the test scene (base 41.7 KB, head 45.4 to 46.3 KB, 3 runs each), the hand-off unchanged at about 93 B a frame; the players' WebAssembly unchanged at 257,421 B; the development bundle +7,344 B raw, +2,649 B gzip | 2026-11-28 | perf-auditor's review of step S (`.checkpoints/cs4c-soldier/review-s-round.md` lines 34 to 38); not re-measured by docs-keeper |
 | CI on main, latest (the rows below are older) | `gate`, `smoke` and `toolchain` success on 2483e9a, PR #70's merge commit (push; gate run 45818982040 with its gate and smoke jobs, completed 12:23 UTC; toolchain run 45818982052, 12:28 UTC) | 2026-11-26 | GitHub's REST API, the commit's workflow runs and the gate run's jobs (read by ci-preview-handover's docs-keeper) |
 | CI on main, latest (the rows below are older) | `gate`, `smoke` and `toolchain` success on 2483e9a, PR #70's merge commit (gate 12:22:25, smoke 12:23:01, toolchain 12:28:06 UTC by `completed_at`) | 2026-11-26 | GitHub's REST API, the commit's check runs (read 14:24 UTC by docs-keeper) [verified] |
 | guard-wrappers (no pull request yet (_corrected 2026-11-26 (MAIN-WALL's docs pass): merged since as PR #73, 4a62873e, 2026-11-26 14:56:33 UTC by the merge commit's date_)): the kit's three test files | `routine-guard.test.mjs` 1551/1551 (1247 on main c1da1bd by the chat's count; `.claude/` unchanged from c1da1bd to 2483e9a, read with git diff), `settings.test.mjs` 127/127, `checkpoint.test.mjs` 33/33, on the docs pass's worktree at 54bbf38c (main 2483e9a merged in) | 2026-11-26 | `node --test`, run by docs-keeper [verified] |

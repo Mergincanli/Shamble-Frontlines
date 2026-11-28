@@ -279,6 +279,20 @@ commit, by his main Advisor on his tap of 22:40:00 UTC (his go: `docs/DECISIONS.
 head 1624f084 (the last commit, after the advisor agent's read); gate, smoke and toolchain green on main (read 22:45
 UTC).
 
+**The preview hosting check, ADR 0006's spike 1 [2026-11-15 to 11-25, MERGED]** — preview-hosting-check
+(SPIKE_PLAN entry 6), by lane 2, run by the chat he calls Builder V2 in his throwaway test repository
+Mergincanli/shamble-preview-check on a test Cloudflare Pages project: 56 runs over the rehearsal and two days of
+sittings. A closed pull request's links were gone within 24 hours, through the cleanup job (without it the host kept
+them); the login wall covered every preview link and left production's own address open; a pull request reached no
+token without his approval and no production; the deleted token was refused. Not passed by the draft's rule:
+production's one-off links carry the host's `X-Robots-Tag: noindex` (the header mark, back to the draft), and the
+build count (no count shown anywhere) and his verdict on checklist step 4 are open; five marks met with departures
+that change no reading. Two review rounds on the build, the verifier PASS WITH NOTES on the evidence; report
+`docs/reports/2026-11-24-preview-hosting-check.md`. His answers of 2026-11-25 are in DECISIONS (a normal merge,
+by his HISTORY-ID (a)); waits for the advisor agent's review of its final head and his go.
+_Pointer (2026-11-25): merged as PR #66, 09faefa, 2026-11-25 11:10:11 UTC (`merged_at`), by merge commit, a normal
+merge on his go of 11:07:07 UTC (his HISTORY-ID (a)), with the expected head d7937de._
+
 - **Kit: KEPT-LOGS (2026-11-15):** kept-logs-rule (PR #53, 53272a1, on his KL-MERGE (a)): `.claude/CHECKPOINTS.md` §11 and `.claude/scripts/kept-logs.mjs`: a day session may pack and remove a closed run set's raw logs and the one old build cache, nothing else; SA-KL-1 to -4 and KLT-1 to -8 left open by his word.
 - **UI theme step 1 (2026-10-02):** menu = dossier, pause = clipboard, Field manual; `wr-*` CSS in both pages; awaiting Brave. (Audit phase 2, 2026-09-26, is the "Bug & optimization run" above.)
 - **Performance / hygiene:** pooled FX, GPU resources disposed on map rebuild, player-following shadow frustum; kill vignette captured on the GPU (`vigShot` corner render + `drawImage`); hot paths use `hyp2`/`hyp3` and change-only DOM writes (`_sd`/`_so`/`_st`); ~4.9 MB/s residual GC churn (AUDIT_BUGS_PERF CS11; measured — `AUDIT_BUGS_PERF.md`); an early kill-vignette attempt (readbacks queued via `_vigQueue`/`vigStep()`) did not remove the hitch and was superseded by the GPU capture.
@@ -319,6 +333,10 @@ UTC).
   the world, is built (steps 6 to 11) and reviewed; the page drawing the scene from the map, with the map's reading
   field by field, moved to the start of 4c by his STEP12-GO (a) (`docs/DECISIONS.md`, 2026-11-27, 20:03:18 UTC);
   then 4c, 4d and the link simulator (`docs/STATUS.md`, "Next").
+- **Pointer, 2026-11-28 (change-set 4c-1's docs pass; not his words):** change-set 4b-2 is merged (PR #79); 4c is two
+  pull requests by his SIZE-4C (b) (`docs/DECISIONS.md`, 2026-11-28, 11:43:45 UTC): 4c-1, the page's scene, is
+  reviewed and waits for his Brave check; 4c-2, the soldier (steps 1 to 7), follows on the same branch; then 4d and
+  the link simulator (`docs/STATUS.md`, "Next").
 - **Superseded by v2** (paused in issue #16; where things stand: `docs/STATUS.md` and `docs/V2_PHASE0_BRIEF.md`). **Queue (Advisor, 2026-10-15; updated 2026-10-16 after 3a):** greybox phase: three-teams (0. team-prep-fixes, merged → 3a three-teams-core, merged 2026-10-17 → **N1** (next; editor Play never rebuilds the nav grid; a one-line change-set) → **R19** (navBuild building-cell fix; right after N1, before 3b; Night queue item 2, NEEDS PLAN) → 3b three-teams-hud → 3c spawn-and-buy; editor v2 comes after the playable greybox loop, per the Advisor's queue) → **"ramps as slopes in SIM"** (its own change-set, before octopon-3-greybox; lets `_botFireWorld` go) → **NC-7 blast reach by line of sight** (to the target's nearest surface, ignoring the target's own box; before the octopon-3 playtests) → octopon-3-greybox → harvest-economy → bot-replan-storm → uplinks → win-and-scoring → scale test on the Octopon-3 greybox (N = 12, 24, 36, 48). Paused until the greybox loop is playable: tutorial-field-manual, ui-step-2, ui-step-3, build-spike, ADR run. house-textures-seeded: low priority, unslotted.
 - **From the 3a report** (approved unattended work is listed in the [Night queue, issue #16](https://github.com/Mergincanli/Shamble-Frontlines/issues/16)): the `navBuild` building-cell fix with bot replanning (R19: 27.5 % of Cabana objective routes cross a roof bots can't climb) is now approved into the queue as item 2, NEEDS PLAN (Advisor 2026-10-17, R19-ORDER). Advisor LOS-SIZE: the bots' sight-check budget for 48 soldiers is sized in the 48-player performance change-set, with measured cost, together with the `updateSoldierAnim` split (CS11) and the soldier draw-call reduction (about 120 per on-screen soldier); that work is still proposed, not approved, and comes before `TUNE.teams.size` rises. Advisor K4-MEASURE: bot fairness between teams is judged by target searches per bot per second and the share of time with a target (`tools/perfbots.js` fairness), plus which team's bot fires first in mutual sightings (not in the tools yet; R19's plan adds it). After N1 and R19: 3b three-teams-hud, 3c spawn-and-buy, as planned.
 - **Core loop v2 (Oct 2026):** see LOOP_V2.md; greybox prototype first (§11).
@@ -338,6 +356,16 @@ UTC).
 ## Recent work
 *(Newest first, a few lines each. Older items fold into "Build history" above.)*
 
+**Change-set 4c-1 of the build plan, The page's scene [2026-11-28, reviewed]** — cs4c-soldier, the first of 4c's two
+pull requests (his SIZE-4C (b)), by lane 1 (the chat he calls Builder V6). Step 0: his words of 2026-11-27 and
+2026-11-28 in the register by script; LOOP_V2's §14 with its dated pointers and EDITOR_V2's pointer (his DESIGN-CLASH
+(a)). Step S, 4b's old step 12 (his STEP12-GO (a)): the page reads the test scene's map field by field and draws it as
+plain grey blocks, a higher top never darker, the street and grass in greys of their own (his STREET-GREY (b)), under
+an overview camera that frames the whole map (in a window of no width it leaves the camera as it was, where its
+first build froze the page); the readout's content and scene rows.
+Two review rounds; planted defects 45 of 45 caught, 3 controls held. Next: his Brave check (Sunday 29 November), and
+4c-2, the soldier, on the same branch (STATUS).
+
 **Change-set 4b-2 of the build plan, The world [2026-11-26 to 11-27, reviewed]** — cs4b-content, the second of 4b's
 two pull requests (his SIZE-4B (b)), by lane 1 (Builder V4, then the chat he calls Builder V6), steps 6 to 11: the
 collision library (parry3d `=0.31.1`, behind one module of `sim`) with its pinned batch and dependency rules; the
@@ -349,6 +377,7 @@ types and JSON Schemas. Step 12, the page's scene with the map's reading field b
 (his STEP12-GO (a)). 8,408 written lines against the stop line 8,450; nothing a player sees changes, no browser
 check. Two review rounds, Lows left as follow-ups (STATUS); planted defects 104 of 104 caught, 19 controls held.
 Report `docs/reports/2026-11-27-cs4b2-world.md`.
+_Pointer (2026-11-28, 4c-1's docs pass): merged as PR #79, merge commit dae6d107 (its own time 2026-11-27 23:12:03 UTC, read with `git log`)._
 
 **CI-TIME [2026-11-27, reviewed]** — #78, by the chat he calls CI Builder: the `toolchain` job's time limit 15 to 25
 minutes (`.github/workflows/toolchain.yml:38`, his exact text approved in advance; nothing else; the 5-minute browser
@@ -454,17 +483,3 @@ decided, (a) with two conditions. Report `docs/reports/2026-11-25-cs3b-the-loop-
 2026-11-25 13:57:03 UTC (`merged_at`), by merge commit, from his main Advisor thread on his tap of 13:56:26 UTC, with
 the expected head 5e02ee73 (the last commit, which Builder V3 reported its advisor agent had approved); gate, smoke and
 toolchain green on it before the merge (the merge commit's message).
-
-**The preview hosting check, ADR 0006's spike 1 [2026-11-15 to 11-25, MERGED]** — preview-hosting-check
-(SPIKE_PLAN entry 6), by lane 2, run by the chat he calls Builder V2 in his throwaway test repository
-Mergincanli/shamble-preview-check on a test Cloudflare Pages project: 56 runs over the rehearsal and two days of
-sittings. A closed pull request's links were gone within 24 hours, through the cleanup job (without it the host kept
-them); the login wall covered every preview link and left production's own address open; a pull request reached no
-token without his approval and no production; the deleted token was refused. Not passed by the draft's rule:
-production's one-off links carry the host's `X-Robots-Tag: noindex` (the header mark, back to the draft), and the
-build count (no count shown anywhere) and his verdict on checklist step 4 are open; five marks met with departures
-that change no reading. Two review rounds on the build, the verifier PASS WITH NOTES on the evidence; report
-`docs/reports/2026-11-24-preview-hosting-check.md`. His answers of 2026-11-25 are in DECISIONS (a normal merge,
-by his HISTORY-ID (a)); waits for the advisor agent's review of its final head and his go.
-_Pointer (2026-11-25): merged as PR #66, 09faefa, 2026-11-25 11:10:11 UTC (`merged_at`), by merge commit, a normal
-merge on his go of 11:07:07 UTC (his HISTORY-ID (a)), with the expected head d7937de._

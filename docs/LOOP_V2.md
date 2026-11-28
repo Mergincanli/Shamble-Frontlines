@@ -13,7 +13,7 @@ idea, a sketch to iterate: not decided (tag added 2026-11-04).
 
 ## 1. The match in one paragraph
 Three teams, one per faction, fight on a three-base map. Money comes from harvesters working a contested field in the
-centre. Tech comes from rotating uplinks, where a carried tech cache is cashed out, and can be stolen. Tech lifts the (2026-11-27: resource points replace open fields, see §14)
+centre. (2026-11-27: resource points replace open fields, see §14) Tech comes from rotating uplinks, where a carried tech cache is cashed out, and can be stolen. Tech lifts the
 whole team through tiers that unlock abilities, stronger units and vehicles. The team that reaches the points target
 first (or leads when time runs out) wins. Winning converts part of the match's tech into account progression.
 
