@@ -266,6 +266,18 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   re-exports. (13) the tests of rows 22, 25, 27, 28, 31, 33, 34, 35, 36, 37, 38 (bar the direct feed), 39; world.rs's
   known answers re-made by a second implementation written for it in the notes (no committed script exists: earlier
   change-sets' agents wrote theirs in notes), `world-known-answers-c4.py`, FNV-1a 64 over the canonical bytes.
+- **State (18:45 Amsterdam, from the clock): C4 in the worktree, saved again as `c4-wip.patch` (98,224 bytes, 18
+  files):** items (3) collision.rs's bounds in whole centimetres (`face_cm`, `aim_box`, `bounds_cm()`, `holds_cm`,
+  `WorldError::Bounds`; tie-test parts a, b, d, e and the refusal: 15 collision tests pass), (4) GROUND's words
+  (map.rs, schema.rs, aim_reach.rs; the generated map schema written again by `SHAMBLE_WRITE_TYPES=1`: one line), (5)
+  the room's code (`statics`, `Room::new(.., &Rules, statics, &[SpawnPoint])`, `statics()`, the fill, `refused_move`,
+  `refused_aim`, `refused()`, the doc, the NONE tie, `JOIN_SLOT`, queue.rs's literal), (6) protocol's `AimPoint::NONE`
+  and the two sentences (its generated types written again: AimPoint.ts, Command.ts), (7) endpoint.rs's NONE, (8)
+  sim-wasm (`local_constants`, `CreateError::Soldier` and `::Rules`, `LocalMatch::new(.., &Rules, statics,
+  &[SpawnPoint])`, `world` and `static_world()` gone, its tests, step_alloc.rs), (9) part: replay.rs's `Lines` with
+  `f32` and the row prefix. Next: the room's tests (T2-6, N-1, W-3's stand-and-join half, the pin with a test-only
+  count of the slice handed, the world past the reach), any_bytes (T2-7), state_hash_alloc.rs, hash_cost.rs, the
+  recordings, T-A, T-B, row 33's three bundles, `maths-allowed.mjs`.
 - **State (18:29 Amsterdam, from the clock): C3 is closed. CI on 9e9a1cc8 green** (gate and smoke run 46169331291,
   toolchain run 46169331285, finished 17:25:23 UTC), so the advisor agent's first GO condition for C4 is met. **C4 in
   the worktree, not committed, saved as `c4-wip.patch`** (`git diff --binary HEAD -- crates packages content` on

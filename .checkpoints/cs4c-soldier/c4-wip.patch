@@ -1,8 +1,43 @@
+diff --git a/crates/client-endpoint/src/endpoint.rs b/crates/client-endpoint/src/endpoint.rs
+index a77334ff..9c6dcbd6 100644
+--- a/crates/client-endpoint/src/endpoint.rs
++++ b/crates/client-endpoint/src/endpoint.rs
+@@ -255,7 +255,8 @@ impl Endpoint {
+                 move_y: 0,
+                 buttons: ahead.post.buttons,
+                 presses: ahead.post.presses,
+-                aim: AimPoint { x: 0, y: 0, z: 0 },
++                // No aim yet: the cursor's ray reaches the command in step 2 of change-set 4c.
++                aim: AimPoint::NONE,
+                 view_time: ViewTime {
+                     tick: ahead.view_tick,
+                     fraction: 0,
 diff --git a/crates/content/src/map.rs b/crates/content/src/map.rs
-index 88f79f22..1aa3c7c8 100644
+index 88f79f22..188c8401 100644
 --- a/crates/content/src/map.rs
 +++ b/crates/content/src/map.rs
-@@ -242,8 +242,10 @@ fn refuse(path: String, kind: Kind) -> Result<(), Error> {
+@@ -1,7 +1,8 @@
+ //! The map: the static world of a match, and where its soldiers start (`content/maps/<id>.json`).
+ //!
+-//! `bounds` is the playable box. `spawns` (at most 16) are the places soldiers start at, each with the way it faces.
+-//! `shapes` (at most 512) are the solid pieces, each a box or a ramp inside its box, all axis-aligned: no angle
++//! `bounds` is the playable box; its bottom is solid ground under the whole box: a soldier with nothing under him
++//! stands on it, and a fall ends on it. `spawns` (at most 16) are the places soldiers start at, each with the way it
++//! faces. `shapes` (at most 512) are the solid pieces, each a box or a ramp inside its box, all axis-aligned: no angle
+ //! enters the static world. `regions` (at most 64) are patches of ground that are only drawn. Lengths are metres and
+ //! y is up.
+ //!
+@@ -36,7 +37,8 @@ pub const MAX_REGIONS: u32 = 64;
+ /// height to the aim point's own field types, and fails when a field widens.
+ pub const AIM_REACH_CM: i32 = 32_767;
+ const AIM_REACH_MIN_CM: i32 = -AIM_REACH_CM;
+-/// How high an aim point reaches, in centimetres above the floor at 0 (an unsigned 16-bit count): 655.35 m.
++/// How high an aim point reaches, in centimetres above y 0 (the aim's zero; the bounds' bottom, the ground, lies at
++/// or above it), as an unsigned 16-bit count: 655.35 m.
+ pub const AIM_HEIGHT_MAX_CM: i32 = 65_535;
+ 
+ /// A grid: its steps a metre, and the least thickness of a box on it, 1 cm, in those steps.
+@@ -242,8 +244,10 @@ fn refuse(path: String, kind: Kind) -> Result<(), Error> {
  }
  
  /// A coordinate's place on a grid, or `None` when it lies between two steps: the
@@ -15,6 +50,1104 @@ index 88f79f22..1aa3c7c8 100644
      let per_metre = f64::from(grid.per_metre);
      let steps = (value * per_metre).round();
      (steps / per_metre == value).then_some(steps as i64)
+diff --git a/crates/content/src/schema.rs b/crates/content/src/schema.rs
+index afe9d717..c2229887 100644
+--- a/crates/content/src/schema.rs
++++ b/crates/content/src/schema.rs
+@@ -66,7 +66,7 @@ const DESCRIPTIONS: &[(&str, &str, &str)] = &[
+     ("map", "format", "The file's kind: shamble-map."),
+     ("map", "version", "The version of the map format the file is written in."),
+     ("map", "id", "The map's id, which is its file's name."),
+-    ("map", "bounds", "The box every spawn, shape and region lies in."),
++    ("map", "bounds", "The box every spawn, shape and region lies in; its bottom is the ground."),
+     ("map", "spawns", "Where soldiers start: at least one."),
+     ("map", "shapes", "The solid pieces of the world."),
+     ("map", "regions", "Patches of ground that are only drawn."),
+@@ -157,7 +157,8 @@ fn corner(len: usize) -> Vec<(&'static str, Node)> {
+ }
+ 
+ /// The bounds' corner on one side: each axis inside `COORDINATE` and the aim's reach on that side (map.rs's `check`:
+-/// x and z within `AIM_REACH_CM`, y from the floor at 0 up to `AIM_HEIGHT_MAX_CM`).
++/// x and z within `AIM_REACH_CM`, y from 0 up to `AIM_HEIGHT_MAX_CM`: y 0 is the aim's zero; the bounds' bottom, the
++/// ground, lies at or above it).
+ fn bounds_corner(lowest: bool) -> Vec<(&'static str, Node)> {
+     let reach = f64::from(AIM_REACH_CM) / 100.0;
+     let height = f64::from(AIM_HEIGHT_MAX_CM) / 100.0;
+diff --git a/crates/devtools/src/replay.rs b/crates/devtools/src/replay.rs
+index 3f485643..104ebf27 100644
+--- a/crates/devtools/src/replay.rs
++++ b/crates/devtools/src/replay.rs
+@@ -167,14 +167,21 @@ pub fn replay(recording: &Recording, bundle: &[u8]) -> Result<Vec<TickHashes>, R
+     Ok(Replay::new(recording, bundle)?.collect())
+ }
+ 
+-/// A reader of the state that writes one `name = value` line per field. The seed's bytes are never written.
+-struct Lines(String);
++/// A reader of the state that writes one `name = value` line per field; a field of the soldier table's row `slot`
++/// is named `row <slot> <name>`, so that every line's name is its own. The seed's bytes are never written.
++struct Lines {
++    text: String,
++    row: Option<u16>,
++}
+ 
+ impl Lines {
+     fn line(&mut self, name: &str, value: fmt::Arguments<'_>) {
+         use fmt::Write;
+         // Writing into a `String` cannot fail.
+-        let _ = writeln!(self.0, "{name} = {value}");
++        let _ = match self.row {
++            Some(slot) => writeln!(self.text, "row {slot} {name} = {value}"),
++            None => writeln!(self.text, "{name} = {value}"),
++        };
+     }
+ }
+ 
+@@ -187,12 +194,23 @@ impl StateSink for Lines {
+         self.line(name, format_args!("{value}"));
+     }
+ 
++    /// The value as Rust writes it (the shortest decimal that reads back as the same `f32`) and its bits, which say
++    /// what the decimal cannot: a zero's sign and a NaN's payload.
++    fn f32(&mut self, name: &'static str, value: f32) {
++        self.line(name, format_args!("{value} (bits {:08x})", value.to_bits()));
++    }
++
++    fn row(&mut self, slot: u16) {
++        self.row = Some(slot);
++    }
++
+     fn bytes<const N: usize>(&mut self, name: &'static str, value: &[u8; N]) {
+         self.line(name, format_args!("{value:?}"));
+     }
+ 
+     fn authority(&mut self) {
+-        self.0.push_str("-- the authority's part --\n");
++        self.row = None;
++        self.text.push_str("-- the authority's part --\n");
+     }
+ 
+     fn secret<const N: usize>(&mut self, name: &'static str, _: &[u8; N]) {
+@@ -203,9 +221,12 @@ impl StateSink for Lines {
+ /// The state as lines, one field each, in the state's own order.
+ #[must_use]
+ pub fn state_lines(world: &World) -> String {
+-    let mut lines = Lines(String::new());
++    let mut lines = Lines {
++        text: String::new(),
++        row: None,
++    };
+     world.visit(&mut lines);
+-    lines.0
++    lines.text
+ }
+ 
+ /// Replays until the world is at `tick` and hands it to `read`; `None` when the recording never reaches that tick.
+diff --git a/crates/devtools/tests/aim_reach.rs b/crates/devtools/tests/aim_reach.rs
+index 9eed1322..873f585d 100644
+--- a/crates/devtools/tests/aim_reach.rs
++++ b/crates/devtools/tests/aim_reach.rs
+@@ -42,7 +42,8 @@ fn the_reach_is_what_the_aim_points_fields_hold() {
+         (i32::from(high.x), i32::from(high.y), i32::from(high.z)),
+         (AIM_REACH_CM, AIM_HEIGHT_MAX_CM, AIM_REACH_CM)
+     );
+-    // One centimetre past the reach does not fit, upward on every axis and below the floor: a wider field takes it.
++    // One centimetre past the reach does not fit, upward on every axis and below y 0 (the aim's zero; the bounds'
++    // bottom, the ground, lies at or above it): a wider field takes it.
+     assert!(
+         !fits(|aim| aim.x, AIM_REACH_CM + 1) && !fits(|aim| aim.z, AIM_REACH_CM + 1),
+         "{WIDENED}"
+diff --git a/crates/protocol/src/messages.rs b/crates/protocol/src/messages.rs
+index 85437349..7c20a8e2 100644
+--- a/crates/protocol/src/messages.rs
++++ b/crates/protocol/src/messages.rs
+@@ -114,7 +114,8 @@ pub struct Command {
+     pub tick: u32,
+     /// Moves forward only and wraps. Provisional: its width (the drafts say 16 bits or narrower).
+     pub sequence: u16,
+-    /// The move vector's x; the vector's length is at most 1. Provisional: its scale and width.
++    /// The move vector's x; the vector's length is at most 1, and a room refuses a longer one. Provisional: its scale
++    /// and width.
+     pub move_x: i8,
+     /// The move vector's y. Provisional: its scale and width.
+     pub move_y: i8,
+@@ -132,6 +133,8 @@ pub struct Command {
+ /// The world point the player aims at (ADR 0001 part 5: "at most 80 bits"). Provisional as a whole: the step of
+ /// 1 cm and the widths are borrowed from the snapshot encoding of entity positions (part 6, E3); the codec sets them
+ /// under PM-0001-51. The encoder clamps to the map: E3's height is 12 bits (0 to 40.95 m), and `y` here holds more.
++/// x -32,768 with y 0 and z 0 means "no aim in this command" ([`AimPoint::NONE`]): a room takes it without asking the
++/// map's bounds, and refuses any other aim outside them.
+ #[derive(Debug, Clone, PartialEq, Eq)]
+ #[cfg_attr(test, derive(ts_rs::TS))]
+ pub struct AimPoint {
+@@ -143,6 +146,15 @@ pub struct AimPoint {
+     pub z: i16,
+ }
+ 
++impl AimPoint {
++    /// No aim in this command: x is its type's least, outside every map's bounds, so no real aim is ever this point.
++    pub const NONE: Self = Self {
++        x: i16::MIN,
++        y: 0,
++        z: 0,
++    };
++}
++
+ /// The time the player's view showed: the interpolation tick plus a fraction of a tick.
+ #[derive(Debug, Clone, PartialEq, Eq)]
+ #[cfg_attr(test, derive(ts_rs::TS))]
+diff --git a/crates/room/src/lib.rs b/crates/room/src/lib.rs
+index 6f2634ae..49f5c9c3 100644
+--- a/crates/room/src/lib.rs
++++ b/crates/room/src/lib.rs
+@@ -19,13 +19,26 @@ pub mod queue;
+ 
+ use protocol::codec::{Control, decode_control, decode_input, encode_control, encode_snapshot};
+ use protocol::messages::{
+-    Input, JoinAccepted, JoinRejected, OwnState, PROTOCOL_VERSION, RejectReason, Snapshot,
++    AimPoint, Input, JoinAccepted, JoinRejected, OwnState, PROTOCOL_VERSION, RejectReason,
++    Snapshot,
+ };
+ use protocol::wrap::{press_edges, seq_ahead, seq_newer, ticks_after};
+ use queue::{CommandQueue, Inserted, Queued};
+-use sim::{BUTTONS, MatchSetup, PlayerCommand, TICK_HZ, World};
++use sim::aim::AimCm;
++use sim::collision::StaticWorld;
++use sim::rules::Rules;
++use sim::{
++    BUTTONS, MatchSetup, PLAYER_SLOT, PLAYER_TEAM, PlayerCommand, SpawnPoint, TICK_HZ, World,
++    move_in_reach,
++};
+ 
+ const _: () = assert!(protocol::messages::BUTTONS == BUTTONS);
++// "No aim yet" has one form, on the wire and in the simulation.
++const _: () = assert!(
++    AimPoint::NONE.x == AimCm::NONE.x
++        && AimPoint::NONE.y == AimCm::NONE.y
++        && AimPoint::NONE.z == AimCm::NONE.z
++);
+ 
+ /// The tick rate as the join answer carries it.
+ const TICK_RATE: u8 = {
+@@ -33,6 +46,12 @@ const TICK_RATE: u8 = {
+     TICK_HZ as u8
+ };
+ 
++/// The one player's slot as the join answer carries it: the world's own (`sim::PLAYER_SLOT`).
++const JOIN_SLOT: u8 = {
++    assert!(PLAYER_SLOT <= 255);
++    PLAYER_SLOT as u8
++};
++
+ /// How far ahead of the tick being run a command's tick may lie; one further ahead is dropped.
+ pub const LEAD_MAX_TICKS: u32 = 8;
+ 
+@@ -52,10 +71,13 @@ pub struct RoomCounters {
+     /// Inputs dropped whole: an ack of a snapshot the room never sent.
+     pub refused_ack: u32,
+     /// Commands dropped: for a tick too far ahead; not for a later tick than the command run before; a press
+-    /// counter that moved by more than one press per tick since the command run before.
++    /// counter that moved by more than one press per tick since the command run before; a move longer than the
++    /// wire's reach (`sim::MOVE_REACH`); an aim that is not "no aim yet" and lies outside the map's bounds.
+     pub refused_ahead: u32,
+     pub refused_not_newer: u32,
+     pub refused_presses: u32,
++    pub refused_move: u32,
++    pub refused_aim: u32,
+     /// Commands that came again, came after a newer one had run, or found the queue full: dropped, not refused.
+     pub duplicates: u32,
+     pub stale: u32,
+@@ -72,9 +94,11 @@ impl RoomCounters {
+     #[must_use]
+     pub const fn refused(&self) -> u32 {
+         let commands = self.refused_ahead.wrapping_add(self.refused_not_newer);
++        let wishes = self.refused_move.wrapping_add(self.refused_aim);
+         let messages = self.decode_errors.wrapping_add(self.refused_ack);
+         commands
+             .wrapping_add(self.refused_presses)
++            .wrapping_add(wishes)
+             .wrapping_add(messages)
+     }
+ }
+@@ -86,6 +110,8 @@ fn count(counter: &mut u32) {
+ /// One match's server side: the world, the one player's slot and that player's commands.
+ pub struct Room {
+     world: World,
++    /// The match's static world, built once from its map: the aim check reads its bounds.
++    statics: StaticWorld,
+     content_hash: [u8; 32],
+     /// The world's tick when the one slot was taken.
+     joined_at: Option<u32>,
+@@ -100,12 +126,21 @@ pub struct Room {
+ }
+ 
+ impl Room {
+-    /// A room for one match on the content with this hash.
++    /// A room for one match on the content with this hash, with the match's rules, its static world and its spawn
++    /// table. The world's start reads the rules and the table (his soldier at the first spawn); the room keeps the
++    /// static world and neither of the others.
+     #[must_use]
+-    pub fn new(setup: &MatchSetup, content_hash: [u8; 32]) -> Self {
++    pub fn new(
++        setup: &MatchSetup,
++        content_hash: [u8; 32],
++        rules: &Rules,
++        statics: StaticWorld,
++        spawns: &[SpawnPoint],
++    ) -> Self {
+         let (acks, commands) = (Vec::new(), Vec::new());
+         Self {
+-            world: World::new(setup),
++            world: World::new(setup, rules, spawns),
++            statics,
+             content_hash,
+             joined_at: None,
+             queue: CommandQueue::default(),
+@@ -122,6 +157,12 @@ impl Room {
+         &self.world
+     }
+ 
++    /// The match's static world: the map's shapes, and its bounds in whole centimetres.
++    #[must_use]
++    pub const fn statics(&self) -> &StaticWorld {
++        &self.statics
++    }
++
+     /// The hash of the world's shared state as it stands: the one number a replay compares tick by tick, the same
+     /// on every target. It covers no seed byte, changes nothing and takes no memory.
+     #[must_use]
+@@ -158,8 +199,8 @@ impl Room {
+             count(&mut self.counters.joins);
+             self.joined_at = Some(self.world.tick());
+             Control::JoinAccepted(JoinAccepted {
+-                slot: 0,
+-                team: 0,
++                slot: JOIN_SLOT,
++                team: PLAYER_TEAM,
+                 squad: 0,
+                 mode_id: MODE_ID.to_owned(),
+                 mode_hash: [0; 32],
+@@ -174,12 +215,13 @@ impl Room {
+ 
+     /// Takes a datagram: an `Input`. Its commands go to the queue, the oldest first.
+     ///
+-    /// Checked here and in `admit`: the acks, the lead, a strictly later tick and the press pace. Not checked yet,
+-    /// each with what brings it: the length of the move and the aim inside the map (the soldier and the map,
+-    /// change-set 4); the view time (lag compensation); presses against cooldowns and ammunition (weapons); how
+-    /// many messages a client may send, the join's deadline and its token (the connection, Slice 3); a lower
+-    /// bound on an ack's tick; and how late a command may still run, so that a client cannot save ticks up and
+-    /// spend them two a tick (decided with the command timing, ADR 0001's open question 6, before online play).
++    /// Checked here and in `admit`: the acks, the lead, the move's length (at most `sim::MOVE_REACH`), the aim
++    /// inside the map's bounds in whole centimetres or "no aim yet", a strictly later tick and the press pace. Not
++    /// checked yet, each with what brings it: the aim's reach against a weapon (change-set 8); the view time (lag
++    /// compensation); presses against cooldowns and ammunition (weapons); how many messages a client may send, the
++    /// join's deadline and its token (the connection, Slice 3); a lower bound on an ack's tick; and how late a
++    /// command may still run, so that a client cannot save ticks up and spend them two a tick (decided with the
++    /// command timing, ADR 0001's open question 6, before online play).
+     pub fn on_datagram(&mut self, bytes: &[u8]) {
+         if self.joined_at.is_none() || decode_input(bytes, &mut self.input).is_err() {
+             count(&mut self.counters.decode_errors);
+@@ -213,12 +255,29 @@ impl Room {
+                 count(&mut self.counters.refused_ahead);
+                 continue;
+             }
++            if !move_in_reach(command.move_x, command.move_y) {
++                count(&mut self.counters.refused_move);
++                continue;
++            }
++            let aim = AimCm {
++                x: command.aim.x,
++                y: command.aim.y,
++                z: command.aim.z,
++            };
++            // "No aim yet" asks no bounds; any other aim lies inside the map's, the faces included.
++            if aim != AimCm::NONE && !self.statics.holds_cm(aim) {
++                count(&mut self.counters.refused_aim);
++                continue;
++            }
+             let queued = Queued {
+                 sequence,
+                 tick: command.tick,
+                 command: PlayerCommand {
+                     buttons: command.buttons,
+                     presses: command.presses,
++                    move_x: command.move_x,
++                    move_y: command.move_y,
++                    aim,
+                 },
+             };
+             match self.queue.insert(queued) {
+diff --git a/crates/room/src/queue.rs b/crates/room/src/queue.rs
+index e5055b5b..a0d31f0b 100644
+--- a/crates/room/src/queue.rs
++++ b/crates/room/src/queue.rs
+@@ -137,6 +137,7 @@ mod tests {
+         let command = PlayerCommand {
+             buttons: sequence,
+             presses: [0; sim::BUTTONS],
++            ..PlayerCommand::NONE
+         };
+         Queued {
+             sequence,
+diff --git a/crates/sim-wasm/src/lib.rs b/crates/sim-wasm/src/lib.rs
+index 4a289e86..f994d82b 100644
+--- a/crates/sim-wasm/src/lib.rs
++++ b/crates/sim-wasm/src/lib.rs
+@@ -14,7 +14,9 @@ pub mod panic;
+ use client_endpoint::post::Post;
+ use local_match::{LocalMatch, loopback};
+ use sim::collision::{StaticWorld, WorldError};
+-use sim::{MatchSetup, SEED_BYTES, TICK_HZ};
++use sim::rules::{Rules, RulesError};
++use sim::soldiers::spawn_points;
++use sim::{MatchSetup, SEED_BYTES, SpawnPoint, TICK_HZ};
+ use wasm_bindgen::prelude::*;
+ 
+ /// Local play: the client endpoint and a local server in one Worker (ADR 0002 part 6). The only mode so far.
+@@ -42,8 +44,12 @@ pub enum CreateError {
+     Content(content::Error),
+     /// The content holds no map with the id `LOCAL_MAP`.
+     MapMissing,
++    /// The content holds this many movement documents, and a local match plays exactly one: its soldier's.
++    Soldier { found: usize },
+     /// The map makes no static collision world: why.
+     World(WorldError),
++    /// The movement document makes no rules a match can play: why.
++    Rules(RulesError),
+     /// More padding than the block writer takes.
+     PadBytes(u32),
+ }
+@@ -66,12 +72,23 @@ impl CreateError {
+                     "the content holds no map \"{LOCAL_MAP}\", the map a local match is played on"
+                 )
+             }
++            Self::Soldier { found } => {
++                format!(
++                    "the content holds {found} movement documents, and a local match plays exactly one, its soldier's"
++                )
++            }
+             Self::World(error) => {
+                 format!(
+                     "the map \"{LOCAL_MAP}\" makes no collision world: {}",
+                     error.message()
+                 )
+             }
++            Self::Rules(error) => {
++                format!(
++                    "the content's movement document makes no rules a match can play: {}",
++                    error.message()
++                )
++            }
+             Self::PadBytes(pad) => {
+                 format!("{pad} bytes of block padding is above the writer's cap")
+             }
+@@ -79,10 +96,22 @@ impl CreateError {
+     }
+ }
+ 
+-/// The static collision world of the local match's map, built once from the content the loader took.
+-fn local_world(set: &content::ContentSet) -> Result<StaticWorld, CreateError> {
++/// What a local match is made of, from the content the loader took, each once and checked in this order: its map
++/// (`LOCAL_MAP`), its one movement document, the map's static collision world, that document's rules, and the map's
++/// spawn table. A mode that names its soldier comes with the change-set that brings a second movement document, as
++/// one that names its map does. None of it is the match's state: the world's start reads the rules and the table, and
++/// the room keeps the static world.
++fn local_constants(
++    set: &content::ContentSet,
++) -> Result<(Rules, StaticWorld, Vec<SpawnPoint>), CreateError> {
+     let map = set.map(LOCAL_MAP).ok_or(CreateError::MapMissing)?;
+-    StaticWorld::build(map).map_err(CreateError::World)
++    let [movement] = set.movements() else {
++        let found = set.movements().len();
++        return Err(CreateError::Soldier { found });
++    };
++    let statics = StaticWorld::build(map).map_err(CreateError::World)?;
++    let rules = Rules::take(movement).map_err(CreateError::Rules)?;
++    Ok((rules, statics, spawn_points(map)))
+ }
+ 
+ /// One local match in the Worker. Its state is the local match's (`local_match`): the client endpoint, the local
+@@ -96,12 +125,15 @@ impl Sim {
+     /// Checks what the host passed and builds the match at tick 0, its join already on its way. The block is whole
+     /// from the start; the host's first `rebase` says when the first tick is due. `bundle` is the match's content
+     /// (`content.json`): it crosses once, here, so no call can swap it mid-match; the game's own loader judges it.
+-    /// The match holds the static collision world of the content's map `LOCAL_MAP`; nothing of the content enters
+-    /// the match's state, and no step queries the world yet (change-set 4c).
++    /// The match is made on the content's map `LOCAL_MAP` and its one movement document (`local_constants`): the room
++    /// keeps the map's static world, whose bounds hold each command's aim, and the world's start puts his soldier at
++    /// the map's first spawn by id with that document's stamina. The content enters the match's state only through that
++    /// start; no step reads a rule yet (the movement comes later in change-set 4c).
+     ///
+     /// # Errors
+     /// A seed of the wrong length, a mode that does not exist, a bundle the loader refuses, a bundle without the map,
+-    /// a map that makes no world, or too much padding, checked in that order.
++    /// a bundle without exactly one movement document, a map that makes no world, a movement document that makes no
++    /// rules, or too much padding, checked in that order.
+     pub fn create(
+         seed: &[u8],
+         mode: u32,
+@@ -114,12 +146,12 @@ impl Sim {
+             return Err(CreateError::Mode(mode));
+         }
+         let set = content::load(bundle).map_err(CreateError::Content)?;
+-        let world = local_world(&set)?;
++        let (rules, statics, spawns) = local_constants(&set)?;
+         let setup = MatchSetup {
+             seed,
+             start_tick: 0,
+         };
+-        let local = LocalMatch::new(&setup, 0, pad_bytes, loopback(), world);
++        let local = LocalMatch::new(&setup, 0, pad_bytes, loopback(), &rules, statics, &spawns);
+         local
+             .map(|local| Self { local })
+             .ok_or(CreateError::PadBytes(pad_bytes))
+@@ -360,11 +392,11 @@ mod tests {
+         assert!(refused(&bundle()).is_none());
+     }
+ 
+-    /// The six checks run in a fixed order, seed, mode, content, map, world, padding: each case below fails all the
+-    /// ones after its own, and only its own is named. (No map a test makes here reaches the world's check: the
+-    /// world's own tests make its refusals, and its sentence is held below.)
++    /// The eight checks run in a fixed order, seed, mode, content, map, soldier, world, rules, padding: each case below
++    /// fails all the ones after its own, and only its own is named. (No map a test makes here reaches the world's
++    /// check: the world's own tests make its refusals, and its sentence is held below.)
+     #[test]
+-    fn the_checks_run_in_the_order_seed_mode_content_map_padding() {
++    fn the_checks_run_in_the_order_seed_mode_content_map_soldier_padding() {
+         let bad = b"{}";
+         let first = |seed: &[u8], mode, pad, bundle: &[u8]| {
+             Sim::create(seed, mode, pad, bundle)
+@@ -390,24 +422,82 @@ mod tests {
+             first(&SEED, MODE_LOCAL, u32::MAX, mapless.as_bytes()),
+             kind(CreateError::MapMissing)
+         );
++        // The map with no movement document, and with two of which one makes no rules: the soldier's check comes
++        // before the rules' and the padding's.
++        let map = ("maps/test-scene.json", content::map::TEST_TEXT);
++        let unplayable = content::movement::TEST_TEXT
++            .replace("\"jump_reach_m\": 3,", "\"jump_reach_m\": 0.25,")
++            .replace("\"test-soldier\"", "\"second\"");
++        for files in [
++            vec![map],
++            vec![
++                map,
++                ("movement/second.json", unplayable.as_str()),
++                ("movement/test-soldier.json", content::movement::TEST_TEXT),
++            ],
++        ] {
++            let bundle = content::bundle::write(&files);
++            assert_eq!(
++                first(&SEED, MODE_LOCAL, u32::MAX, bundle.as_bytes()),
++                kind(CreateError::Soldier { found: 0 })
++            );
++        }
+         assert_eq!(
+             first(&SEED, MODE_LOCAL, u32::MAX, &bundle()),
+             kind(CreateError::PadBytes(0))
+         );
+     }
+ 
+-    /// The match holds the static world of the content's map `LOCAL_MAP`: the same world the map builds on its own.
++    /// The match's room holds the static world of the content's map `LOCAL_MAP`: the same world the map builds on its
++    /// own, its bounds in whole centimetres included.
+     #[test]
+     fn the_match_holds_the_static_world_of_the_local_map() {
+         let sim = Sim::create(&SEED, MODE_LOCAL, 0, &bundle()).expect("a good seed and mode");
+         let set = content::load(&bundle()).expect("the test bundle loads");
+         let built =
+             StaticWorld::build(set.map(LOCAL_MAP).expect("the test map")).expect("it builds");
+-        let held = sim.local().static_world();
++        let held = sim.local().room().statics();
+         assert_eq!(held.solids().len(), built.solids().len());
+         assert_eq!(held.tree_depth(), built.tree_depth());
+         assert_eq!(held.tree_bytes(), built.tree_bytes());
+-        assert!(!held.solids().is_empty());
++        assert_eq!(held.bounds_cm(), built.bounds_cm());
++        assert!(!held.solids().is_empty() && held.bounds_cm().is_some());
++    }
++
++    /// The match plays the bundle's one movement document: a bundle with none or with two is refused, saying how many
++    /// it found; one whose document makes no rules is refused with the rules' own reason.
++    #[test]
++    fn a_bundle_without_exactly_one_movement_document_or_with_one_that_does_not_play_makes_no_match() {
++        let map = ("maps/test-scene.json", content::map::TEST_TEXT);
++        let movement = ("movement/test-soldier.json", content::movement::TEST_TEXT);
++        let second_text = content::movement::TEST_TEXT.replace("\"test-soldier\"", "\"second\"");
++        assert_ne!(second_text, content::movement::TEST_TEXT);
++        let second = ("movement/second.json", second_text.as_str());
++        for (files, found) in [(vec![map], 0), (vec![map, movement, second], 2)] {
++            let bundle = content::bundle::write(&files);
++            assert!(content::load(bundle.as_bytes()).is_ok(), "{found}");
++            let error = Sim::create(&SEED, MODE_LOCAL, 0, bundle.as_bytes()).err();
++            assert_eq!(error, Some(CreateError::Soldier { found }));
++        }
++        assert_eq!(
++            CreateError::Soldier { found: 2 }.message(),
++            "the content holds 2 movement documents, and a local match plays exactly one, its soldier's"
++        );
++        // A jump that reaches lower than the step-up: every value inside its range, and no rules.
++        let low = content::movement::TEST_TEXT.replace("\"jump_reach_m\": 3,", "\"jump_reach_m\": 0.25,");
++        assert_ne!(low, content::movement::TEST_TEXT);
++        let bundle = content::bundle::write(&[map, ("movement/test-soldier.json", &low)]);
++        let set = content::load(bundle.as_bytes()).expect("the loader takes it");
++        let why = Rules::take(&set.movements()[0]).expect_err("no rules");
++        let error = Sim::create(&SEED, MODE_LOCAL, 0, bundle.as_bytes()).err();
++        assert_eq!(error, Some(CreateError::Rules(why)));
++        assert_eq!(
++            CreateError::Rules(why).message(),
++            format!(
++                "the content's movement document makes no rules a match can play: {}",
++                why.message()
++            )
++        );
+     }
+ 
+     /// A bundle whose maps have other ids makes no match, and says which map it looked for; a map that makes no
+diff --git a/crates/sim-wasm/src/local_match.rs b/crates/sim-wasm/src/local_match.rs
+index 9862fda2..3e8f728b 100644
+--- a/crates/sim-wasm/src/local_match.rs
++++ b/crates/sim-wasm/src/local_match.rs
+@@ -15,7 +15,8 @@ use protocol::loopback::Loopback;
+ use protocol::transport::{Channel, Delivery, SendError, Side, Transport, TransportPair};
+ use room::Room;
+ use sim::collision::StaticWorld;
+-use sim::{MatchSetup, TICK_HZ};
++use sim::rules::Rules;
++use sim::{MatchSetup, SpawnPoint, TICK_HZ};
+ 
+ /// The content hash the join names on both sides: zeros, until change-set 8 brings the bundle's sha256 into the join
+ /// (ADR 0005, CD-8). The match itself is made on a bundle from change-set 4b on; this hash does not name it yet.
+@@ -32,9 +33,9 @@ pub fn loopback() -> Loopback {
+     Loopback::new(SLOT_BYTES, 8)
+ }
+ 
+-/// One local match: the local server, the client endpoint and the link between them, and the static collision
+-/// world of the match's map. It owns no state of the exchange itself: the endpoint holds the page's post and writes
+-/// the block, the room holds the world's state.
++/// One local match: the local server, the client endpoint and the link between them. It owns no state of the exchange
++/// itself: the endpoint holds the page's post and writes the block, the room holds the world's state and the match's
++/// static collision world.
+ pub struct LocalMatch<P: TransportPair = Loopback> {
+     room: Room,
+     endpoint: Endpoint,
+@@ -45,32 +46,31 @@ pub struct LocalMatch<P: TransportPair = Loopback> {
+     outgoing: Vec<u8>,
+     /// Messages the link did not take; wraps.
+     unsent: u32,
+-    /// The map's solid shapes and their tree, built once from the match's content. No step queries it yet: the
+-    /// movement and the aim's cast that do come with change-set 4c. It is no state: nothing of it is hashed.
+-    world: StaticWorld,
+ }
+ 
+ impl<P: TransportPair> LocalMatch<P> {
+-    /// A match over `link` on the static world `world`, with the join already on its way; the endpoint's first
+-    /// command has `first_sequence` (0 in play). The block is whole from the start, and no tick is due before the
+-    /// first `rebase`. `None` when `pad_bytes` is more padding than the block writer takes.
++    /// A match over `link` with the match's rules, its static world (the room keeps it) and its spawn table (the
++    /// world's start reads it and the rules), with the join already on its way; the endpoint's first command has
++    /// `first_sequence` (0 in play). The block is whole from the start, and no tick is due before the first `rebase`.
++    /// `None` when `pad_bytes` is more padding than the block writer takes.
+     #[must_use]
+     pub fn new(
+         setup: &MatchSetup,
+         first_sequence: u16,
+         pad_bytes: u32,
+         link: P,
+-        world: StaticWorld,
++        rules: &Rules,
++        statics: StaticWorld,
++        spawns: &[SpawnPoint],
+     ) -> Option<Self> {
+         let mut local = Self {
+-            room: Room::new(setup, NO_CONTENT),
+             endpoint: Endpoint::new(NO_CONTENT, first_sequence, pad_bytes)?,
++            room: Room::new(setup, NO_CONTENT, rules, statics, spawns),
+             link,
+             schedule: LocalSchedule::new(0.0, TICK_HZ),
+             incoming: Vec::with_capacity(MAX_JOIN_BYTES),
+             outgoing: Vec::with_capacity(MAX_JOIN_BYTES),
+             unsent: 0,
+-            world,
+         };
+         let joined = local.endpoint.join(&mut local.outgoing);
+         let mut client = local.link.end(Side::Client);
+@@ -93,12 +93,6 @@ impl<P: TransportPair> LocalMatch<P> {
+         &self.endpoint
+     }
+ 
+-    /// The static collision world of the match's map.
+-    #[must_use]
+-    pub const fn static_world(&self) -> &StaticWorld {
+-        &self.world
+-    }
+-
+     /// Messages the link did not take; wraps. They are in the block's count of refused messages.
+     #[must_use]
+     pub const fn unsent(&self) -> u32 {
+@@ -199,18 +193,28 @@ mod tests {
+     use protocol::wrap::press_edges;
+     use sim::BUTTONS;
+ 
+-    /// The static world of the content crate's test map (`map::TEST_TEXT`), which every match here is made on.
+-    fn world() -> StaticWorld {
++    /// The rules, static world and spawn table of the content crate's test bundle (`bundle::test_bundle`), which every
++    /// match here is made on.
++    fn constants() -> (Rules, StaticWorld, Vec<SpawnPoint>) {
+         let bundle = content::bundle::test_bundle();
+         let set = content::load(bundle.as_bytes()).expect("the test bundle loads");
+-        StaticWorld::build(set.map("test-scene").expect("the test map"))
+-            .expect("the test map builds")
++        let map = set.map("test-scene").expect("the test map");
++        let rules = Rules::take(&set.movements()[0]).expect("its movement table plays");
++        let statics = StaticWorld::build(map).expect("the test map builds");
++        (rules, statics, sim::soldiers::spawn_points(map))
++    }
++
++    /// A match on the test bundle over this link.
++    fn over<P: TransportPair>(setup: &MatchSetup, pad_bytes: u32, link: P) -> Option<LocalMatch<P>> {
++        let (rules, statics, spawns) = constants();
++        LocalMatch::new(setup, 0, pad_bytes, link, &rules, statics, &spawns)
+     }
+ 
+     fn local(start_tick: u32, first_sequence: u16) -> LocalMatch {
+         let seed = [7; sim::SEED_BYTES];
+         let setup = MatchSetup { seed, start_tick };
+-        LocalMatch::new(&setup, first_sequence, 0, loopback(), world())
++        let (rules, statics, spawns) = constants();
++        LocalMatch::new(&setup, first_sequence, 0, loopback(), &rules, statics, &spawns)
+             .expect("no padding is allowed")
+     }
+ 
+@@ -396,7 +400,7 @@ mod tests {
+             start_tick: 0,
+         };
+         let pad = client_endpoint::block::MAX_PAD_BYTES + 1;
+-        assert!(LocalMatch::new(&setup, 0, pad, loopback(), world()).is_none());
++        assert!(over(&setup, pad, loopback()).is_none());
+     }
+ 
+     /// A link that takes nothing: nothing panics, the join never arrives, so the room has no player to send to,
+@@ -409,8 +413,7 @@ mod tests {
+             start_tick: 0,
+         };
+         // Slots of one byte: no message fits.
+-        let mut local =
+-            LocalMatch::new(&setup, 0, 0, Loopback::new(1, 8), world()).expect("no padding");
++        let mut local = over(&setup, 0, Loopback::new(1, 8)).expect("no padding");
+         assert_eq!(local.unsent(), 1);
+         for step in 0..10 {
+             local.step(f64::from(step));
+diff --git a/crates/sim-wasm/tests/step_alloc.rs b/crates/sim-wasm/tests/step_alloc.rs
+index 3b6f428e..6ebbae63 100644
+--- a/crates/sim-wasm/tests/step_alloc.rs
++++ b/crates/sim-wasm/tests/step_alloc.rs
+@@ -15,6 +15,8 @@ use std::cell::Cell;
+ 
+ use client_endpoint::post::Post;
+ use sim::collision::StaticWorld;
++use sim::rules::Rules;
++use sim::soldiers::spawn_points;
+ use sim::{BUTTONS, MatchSetup, SEED_BYTES};
+ use sim_wasm::local_match::{LocalMatch, loopback};
+ 
+@@ -77,13 +79,16 @@ fn a_tick_of_the_local_match_takes_no_memory_once_the_match_is_warm() {
+         seed,
+         start_tick: 0,
+     };
+-    // The match is made on the content crate's test map, as a local match always holds its map's static world.
++    // The match is made on the content crate's test bundle, as a local match is always made on its content: the
++    // map's static world (the room keeps it and checks each command's aim against its bounds), the movement
++    // document's rules and the map's spawn table (his soldier stands at the first spawn).
+     let bundle = content::bundle::test_bundle();
+     let set = content::load(bundle.as_bytes()).expect("the test bundle loads");
+-    let world =
+-        StaticWorld::build(set.map("test-scene").expect("the test map")).expect("it builds");
+-    let mut local =
+-        LocalMatch::new(&setup, 0, 0, loopback(), world).expect("no padding is allowed");
++    let map = set.map("test-scene").expect("the test map");
++    let statics = StaticWorld::build(map).expect("it builds");
++    let rules = Rules::take(&set.movements()[0]).expect("its movement table plays");
++    let mut local = LocalMatch::new(&setup, 0, 0, loopback(), &rules, statics, &spawn_points(map))
++        .expect("no padding is allowed");
+     let mut presses = [0u8; BUTTONS];
+     let mut step = |local: &mut LocalMatch, number: u32| {
+         // A press every tick, round the buttons, and every bit pattern of the held buttons in turn.
+diff --git a/crates/sim/src/collision.rs b/crates/sim/src/collision.rs
+index 60197bed..084ca1f2 100644
+--- a/crates/sim/src/collision.rs
++++ b/crates/sim/src/collision.rs
+@@ -1,6 +1,7 @@
+ //! The static world of a match: the map's solid shapes as the simulation holds them, the tree over them and the ray
+-//! cast (ADR 0004 part 10; PM-0004-32). It is built once from the map document when a match starts, never changes
+-//! after, and is never part of a snapshot: the same document gives the same world again.
++//! cast (ADR 0004 part 10; PM-0004-32), and the map's bounds in whole centimetres, the box a command's aim must lie
++//! in. It is built once from the map document when a match starts, never changes after, and is never part of a
++//! snapshot: the same document gives the same world again.
+ //!
+ //! This is the one file that names the collision library (`crates/sim/tests/rules_scan.rs` holds that). What it
+ //! takes from the library is the tree: the binned build over the shapes' boxes, the walk over its nodes, and the
+@@ -14,11 +15,14 @@
+ //! A shape's index is its rank by id (bytes), whatever order the document lists the shapes in: two documents that
+ //! hold the same shapes give the same world, byte for byte ([`StaticWorld::tree_bytes`]).
+ 
+-use content::map::{Form, MapDocument, Toward};
++use content::map::{
++    AIM_HEIGHT_MAX_CM, AIM_REACH_CM, BOUNDS_GRID, Form, MapDocument, Toward, on_grid,
++};
+ use parry3d::bounding_volume::Aabb;
+ use parry3d::math::Vector;
+ use parry3d::partitioning::{Bvh, BvhBuildStrategy, TraversalAction};
+ 
++use crate::aim::AimCm;
+ use crate::vec::V3;
+ 
+ /// The most shapes a static world holds: the map kind's own cap (`content::map::MAX_SHAPES`; a test ties the two).
+@@ -42,6 +46,9 @@ pub const MAX_TREE_DEPTH: u32 = 31;
+ pub enum WorldError {
+     /// More shapes than [`MAX_SHAPES`]: this many.
+     TooManyShapes(usize),
++    /// The map's bounds have a corner that is no finite `f32`, or no thickness on some axis once their corners are
++    /// `f32`: the checks a shape gets.
++    Bounds,
+     /// The shape at this place in the document's list has a corner that is no finite `f32`.
+     NotFinite(usize),
+     /// The shape at this place in the document's list has no thickness on some axis once its corners are `f32`.
+@@ -60,6 +67,7 @@ impl WorldError {
+                     "the map holds {found} shapes, and a static world holds at most {MAX_SHAPES}"
+                 )
+             }
++            Self::Bounds => "the map's bounds have a corner that is not a finite number, or no thickness on one of their axes".to_owned(),
+             Self::NotFinite(place) => {
+                 format!("shape {place} of the map has a corner that is not a finite number")
+             }
+@@ -96,6 +104,7 @@ pub struct StaticWorld {
+     solids: Vec<Solid>,
+     tree: Bvh,
+     depth: u32,
++    bounds_cm: Option<[[i32; 3]; 2]>,
+ }
+ 
+ /// A corner as the simulation holds it: narrowed once, here, and a zero without its sign (a file cannot hold a
+@@ -108,6 +117,52 @@ pub(crate) fn narrow(corner: [f64; 3]) -> [f32; 3] {
+     })
+ }
+ 
++/// One face of the map's bounds in whole centimetres, from the document's own number (never from its `f32`): on the
++/// bounds' grid its count by the loader's own rule (content's `on_grid`: 0.55 gives 55, where a plain rounding up of
++/// 0.55 x 100 gives 56), and off that grid, which only a document built in code can be, the next whole centimetre
++/// inward: up for a lower face (`lower`), down for an upper one. Off the grid the count over 100 is never the number
++/// itself (that is what off the grid means), so each comparison is strict. A face beyond `i64` saturates; the aim's
++/// reach holds it after.
++fn face_cm(value: f64, lower: bool) -> i64 {
++    if let Some(steps) = on_grid(value, BOUNDS_GRID) {
++        return steps;
++    }
++    let per_metre = f64::from(BOUNDS_GRID.per_metre);
++    let nearest = (value * per_metre).round();
++    let steps = nearest as i64;
++    if lower && nearest / per_metre < value {
++        steps.saturating_add(1)
++    } else if !lower && nearest / per_metre > value {
++        steps.saturating_sub(1)
++    } else {
++        steps
++    }
++}
++
++/// The map's bounds in whole centimetres, held to the aim's reach (x and z within `AIM_REACH_CM` either way, y from 0
++/// up to `AIM_HEIGHT_MAX_CM`: content's map.rs), as its lower corner and then its upper one. Every map the loader takes
++/// lies inside the reach already, so there this is the bounds themselves; a map built in code past the reach keeps the
++/// part inside it. `None` when that part holds no whole centimetre on some axis.
++fn aim_box(min: [f64; 3], max: [f64; 3]) -> Option<[[i32; 3]; 2]> {
++    let reach = [
++        (-AIM_REACH_CM, AIM_REACH_CM),
++        (0, AIM_HEIGHT_MAX_CM),
++        (-AIM_REACH_CM, AIM_REACH_CM),
++    ];
++    let mut held = [[0; 3]; 2];
++    for (axis, (least, most)) in reach.into_iter().enumerate() {
++        let low = i64::max(face_cm(min[axis], true), i64::from(least));
++        let high = i64::min(face_cm(max[axis], false), i64::from(most));
++        if low > high {
++            return None;
++        }
++        // Both lie within the reach now, which `i32` holds exactly.
++        held[0][axis] = low as i32;
++        held[1][axis] = high as i32;
++    }
++    Some(held)
++}
++
+ /// Where a ray enters a box, between `t = 0` and `limit`, or nothing when it misses it there. One subtraction and
+ /// one division per axis, on the box's corners as they are stored; a direction of zero on an axis is a plain
+ /// question (is the origin between the two faces, the faces included) and never a multiplication of zero by
+@@ -209,11 +264,21 @@ impl StaticWorld {
+     /// its bounds, its ids); these are the checks a document needs whoever made it, a test included.
+     ///
+     /// # Errors
+-    /// Too many shapes, a corner that is not finite, a shape without thickness, or a tree that is too deep.
++    /// Too many shapes, bounds that are not finite or have no thickness, a corner that is not finite, a shape without
++    /// thickness, or a tree that is too deep.
+     pub fn build(map: &MapDocument) -> Result<Self, WorldError> {
+         if map.shapes.len() > MAX_SHAPES {
+             return Err(WorldError::TooManyShapes(map.shapes.len()));
+         }
++        // The bounds get the checks a shape gets, on their corners as `f32`; the box an aim must lie in is taken
++        // from the document's own numbers.
++        let (low, high) = (narrow(map.bounds.min), narrow(map.bounds.max));
++        if !low.iter().chain(&high).all(|corner| corner.is_finite())
++            || (0..3).any(|axis| low[axis] >= high[axis])
++        {
++            return Err(WorldError::Bounds);
++        }
++        let bounds_cm = aim_box(map.bounds.min, map.bounds.max);
+         let mut order: Vec<usize> = (0..map.shapes.len()).collect();
+         order.sort_by(|a, b| {
+             map.shapes[*a]
+@@ -251,6 +316,25 @@ impl StaticWorld {
+             solids,
+             tree,
+             depth,
++            bounds_cm,
++        })
++    }
++
++    /// The map's bounds in whole centimetres, held to the aim's reach: the box [`StaticWorld::holds_cm`] reads, its
++    /// lower corner and then its upper one (x, y, z), both faces inside it. `None` when no whole centimetre of the
++    /// reach lies within the bounds on some axis, which only a document built in code can give: then no aim is held.
++    #[must_use]
++    pub const fn bounds_cm(&self) -> Option<[[i32; 3]; 2]> {
++        self.bounds_cm
++    }
++
++    /// Whether an aim lies in [`StaticWorld::bounds_cm`], both faces included: never on a world with no such box, and
++    /// never "no aim yet" ([`AimCm::NONE`]), whose x lies past the aim's reach on every map.
++    #[must_use]
++    pub fn holds_cm(&self, aim: AimCm) -> bool {
++        let at = [i32::from(aim.x), i32::from(aim.y), i32::from(aim.z)];
++        self.bounds_cm.is_some_and(|[low, high]| {
++            (0..3).all(|axis| low[axis] <= at[axis] && at[axis] <= high[axis])
+         })
+     }
+ 
+@@ -341,7 +425,7 @@ impl StaticWorld {
+ 
+ #[cfg(test)]
+ mod tests {
+-    use content::map::{Bounds, Shape};
++    use content::map::{Bounds, Shape, Spawn};
+     use parry3d::query::{Ray, RayCast};
+     use parry3d::shape::ConvexPolyhedron;
+ 
+@@ -603,6 +687,209 @@ mod tests {
+         );
+     }
+ 
++    /// A document with these bounds, one spawn at their lower corner and no shape: the loader's own rules
++    /// (`content::map::check`) can judge it.
++    fn bounded(min: [f64; 3], max: [f64; 3]) -> MapDocument {
++        MapDocument {
++            id: "bounded".to_owned(),
++            bounds: Bounds { min, max },
++            spawns: vec![Spawn {
++                id: "a".to_owned(),
++                at: min,
++                facing_deg: 0.0,
++            }],
++            shapes: Vec::new(),
++            regions: Vec::new(),
++        }
++    }
++
++    fn box_of(map: &MapDocument) -> Option<[[i32; 3]; 2]> {
++        StaticWorld::build(map).expect("a world").bounds_cm()
++    }
++
++    /// The committed test scene's bounds (content/maps/test-scene.json), in metres and in centimetres.
++    const SCENE: ([f64; 3], [f64; 3]) = ([-32.0, 0.0, -24.0], [80.0, 20.0, 24.0]);
++    const SCENE_CM: [[i32; 3]; 2] = [[-3_200, 0, -2_400], [8_000, 2_000, 2_400]];
++
++    #[test]
++    fn bounds_on_the_grid_are_their_own_count_of_whole_centimetres() {
++        // The made-up test map as the loader reads it.
++        let set = content::load(content::bundle::test_bundle().as_bytes()).expect("the test bundle loads");
++        let loaded = set.map("test-scene").expect("its map");
++        assert_eq!(box_of(loaded), Some([[-5_000, 0, -5_000], [5_000, 2_000, 5_000]]));
++        // The test scene's bounds, the reach's own edges, and lower faces at 0.55 and -0.55: 0.55 x 100 is not 55 to
++        // the last bit, so a plain rounding up would put the face on 56.
++        let face = 0.55_f64;
++        assert_eq!((face * 100.0).ceil(), 56.0);
++        #[rustfmt::skip]
++        let cases = [
++            (SCENE.0, SCENE.1, SCENE_CM),
++            ([-327.67, 0.0, -327.67], [327.67, 655.35, 327.67], [[-32_767, 0, -32_767], [32_767, 65_535, 32_767]]),
++            ([0.55, 0.55, -0.55], [1.0, 1.0, 1.0], [[55, 55, -55], [100, 100, 100]]),
++        ];
++        for (min, max, expected) in cases {
++            let map = bounded(min, max);
++            content::map::check(&map).expect("the loader takes it");
++            assert_eq!(box_of(&map), Some(expected), "{min:?} {max:?}");
++            // Each face is the loader's own count, exactly.
++            for axis in 0..3 {
++                let count = |value: f64| on_grid(value, BOUNDS_GRID);
++                assert_eq!(count(min[axis]), Some(i64::from(expected[0][axis])));
++                assert_eq!(count(max[axis]), Some(i64::from(expected[1][axis])));
++            }
++        }
++    }
++
++    #[test]
++    fn bounds_off_the_grid_take_the_next_whole_centimetre_inward() {
++        // Documents built in code, which the loader refuses: every face lies inward of the document's own number by
++        // less than 1 cm, judged in f64 against that number.
++        #[rustfmt::skip]
++        let cases = [
++            ([-32.004, 0.005, -24.0], [80.004, 20.001, 24.0], [[-3_200, 1, -2_400], [8_000, 2_000, 2_400]]),
++            ([-0.015, 0.009, 0.001], [0.019, 0.011, 0.999], [[-1, 1, 1], [1, 1, 99]]),
++        ];
++        let metres = |cm: i32| f64::from(cm) / 100.0;
++        for (min, max, expected) in cases {
++            let map = bounded(min, max);
++            assert!(content::map::check(&map).is_err(), "{min:?} {max:?}");
++            let held = box_of(&map).expect("a box");
++            assert_eq!(held, expected, "{min:?} {max:?}");
++            for axis in 0..3 {
++                let (low, high) = (held[0][axis], held[1][axis]);
++                assert!(metres(low) >= min[axis] && metres(low - 1) < min[axis], "{axis}: {low}");
++                assert!(metres(high) <= max[axis] && metres(high + 1) > max[axis], "{axis}: {high}");
++            }
++        }
++    }
++
++    #[test]
++    fn the_aims_box_lies_inside_the_bounds_and_the_reach_and_a_map_past_the_reach_still_builds() {
++        let reach = [
++            [-AIM_REACH_CM, 0, -AIM_REACH_CM],
++            [AIM_REACH_CM, AIM_HEIGHT_MAX_CM, AIM_REACH_CM],
++        ];
++        // A 2 km map built in code (0 to 2,000 m on x and z) builds, and its box is the part inside the reach; so is a
++        // map reaching past the reach on every side, below y 0 included.
++        #[rustfmt::skip]
++        let cases = [
++            ([0.0, 0.0, 0.0], [2_000.0, 20.0, 2_000.0], [[0, 0, 0], [32_767, 2_000, 32_767]]),
++            ([-2_000.0, -5.0, -2_000.0], [2_000.0, 700.0, 2_000.0], reach),
++            ([-32.004, 0.005, -24.0], [80.004, 20.001, 24.0], [[-3_200, 1, -2_400], [8_000, 2_000, 2_400]]),
++            (SCENE.0, SCENE.1, SCENE_CM),
++        ];
++        for (min, max, expected) in cases {
++            let held = box_of(&bounded(min, max)).expect("a box");
++            assert_eq!(held, expected, "{min:?} {max:?}");
++            for axis in 0..3 {
++                let (low, high) = (held[0][axis], held[1][axis]);
++                assert!(reach[0][axis] <= low && low <= high && high <= reach[1][axis]);
++                assert!(f64::from(low) / 100.0 >= min[axis] && f64::from(high) / 100.0 <= max[axis]);
++            }
++        }
++        // Bounds wholly past the reach on one axis, or holding no whole centimetre on one, give no box, and the world
++        // still builds.
++        for (min, max) in [
++            ([400.0, 0.0, 0.0], [500.0, 10.0, 10.0]),
++            ([0.0, 700.0, 0.0], [1.0, 800.0, 1.0]),
++            ([0.0, 0.0, -0.009], [1.0, 1.0, -0.001]),
++        ] {
++            assert_eq!(box_of(&bounded(min, max)), None, "{min:?} {max:?}");
++        }
++    }
++
++    #[test]
++    fn a_face_moved_by_one_centimetre_moves_that_face_of_the_box_alone() {
++        let metres = |cm: i32| f64::from(cm) / 100.0;
++        for side in 0..2 {
++            for axis in 0..3 {
++                for by in [-1, 1] {
++                    let mut moved_cm = SCENE_CM;
++                    moved_cm[side][axis] += by;
++                    if moved_cm[0][1] < 0 {
++                        continue;
++                    }
++                    let (mut min, mut max) = SCENE;
++                    let face = if side == 0 { &mut min } else { &mut max };
++                    face[axis] = metres(moved_cm[side][axis]);
++                    let map = bounded(min, max);
++                    content::map::check(&map).expect("the loader takes it");
++                    assert_eq!(box_of(&map), Some(moved_cm), "{side} {axis} {by}");
++                }
++            }
++        }
++    }
++
++    #[test]
++    fn an_aim_is_held_on_each_face_of_the_box_and_refused_one_centimetre_past_it() {
++        let build = |min, max| StaticWorld::build(&bounded(min, max)).expect("a world");
++        let aim = |x: i16, y: u16, z: i16| AimCm { x, y, z };
++        let scene = build(SCENE.0, SCENE.1);
++        // Each face and the two far corners are held; one centimetre past each face is not (y 0 has nothing below it
++        // in an aim's type: the raised map below has its lower y face at 2 m).
++        for held in [
++            aim(-3_200, 10, 0),
++            aim(8_000, 10, 0),
++            aim(0, 0, 0),
++            aim(0, 2_000, 0),
++            aim(0, 10, -2_400),
++            aim(0, 10, 2_400),
++            aim(-3_200, 0, -2_400),
++            aim(8_000, 2_000, 2_400),
++        ] {
++            assert!(scene.holds_cm(held), "{held:?}");
++        }
++        for past in [
++            aim(-3_201, 10, 0),
++            aim(8_001, 10, 0),
++            aim(0, 2_001, 0),
++            aim(0, 10, -2_401),
++            aim(0, 10, 2_401),
++        ] {
++            assert!(!scene.holds_cm(past), "{past:?}");
++        }
++        let raised = build([-1.0, 2.0, -1.0], [1.0, 4.0, 1.0]);
++        assert!(raised.holds_cm(aim(0, 200, 0)) && raised.holds_cm(aim(0, 400, 0)));
++        assert!(!raised.holds_cm(aim(0, 199, 0)) && !raised.holds_cm(aim(0, 401, 0)));
++        // "No aim yet", and any aim with the type's least x, is held on no map, the widest one included.
++        let widest = build([-327.67, 0.0, -327.67], [327.67, 655.35, 327.67]);
++        assert!(widest.holds_cm(aim(-32_767, 65_535, 32_767)));
++        for world in [&scene, &raised, &widest] {
++            assert!(!world.holds_cm(AimCm::NONE));
++            assert!(!world.holds_cm(aim(i16::MIN, 10, 0)));
++        }
++        // A world with no box holds no aim at all.
++        let past = build([400.0, 0.0, 0.0], [500.0, 10.0, 10.0]);
++        assert_eq!(past.bounds_cm(), None);
++        assert!(!past.holds_cm(aim(32_767, 0, 0)) && !past.holds_cm(aim(0, 0, 0)));
++    }
++
++    #[test]
++    fn bounds_that_are_not_finite_or_flat_are_refused() {
++        let refused = |min, max| StaticWorld::build(&bounded(min, max)).expect_err("no world");
++        let (min, max) = SCENE;
++        for bad in [f64::NAN, f64::INFINITY, f64::NEG_INFINITY, 1e39, -1e39] {
++            for axis in 0..3 {
++                let (mut low, mut high) = (min, max);
++                low[axis] = bad;
++                assert_eq!(refused(low, max), WorldError::Bounds, "{bad} {axis}");
++                high[axis] = bad;
++                assert_eq!(refused(min, high), WorldError::Bounds, "{bad} {axis}");
++            }
++        }
++        // No thickness: one face twice, the faces the wrong way round, and two doubles one `f32` apart.
++        assert_eq!(refused([0.0, 1.0, 0.0], [1.0, 1.0, 1.0]), WorldError::Bounds);
++        assert_eq!(refused([0.0, 0.0, 2.0], [1.0, 1.0, 1.0]), WorldError::Bounds);
++        assert_eq!(
++            refused([100.0, 0.0, 0.0], [100.000_000_1, 1.0, 1.0]),
++            WorldError::Bounds
++        );
++        assert_eq!(
++            WorldError::Bounds.message(),
++            "the map's bounds have a corner that is not a finite number, or no thickness on one of their axes"
++        );
++    }
++
+     #[test]
+     fn a_ray_meets_the_first_shape_on_its_way_and_the_lower_index_of_two_at_one_distance() {
+         let built = world(yard());
 diff --git a/crates/sim/src/lib.rs b/crates/sim/src/lib.rs
 index d480ef0c..01a07b80 100644
 --- a/crates/sim/src/lib.rs
@@ -867,3 +2000,43 @@ index 28a50a56..9231c40c 100644
 +        }
 +    }
  }
+diff --git a/packages/types/src/generated/content/schema/map.schema.json b/packages/types/src/generated/content/schema/map.schema.json
+index acba292e..82ca8a3f 100644
+--- a/packages/types/src/generated/content/schema/map.schema.json
++++ b/packages/types/src/generated/content/schema/map.schema.json
+@@ -19,7 +19,7 @@
+       "additionalProperties": {
+         "not": {}
+       },
+-      "description": "The box every spawn, shape and region lies in.",
++      "description": "The box every spawn, shape and region lies in; its bottom is the ground.",
+       "properties": {
+         "max": {
+           "description": "The highest corner, x, y and z, in metres: on whole centimetres, above the lowest on every axis, inside the aim's reach.",
+diff --git a/packages/types/src/generated/protocol/AimPoint.ts b/packages/types/src/generated/protocol/AimPoint.ts
+index f28564f2..6cad0349 100644
+--- a/packages/types/src/generated/protocol/AimPoint.ts
++++ b/packages/types/src/generated/protocol/AimPoint.ts
+@@ -4,6 +4,8 @@
+  * The world point the player aims at (ADR 0001 part 5: "at most 80 bits"). Provisional as a whole: the step of
+  * 1 cm and the widths are borrowed from the snapshot encoding of entity positions (part 6, E3); the codec sets them
+  * under PM-0001-51. The encoder clamps to the map: E3's height is 12 bits (0 to 40.95 m), and `y` here holds more.
++ * x -32,768 with y 0 and z 0 means "no aim in this command" ([`AimPoint::NONE`]): a room takes it without asking the
++ * map's bounds, and refuses any other aim outside them.
+  */
+ export type AimPoint = { 
+ /**
+diff --git a/packages/types/src/generated/protocol/Command.ts b/packages/types/src/generated/protocol/Command.ts
+index 59ffc412..7af1063d 100644
+--- a/packages/types/src/generated/protocol/Command.ts
++++ b/packages/types/src/generated/protocol/Command.ts
+@@ -15,7 +15,8 @@ tick: number,
+  */
+ sequence: number, 
+ /**
+- * The move vector's x; the vector's length is at most 1. Provisional: its scale and width.
++ * The move vector's x; the vector's length is at most 1, and a room refuses a longer one. Provisional: its scale
++ * and width.
+  */
+ move_x: number, 
+ /**
