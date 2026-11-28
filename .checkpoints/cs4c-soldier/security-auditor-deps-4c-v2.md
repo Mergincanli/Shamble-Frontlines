@@ -48,3 +48,65 @@ Builds on security-auditor-deps-4c.md (APPROVE with F1, F2, item 3). Read only; 
   content's range check (finite, [0, 360)) and the quarter-turn reduction, so item 3 asks for: content refusing NaN,
   inf, negative and >= 360 facings (with bites), and the vectors run natively with overflow checks on (release
   profile), no panic. Input is content (authored, loaded server-side), not network data.
+- [x] 1 re-checked after the cargo calls: `sha256sum -c` of the five in `.gate/deps-4c`: five OK (lock not rewritten).
+  The scratch worktree's own git status was not read (the guard refuses git with -C, and a cd in front of git is
+  refused by the brief's shell rule); the five digests and the patch's rebuild from a4e93679 carry "nothing else moved"
+  for the batch, which is the patch, not the scratch tree.
+- [x] 4c corrected. Scope of "one generic path": `cfg` grep of sincos.rs, rem_pio2.rs, k_sin.rs, k_cos.rs,
+  rem_pio2_large.rs, floor.rs: sincos.rs:58-61 debug_assertions only (an unreachable `_` arm of `n & 3`);
+  rem_pio2.rs:56 x86 without sse2 only; rem_pio2_large.rs:29/:41 the IPIO2 table's LENGTH differs by pointer width
+  (66 on wasm32, 690 on 64-bit; the extra entries serve quad precision), and :237 a debug_assert. So the reached path
+  (direct |x| <= pi/4, medium rem_pio2) is one code on wasm32, x86_64 and aarch64; rem_pio2_large is the one place
+  that differs by target, and it is unreachable for r in [0, pi/2). Withdrawn: my "upstream's no_panic CI does not
+  exercise overflow checks" (no source read for it). Kept: our profile has overflow checks on for libm
+  (Cargo.toml:110-111), so the vectors run natively in the release profile must show no panic.
+- [x] 2' input grounded. The facing is content: crates/content/src/map.rs:66 `FACING` range [0, 360) (min inclusive,
+  max exclusive), read at :185 `entry.number(&FACING)?`; JSON has no NaN or infinity; schema.rs:605-619 bites 360 and
+  the double below 0. -0.0 passes `>= 0.0` (RR3's `+ 0.0` canonicalisation answers it). Loaded server-side from our
+  own bundle: a panic would be a server DoS from content data, so the check stays in scope.
+- [x] 5 scan deadline. The batch's manifest line is what makes `libm::` resolvable in sim; from that commit on,
+  `libm::expm1(` would compile and pass the scan. So RR1's rule lands in the commit that applies this batch (F1's
+  commit), even if exp or sincos first joins later; the allowances join with their call sites.
+
+## Answer
+Verdict: APPROVE, on exactly: Cargo.toml fc436ec36d3d54808012df5f6d830a11f80fb2e2272c8f9c0ec6975da35a49a8, Cargo.lock
+b7c6ee5de5fe0a89ba819a1f67159d481763758bedfa67f607401a5a25468910, crates/sim/Cargo.toml
+c7432b0346817b407417e38b264c462450c8168694b0f39a84b02218288a65c8, crates/room/Cargo.toml
+79b829a9ee954108082b0ec83aeeb1c4553fe67806b0c3dfc69f4c5d50319c5c, crates/client-endpoint/Cargo.toml
+22e2c5bf5795e9a93584dbf23abb4dc06645121d98563e5ca560f6b3790a58f9, and the patch deps-4c-v2.diff
+0edaf8f3ff1610f6a29ae71ec22ae4d9028157d5d3e6e34672e9c723ce7c8b7b. Checked: v1 -> v2 differs only in the root comment
+(3 lines -> 4, its hunk header); the patch rebuilds exactly the five from a4e93679 (whose manifests equal 8bee8365's);
+`git apply --check` OK; `cargo metadata --offline --locked` exit 0; libm features default + arch, tree = the first
+answer's after file modulo path. Pure ASCII, no CR. No new finding on the batch.
+
+F1 (Medium) stands as written (dependency_rules.rs:141-148 still red with the batch; tightened update in the same
+commit), and gains: the exact-line pin of sim's table is also what stops a renamed libm dependency
+(`m = { package = "libm" }`) slipping past the scan, which keys on the token `libm`.
+F2 (Low) stands for layering.rs (still absent). Its root-comment half now closes when the same commit holds: one
+maths-allowed.mjs entry per libm path the players' real build prints (expected libm::math::exp, ::sincos, ::rem_pio2,
+::rem_pio2_large; exact module paths, no entry covering a sibling, never a `libm::math` prefix), each with its why;
+the sincos and exp vectors; and maths-allowed.mjs:9-10's "The simulation itself calls no maths routine" rewritten.
+
+Item 3, corrected:
+- Scan (RR1, replaces answer 1's first bullet): libm under the collision library's rule, stricter: named in one file
+  of sim only, never imported (no `use libm`, `use libm::{..}`, `use libm::*`, `as`, `pub use`, `extern crate`),
+  full-path calls `libm::<name>(` only, one allowance per (function, routine) pair (easing-share setup -> exp,
+  spawn-facing function -> sincos), every other libm path refused by construction. Bites: `libm::expm1(` and
+  `libm::sincos(` in another function of that file, `libm::sincosf(`, `libm::expf(`, `use libm::{exp};` + bare
+  `exp(`, `use libm::*;`, `::libm::exp(` outside the site, `extern crate libm as m;`, libm named in a second file.
+  Controls: the two sites pass. Lands in the commit that applies this batch (the line makes libm resolvable).
+- Maths list (RR4): the entries above, from the real build's names (libmProblems, build-checks.mjs:776-788, covers an
+  entry and its `::` children only). BANNED_MATHS keeps the C names exp/sincos refused.
+- PM-0004-22 vectors for sincos (RR4): the 90,000-point 0.001-degree grid on [0, 90), >= 10,000 seeded doubles, the
+  edges (0, 45 and the double below it, the double below 90, r under 2^-27 sqrt 2), the full facings 0/90/180/270 and
+  the double below 360 through the quarter turns (no -0.0 out: RR3's `0.0 - v` and `+ 0.0`, with the `-v` plant);
+  K pinned by bits (0x3f91df46a2529d39); bit-identical natively, in Node and each engine, against the correctly
+  rounded reference; and run natively in the release profile (overflow checks on for libm, Cargo.toml:110-111) with
+  no panic. Exp's vectors as in answer 1.
+- Domain (new): rem_pio2_large is linked but is the only target-dependent code (rem_pio2_large.rs:29/:41) and is
+  unreachable only because content refuses facings outside [0, 360) (map.rs:66, :185; schema.rs:605-619). That check
+  stays, with its bites; the reduction to r in [0, 90) is tested to hold for every accepted input (RR3's Sterbenz run).
+- Feature pin: unchanged (default + arch; unstable-intrinsics and force-soft-floats refused). sincos needs no feature.
+  Reached path (direct and rem_pio2 medium) has no arch override and no fma (cfg grep of the six files).
+
+DONE

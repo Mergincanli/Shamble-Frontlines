@@ -10,7 +10,7 @@
   `/home/user/Shamble-Frontlines` is never switched.
 - **Base:** origin/main dae6d107fdbe942567104bcf1c9a2cbc6b3a1e0f (pull request #79's merge commit), taken in by
   fast-forward from b7145273.
-- **Last update:** 2026-11-28 02:48 Amsterdam (from the clock; an earlier save said 01:08, a time written without
+- **Last update:** 2026-11-28 02:49 Amsterdam (from the clock; an earlier save said 01:08, a time written without
   reading the clock: it was 00:57; an edit at 02:04 wrote "02:06", also unread, corrected here)
 
 ## Steps done
@@ -108,12 +108,11 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
 1. **His answers** (the question file's eleven; the Testlines read and the CI Builder's request in the chat). On each:
    step 0 when PASTE-BREAKS, BOARD-WORDS and DESIGN-CLASH are in (condition 8; BOARD-WORDS (b)'s method written first,
    condition 7); step S's six reviews by SIZE-4C; STREET-GREY before 4c-1 merges.
-2. **The dependency batch: answered** (APPROVE, 2026-11-28; `dependency-check.md` written by its form, the five
+2. **The dependency batch: answered twice** (APPROVE on the first version; reworded for FACING-SPAWN (a) and APPROVE
+   again on `deps-4c-v2.diff`, `security-auditor-deps-4c-v2.md`; `dependency-check.md` rewritten from it, the five
    digests checked again with `sha256sum` against the scratch worktree). The batch is applied only in the step that
-   first needs it, after SIZE-4C, in one commit with F1's test and F2's layering test; FACING-SPAWN is settled before,
-   since its option (a) would change the root comment the auditor answered on (then a new answer). For rust-reviewer
-   when exp is first called: the answer's item 3 (one named allowance in `rules_scan.rs`, the exact paths in
-   `maths-allowed.mjs`, PM-0004-22's vectors, the feature pin, one exhaustive native run).
+   first needs it, after SIZE-4C, in one commit with F1's tightened test, F2's layering test and the maths list's four
+   entries with their vectors, and the scan's stricter libm rule (item 3, corrected by rust-reviewer's RR1 and RR4).
 3. **The advisor agent's item 10, as notes and prototypes only (condition 2):** rust-reviewer's block 6 (the bodies
    3a, 3b and 2 on block 5's "not run" list: ramp sides with the set-back, a ceiling on a made map, landing, the push
    with two soldiers; what the 2.5D form does with a shape whose bottom is above the ground; its yes or no on the
@@ -173,8 +172,10 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   Low: `tests/layering.rs` lands in the same commit), both written in `dependency-check.md`. No saver runs: the main
   session commits and pushes the notes by hand, at least every 25 minutes, and holds notes pushes while a code head's
   toolchain run is going.
-- **Next:** wait for his answers (the question file's eleven, and the two asks in the chat); meanwhile only notes and
-  prototypes (condition 2): the advisor agent's item 10 before steps 1 to 7.
+- **Next:** wait for his answers (the question file's twelve with FALL-STEP, and the two asks in the chat); meanwhile
+  only notes and prototypes (condition 2). The advisor agent's item 10 stands as far as it goes without him (the
+  sheet's revision 3.2, section H's table); it is asked to approve steps 1 to 7 only once his answers on BODY-SHAPE,
+  SWEEP-ROUTE (DEPART-4C) and the slope (MOVE-RULES row 9) are in, with FALL-STEP.
 
 ## Running work
 - Design reads against main dae6d107 (at most three agents at a time), each writing only its own file in
@@ -273,7 +274,14 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
     the meaning netcode-architect's 2.1 (:240) gives the owner's aim, with no wire change (for netcode-architect to
     note at step 2's review). A world with no aim area: NO constructor change (the loader already refuses such a
     playable map, map.rs:13-14; only a map built in code can lack it, and it fails safe), one room test with a planted
-    panic, about 0 / 10. So "no aim yet" has all three yeses. Running from
+    panic, about 0 / 10. So "no aim yet" has all three yeses.
+    **security-auditor on the reworded batch DONE: APPROVE** on its five digests (Cargo.toml fc436ec3..., the other
+    four unchanged) and the patch (0edaf8f3...); F1 stands (with the renamed-dependency point); F2 stands, its root
+    comment half closing with the maths list's four exact entries, the exp and sincos vectors and maths-allowed.mjs:9-10
+    rewritten in the same commit; item 3 corrected by RR1 and RR4 (the scan's stricter libm rule lands in the commit
+    that applies the batch; content's refusal of facings outside [0, 360) stays, since it keeps rem_pio2_large, the
+    one target-dependent routine, unreachable). `dependency-check.md` rewritten from it (02:49 Amsterdam, from the clock). No agent
+    runs now. Earlier note, kept: running from
     02:44 Amsterdam: security-auditor on the reworded batch (with RR1's correction of its item 3), rust-reviewer's
     block 8 and engine-architect's block 6 ("no aim yet"; the aim area in the constructors).
 - **The sheet's revision 3** (from 02:14 Amsterdam): the record rule applied with its confirmations outstanding, the
