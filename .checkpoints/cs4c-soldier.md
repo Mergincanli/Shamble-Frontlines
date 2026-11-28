@@ -221,6 +221,26 @@ answers SIZE-4C only step 0 and step S go on the branch; afterwards notes and pr
   `/home/user/Shamble-Frontlines/.gate/cs4b-2`. A session of another account works on its own branch from this
   branch's head and never pushes here (his Lanes rule). SEAT-OUT from him: stop at a whole point and report the last
   commit's id.
+- **C4's order of work (written 18:16 Amsterdam, from the clock; the design's pointers are in the 17:52 state
+  below):** (1) sim world.rs: `PLAYER_SLOT`, `PLAYER_TEAM`, `MOVE_REACH`, `move_in_reach`; `PlayerCommand` gains
+  `move_x`, `move_y: i8` and `aim: AimCm` (NONE with `AimCm::NONE`); `PlayerRecord { buttons, presses }` and `NONE`;
+  `World { tick, player: PlayerRecord, soldiers, seed }`; `World::new(setup, &Rules, &[SpawnPoint])` (slot 0 at the
+  first point, grounded, stamina full, NONE aim; no soldier when the table is empty); the fold (oldest first: the
+  newest's buttons and presses are the record; each command's move into `held_move`, a real aim into `aim_cm`; no row
+  touched on an empty slot); `visit` and `visit_shared` with the 48 rows of 60 bytes (2,902 shared bytes);
+  `StateSink::f32`; `authority_step(commands)` still takes no rules (C5 adds them). (2) soldiers.rs's row visited in
+  11.2's order. (3) collision.rs `bounds_cm`, `holds_cm`, the cm derivation in `build`, `WorldError::Bounds`. (4) content
+  map.rs `on_grid` `pub`, GROUND's words. (5) room: `statics`, `Room::new(.., &Rules, statics, &[SpawnPoint])`,
+  `Room::statics()`, the fill, `refused_move`, `refused_aim`, `refused()`, the doc, the NONE tie, the join on
+  `PLAYER_SLOT`/`PLAYER_TEAM`, queue.rs's literal, any_bytes. (6) protocol `AimPoint::NONE`, messages.rs:117. (7)
+  endpoint.rs:258's NONE. (8) sim-wasm `local_constants`, `CreateError::Rules` and `::Soldier`, `LocalMatch::new(..,
+  &Rules, statics, &[SpawnPoint])` without `world` and `static_world()`, step_alloc.rs. (9) devtools: replay.rs's
+  `Lines` gains `f32`, hash_cost.rs, the recordings made again (the frozen bundle is C2's: no re-freeze; the `.hashes`
+  now move, as the state does), the vectors' `vector.txt`. (10) `maths-allowed.mjs`'s entries for what the players'
+  build then prints (about 14, B17-6), each with its reason. (11) sim/tests/state_hash_alloc.rs. (12) lib.rs's
+  re-exports. (13) the tests of rows 22, 25, 27, 28, 31, 33, 34, 35, 36, 37, 38 (bar the direct feed), 39; world.rs's
+  known answers re-made by a second implementation written for it in the notes (no committed script exists: earlier
+  change-sets' agents wrote theirs in notes), `world-known-answers-c4.py`, FNV-1a 64 over the canonical bytes.
 - **State (18:13 Amsterdam, from the clock): C3's fix pass committed after this notes commit (the code head, so CI
   runs on it); its full local checks passed (`.gate/local-checks-c3b.log`: the players' file 58548ac7..., unchanged;
   Node 41 of 41; the browser tests 29 of 29 in 212 s), the gate PASS (`.gate/gate-c3b.log`), the tree byte for byte
